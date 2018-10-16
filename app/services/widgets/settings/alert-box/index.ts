@@ -1,3 +1,4 @@
+import uuid from 'uuid/v4';
 import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
@@ -26,10 +27,7 @@ const REGEX_TESTERS = Object.keys(API_NAME_MAP).map((key) => (
   { name: API_NAME_MAP[key], tester: new RegExp(`^${key}s?_|show_${key}_`) }
 ));
 
-export interface IAlertBoxData extends IWidgetData {
-  settings: IAlertBoxSettings;
-}
-
+export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; }
 
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
@@ -59,7 +57,6 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   protected patchBeforeSend(settings: IAlertBoxSettings) {
-
     return settings;
   }
 
@@ -98,8 +95,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   private varifySetting(setting: any): IAlertBoxSetting {
     const { show_message, enabled, variations, ...rest } = setting;
     const defaultVariation = this.reshapeVariation(rest);
-    variations.unshift(defaultVariation);
-    return { showMessage: show_message, enabled, variations };
+    const idVariations = variations.map((variation: IAlertBoxVariation) => ({ id: uuid(), ...variation }))
+    idVariations.unshift(defaultVariation);
+    return { showMessage: show_message, enabled, variations: idVariations };
   }
 
   private reshapeVariation(setting: any): IAlertBoxVariation {
@@ -108,6 +106,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: null,
       conditions: [],
       name: 'Default',
+      id: uuid(),
       settings: {
         customCss: setting.custom_css,
         customHtml: setting.custom_html,

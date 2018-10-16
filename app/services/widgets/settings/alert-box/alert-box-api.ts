@@ -31,6 +31,7 @@ export interface IAlertBoxVariation {
   conditionData: any;
   conditions: { type: string, description: string }[];
   name: string;
+  id: string;
   settings: {
     customCss: string;
     customHtml: string;
