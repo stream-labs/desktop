@@ -391,7 +391,6 @@ export class PlatformAppsService extends
 
   unloadApp(app: ILoadedApp) {
     this.REMOVE_APP(app.id);
-    this.appUnload.next(app.id);
     if (app.unpacked) {
       localStorage.removeItem(this.localStorageKey);
       if (this.devServer) {
@@ -399,6 +398,7 @@ export class PlatformAppsService extends
         this.devServer = null;
       }
     }
+    this.appUnload.next(app.id);
   }
 
   async reloadApp(appId: string) {
