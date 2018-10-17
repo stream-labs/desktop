@@ -14,7 +14,6 @@ import { cloneDeep } from 'lodash';
 import { IObsListInput } from '../../components/obs/inputs/ObsInput';
 import {IpcServerService} from '../ipc-server';
 import {AudioService, IAudioSource} from '../audio';
-import {FileManagerService} from '../file-manager';
 import * as fs from 'fs';
 
 interface IBrandDeviceUrls {
@@ -56,7 +55,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private audioService: AudioService;
   @Inject() private ipcServerService: IpcServerService;
-  @Inject() private fileManagerService: FileManagerService;
 
 
   serviceEnabled() {
