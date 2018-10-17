@@ -178,21 +178,6 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       up: (sourceId) => getSourcesService().setMuted(sourceId, true),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    },
-    /* 
-      If the backend send a hotkey with a name that isn`t on this array it will
-      result in a crash, for now each hotkey registered by the backend will have
-      its name set to 'BACKEND_SOURCE' so it won`t be a problem anymore.
-      The ideal would be to receive a backend hotkey and use its name correctly,
-      so we could have there static hotkeys here and dynamic ones (those that
-      come from the backend).
-    */
-    {
-      name: 'BACKEND_SOURCE',
-      description: () => $t('Dummy'),
-      down: (sourceId) => {},
-      up: (sourceId) => {},
-      shouldApply: (sourceId) => false
     }
   ]
 };
@@ -292,9 +277,8 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
         if(!hotkey) {
           this.sourceHotkeyInfos.push(hotkeyInfo);
-
+          this.invalidate();
         }
-        this.invalidate();
       }
     );
   }
@@ -506,7 +490,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
           if(hotkey.hotkeyId) { // If this is a hotkey registered directly by a source
             obs.NodeObs.ProcessHotkeyStatus(hotkey.hotkeyId, true, hotkey.sourceId)
           } else {
-            hotkey.action.upHandler();
+            hotkey.action.downHandler();
           }
         })
       });
