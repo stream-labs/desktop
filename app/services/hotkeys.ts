@@ -152,14 +152,14 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
 
   SOURCE: [
     {
-      name: 'TOGGLE_MUTE',
+      name: 'MUTE',
       description: () => $t('Mute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, true),
       isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
-      name: 'TOGGLE_UNMUTE',
+      name: 'UNMUTE',
       description: () => $t('Unmute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
@@ -284,7 +284,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.sourceHotkeyInfos = [];
     obs.NodeObs.ConnectHotkeyCallback(
       (hotkeyInfo: IBackendSourceHotkeyInfo) => {
-        this.sourceHotkeyInfos.push(hotkeyInfo);
+
+        // Check if we already handle this case by hand here
+        const hotkey = HOTKEY_ACTIONS.SOURCE.find(hotkey => {
+          return hotkey.name == hotkeyInfo.hotkeyName;
+        });
+
+        if(!hotkey) {
+          this.sourceHotkeyInfos.push(hotkeyInfo);
+
+        }
         this.invalidate();
       }
     );

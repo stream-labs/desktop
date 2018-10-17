@@ -138,6 +138,7 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       this.crashReporterService.endShutdown();
+      obs.NodeObs.DisconnectHotkeyCallback();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
