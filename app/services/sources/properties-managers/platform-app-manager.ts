@@ -64,7 +64,8 @@ export class PlatformAppManager extends PropertiesManager {
   updateUrl() {
     const url = this.platformAppsService.getPageUrlForSource(
       this.settings.appId,
-      this.settings.appSourceId
+      this.settings.appSourceId,
+      this.settings.appSettings
     );
 
     // This app was uninstalled or unsubscribed to

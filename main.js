@@ -318,7 +318,7 @@ app.on('ready', () => {
       version: pjson.version,
       exec: process.argv,
       cwd: process.cwd(),
-      waitPid: [ process.pid ],
+      waitPids: [ process.pid ],
       appDir: path.dirname(app.getPath('exe')),
       tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
       cacheDir: app.getPath('userData'),
@@ -469,4 +469,8 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
   webContents.fromId(id).on('will-navigate', e => {
     e.preventDefault();
   });
+});
+
+ipcMain.on('getMainWindowWebContentsId', e => {
+  e.returnValue = mainWindow.webContents.id;
 });

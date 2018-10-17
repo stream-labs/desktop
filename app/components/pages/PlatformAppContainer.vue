@@ -1,25 +1,11 @@
 <template>
 <div class="platform-app-container">
-  <div v-if="isPopOutAllowed" class="platform-app-controls">
-    <button
-      @click="popOut"
-      class="button button--default"
-      :disabled="params.poppedOut">
-      Pop Out
-    </button>
-    <button
-      v-if="isUnpacked"
-      @click="refreshApp"
-      class="button button--default">
-      Reload
-    </button>
-  </div>
   <PlatformAppWebview
     v-if="!params.poppedOut"
     class="platform-app-webview"
     :appId="params.appId"
     :pageSlot="slot" />
-  <div v-else>
+  <div v-else class="platform-app-popped-out">
     This app is currently popped out into an external window.
   </div>
 </div>
@@ -34,6 +20,10 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.platform-app-popped-out {
+  .padding();
 }
 
 .platform-app-controls {

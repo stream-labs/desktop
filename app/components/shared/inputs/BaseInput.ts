@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
+import ValidatedForm from './ValidatedForm.vue';
 
 export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
@@ -22,7 +23,9 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
-    if (this.$parent['emitInput']) this.$parent['emitInput'](eventData, event);
+    if (this.$parent instanceof ValidatedForm) {
+      this.$parent.emitInput(eventData, event);
+    }
   }
 
   getValidations() {

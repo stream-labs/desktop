@@ -201,6 +201,35 @@ async function getVersion(info) {
  * we're out of date should we actually tell the app
  * to close so we can update. */
 async function entry(info) {
+    try {
+        statusWindow = new BrowserWindow({
+            width: 400,
+            height: 180,
+            frame: false,
+            resizable: false,
+            show: false
+        });
+
+        statusWindow.on('closed', () => {
+            statusWindow = null;
+        });
+
+        /* 20 minutes in documentation and I still can't
+         * tell if this does what I'm wanting */
+        statusWindow.webContents.on('destroyed', () => {
+            statusWindow = null;
+        });
+
+        statusWindow.on('ready-to-show', () => {
+            statusWindow.show();
+        });
+
+        statusWindow.loadURL('file://' + __dirname + '/index.html');
+    } catch (error) {
+        if (statusWindow) statusWindow.close();
+        statusWindow = null;
+    }
+
     const latestVersion = await getVersion(info);
 
     /* Latest version doesn't necessarily need
@@ -226,25 +255,6 @@ async function entry(info) {
         return false;
     }
 
-    try {
-        statusWindow = new BrowserWindow({
-            width: 400,
-            height: 180,
-            frame: false,
-            resizable: false,
-            show: false
-        });
-
-        statusWindow.on('ready-to-show', () => {
-            statusWindow.show();
-        });
-
-        statusWindow.loadURL('file://' + __dirname + '/index.html');
-    } catch (error) {
-        if (statusWindow) statusWindow.close();
-        statusWindow = null;
-    }
-
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
     ensureDir(info.tempDir);
@@ -252,10 +262,7 @@ async function entry(info) {
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, (progress) => {
-        if (!statusWindow) return;
-        statusWindow.webContents.send('bootstrap-progress', progress);
-    });
+    const updaterPath = await fetchUpdater(info, progress => {});
 
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
@@ -269,9 +276,14 @@ async function entry(info) {
         '--force-temp'
     ];
 
-    for (pid in info.waitPids) {
-        updaterArgs.push_back('-p');
-        updaterArgs.push_back(pid);
+    info.waitPids.forEach((pid) => {
+        updaterArgs.push('-p');
+        updaterArgs.push(pid);
+    });
+
+    if (statusWindow) {
+        updaterArgs.push('-p');
+        updaterArgs.push(statusWindow.webContents.getOSProcessId());
     }
 
     console.log(updaterArgs);
