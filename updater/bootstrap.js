@@ -192,7 +192,69 @@ async function getVersion(info) {
     return response.body.version;
 }
 
-async function start(info, latestVersion) {
+/* Note that we return true when we fail to fetch
+ * version correctly! This is to make sure we don't
+ * bork the user due to update error. It's better to
+ * let the user use an out of date application than
+ * not to use it at all in this case. Only in the
+ * case that we correctly fetch version and know that
+ * we're out of date should we actually tell the app
+ * to close so we can update. */
+async function entry(info) {
+    try {
+        statusWindow = new BrowserWindow({
+            width: 400,
+            height: 180,
+            frame: false,
+            resizable: false,
+            show: false
+        });
+
+        statusWindow.on('closed', () => {
+            statusWindow = null;
+        });
+
+        /* 20 minutes in documentation and I still can't
+         * tell if this does what I'm wanting */
+        statusWindow.webContents.on('destroyed', () => {
+            statusWindow = null;
+        });
+
+        statusWindow.on('ready-to-show', () => {
+            statusWindow.show();
+        });
+
+        statusWindow.loadURL('file://' + __dirname + '/index.html');
+    } catch (error) {
+        if (statusWindow) statusWindow.close();
+        statusWindow = null;
+    }
+
+    const latestVersion = await getVersion(info);
+
+    /* Latest version doesn't necessarily need
+    * to be greater than the current version!
+    * If it's different, update to latest. */
+    if (!latestVersion) {
+        console.log('Failed to fetch latest version!');
+        return false;
+    }
+
+    if (semver.eq(info.version, latestVersion)) {
+        console.log('Already latest version!');
+        return false;
+    }
+
+    if (semver.gt(info.version, latestVersion)) {
+        console.log('Latest version is less than current version!');
+        return false;
+    }
+
+    if (!await checkChance(info, latestVersion)) {
+        console.log('Failed the chance lottery. Better luck next time!');
+        return false;
+    }
+
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
     ensureDir(info.tempDir);
@@ -200,10 +262,7 @@ async function start(info, latestVersion) {
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, (progress) => {
-        if (!statusWindow) return;
-        statusWindow.webContents.send('bootstrap-progress', progress);
-    });
+    const updaterPath = await fetchUpdater(info, progress => {});
 
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
@@ -238,76 +297,6 @@ async function start(info, latestVersion) {
 
     if (statusWindow) statusWindow.close();
     return true;
-}
-
-/* Note that we return true when we fail to fetch
- * version correctly! This is to make sure we don't
- * bork the user due to update error. It's better to
- * let the user use an out of date application than
- * not to use it at all in this case. Only in the
- * case that we correctly fetch version and know that
- * we're out of date should we actually tell the app
- * to close so we can update. */
-async function entry(info) {
-    const latestVersion = await getVersion(info);
-
-    /* Latest version doesn't necessarily need
-    * to be greater than the current version!
-    * If it's different, update to latest. */
-    if (!latestVersion) {
-        console.log('Failed to fetch latest version!');
-        return false;
-    }
-
-    if (semver.eq(info.version, latestVersion)) {
-        console.log('Already latest version!');
-        return false;
-    }
-
-    if (semver.gt(info.version, latestVersion)) {
-        console.log('Latest version is less than current version!');
-        return false;
-    }
-
-    if (!await checkChance(info, latestVersion)) {
-        console.log('Failed the chance lottery. Better luck next time!');
-        return false;
-    }
-
-    try {
-        statusWindow = new BrowserWindow({
-            width: 400,
-            height: 180,
-            frame: false,
-            resizable: false,
-            show: false
-        });
-
-        statusWindow.on('closed', () => {
-            statusWindow = null;
-        });
-
-        /* 20 minutes in documentation and I still can't
-         * tell if this does what I'm wanting */
-        statusWindow.webContents.on('destroyed', () => {
-            statusWindow = null;
-        });
-
-        const retPromise = new Promise((resolve, reject) => {
-            statusWindow.on('ready-to-show', () => {
-                statusWindow.show();
-                resolve(start(info, latestVersion));
-            });
-        });
-
-        statusWindow.loadURL('file://' + __dirname + '/index.html');
-
-        return retPromise;
-    } catch (error) {
-        if (statusWindow) statusWindow.close();
-        statusWindow = null;
-        return start(info, latestVersion);
-    }
 }
 
 module.exports = async (info) => {

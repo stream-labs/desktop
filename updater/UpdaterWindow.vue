@@ -1,26 +1,8 @@
 <template>
 <div class="UpdaterWindow">
-  <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
-  {{ message }}
-  <div v-if="(percentComplete !== null) && !installing && !error" class="UpdaterWindow-progressBarContainer">
-    <div
-      class="UpdaterWindow-progressBar"
-      :style="{ width: percentComplete + '%' }"/>
-    <div class="UpdaterWindow-progressPercent">
-      {{ percentComplete }}%
-    </div>
-  </div>
-  <div class="UpdaterWindow-issues" v-if="installing">
-    This may take a few minutes.  If you are having issues updating, please
-    <span class="UpdaterWindow-link" @click="download">
-      download a fresh installer.
-    </span>
-  </div>
-  <div class="UpdaterWindow-issues" v-if="error">
-    There was an error updating. Please
-    <span class="UpdaterWindow-link" @click="download">
-      download a fresh installer.
-    </span>
+  <div>
+    <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
+    {{ message }}
   </div>
 </div>
 </template>
@@ -29,29 +11,11 @@
 const { remote, ipcRenderer } = window.require('electron');
 
 export default {
-
   data() {
     return {
-      message: 'Downloading updater...',
-      installing: false,
-      error: false,
-      percentComplete: null
+      message: 'Checking for updates',
     };
-  },
-
-  mounted() {
-    ipcRenderer.on('bootstrap-progress', (event, data) => {
-      this.percentComplete = Math.floor(data);
-    });
-  },
-
-  methods: {
-    download() {
-      remote.shell.openExternal('https://streamlabs.com/streamlabs-obs');
-      remote.app.quit();
-    }
   }
-
 };
 </script>
 
@@ -72,34 +36,6 @@ export default {
 
 .UpdaterWindow-icon {
   margin-right: 8px;
-}
-
-.UpdaterWindow-progressBarContainer {
-  position: relative;
-  margin-top: 40px;
-  background-color: #09161D;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.UpdaterWindow-progressBar {
-  height: 8px;
-  background-color: #31c3a2;
-}
-
-.UpdaterWindow-progressPercent {
-  width: 100%;
-  text-align: center;
-  color: #BDC2C4;
-  font-size: 14px;
-  margin: 16px 0 24px 0;
-}
-
-.UpdaterWindow-issues {
-  font-size: 13px;
-  font-weight: 300;
-  padding-top: 25px;
-  -webkit-app-region: no-drag;
 }
 
 .UpdaterWindow-link {
