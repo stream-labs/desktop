@@ -51,7 +51,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   alertTypes = this.alertBoxService.apiNames();
 
   selectedAlert = 'general';
-  selectedId: string = null;
+  selectedId = 'default';
 
   get selectedVariation() {
     if (this.selectedAlert === 'general') { return this.wData }
