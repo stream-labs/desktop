@@ -5,15 +5,14 @@ import { mutation, StatefulService } from '../stateful-service';
 import { Inject } from '../../util/injector';
 import { HostsService } from '../hosts';
 import { InitAfter } from '../../util/service-observer';
-import { downloadFile, handleErrors } from '../../util/requests';
+import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TSourceType } from '../sources';
-import { IScenesServiceApi, ScenesService } from '../scenes';
+import { ScenesService } from '../scenes';
 import { cloneDeep } from 'lodash';
 import { IObsListInput } from '../../components/obs/inputs/ObsInput';
 import {IpcServerService} from '../ipc-server';
-import {IJsonRpcRequest} from '../jsonrpc';
 import {AudioService, IAudioSource} from '../audio';
 import {FileManagerService} from '../file-manager';
 import * as fs from 'fs';
@@ -84,10 +83,10 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     });
 
     // uncomment the code below to test brand device steps
-    this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
-    this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
-    this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
-    this.SET_SYSTEM_PARAM('SystemVersion', '1');
+    // this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
+    // this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
+    // this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
+    // this.SET_SYSTEM_PARAM('SystemVersion', '1');
 
 
     this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
@@ -118,7 +117,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       }
 
       if (deviceUrls.record_encoder_url) {
-        await downloadFile(deviceUrls.stream_encoder_url, `${cacheDir}/recordEncoder.json`);
+        await downloadFile(deviceUrls.record_encoder_url, `${cacheDir}/recordEncoder.json`);
       }
 
       if (deviceUrls.overlay_url) {
@@ -136,44 +135,11 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       // process API additional commands, some sources can be setup here
       if (deviceUrls.onboarding_cmds_url) {
         const cmdsPath = `${tempDir}/onboarding_cmds.json`;
-        await downloadFile(deviceUrls.overlay_url, cmdsPath);
+        await downloadFile(deviceUrls.onboarding_cmds_url, cmdsPath);
         const cmds =  JSON.parse(fs.readFileSync(cmdsPath, 'utf8'));
         if (!newSceneCollectionCreated) await this.sceneCollectionsService.create({ name: deviceName });
         for (const cmd of cmds) this.ipcServerService.exec(cmd);
       }
-
-      //
-      // const initialCmds: IJsonRpcRequest[] = [
-      //   {
-      //     "id": '1',
-      //     "jsonrpc": "2.0",
-      //     "method": "addSceneItem",
-      //     "params": {
-      //       "resource": 'BrandDeviceService',
-      //       "args": [
-      //         "Capture Card",
-      //         "dshow_input",
-      //         {
-      //           "sourceSettings": {
-      //             "res_type": 1
-      //             "resolution": "1920x1080",
-      //             "use_custom_audio_device": true
-      //           },
-      //           "sourceFuzzySettings": {
-      //             "audio_device_id": "MZ03080 PCI, Analog 01 WaveIn"
-      //           },
-      //           "audioSettings": {
-      //             "monitoringType": 2
-      //           }
-      //         }
-      //       ]
-      //     }
-      //   }
-      // ];
-      //
-      // this.ipcServerService.exec(initialCmds[0]);
-
-
       return true;
     } catch (e) {
       return false;
@@ -181,8 +147,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   }
 
   /**
-   * The same type of audio and video devices has different id for each PC
-   * This method allows to add devices by part of its name instead of id
+   * This method is calling by autoconfiguration commands from onboarding_cmds.json
    * @Example
    * addSceneItem(
    *  'camera',
