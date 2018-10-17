@@ -4,6 +4,7 @@ import { addSource } from '../helpers/spectron/sources';
 import { logIn, blankSlate } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { sleep } from '../helpers/sleep';
+import { waitForWidgetSettingsSync } from './widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
@@ -87,9 +88,8 @@ test('Stream Boss Manage Battle settings', async t => {
   };
 
   await formMonkey.fill('manage-battle-form', testSet1);
-  t.true(await formMonkey.contains('manage-battle-form', testSet1));
-
-  await sleep(10000);
+  await waitForWidgetSettingsSync(t);
+  t.true(await formMonkey.includes('manage-battle-form', testSet1));
 
   const testSet2 = {
     boss_heal: true,
@@ -102,5 +102,6 @@ test('Stream Boss Manage Battle settings', async t => {
   };
 
   await formMonkey.fill('manage-battle-form', testSet2);
-  t.true(await formMonkey.contains('manage-battle-form', testSet2));
+  await waitForWidgetSettingsSync(t);
+  t.true(await formMonkey.includes('manage-battle-form', testSet2));
 });

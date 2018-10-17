@@ -136,7 +136,7 @@ export class FormMonkey {
     return formData;
   }
 
-  async contains(formName: string, expectedData: Dictionary<any>): Promise<boolean> {
+  async includes(formName: string, expectedData: Dictionary<any>): Promise<boolean> {
     const formData = await this.read(formName);
     return isMatch(formData, expectedData);
   }
