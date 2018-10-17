@@ -76,6 +76,4 @@ export default class StudioFooterComponent extends Vue {
       }
     }
   }
-
-  recordTooltip = $t('Set path in Settings > Output.');
 }
