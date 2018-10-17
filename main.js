@@ -27,6 +27,7 @@ const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 const pid = require('process').pid;
+const crashHandler = require('crash-handler');
 
 app.disableHardwareAcceleration();
 
@@ -63,58 +64,11 @@ function openDevTools() {
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
-function tryConnect(buffer, attempt = 5, waitMs = 100) {
-  console.log('Trying to connect');
-  const net = require('net');
-  const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler');
-   socket.on('connect', () => {
-    console.log('Connected');
-    socket.write(buffer);
-    socket.destroy();
-    socket.unref();
-  });
-   socket.on('error', () => {
-    console.log('Error connecting');
-    socket.destroy();
-    socket.unref();
-    if (attempt > 0) {
-      setTimeout(() => {
-        tryConnect(buffer, attempt - 1, waitMs * 2);
-      }, waitMs);
-    }
-  });
-}
-
-function registerProcess(isCritial = false) {
-  const buffer = new Buffer(512);
-  let offset = 0;
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(isCritial, offset++);
-  buffer.writeUInt32LE(pid, offset++);
-
-  tryConnect(buffer);
-}
-
-function unregisterProcess() {
-  const buffer = new Buffer(512);
-  let offset = 0;
-  buffer.writeUInt32LE(1, offset++);
-  buffer.writeUInt32LE(pid, offset++);
-  
-  tryConnect(buffer);
-}
-
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  // Spawn crash-handler process
-  const { spawn } = require('child_process');
-  const subprocess = spawn('./crash-handler.exe', {
-    detached: true,
-    stdio: 'ignore'
-  });
-  subprocess.unref();
-  registerProcess(false);
+  crashHandler.startCrashHandler();
+  crashHandler.registerProcess(pid, false);
 
   // Initialize obs-studio-server
   // Set up environment variables for IPC.
@@ -204,7 +158,7 @@ function startApp() {
 
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
-      unregisterProcess();
+      crashHandler.unregisterProcess(pid);
       shutdownStarted = true;
       childWindow.destroy();
       mainWindow.send('shutdown');

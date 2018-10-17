@@ -78,6 +78,7 @@
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz",
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.24/iojs-v2.0.8-signed.tar.gz",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.3/iojs-v2.0.8-crash-handler.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",

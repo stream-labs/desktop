@@ -27,6 +27,8 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
+const crashHandler = window['require']('crash-handler');
+
 interface IAppState {
   loading: boolean;
   argv: string[];
@@ -71,58 +73,9 @@ export class AppService extends StatefulService<IAppState> {
   
   private pid = require('process').pid;
 
-  tryConnect(buffer: Buffer, attempt:number = 5, waitMs:number = 100) {
-    const net = require('net');
-    let socket = net.connect('\\\\.\\pipe\\slobs-crash-handler');
-  
-    socket.on('connect', () => {
-      socket.write(buffer);
-      socket.destroy();
-      socket.unref();
-    });
-  
-    socket.once('error', (message: string) => {
-      socket.destroy();
-      socket.unref();
-      if (attempt > 0) {
-        setTimeout(() => {
-          this.tryConnect(buffer, attempt - 1, waitMs * 2);
-        }, waitMs);
-      }
-    });
-  }
-
-  registerProcess(isCritial:boolean = false) {
-    const buffer = new Buffer(512);
-    let offset = 0;
-    buffer.writeUInt32LE(0, offset++);
-    buffer.writeUInt32LE(isCritial ? 1 : 0, offset++);
-    buffer.writeUInt32LE(this.pid, offset++);
-  
-    this.tryConnect(buffer);
-  }
-
-  unregisterProcess() {
-    const buffer = new Buffer(512);
-    let offset = 0;
-    buffer.writeUInt32LE(1, offset++);
-    buffer.writeUInt32LE(this.pid, offset++);
-  
-    this.tryConnect(buffer);
-  }
-
-  terminateCrashHandler() {
-    const buffer = new Buffer(512);
-    let offset = 0;
-    buffer.writeUInt32LE(2, offset++);
-    buffer.writeUInt32LE(this.pid, offset++);
-
-    this.tryConnect(buffer);
-  }
-
   @track('app_start')
   async load() {
-    this.registerProcess(false);
+    crashHandler.registerProcess(this.pid, false);
     this.START_LOADING();
 
     // Initialize OBS
@@ -176,7 +129,7 @@ export class AppService extends StatefulService<IAppState> {
 
   @track('app_close')
   private shutdownHandler() {
-    this.unregisterProcess();
+    crashHandler.unregisterProcess(this.pid);
     this.START_LOADING();
 
     this.crashReporterService.beginShutdown();
@@ -193,7 +146,7 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
-      this.terminateCrashHandler();
+      crashHandler.terminateCrashHandler(this.pid);
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
