@@ -87,6 +87,12 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         }
       });
       if (!testSuccess && !/smfredemption/.test(key)) newSettings[key] = settings[key];
+
+      // These settings are handled differently and purposely dropped on the floor in reshapeVariation
+      newSettings.bits_alert_min_amount = settings.bits_alert_min_amount;
+      newSettings.donation_alert_min_amount = settings.donation_alert_min_amount;
+      newSettings.host_viewer_minimum = settings.host_viewer_minimum;
+      newSettings.raid_raider_minimum = settings.raid_raider_minimum;
     });
 
     return newSettings;
@@ -106,7 +112,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: null,
       conditions: [],
       name: 'Default',
-      id: uuid(),
+      id: 'default',
       settings: {
         customCss: setting.custom_css,
         customHtml: setting.custom_html,
@@ -129,7 +135,22 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           thickness: setting.font_weight
         },
         textDelay: setting.text_delay,
-        type: ''
+        type: '',
+        message: {
+          minAmount: setting.message_min_amount || setting.alert_message_min_amount,
+          allowEmotes: setting.message_allow_emotes,
+          font: setting.message_font,
+          color: setting.message_font_color,
+          size: setting.message_font_size,
+          weight: setting.message_font_weight
+        },
+        tts: {
+          enabled: setting.tts_enabled,
+          minAmount: setting.tts_min_amount,
+          language: setting.tts_language,
+          security: setting.tts_security,
+          volume: setting.tts_volume
+        }
       }
     };
   }
@@ -157,6 +178,17 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_font_size`]: settings.text.size,
       [`${prefix}_font_weight`]: settings.text.thickness,
       [`${prefix}_text_delay`]: settings.textDelay,
+      [`${prefix}_alert_message_min_amount`]: settings.message.minAmount,
+      [`${prefix}_message_allow_emotes`]: settings.message.allowEmotes,
+      [`${prefix}_message_font`]: settings.message.font,
+      [`${prefix}_message_font_color`]: settings.message.color,
+      [`${prefix}_message_font_size`]: settings.message.size,
+      [`${prefix}_message_font_weight`]: settings.message.weight,
+      [`${prefix}_tts_enabled`]: settings.tts.enabled,
+      [`${prefix}_tts_min_amount`]: settings.tts.minAmount,
+      [`${prefix}_tts_language`]: settings.tts.language,
+      [`${prefix}_tts_security`]: settings.tts.security,
+      [`${prefix}_tts_volume`]: settings.tts.volume
     };
   }
 

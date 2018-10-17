@@ -54,7 +54,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   selectedId: string = null;
 
   get selectedVariation() {
-    if (this.selectedAlert === 'general') { return this.wData.settings }
+    if (this.selectedAlert === 'general') { return this.wData }
     return this.wData.settings[this.selectedAlert].variations.find(
       (variation: IAlertBoxVariation) => variation.id === this.selectedId
     );
@@ -67,7 +67,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
       { value: 'source', label: $t('Source') }
     ] :
     [
-      { value: 'variation-general', label: $t('General Settings') },
+      { value: 'title', label: $t('Title Message') },
       { value: 'media', label: $t('Image & Video') },
       { value: 'meessage', label: $t('Donor Message') },
       { value: 'audio', label: $t('Audio') },

@@ -8,8 +8,6 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   layout: string;
   prime_sub_enabled: boolean;
   moderation_delay: number;
-  recent_events_donation_min_amount: number;
-  recent_events_host_min_viewer_count: number;
   unlimited_media_moderation_delay: boolean;
 
   // SHOW MESSAGES
@@ -23,6 +21,14 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   show_smfredemption_message: boolean;
   show_tiltifydonation_message: boolean;
   show_treat_message: boolean;
+
+  // WHITE-LISTED SETTINGS
+  bits_alert_min_amount: number;
+  donation_alert_min_amount: number;
+  host_viewer_minimum: number;
+  raid_raider_minimum: number;
+  recent_events_donation_min_amount: number;
+  recent_events_host_min_viewer_count: number;
 }
 
 // ALERT VARIATION
@@ -55,6 +61,21 @@ export interface IAlertBoxVariation {
     };
     textDelay: number;
     type: string;
+    message?: {
+      minAmount: number;
+      allowEmotes: boolean;
+      font: string;
+      color: string;
+      size: string;
+      weight: string;
+    };
+    tts?: {
+      minAmount: number;
+      enabled: boolean;
+      language: string;
+      security: number;
+      volume: number;
+    };
   }
 }
 
@@ -102,7 +123,6 @@ interface IAlertBoxBitsSettings {
   bit_variations: IAlertBoxVariation[];
   bits_alert_duration: number;
   bits_alert_message_min_amount: number;
-  bits_alert_min_amount: number;
   bits_custom_css: string;
   bits_custom_html: string;
   bits_custom_html_enabled: boolean;
@@ -139,7 +159,6 @@ interface IAlertBoxBitsSettings {
 interface IAlertBoxDonationSettings {
   donation_alert_duration: number;
   donation_alert_message_min_amount: number;
-  donation_alert_min_amount: number;
   donation_custom_css: string;
   donation_custom_html: string;
   donation_custom_html_enabled: boolean;
@@ -231,7 +250,6 @@ interface IAlertBoxHostSettings {
   host_text_animation: string;
   host_text_delay: number;
   host_variations: IAlertBoxVariation[]
-  host_viewer_minimum: number;
 }
 
 // MERCH
@@ -285,7 +303,6 @@ interface IAlertBoxRaidSettings {
   raid_image_href: string;
   raid_layout: string;
   raid_message_template: string;
-  raid_raider_minimum: number;
   raid_show_animation: string;
   raid_sound_href: string;
   raid_sound_volume: number;
