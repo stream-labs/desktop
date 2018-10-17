@@ -254,7 +254,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.sourcesService.sourceAdded.subscribe(() => this.invalidate());
     this.sourcesService.sourceRemoved.subscribe((source) => {
       
-      // Remove each occurence of this source on the hotkeyInfos (automatical source hotkey)
+      // Remove each occurrence of this source on the hotkeyInfos (automatical source hotkey)
       for(var i=this.sourceHotkeyInfos.length-1; i--;) {
         if(this.sourceHotkeyInfos[i].sourceName && 
           this.sourcesService.getSourceById(this.sourceHotkeyInfos[i].sourceName).sourceId == 
@@ -264,6 +264,8 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       }
 
       this.invalidate();
+      this.updateRegisteredHotkeys();
+      this.bindHotkeys();
     });
 
     this.sourceHotkeyInfos = [];
@@ -278,6 +280,8 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         if(!hotkey) {
           this.sourceHotkeyInfos.push(hotkeyInfo);
           this.invalidate();
+          this.updateRegisteredHotkeys();
+          this.bindHotkeys();
         }
       }
     );
