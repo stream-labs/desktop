@@ -23,8 +23,7 @@
         :disabled="locked"
         class="record-button"
         @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }"
-        v-tooltip.left="recordTooltip">
+        :class="{ active: streamingService.isRecording }">
         <span>REC</span>
       </button>
     </div>
@@ -103,17 +102,13 @@
   position: relative;
   width: 30px;
   height: 30px;
-  background-color: #dcdfe2;
-  border: none;
+  background-color: @day-button;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .6;
   .transition();
   .weight(@bold);
-  border: 1px solid #c4c5c5;
-  box-sizing: content-box;
   letter-spacing: .2px;
 
   span {
@@ -122,19 +117,24 @@
   }
 
   &:hover {
-    opacity: 1;
+    background-color: darken(@day-button, 8%);
   }
 
   &.active {
     opacity: 1;
     animation: pulse 2.5s infinite;
     border: 1px solid @red;
+    background-color: @red;
+
+    span {
+      color: @white;
+    }
   }
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
+    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.6);
   }
   70% {
     box-shadow: 0 0 0 6px rgba(0, 0, 0, 0);
@@ -154,11 +154,14 @@
   }
 
   .record-button {
-    background-color: #3c4c53;
-    border-color: @night-border;
+    background-color: @night-button;
+
+    &:hover {
+      background-color: lighten(@night-button, 8%);
+    }
 
     &.active {
-      border-color: @red;
+      background-color: @red;
     }
 
     &:focus {
