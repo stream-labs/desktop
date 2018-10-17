@@ -8,6 +8,7 @@
 
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <apps-nav v-if="platformApps.length > 0"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
         <custom-loader></custom-loader>
       </div>

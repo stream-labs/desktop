@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
@@ -32,6 +33,7 @@ import electron from 'electron';
   components: {
     TitleBar,
     TopNav,
+    AppsNav,
     Studio,
     Dashboard,
     BrowseOverlays,
