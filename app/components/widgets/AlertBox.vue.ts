@@ -76,6 +76,14 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     ];
   }
 
+  get minTriggerAmount() {
+    return ''
+  }
+
+  get minRecentEvents() {
+    return ''
+  }
+
   selectAlertType(alertName: string) {
     this.selectedAlert = this.selectedAlert === alertName ? 'general' : alertName;
   }
