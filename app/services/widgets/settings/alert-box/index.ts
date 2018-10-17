@@ -56,8 +56,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return { ...rest, settings: newSettings };
   }
 
-  protected patchBeforeSend(settings: IAlertBoxSettings) {
-    return settings;
+  protected patchBeforeSend(settings: IAlertBoxSettings): IAlertBoxApiSettings {
+    return this.flattenSettings(settings);
   }
 
   private transformSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
@@ -132,5 +132,51 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         type: ''
       }
     };
+  }
+
+  private unshapeVariation(variation: IAlertBoxVariation, prefix: string) {
+    const { settings } = variation;
+    return {
+      [`${prefix}_custom_css`]: settings.customCss,
+      [`${prefix}_custom_html`]: settings.customHtml,
+      [`${prefix}_custom_html_enabled`]: settings.customHtmlEnabled,
+      [`${prefix}_custom_js`]: settings.customJs,
+      [`${prefix}_custom_json`]: settings.customJson,
+      [`${prefix}_alert_duration`]: settings.duration,
+      [`${prefix}_hide_animation`]: settings.hideAnimation,
+      [`${prefix}_show_animation`]: settings.showAnimation,
+      [`${prefix}_image_href`]: settings.image.href,
+      [`${prefix}_layout`]: settings.layout,
+      [`${prefix}_sound_href`]: settings.sound.href,
+      [`${prefix}_sound_volume`]: settings.sound.volume,
+      [`${prefix}_text_animation`]: settings.text.animation,
+      [`${prefix}_font_color`]: settings.text.color,
+      [`${prefix}_font_color2`]: settings.text.color2,
+      [`${prefix}_font`]: settings.text.font,
+      [`${prefix}_message_template`]: settings.text.format,
+      [`${prefix}_font_size`]: settings.text.size,
+      [`${prefix}_font_weight`]: settings.text.thickness,
+      [`${prefix}_text_delay`]: settings.textDelay,
+    };
+  }
+
+  private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
+    const settingsObj = {} as IAlertBoxApiSettings;
+    Object.keys(settings).forEach((setting) => {
+      const prefix = Object.keys(API_NAME_MAP).find(() => API_NAME_MAP[setting]);
+      if (prefix) {
+        const bitsPrefix = prefix === 'bit' ? 'bits' : prefix;
+        const defaultVariation = settings[setting].variations.shift();
+        settingsObj[`${prefix}_variations`] = settings[setting].variations;
+        settingsObj[`${bitsPrefix}_enabled`] = settings[setting].enabled;
+        settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
+        const flattenedDefault = this.unshapeVariation(defaultVariation, bitsPrefix);
+        Object.keys(flattenedDefault).forEach((key) => settingsObj[key] = flattenedDefault[key]);
+      } else {
+        settingsObj[setting] = settings[setting];
+      }
+    });
+
+    return settingsObj;
   }
 }
