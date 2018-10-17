@@ -61,19 +61,26 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   get navItems() {
-    return this.selectedAlert === 'general' ? [
-      { value: 'general', label: $t('General Settings') },
-      { value: 'moderation', label: $t('Moderator Tools') },
-      { value: 'source', label: $t('Source') }
-    ] :
-    [
+    if (this.selectedAlert === 'general') {
+      return [
+        { value: 'general', label: $t('General Settings') },
+        { value: 'moderation', label: $t('Moderator Tools') },
+        { value: 'source', label: $t('Source') }
+      ];
+    }
+    const baseItems = [
       { value: 'title', label: $t('Title Message') },
       { value: 'media', label: $t('Image & Video') },
-      { value: 'meessage', label: $t('Donor Message') },
       { value: 'audio', label: $t('Audio') },
       { value: 'animation', label: $t('Animation') },
-      { value: 'alert', label: $t('Alert Settings') },
     ];
+    if (this.selectedVariation.settings.message) {
+      baseItems.push({ value: 'message', label: $t('Donor Message') })
+    }
+    if (['donations', 'bits', 'hosts', 'raids'].includes(this.selectedAlert) || this.selectedId !== 'default') {
+      baseItems.push({ value: 'alert', label: $t('Alert Settings') })
+    }
+    return baseItems;
   }
 
   get minTriggerAmount() {
