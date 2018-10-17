@@ -15,7 +15,6 @@ import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
 import { NotificationsService } from './services/notifications';
-import { ObsApiService } from './services/obs-api';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
@@ -40,6 +39,8 @@ import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
+import { PlatformAppsService } from 'services/platform-apps';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -79,6 +80,7 @@ import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -124,7 +126,6 @@ export class ServicesManager extends Service {
     KeyListenerService,
     NavigationService,
     NotificationsService,
-    ObsApiService,
     OnboardingService,
     PerformanceService,
     PerformanceMonitorService,
@@ -151,6 +152,8 @@ export class ServicesManager extends Service {
     TcpServerService,
     StreamInfoService,
     StreamlabelsService,
+    PlatformAppsService,
+    PlatformAppStoreService,
     GuestApiService,
     VideoEncodingOptimizationService,
     CrashReporterService,
@@ -192,7 +195,8 @@ export class ServicesManager extends Service {
     AnnouncementsService,
     MediaShareService,
     AlertBoxService,
-    ChatbotWidgetService
+    ChatbotWidgetService,
+    BrandDeviceService
   };
 
   private instances: Dictionary<Service> = {};

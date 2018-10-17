@@ -66,6 +66,20 @@
       </ul>
     </add-source-info>
 
+    <add-source-info
+      v-for="appSource in availableAppSources"
+      :key="`${appSource.appId}-${appSource.source.id}`"
+      v-if="(inspectedSource === 'app_source') && (inspectedAppId === appSource.appId) && (inspectedAppSourceId === appSource.source.id)"
+      :name="appSource.source.name"
+      :description="appSource.source.about.description">
+      <img class="source__demo source__demo--night" slot="media" :src="getAppAssetUrl(appSource.appId, appSource.source.about.bannerImage)" />
+      <ul slot="support-list">
+        <li v-for="(bullet, index) in appSource.source.about.bullets" :key="index">
+          {{ bullet }}
+        </li>
+      </ul>
+    </add-source-info>
+
     <div
       class="source-info"
       v-if="inspectedSource === null">
@@ -85,7 +99,7 @@
       </div>
     </div>
 
-    <div class="sources">
+    <div class="sources" :class="{'sources--has-platform-apps' : showAppSources}">
       <div class="source-group">
         <h2>{{ $t('Standard') }}</h2>
         <ul class="source-list">
@@ -125,6 +139,25 @@
             <div>{{ $t('Stream Label') }}</div>
           </div>
         </div>
+      </div>
+
+      <div class="source-group" v-if="showAppSources">
+        <h2>{{ $t('Apps') }}</h2>
+        <ul class="source-list">
+          <li
+            v-for="appSource in availableAppSources"
+            :key="`${appSource.appId}-${appSource.source.id}`"
+            class="source source--standard"
+            :class="{
+              'source--active': inspectedSource === 'app_source' &&
+                inspectedAppId === appSource.appId &&
+                inspectedAppSourceId === appSource.source.id
+            }"
+            @click="inspectSource('app_source', appSource.appId, appSource.source.id)"
+            @dblclick="selectAppSource(appSource.appId, appSource.source.id)">
+            {{ appSource.source.name }}
+          </li>
+        </ul>
       </div>
     </div>
     <div class="modal-layout-controls">
@@ -188,18 +221,22 @@ h2 {
   display: flex;
   flex: 1 0 auto;
 
+  &.sources--has-platform-apps {
+    .source-group {
+      flex: 0 0 33%;
+    }
+  }
+
   .source-group {
+    margin: -16px 0px -16px 0px;
+    padding: 16px 16px 16px 0;
+    flex: 0 0 50%;
+
     &:last-child {
       padding: 16px 0 16px 16px;
       border-right: none;
     }
   }
-}
-
-.source-group {
-  margin: -16px 0px -16px 0px;
-  padding: 16px 16px 16px 0;
-  flex: 0 0 50%;
 }
 
 .source-list {

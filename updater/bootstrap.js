@@ -18,6 +18,7 @@ const fs = require('fs');
 const request = require('request');
 const zlib = require('zlib');
 const cp = require('child_process');
+const semver = require('semver');
 const { BrowserWindow } = require('electron');
 const prequest = util.promisify(request);
 const readFile = util.promisify(fs.readFile);
@@ -200,26 +201,6 @@ async function getVersion(info) {
  * we're out of date should we actually tell the app
  * to close so we can update. */
 async function entry(info) {
-    const latestVersion = await getVersion(info);
-
-    /* Latest version doesn't necessarily need
-    * to be greater than the current version!
-    * If it's different, update to latest. */
-    if (!latestVersion) {
-        console.log('Failed to fetch latest version!');
-        return false;
-    }
-
-    if (info.version === latestVersion) {
-        console.log('Already latest version!');
-        return false;
-    }
-
-    if (!await checkChance(info, latestVersion)) {
-        console.log('Failed the chance lottery. Better luck next time!');
-        return false;
-    }
-
     try {
         statusWindow = new BrowserWindow({
             width: 400,
@@ -227,6 +208,16 @@ async function entry(info) {
             frame: false,
             resizable: false,
             show: false
+        });
+
+        statusWindow.on('closed', () => {
+            statusWindow = null;
+        });
+
+        /* 20 minutes in documentation and I still can't
+         * tell if this does what I'm wanting */
+        statusWindow.webContents.on('destroyed', () => {
+            statusWindow = null;
         });
 
         statusWindow.on('ready-to-show', () => {
@@ -239,6 +230,31 @@ async function entry(info) {
         statusWindow = null;
     }
 
+    const latestVersion = await getVersion(info);
+
+    /* Latest version doesn't necessarily need
+    * to be greater than the current version!
+    * If it's different, update to latest. */
+    if (!latestVersion) {
+        console.log('Failed to fetch latest version!');
+        return false;
+    }
+
+    if (semver.eq(info.version, latestVersion)) {
+        console.log('Already latest version!');
+        return false;
+    }
+
+    if (semver.gt(info.version, latestVersion)) {
+        console.log('Latest version is less than current version!');
+        return false;
+    }
+
+    if (!await checkChance(info, latestVersion)) {
+        console.log('Failed the chance lottery. Better luck next time!');
+        return false;
+    }
+
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
     ensureDir(info.tempDir);
@@ -246,10 +262,7 @@ async function entry(info) {
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, (progress) => {
-        if (!statusWindow) return;
-        statusWindow.webContents.send('bootstrap-progress', progress);
-    });
+    const updaterPath = await fetchUpdater(info, progress => {});
 
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
@@ -263,9 +276,14 @@ async function entry(info) {
         '--force-temp'
     ];
 
-    for (pid in info.waitPids) {
-        updaterArgs.push_back('-p');
-        updaterArgs.push_back(pid);
+    info.waitPids.forEach((pid) => {
+        updaterArgs.push('-p');
+        updaterArgs.push(pid);
+    });
+
+    if (statusWindow) {
+        updaterArgs.push('-p');
+        updaterArgs.push(statusWindow.webContents.getOSProcessId());
     }
 
     console.log(updaterArgs);

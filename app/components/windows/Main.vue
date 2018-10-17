@@ -8,13 +8,21 @@
 
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <apps-nav v-if="platformApps.length > 0"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
         <custom-loader></custom-loader>
       </div>
 
-      <component
-        v-if="!shouldLockContent"
+      <PlatformAppContainer
         class="main-page-container"
+        v-for="app in platformApps"
+        :key="app.id"
+        :style="appStyles(app.id)"
+        v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
+        :params="{ appId: app.id, poppedOut: isAppPoppedOut(app.id) }" />
+      <component
+        class="main-page-container"
+        v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
         :is="page"
         :params="params"/>
       <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />

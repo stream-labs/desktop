@@ -51,7 +51,12 @@ export default class Chat extends Vue {
       const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        if (parsedUrl.host && parsedUrl.query && (parsedUrl.host === 'twitch.tv' || parsedUrl.host.endsWith('.twitch.tv')) && parsedUrl.query.includes('ffz-settings')) {
+        if (
+          parsedUrl.host &&
+          parsedUrl.query &&
+          (parsedUrl.host === 'twitch.tv' || parsedUrl.host.endsWith('.twitch.tv')) &&
+          parsedUrl.query.includes('ffz-settings')
+        ) {
           this.windowsService.createOneOffWindow({
             componentName: 'FFZSettings',
             title: $t('FrankerFaceZ Settings'),

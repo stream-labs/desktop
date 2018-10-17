@@ -1,13 +1,16 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
+import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 
 // Pages
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
 import Chatbot from '../pages/Chatbot.vue';
+import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
@@ -23,12 +26,14 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
+import PlatformAppContainer from '../pages/PlatformAppContainer.vue';
 import electron from 'electron';
 
 @Component({
   components: {
     TitleBar,
     TopNav,
+    AppsNav,
     Studio,
     Dashboard,
     BrowseOverlays,
@@ -41,6 +46,8 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
+    PlatformAppContainer,
+    PlatformAppStore
   }
 })
 export default class Main extends Vue {
@@ -50,6 +57,7 @@ export default class Main extends Vue {
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   mounted() {
     electron.remote.getCurrentWindow().show();
@@ -85,6 +93,29 @@ export default class Main extends Vue {
 
   get isOnboarding() {
     return this.navigationService.state.currentPage === 'Onboarding';
+  }
+
+  get platformApps() {
+    return this.platformAppsService.enabledApps;
+  }
+
+  isAppPersistent(appId: string) {
+    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
+  }
+
+  isAppPoppedOut(appId: string) {
+    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
+  }
+
+  appStyles(appId: string) {
+    if (this.page === 'PlatformAppContainer' && this.params.appId === appId) {
+      return {};
+    } else {
+      return {
+        position: 'absolute',
+        top: '-10000px'
+      };
+    }
   }
 
   /**

@@ -44,9 +44,11 @@ export default class BrowseOverlays extends Vue {
   };
 
   mounted() {
-    this.guestApiService.exposeApi(this.$refs.overlaysWebview, {
-      installOverlay: this.installOverlay,
-      installWidgets: this.installWidgets
+    this.$refs.overlaysWebview.addEventListener('dom-ready', () => {
+      this.guestApiService.exposeApi(this.$refs.overlaysWebview.getWebContents().id, {
+        installOverlay: this.installOverlay,
+        installWidgets: this.installWidgets
+      });
     });
 
     this.$refs.overlaysWebview.addEventListener('new-window', e => {
