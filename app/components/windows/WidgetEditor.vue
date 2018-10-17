@@ -116,9 +116,7 @@
     width: 100%;
 
     .tab-button {
-      text-transform: uppercase;
       height: 36px;
-      font-size: 12px;
       position: relative;
       bottom: -1px;
       z-index: 1;
@@ -137,14 +135,11 @@
       margin-bottom: 0;
       width: auto;
       flex-direction: column;
-      margin-right: 8px;
+      margin-right: 16px;
       margin-bottom: 16px;
     }
     .int-input{
       width: 60px;
-    }
-    input[type=text] {
-      height: 28px;
     }
   }
 
@@ -175,11 +170,9 @@
   }
 
   .top-settings {
-    height: 50px;
     width: 100%;
     display: flex;
     align-items: center;
-    font-size: 12px;
 
     > div {
       display: flex;
@@ -251,14 +244,13 @@
   .sidebar {
     width: 30%;
     height: 100%;
-    font-size: 12px;
     position: absolute;
     right: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-left: 1px solid @day-border;
-    background-color: @day-section;
+    background-color: @day-bg;
     .transition();
     transition-delay: 300ms;
   }
