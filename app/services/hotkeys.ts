@@ -8,7 +8,6 @@ import { StatefulService, mutation, ServiceHelper } from 'services/stateful-serv
 import { defer } from 'lodash';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
-import { integer } from 'aws-sdk/clients/cloudfront';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -179,6 +178,21 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       up: (sourceId) => getSourcesService().setMuted(sourceId, true),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+    },
+    /* 
+      If the backend send a hotkey with a name that isn`t on this array it will
+      result in a crash, for now each hotkey registered by the backend will have
+      its name set to 'BACKEND_SOURCE' so it won`t be a problem anymore.
+      The ideal would be to receive a backend hotkey and use its name correctly,
+      so we could have there static hotkeys here and dynamic ones (those that
+      come from the backend).
+    */
+    {
+      name: 'BACKEND_SOURCE',
+      description: () => $t('Dummy'),
+      down: (sourceId) => {},
+      up: (sourceId) => {},
+      shouldApply: (sourceId) => false
     }
   ]
 };
@@ -213,7 +227,7 @@ interface IHotkeysServiceState {
 }
 
 /**
- * Represents a backend source Hotkey info
+ * Represents a backend Hotkey info for a source
  */
 interface IBackendSourceHotkeyInfo {
   sourceName: string;
@@ -253,7 +267,19 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.scenesService.itemAdded.subscribe(() => this.invalidate());
     this.scenesService.itemRemoved.subscribe(() => this.invalidate());
     this.sourcesService.sourceAdded.subscribe(() => this.invalidate());
-    this.sourcesService.sourceRemoved.subscribe(() => this.invalidate());
+    this.sourcesService.sourceRemoved.subscribe((source) => {
+      
+      // Remove each occurence of this source on the hotkeyInfos (automatical source hotkey)
+      for(var i=this.sourceHotkeyInfos.length-1; i--;) {
+        if(this.sourceHotkeyInfos[i].sourceName && 
+          this.sourcesService.getSourceById(this.sourceHotkeyInfos[i].sourceName).sourceId == 
+          source.resourceId) {
+            this.sourceHotkeyInfos.splice(i, 1);
+          }
+      }
+
+      this.invalidate();
+    });
 
     this.sourceHotkeyInfos = [];
     obs.NodeObs.ConnectHotkeyCallback(
@@ -282,7 +308,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
     });
 
-
     this.scenesService.scenes.forEach(scene => {
       scene.getItems().forEach(sceneItem => {
         HOTKEY_ACTIONS.SCENE_ITEM.forEach(action => {
@@ -303,7 +328,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
     });
 
-    /*
     this.sourcesService.getSources().forEach(source => {
       HOTKEY_ACTIONS.SOURCE.forEach(action => {
         hotkeys.push({
@@ -313,15 +337,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         });
       });
     });
-    */
    
+    // This will insert each hotkey that should be handled by the backend
     this.sourceHotkeyInfos.forEach(hotkeyInfo => {
       if(this.sourcesService.getSourceById(hotkeyInfo.sourceName)) {
         hotkeys.push({
           actionName: hotkeyInfo.hotkeyName,
           bindings: [],
           sourceId: this.sourcesService.getSourceById(hotkeyInfo.sourceName).sourceId, // Redundant?
-          hotkeyId: hotkeyInfo.hotkeyId,
+          // A hotkey with a hotkeyId means that it will be handled by the backend
+          hotkeyId: hotkeyInfo.hotkeyId,  
           description: hotkeyInfo.hotkeyDescription
         });
       }
@@ -449,8 +474,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         const downHotkeys = downBindingMap.get(JSON.stringify(binding)) || [];
         const upHotkeys = upBindingMap.get(JSON.stringify(binding)) || [];
 
-        if (hotkey.action.downHandler) downHotkeys.push(hotkey);
-        if (hotkey.action.upHandler) upHotkeys.push(hotkey);
+        if(hotkey.action) {
+          if (hotkey.action.downHandler) downHotkeys.push(hotkey);
+          if (hotkey.action.upHandler) upHotkeys.push(hotkey);
+        } else if(hotkey.hotkeyId) {
+          downHotkeys.push(hotkey);
+          upHotkeys.push(hotkey);
+        }
 
         downBindingMap.set(JSON.stringify(binding), downHotkeys);
         upBindingMap.set(JSON.stringify(binding), upHotkeys);
@@ -463,7 +493,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler())
+        callback: () => hotkeys.forEach(hotkey => {
+          if(hotkey.hotkeyId) { // If this is a hotkey registered directly by a source
+            obs.NodeObs.ProcessHotkeyStatus(hotkey.hotkeyId, true, hotkey.sourceId)
+          } else {
+            hotkey.action.upHandler();
+          }
+        })
       });
     });
 
@@ -473,7 +509,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeyup',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler())
+        callback: () => hotkeys.forEach(hotkey => {
+          if(hotkey.hotkeyId) { // If this is a hotkey registered directly by a source
+            obs.NodeObs.ProcessHotkeyStatus(hotkey.hotkeyId, false, hotkey.sourceId)
+          } else {
+            hotkey.action.upHandler();
+          }
+        })
       });
     });
   }
@@ -508,10 +550,11 @@ export class Hotkey implements IHotkey {
   sceneItemId?: string;
   bindings: IBinding[];
   description?: string;
+
   hotkeyId?: number;
+  action?: IHotkeyAction;
 
   type: THotkeyType;
-  action: IHotkeyAction;
   shouldApply: boolean;
 
   @Inject() private hotkeysService: HotkeysService;
@@ -533,13 +576,15 @@ export class Hotkey implements IHotkey {
     }
 
     const entityId = this.sourceId || this.sceneId || this.sceneItemId;
-    this.action = this.getAction(entityId);
 
-    // If this has a hotkeyid, it is a dynamic hotkey, so it should always 
-    // apply and its info comes from the backend
+    // In case we have a valid hotkeyId it means that this was a source that
+    // automatically registered its hotkey, so for now it will always apply 
+    // and its description was already filled when assigning the hotkeyModel
+    // to this hotkey object
     if(this.hotkeyId) {
       this.shouldApply = true;
     } else {
+      this.action = this.getAction(entityId);
       this.shouldApply = this.action.shouldApply(entityId);
       this.description = this.action.description(entityId);
     }
@@ -549,7 +594,8 @@ export class Hotkey implements IHotkey {
     return (this.actionName === other.actionName) &&
       (this.sceneId === other.sceneId) &&
       (this.sourceId === other.sourceId) &&
-      (this.sceneItemId === other.sceneItemId);
+      (this.sceneItemId === other.sceneItemId) && 
+      (this.hotkeyId === other.hotkeyId);
   }
 
   getModel(): IHotkey {
@@ -560,19 +606,6 @@ export class Hotkey implements IHotkey {
     var action = { ...HOTKEY_ACTIONS[this.type].find(action => {
       return action.name === this.actionName;
     }) };
-
-    // If we can`t find a static action, use the dynamic mode
-    if(!action) {
-      action = {
-        name: 'TOGGLE_MUTE',
-        description: () => $t('Dummy'),
-
-        // To be filled with dynamic calls to the backend using the hotkeyId property
-        down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-        isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
-        shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-      };
-    }
 
     const { up, down } = action;
 
