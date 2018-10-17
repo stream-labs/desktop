@@ -16,7 +16,7 @@
       <form-input
         :value="value"
         :metadata="formInputMetadata"
-        @input="value => $emit('input', value)"
+        @input="(value, event) => emitInput(value, event)"
       />
 
       <div v-if="!type" class="slots">
