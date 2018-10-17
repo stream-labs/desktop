@@ -1,6 +1,7 @@
 import test from 'ava';
 import * as Proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
+import { sleep } from 'util/sleep';
 
 const proxyquire = Proxyquire.noCallThru();
 
@@ -41,6 +42,9 @@ const getStub = (injectTable = {}) => ({
       },
       ...injectTable
     })
+  },
+  '../../util/sleep': {
+    sleep: () => sleep(0),
   },
   '../streaming': {
     StreamingService: {}

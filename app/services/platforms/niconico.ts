@@ -3,6 +3,7 @@ import { IPlatformService, IStreamingSetting } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
+import { sleep } from 'util/sleep';
 import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { Builder, parseString } from 'xml2js';
@@ -226,7 +227,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
       return result;
     } catch (e) {
       // APIのレスポンスに番組状態が反映されるのが遅れる場合があるので、少し待ってリトライ
-      await new Promise(done => setTimeout(done, 3000));
+      await sleep(3000);
     }
 
     try {
