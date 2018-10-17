@@ -12,6 +12,8 @@ export async function waitForWidgetSettingsSync(t: GenericTestContext<any>) {
 
   return await apiClient.waitForEvent((event: Dictionary<any>) => {
     console.log('caught an event', event);
-    return event.type && event.type.contains('SettingsUpdate'); // maybe there is better way to distinguish WidgetEvents
+
+    // maybe there is better way to distinguish WidgetEvents, but check the event type for now
+    return (typeof event.type == 'string') && event.type.includes('SettingsUpdate');
   });
 }

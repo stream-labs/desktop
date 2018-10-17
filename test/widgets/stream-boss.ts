@@ -73,6 +73,9 @@ test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   await logIn(t);
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
+
+  // await sleep(9999999);
+
   await client.click('li=Manage Battle');
 
   const formMonkey = new FormMonkey(t, true);
