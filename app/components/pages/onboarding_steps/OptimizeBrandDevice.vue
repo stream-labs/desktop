@@ -5,6 +5,10 @@
 
       <div class="onboarding-title">{{ $t('Optimize') }} {{ deviceName }}</div>
 
+      <div class="onboarding-desc" v-if="status == ''">
+        {{ $t('Collecting some information about your PC...') }}
+      </div>
+
       <div class="onboarding-desc" v-if="status == 'init' || status == 'pending'">
         {{ $t('We found optimized settings for your PC') }}
       </div>
