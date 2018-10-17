@@ -5,10 +5,6 @@ import { sleep } from 'util/sleep';
 
 const proxyquire = Proxyquire.noCallThru();
 
-function noopDecorator() {
-  return function() {};
-}
-
 function createInject(mockServices: any) {
   return function Inject(serviceName?: string) {
     return function (target: Object, key: string) {
@@ -24,15 +20,7 @@ function createInject(mockServices: any) {
   };
 }
 
-function identity<T>(x: T): T {
-  return x;
-}
-
 const getStub = (injectTable = {}) => ({
-  './../stateful-service': {
-    mutation: noopDecorator,
-    '@noCallThru': false
-  },
   '../../util/injector': {
     Inject: createInject({
       StreamingService: {
@@ -46,50 +34,31 @@ const getStub = (injectTable = {}) => ({
   '../../util/sleep': {
     sleep: () => sleep(0),
   },
-  '../streaming': {
-    StreamingService: {}
-  },
-  '../user': {
-    UserService: {}
-  },
-  '../settings': {
-    SettingsService: {}
-  },
-  'services/windows': {
-    WindowsService: {}
-  },
+  '../streaming': {},
+  '../user': {},
+  '../settings': {},
+  'services/windows': {},
 });
 
 test('get instance', t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
   const m = proxyquire('./niconico', getStub());
   t.truthy(m.NiconicoService.instance);
 });
 
 test('setupStreamSettingsで番組がない場合', async t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
   const m = proxyquire('./niconico', getStub());
   const { instance } = m.NiconicoService;
-  const spy = sinon.spy(() => Promise.resolve({}));
-  instance.fetchLiveProgramInfo = spy;
+  const fetchLiveProgramInfoStub = sinon.stub();
+  fetchLiveProgramInfoStub.returns(Promise.resolve({}));
+  instance.fetchLiveProgramInfo = fetchLiveProgramInfoStub;
 
   const result = await instance.setupStreamSettings()
   t.falsy(result.url, '空の配信設定を得る');
   t.false(result.asking, 'ポップアップは出さない');
-  t.true(spy.calledTwice, 'リトライするので2回呼ぶ')
+  t.true(fetchLiveProgramInfoStub.calledTwice, 'リトライするので2回呼ぶ')
 });
 
 test('setupStreamSettingsで番組がひとつある場合', async t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
   const updatePlatformChannelIdStub = sinon.stub();
   const getSettingsFormDataStub = sinon.stub();
   const setSettingsStub = sinon.stub();
@@ -142,10 +111,6 @@ test('setupStreamSettingsで番組がひとつある場合', async t => {
 });
 
 test('setupStreamSettingsで番組取得にリトライで成功する場合', async t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
   const updatePlatformChannelIdStub = sinon.stub();
   const getSettingsFormDataStub = sinon.stub();
   const setSettingsStub = sinon.stub();
@@ -199,10 +164,6 @@ test('setupStreamSettingsで番組取得にリトライで成功する場合', a
 });
 
 test('setupStreamSettingsで番組が複数ある場合', async t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
   const updatePlatformChannelIdStub = sinon.stub();
   const getSettingsFormDataStub = sinon.stub();
   const setSettingsStub = sinon.stub();

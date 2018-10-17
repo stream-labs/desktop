@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './../stateful-service';
+import { Service } from './../service';
 import { IPlatformService, IStreamingSetting } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -10,8 +10,6 @@ import { Builder, parseString } from 'xml2js';
 import { StreamingService, EStreamingState } from '../streaming';
 import { WindowsService } from 'services/windows';
 
-interface INiconicoServiceState {
-}
 export type INiconicoProgramSelection = {
   info: LiveProgramInfo
   selectedId: string
@@ -118,7 +116,7 @@ class GetPublishStatusResult {
   }
 }
 
-export class NiconicoService extends StatefulService<INiconicoServiceState> implements IPlatformService {
+export class NiconicoService extends Service implements IPlatformService {
 
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
@@ -129,9 +127,6 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 800,
     height: 800,
-  };
-
-  static initialState: INiconicoServiceState = {
   };
 
   getUserKey(): Promise<string> {
