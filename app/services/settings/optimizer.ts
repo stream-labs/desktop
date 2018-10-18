@@ -7,7 +7,8 @@ export enum OptimizationKey {
     audioBitrate = 'audioBitrate',
     quality = 'quality',
     colorSpace = 'colorSpace',
-    fps = 'fps',
+    fpsType = 'fpsType',
+    fpsCommon = 'fpsCommon',
     encoder = 'encoder',
     keyframeInterval = 'keyframeInterval',
     encoderPreset = 'encoderPreset',
@@ -18,13 +19,14 @@ export enum OptimizationKey {
 
 // OptimizationKey のキーと完全対応していること
 export type OptimizeSettings = {
-    outputMode?: string
+    outputMode?: 'Simple' | 'Advanced'
     videoBitrate?: number
     audioBitrate?: string
     quality?: string
     colorSpace?: string
-    fps?: string
-    encoder?: string
+    fpsType?: 'Common FPS Values'| 'Integer FPS Value'| 'Fractional FPS Value'
+    fpsCommon?: string
+    encoder?: 'obs_x264' | 'obs_qsv11'
     keyframeInterval?: number
     encoderPreset?: string
     profile?: string
@@ -137,11 +139,23 @@ const definitionParams: DefinitionParam[] = [
         setting: 'ColorSpace',
     },
     {
-        key: OptimizationKey.fps,
+        key: OptimizationKey.fpsType,
         category: CategoryName.video,
         subCategory: 'Untitled',
-        setting: 'FPSCommon',
-        label: 'streaming.FPS',
+        setting: 'FPSType',
+        lookupValueName: true,
+        dependents: [{
+            value: 'Common FPS Values',
+            params: [
+                {
+                    key: OptimizationKey.fpsCommon,
+                    category: CategoryName.video,
+                    subCategory: 'Untitled',
+                    setting: 'FPSCommon',
+                    label: 'streaming.FPS',
+                },
+            ]
+        }]
     },
 ];
 
