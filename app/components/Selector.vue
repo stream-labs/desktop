@@ -61,7 +61,7 @@
   .transition();
 
   &.selector-item--active {
-    background-color: @light-2;
+    background-color: @light-3;
     color: @day-title;
     .weight(@medium);
 
