@@ -59,13 +59,6 @@ const definitionParams: DefinitionParam[] = [
             value: 'Advanced',
             params: [
                 {
-                    key: OptimizationKey.videoBitrate,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    setting: 'bitrate',
-                    label: 'settings.videoBitrate',
-                },
-                {
                     key: OptimizationKey.audioBitrate,
                     category: CategoryName.output,
                     subCategory: 'Audio - Track 1',
@@ -82,11 +75,32 @@ const definitionParams: DefinitionParam[] = [
                         value: 'obs_x264',
                         params: [
                             {
+                                key: OptimizationKey.videoBitrate,
+                                category: CategoryName.output,
+                                subCategory: 'Streaming',
+                                setting: 'bitrate',
+                                label: 'settings.videoBitrate',
+                            },
+                            {
+                                key: OptimizationKey.keyframeInterval,
+                                category: CategoryName.output,
+                                subCategory: 'Streaming',
+                                label: 'settings.keyframeInterval',
+                                setting: 'keyint_sec',
+                            },
+                            {
                                 key: OptimizationKey.encoderPreset,
                                 category: CategoryName.output,
                                 subCategory: 'Streaming',
                                 setting: 'preset',
                                 label: 'settings.encoderPreset',
+                                lookupValueName: true,
+                            },
+                            {
+                                key: OptimizationKey.profile,
+                                category: CategoryName.output,
+                                subCategory: 'Streaming',
+                                setting: 'profile',
                                 lookupValueName: true,
                             },
                             {
@@ -98,20 +112,6 @@ const definitionParams: DefinitionParam[] = [
                             },
                         ]
                     }]
-                },
-                {
-                    key: OptimizationKey.keyframeInterval,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    label: 'settings.keyframeInterval',
-                    setting: 'keyint_sec',
-                },
-                {
-                    key: OptimizationKey.profile,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    setting: 'profile',
-                    lookupValueName: true,
                 },
                 {
                     key: OptimizationKey.audioTrackIndex,
