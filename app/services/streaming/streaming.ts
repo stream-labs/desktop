@@ -19,6 +19,7 @@ import { CustomizationService } from 'services/customization';
 import { StreamInfoService }from 'services/stream-info';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
+import { OptimizedSettings } from 'services/settings/optimizer';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -216,6 +217,24 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  // 最適化ウィンドウの高さを計算する
+  private calculateOptimizeWindowSize(settings: OptimizedSettings): number {
+    const windowHeader = 6 + 20 + 1;
+    const descriptionLabel = 22.4 + 12;
+    const doNotShowCheck = 28 + 12;
+    const contentOverhead = 16;
+    const modalControls = 8 + 36 + 8;
+    const categoryOverhead = 22.4 + 4 + 8 + 8 + 12;
+    const lineHeight = 20.8;
+
+    const overhead = windowHeader + descriptionLabel + doNotShowCheck + contentOverhead + modalControls;
+
+    const numCategories = settings.info.length;
+    const numLines = settings.info.reduce((sum, tuple) => sum + tuple[1].length, 0);
+    const height = overhead + numCategories * categoryOverhead + numLines * lineHeight;
+    return Math.floor(height); // floorしないと死ぬ
+  }
+
   private async optimizeForNiconico(streamingSetting: IStreamingSetting) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
@@ -240,7 +259,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           queryParams: settings,
           size: {
             width: 500,
-            height: 600
+            height: this.calculateOptimizeWindowSize(settings)
           }
         });
       } else {
