@@ -369,21 +369,30 @@ export class Optimizer {
 
     private *getValues(definitions: DefinitionParam[]): IterableIterator<OptimizeSettings> {
         for (const item of definitions) {
+            let changed = false;
             const value = this.findValue(item);
             yield { [item.key]: value };
             if (item.dependents) {
-                let lastCategorySettings = this.getCategory(item.category);
+                let lastCategorySettings = JSON.parse(JSON.stringify(this.getCategory(item.category)));
 
                 for (const dependent of item.dependents) {
                     this.setValue(item, dependent.value);
+                    if (value !== dependent.value) {
+                        changed = true;
+                    }
                     for (const current of this.getValues(dependent.params)) {
                         yield current;
                     }
                 }
 
-                this.categoryCache.set(item.category, lastCategorySettings);
-                this.setValue(item, value);
-                this.writeBackCategory(item.category);
+                if (changed) {
+                    // まず値を変更した上で書き戻し、
+                    this.setValue(item, value);
+                    this.writeBackCategory(item.category);
+                    // 次に元の値群を書き戻すことで依存値が書き戻せる
+                    this.categoryCache.set(item.category, lastCategorySettings);
+                    this.updateCategory(item.category);
+                }
             }
         }
     }
