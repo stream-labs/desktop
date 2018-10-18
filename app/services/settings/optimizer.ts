@@ -367,18 +367,23 @@ export class Optimizer {
         }
     }
 
-    private *getValues(definitions: DefinitionParam[]): IterableIterator<{}> {
+    private *getValues(definitions: DefinitionParam[]): IterableIterator<OptimizeSettings> {
         for (const item of definitions) {
             const value = this.findValue(item);
             yield { [item.key]: value };
             if (item.dependents) {
+                let lastCategorySettings = this.getCategory(item.category);
+
                 for (const dependent of item.dependents) {
                     this.setValue(item, dependent.value);
                     for (const current of this.getValues(dependent.params)) {
                         yield current;
                     }
                 }
+
+                this.categoryCache.set(item.category, lastCategorySettings);
                 this.setValue(item, value);
+                this.writeBackCategory(item.category);
             }
         }
     }
