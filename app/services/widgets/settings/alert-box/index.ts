@@ -63,7 +63,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   private transformSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
     const triagedSettings = this.triageSettings(settings);
     Object.keys(triagedSettings).forEach((key) => {
-      if(this.apiNames().includes(key) && key !== 'resubs') {
+      if (key === 'subs') {
+        triagedSettings['subs'] = this.varifySetting({ ...triagedSettings['subs'], ...triagedSettings['resubs'] });
+      } else if (this.apiNames().includes(key) && key !== 'resubs') {
         triagedSettings[key] = this.varifySetting(triagedSettings[key]);
       }
     })
@@ -192,23 +194,58 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     };
   }
 
+  private unshapeSubs(variation: IAlertBoxVariation) {
+    const { settings } = variation;
+    return {
+      sub_custom_css: settings.customCss,
+      sub_custom_html: settings.customHtml,
+      sub_custom_html_enabled: settings.customHtmlEnabled,
+      sub_custom_js: settings.customJs,
+      sub_custom_json: settings.customJson,
+      sub_alert_duration: settings.duration,
+      sub_hide_animation: settings.hideAnimation,
+      sub_show_animation: settings.showAnimation,
+      sub_image_href: settings.image.href,
+      sub_layout: settings.layout,
+      sub_sound_href: settings.sound.href,
+      sub_sound_volume: settings.sound.volume,
+      sub_text_animation: settings.text.animation,
+      sub_font_color: settings.text.color,
+      sub_font_color2: settings.text.color2,
+      sub_font: settings.text.font,
+      sub_message_template: settings.text.format,
+      sub_font_size: settings.text.size,
+      sub_font_weight: settings.text.thickness,
+      sub_text_delay: settings.textDelay,
+      resub_message_allow_emotes: settings.message.allowEmotes,
+      resub_message_font: settings.message.font,
+      resub_message_font_color: settings.message.color,
+      resub_message_font_size: settings.message.size,
+      resub_message_font_weight: settings.message.weight,
+      resub_tts_enabled: settings.tts.enabled,
+      resub_tts_language: settings.tts.language,
+      resub_tts_security: settings.tts.security,
+      resub_tts_volume: settings.tts.volume
+    };
+  }
+
   private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
     const settingsObj = {} as IAlertBoxApiSettings;
     Object.keys(settings).forEach((setting) => {
-      const prefix = Object.keys(API_NAME_MAP).find(() => API_NAME_MAP[setting]);
-      if (prefix) {
+      const prefix = Object.keys(API_NAME_MAP).find((key) => API_NAME_MAP[key] === setting);
+      if (prefix && prefix !== 'resub') {
         const bitsPrefix = prefix === 'bit' ? 'bits' : prefix;
         const defaultVariation = settings[setting].variations.shift();
         settingsObj[`${prefix}_variations`] = settings[setting].variations;
         settingsObj[`${bitsPrefix}_enabled`] = settings[setting].enabled;
         settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
-        const flattenedDefault = this.unshapeVariation(defaultVariation, bitsPrefix);
+        const flattenedDefault = prefix === 'sub' ?
+          this.unshapeSubs(defaultVariation) :  this.unshapeVariation(defaultVariation, bitsPrefix);
         Object.keys(flattenedDefault).forEach((key) => settingsObj[key] = flattenedDefault[key]);
-      } else {
+      } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
     });
-
     return settingsObj;
   }
 }

@@ -18,7 +18,9 @@
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
-        <div class="left-accordion__input"><toggle-input v-model="wData.settings[alert].enabled" /></div>
+        <div class="left-accordion__input">
+          <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
+        </div>
       </div>
       <div
         v-if="wData && selectedAlert === alert"
@@ -41,18 +43,18 @@
   </div>
 
   <!-- General Settings -->
-  <validated-form slot="general-properties" v-if="selectedVariation">
+  <validated-form slot="general-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" />
     <v-form-group :title="$t('Global Alert Delay')" type="slider" v-model="wData.settings.alert_delay" :metadata="{ min: 0, max: 30 }" />
   </validated-form>
-  <validated-form slot="moderation-properties" v-if="selectedVariation">
+  <validated-form slot="moderation-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Unlimited Alert Moderation Delay')" type="toggle" v-model="wData.settings.unlimited_alert_moderation_enabled" />
     <v-form-group :title="$t('Alert Moderation delay')" type="slider" v-model="wData.settings.moderation_delay" />
     <v-form-group :title="$t('Unlimited Media Sharing Alert Moderation Delay')" type="toggle" v-model="wData.settings.unlimited_media_moderation_delay" />
   </validated-form>
 
   <!-- Alert-Specific Settings -->
-  <validated-form slot="title-properties" v-if="selectedVariation">
+  <validated-form slot="title-properties" @input="save()" v-if="selectedVariation">
     <div v-if="selectedVariation.settings.text">
       <v-form-group :title="$t('Message Template')" type="textArea" v-model="selectedVariation.settings.text.format" />
       <v-form-group :title="$t('Font')" type="fontFamily" v-model="selectedVariation.settings.text.font" />
@@ -62,10 +64,10 @@
       <v-form-group :title="$t('Text Color secondary')" type="color" v-model="selectedVariation.settings.text.color2" />
     </div>
   </validated-form>
-  <validated-form slot="media-properties" v-if="selectedVariation">
+  <validated-form slot="media-properties" @input="save()" v-if="selectedVariation">
     <media-gallery-input v-model="selectedVariation.settings.image.href" v-if="selectedVariation.settings.image" />
   </validated-form>
-  <validated-form slot="message-properties" v-if="selectedVariation">
+  <validated-form slot="message-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Show Message?')" type="toggle" v-model="selectedVariation.showMessage" />
     <div v-if="selectedVariation.settings.message">
       <v-form-group :title="$t('Min. Amount to Show')" type="number" v-model="selectedVariation.settings.message.minAmount" />
@@ -84,18 +86,18 @@
       <v-form-group :title="$t('Spam Security')" type="slider" v-model="selectedVariation.settings.tts.security" />
     </div>
   </validated-form>
-  <validated-form slot="audio-properties" v-if="selectedVariation && selectedVariation.settings.sound">
+  <validated-form slot="audio-properties" @input="save()" v-if="selectedVariation && selectedVariation.settings.sound">
     <sound-input v-model="selectedVariation.settings.sound.href" />
     <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.sound.volume" :metadata="{ min: 0, max: 100 }" />
   </validated-form>
-  <validated-form slot="animation-properties" v-if="selectedVariation">
+  <validated-form slot="animation-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Show Animation')" type="animation" v-model="selectedVariation.settings.showAnimation" />
     <v-form-group :title="$t('Hide Animation')" type="animation" v-model="selectedVariation.settings.hideAnimation" />
     <v-form-group :title="$t('Alert Duration')" type="slider" v-model="selectedVariation.settings.duration" :metadata="{ min: 2, max: 300 }" />
     <v-form-group :title="$t('Text Animation')" type="dropdown" v-model="selectedVariation.settings.text.animation" v-if="selectedVariation.settings.text" />
     <v-form-group :title="$t('Text Delay')" type="slider" v-model="selectedVariation.settings.textDelay" :metadata="{ min: 0, max: 60 }" />
   </validated-form>
-  <validated-form slot="alert-properties" v-if="selectedVariation">
+  <validated-form slot="alert-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Min. Amount to Trigger Alert')" type="number" v-model="minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
     <v-form-group :title="$t('Min. Amount to Show in Recent Events')" type="number" v-model="minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
