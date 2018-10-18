@@ -48,9 +48,13 @@
     <v-form-group :title="$t('Global Alert Delay')" type="slider" v-model="wData.settings.alert_delay" :metadata="{ min: 0, max: 30 }" />
   </validated-form>
   <validated-form slot="moderation-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Unlimited Alert Moderation Delay')" type="toggle" v-model="wData.settings.unlimited_alert_moderation_enabled" />
+    <v-form-group :title="$t('Unlimited Alert Moderation Delay')">
+      <toggle-input v-model="wData.settings.unlimited_alert_moderation_enabled" />
+    </v-form-group>
     <v-form-group :title="$t('Alert Moderation delay')" type="slider" v-model="wData.settings.moderation_delay" />
-    <v-form-group :title="$t('Unlimited Media Sharing Alert Moderation Delay')" type="toggle" v-model="wData.settings.unlimited_media_moderation_delay" />
+    <v-form-group :title="$t('Unlimited Media Sharing Alert Moderation Delay')">
+      <toggle-input v-model="wData.settings.unlimited_media_moderation_delay" />
+    </v-form-group>
   </validated-form>
 
   <!-- Alert-Specific Settings -->
@@ -68,18 +72,18 @@
     <media-gallery-input v-model="selectedVariation.settings.image.href" v-if="selectedVariation.settings.image" />
   </validated-form>
   <validated-form slot="message-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Show Message?')" type="toggle" v-model="selectedVariation.showMessage" />
+    <v-form-group :title="$t('Show Message?')" type="bool" v-model="selectedVariation.showMessage" />
     <div v-if="selectedVariation.settings.message">
       <v-form-group :title="$t('Min. Amount to Show')" type="number" v-model="selectedVariation.settings.message.minAmount" />
       <v-form-group :title="$t('Font')" type="fontFamily" v-model="selectedVariation.settings.message.font" />
       <v-form-group :title="$t('Font Size')" type="fontSize" v-model="selectedVariation.settings.message.size" />
       <v-form-group :title="$t('Font Weight')" type="slider" v-model="selectedVariation.settings.message.weight" :metadata="{ min: 300, max: 900, interval: 100 }" />
       <v-form-group :title="$t('Text Color')" type="color" v-model="selectedVariation.settings.message.color" />
-      <v-form-group :title="$t('Allow Twitch Emojis?')" type="toggle" v-model="selectedVariation.settings.message.allowEmojis" />
+      <v-form-group :title="$t('Allow Twitch Emojis?')" type="bool" v-model="selectedVariation.settings.message.allowEmojis" />
     </div>
     <div v-if="selectedVariation.settings.tts">
       <span>{{ $t('Text to Speech') }}</span>
-      <v-form-group :title="$t('Enable TTS?')" type="toggle" v-model="selectedVariation.settings.tts.enabled" />
+      <v-form-group :title="$t('Enable TTS?')" type="bool" v-model="selectedVariation.settings.tts.enabled" />
       <v-form-group :title="$t('Min. Amount to Read')" type="number" v-model="selectedVariation.settings.tts.minAmount" />
       <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.tts.volume" :metadata="{ min: 0, max: 100 }" />
       <v-form-group :title="$t('Language')" type="dropdown" v-model="selectedVariation.settings.tts.language" />
