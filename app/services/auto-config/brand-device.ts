@@ -5,9 +5,16 @@ import { mutation, StatefulService } from '../stateful-service';
 import { Inject } from '../../util/injector';
 import { HostsService } from '../hosts';
 import { InitAfter } from '../../util/service-observer';
-import { downloadFile, handleErrors } from '../../util/requests';
+import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { TSourceType } from '../sources';
+import { ScenesService } from '../scenes';
+import { cloneDeep } from 'lodash';
+import { IObsListInput } from '../../components/obs/inputs/ObsInput';
+import {IpcServerService} from '../ipc-server';
+import {AudioService, IAudioSource} from '../audio';
+import * as fs from 'fs';
 
 interface IBrandDeviceUrls {
   system_sku: string;
@@ -15,6 +22,7 @@ interface IBrandDeviceUrls {
   global_ini_url: string;
   stream_encoder_url: string;
   record_encoder_url: string;
+  onboarding_cmds_url: string;
   overlay_url: string;
   name: string;
 }
@@ -44,6 +52,9 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private audioService: AudioService;
+  @Inject() private ipcServerService: IpcServerService;
 
 
   serviceEnabled() {
@@ -84,8 +95,10 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     try {
 
       const deviceUrls = await this.fetchDeviceUrls();
+      const deviceName = deviceUrls.name;
       const cacheDir = electron.remote.app.getPath('userData');
       const tempDir = electron.remote.app.getPath('temp');
+      let newSceneCollectionCreated = false;
 
       // download all files
 
@@ -102,23 +115,83 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       }
 
       if (deviceUrls.record_encoder_url) {
-        await downloadFile(deviceUrls.stream_encoder_url, `${cacheDir}/recordEncoder.json`);
+        await downloadFile(deviceUrls.record_encoder_url, `${cacheDir}/recordEncoder.json`);
       }
 
       if (deviceUrls.overlay_url) {
         const overlayPath = `${tempDir}/slobs-brand-device.overlay`;
         await downloadFile(deviceUrls.overlay_url, overlayPath);
-        await this.sceneCollectionsService.loadOverlay(overlayPath, this.state.urls.name);
+        await this.sceneCollectionsService.loadOverlay(overlayPath, deviceName);
+        newSceneCollectionCreated = true;
       }
 
       // force SLOBS to reload config files
       obs.NodeObs.OBS_service_resetVideoContext();
       obs.NodeObs.OBS_service_resetAudioContext();
 
+
+      // process API additional commands, some sources can be setup here
+      if (deviceUrls.onboarding_cmds_url) {
+        const cmdsPath = `${tempDir}/onboarding_cmds.json`;
+        await downloadFile(deviceUrls.onboarding_cmds_url, cmdsPath);
+        const cmds =  JSON.parse(fs.readFileSync(cmdsPath, 'utf8'));
+        if (!newSceneCollectionCreated) await this.sceneCollectionsService.create({ name: deviceName });
+        for (const cmd of cmds) this.ipcServerService.exec(cmd);
+      }
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  /**
+   * This method is calling by autoconfiguration commands from onboarding_cmds.json
+   * @Example
+   * addSceneItem(
+   *  'camera',
+   *  'dshow_input',
+   *  {
+   *   sourceSetting: {use_custom_audio_device: true}
+   *   fuzzySourceSettings: { audio_device_id: 'Microphone (Realtek(R) Audio)' }} // use description instead of id here
+   * )
+   */
+  addSceneItem(
+    name: string,
+    type: TSourceType,
+    options: {
+      sourceSettings?: Dictionary<any>,
+      sourceFuzzySettings?: Dictionary<any>,
+      audioSettings: Partial<IAudioSource>
+    })
+  {
+    const sceneItem = this.scenesService.activeScene.createAndAddSource(name, type);
+    const source = sceneItem.getSource();
+
+    if (!options.sourceSettings) return;
+    const settings = cloneDeep(options.sourceSettings);
+    const propsFormData = source.getPropertiesFormData();
+
+    for (const prop of propsFormData) {
+      // handle only LIST props for now
+      if (prop.type !== 'OBS_PROPERTY_LIST') continue;
+      if (!(prop.name in options.sourceFuzzySettings)) continue;
+
+      const searchPattern = options.sourceFuzzySettings[prop.name];
+
+      const option = (prop as IObsListInput<string>).options.find(option => {
+        return (option.value.includes(searchPattern) || option.description.includes(searchPattern))
+      });
+
+      if (!option) continue;
+      settings[prop.name] = option.value;
+    }
+
+    source.updateSettings(settings);
+
+    if (!options.audioSettings) return;
+    const audioSource = this.audioService.getSource(source.sourceId);
+    if (!audioSource) return;
+    audioSource.setSettings(options.audioSettings);
   }
 
   private async fetchDeviceUrls(): Promise<IBrandDeviceUrls> {
