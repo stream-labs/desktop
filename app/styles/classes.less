@@ -7,16 +7,28 @@
   justify-content: center;
 }
 
+.flex--wrap {
+  flex-wrap: wrap;
+}
+
 .flex--space-between {
   justify-content: space-between;
 }
 
-.flex--start {
+.flex--justify-start {
+  justify-content: flex-start;
+}
+
+.flex--align-start {
   align-items: flex-start;
 }
 
 .flex--column {
   flex-direction: column;
+}
+
+.flex--grow {
+  flex-grow: 1;
 }
 
 .flex__column {
@@ -26,51 +38,72 @@
   width: 100%;
 }
 
+.margin-right--20 {
+  margin-right: 20px;
+}
+
 .section {
-  padding: 20px 20px 0;
-  background: @day-primary;
-  border-bottom: 1px solid @day-border;
+  .padding(2);
+  .margin-bottom(3);
+  background: @day-section;
+  .radius();
 
   .button {
-    margin-bottom: 20px;
+    .margin-right(2);
   }
 }
 
 .section-title--dropdown {
-  h4 {
-    margin-bottom: 20px;
-    cursor: pointer;
-  }
+  cursor: pointer;
+  margin-bottom: 0;
 }
 
-.section-content--dropdown {
-  > div {
-    div {
-      &:last-child {
-        .input {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
+.section-title__icon {
+  background-color: @light-2;
+  color: @icon;
+  .radius();
+  .margin-right();
+  font-size: 10px;
+  padding: 4px;
+  vertical-align: text-bottom;
 }
 
-.text--sm {
-  font-size: 11px;
+.section-content {
+  margin-bottom: -16px;
 }
 
-// Backgrounds
-.gradient--teal {
-  background: #31c3a2; /* Old browsers */
-  background: -moz-linear-gradient(-45deg, #31c3a2 1%, #20e5be 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(-45deg, #31c3a2 1%,#20e5be 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(135deg, #31c3a2 1%,#20e5be 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#31c3a2', endColorstr='#20e5be',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+.section-content--opened {
+  .margin-top(3);
+}
+
+.noselect {
+  user-select: none;
+}
+
+.input-error {
+  color: @red;
+}
+
+// Toasts
+.toast-alert {
+  background-color: @red !important;
+}
+
+.toast-busy {
+  background-color: @yellow !important;
+  margin-top: 250px !important;
+}
+
+.toast-success {
+  background-color: @teal !important;
 }
 
 .night-theme {
   .section {
-    background: @night-primary;
-    border-color: @night-border;
+    background: @night-section;
+  }
+
+  .section-title__icon {
+    background-color: @dark-3;
   }
 }

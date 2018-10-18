@@ -5,8 +5,8 @@
       <h3>{{ name }}</h3>
       <div class="desc">{{ description }}</div>
 
-      <div class="source-support">
-        <div class="source-support__label">Supports</div>
+      <div class="source-support" v-if="showSupport">
+        <div class="source-support__label">{{ $t('Supports') }}</div>
         <slot name="support-list"></slot>
       </div>
     </div>
@@ -14,7 +14,6 @@
     <div class="source-info__media">
       <slot name="media"></slot>
     </div>
-    <!--<button @click="$emit('clickAdd')" class="button button--action">Add Source</button>-->
   </div>
 </div>
 </template>
@@ -52,6 +51,8 @@
   align-content: center;
   max-height: 150px;
   justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
 
   video,
   img {
@@ -60,12 +61,6 @@
     max-width: 100%;
     .radius;
   }
-}
-
-.source-text,
-.source-info__media {
-  display: flex;
-  flex: 0 0 50%;
 }
 
 .source-support__list {
@@ -85,8 +80,8 @@
 .source-support__label {
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: .7px;
-  .semibold;
+  .letter-spacing();
+  .weight(@medium);
   margin-bottom: 5px;
 }
 

@@ -2,41 +2,64 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { ScenesService } from '../services/scenes';
+import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { ScenesTransitionsService } from '../services/scenes-transitions';
-import { ScenesCollectionsService } from '../services/scenes-collections/config';
-import { AppService } from '../services/app';
+import { TransitionsService } from 'services/transitions';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
+import HelpTip from './shared/HelpTip.vue';
+import { EDismissable } from 'services/dismissables';
+import Fuse from 'fuse.js';
+import { SourceFiltersService } from 'services/source-filters';
+import { ProjectorService } from 'services/projector';
+import { $t } from 'services/i18n';
+import electron from 'electron';
 
 @Component({
-  components: { Selector, DropdownMenu },
+  components: { Selector, DropdownMenu, HelpTip },
 })
 export default class SceneSelector extends Vue {
+  @Inject() scenesService: ScenesService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() appService: AppService;
+  @Inject() transitionsService: TransitionsService;
+  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() projectorService: ProjectorService;
 
-  @Inject()
-  scenesService: ScenesService;
+  searchQuery = '';
 
-  @Inject()
-  scenesCollectionsService: ScenesCollectionsService;
+  addSceneTooltip = $t('Add a new Scene.');
+  removeSceneTooltip = $t('Remove Scene.');
+  showTransitionsTooltip = $t('Edit Scene Transitions.');
 
-  @Inject()
-  appService: AppService;
-
-  @Inject()
-  scenesTransitionsService: ScenesTransitionsService;
-
-  menu = new Menu();
-
-  created() {
-    this.menu.append({
-      label: 'Duplicate',
-      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
+  showContextMenu() {
+    const menu = new Menu();
+    menu.append({
+      label: $t('Duplicate'),
+      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.id)
     });
-    this.menu.append({
-      label: 'Rename',
-      click: () => this.scenesService.showNameScene(this.scenesService.activeScene.name)
+    menu.append({
+      label: $t('Rename'),
+      click: () => this.scenesService.showNameScene({
+        rename: this.scenesService.activeScene.id
+      })
     });
+    menu.append({
+      label: $t('Remove'),
+      click: () => this.removeScene()
+    });
+    menu.append({
+      label: $t('Filters'),
+      click: () => this.sourceFiltersService.showSourceFilters(
+        this.scenesService.activeScene.id
+      )
+    });
+    menu.append({
+      label: $t('Create Scene Projector'),
+      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
+    });
+    menu.popup();
   }
 
   makeActive(id: string) {
@@ -52,15 +75,25 @@ export default class SceneSelector extends Vue {
   }
 
   removeScene() {
-    this.scenesService.removeScene(this.activeSceneId);
+    const name = this.scenesService.activeScene.name;
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
+        buttons: [$t('Cancel'), $t('OK')]
+      },
+      ok => {
+        if (!ok) return;
+        if (!this.scenesService.removeScene(this.activeSceneId)) {
+          alert($t('There needs to be at least one scene.'));
+        }
+      }
+    );
   }
 
   showTransitions() {
-    this.scenesTransitionsService.showSceneTransitions();
-  }
-
-  loadConfig(configName: string) {
-    this.appService.loadConfig(configName);
+    this.transitionsService.showSceneTransitions();
   }
 
   get scenes() {
@@ -72,12 +105,27 @@ export default class SceneSelector extends Vue {
     });
   }
 
-  get scenesCollections() {
-    return this.scenesCollectionsService.state.scenesCollections;
+  get sceneCollections() {
+    const list = this.sceneCollectionsService.collections;
+
+    if (this.searchQuery) {
+      const fuse = new Fuse(list, {
+        shouldSort: true,
+        keys: ['name']
+      });
+
+      return fuse.search(this.searchQuery);
+    }
+
+    return list;
   }
 
-  get activeConfig() {
-    return this.scenesCollectionsService.state.activeCollection;
+  get activeId() {
+    return this.sceneCollectionsService.activeCollection.id;
+  }
+
+  get activeCollection() {
+    return this.sceneCollectionsService.activeCollection;
   }
 
   get activeSceneId() {
@@ -88,25 +136,15 @@ export default class SceneSelector extends Vue {
     return null;
   }
 
-  addCollection() {
-    this.scenesCollectionsService.showNameConfig();
+  loadCollection(id: string) {
+    this.sceneCollectionsService.load(id);
   }
 
-
-  duplicateCollection() {
-    this.scenesCollectionsService.showNameConfig({
-      scenesCollectionToDuplicate: this.activeConfig
-    });
+  manageCollections() {
+    this.sceneCollectionsService.showManageWindow();
   }
 
-
-  renameCollection() {
-    this.scenesCollectionsService.showNameConfig({ rename: true });
-  }
-
-
-  removeCollection() {
-    if (!confirm(`remove ${this.activeConfig} ?`)) return;
-    this.appService.removeCurrentConfig();
+  get helpTipDismissable() {
+    return EDismissable.SceneCollectionsHelpTip;
   }
 }

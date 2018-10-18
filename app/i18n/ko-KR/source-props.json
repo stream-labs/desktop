@@ -1,0 +1,17 @@
+{
+    "Image": "이미지",
+    "Color Source": "색 소스",
+    "Browser Source": "브라우저 소스",
+    "Media Source": "미디어 소스",
+    "Image Slide Show": "이미지 슬라이드 쇼",
+    "Text (GDI+)": "텍스트 (GDI+)",
+    "Text (FreeType 2)": "텍스트 (FreeType 2)",
+    "Display Capture": "디스플레이 캡처",
+    "Window Capture": "창 캡처",
+    "Game Capture": "게임 캡처",
+    "Video Capture Device": "영상 캡처 장치",
+    "Audio Input Capture": "소리 입력 캡처",
+    "Audio Output Capture": "소리 출력 캡처",
+    "Blackmagic Device": "Blackmagic 장치",
+    "NDI Source": "NDI 소스"
+}

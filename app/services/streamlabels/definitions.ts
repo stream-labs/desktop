@@ -16,15 +16,14 @@ export interface IStreamlabelDefinition {
 }
 
 export interface IStreamlabelSettingsDefinition {
-  format?: { tokens: string[]; };
-  item_format?: { tokens: string[]; };
-  item_separator?: { tokens: string[]; };
+  format?: { tokens: string[] };
+  item_format?: { tokens: string[] };
+  item_separator?: { tokens: string[] };
   settingsStat?: string;
   settingsWhitelist?: string[];
 }
 
 type TStreamlabelFormType = 'simpleFileForm' | 'itemFileForm';
-
 
 export function getDefinitions(platform: TPlatform) {
   if (platform === 'twitch') {
@@ -32,21 +31,28 @@ export function getDefinitions(platform: TPlatform) {
       ...allDefinitions,
       ...twitchDefinitions
     };
-  } else if (platform === 'youtube') {
+  }
+
+  if (platform === 'youtube') {
     return {
       ...allDefinitions,
       ...youtubeDefinitions
     };
-  } else {
-    throw new Error(`${platform} is not a supported platform`);
   }
-}
 
+  if (platform === 'mixer') {
+    return {
+      ...allDefinitions,
+      ...mixerDefinitions
+    };
+  }
+
+  throw new Error(`${platform} is not a supported platform`);
+}
 
 /*********************
  * Definitions Below *
  *********************/
-
 
 /**
  * Used by all services
@@ -54,159 +60,183 @@ export function getDefinitions(platform: TPlatform) {
 const allDefinitions: IStreamlabelSet = {
   top_donator: {
     label: 'Top Donor',
-    files: [{
-      name: 'all_time_top_donator',
-      label: 'All-Time Top Donor',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
+    files: [
+      {
+        name: 'all_time_top_donator',
+        label: 'All-Time Top Donor',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'session_top_donator',
+        label: 'Session Top Donor',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_top_donator',
+        label: 'Monthly Top Donor',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: '30day_top_donator',
+        label: '30-Day Top Donor',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_top_donator',
+        label: 'Weekly Top Donor',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
       }
-    }, {
-      name: 'session_top_donator',
-      label: 'Session Top Donor',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'monthly_top_donator',
-      label: 'Monthly Top Donor',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: '30day_top_donator',
-      label: '30-Day Top Donor',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'weekly_top_donator',
-      label: 'Weekly Top Donor',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }]
+    ]
   },
   top_donators: {
     label: 'Top Donors (Top 10)',
-    files: [{
-      name: 'all_time_top_donators',
-      label: 'All-Time Top Donors',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
+    files: [
+      {
+        name: 'all_time_top_donators',
+        label: 'All-Time Top Donors',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'session_top_donators',
+        label: 'Session Top Donors',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'monthly_top_donators',
+        label: 'Monthly Top Donors',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: '30day_top_donators',
+        label: '30-Day Top Donors',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'weekly_top_donators',
+        label: 'Weekly Top Donors',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
       }
-    }, {
-      name: 'session_top_donators',
-      label: 'Session Top Donors',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'monthly_top_donators',
-      label: 'Monthly Top Donors',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: '30day_top_donators',
-      label: '30-Day Top Donors',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'weekly_top_donators',
-      label: 'Weekly Top Donors',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }]
+    ]
   },
   top_donations: {
     label: 'Top Donations',
-    files: [{
-      name: 'all_time_top_donations',
-      label: 'All-Time Top Donations',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
+    files: [
+      {
+        name: 'all_time_top_donations',
+        label: 'All-Time Top Donations',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'session_top_donations',
+        label: 'Session Top Donations',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'monthly_top_donations',
+        label: 'Monthly Top Donations',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: '30day_top_donations',
+        label: '30-Day Top Donations',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'weekly_top_donations',
+        label: 'Weekly Top Donations',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
       }
-    }, {
-      name: 'session_top_donations',
-      label: 'Session Top Donations',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'monthly_top_donations',
-      label: 'Monthly Top Donations',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: '30day_top_donations',
-      label: '30-Day Top Donations',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'weekly_top_donations',
-      label: 'Weekly Top Donations',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }]
+    ]
   },
   donation_amount: {
     label: 'Donation Amount',
-    files: [{
-      name: 'total_donation_amount',
-      label: 'Total Donation Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
+    files: [
+      {
+        name: 'total_donation_amount',
+        label: 'Total Donation Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'session_donation_amount',
+        label: 'Session Donation Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_donation_amount',
+        label: 'Monthly Donation Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: '30day_donation_amount',
+        label: '30-Day Donation Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_donation_amount',
+        label: 'Weekly Donation Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
       }
-    }, {
-      name: 'session_donation_amount',
-      label: 'Session Donation Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'monthly_donation_amount',
-      label: 'Monthly Donation Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: '30day_donation_amount',
-      label: '30-Day Donation Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'weekly_donation_amount',
-      label: 'Weekly Donation Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }]
+    ]
   },
   donators: {
     label: 'Donors',
@@ -217,7 +247,8 @@ const allDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
         }
-      }, {
+      },
+      {
         name: 'session_donators',
         label: 'Session Donors (Max 25)',
         settings: {
@@ -225,7 +256,8 @@ const allDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
         }
-      }, {
+      },
+      {
         name: 'session_most_recent_donator',
         label: 'Session Recent Donor',
         settings: {
@@ -350,117 +382,135 @@ const youtubeDefinitions: IStreamlabelSet = {
   },
   superchat_amount: {
     label: 'Super Chat Amount',
-    files: [{
-      name: 'total_youtube_superchat_amount',
-      label: 'Total Super Chat Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
+    files: [
+      {
+        name: 'total_youtube_superchat_amount',
+        label: 'Total Super Chat Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'session_youtube_superchat_amount',
+        label: 'Session Super Chat Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_youtube_superchat_amount',
+        label: 'Monthly Super Chat Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: '30day_youtube_superchat_amount',
+        label: '30-Day Super Chat Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_youtube_superchat_amount',
+        label: 'Weekly Super Chat Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
       }
-    }, {
-      name: 'session_youtube_superchat_amount',
-      label: 'Session Super Chat Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'monthly_youtube_superchat_amount',
-      label: 'Monthly Super Chat Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: '30day_youtube_superchat_amount',
-      label: '30-Day Super Chat Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'weekly_youtube_superchat_amount',
-      label: 'Weekly Super Chat Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }]
+    ]
   },
 
   top_superchatters: {
     label: 'Top Super Chatters (Top 10)',
-    files: [{
-      name: 'all_time_top_youtube_superchatters',
-      label: 'All-Time Top Super Chatters',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
+    files: [
+      {
+        name: 'all_time_top_youtube_superchatters',
+        label: 'All-Time Top Super Chatters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'session_top_youtube_superchatters',
+        label: 'Session Top Super Chatters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'monthly_top_youtube_superchatters',
+        label: 'Monthly Top Super Chatters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: '30day_top_youtube_superchatters',
+        label: '30-Day Top Super Chatters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'weekly_top_youtube_superchatters',
+        label: 'Weekly Top Super Chatters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
       }
-    }, {
-      name: 'session_top_youtube_superchatters',
-      label: 'Session Top Super Chatters',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'monthly_top_youtube_superchatters',
-      label: 'Monthly Top Super Chatters',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: '30day_top_youtube_superchatters',
-      label: '30-Day Top Super Chatters',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'weekly_top_youtube_superchatters',
-      label: 'Weekly Top Super Chatters',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }]
+    ]
   },
 
   top_superchatter: {
     label: 'Top Super Chatter',
-    files: [{
-      name: 'all_time_top_youtube_superchatter',
-      label: 'All-Time Top Super Chatter',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
+    files: [
+      {
+        name: 'all_time_top_youtube_superchatter',
+        label: 'All-Time Top Super Chatter',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'session_top_youtube_superchatter',
+        label: 'Session Top Super Chatter',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_top_youtube_superchatter',
+        label: 'Monthly Top Super Chatter',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: '30day_top_youtube_superchatter',
+        label: '30-Day Top Super Chatter',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_top_youtube_superchatter',
+        label: 'Weekly Top Super Chatter',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
       }
-    }, {
-      name: 'session_top_youtube_superchatter',
-      label: 'Session Top Super Chatter',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'monthly_top_youtube_superchatter',
-      label: 'Monthly Top Super Chatter',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: '30day_top_youtube_superchatter',
-      label: '30-Day Top Super Chatter',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'weekly_top_youtube_superchatter',
-      label: 'Weekly Top Super Chatter',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }]
+    ]
   },
 
   superchatters: {
@@ -472,7 +522,8 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
         }
-      }, {
+      },
+      {
         name: 'session_superchatters',
         label: 'Session Super Chatters (Max 25)',
         settings: {
@@ -480,7 +531,8 @@ const youtubeDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
         }
-      }, {
+      },
+      {
         name: 'session_most_recent_youtube_superchatter',
         label: 'Session Recent Super Chatter',
         settings: {
@@ -539,7 +591,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         }
       }
     ]
-  },
+  }
 };
 
 /**
@@ -651,81 +703,93 @@ const twitchDefinitions: IStreamlabelSet = {
   },
   top_cheerer: {
     label: 'Top Cheerer',
-    files: [{
-      name: 'all_time_top_cheerer',
-      label: 'All-Time Top Cheerer',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
+    files: [
+      {
+        name: 'all_time_top_cheerer',
+        label: 'All-Time Top Cheerer',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'session_top_cheerer',
+        label: 'Session Top Cheerer',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_top_cheerer',
+        label: 'Monthly Top Cheerer',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: '30day_top_cheerer',
+        label: '30-Day Top Cheerer',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_top_cheerer',
+        label: 'Weekly Top Cheerer',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] }
+        }
       }
-    }, {
-      name: 'session_top_cheerer',
-      label: 'Session Top Cheerer',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'monthly_top_cheerer',
-      label: 'Monthly Top Cheerer',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: '30day_top_cheerer',
-      label: '30-Day Top Cheerer',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }, {
-      name: 'weekly_top_cheerer',
-      label: 'Weekly Top Cheerer',
-      settings: {
-        format: { tokens: ['{name}', '{amount}'] }
-      }
-    }]
+    ]
   },
   top_cheerers: {
     label: 'Top Cheerers (Top 10)',
-    files: [{
-      name: 'all_time_top_cheerers',
-      label: 'All-Time Top Cheerers',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
+    files: [
+      {
+        name: 'all_time_top_cheerers',
+        label: 'All-Time Top Cheerers',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'session_top_cheerers',
+        label: 'Session Top Cheerers',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'monthly_top_cheerers',
+        label: 'Monthly Top Cheerers',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: '30day_top_cheerers',
+        label: '30-Day Top Cheerers',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
+      },
+      {
+        name: 'weekly_top_cheerers',
+        label: 'Weekly Top Cheerers',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] }
+        }
       }
-    }, {
-      name: 'session_top_cheerers',
-      label: 'Session Top Cheerers',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'monthly_top_cheerers',
-      label: 'Monthly Top Cheerers',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: '30day_top_cheerers',
-      label: '30-Day Top Cheerers',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }, {
-      name: 'weekly_top_cheerers',
-      label: 'Weekly Top Cheerers',
-      settings: {
-        format: { tokens: ['{list}'] },
-        item_format: { tokens: ['{name}', '{amount}'] },
-        item_separator: { tokens: ['\\n'] }
-      }
-    }]
+    ]
   },
   top_cheers: {
     label: 'Top Cheers',
@@ -779,37 +843,43 @@ const twitchDefinitions: IStreamlabelSet = {
   },
   cheer_amount: {
     label: 'Cheer Amount',
-    files: [{
-      name: 'total_cheer_amount',
-      label: 'Total Cheer Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
+    files: [
+      {
+        name: 'total_cheer_amount',
+        label: 'Total Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'session_cheer_amount',
+        label: 'Session Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'monthly_cheer_amount',
+        label: 'Monthly Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: '30day_cheer_amount',
+        label: '30-Day Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
+      },
+      {
+        name: 'weekly_cheer_amount',
+        label: 'Weekly Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] }
+        }
       }
-    }, {
-      name: 'session_cheer_amount',
-      label: 'Session Cheer Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'monthly_cheer_amount',
-      label: 'Monthly Cheer Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: '30day_cheer_amount',
-      label: '30-Day Cheer Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }, {
-      name: 'weekly_cheer_amount',
-      label: 'Weekly Cheer Amount',
-      settings: {
-        format: { tokens: ['{amount}'] }
-      }
-    }]
+    ]
   },
   cheerers: {
     label: 'Cheerers',
@@ -820,7 +890,8 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
         }
-      }, {
+      },
+      {
         name: 'session_cheerers',
         label: 'Session Cheerers (Max 25)',
         settings: {
@@ -828,7 +899,8 @@ const twitchDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
         }
-      }, {
+      },
+      {
         name: 'session_most_recent_cheerer',
         label: 'Session Recent Cheerer',
         settings: {
@@ -925,6 +997,110 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{months}'] }
         }
+      }
+    ]
+  }
+};
+const mixerDefinitions: IStreamlabelSet = {
+  // trains_combos: {
+  //   label: 'Trains/Combos',
+  //   files: [
+  //     {
+  //       name: 'train_tips',
+  //       label: 'Donation Train',
+  //     },
+  //     {
+  //       name: 'train_mixer_follows',
+  //       label: 'Follows Train',
+  //     },
+  //     {
+  //       name: 'train_mixer_subscriptions',
+  //       label: 'Subscription Train',
+  //     }
+  //   ]
+  // },
+  subscribers: {
+    label: 'Subscribers',
+    files: [
+      // {
+      //     name: 'total_mixer_subscriber_count',
+      //     label: 'Total Subscriber Count',
+      //     settings: {
+      //         format: { tokens: ['{count}'] }
+      //     },
+      // },
+      {
+        name: 'most_recent_mixer_subscriber',
+        label: 'Most Recent Subscriber',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+      {
+        name: 'session_mixer_subscribers',
+        label: 'Session Subscribers (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_mixer_subscriber_count',
+        label: 'Session Subscriber Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_most_recent_mixer_subscriber',
+        label: 'Session Most Recent Subscriber',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      }
+    ]
+  },
+  followers: {
+    label: 'Followers',
+    files: [
+      // {
+      //     name: 'total_follower_count',
+      //     label: 'Total Follower Count',
+      //     settings: {
+      //         format: { tokens: ['{count}'] }
+      //     },
+      //     template: 'simpleFileForm'
+      // },
+      {
+        name: 'most_recent_mixer_follower',
+        label: 'Most Recent Follower',
+        settings: {
+          format: { tokens: ['{name}'] }
+        },
+      },
+      {
+        name: 'session_mixer_followers',
+        label: 'Session Followers (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] }
+        },
+      },
+      {
+        name: 'session_mixer_follower_count',
+        label: 'Session Follower Count',
+        settings: {
+          format: { tokens: ['{count}'] }
+        },
+      },
+      {
+        name: 'session_most_recent_mixer_follower',
+        label: 'Session Most Recent Follower',
+        settings: {
+          format: { tokens: ['{name}'] }
+        },
       }
     ]
   }

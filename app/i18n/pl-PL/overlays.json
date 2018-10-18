@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "Pomyślnie zapisano %{filename}",
+  "Successfully loaded %{filename}.overlay": "Pomyślnie załadowano %{filename}.overlay",
+  "This is an experimental feature.  Use at your own risk.": "Ta funkcja jest eksperymentalna. Użycie na własne ryzyko.",
+  "Export Overlay File": "Eksportuj plik nakładki",
+  "Import Overlay File": "Importuj plik nakładki",
+  "Import Widget File in Current Scene": "Importuj plik widżetu do bieżącej sceny"
+}

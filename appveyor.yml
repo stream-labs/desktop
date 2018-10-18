@@ -2,10 +2,26 @@ build: off
 
 install:
   - ps: Install-Product node 8
-  - git submodule update --init --recursive
-  - yarn install
-  - yarn install-node-obs
-  - yarn ci:compile
+  - yarn install --frozen-lockfile --check-files
+  - yarn compile:ci
 
 test_script:
-  - yarn test -- -v
+  - yarn test
+  # - yarn screentest
+  # - 7z a screentest.zip test-dist\screentest\*
+  # - ps: $env:warning_ico = ":warning:"
+  # - ps: $env:success_ico = ":white_check_mark:"
+  # - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
+  # - ps: $env:project_link = "https://ci.appveyor.com/project/Streamlabs/streamlabs-obs"
+  # - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:warning_ico $env:changed_screens screens have been changed $env:project_link/build/$env:APPVEYOR_BUILD_VERSION/artifacts"} else { Add-AppveyorMessage "$env:success_ico no screens changed" }
+
+# artifacts:
+#   - path: 'screentest.zip'
+#     name: Screentests
+
+notifications:
+  - provider: GitHubPullRequest
+    template: "{{#failed}}:x: build failed{{/failed}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
+
+cache:
+  - plugins

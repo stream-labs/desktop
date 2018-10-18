@@ -1,0 +1,17 @@
+{
+    "Image": "イメージ",
+    "Color Source": "色のソース",
+    "Browser Source": "ブラウザーのソース",
+    "Media Source": "メディア ソース",
+    "Image Slide Show": "画像スライド ショー",
+    "Text (GDI+)": "テキスト (GDI +)",
+    "Text (FreeType 2)": "テキスト (FreeType 2)",
+    "Display Capture": "キャプチャーを表示します。",
+    "Window Capture": "ウィンドウのキャプチャー",
+    "Game Capture": "ゲームの キャプチャー",
+    "Video Capture Device": "ビデオ キャプチャー デバイス",
+    "Audio Input Capture": "オーディオ入力のキャプチャー",
+    "Audio Output Capture": "オーディオ出力のキャプチャー",
+    "Blackmagic Device": "Blackmagic デバイス",
+    "NDI Source": "NDI のソース"
+}

@@ -1,5 +1,6 @@
-import * as input from 'components/shared/forms/Input';
+import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
+import { compact } from 'lodash';
 
 
 /**
@@ -8,15 +9,12 @@ import * as obs from '../../../../obs-api';
  */
 export interface IPropertyManager {
   destroy(): void;
-  getPropertiesFormData(): input.TFormData;
-  setPropertiesFormData(property: input.TFormData): void;
+  getPropertiesFormData(): input.TObsFormData;
+  setPropertiesFormData(property: input.TObsFormData): void;
   settings: Dictionary<any>;
   applySettings(settings: Dictionary<any>): void;
   customUIComponent: string;
 }
-
-
-
 
 
 /**
@@ -37,8 +35,8 @@ export abstract class PropertiesManager implements IPropertyManager {
    */
   constructor(public obsSource: obs.ISource, settings: Dictionary<any>) {
     this.settings = {};
-    this.init();
     this.applySettings(settings);
+    this.init();
   }
 
 
@@ -47,6 +45,12 @@ export abstract class PropertiesManager implements IPropertyManager {
    * that are stored in the application configuration.
    */
   settings: Dictionary<any>;
+
+  /**
+   * Will be true when the manager has been destroyed.  This should
+   * be checked before accessing the obsInput reference.
+   */
+  protected destroyed = false;
 
 
   /**
@@ -62,6 +66,7 @@ export abstract class PropertiesManager implements IPropertyManager {
    * properties manager.
    */
   destroy() {
+    this.destroyed = true;
   }
 
 
@@ -102,9 +107,9 @@ export abstract class PropertiesManager implements IPropertyManager {
   }
 
 
-  getPropertiesFormData(): input.TFormData {
+  getPropertiesFormData(): input.TObsFormData {
     const obsProperties = input.getPropertiesFormData(this.obsSource);
-    let propsArray: input.TFormData = [];
+    let propsArray: input.TObsFormData = [];
 
     // First, add properties that appear in the display order
     this.displayOrder.forEach(name => {
@@ -117,7 +122,7 @@ export abstract class PropertiesManager implements IPropertyManager {
     });
 
     propsArray = propsArray.concat(obsProperties);
-    propsArray = propsArray.filter(prop => !this.blacklist.includes(prop.name));
+    propsArray = compact(propsArray).filter(prop => !this.blacklist.includes(prop.name));
 
     return propsArray;
   }
@@ -130,7 +135,7 @@ export abstract class PropertiesManager implements IPropertyManager {
    * are edited by the user.
    * @param properties The OBS properties
    */
-  setPropertiesFormData(properties: input.TFormData) {
+  setPropertiesFormData(properties: input.TObsFormData) {
     input.setPropertiesFormData(this.obsSource, properties);
   }
 

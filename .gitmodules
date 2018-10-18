@@ -1,6 +1,0 @@
-[submodule "node-libuiohook"]
-	path = node-libuiohook
-	url = https://github.com/stream-labs/node-libuiohook.git
-[submodule "obs-studio-node"]
-	path = obs-studio-node
-	url = https://github.com/stream-labs/obs-studio-node.git

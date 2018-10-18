@@ -2,13 +2,13 @@
   <div>
     <div v-if="loggedIn">
       <a class="link" @click="logout">
-        <i class="fa fa-sign-out"/> <span class="user__name">{{ username }}</span>
+        <i class="icon-logout"/> <span class="user__name">{{ username }}</span>
       </a>
     </div>
     <div
       v-else>
       <a class="link link--uppercase" @click="login">
-        <i class="fa fa-sign-in"/> Login
+        <i class="fas fa-sign-in-alt"/> {{ $t('Login') }}
       </a>
     </div>
   </div>
@@ -20,6 +20,10 @@
 @import "../styles/index";
 
 .user__name {
-  .semibold;
+  .weight(@medium);
+
+  @media(max-width: 1600px) {
+    display: none;
+  }
 }
 </style>

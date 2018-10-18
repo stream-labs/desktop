@@ -1,0 +1,19 @@
+{
+  "Label Type": "Tipo de Rótulo",
+  "Label Template": "Modelo do Rótulo",
+  "Item Template": "Modelo do Item",
+  "Item Separator": "Separador do Item",
+  "Item Limit": "Limite do Item",
+  "Duration (seconds)": "Duração (segundos)",
+  "Show Clock": "Exibir Relógio",
+  "Always, show 0:00 when inactive": "Sempre exibir 0:00 quando inativo",
+  "Hide when inactive": "Ocultar quando inativo",
+  "Show Count": "Mostrar Contagem",
+  "Always, show 0 when inactive": "Sempre exibir 0 quando inativo",
+  "Show Latest": "Exibir Mais Recente",
+  "Always, show last person when inactive": "Sempre exibir a última pessoa quando inativo",
+  "Include Resubs": "Incluir Resubs",
+  "Preview": "Visualizar",
+  "Note:": "Nota:",
+  "Actual label text may take up to 60 seconds to update": "O texto atual pode demorar até 60 segundos para atualizar"
+}

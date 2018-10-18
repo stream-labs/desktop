@@ -2,8 +2,8 @@ import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors } from 'util/requests';
-import io from 'socket.io-client';
+import { handleErrors, authorizedHeaders } from 'util/requests';
+import { WebsocketService, TSocketEvent } from 'services/websocket';
 import uuid from 'uuid/v4';
 import fs from 'fs';
 import path from 'path';
@@ -63,42 +63,8 @@ interface ITrains {
   follow: ITrainInfo;
 }
 
+
 type TTrainType = 'donation' | 'follow' | 'subscription';
-
-type TSocketEvent =
-  IStreamlabelsSocketEvent |
-  IDonationSocketEvent |
-  IFollowSocketEvent |
-  ISubscriptionSocketEvent;
-
-interface IStreamlabelsSocketEvent {
-  type: 'streamlabels';
-  message: {
-    data: Dictionary<string>;
-  };
-}
-
-interface IDonationSocketEvent {
-  type: 'donation';
-  message: {
-    name: string;
-    amount: string;
-  }[];
-}
-
-interface IFollowSocketEvent {
-  type: 'follow';
-  message: {
-    name: string;
-  }[];
-}
-
-interface ISubscriptionSocketEvent {
-  type: 'subscription';
-  message: {
-    name: string;
-  }[];
-}
 
 
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
@@ -110,6 +76,7 @@ export class StreamlabelsService extends Service {
 
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() websocketService: WebsocketService;
 
 
   /**
@@ -130,6 +97,8 @@ export class StreamlabelsService extends Service {
 
 
   trainInterval: number;
+
+  socket: SocketIOClient.Socket;
 
 
   /**
@@ -168,6 +137,16 @@ export class StreamlabelsService extends Service {
     this.fetchSettings();
     this.initSocketConnection();
     this.initTrainClockInterval();
+
+    this.userService.userLogin.subscribe(() => {
+      this.onUserLogin();
+    });
+  }
+
+
+  onUserLogin() {
+    this.fetchInitialData();
+    this.fetchSettings();
   }
 
 
@@ -242,16 +221,27 @@ export class StreamlabelsService extends Service {
       this.outputAllTrains();
     }
 
-    const headers = new Headers();
+    const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-    `/settings?token=${this.userService.widgetToken}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const request = new Request(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(this.settings)
     });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(() => true);
+  }
+
+  restartSession(): Promise<Boolean> {
+    if (!this.userService.isLoggedIn()) return;
+
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     return fetch(request)
       .then(handleErrors)
@@ -271,9 +261,9 @@ export class StreamlabelsService extends Service {
   private fetchInitialData(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-      `/files?token=${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(handleErrors)
@@ -285,9 +275,9 @@ export class StreamlabelsService extends Service {
   private fetchSettings(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-      `/settings?token=${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(handleErrors)
@@ -297,31 +287,7 @@ export class StreamlabelsService extends Service {
 
 
   private initSocketConnection(): void {
-    if (!this.userService.isLoggedIn()) {
-      console.warn('User must be logged in for streamlabels socket connection');
-      return;
-    }
-
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token/${this.userService.widgetToken}`;
-    const request = new Request(url);
-
-    fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.socket_token)
-      .then(token => {
-        const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
-        const socket = io(url, { transports: ['websocket'] });
-
-        // These are useful for debugging
-        socket.on('connect', () => this.log('Connection Opened'));
-        socket.on('connect_error', (e: any) => this.log('Connection Error', e));
-        socket.on('connect_timeout', () => this.log('Connection Timeout'));
-        socket.on('error', () => this.log('Error'));
-        socket.on('disconnect', () => this.log('Connection Closed'));
-
-        socket.on('event', (e: any) => this.onSocketEvent(e));
-      });
+    this.websocketService.socketEvent.subscribe(e => this.onSocketEvent(e));
   }
 
 
@@ -444,11 +410,15 @@ export class StreamlabelsService extends Service {
 
 
   private ensureDirectory() {
-    if (fs.existsSync(this.streamlabelsDirectory)) {
-      rimraf.sync(this.streamlabelsDirectory);
-    }
+    try {
+      if (fs.existsSync(this.streamlabelsDirectory)) {
+        rimraf.sync(this.streamlabelsDirectory);
+      }
 
-    fs.mkdirSync(this.streamlabelsDirectory);
+      fs.mkdirSync(this.streamlabelsDirectory);
+    } catch (e) {
+      console.error('Error ensuring streamlabels directory!');
+    }
   }
 
 
@@ -503,5 +473,4 @@ export class StreamlabelsService extends Service {
       data: this.output[statname]
     });
   }
-
 }

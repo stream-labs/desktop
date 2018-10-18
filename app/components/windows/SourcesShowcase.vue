@@ -2,361 +2,81 @@
 <modal-layout
   :show-controls="false"
   :content-styles="{ padding: 0 }"
-  title="Add Source">
+>
 
   <div slot="content"
     class="add-source">
     <!-- Standard sources -->
     <add-source-info
-      v-if="inspectedSource === 'image_source'"
-      @clickAdd="selectSource('image_source')"
-      name="Image"
-      description="Add images to your scene.">
-      <img slot="media" src="../../../media/source-demos/source-image.png"/>
+      v-for="source in availableSources"
+      :key="source.value"
+      v-if="inspectedSource === source.value"
+      :name="sourceData(source.value).name"
+      :description="sourceData(source.value).description"
+      :showSupport="!!sourceData(source.value).supportList"
+    >
+      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(source.value, 'day')" />
+      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(source.value, 'night')"/>
       <ul slot="support-list" class="source-support__list">
-        <li>png</li>
-        <li>jpg</li>
-        <li>jpeg</li>
-        <li>gif</li>
-        <li>tga</li>
-        <li>bmp</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'slideshow'"
-      @clickAdd="selectSource('slideshow')"
-      name="Image Slide Show"
-      description="Add a slideshow of images to your scene.">
-      <img slot="media" src="../../../media/source-demos/source-slide-show.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>png</li>
-        <li>jpg</li>
-        <li>jpeg</li>
-        <li>gif</li>
-        <li>tga</li>
-        <li>bmp</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'ffmpeg_source'"
-      @clickAdd="selectSource('ffmpeg_source')"
-      name="Media Source"
-      description="Add videos or sound clips to your scene.">
-      <img slot="media" src="../../../media/source-demos/source-media.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>mp4</li>
-        <li>ts</li>
-        <li>mov</li>
-        <li>flv</li>
-        <li>mkv</li>
-        <li>avi</li>
-        <li>mp3</li>
-        <li>ogg</li>
-        <li>aac</li>
-        <li>wav</li>
-        <li>gif</li>
-        <li>webm</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'window_capture'"
-      @clickAdd="selectSource('window_capture')"
-      name="Window Capture"
-      description="Capture a specific window that's open on your computer.">
-      <img slot="media" src="../../../media/source-demos/source-capture.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Compatible with most modern browsers and programs</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'dshow_input'"
-      @clickAdd="selectSource('dshow_input')"
-      name="Video Capture Device"
-      description="Select from your build in USB webcam or an external.">
-      <img slot="media" src="../../../media/source-demos/source-video.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Built in webcam</li>
-        <li>Logitech webcam</li>
-        <li>Capture cards (Elgato, Avermedia, BlackMagic)</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'wasapi_output_capture'"
-      @clickAdd="selectSource('wasapi_output_capture')"
-      name="Audio Output Capture"
-      description="Captures your desktop audio for the purpose of playing sound, such as music or speech.">
-      <img slot="media" src="../../../media/source-demos/source-output.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Desktop audio</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'color_source'"
-      @clickAdd="selectSource('color_source')"
-      name="Color Source"
-      description="Add a color to the background of your whole scene or just a part.">
-      <img slot="media" src="../../../media/source-demos/source-color.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Hex</li>
-        <li>RGBA</li>
-        <li>HSV</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'browser_source'"
-      @clickAdd="selectSource('browser_source')"
-      name="BrowserSource"
-      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
-      <img slot="media" src="../../../media/source-demos/source-browser.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Websites</li>
-        <li>Third party widgets</li>
-        <li>HTML</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'text_gdiplus'"
-      @clickAdd="selectSource('text_gdiplus')"
-      name="Text (GDI+)"
-      description="Add text to your scene and adjust its style.">
-      <img slot="media" src="../../../media/source-demos/source-text.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Hex</li>
-        <li>RGBA</li>
-        <li>HSV</li>
-        <li>System Fonts</li>
-        <li>System Sizes</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'monitor_capture'"
-      @clickAdd="selectSource('monitor_capture')"
-      name="Display Capture"
-      description="Capture your entire computer monitor.">
-      <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Primary monitor</li>
-        <li>Secondary monitor</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'game_capture'"
-      @clickAdd="selectSource('game_capture')"
-      name="Game Capture"
-      description="Capture a game you're playing on your computer.">
-      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Built in works with most modern computer games</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'wasapi_input_capture'"
-      @clickAdd="selectSource('wasapi_input_capture')"
-      name="Audio Input Capture"
-      description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.">
-      <img slot="media" src="../../../media/source-demos/source-input.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Built in microphones</li>
-        <li>USB microphones</li>
-        <li>Other USB devices</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'decklink-input'"
-      @clickAdd="selectSource('decklink-input')"
-      name="Blackmagic Device"
-      description="Capture the feed your decklink device is capturing.">
-      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Works with most of the recent Blackmagic cards.</li>
+        <li v-for="support in sourceData(source.value).supportList" :key="support">
+          {{ support }}
+        </li>
       </ul>
     </add-source-info>
 
     <!-- Widget Sources -->
     <add-source-info
-      v-if="inspectedSource === widgetTypes.AlertBox"
-      @clickAdd="selectWidget(widgetTypes.AlertBox)"
-      name="Alertbox"
-      description="Thanks viewers with notification popups.">
-      <img slot="media" src="../../../media/source-demos/alertbox.gif"/>
+      v-for="type in iterableWidgetTypes"
+      :key="type"
+      v-if="inspectedSource === widgetTypes[type]"
+      :name="widgetData(type).name"
+      :description="widgetData(type).description"
+    >
+      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--day" autoplay loop slot="media">
+        <source :src="getSrc(type, 'day')">
+      </video>
+      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--night" autoplay loop slot="media">
+        <source :src="getSrc(type, 'night')">
+      </video>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--day" slot="media" :src="getSrc(type, 'day')"/>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--night" slot="media" :src="getSrc(type, 'night')"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
+        <li v-for="support in widgetData(type).supportList" :key="support">
+          {{ support }}
+        </li>
       </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.DonationTicker"
-      @clickAdd="selectWidget(widgetTypes.DonationTicker)"
-      name="Donation Ticker"
-      description="Show off your most recent donations to your viewers.">
-      <img slot="media" src="../../../media/source-demos/donationticker.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.EventList"
-      @clickAdd="selectWidget(widgetTypes.EventList)"
-      name="Event List"
-      description="Include your channel's most recent events into your stream.">
-      <img slot="media" src="../../../media/source-demos/eventlist.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
-        <li>Redemptions</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.DonationGoal"
-      @clickAdd="selectWidget(widgetTypes.DonationGoal)"
-      name="Donation Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/donationgoal.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.FollowerGoal"
-      @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
-      name="Follower Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Twitch Follows</li>
-        <li>Youtube Follows</li>
-        <li>Mixer Follows</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.BitGoal"
-      @clickAdd="selectWidget(widgetTypes.BitGoal)"
-      name="Bit Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Twitch Bits</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.SubscriptionGoal"
-      @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
-      name="Subscription Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Youtube Subscribers</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.ChatBox"
-      @clickAdd="selectWidget(widgetTypes.ChatBox)"
-      name="Chatbox"
-      description="Include your channel's chat into your stream.">
-      <img slot="media" src="../../../media/source-demos/chat.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Twitch chat</li>
-        <li>Youtube chat</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.TheJar"
-      @clickAdd="selectWidget(widgetTypes.TheJar)"
-      name="The Jar"
-      description="The jar that catches bits, tips, and more.">
-      <img slot="media" src="../../../media/source-demos/jar.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.ViewerCount"
-      @clickAdd="selectWidget(widgetTypes.ViewerCount)"
-      name="Viewer Count"
-      description="Show off your viewers from multiple platforms.">
-      <img slot="media" src="../../../media/source-demos/viewercount-source.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Youtube</li>
-        <li>Twitch</li>
-        <li>Mixer</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.StreamBoss"
-      @clickAdd="selectWidget(widgetTypes.StreamBoss)"
-      name="Stream Boss"
-      description="Battle with bits to be the boss of the stream!">
-      <img slot="media" src="../../../media/source-demos/streamboss-source.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Twitch Bits</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.Credits"
-      @clickAdd="selectWidget(widgetTypes.Credits)"
-      name="Credits"
-      description="Rolling credits to play at the end of your stream.">
-      <img slot="media" src="../../../media/source-demos/credits.gif"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>New Followers</li>
-        <li>New Subscribers</li>
-        <li>Cheers</li>
-        <li>Donations</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'scene'"
-      @clickAdd="selectSource('scene')"
-      name="Scene"
-      description="Allows you to add existing scene as a source">
-      <img slot="media" src="../../../media/source-demos/source-browser.png"/>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'streamlabel'"
-      @clickAdd="selectWidget(widgetTypes.Credits)"
-      name="Stream Label"
-      description="This is a placeholder description for streamlabels.">
-      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      :name="$t('Stream Label')"
+      :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
+      key="28">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>New Followers</li>
-        <li>New Subscribers</li>
-        <li>Cheers</li>
-        <li>Donations</li>
+        <li>{{ $t('New Followers') }}</li>
+        <li>{{ $t('New Subscribers') }}</li>
+        <li>{{ $t('New Cheers') }}</li>
+        <li>{{ $t('New Donations') }}</li>
+        <li>{{ $t('All-Time Top Donator') }}</li>
+        <li>{{ $t('Weekly Top Donator') }}</li>
+        <li>{{ $t('Monthly Follows') }}</li>
+        <li>{{ $t('Many more') }}</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-for="appSource in availableAppSources"
+      :key="`${appSource.appId}-${appSource.source.id}`"
+      v-if="(inspectedSource === 'app_source') && (inspectedAppId === appSource.appId) && (inspectedAppSourceId === appSource.source.id)"
+      :name="appSource.source.name"
+      :description="appSource.source.about.description">
+      <img class="source__demo source__demo--night" slot="media" :src="getAppAssetUrl(appSource.appId, appSource.source.about.bannerImage)" />
+      <ul slot="support-list">
+        <li v-for="(bullet, index) in appSource.source.about.bullets" :key="index">
+          {{ bullet }}
+        </li>
       </ul>
     </add-source-info>
 
@@ -364,144 +84,80 @@
       class="source-info"
       v-if="inspectedSource === null">
       <div class="source-welcome">
-        <div class="source-welcome__text">
-          <h3>Welcome to sources!</h3>
+        <div class="source-info__text">
+          <h3>{{ $t('Welcome to sources!') }}</h3>
           <ol>
-            <li>Browse through our Standard and Widget sources</li>
-            <li>Click a source to get more details about it</li>
-            <li>Click 'Add Source' when you're ready to add it to your scene</li>
+            <li>{{ $t('Browse through our Standard and Widget sources') }}</li>
+            <li>{{ $t('Click a source to get more details about it') }}</li>
+            <li>{{ $t('Click "Add Source" when you\'re ready to add it to your scene') }}</li>
           </ol>
         </div>
-        <div class="source-welcome__img">
-          <img slot="media" src="../../../media/source-demos/source-welcome.png"/>
+        <div class="source-info__media">
+          <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
+          <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/sources.png"/>
         </div>
       </div>
     </div>
 
-    <div class="sources">
+    <div class="sources" :class="{'sources--has-platform-apps' : showAppSources}">
       <div class="source-group">
-        <h4>Standard</h4>
+        <h2>{{ $t('Standard') }}</h2>
         <ul class="source-list">
           <li
             v-for="source in availableSources"
+            :key="source.value"
             class="source source--standard"
             :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
             @dblclick="selectSource(source.value)">
-            {{ source.description }}
+            {{ $t(source.description) }}
           </li>
         </ul>
       </div>
 
       <div class="source-group" v-if="loggedIn">
-        <h4>Widgets</h4>
+        <h2>{{ $t('Widgets') }}</h2>
         <div class="source-list">
           <div
+            v-for="type in iterableWidgetTypes"
+            :key="type"
+            v-show="!widgetData(type).platforms || widgetData(type).platforms.has(platform)"
             class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Alertbox}"
-            @click="inspectSource(widgetTypes.AlertBox)"
-            @dblclick="selectWidget(widgetTypes.AlertBox)">
-            <div>Alertbox</div><span class="label--essential">Essential</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.EventList}"
-            @click="inspectSource(widgetTypes.EventList)"
-            @dblclick="selectWidget(widgetTypes.EventList)">
-            <div>Event List</div><span class="label--essential">Essential</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
-            @click="inspectSource(widgetTypes.TheJar)"
-            @dblclick="selectWidget(widgetTypes.TheJar)">
-            <div>The Jar</div><span class="label--essential">Essential</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationGoal}"
-            @click="inspectSource(widgetTypes.DonationGoal)"
-            @dblclick="selectWidget(widgetTypes.DonationGoal)">
-            <div>Donation Goal</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
-            @click="inspectSource(widgetTypes.FollowerGoal)"
-            @dblclick="selectWidget(widgetTypes.FollowerGoal)">
-            <div>Follower Goal</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'twitch'"
-            :class="{'source--active': inspectedSource === widgetTypes.BitGoal}"
-            @click="inspectSource(widgetTypes.BitGoal)"
-            @dblclick="selectWidget(widgetTypes.BitGoal)">
-            <div>Bit Goal</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'youtube'"
-            :class="{'source--active': inspectedSource === widgetTypes.SubscriptionGoal}"
-            @click="inspectSource(widgetTypes.SubscriptionGoal)"
-            @dblclick="selectWidget(widgetTypes.SubscriptionGoal)">
-            <div>Subscription Goal</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationTicker}"
-            @click="inspectSource(widgetTypes.DonationTicker)"
-            @dblclick="selectWidget(widgetTypes.DonationTicker)">
-            <div>Donation Ticker</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
-            @click="inspectSource(widgetTypes.ChatBox)"
-            @dblclick="selectWidget(widgetTypes.ChatBox)">
-            <div>Chatbox</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.StreamBoss}"
-            @click="inspectSource(widgetTypes.StreamBoss)"
-            @dblclick="selectWidget(widgetTypes.StreamBoss)">
-            <div>Stream Boss</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Credits}"
-            @click="inspectSource(widgetTypes.Credits)"
-            @dblclick="selectWidget(widgetTypes.Credits)">
-            <div>Credits</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ViewerCount}"
-            @click="inspectSource(widgetTypes.ViewerCount)"
-            @dblclick="selectWidget(widgetTypes.ViewerCount)">
-            <div>Viewer Count</div>
+            :class="{'source--active': inspectedSource === widgetTypes[type]}"
+            @click="inspectSource(widgetTypes[type])"
+            @dblclick="selectWidget(widgetTypes[type])"
+          >
+            <div>{{ widgetData(type).name }}</div>
+            <span v-if="essentialWidgetTypes.has(widgetTypes[type])" class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === 'streamlabel'}"
             @click="inspectSource('streamlabel')"
-            @dblclick="selectSource('text_gdiplus', 'streamlabels')">
-            <div>Stream Label</div>
+            @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
+            <div>{{ $t('Stream Label') }}</div>
           </div>
         </div>
+      </div>
+
+      <div class="source-group" v-if="showAppSources">
+        <h2>{{ $t('Apps') }}</h2>
+        <ul class="source-list">
+          <li
+            v-for="appSource in availableAppSources"
+            :key="`${appSource.appId}-${appSource.source.id}`"
+            class="source source--standard"
+            :class="{
+              'source--active': inspectedSource === 'app_source' &&
+                inspectedAppId === appSource.appId &&
+                inspectedAppSourceId === appSource.source.id
+            }"
+            @click="inspectSource('app_source', appSource.appId, appSource.source.id)"
+            @dblclick="selectAppSource(appSource.appId, appSource.source.id)">
+            {{ appSource.source.name }}
+          </li>
+        </ul>
       </div>
     </div>
     <div class="modal-layout-controls">
@@ -509,7 +165,7 @@
         @click="selectInspectedSource()"
         class="button button--action"
         :disabled="inspectedSource === null">
-          Add Source
+        {{ $t('Add Source') }}
       </button>
     </div>
   </div>
@@ -522,13 +178,13 @@
 @import "../../styles/index";
 
 .source-info {
-  padding: 20px;
+  .padding(2);
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
-  flex: 0 0 190px;
-  height: 190px;
-  align-items: center;
+  flex: 0 0 210px;
+  height: 210px;
+  align-items: flex-start;
 }
 
 .night-theme {
@@ -542,12 +198,11 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-h4 {
-  color: @grey;
+h2 {
+  .margin-bottom(2);
 }
 
 .add-source {
-  color: @navy;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -557,32 +212,31 @@ h4 {
 .source-welcome {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-}
-
-.source-welcome__img {
-  padding: 0 20px 0 40px;
-  flex: 0 0 50%;
+  align-items: center;
+  width: 100%;
 }
 
 .sources {
-  padding: 20px;
+  .padding(2);
   display: flex;
   flex: 1 0 auto;
 
+  &.sources--has-platform-apps {
+    .source-group {
+      flex: 0 0 33%;
+    }
+  }
+
   .source-group {
+    margin: -16px 0px -16px 0px;
+    padding: 16px 16px 16px 0;
+    flex: 0 0 50%;
+
     &:last-child {
-      padding: 20px 0 20px 20px;
+      padding: 16px 0 16px 16px;
       border-right: none;
     }
   }
-}
-
-.source-group {
-  border-right: 1px solid @day-border;
-  margin: -20px 0px -20px 0px;
-  padding: 20px 20px 20px 0;
-  flex: 0 0 50%;
 }
 
 .source-list {
@@ -601,20 +255,27 @@ h4 {
 }
 
 .source {
-  color: @navy;
   cursor: pointer;
-  .transition;
-  border: 1px solid @day-border;
-  padding: 4px 10px;
-  margin-top: 10px;
+  .transition();
+  padding: 4px 8px;
+  margin-top: 8px;
+  background-color: @day-section;
   width: 49%;
+  .radius();
 
   &:hover,
   &.source--active {
-    color: @navy-secondary;
-    .semibold;
-    border-color: @day-border;
-    background-color: @day-secondary;
+    color: @day-title;
+    .weight(@medium);
+    background-color: @light-2;
+  }
+
+  >div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
   }
 }
 
@@ -625,8 +286,27 @@ h4 {
 .source--widget {
   display: flex;
   align-items: center;
+}
+
+.source-info__media {
   .radius;
-  .transition;
+  overflow: hidden;
+  text-align: center;
+  .padding-left(2);
+  align-items: center;
+  align-content: center;
+  max-height: 150px;
+  justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
+
+  video,
+  img {
+    width: auto;
+    max-height: 150px;
+    max-width: 100%;
+    .radius();
+  }
 }
 
 .source__icon {
@@ -634,26 +314,33 @@ h4 {
   width: 30px;
 }
 
-.night-theme {
-  .add-source {
-    color: @grey;
-  }
+.source__demo--day {
+  display: block;
+}
 
+.source__demo--night {
+  display: none;
+}
+
+.night-theme {
   .source {
-    color: @grey;
     background: @night-hover;
     border-color: @night-hover;
 
     &:hover,
     &.source--active {
-      color: @white;
-      border-color: @night-secondary;
+      color: @night-title;
       background: @night-secondary;
     }
   }
 
-  .source-group {
-    border-color: @night-border;
+  .source__demo--day {
+    display: none;
+  }
+
+  .source__demo--night {
+    display: block;
   }
 }
+
 </style>

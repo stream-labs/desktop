@@ -5,7 +5,8 @@ import { OnboardingService } from '../../../services/onboarding';
 import { Multiselect } from 'vue-multiselect';
 import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
-import { ScenesCollectionsService } from '../../../services/scenes-collections';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { Multiselect }
@@ -19,7 +20,7 @@ export default class ObsImport extends Vue {
   obsImporterService: ObsImporterService;
 
   @Inject()
-  scenesCollectionsService: ScenesCollectionsService;
+  sceneCollectionsService: SceneCollectionsService;
 
   status = 'initial';
 
@@ -30,40 +31,39 @@ export default class ObsImport extends Vue {
   selectedProfile = this.profiles[0] || '';
 
   created() {
-    if (this.sceneCollections.length < 1) {
-      this.startFresh();
-    }
+    if (this.sceneCollections && (this.sceneCollections.length > 0)) return;
+    this.startFresh();
   }
 
   get title() {
     if (this.status === 'importing') {
-      return 'Importing';
+      return $t('Importing');
     }
 
     if (this.status === 'done') {
-      return 'Successfully Imported';
+      return $t('Successfully Imported');
     }
 
-    return 'Import from OBS';
+    return $t('Import from OBS');
   }
 
   get description() {
     if (this.status === 'importing') {
-      return `Importing your scenes and sources`;
+      return $t('Importing your scenes and sources');
     }
 
     if (this.status === 'done') {
-      return `All scenes, sources and settings have been imported.`;
+      return $t('All scenes, sources and settings have been imported.');
     }
 
-    return 'Import your scenes and your settings from OBS with a simple click, or start fresh.';
+    return $t('Import your scenes and your settings from OBS with a simple click, or start fresh.');
   }
 
   startImport() {
     this.status = 'importing';
-    defer(() => {
+    defer(async () => {
       try {
-        this.obsImporterService.load(this.selectedProfile);
+        await this.obsImporterService.load(this.selectedProfile);
         this.status = 'done';
       } catch (e) {
         // I suppose let's pretend we succeeded for now.
@@ -73,7 +73,6 @@ export default class ObsImport extends Vue {
   }
 
   startFresh() {
-    this.scenesCollectionsService.switchToBlankConfig();
     this.onboardingService.skip();
   }
 

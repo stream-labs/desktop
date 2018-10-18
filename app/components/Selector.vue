@@ -5,18 +5,16 @@
     :options="{draggable: draggableSelector}"
     @change="handleChange">
     <li
+      v-for="(item, index) in normalizedItems"
+      :key="item.value"
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-      v-for="(item, index) in normalizedItems"
-      @contextmenu.stop="handleContextMenu(index)"
-      @click="handleSelect(index)"
-      @dblclick="handleDoubleClick(index)">
-      <div class="selector-item-text">
-        {{item.name}}
-      </div>
+      @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
+      @click="(ev) => handleSelect(ev, index)"
+      @dblclick="(ev) => handleDoubleClick(ev, index)">
+      <div class="selector-item-text">{{item.name}}</div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
-        <i v-if="draggable" class="icon-btn fa fa-bars fa-rotate-90 selector-drag-handle"/>
       </div>
     </li>
   </draggable>
@@ -47,30 +45,25 @@
   list-style-type: none;
   margin: 0;
   overflow: auto;
-
-  .selector-item {
-    &:first-child {
-      border-top-color: transparent;
-    }
-  }
+  .radius();
 }
 
 .selector-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  .padding-h-sides();
   cursor: pointer;
   justify-content: space-between;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-  color: @navy;
-  .transition;
+  color: @day-paragraph;
+  .transition();
 
   &.selector-item--active {
-    background-color: @white;
-    border-color: @day-border;
-    color: @navy-secondary;
+    background-color: @light-2;
+    color: @day-title;
+    .weight(@medium);
 
     .selector-actions {
       opacity: 1;
@@ -97,17 +90,18 @@
   display: flex;
   flex-direction: row;
   font-size: 13px;
-  opacity: 0;
+  opacity: .2;
 }
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover;
+  .icon-hover();
 }
 
 .night-theme {
-  .sortable-ghost, .sortable-chosen {
-    background: @night-accent-light;
+  .sortable-ghost,
+  .sortable-chosen {
+    background: @night-hover;
   }
 
   .selector-item {
@@ -115,7 +109,6 @@
 
     &.selector-item--active {
       background-color: @night-hover;
-      border-color: transparent;
       color: @white;
     }
   }

@@ -1,26 +1,31 @@
-import { StatefulService, mutation } from '../stateful-service';
-import { OnboardingService } from '../onboarding';
-import {
-  ScenesCollectionsService,
-  OverlaysPersistenceService,
-  IDownloadProgress
-} from '../scenes-collections';
-import { HotkeysService } from '../hotkeys';
-import { UserService } from '../user';
-import { ShortcutsService } from '../shortcuts';
-import { Inject } from '../../util/injector';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { OnboardingService } from 'services/onboarding';
+import { HotkeysService } from 'services/hotkeys';
+import { UserService } from 'services/user';
+import { ShortcutsService } from 'services/shortcuts';
+import { Inject } from 'util/injector';
 import electron from 'electron';
-import { ScenesTransitionsService } from '../scenes-transitions';
-import { SourcesService } from '../sources';
-import { ScenesService } from '../scenes';
-import { VideoService } from '../video';
-import { StreamInfoService } from '../stream-info';
-import { track } from '../usage-statistics';
-import { IpcServerService } from '../ipc-server';
-import { TcpServerService } from '../tcp-server';
-import { IAppServiceApi } from './app-api';
-import { StreamlabelsService } from '../streamlabels';
-import path from 'path';
+import { TransitionsService } from 'services/transitions';
+import { SourcesService } from 'services/sources';
+import { ScenesService } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { StreamInfoService } from 'services/stream-info';
+import { track } from 'services/usage-statistics';
+import { IpcServerService } from 'services/ipc-server';
+import { TcpServerService } from 'services/tcp-server';
+import { StreamlabelsService } from 'services/streamlabels';
+import { PerformanceMonitorService } from 'services/performance-monitor';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { FileManagerService } from 'services/file-manager';
+import { PatchNotesService } from 'services/patch-notes';
+import { ProtocolLinksService } from 'services/protocol-links';
+import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
+import { FacemasksService } from 'services/facemasks';
+import { OutageNotificationsService } from 'services/outage-notifications';
+import { CrashReporterService } from 'services/crash-reporter';
+import { PlatformAppsService } from 'services/platform-apps';
+import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
   loading: boolean;
@@ -31,238 +36,120 @@ interface IAppState {
  * Performs operations that happen once at startup and shutdown. This service
  * mainly calls into other services to do the heavy lifting.
  */
-export class AppService extends StatefulService<IAppState>
-  implements IAppServiceApi {
+export class AppService extends StatefulService<IAppState> {
   @Inject() onboardingService: OnboardingService;
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
-  @Inject() overlaysPersistenceService: OverlaysPersistenceService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() hotkeysService: HotkeysService;
   @Inject() userService: UserService;
   @Inject() shortcutsService: ShortcutsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() patchNotesService: PatchNotesService;
+  @Inject() windowsService: WindowsService;
+  @Inject() facemasksService: FacemasksService;
+  @Inject() outageNotificationsService: OutageNotificationsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static initialState: IAppState = {
     loading: true,
-    argv: []
+    argv: electron.remote.process.argv
   };
 
   private autosaveInterval: number;
 
-  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() videoService: VideoService;
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
+  @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private fileManagerService: FileManagerService;
+  @Inject() private protocolLinksService: ProtocolLinksService;
+  @Inject() private crashReporterService: CrashReporterService;
+  @Inject() private announcementsService: AnnouncementsService;
 
   @track('app_start')
-  load() {
-    let loadingPromise: Promise<void>;
+  async load() {
+    this.START_LOADING();
+
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    this.userService;
+    await this.userService.initialize();
 
-    // If we're not showing the onboarding steps, we should load
-    // the config file.  Otherwise the onboarding process will
-    // handle it based on what the user wants.
+    // Second, we want to start the crash reporter service.  We do this
+    // after the user service because we want crashes to be associated
+    // with a particular user if possible.
+    this.crashReporterService.beginStartup();
+
+    // Initialize any apps before loading the scene collection.  This allows
+    // the apps to already be in place when their sources are created.
+    await this.platformAppsService.initialize();
+
+    await this.sceneCollectionsService.initialize()
+
     const onboarded = this.onboardingService.startOnboardingIfRequired();
-    if (!onboarded) {
-      if (this.scenesCollectionsService.hasConfigs()) {
-        loadingPromise = this.loadConfig('', { saveCurrent: false });
-      } else {
-        this.scenesCollectionsService.switchToBlankConfig();
-        loadingPromise = Promise.resolve();
-      }
-    } else {
-      loadingPromise = Promise.resolve();
-    }
 
-    loadingPromise.then(() => {
-      if (onboarded) this.enableAutoSave();
-
-      electron.ipcRenderer.on('shutdown', () => {
-        electron.ipcRenderer.send('acknowledgeShutdown');
-        this.shutdownHandler();
-      });
-
-      this.shortcutsService;
-      this.streamlabelsService;
-
-      // Pre-fetch stream info
-      this.streamInfoService;
-
-      this.ipcServerService.listen();
-      this.tcpServerService.listen();
-      this.FINISH_LOADING();
+    electron.ipcRenderer.on('shutdown', () => {
+      electron.ipcRenderer.send('acknowledgeShutdown');
+      this.shutdownHandler();
     });
-  }
 
-  /**
-   * reset current scene collection and load new one
-   */
-  loadConfig(
-    configName?: string,
-    options = { saveCurrent: true }
-  ): Promise<void> {
-    return new Promise(resolve => {
-      this.START_LOADING();
+    this.facemasksService;
 
-      window.setTimeout(() => {
-        // wait while current config will be saved
-        (options.saveCurrent
-          ? this.scenesCollectionsService.rawSave()
-          : Promise.resolve()
-        ).then(() => {
-          this.reset();
+    this.shortcutsService;
+    this.streamlabelsService;
 
-          this.scenesCollectionsService.load(configName).then(() => {
-            this.scenesService.makeSceneActive(
-              this.scenesService.activeSceneId
-            );
-            this.hotkeysService.bindHotkeys();
-            this.enableAutoSave();
-            this.FINISH_LOADING();
-            resolve();
-          });
-        });
-      }, 500);
-    });
-  }
+    // Pre-fetch stream info
+    this.streamInfoService;
 
-  /**
-   * the main process sends argv string here
-   */
-  setArgv(argv: string[]) {
-    this.SET_ARGV(argv);
-  }
+    this.performanceMonitorService.start();
 
-  /**
-   * Loads an overlay file as a new scene collection
-   * @param collectionName The name of the new scene collection
-   * @param overlayPath The path to the overlay file
-   */
-  async loadOverlay(collectionName: string, overlayPath: string) {
-    this.START_LOADING();
+    this.ipcServerService.listen();
+    this.tcpServerService.listen();
 
-    // Make sure the current collection is saved
-    await this.scenesCollectionsService.rawSave();
+    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.announcementsService.updateBanner();
+    this.outageNotificationsService;
 
-    this.reset();
-    this.scenesCollectionsService.switchToEmptyConfig(collectionName);
-    await this.overlaysPersistenceService.loadOverlay(overlayPath);
-    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
-    this.scenesService.activeScene.makeItemsActive([]);
+    this.crashReporterService.endStartup();
 
-    // Save the newly loaded config
-    await this.scenesCollectionsService.rawSave();
-
-    this.enableAutoSave();
     this.FINISH_LOADING();
-  }
-
-  /**
-   * Downloads and installs an overlay
-   * @param url the URL of the overlay
-   */
-  async installOverlay(url: string, progressCallback?: (info: IDownloadProgress) => void) {
-    this.START_LOADING();
-
-    let pathName: string;
-
-    // A download error should not result in an infinite spinner
-    try {
-      pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
-    } catch (e) {
-      this.FINISH_LOADING();
-      throw e;
-    }
-
-    const filename = path.parse(url).name;
-    const configName = this.scenesCollectionsService.suggestName(filename);
-
-    await this.loadOverlay(configName, pathName);
-  }
-
-  /**
-   * remove the config and load the new one
-   */
-  async removeCurrentConfig() {
-    this.START_LOADING();
-    this.disableAutosave();
-    this.scenesCollectionsService.removeConfig();
-    if (this.scenesCollectionsService.hasConfigs()) {
-      this.loadConfig('', { saveCurrent: false });
-    } else {
-      await this.switchToBlankConfig();
-    }
-  }
-
-  /**
-   * reset current scenes and switch to blank config
-   */
-  async switchToBlankConfig(configName?: string) {
-    this.reset();
-    this.scenesCollectionsService.switchToBlankConfig(configName);
-    await this.scenesCollectionsService.rawSave();
-    this.enableAutoSave();
-    this.FINISH_LOADING();
+    this.protocolLinksService.start(this.state.argv);
   }
 
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
 
+    this.crashReporterService.beginShutdown();
+
+    this.ipcServerService.stopListening();
+    this.tcpServerService.stopListening();
+
     window.setTimeout(async () => {
-      this.disableAutosave();
-
-      this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
-
-      if (this.scenesCollectionsService.state.activeCollection) {
-        await this.scenesCollectionsService.rawSave();
-      }
-
-      this.reset();
-      this.videoService.destroyAllDisplays();
-      this.scenesTransitionsService.release();
+      await this.sceneCollectionsService.deinitialize();
+      this.performanceMonitorService.stop();
+      this.transitionsService.shutdown();
+      this.windowsService.closeAllOneOffs();
+      await this.fileManagerService.flushAll();
+      this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
 
-  /**
-   * cleanup all created objects
-   */
-  reset() {
-    this.disableAutosave();
-
-    // we should remove inactive scenes first to avoid the switching between scenes
-    this.scenesService.scenes.forEach(scene => {
-      if (scene.id === this.scenesService.activeSceneId) return;
-      scene.remove(true);
-    });
-
-    if (this.scenesService.activeScene) {
-      this.scenesService.activeScene.remove(true);
-    }
-
-    this.sourcesService.sources.forEach(source => {
-      if (source.type !== 'scene') source.remove();
-    });
-
-    this.hotkeysService.unregisterAll();
+  startLoading() {
+    this.START_LOADING();
   }
 
-  private enableAutoSave() {
-    this.autosaveInterval = window.setInterval(() => {
-      this.scenesCollectionsService.save();
-    }, 60 * 1000);
-  }
-
-  private disableAutosave() {
-    clearInterval(this.autosaveInterval);
+  finishLoading() {
+    this.FINISH_LOADING();
   }
 
   @mutation()

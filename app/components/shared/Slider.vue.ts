@@ -1,35 +1,37 @@
 import Vue from 'vue';
-import vueSlider from 'vue-slider-component';
-import { throttle } from 'lodash-decorators';
+import VueSlider from 'vue-slider-component';
 import { Component, Prop } from 'vue-property-decorator';
+import ResizeSensor from 'css-element-queries/src/ResizeSensor';
+import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { vueSlider }
+  components: { VueSlider }
 })
 export default class SliderInput extends Vue {
+  @Prop() value: number;
+  @Prop() min: number;
+  @Prop() max: number;
+  @Prop() interval: number;
+  @Prop() disabled: boolean;
+  @Prop() tooltip: string;
+  @Prop() valueBox: boolean;
+  @Prop() dotSize: number;
+  @Prop() sliderStyle: object;
+  @Prop() usePercentages: boolean;
 
-  @Prop()
-  value: number;
+  $refs: { slider: any };
 
-  @Prop()
-  min: number;
+  mounted() {
+    // Hack to prevent transitions from messing up slider width
+    setTimeout(() => {
+      this.onResizeHandler();
+    }, 500);
 
-  @Prop()
-  max: number;
+    new ResizeSensor(this.$el, () => {
+      this.onResizeHandler();
+    });
+  }
 
-  @Prop()
-  interval: number;
-
-  @Prop()
-  disabled: boolean;
-
-  @Prop()
-  tooltip: string;
-
-  @Prop()
-  valueBox: boolean;
-
-  @throttle(500)
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
   }
@@ -44,4 +46,14 @@ export default class SliderInput extends Vue {
     return parseFloat(num.toFixed(6));
   }
 
+  formatter(value: number) {
+    let formattedValue = String(value);
+    if (this.usePercentages) formattedValue = Math.round(value * 100) + '%';
+    return formattedValue;
+  }
+
+  @debounce(500)
+  private onResizeHandler() {
+    if (this.$refs.slider) this.$refs.slider.refresh();
+  }
 }

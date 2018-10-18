@@ -1,0 +1,19 @@
+{
+  "Label Type": "Тип Метки",
+  "Label Template": "Шаблон Метки",
+  "Item Template": "Шаблон элемента",
+  "Item Separator": "Разделитель элементов",
+  "Item Limit": "Максимальное число элементов",
+  "Duration (seconds)": "Продолжительность (в секундах)",
+  "Show Clock": "Показать часы",
+  "Always, show 0:00 when inactive": "Всегда, показывать 0:00 при отсутствии активности",
+  "Hide when inactive": "Скрыть при отсутствии активности",
+  "Show Count": "Показать Счетчик",
+  "Always, show 0 when inactive": "Всегда, показывать 0 при отсутствии активности",
+  "Show Latest": "Показать последнее",
+  "Always, show last person when inactive": "Всегда, показывать последнего человека при отсутствии активности",
+  "Include Resubs": "Учитывать вновь подписавшихся",
+  "Preview": "Предварительный просмотр",
+  "Note:": "Примечание:",
+  "Actual label text may take up to 60 seconds to update": "Обновление текста метки может занять до 60 секунд"
+}

@@ -1,4 +1,4 @@
-import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
+import { IJsonRpcRequest } from '../../app/services/jsonrpc';
 import { Subject } from 'rxjs/Subject';
 
 
@@ -8,8 +8,11 @@ const { spawnSync } = require('child_process');
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
+const PROMISE_TIMEOUT = 20000;
 
 let clientInstance: ApiClient = null;
+
+export type TConnectionStatus = 'disconnected'|'pending'|'connected';
 
 export class ApiClient {
 
@@ -21,12 +24,21 @@ export class ApiClient {
   private rejectConnection: Function;
   private requests = {};
   private subscriptions: Dictionary<Subject<any>> = {};
-  private connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
+  private connectionStatus: TConnectionStatus = 'disconnected';
 
   /**
    * cached resourceSchemes
    */
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
+
+
+  /**
+   * if result of calling a service method is promise -
+   * we create a linked promise and keep it callbacks here until
+   * the promise in the application will be resolved or rejected
+   */
+  private promises: Dictionary<Function[]> = {};
+
 
   // set to 'true' for debugging
   logsEnabled = false;
@@ -69,6 +81,13 @@ export class ApiClient {
 
   disconnect() {
     this.socket.end();
+    this.resolveConnection = null;
+    this.rejectConnection = null;
+  }
+
+
+  getConnectionStatus(): TConnectionStatus {
+    return this.connectionStatus;
   }
 
 
@@ -83,7 +102,7 @@ export class ApiClient {
       await this.connect();
     }
 
-    const id = this.nextRequestId++;
+    const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
       jsonrpc: '2.0',
       id,
@@ -115,7 +134,11 @@ export class ApiClient {
 
     const err = process.stderr.toString();
     const responseStr = process.stdout.toString();
-    if (err) throw err;
+
+    if (err) {
+      this.log('SYNC_RESPONSE_ERR:', err);
+      throw err;
+    }
     this.log('SYNC_RESPONSE:', responseStr);
     const response = JSON.parse(responseStr);
     return response;
@@ -167,9 +190,23 @@ export class ApiClient {
       if (!result) return;
 
       if (result._type === 'EVENT') {
-        const eventSubject = this.subscriptions[message.result.resourceId];
-        this.eventReceived.next(result.data);
-        if (eventSubject) eventSubject.next(result.data);
+        if (result.emitter === 'STREAM') {
+          const eventSubject = this.subscriptions[message.result.resourceId];
+          this.eventReceived.next(result.data);
+          if (eventSubject) eventSubject.next(result.data);
+
+        } else if (result.emitter === 'PROMISE') {
+
+          // case when listenAllSubscriptions = true
+          if (!this.promises[result.resourceId]) return;
+
+          const [resolve, reject] = this.promises[result.resourceId];
+          if (result.isRejected) {
+            reject(result.data);
+          } else {
+            resolve(result.data);
+          }
+        }
       }
     });
 
@@ -177,6 +214,7 @@ export class ApiClient {
 
 
   unsubscribe(subscriptionId: string) {
+    delete this.subscriptions[subscriptionId];
     return this.request(subscriptionId, 'unsubscribe');
   }
 
@@ -190,16 +228,20 @@ export class ApiClient {
 
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
 
-    const hanleRequest = (resourceId: string, property: string, ...args: any[]): any => {
+    const handleRequest = (resourceId: string, property: string, ...args: any[]): any => {
 
       const result = this.requestSync(resourceId, property as string, ...args);
 
-      // TODO: add promises support
-      if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
+      if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
+        return new Promise((resolve, reject) => {
+          this.promises[result.resourceId] = [resolve, reject];
+          setTimeout(() => reject(`promise timeout for ${resourceId}.${property}`), PROMISE_TIMEOUT);
+        });
+      } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
         if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
         return subject;
-      } else if (result && result._type === 'HELPER') {
+      } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
       } else {
 
@@ -221,7 +263,7 @@ export class ApiClient {
 
     return new Proxy(resourceModel, {
 
-      get: (target, property, receiver) => {
+      get: (target, property: string, receiver) => {
 
 
         if (resourceModel[property] !== void 0) return resourceModel[property];
@@ -229,11 +271,11 @@ export class ApiClient {
         const resourceScheme = this.getResourceScheme(resourceId);
 
         if (resourceScheme[property] !== 'function') {
-          return hanleRequest(resourceId, property as string);
+          return handleRequest(resourceId, property as string);
         }
 
         return (...args: any[]) => {
-          return hanleRequest(resourceId, property as string, ...args);
+          return handleRequest(resourceId, property as string, ...args);
         };
 
       }
@@ -244,7 +286,7 @@ export class ApiClient {
   fetchNextEvent(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.eventReceived.first().subscribe(event => resolve(event));
-      setTimeout(() => reject('timeout'), 2000);
+      setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
     });
   }
 
@@ -271,9 +313,12 @@ export class ApiClient {
 
 
 export async function getClient() {
-  if (clientInstance) return clientInstance;
-  clientInstance = new ApiClient();
-  await clientInstance.connect();
-  await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
+  if (!clientInstance) clientInstance = new ApiClient();
+
+  if (clientInstance.getConnectionStatus() === 'disconnected') {
+    await clientInstance.connect();
+    await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
+  }
+
   return clientInstance;
 }

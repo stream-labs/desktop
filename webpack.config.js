@@ -1,5 +1,6 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const plugins = [];
 
@@ -43,9 +44,11 @@ module.exports = {
     'aws-sdk': 'require("aws-sdk")',
     'asar': 'require("asar")',
     'backtrace-node': 'require("backtrace-node")',
+    'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
-    'backtrace-js': 'require("backtrace-js")'
+    'backtrace-js': 'require("backtrace-js")',
+    'request': 'require("request")'
   },
 
   module: {
@@ -92,15 +95,29 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',
           outputPath: 'media/',
-          publicPath: 'bundles/'
+          publicPath: 'bundles/media/'
+        }
+      },
+      // Handles custom fonts. Currently used for icons.
+      {
+        test: /\.woff$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'fonts/',
+          publicPath: 'bundles/fonts/'
         }
       }
     ]
+  },
+
+  optimization: {
+    minimizer: [new UglifyJsPlugin({ sourceMap: true, uglifyOptions: { mangle: false } })]
   },
 
   plugins

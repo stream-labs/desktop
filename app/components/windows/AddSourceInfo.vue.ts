@@ -10,4 +10,7 @@ export default class AddSourceInfo extends Vue {
   @Prop()
   description: string;
 
+  @Prop({ default: true })
+  showSupport: boolean;
+
 }

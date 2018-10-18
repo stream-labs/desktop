@@ -1,17 +1,12 @@
 {
-  "extends": "tslint-config-airbnb",
+  "extends": "tslint-config-prettier",
   "rules": {
-    "ter-arrow-parens": false,
-    "function-name": false,
-    "variable-name": false,
-    "trailing-comma": false,
-    "import-name": false,
-    "no-increment-decrement": false,
-    "no-param-reassign": false,
     "max-line-length": {
       "options": [120]
     },
-    "align": [true, "parameters", "statements"]
+    "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+    "curly": [true, "ignore-same-line"],
+    "no-consecutive-blank-lines": [true, 2]
   },
   "jsRules": {
   }

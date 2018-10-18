@@ -1,58 +1,56 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { OverlaysPersistenceService } from '../services/scenes-collections';
-import { CacheUploaderService } from '../services/cache-uploader';
-import { Inject } from '../util/injector';
-import BoolInput from './shared/forms/BoolInput.vue';
-import { IFormInput } from './shared/forms/Input';
-import { CustomizationService } from '../services/customization';
+import { CacheUploaderService } from 'services/cache-uploader';
+import { Inject } from 'util/injector';
+import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
+import { CustomizationService } from 'services/customization';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
+import { StreamlabelsService } from 'services/streamlabels';
+import { OnboardingService } from 'services/onboarding';
+import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
+import { StreamingService } from 'services/streaming';
+import { $t } from 'services/i18n';
 
 @Component({
-  components: { BoolInput }
+  components: { ObsBoolInput }
 })
 export default class ExtraSettings extends Vue {
-
-  @Inject('OverlaysPersistenceService')
-  overlaysService: OverlaysPersistenceService;
-
-  @Inject()
-  cacheUploaderService: CacheUploaderService;
-
+  @Inject() cacheUploaderService: CacheUploaderService;
   @Inject() customizationService: CustomizationService;
+  @Inject() streamlabelsService: StreamlabelsService;
+  @Inject() onboardingService: OnboardingService;
+  @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
+  @Inject() streamingService: StreamingService;
 
   cacheUploading = false;
 
-  get streamInfoUpdateModel(): IFormInput<boolean> {
+  get streamInfoUpdateModel(): IObsInput<boolean> {
     return {
       name: 'stream_info_udpate',
-      description: 'Confirm stream title and game before going live',
+      description: $t('Confirm stream title and game before going live'),
       value: this.customizationService.state.updateStreamInfoOnLive
     };
   }
 
-  get leftDockModel(): IFormInput<boolean> {
-    return {
-      name: 'left_dock',
-      description: 'Show the live dock (chat) on the left side',
-      value: this.customizationService.state.leftDock
-    };
-  }
-
-  setStreamInfoUpdate(model: IFormInput<boolean>) {
+  setStreamInfoUpdate(model: IObsInput<boolean>) {
     this.customizationService.setUpdateStreamInfoOnLive(model.value);
   }
 
-  setLeftDock(model: IFormInput<boolean>) {
-    this.customizationService.setLeftDock(model.value);
-  }
-
   showCacheDir() {
-    electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
+    electron.remote.shell.showItemInFolder(
+      electron.remote.app.getPath('userData')
+    );
   }
 
   deleteCacheDir() {
-    if (confirm('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!')) {
+    if (
+      confirm(
+        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!')
+      )
+    ) {
       electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
       electron.remote.app.quit();
     }
@@ -62,9 +60,34 @@ export default class ExtraSettings extends Vue {
     this.cacheUploading = true;
     this.cacheUploaderService.uploadCache().then(file => {
       electron.remote.clipboard.writeText(file);
-      alert(`Your cache directory has been successfully uploaded.  The file name ${file} has been copied to your clipboard.  Please paste it into discord and tag a developer.`);
+      alert(
+        $t('Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.', { file })
+      );
       this.cacheUploading = false;
     });
   }
 
+  restartStreamlabelsSession() {
+    this.streamlabelsService.restartSession().then(result => {
+      if (result) alert($t('Streamlabels session has been succesfully restarted!'));
+    });
+  }
+
+  runAutoOptimizer() {
+    this.onboardingService.start({ isOptimize: true });
+    this.windowsService.closeChildWindow();
+  }
+
+  get isTwitch() {
+    return (
+      this.userService.isLoggedIn() &&
+      this.userService.platform.type === 'twitch'
+    );
+  }
+
+  get isRecordingOrStreaming() {
+    return (
+      this.streamingService.isStreaming || this.streamingService.isRecording
+    );
+  }
 }

@@ -3,13 +3,17 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
+import { EFontStyle } from 'obs-studio-node';
 
+export interface IFamilyWithStyle {
+  family: IFontFamily;
+  style: IFontStyle;
+}
 
 export interface IFontStyle {
   name: string;
   file: string;
 }
-
 
 export interface IFontFamily {
   name: string;
@@ -27,6 +31,9 @@ export class FontLibraryService extends Service {
 
   private manifest: IFontManifest;
 
+  // Used to prevent downloading the same font multiple times
+  fontDownloadPromises: Dictionary<Promise<string>> = {};
+
 
   getManifest(): Promise<IFontManifest> {
     if (!this.manifest) {
@@ -40,11 +47,10 @@ export class FontLibraryService extends Service {
       }).catch(() => {
         return { families: [] };
       });
-    } else {
-      return Promise.resolve(this.manifest);
     }
-  }
 
+    return Promise.resolve(this.manifest);
+  }
 
   findFamily(family: string): Promise<IFontFamily> {
     return this.getManifest().then(manifest => {
@@ -88,12 +94,15 @@ export class FontLibraryService extends Service {
   downloadFont(file: string): Promise<string> {
     const fontPath = this.libraryPath(file);
 
+    if (this.fontDownloadPromises[file]) return this.fontDownloadPromises[file];
+
     // Don't re-download the font if we have already downloaded it
     if (fs.existsSync(fontPath)) {
-      return Promise.resolve(fontPath);
+      this.fontDownloadPromises[file] = Promise.resolve(fontPath);
+      return this.fontDownloadPromises[file];
     }
 
-    return new Promise(resolve => {
+    this.fontDownloadPromises[file] = new Promise(resolve => {
       this.ensureFontsDirectory();
 
       https.get(this.libraryUrl(file), response => {
@@ -103,6 +112,8 @@ export class FontLibraryService extends Service {
         response.pipe(fontFile);
       });
     });
+
+    return this.fontDownloadPromises[file];
   }
 
 

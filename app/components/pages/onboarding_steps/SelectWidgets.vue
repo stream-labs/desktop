@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="onboarding-step onboarding-step--wide">
-      <div class="onboarding-title">Add Widgets</div>
+      <div class="onboarding-title">{{ $t('Add Widgets') }}</div>
       <div class="onboarding-desc">
-        Select the Streamlabs widgets you would like to activate for your stream. These will get automatically added to your scene.
+        {{ $t('Select the Streamlabs widgets you would like to activate for your stream. These will get automatically added to your scene.') }}
       </div>
       <div class="select-widgets">
         <div class="select-widgets__column">
@@ -13,7 +13,7 @@
               :selected="selectedWidgets.includes(widgetTypes.AlertBox)"
               :inspected="inspectedWidget === widgetTypes.AlertBox"
               name="Alertbox"
-              description="Thanks viewers with notification popups"
+              :description="$t('Thanks viewers with notification popups')"
               @toggle="toggleWidget(widgetTypes.AlertBox)"
               @inspect="inspectWidget(widgetTypes.AlertBox)"
               @close="closeInspection">
@@ -25,7 +25,7 @@
               :selected="selectedWidgets.includes(widgetTypes.EventList)"
               :inspected="inspectedWidget === widgetTypes.EventList"
               name="Event List"
-              description="Most recent events into your stream"
+              :description="$t('Most recent events into your stream')"
               @toggle="toggleWidget(widgetTypes.EventList)"
               @inspect="inspectWidget(widgetTypes.EventList)"
               @close="closeInspection">
@@ -34,12 +34,12 @@
             </selectable-widget>
 
             <selectable-widget
-              :selected="selectedWidgets.includes(widgetTypes.TheJar)"
-              :inspected="inspectedWidget === widgetTypes.TheJar"
+              :selected="selectedWidgets.includes(widgetTypes.TipJar)"
+              :inspected="inspectedWidget === widgetTypes.TipJar"
               name="The Jar"
-              description="A jar that catches bits, tips, and more"
-              @toggle="toggleWidget(widgetTypes.TheJar)"
-              @inspect="inspectWidget(widgetTypes.TheJar)"
+              :description="$t('A jar that catches bits, tips, and more')"
+              @toggle="toggleWidget(widgetTypes.TipJar)"
+              @inspect="inspectWidget(widgetTypes.TipJar)"
               @close="closeInspection">
               <img slot="icon" src="../../../../media/images/icons/jar.png">
               <video slot="body" autoplay loop muted src="../../../../media/mp4/jar.mp4"></video>
@@ -54,7 +54,7 @@
               :selected="selectedWidgets.includes(widgetTypes.ChatBox)"
               :inspected="inspectedWidget === widgetTypes.ChatBox"
               name="Chatbox"
-              description="Your channel's chat in your stream"
+              :description="$t('Your channel\'s chat in your stream')"
               @toggle="toggleWidget(widgetTypes.ChatBox)"
               @inspect="inspectWidget(widgetTypes.ChatBox)"
               @close="closeInspection">
@@ -66,7 +66,7 @@
               :selected="selectedWidgets.includes(widgetTypes.DonationTicker)"
               :inspected="inspectedWidget === widgetTypes.DonationTicker"
               name="Donation Ticker"
-              description="Show off most recent donations to viewers"
+              :description="$t('Show off most recent donations to viewers')"
               @toggle="toggleWidget(widgetTypes.DonationTicker)"
               @inspect="inspectWidget(widgetTypes.DonationTicker)"
               @close="closeInspection">
@@ -78,7 +78,7 @@
               :selected="selectedWidgets.includes(widgetTypes.DonationGoal)"
               :inspected="inspectedWidget === widgetTypes.DonationGoal"
               name="Donation Goal"
-              description="Give your viewers a donation target to help you reach"
+              :description="$t('Give your viewers a donation target to help you reach')"
               @toggle="toggleWidget(widgetTypes.DonationGoal)"
               @inspect="inspectWidget(widgetTypes.DonationGoal)"
               @close="closeInspection">
@@ -91,7 +91,7 @@
               :selected="selectedWidgets.includes(widgetTypes.FollowerGoal)"
               :inspected="inspectedWidget === widgetTypes.FollowerGoal"
               name="Follower Goal"
-              description="Give your viewers a follower target to help you reach"
+              :description="$t('Give your viewers a follower target to help you reach')"
               @toggle="toggleWidget(widgetTypes.FollowerGoal)"
               @inspect="inspectWidget(widgetTypes.FollowerGoal)"
               @close="closeInspection">
@@ -104,7 +104,7 @@
               :selected="selectedWidgets.includes(widgetTypes.BitGoal)"
               :inspected="inspectedWidget === widgetTypes.BitGoal"
               name="Bit Goal"
-              description="Give your viewers a bit target to help you reach"
+              :description="$t('Give your viewers a bit target to help you reach')"
               @toggle="toggleWidget(widgetTypes.BitGoal)"
               @inspect="inspectWidget(widgetTypes.BitGoal)"
               @close="closeInspection">
@@ -117,7 +117,7 @@
               :selected="selectedWidgets.includes(widgetTypes.SubscriberGoal)"
               :inspected="inspectedWidget === widgetTypes.SubscriberGoal"
               name="Subscriber Goal"
-              description="Give your viewers a subscriber target to help you reach"
+              :description="$t('Give your viewers a subscriber target to help you reach')"
               @toggle="toggleWidget(widgetTypes.SubscriberGoal)"
               @inspect="inspectWidget(widgetTypes.SubscriberGoal)"
               @close="closeInspection">
@@ -129,7 +129,7 @@
               :selected="selectedWidgets.includes(widgetTypes.ViewerCount)"
               :inspected="inspectedWidget === widgetTypes.ViewerCount"
               name="Viewer Count"
-              description="Show off how many viewers you have from multiple platforms"
+              :description="$t('Show off how many viewers you have from multiple platforms')"
               @toggle="toggleWidget(widgetTypes.ViewerCount)"
               @inspect="inspectWidget(widgetTypes.ViewerCount)"
               @close="closeInspection">
@@ -141,7 +141,7 @@
               :selected="selectedWidgets.includes(widgetTypes.StreamBoss)"
               :inspected="inspectedWidget === widgetTypes.StreamBoss"
               name="Stream Boss"
-              description="Give your viewers an opportunity of becoming a boss"
+              :description="$t('Give your viewers an opportunity of becoming a boss')"
               @toggle="toggleWidget(widgetTypes.StreamBoss)"
               @inspect="inspectWidget(widgetTypes.StreamBoss)"
               @close="closeInspection">
@@ -153,7 +153,7 @@
               :selected="selectedWidgets.includes(widgetTypes.Credits)"
               :inspected="inspectedWidget === widgetTypes.Credits"
               name="Credits"
-              description="Rolling credits at the end of your stream"
+              :description="$t('Rolling credits at the end of your stream')"
               @toggle="toggleWidget(widgetTypes.Credits)"
               @inspect="inspectWidget(widgetTypes.Credits)"
               @close="closeInspection">
@@ -167,11 +167,11 @@
         :disabled="busy"
         class="button button--lg button--action"
         @click="next">
-        Add {{ selectedWidgets.length }} Widgets
+        {{ $t('Add %{widgetscount} Widgets', { widgetscount:  selectedWidgets.length}) }}
       </button>
       <div class="setup-later">
-        <span>Rather do this manually?</span>
-        <a @click="skip">Setup later</a>
+        <span>{{ $t('Rather do this manually?') }}</span>
+        <a @click="skip">{{ $t('Setup later')}}</a>
       </div>
     </div>
   </div>
@@ -205,7 +205,7 @@
 }
 
 .select-widgets__column-title {
-  .semibold;
+  .weight(@medium);
   color: @white;
   font-size: 14px;
 }

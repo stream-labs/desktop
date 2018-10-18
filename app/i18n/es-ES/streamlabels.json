@@ -1,0 +1,19 @@
+{
+  "Label Type": "Tipo de Etiqueta",
+  "Label Template": "Plantilla de Etiqueta",
+  "Item Template": "Plantilla de Elementos",
+  "Item Separator": "Separador de Elementos",
+  "Item Limit": "Límite de Elementos",
+  "Duration (seconds)": "Duración (segundos)",
+  "Show Clock": "Mostrar Reloj",
+  "Always, show 0:00 when inactive": "Mostrar siempre 0:00 cuando esté inactivo",
+  "Hide when inactive": "Ocultar cuando esté inactivo",
+  "Show Count": "Mostrar Cuenta",
+  "Always, show 0 when inactive": "Mostrar siempre 0 cuando esté inactivo",
+  "Show Latest": "Mostrar último",
+  "Always, show last person when inactive": "Mostrar siempre la última persona cuando esté inactivo",
+  "Include Resubs": "Incluir Resuscripciones",
+  "Preview": "Vista Previa",
+  "Note:": "Nota:",
+  "Actual label text may take up to 60 seconds to update": "La etiqueta actual podría tardar hasta 60 segundos en actualizarse"
+}

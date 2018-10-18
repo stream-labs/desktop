@@ -2,7 +2,7 @@
 <div>
   <div class="input-container select">
     <div class="input-label">
-      <label>Label Type</label>
+      <label>{{ $t('Label Type') }}</label>
     </div>
     <div class="input-wrapper">
       <multiselect
@@ -18,7 +18,7 @@
   </div>
   <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
-      <label>Label Template</label>
+      <label>{{ $t('Label Template') }}</label>
     </div>
     <div class="input-wrapper">
       <input
@@ -38,7 +38,7 @@
   </div>
   <div class="input-container" v-if="labelSettings.item_format != null">
     <div class="input-label">
-      <label>Item Template</label>
+      <label>{{ $t('Item Template') }}</label>
     </div>
     <div class="input-wrapper">
       <input
@@ -58,7 +58,7 @@
   </div>
   <div class="input-container" v-if="labelSettings.item_separator != null">
     <div class="input-label">
-      <label>Item Separator</label>
+      <label>{{ $t('Item Separator') }}</label>
     </div>
     <div class="input-wrapper">
       <input
@@ -78,7 +78,7 @@
   </div>
   <div class="input-container" v-if="labelSettings.limit != null">
     <div class="input-label">
-      <label>Item Limit</label>
+      <label>{{ $t('Item Limit') }}</label>
     </div>
     <div class="input-wrapper">
       <input
@@ -89,7 +89,7 @@
   </div>
   <div class="input-container" v-if="labelSettings.duration != null">
     <div class="input-label">
-      <label>Duration (seconds)</label>
+      <label>{{ $t('Duration (seconds)') }}</label>
     </div>
     <div class="input-wrapper">
       <input
@@ -100,15 +100,15 @@
   </div>
   <div class="input-container select" v-if="labelSettings.show_clock != null">
     <div class="input-label">
-      <label>Show Clock</label>
+      <label>{{ $t('Show Clock') }}</label>
     </div>
     <div class="input-wrapper">
       <multiselect
         :options="['always', 'active']"
         :custom-label="val => {
           return val === 'always' ?
-            'Always, show 0:00 when inactive' :
-            'Hide when inactive';
+            $t('Always, show 0:00 when inactive') :
+            $t('Hide when inactive');
         }"
         :allow-empty="false"
         v-model="labelSettings.show_clock"
@@ -117,15 +117,15 @@
   </div>
   <div class="input-container select" v-if="labelSettings.show_count != null">
     <div class="input-label">
-      <label>Show Count</label>
+      <label>{{ $t('Show Count') }}</label>
     </div>
     <div class="input-wrapper">
       <multiselect
         :options="['always', 'active']"
         :custom-label="val => {
           return val === 'always' ?
-            'Always, show 0 when inactive' :
-            'Hide when inactive';
+            $t('Always, show 0 when inactive') :
+            $t('Hide when inactive');
         }"
         :allow-empty="false"
         v-model="labelSettings.show_count"
@@ -134,15 +134,15 @@
   </div>
   <div class="input-container select" v-if="labelSettings.show_latest != null">
     <div class="input-label">
-      <label>Show Latest</label>
+      <label>{{ $t('Show Latest') }}</label>
     </div>
     <div class="input-wrapper">
       <multiselect
         :options="['always', 'active']"
         :custom-label="val => {
           return val === 'always' ?
-            'Always, show last person when inactive' :
-            'Hide when inactive';
+            $t('Always, show last person when inactive') :
+            $t('Hide when inactive');
         }"
         :allow-empty="false"
         v-model="labelSettings.show_latest"
@@ -158,13 +158,13 @@
           type="checkbox"
           v-model="labelSettings.include_resubs"
           @change="debouncedSetSettings"/>
-        <label>Include Resubs</label>
+        <label>{{ $t('Include Resubs') }}</label>
       </div>
     </div>
   </div>
   <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
-      <label>Preview</label>
+      <label>{{ $t('Preview') }}</label>
     </div>
     <div class="input-wrapper">
       <div class="streamlabel-preview">
@@ -173,8 +173,8 @@
         </div>
       </div>
       <div>
-        <b>Note:</b>
-        Actual label text may take up to 60 seconds to update
+        <b>{{ $t('Note:') }}</b>
+        {{ $t('Actual label text may take up to 60 seconds to update') }}
       </div>
     </div>
   </div>

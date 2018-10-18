@@ -1,49 +1,63 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import ListInput from 'components/shared/forms/ListInput.vue';
+import ObsListInput from 'components/obs/inputs/ObsListInput.vue';
 import { ISourceApi } from 'services/sources';
-import { IListInput } from 'components/shared/forms/Input';
-import { WidgetDefinitions, IWidget } from 'services/widgets';
+import { IObsListInput } from 'components/obs/inputs/ObsInput';
+import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
+import { NavigationService } from 'services/navigation';
+import { ChatbotCommonService } from 'services/chatbot';
+import { WindowsService } from 'services/windows';
+import { Inject } from 'util/injector';
+import { $t } from 'services/i18n';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
-    ListInput
+    ObsListInput
   }
 })
 export default class WidgetProperties extends Vue {
-
   @Prop() source: ISourceApi;
 
-  widgetModel: IListInput<string> = null;
+  @Inject() navigationService: NavigationService;
+  @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
+  @Inject() chatbotCommonService: ChatbotCommonService;
 
-  created() {
-    this.refreshWidgetModel();
+  widgetModel: IObsListInput<string> = null;
+
+  get isLoggedIn() {
+    return this.userService.isLoggedIn();
   }
 
-  handleInput(value: IListInput<string>) {
-    this.source.setPropertiesManagerSettings({
-      widgetType: value.value
-    });
-    this.refreshWidgetModel();
-    this.$emit('update');
+  login() {
+    this.windowsService.closeChildWindow();
+    this.userService.showLogin();
   }
 
-  refreshWidgetModel() {
-    const value = this.source.getPropertiesManagerSettings().widgetType.toString();
+  navigateWidgetSettings() {
 
-    this.widgetModel = {
-      value,
-      description: 'Widget Type',
-      name: 'widgetType',
-      options: Object.keys(WidgetDefinitions).map(type => {
-        const widget = WidgetDefinitions[type] as IWidget;
+    const widgetType = this.source
+      .getPropertiesManagerSettings()
+      .widgetType;
 
-        return {
-          description: widget.name,
-          value: type
-        };
-      })
-    };
+    const subPage = {
+      [WidgetType.AlertBox]: 'alertbox',
+      [WidgetType.DonationGoal]: 'donationgoal',
+      [WidgetType.FollowerGoal]: 'followergoal',
+      [WidgetType.SubscriberGoal]: 'followergoal',
+      [WidgetType.BitGoal]: 'bitgoal',
+      [WidgetType.DonationTicker]: 'donationticker',
+      [WidgetType.ChatBox]: 'chatbox',
+      [WidgetType.EventList]: 'eventlist',
+      [WidgetType.TipJar]: 'jar',
+      [WidgetType.ViewerCount]: 'viewercount',
+      [WidgetType.StreamBoss]: 'streamboss',
+      [WidgetType.Credits]: 'credits',
+      [WidgetType.SpinWheel]: 'wheel'
+    }[widgetType.toString()];
+
+    this.navigationService.navigate('Dashboard', { subPage });
+    this.windowsService.closeChildWindow();
   }
-
 }

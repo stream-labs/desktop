@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "방송 시작",
+  "Stop Streaming": "방송 끄기",
+  "Start Recording": "녹화 시작",
+  "Stop Recording": "녹화 끄기",
+  "Switch to scene": "장면 전환",
+  "Show %{sourcename}": "%{sourcename} 보기",
+  "Hide %{sourcename}": "%{sourcename} 숨기기",
+  "Mute": "음소거",
+  "Unmute": "음소거 해제 ",
+  "Push to Mute": "눌러서 음소거",
+  "Push to Talk": "눌러서 말하기",
+  "Enable Studio Mode": "스튜디오 모드 활성화",
+  "Disable Studio Mode": "스튜디오 모드 비활성화",
+  "Transition (Studio Mode)": "전환 (스튜디오 모드)"
+}

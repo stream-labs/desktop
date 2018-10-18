@@ -1,10 +1,13 @@
 import { Service } from './service';
-import {
-  IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse,
-  ServicesManager
-} from '../services-manager';
+import { ServicesManager } from '../services-manager';
 import electron from 'electron';
 import { Subscription } from 'rxjs/Subscription';
+import {
+  IJsonRpcRequest,
+  IJsonRpcResponse,
+  IJsonRpcEvent
+} from 'services/jsonrpc';
+
 const { ipcRenderer } = electron;
 
 /**
@@ -12,22 +15,26 @@ const { ipcRenderer } = electron;
  * using by child window
  */
 export class IpcServerService extends Service {
-
   servicesManager: ServicesManager = ServicesManager.instance;
   servicesEventsSubscription: Subscription;
   requestHandler: Function;
 
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
-      const response: IJsonRpcResponse<any> = this.servicesManager.executeServiceRequest(request);
+      const response: IJsonRpcResponse<any> = this.exec(request);
       ipcRenderer.send('services-response', response);
     };
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');
 
-    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(event => this.sendEvent(event));
+    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(
+      event => this.sendEvent(event)
+    );
   }
 
+  exec(request: IJsonRpcRequest) {
+    return this.servicesManager.executeServiceRequest(request);
+  }
 
   stopListening() {
     ipcRenderer.removeListener('services-request', this.requestHandler);
@@ -37,5 +44,4 @@ export class IpcServerService extends Service {
   private sendEvent(event: IJsonRpcResponse<IJsonRpcEvent>) {
     ipcRenderer.send('services-message', event);
   }
-
 }

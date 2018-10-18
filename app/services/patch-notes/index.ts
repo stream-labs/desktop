@@ -1,0 +1,76 @@
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { mutation } from 'services/stateful-service';
+import electron from 'electron';
+import Util from 'services/utils';
+import { notes } from './notes';
+import { NavigationService } from 'services/navigation';
+import { Inject } from 'util/injector';
+
+interface IPatchNotesState {
+  lastVersionSeen: string;
+}
+
+export interface IPatchNotes {
+  version: string;
+  title: string;
+  notes: string[];
+  showChest: boolean;
+}
+
+export class PatchNotesService extends PersistentStatefulService<IPatchNotesState> {
+
+  @Inject() navigationService: NavigationService;
+
+  static defaultState: IPatchNotesState = {
+    lastVersionSeen: null
+  };
+
+  init() {
+    super.init();
+
+    if (Util.isDevMode()) {
+      // Useful for previewing patch notes in dev mode
+      window['showPatchNotes'] = () => {
+        this.navigationService.navigate('PatchNotes');
+      };
+    }
+  }
+
+  /**
+   * Will show the latest patch notes if they are available and
+   * the user has not seen them.
+   * @param onboarded Whether the user was onboarded this session
+   */
+  showPatchNotesIfRequired(onboarded: boolean) {
+    // Don't show the patch notes in dev mode
+    if (Util.isDevMode()) return;
+
+    // We do not show patch notes for preview
+    if (Util.isPreview()) return;
+    if (Util.isIpc()) return;
+
+    const currentVersion = electron.remote.process.env.SLOBS_VERSION;
+
+    // If the notes don't match the current version, we shouldn't
+    // show them.
+    if (notes.version !== currentVersion) return;
+
+    // The user has already seen the current patch notes
+    if (currentVersion === this.state.lastVersionSeen) return;
+
+    this.SET_LAST_VERSION_SEEN(currentVersion);
+
+    // Only show the actual patch notes if they weren't onboarded
+    if (!onboarded) this.navigationService.navigate('PatchNotes');
+  }
+
+  get notes() {
+    return notes;
+  }
+
+  @mutation()
+  private SET_LAST_VERSION_SEEN(version: string) {
+    this.state.lastVersionSeen = version;
+  }
+
+}

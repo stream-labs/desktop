@@ -1,0 +1,14 @@
+{
+  "baseBranch": "staging",
+  "dist": "test-dist/screentest",
+  "configs": {
+    "resolution": {
+      "window": "main",
+      "options": [{ "width": 1000, "height": 700 }, { "width": 1500, "height": 900 }]
+    },
+    "nightMode": {
+      "options": [true, false]
+    }
+  }
+
+}

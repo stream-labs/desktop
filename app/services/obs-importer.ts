@@ -1,16 +1,17 @@
 import electron from 'electron';
-import { Service } from './service';
+import { Service } from 'services/service';
 import fs from 'fs';
 import path from 'path';
-import { ScenesService } from './scenes';
-import { SourcesService } from './sources';
-import { SourceFiltersService } from './source-filters';
-import { ScenesTransitionsService } from './scenes-transitions';
-import { AudioService } from './audio';
-import { Inject } from '../util/injector';
-import { ScenesCollectionsService } from './scenes-collections/config';
-import { AppService } from './app';
-import { nodeObs } from './obs-api';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from 'services/sources';
+import { TSourceType } from 'services/sources/sources-api';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
+import { TransitionsService, ETransitionType } from 'services/transitions';
+import { AudioService } from 'services/audio';
+import { Inject } from 'util/injector';
+import { SceneCollectionsService } from 'services/scene-collections';
+import * as obs from '../../obs-api';
+import { SettingsService } from 'services/settings';
 
 interface Source {
   name?: string;
@@ -22,21 +23,57 @@ interface ISceneCollection {
   name: string;
 }
 
+interface IOBSConfigFilter {
+  id: TSourceFilterType;
+  name: string;
+  enabled: boolean;
+  settings: Dictionary<any>;
+}
+
+interface IOBSConfigSceneItem {
+  name: string;
+  crop_top: number;
+  crop_right: number;
+  crop_bottom: number;
+  crop_left: number;
+  pos: IVec2;
+  scale: IVec2;
+  visible: boolean;
+}
+
+interface IOBSConfigSource {
+  id: TSourceType;
+  name: string;
+  settings: {
+    shutdown?: boolean;
+    items?: IOBSConfigSceneItem[];
+  };
+  channel?: number;
+  muted: boolean;
+  volume: number;
+  filters:IOBSConfigFilter[];
+}
+
+interface IOBSConfigTransition {
+  id: string;
+}
+
+interface IOBSConfigJSON {
+  sources: IOBSConfigSource[];
+  current_scene: string;
+  scene_order: { name: string }[];
+  transitions: IOBSConfigTransition[];
+  transition_duration: number;
+}
+
 export class ObsImporterService extends Service {
   @Inject() scenesService: ScenesService;
-
   @Inject() sourcesService: SourcesService;
-
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;
-
-  @Inject('ScenesTransitionsService')
-  transitionsService: ScenesTransitionsService;
-
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
-
+  @Inject() transitionsService: TransitionsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() audioService: AudioService;
-
-  @Inject() appService: AppService;
+  @Inject() settingsService: SettingsService;
 
   async load(selectedprofile: string) {
     if (!this.isOBSinstalled()) return;
@@ -44,38 +81,60 @@ export class ObsImporterService extends Service {
     // Scene collections
     const collections = this.getSceneCollections();
     for (const collection of collections) {
-      this.appService.reset();
       await this.importCollection(collection);
     }
 
     // Profile
     this.importProfile(selectedprofile);
 
-    nodeObs.OBS_service_resetVideoContext();
-    nodeObs.OBS_service_resetAudioContext();
+    // Select current scene collection
+    const globalConfigFile = path.join(this.OBSconfigFileDirectory, 'global.ini');
+
+    const data = fs.readFileSync(globalConfigFile).toString();
+
+    if (data) {
+      const match = data.match(/^SceneCollection\=(.*)$/m);
+      if (match && match[1]) {
+        const coll = this.sceneCollectionsService.collections.find(co => co.name === match[1]);
+        if (coll) this.sceneCollectionsService.load(coll.id);
+      }
+    }
+
+    obs.NodeObs.OBS_service_resetVideoContext();
+    obs.NodeObs.OBS_service_resetAudioContext();
+
+    // Ensure we reload any updated settings
+    this.settingsService.loadSettingsIntoStore();
   }
 
-  private importCollection(collection: ISceneCollection): Promise<void> {
+  private async importCollection(collection: ISceneCollection) {
     const sceneCollectionPath = path.join(
       this.sceneCollectionsDirectory,
       collection.filename
     );
-    const configJSON = JSON.parse(
+    const configJSON: IOBSConfigJSON = JSON.parse(
       fs.readFileSync(sceneCollectionPath).toString()
     );
 
-    this.importSources(configJSON);
-    this.importScenes(configJSON);
-    this.importSceneOrder(configJSON);
-    this.importMixerSources(configJSON);
-    this.importTransitions(configJSON);
-    if (this.scenesService.scenes.length === 0) {
-      this.scenesCollectionsService.setUpDefaults();
-    }
-    return this.scenesCollectionsService.rawSave(collection.name);
+    await this.sceneCollectionsService.create({
+      name: collection.name,
+      setupFunction: () => {
+        this.importSources(configJSON);
+        this.importScenes(configJSON);
+        this.importSceneOrder(configJSON);
+        this.importMixerSources(configJSON);
+        this.importTransitions(configJSON);
+
+        if (this.scenesService.scenes.length === 0) {
+          return false;
+        }
+
+        return true;
+      }
+    });
   }
 
-  importFilters(filtersJSON: any, source: Source) {
+  importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
         const isFilterAvailable = this.filtersService
@@ -122,7 +181,7 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importSources(configJSON: any) {
+  importSources(configJSON: IOBSConfigJSON) {
     const sourcesJSON = configJSON.sources;
 
     if (Array.isArray(sourcesJSON)) {
@@ -133,6 +192,11 @@ export class ObsImporterService extends Service {
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            if (sourceJSON.id === 'browser_source') {
+              sourceJSON.settings.shutdown = true;
+            }
+
+            // Check "Shutdown source when not visible" by default for browser sources
             const source = this.sourcesService.createSource(
               sourceJSON.name,
               sourceJSON.id,
@@ -162,9 +226,13 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importScenes(configJSON: any) {
+  importScenes(configJSON: IOBSConfigJSON) {
     const sourcesJSON = configJSON.sources;
     const currentScene = configJSON.current_scene;
+
+    // OBS uses unique scene names instead id
+    // so create a mapping variable
+    const nameToIdMap: Dictionary<string> = {};
 
     if (Array.isArray(sourcesJSON)) {
       // Create all the scenes
@@ -173,13 +241,14 @@ export class ObsImporterService extends Service {
           const scene = this.scenesService.createScene(sourceJSON.name, {
             makeActive: sourceJSON.name === currentScene
           });
+          nameToIdMap[scene.name] = scene.id;
         }
       });
 
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getSceneByName(sourceJSON.name);
+          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
@@ -203,9 +272,14 @@ export class ObsImporterService extends Service {
                 const pos = item.pos;
                 const scale = item.scale;
 
-                sceneItem.setCrop(crop);
-                sceneItem.setPositionAndScale(pos.x, pos.y, scale.x, scale.y);
-                sceneItem.setVisibility(item.visible);
+                sceneItem.setSettings({
+                  visible: item.visible,
+                  transform: {
+                    crop,
+                    scale,
+                    position: pos
+                  }
+                });
               }
             });
           }
@@ -214,7 +288,7 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importSceneOrder(configJSON: any) {
+  importSceneOrder(configJSON: IOBSConfigJSON) {
     const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
     const listScene = this.scenesService.scenes;
@@ -231,7 +305,7 @@ export class ObsImporterService extends Service {
     this.scenesService.setSceneOrder(sceneNames);
   }
 
-  importMixerSources(configJSON: any) {
+  importMixerSources(configJSON: IOBSConfigJSON) {
     const channelNames = [
       'DesktopAudioDevice1',
       'DesktopAudioDevice2',
@@ -259,12 +333,17 @@ export class ObsImporterService extends Service {
     });
   }
 
-  importTransitions(configJSON: any) {
-    // Only import the first transition found in obs as slobs only
-    // uses one global transition
+  // TODO: Fix this function
+  importTransitions(configJSON: IOBSConfigJSON) {
+    // Only import a single transition from OBS for now.
+    // Eventually we should import all transitions
     if (configJSON.transitions && configJSON.transitions.length > 0) {
-      this.transitionsService.setType(configJSON.transitions[0].id);
-      this.transitionsService.setDuration(configJSON.transition_duration);
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.createTransition(
+        configJSON.transitions[0].id as ETransitionType,
+        'Global Transition',
+        { duration: configJSON.transition_duration }
+      );
     }
   }
 
@@ -291,6 +370,7 @@ export class ObsImporterService extends Service {
 
   getSceneCollections(): ISceneCollection[] {
     if (!this.isOBSinstalled()) return [];
+    if (!fs.existsSync(this.sceneCollectionsDirectory)) return [];
 
     let files = fs.readdirSync(this.sceneCollectionsDirectory);
 

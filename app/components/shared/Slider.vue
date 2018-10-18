@@ -9,10 +9,14 @@
     :interval="interval"
     :speed="0"
     :height="4"
+    :dotSize="dotSize"
     :tooltip="tooltip"
+    :sliderStyle="sliderStyle"
+    :formatter="formatter"
+    ref="slider"
   />
   <input
-    v-if="valueBox"
+    v-if="valueBox && !usePercentages"
     class="slider-input"
     type="text"
     :value="value"
@@ -33,15 +37,16 @@
 }
 
 .slider-input {
-  margin-left: 10px;
+  .margin-left(3);
   width: 60px;
 }
 
 .slider {
   background: transparent;
-  padding:8px 0 !important;
+  padding: 8px 0 0 !important;
   margin: 0;
   flex-grow: 1;
+  height: auto;
 
   &:hover {
     .vue-slider-tooltip {

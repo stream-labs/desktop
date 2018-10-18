@@ -1,14 +1,12 @@
 <template>
-<modal-layout
-  title="Name Scene Collection"
-  :done-handler="submit">
+<modal-layout :done-handler="submit">
   <form
     slot="content"
     @submit.prevent="submit">
     <p
       v-if="!error"
       class="NameScene-label">
-      Please enter the name of the Scenes Collection
+      {{ $t('Please enter the name of the Scenes Collection') }}
     </p>
     <p
       v-if="error"

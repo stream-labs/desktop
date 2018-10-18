@@ -98,11 +98,17 @@ function isHomePage() {
 }
 
 function patchNavigation() {
+
   document.querySelectorAll('.tsd-navigation.primary li a').forEach(link => {
     var linkText = link.innerHTML;
 
-    // hide all links without "-api" postfix
-    if (!linkText.match(/<wbr>api/) || linkText.match(/obs-<wbr>api/)) {
+    // hide all links without "-api" postfix and some blacklisted services
+    if (
+      !linkText.match(/<wbr>api/) ||
+      linkText.match(/obs-<wbr>api/) ||
+      linkText.match(/guest-<wbr>api/) ||
+      linkText.match(/server-<wbr>api/)
+    ) {
       link.parentElement.style.display = 'none';
     }
 

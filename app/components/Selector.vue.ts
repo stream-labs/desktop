@@ -36,24 +36,24 @@ export default class Selector extends Vue {
     });
   }
 
-  handleSelect(index: number) {
+  handleSelect(ev: MouseEvent, index: number) {
     const value = this.normalizedItems[index].value;
-    this.$emit('select', value);
+    this.$emit('select', value, ev);
   }
 
-  handleContextMenu(index?: number) {
+  handleContextMenu(ev: MouseEvent, index?: number) {
     if (index !== void 0) {
       const value = this.normalizedItems[index].value;
-      this.handleSelect(index);
+      this.handleSelect(ev, index);
       this.$emit('contextmenu', value);
       return;
     }
     this.$emit('contextmenu');
   }
 
-  handleDoubleClick(index: number) {
+  handleDoubleClick(ev: MouseEvent, index: number) {
     const value = this.normalizedItems[index].value;
-    this.handleSelect(index);
+    this.handleSelect(ev, index);
     this.$emit('dblclick', value);
   }
 

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Regression preview</title>
+  <script src="https://rawgit.com/vuejs/vue/dev/dist/vue.js" type="application/javascript"></script>
+</head>
+<body>
+
+<div id="app">
+  <div class="filters">
+
+    <div v-for="(filter, paramName) of state.config.configs" class="filter">
+      <h3>{{ paramName }}</h3>
+      <label v-for="(filterParam, ind) of filter.options">
+        <input type="checkbox" v-model="filters[paramName][ind]">
+        {{ JSON.stringify(filterParam) }}
+      </label>
+    </div>
+
+    <ul class="stats">
+      <li>Total: {{ state.totalScreens }}</li>
+      <li>Changed: {{ state.changedScreens }}</li>
+      <li>New: {{ state.newScreens }}</li>
+      <li><label><input type="checkbox" v-model="showOnlyChanged">Show only changed</label></li>
+    </ul>
+
+  </div>
+  <div class="regressions">
+    <div
+        class="regression"
+        :class="{'regression-new': regression.isNew }"
+        v-for="(regression, ind) of state.regressions"
+        v-if="canShow(regression)"
+    >
+
+      <span v-if="regression.isNew" class="badge new">NEW</span>
+      <span v-if="regression.isChanged" class="badge changed">CHANGED</span>
+      {{ ind }}
+      <pre>({{ JSON.stringify(regression.params) }})</pre>
+      <table width="100%">
+        <tr>
+          <td >
+            <a :href="regression.branchImage" target="_blank">
+              <img :src="regression.branchImage" >
+            </a>
+          </td>
+          <td >
+            <a :href="regression.baseImage"  target="_blank" v-if="!regression.isNew">
+              <img :src="regression.baseImage" >
+            </a>
+          </td>
+          <td>
+            <a :href="regression.diffImage"  target="_blank" v-if="!regression.isNew">
+              <img :src="regression.diffImage" >
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const state = ##STATE_PLACEHOLDER##;
+  var app = new Vue({
+    el: '#app',
+    data() {
+
+      const filters = {};
+
+      Object.keys(state.config.configs).forEach(paramName => {
+        const paramOptions = state.config.configs[paramName].options;
+        const filterValues = [];
+        filterValues.length = paramOptions.length;
+        filterValues.fill(true);
+        filters[paramName] = filterValues;
+      });
+
+      return {
+        state,
+        filters,
+        showOnlyChanged: true
+      }
+    },
+    methods: {
+      canShow(regression) {
+
+        if (this.showOnlyChanged && !regression.isChanged && !regression.isNew) {
+          return false;
+        }
+
+        for (const paramName in regression.params) {
+          const paramValue = regression.params[paramName];
+          const configVariations = this.state.config.configs[paramName].options;
+          for (let ind = 0; ind < configVariations.length; ind++ ) {
+            if (
+              JSON.stringify(paramValue) === JSON.stringify(configVariations[ind]) &&
+              this.filters[paramName][ind] === false
+            ) return false;
+          }
+        }
+
+        return true;
+      }
+    }
+  })
+
+</script>
+<style>
+
+
+  body {
+    background-color: darkgray;
+    font-family: Verdana;
+  }
+
+  h3 {
+    margin: 0;
+    color: whitesmoke;
+  }
+
+  .filters {
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100%;
+    background-color: #222222;
+    border-bottom: 1px solid #555;
+    color: #2faf93;
+    font-family: "courier new", courier, monospace;
+  }
+
+  .filter {
+    display: inline-block;
+    padding: 5px;
+  }
+
+  .filters label {
+    display: block;
+  }
+
+  .stats {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    list-style: none;
+    font-size: 12px;
+  }
+
+  .regressions {
+    margin-top: 75px;
+  }
+
+  .regression {
+    margin-bottom: 20px;
+  }
+
+  .regression img {
+    display:block;
+    width:100%;
+    cursor: pointer;
+  }
+
+  span.badge{
+    color: white;
+    border-radius: 3px;
+    padding: 2px 4px;
+  }
+
+  .badge.new {
+    background-color: #2faf93;
+  }
+
+  .badge.changed {
+    background-color: orangered;
+  }
+
+
+  .regression-new img {
+    display: inline;
+    width: auto;
+  }
+</style>
+
+</body>
+</html>

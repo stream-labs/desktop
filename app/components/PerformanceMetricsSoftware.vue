@@ -3,7 +3,7 @@
   <span class="performance-metric-wrapper">
     <img class="performance-metric-icon" src="../../media/images/icons/cpu.png">
     <span class="performance-metric">
-      <span class="performance-metric__value">{{ cpuPercent }}%</span> CPU
+      <span class="performance-metric__value">{{ cpuPercent }}%</span> {{ $t('CPU') }}
     </span>
   </span>
 

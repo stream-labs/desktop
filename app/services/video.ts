@@ -1,28 +1,32 @@
 import { Service } from './service';
 import { SettingsService } from './settings';
-import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import electron from 'electron';
 import { Inject } from '../util/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
+import { ScalableRectangle } from '../util/ScalableRectangle';
+import { Subscription } from 'rxjs/Subscription';
+import { SelectionService } from 'services/selection';
 
 const { remote } = electron;
 
 const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 
+export interface IDisplayOptions {
+  sourceId?: string;
+  paddingSize?: number;
+}
+
 export class Display {
-
-  @Inject()
-  settingsService: SettingsService;
-
-  @Inject()
-  videoService: VideoService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
+  @Inject() videoService: VideoService;
+  @Inject() windowsService: WindowsService;
+  @Inject() selectionService: SelectionService;
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
+  isDestroyed = false;
 
   trackingInterval: number;
   currentPosition: IRectangle = {
@@ -34,28 +38,48 @@ export class Display {
 
   windowId: string;
 
-  constructor(public name: string) {
+  private selectionSubscription: Subscription;
+
+  sourceId: string;
+  
+  boundDestroy: any;
+  boundClose: any;
+  displayDestroyed: boolean;
+
+  constructor(public name: string, options: IDisplayOptions = {}) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
 
-    nodeObs.OBS_content_createDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
-      name
-    );
-    this.outputRegionCallbacks = [];
+    this.sourceId = options.sourceId;
 
-    // Watch for changes to the base resolution.
-    // This seems super freaking hacky.
-    this.settingsService.store.watch(state => {
-      return state.SettingsService.Video.Base;
-    }, () => {
-      // This gives the setting time to propagate
-      setTimeout(() => {
-        this.refreshOutputRegion();
-      }, 1000);
+    if (this.sourceId) {
+      obs.NodeObs.OBS_content_createSourcePreviewDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        this.sourceId,
+        name
+      );
+    } else {
+      obs.NodeObs.OBS_content_createDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        name
+      );
+    }
+    this.displayDestroyed = false;
+
+    this.selectionSubscription = this.selectionService.updated.subscribe(state => {
+      this.switchGridlines(state.selectedIds.length <= 1);
     });
 
-    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
-    this.videoService.registerDisplay(this);
+    obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+
+    if (options.paddingSize != null) {
+      obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
+    }
+
+    this.outputRegionCallbacks = [];
+
+    this.boundClose = this.remoteClose.bind(this);
+
+    remote.getCurrentWindow().on('close', this.boundClose);
   }
 
   /**
@@ -96,20 +120,28 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    nodeObs.OBS_content_moveDisplay(this.name, x, y);
+    obs.NodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    nodeObs.OBS_content_resizeDisplay(this.name, width, height);
-    this.refreshOutputRegion();
+    obs.NodeObs.OBS_content_resizeDisplay(this.name, width, height);
+    if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
+  }
+
+  remoteClose() {
+    if (this.trackingInterval) clearInterval(this.trackingInterval);
+    if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
+    if (!this.displayDestroyed) {
+      obs.NodeObs.OBS_content_destroyDisplay(this.name);
+      this.displayDestroyed = true;
+    }
   }
 
   destroy() {
-    this.videoService.unregisterDisplay(this);
-    nodeObs.OBS_content_destroyDisplay(this.name);
-    if (this.trackingInterval) clearInterval(this.trackingInterval);
+    remote.getCurrentWindow().removeListener('close', this.boundClose);
+    this.remoteClose();
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -117,8 +149,8 @@ export class Display {
   }
 
   refreshOutputRegion() {
-    const position = nodeObs.OBS_content_getDisplayPreviewOffset(this.name);
-    const size = nodeObs.OBS_content_getDisplayPreviewSize(this.name);
+    const position = obs.NodeObs.OBS_content_getDisplayPreviewOffset(this.name);
+    const size = obs.NodeObs.OBS_content_getDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -130,10 +162,18 @@ export class Display {
     });
   }
 
+  drawingUI = true;
+
   setShoulddrawUI(drawUI: boolean) {
-    nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
+    this.drawingUI = drawUI;
+    obs.NodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
   }
 
+  switchGridlines(enabled: boolean) {
+    // This function does nothing if we aren't drawing the UI
+    if (!this.drawingUI) return;
+    obs.NodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
+  }
 }
 
 export class VideoService extends Service {
@@ -145,28 +185,19 @@ export class VideoService extends Service {
 
   init() {
     this.settingsService.loadSettingsIntoStore();
-  }
 
-  createDisplay() {
-    return new Display(this.getRandomDisplayId());
-  }
-
-
-  registerDisplay(display: Display) {
-    this.activeDisplays[display.name] = display;
-  }
-
-
-  unregisterDisplay(display: Display) {
-    delete this.activeDisplays[display.name];
-  }
-
-
-  /**
-   * Destroy all active displays.  This is useful on shutdown.
-   */
-  destroyAllDisplays() {
-    Object.values(this.activeDisplays).forEach(display => display.destroy());
+    // Watch for changes to the base resolution.
+    // This seems super freaking hacky.
+    this.settingsService.store.watch(state => {
+      return state.SettingsService.Video.Base;
+    }, () => {
+      // This gives the setting time to propagate
+      setTimeout(() => {
+        Object.values(this.activeDisplays).forEach(display => {
+          display.refreshOutputRegion();
+        });
+      }, 1000);
+    });
   }
 
   // Generates a random string:
@@ -174,6 +205,15 @@ export class VideoService extends Service {
   getRandomDisplayId() {
     return Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
+  }
+
+  getScreenRectangle() {
+    return new ScalableRectangle({
+      x: 0,
+      y: 0,
+      width: this.baseWidth,
+      height: this.baseHeight
+    });
   }
 
   get baseWidth() {

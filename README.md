@@ -2,22 +2,18 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
 
-Electron client for the Streamlabs OBS streaming software.
+Simple, powerful, and efficient live streaming software built on Electron and OBS.
+
+![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
 
 This application currently only supports 64-bit Windows.
-
-## Issues
-
-Please submit all issues here:
-
-https://tracker.streamlabs.com
 
 ## Dependencies
 
 ### Node.js
 
 Node is required for installing npm packages and for running
-various scripts.  We recommend the current LTS release, 8.9.1:
+various scripts.  We recommend the current LTS release, 8.x.x:
 
 https://nodejs.org
 
@@ -47,6 +43,9 @@ download it here:
 
 https://cmake.org/download/
 
+Make sure to add CMake to your path. You may have to restart your
+machine before CMake is available.
+
 ### Python 2.7
 
 Node-gyp requires python 2.7 available in your path to install some
@@ -56,26 +55,11 @@ https://www.python.org/
 
 ## Installation
 
-First, make sure you have initialized git submodules:
-
-```
-git submodule update --init --recursive
-```
-
 Install all node modules via yarn:
 
 ```
 yarn install
 ```
-
-Install the current release of node-obs:
-
-```
-yarn install-node-obs
-```
-
-If you would prefer to compile this yourself, you can find instructions here:
-https://github.com/stream-labs/node-obs
 
 Then, compile assets with webpack:
 
@@ -185,3 +169,9 @@ manual deploy.
 - [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
 - [ ] Deploy the new version `yarn deploy`
 - [ ] Merge master back into staging
+
+## ❤ OBS Developers
+
+At its core, Streamlabs OBS is powered by the [OBS](https://obsproject.com/)
+engine.  We want to thank all of the developers over at the OBS project for
+their years of tireless hard work, without which Streamlabs OBS wouldn't exist today.

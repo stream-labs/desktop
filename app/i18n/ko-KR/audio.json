@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "오디오 고급 설정",
+  "Volume (%)": "음량 (%)",
+  "Downmix to Mono": "모노로 강제 송출",
+  "Sync Offset (ms)": "싱크 오프셋 (ms)",
+  "Audio Monitoring": "오디오 모니터링",
+  "Monitor Off": "모니터링 끔",
+  "Monitor Only (mute output)": "모니터링만 (출력은 제거)",
+  "Monitor and Output": "모니터링과 출력",
+  "Tracks": "트랙",
+  "Advanced Audio Settings": "고급 오디오 설정",
+  "Volume ( % )": "볼륨 ( % )",
+  "Sync Offset ( ms )": "싱크 오프셋 ( ms )",
+  "Mixer": "믹서",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "오디오 레벨을 모니터링합니다. 막대가 움직이고 있다면 오디오가 출력되고 있는 것입니다."
+}

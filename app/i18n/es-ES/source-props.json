@@ -1,0 +1,17 @@
+{
+    "Image": "Imagen",
+    "Color Source": "Fuente Color",
+    "Browser Source": "Fuente Navegador",
+    "Media Source": "Fuente Multimedia",
+    "Image Slide Show": "Presentación de Imágenes",
+    "Text (GDI+)": "Texto (GDI+)",
+    "Text (FreeType 2)": "Texto (FreeType 2)",
+    "Display Capture": "Captura de Pantalla",
+    "Window Capture": "Captura de Ventana",
+    "Game Capture": "Captura de Juego",
+    "Video Capture Device": "Dispositivo de Captura de Video",
+    "Audio Input Capture": "Captura de Entrada de Audio",
+    "Audio Output Capture": "Captura de Salida de Audio",
+    "Blackmagic Device": "Dispositivo Blackmagic",
+    "NDI Source": "Fuente NDI"
+}

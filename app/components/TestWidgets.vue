@@ -1,27 +1,27 @@
 <template>
-  <div>
+  <div class="slide-open">
     <a
       class="slide-open__open link"
       @click="slideOpen = !slideOpen">
-      <i class="fa fa-arrow-left" aria-hidden="true"></i> Test Widgets
+      {{$t('Test Widgets') }}
     </a>
     <transition name="slide-fade">
       <div
         v-if="slideOpen"
         class="slide-open__menu">
-        <a class="slide-open__close"
-          @click="slideOpen = !slideOpen">
-          <i class="fa fa-times" aria-hidden="true"></i>
-        </a>
-        <div class="button-container">
-          <button
-            class="button button--trans"
-            v-for="tester in widgetTesters"
-            :key="tester.name"
-            @click="tester.test()">
-            {{ tester.name }}
-          </button>
-        </div>
+        <button
+          class="button button--trans"
+          v-for="tester in widgetTesters"
+          :key="tester.name"
+          @click="tester.test()">
+          {{ $t(tester.name) }}
+        </button>
+        <button
+          class="button button--trans"
+          v-if="facemasksActive"
+          @click="playTestFacemask()">
+          Mask
+        </button>
       </div>
     </transition>
   </div>

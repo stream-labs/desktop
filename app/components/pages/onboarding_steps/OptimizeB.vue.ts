@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
+import { $t } from 'services/i18n';
 
 interface IConfigStepPresentation {
   description: string;
@@ -54,15 +55,15 @@ export default class OptimizeB extends Vue {
 
   summaryForStep(progress: IConfigProgress) {
     return {
-      detecting_location: 'Detecting your location ...',
-      location_found: `Detected ${progress.continent}`,
-      bandwidth_test: 'Performing bandwidth test ...',
-      streamingEncoder_test: 'Testing streaming encoder ...',
-      recordingEncoder_test: 'Testing recording encoder ...',
-      checking_settings: 'Attempting stream ...',
-      setting_default_settings: 'Reverting to defaults ...',
-      saving_service: 'Applying stream settings ...',
-      saving_settings: 'Applying general settings ...'
+      detecting_location: $t('Detecting your location ...'),
+      location_found: $t('Detected %{continent}', { continent: progress.continent }),
+      bandwidth_test: $t('Performing bandwidth test ...'),
+      streamingEncoder_test: $t('Testing streaming encoder ...'),
+      recordingEncoder_test: $t('Testing recording encoder ...'),
+      checking_settings: $t('Attempting stream ...'),
+      setting_default_settings: $t('Reverting to defaults ...'),
+      saving_service: $t('Applying stream settings ...'),
+      saving_settings: $t('Applying general settings ...')
     }[progress.description];
   }
 

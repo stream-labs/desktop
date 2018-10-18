@@ -1,13 +1,12 @@
 <template>
   <modal-layout
-    title="Add source filter"
     :done-handler="done"
     :cancel-handler="cancel"
   >
 
     <div slot="content">
-      <ListInput v-model="form.type" @input="setTypeAsName"></ListInput>
-      <TextInput v-model="form.name"></TextInput>
+      <ObsListInput v-model="form.type" @input="setTypeAsName"></ObsListInput>
+      <ObsTextInput v-model="form.name"></ObsTextInput>
       <p v-if="error" style="color: red">
         {{ error }}
       </p>

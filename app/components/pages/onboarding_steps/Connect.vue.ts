@@ -1,27 +1,27 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { UserService } from '../../../services/user';
-import { TPlatform } from '../../../services/platforms';
-import { Inject } from '../../../util/injector';
-import { OnboardingService } from '../../../services/onboarding';
+import { UserService } from 'services/user';
+import { TPlatform } from 'services/platforms';
+import { Inject } from 'util/injector';
+import { OnboardingService } from 'services/onboarding';
+import electron from 'electron';
 
 @Component({})
 export default class Connect extends Vue {
+  @Inject() userService: UserService;
+  @Inject() onboardingService: OnboardingService;
 
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  onboardingService: OnboardingService;
-
-  loadingState: Dictionary<boolean> = {};
+  loadingState = false;
 
   authPlatform(platform: TPlatform) {
-    Vue.set(this.loadingState, platform, true);
+    this.loadingState = true;
     this.userService.startAuth(
       platform,
       () => {
-        this.loadingState[platform] = false;
+        this.loadingState = false;
+      },
+      () => {
+        this.loadingState = true;
       },
       () => {
         this.onboardingService.next();
@@ -30,16 +30,25 @@ export default class Connect extends Vue {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loadingState[platform]) return 'fa-spinner fa-spin';
+    if (this.loadingState) return 'fas fa-spinner fa-spin';
 
     return {
-      twitch: 'fa-twitch',
-      youtube: 'fa-youtube-play'
+      twitch: 'fab fa-twitch',
+      youtube: 'fab fa-youtube',
+      mixer: 'fas fa-times'
     }[platform];
   }
 
   skipOnboarding() {
     this.onboardingService.skip();
+  }
+
+  get isSecurityUpgrade() {
+    return this.onboardingService.options.isSecurityUpgrade;
+  }
+
+  contactSupport() {
+    electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
 }

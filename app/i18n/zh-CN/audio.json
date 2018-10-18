@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "开启高级音频设置",
+  "Volume (%)": "音量 (%)",
+  "Downmix to Mono": "混降到单声道",
+  "Sync Offset (ms)": "同步偏移量 (ms)",
+  "Audio Monitoring": "音频监控",
+  "Monitor Off": "监控关闭",
+  "Monitor Only (mute output)": "仅监控 (静音输出)",
+  "Monitor and Output": "显示器和输出",
+  "Tracks": "音轨",
+  "Advanced Audio Settings": "高级音频设置",
+  "Volume ( % )": "音量 ( % )",
+  "Sync Offset ( ms )": "同步偏移量 ( ms )",
+  "Mixer": "混音器",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "监控音频级别。如果横条形图移动, 表示正在输出音频。"
+}

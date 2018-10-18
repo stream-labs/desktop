@@ -1,20 +1,33 @@
 <template>
-<div class="main" :class="{'night-theme': nightTheme}">
+<div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
-  <div class="main-spacer bgColor-teal"></div>
+  <div class="main-spacer"></div>
+  <news-banner />
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
+
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <apps-nav v-if="platformApps.length > 0"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
-        <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
+        <custom-loader></custom-loader>
       </div>
-      <component
-        v-if="!shouldLockContent"
+
+      <PlatformAppContainer
         class="main-page-container"
-        :is="page"/>
+        v-for="app in platformApps"
+        :key="app.id"
+        :style="appStyles(app.id)"
+        v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
+        :params="{ appId: app.id, poppedOut: isAppPoppedOut(app.id) }" />
+      <component
+        class="main-page-container"
+        v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
+        :is="page"
+        :params="params"/>
       <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
     </div>
+
     <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
   </div>
 </div>
@@ -41,10 +54,13 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  width: 72%;
 }
 
 .main-spacer {
   height: 4px;
+  flex: 0 0 4px;
+  .bg--teal();
 }
 
 .main-page-container {
@@ -60,9 +76,5 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.main-loading-spinner {
-  font-size: 42px;
 }
 </style>

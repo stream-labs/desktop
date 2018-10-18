@@ -2,17 +2,48 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
             "type": "node",
             "request": "launch",
+            "name": "Launch",
             "protocol": "inspector",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "runtimeArgs": [
-                "${workspaceRoot}"
+                "."
             ],
             "cwd": "${workspaceRoot}",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
             "envFile": "${workspaceRoot}/.env",
             "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Electron: Main",
+            "protocol": "inspector",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "runtimeArgs": [
+                "--remote-debugging-port=44695",
+                "."
+            ],
+            "cwd": "${workspaceRoot}",
+            "envFile": "${workspaceRoot}/.env",
+            "outputCapture": "std"
+        },
+        {
+            "name": "Electron: Renderer",
+            "type": "chrome",
+            "request": "attach",
+            "port": 44695,
+            "webRoot": "${workspaceFolder}",
+            "timeout": 30000
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Electron: All",
+            "configurations": [
+                "Electron: Main",
+                "Electron: Renderer"
+            ]
         }
     ]
 }

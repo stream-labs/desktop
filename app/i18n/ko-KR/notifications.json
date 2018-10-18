@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "새로운 알림 없음",
+  "Enable notifications": "알림 활성화",
+  "Enable sound": "소리 활성화",
+  "Skipped frames detected:": "건너뛴 프레임 감지됨:",
+  "Detect skipped frames": "건너뛴 프레임 감지",
+  "Skipped frames threshold": "건너뛴 프레임의 임계값",
+  "Detect lagged frames": "지연된 프레임 감지됨",
+  "Lagged frames threshold": "지연된 프레임의 임계값",
+  "Detect dropped frames": "드랍된 프레임 감지됨",
+  "Dropped frames threshold": "드랍된 프레임의 임계값",
+  "Show Notifications": "알림 보기",
+  "Restore Defaults": "기본 설정으로 초기화",
+  "Troubleshooter Notifications": "문제 해결사 알림",
+  "Click to open your Notifications window": "클릭해서 알림창을 열기",
+  "Click to read your unread Notifications": "클릭해서 읽지 않은 알림 읽기",
+  "New Notifications": "새 알림",
+  "Log": "기록"
+}

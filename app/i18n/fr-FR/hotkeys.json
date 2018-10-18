@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "Commencer la diffusion",
+  "Stop Streaming": "Arrêter la diffusion",
+  "Start Recording": "Commencer l'enregistrement",
+  "Stop Recording": "Arrêter l'enregistrement",
+  "Switch to scene": "Passer à la scène",
+  "Show %{sourcename}": "Afficher",
+  "Hide %{sourcename}": "Masquer",
+  "Mute": "Désactivé le son",
+  "Unmute": "Activé le son",
+  "Push to Mute": "Appuyer pour désactiver le son",
+  "Push to Talk": "Appuyer pour Parler",
+  "Enable Studio Mode": "Activer le Mode Studio",
+  "Disable Studio Mode": "Désactivé le Mode Studio",
+  "Transition (Studio Mode)": "Transition (Mode Studio)"
+}

@@ -1,9 +1,10 @@
-import { SettingsService } from '../services/settings';
-import { Inject } from '../util/injector';
-import { ScenesService, SceneItem } from '../services/scenes';
-import { VideoService, Display } from '../services/video';
-import { WindowsService } from '../services/windows';
-import { ScalableRectangle } from '../util/ScalableRectangle';
+import { SettingsService } from 'services/settings';
+import { Inject } from 'util/injector';
+import { ScenesService, SceneItem } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { WindowsService } from 'services/windows';
+import { ScalableRectangle } from 'util/ScalableRectangle';
+import { SelectionService } from 'services/selection';
 import electron from 'electron';
 
 const { webFrame, screen } = electron;
@@ -33,7 +34,7 @@ interface IEdge {
   length: number;
 }
 
-// A set of edged separated by location
+// A set of edges separated by location
 interface IEdgeCollection {
   top: IEdge[];
   bottom: IEdge[];
@@ -41,20 +42,25 @@ interface IEdgeCollection {
   right: IEdge[];
 }
 
+interface ISourceEdges {
+  top: IEdge;
+  bottom: IEdge;
+  left: IEdge;
+  right: IEdge;
+}
+
+interface IDragHandlerOptions {
+  displaySize: IVec2;
+  displayOffset: IVec2;
+}
+
 // Encapsulates logic for dragging sources in the overlay editor
-class DragHandler {
-
-  @Inject()
-  settingsService: SettingsService;
-
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  videoService: VideoService;
-
-  @Inject()
-  windowsService: WindowsService;
+export class DragHandler {
+  @Inject() private settingsService: SettingsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private videoService: VideoService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private selectionService: SelectionService;
 
   // Settings
   snapEnabled: boolean;
@@ -66,24 +72,25 @@ class DragHandler {
   // Video Canvas
   baseWidth: number;
   baseHeight: number;
-  renderedWidth: number;
-  renderedHeight: number;
+  displaySize: IVec2;
+  displayOffset: IVec2;
   scaleFactor: number;
   snapDistance: number;
 
   // Sources
-  draggedSource: SceneItem;
-  otherSources: SceneItem[];
+  private draggedSource: SceneItem;
+  private otherSources: SceneItem[];
 
   // Mouse properties
-  currentX: number;
-  currentY: number;
+  mouseOffset: IVec2 = { x: 0, y: 0 };
 
   targetEdges: IEdgeCollection;
 
-  // startEvent: The mousedown event that started the drag
-  // display: The OBS display object we are operating on
-  constructor(startEvent: MouseEvent, display: Display) {
+  /**
+   * @param startEvent the mouse event for this drag
+   * @param options drag handler options
+   */
+  constructor(startEvent: MouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
@@ -94,22 +101,27 @@ class DragHandler {
     // Load some attributes about the video canvas
     this.baseWidth = this.videoService.baseWidth;
     this.baseHeight = this.videoService.baseHeight;
-    this.renderedWidth = display.outputRegion.width;
-    this.renderedHeight = display.outputRegion.height;
+    this.displaySize = options.displaySize;
+    this.displayOffset = options.displayOffset;
     this.scaleFactor = this.windowsService.state.main.scaleFactor;
     this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
-      this.renderedWidth;
+      this.displaySize.x;
 
     // Load some attributes about sources
-    const scene = this.scenesService.activeScene;
-    this.draggedSource = scene.activeItems[0];
-    this.otherSources = scene.inactiveSources.filter(source => {
-      return source.isVisualSource;
-    });
+    this.draggedSource = this.selectionService.getLastSelected();
+    this.otherSources = this.selectionService
+      .clone()
+      .invert()
+      .getItems()
+      .filter(item => item.isVisualSource);
 
-    // Store the starting mouse event
-    this.currentX = startEvent.pageX;
-    this.currentY = startEvent.pageY;
+    const rect = this.draggedSource.getRectangle();
+    rect.normalize();
+
+    const pos = this.mousePositionInCanvasSpace(startEvent);
+
+    this.mouseOffset.x = pos.x - rect.x;
+    this.mouseOffset.y = pos.y - rect.y;
 
     // Generate the edges we should snap to
     this.targetEdges = this.generateTargetEdges();
@@ -117,93 +129,89 @@ class DragHandler {
 
   // Should be called when the mouse moves
   move(event: MouseEvent) {
-    const delta = this.mouseDelta(event);
-
-    const rect = new ScalableRectangle(this.draggedSource);
+    const rect = this.draggedSource.getRectangle();
     const denormalize = rect.normalize();
 
-    // The new source location before applying snapping
-    let newX = rect.x + delta.x;
-    let newY = rect.y + delta.y;
+    const mousePos = this.mousePositionInCanvasSpace(event);
 
-    // Whether or not we snapped the X or Y coordinate
-    let snappedX = false;
-    let snappedY = false;
+    // Move the rectangle to its new position
+    rect.x = mousePos.x - this.mouseOffset.x;
+    rect.y = mousePos.y - this.mouseOffset.y;
 
+    // Adjust position for snapping
     // Holding Ctrl temporary disables snapping
     if (this.snapEnabled && !event.ctrlKey) {
-      const sourceEdges = this.generateSourceEdges(rect, newX, newY);
+      const sourceEdges = this.generateSourceEdges(rect);
 
-      Object.keys(sourceEdges).forEach(edgeName => {
-        const sourceEdge = sourceEdges[edgeName] as IEdge;
+      const leftDistance = this.getNearestEdgeDistance(
+        sourceEdges.left,
+        this.targetEdges.left
+      );
+      const rightDistance = this.getNearestEdgeDistance(
+        sourceEdges.right,
+        this.targetEdges.right
+      );
+      const topDistance = this.getNearestEdgeDistance(
+        sourceEdges.top,
+        this.targetEdges.top
+      );
+      const bottomDistance = this.getNearestEdgeDistance(
+        sourceEdges.bottom,
+        this.targetEdges.bottom
+      );
 
-        this.targetEdges[edgeName].find((targetEdge: IEdge) => {
-          if (this.shouldSnap(sourceEdge, targetEdge)) {
-            if ((edgeName === 'left') && !snappedX) {
-              snappedX = true;
-              newX = targetEdge.depth;
-            }
+      let snapDistanceX = 0;
+      let snapDistanceY = 0;
 
-            if ((edgeName === 'right') && !snappedX) {
-              snappedX = true;
-              newX = targetEdge.depth - rect.scaledWidth;
-            }
+      if (Math.abs(leftDistance) <= Math.abs(rightDistance)) {
+        if (Math.abs(leftDistance) < this.snapDistance) snapDistanceX = leftDistance;
+      } else {
+        if (Math.abs(rightDistance) < this.snapDistance) snapDistanceX = rightDistance;
+      }
 
-            if ((edgeName === 'top') && !snappedY) {
-              snappedY = true;
-              newY = targetEdge.depth;
-            }
+      if (Math.abs(topDistance) <= Math.abs(bottomDistance)) {
+        if (Math.abs(topDistance) < this.snapDistance) snapDistanceY = topDistance;
+      } else {
+        if (Math.abs(bottomDistance) < this.snapDistance) snapDistanceY = bottomDistance;
+      }
 
-            if ((edgeName === 'bottom') && !snappedY) {
-              snappedY = true;
-              newY = targetEdge.depth - rect.scaledHeight;
-            }
-
-            // Leave the loop early if we snapped X & Y
-            return snappedX && snappedY;
-          }
-        });
-      });
+      rect.x += snapDistanceX;
+      rect.y += snapDistanceY;
     }
-
-    rect.x = newX;
-    rect.y = newY;
 
     denormalize();
 
-    this.scenesService.activeScene.getItem(
-      this.draggedSource.sceneItemId
-    ).setPosition(rect);
+    // Translate new position into a delta that can be applied
+    // to all selected sources equally.
+    const deltaX = rect.x - this.draggedSource.transform.position.x;
+    const deltaY = rect.y - this.draggedSource.transform.position.y;
 
-    if (!snappedX) {
-      this.currentX = event.pageX;
-    }
-
-    if (!snappedY) {
-      this.currentY = event.pageY;
-    }
+    this.selectionService.getItems().forEach(item => {
+      const pos = item.transform.position;
+      item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
+    });
   }
 
-  // Private:
+  private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {
+    return this.pageSpaceToCanvasSpace({
+      x: event.pageX - this.displayOffset.x,
+      y: event.pageY - this.displayOffset.y
+    });
+  }
 
-  // Returns mouse deltas in base space
-  mouseDelta(event: MouseEvent) {
-    // Deltas in rendered space
-    const deltaX = event.pageX - this.currentX;
-    const deltaY = event.pageY - this.currentY;
-
+  private pageSpaceToCanvasSpace(vec: IVec2) {
     return {
-      x: (deltaX * this.scaleFactor * this.baseWidth) / this.renderedWidth,
-      y: (deltaY * this.scaleFactor * this.baseHeight) / this.renderedHeight
+      x: (vec.x * this.scaleFactor * this.baseWidth) / this.displaySize.x,
+      y: (vec.y * this.scaleFactor * this.baseHeight) / this.displaySize.y
     };
   }
 
-  // A and B are both edges, and this function returns true
-  // if they should snap together.  For best results, only
-  // compare horizontal edges to other horizontal edges, and
-  // vertical edges to other vertical edges.
-  shouldSnap(a: IEdge, b: IEdge) {
-    // First, check if the edges overlap
+  /**
+   * Returns true if 2 edges overlap
+   * @param a an edge
+   * @param b another edge
+   */
+  private edgesOverlap(a: IEdge, b: IEdge): boolean {
     if (a.offset + a.length < b.offset) {
       return false;
     }
@@ -212,18 +220,31 @@ class DragHandler {
       return false;
     }
 
-    // Next, check if the edges are within snapping depth
-    if (Math.abs(a.depth - b.depth) > this.snapDistance) {
-      return false;
-    }
-
     return true;
   }
 
-  // Generates the target edges, which are edges that the
-  // currently dragged source can snap to.  They are separated
-  // by which edge of the source can snap to it.
-  generateTargetEdges() {
+  private getNearestEdgeDistance(sourceEdge: IEdge, targetEdges: IEdge[]) {
+    let minDistance = Infinity;
+
+    targetEdges.forEach(targetEdge => {
+      if (!this.edgesOverlap(targetEdge, sourceEdge)) return;
+
+      const distance = targetEdge.depth - sourceEdge.depth;
+
+      if (Math.abs(distance) < Math.abs(minDistance)) {
+        minDistance = distance;
+      }
+    });
+
+    return minDistance;
+  }
+
+  /**
+   * Generates the target edges, which are edges that the
+   * currently dragged source can snap to.  They are separated
+   * by which edge of the source can snap to it.
+   */
+  private generateTargetEdges() {
     const targetEdges: IEdgeCollection = {
       left: [],
       top: [],
@@ -249,14 +270,14 @@ class DragHandler {
 
       // Screen right
       targetEdges.right.push({
-        depth: this.baseWidth - 1,
+        depth: this.baseWidth,
         offset: 0,
         length: this.baseHeight
       });
 
       // Screen bottom
       targetEdges.bottom.push({
-        depth: this.baseHeight - 1,
+        depth: this.baseHeight,
         offset: 0,
         length: this.baseWidth
       });
@@ -265,7 +286,7 @@ class DragHandler {
     // Source edge snapping:
     if (this.sourceSnapping) {
       this.otherSources.forEach(source => {
-        const edges = this.generateSourceEdges(source, source.x, source.y);
+        const edges = this.generateSourceEdges(source.getRectangle());
 
         // The dragged source snaps to the adjacent edge
         // of other sources.  So the right edge snaps to
@@ -280,12 +301,14 @@ class DragHandler {
     return targetEdges;
   }
 
-  // Generates edges for the given source at
-  // the given x & y coordinates
-  generateSourceEdges(source: IScalableRectangle, x: number, y: number) {
+  /**
+   * Generates edges for the given source at
+   * the given x & y coordinates
+   */
+  private generateSourceEdges(source: IScalableRectangle): ISourceEdges {
     const rect = new ScalableRectangle({
-      x,
-      y,
+      x: source.x,
+      y: source.y,
       width: source.width,
       height: source.height,
       scaleX: source.scaleX,
@@ -324,5 +347,3 @@ class DragHandler {
   }
 
 }
-
-export default DragHandler;

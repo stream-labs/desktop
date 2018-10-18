@@ -1,0 +1,19 @@
+{
+  "Label Type": "Tipo Etichetta",
+  "Label Template": "Modello Etichetta",
+  "Item Template": "Modello Elemento",
+  "Item Separator": "Elemento Separatore",
+  "Item Limit": "Limite di Elementi",
+  "Duration (seconds)": "Durata (secondi)",
+  "Show Clock": "Mostra Tempo",
+  "Always, show 0:00 when inactive": "Sempre, visualizza 0:00 quando inattivo",
+  "Hide when inactive": "Nascondi quanto inattivo",
+  "Show Count": "Mostra Conteggio",
+  "Always, show 0 when inactive": "Sempre, visualizza 0 quando inattivo",
+  "Show Latest": "Mostra Ultimo",
+  "Always, show last person when inactive": "Sempre, visualizza l'ultima persona quando inattivo",
+  "Include Resubs": "Includi Rinnovi",
+  "Preview": "Anteprima",
+  "Note:": "Nota:",
+  "Actual label text may take up to 60 seconds to update": "Il testo dell'etichetta può richiedere fino a 60 secondi prima di aggiornarsi"
+}

@@ -6,39 +6,68 @@ export * from './service';
 
 export function mutation(options = { vuexSyncIgnore: false }) {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
-    const serviceName = target.constructor.name;
-    const mutationName = `${serviceName}.${methodName}`;
-
-    target.mutations = target.mutations || {};
-    target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
-      const targetIsSingleton = !!target.constructor.instance;
-      let context = null;
-
-      if (targetIsSingleton) {
-        context = target.constructor.instance;
-      } else {
-        context = new target.constructor(...payload.constructorArgs);
-      }
-
-      descriptor.value.call(context, ...payload.args);
-    };
-
-    return {
-      ...descriptor,
-
-      value(...args: any[]) {
-        const constructorArgs = this['constructorArgs'];
-        const store = StatefulService.getStore();
-        store.commit(
-          mutationName, {
-            args,
-            constructorArgs,
-            __vuexSyncIgnore: options.vuexSyncIgnore
-          });
-      }
-    };
+    return registerMutation(target, methodName, descriptor, options);
   };
 
+}
+
+function registerMutation(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor,
+  options = { vuexSyncIgnore: false }
+) {
+  const serviceName = target.constructor.name;
+  const mutationName = `${serviceName}.${methodName}`;
+
+  target.originalMethods = target.originalMethods || {};
+  target.originalMethods[methodName] = target[methodName];
+  target.mutations = target.mutations || {};
+  target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
+    const targetIsSingleton = !!target.constructor.instance;
+    let context = null;
+
+    if (targetIsSingleton) {
+      context = target.constructor.instance;
+    } else {
+      context = new target.constructor(...payload.constructorArgs);
+    }
+
+    descriptor.value.call(context, ...payload.args);
+  };
+
+
+  Object.defineProperty(target, methodName, {
+    ...descriptor,
+
+    value(...args: any[]) {
+      const constructorArgs = this['constructorArgs'];
+      const store = StatefulService.getStore();
+      store.commit(
+        mutationName, {
+          args,
+          constructorArgs,
+          __vuexSyncIgnore: options.vuexSyncIgnore
+        });
+    }
+  });
+
+  return Object.getOwnPropertyDescriptor(target, methodName);
+}
+
+
+function inheritMutations(target: any) {
+  const baseClassMutations = Object.getPrototypeOf(target.prototype)
+    .constructor
+    .prototype
+    .originalMethods;
+  if (baseClassMutations) {
+    Object.keys(baseClassMutations).forEach(methodName => {
+      if (Object.getOwnPropertyDescriptor(target.prototype, methodName)) return; // mutation is overridden
+      target.prototype[methodName] = baseClassMutations[methodName];
+      registerMutation(target.prototype, methodName, Object.getOwnPropertyDescriptor(target.prototype, methodName));
+    });
+  }
 }
 
 /**
@@ -70,16 +99,26 @@ export abstract class StatefulService<TState extends object> extends Service {
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-
 }
 
 /**
  * Returns an injectable Vuex module
  */
 export function getModule(ModuleContainer: any): Module<any, any> {
+  const prototypeMutations = (<any>ModuleContainer.prototype).mutations;
+  const mutations = {};
+
+  // filter inherited mutations
+  for (const mutationName in prototypeMutations) {
+    const serviceName = mutationName.split('.')[0];
+    if (serviceName !== ModuleContainer.name) continue;
+    mutations[mutationName] = prototypeMutations[mutationName];
+  }
+
   return {
-    state: ModuleContainer.initialState || {},
-    mutations: (<any>ModuleContainer.prototype).mutations
+    state: ModuleContainer.initialState ?
+      JSON.parse(JSON.stringify(ModuleContainer.initialState)) : {},
+    mutations: mutations
   };
 }
 
@@ -102,7 +141,7 @@ export function ServiceHelper(): ClassDecorator {
       this.constructorArgs = args;
       this.isHelper = true;
       this.helperName = target.name;
-      this.resourceId = this.helperName + JSON.stringify(this.constructorArgs);
+      this._resourceId = this.helperName + JSON.stringify(this.constructorArgs);
       return this;
     };
 
@@ -113,7 +152,17 @@ export function ServiceHelper(): ClassDecorator {
     // so we need to save the name
     Object.defineProperty(f, 'name', { value: target.name });
 
+    inheritMutations(f);
+
     // return new constructor (will override original)
     return f;
   };
 }
+
+
+export function InheritMutations(): ClassDecorator {
+  return function (target: any) {
+    inheritMutations(target);
+  };
+}
+

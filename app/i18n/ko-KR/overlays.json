@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "%{filename} 성공적으로 저장됨",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay 성공적으로 로딩됨",
+  "This is an experimental feature.  Use at your own risk.": "이 기능은 실험적인 기능입니다. 위험부담은 본인이 지셔야합니다.",
+  "Export Overlay File": "오버레이 파일 내보내기",
+  "Import Overlay File": "오버레이 파일 가져오기",
+  "Import Widget File in Current Scene": "현재 장면으로 위젯 파일 가져오기"
+}

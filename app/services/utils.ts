@@ -1,4 +1,5 @@
 import URI from 'urijs';
+import { isEqual } from 'lodash';
 import electron from 'electron';
 
 export const enum EBit { ZERO, ONE }
@@ -21,16 +22,31 @@ export default class Utils {
 
 
   static getUrlParams(url: string) {
-    return URI.parseQuery(URI.parse(url).query);
+    return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
+  static isMainWindow(): boolean {
+    return this.getCurrentUrlParams().windowId === 'main';
+  }
 
   static isChildWindow(): boolean {
-    return !!this.getCurrentUrlParams().child;
+    return this.getCurrentUrlParams().windowId === 'child';
   }
 
   static isDevMode() {
-    return electron.remote.process.env.NODE_ENV !== 'production';
+    return process.env.NODE_ENV !== 'production';
+  }
+
+  static isPreview(): boolean {
+    return electron.remote.process.env.SLOBS_PREVIEW;
+  }
+
+  static isIpc(): boolean {
+    return electron.remote.process.env.SLOBS_IPC;
+  }
+
+  static useLocalHost(): boolean {
+    return electron.remote.process.env.SLOBS_USE_LOCAL_HOST;
   }
 
   /**
@@ -79,5 +95,51 @@ export default class Utils {
       pow++;
     }
     return result;
+  }
+
+  static getChangedParams<T>(obj: T, patch: T): Partial<T> {
+    const result: Dictionary<any> = {};
+    Object.keys(patch).forEach(key => {
+      if (!isEqual(obj[key], patch[key])) result[key] = patch[key];
+    });
+    return result as Partial<T>;
+  }
+
+  static getDeepChangedParams<T>(obj: T, patch: T): Partial<T> {
+    const result: Dictionary<any> = {};
+
+    if (obj == null) return patch;
+
+    Object.keys(patch).forEach(key => {
+      if (!isEqual(obj[key], patch[key])) {
+        if (patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])) {
+          result[key] = this.getDeepChangedParams(obj[key], patch[key]);
+        } else {
+          result[key] = patch[key];
+        }
+      }
+    });
+    return result as Partial<T>;
+  }
+
+  /**
+   * @see https://www.typescriptlang.org/docs/handbook/mixins.html
+   */
+  static applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        const baseDescriptor = Object.getOwnPropertyDescriptor(baseCtor.prototype, name);
+        const derivedDescriptor = Object.getOwnPropertyDescriptor(derivedCtor.prototype, name);
+        // ignore getters
+        if (
+          baseDescriptor && baseDescriptor.get ||
+          derivedDescriptor && derivedDescriptor.get
+        ) return;
+
+        // ignore the property already exist
+        if (derivedCtor.prototype[name]) return;
+        derivedCtor.prototype[name] = baseCtor.prototype[name];
+      });
+    });
   }
 }

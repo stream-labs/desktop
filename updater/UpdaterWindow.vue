@@ -1,82 +1,49 @@
 <template>
 <div class="UpdaterWindow">
-  <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
-  {{ message }}
-  <div v-if="percentComplete !== null" class="UpdaterWindow-progressBarContainer">
-    <div
-      class="UpdaterWindow-progressBar"
-      :style="{ width: percentComplete + '%' }"/>
-    <div class="UpdaterWindow-progressPercent">
-      {{ percentComplete }}%
-    </div>
+  <div>
+    <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
+    {{ message }}
   </div>
 </div>
 </template>
 
 <script>
-const { ipcRenderer } = window.require('electron');
+const { remote, ipcRenderer } = window.require('electron');
 
 export default {
-
   data() {
     return {
       message: 'Checking for updates',
-
-      percentComplete: null
-    }
-  },
-
-  mounted() {
-    ipcRenderer.on('autoUpdate-pushState', (event, data) => {
-      if (data.version) {
-        this.message = `Downloading version ${data.version}`
-      }
-
-      if (data.percent) {
-        this.percentComplete = Math.round(data.percent);
-      }
-    });
-
-    ipcRenderer.send('autoUpdate-getState');
+    };
   }
-
 };
 </script>
 
 <style lang="less" scoped>
 .UpdaterWindow {
   height: 100%;
-  padding: 40px;
-
-  color: #444;
+  padding: 32px;
+  background-color: #17242D;
+  color: #ffffff;
   font-size: 18px;
   text-align: center;
-
   -webkit-app-region: drag
 }
 
+.updater-window__img {
+  width: 48px;
+}
+
 .UpdaterWindow-icon {
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
-.UpdaterWindow-progressBarContainer {
-  position: relative;
-  margin-top: 40px;
-}
+.UpdaterWindow-link {
+  color: #bbb;
+  cursor: pointer;
 
-.UpdaterWindow-progressBar {
-  height: 40px;
-  background-color: #31c3a2;
-}
-
-.UpdaterWindow-progressPercent {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-
-  text-align: center;
-  line-height: 40px;
+  &:hover {
+    color: #eee;
+  }
 }
 </style>

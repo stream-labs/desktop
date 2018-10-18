@@ -1,10 +1,13 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
-import { StreamingService } from '../services/streaming';
-import { Inject } from '../util/injector';
-import { NavigationService } from '../services/navigation';
-import { UserService } from '../services/user';
-import { CustomizationService } from '../services/customization';
+import { Component, Prop, Watch } from 'vue-property-decorator';
+import { StreamingService, EStreamingState } from 'services/streaming';
+import { Inject } from 'util/injector';
+import { NavigationService } from 'services/navigation';
+import { UserService } from 'services/user';
+import { CustomizationService } from 'services/customization';
+import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
+import electron from 'electron';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -12,21 +15,43 @@ export default class StartStreamingButton extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
+  @Inject() mediaBackupService: MediaBackupService;
 
   @Prop() disabled: boolean;
 
-  toggleStreaming() {
+  async toggleStreaming() {
     if (this.streamingService.isStreaming) {
-      this.streamingService.stopStreaming();
+      this.streamingService.toggleStreaming();
     } else {
+      if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
+        const goLive = await new Promise<boolean>(resolve => {
+          electron.remote.dialog.showMessageBox(
+            electron.remote.getCurrentWindow(),
+            {
+              title: $t('Cloud Backup'),
+              type: 'warning',
+              message: $t('Your media files are currently being synced with the cloud. ') +
+                $t('It is recommended that you wait until this finishes before going live.'),
+              buttons: [$t('Wait'), $t('Go Live Anyway')]
+            },
+            goLive => {
+              resolve(!!goLive);
+            }
+          );
+        });
+
+        if (!goLive) return;
+      }
+
       if (
         this.userService.isLoggedIn() &&
         this.customizationService.state.updateStreamInfoOnLive &&
-        this.userService.platform.type === 'twitch'
+        (this.userService.platform.type === 'twitch' ||
+        this.userService.platform.type === 'mixer')
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
-        this.streamingService.startStreaming();
+        this.streamingService.toggleStreaming();
         if (this.userService.isLoggedIn()) {
           this.navigationService.navigate('Live');
         }
@@ -34,11 +59,58 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
-  get streamButtonLabel() {
-    if (this.streamingService.isStreaming) {
-      return 'End Stream';
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
+  }
+
+  getStreamButtonLabel() {
+    if (this.streamingStatus === EStreamingState.Live) {
+      return $t('End Stream');
     }
 
-    return 'Go Live';
+    if (this.streamingStatus === EStreamingState.Starting) {
+      if (this.streamingService.delayEnabled) {
+        return `Starting ${this.streamingService.delaySecondsRemaining}s`;
+      }
+
+      return $t('Starting');
+    }
+
+    if (this.streamingStatus === EStreamingState.Ending) {
+      if (this.streamingService.delayEnabled) {
+        return `Discard ${this.streamingService.delaySecondsRemaining}s`;
+      }
+
+      return $t('Ending');
+    }
+
+    if (this.streamingStatus === EStreamingState.Reconnecting) {
+      return $t('Reconnecting');
+    }
+
+    return $t('Go Live');
+  }
+
+  getIsRedButton() {
+    return this.streamingStatus !== EStreamingState.Offline;
+  }
+
+  get isStreaming() {
+    return this.streamingService.isStreaming;
+  }
+
+  get isDisabled() {
+    return this.disabled ||
+      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
+      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+  }
+
+  @Watch('streamingStatus')
+  setDelayUpdate() {
+    this.$forceUpdate();
+
+    if (this.streamingService.delaySecondsRemaining) {
+      setTimeout(() => this.setDelayUpdate(), 100);
+    }
   }
 }

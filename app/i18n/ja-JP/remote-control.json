@@ -1,0 +1,12 @@
+{
+  "Show details": "詳細を表示する",
+  "Hide details": "詳細を非表示する",
+  "API token": "API トークン",
+  "Generate new": "新しく再生します。",
+  "Port": "ポート",
+  "IP addresses": "IP アドレス",
+  "You can now control Streamlabs OBS from your phone.": "携帯電話でStreamlabs OBSを制御することができます。",
+  "To begin, Scan this QR code with your phone.": "まず、あなたの携帯電話でこの QR コードをスキャンして下さい。",
+  "This feature will only work with the most recent version of the Streamlabs mobile app.": "この機能は、Streamlabs 携帯アプリの最新バージョンでしか出来ません。",
+  "Click to show": "クリックすると表示"
+}

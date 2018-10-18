@@ -1,32 +1,38 @@
 // Source helper functions
 import { focusMain, focusChild } from '.';
 import { contextMenuClick } from './context-menu';
+import { dialogDismiss } from './dialog';
 
 async function clickSourceAction(t, selector) {
   await t.context.app.client
-    .$('h4=Sources')
+    .$('h2=Sources')
     .$('..')
     .click(selector);
 }
 
 export async function clickAddSource(t) {
-  await clickSourceAction(t, '.fa-plus');
+  await clickSourceAction(t, '.icon-add');
 }
 
 export async function clickRemoveSource(t) {
-  await clickSourceAction(t, '.fa-minus');
+  await clickSourceAction(t, '.icon-subtract');
+  await dialogDismiss(t, 'OK');
 }
 
 export async function clickSourceProperties(t) {
-  await clickSourceAction(t, '.fa-cog');
+  await clickSourceAction(t, '.icon-settings');
 }
 
 export async function selectSource(t, name) {
-  await t.context.app.client.click(`li=${name}`);
+  await t.context.app.client.click(`.item-title=${name}`);
+}
+
+export async function selectTestSource(t) {
+  await t.context.app.client.click('.item-title*=__')
 }
 
 export async function rightClickSource(t, name) {
-  await t.context.app.client.rightClick(`li=${name}`);
+  await t.context.app.client.rightClick(`.item-title=${name}`);
 }
 
 export async function addSource(t, type, name, closeProps = true) {
@@ -36,7 +42,13 @@ export async function addSource(t, type, name, closeProps = true) {
   await clickAddSource(t);
 
   await focusChild(t);
-  await app.client.click(`li=${type}`);
+
+  if (await app.client.isExisting(`li=${type}`)) {
+    await app.client.click(`li=${type}`); // source
+  } else {
+    await app.client.click(`div=${type}`); // widget
+  }
+
   await app.client.click('button=Add Source');
   await app.client.setValue('input', name);
 
@@ -49,6 +61,8 @@ export async function addSource(t, type, name, closeProps = true) {
   // Close source properties too
   if (closeProps) {
     await app.client.click('button=Done');
+  } else {
+    await focusChild(t);
   }
 }
 
@@ -71,4 +85,13 @@ export async function openRenameWindow(t, sourceName) {
   await rightClickSource(t, sourceName);
   await contextMenuClick(t, 'Rename');
   await focusChild(t);
+}
+
+export async function sourceIsExisting(t, sourceName) {
+  const app = t.context.app;
+  return app.client.isExisting(`.item-title=${sourceName}`);
+}
+
+export async function testSourceExists(t) {
+  return t.context.app.client.isExisting('.item-title*=__')
 }

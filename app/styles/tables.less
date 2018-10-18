@@ -1,0 +1,106 @@
+table {
+  color: @day-paragraph;
+
+  i,
+  .fa,
+  .fas,
+  .far {
+    .icon-hover();
+  }
+
+  thead {
+    background: transparent;
+    border: 1px solid transparent;
+  }
+
+  tbody {
+    border: none;
+    background-color: transparent;
+
+    tr {
+      &:nth-child(odd) {
+        background-color: @light-1;
+        border: 0;
+      }
+
+      &:nth-child(even) {
+        background-color: transparent;
+        border: 0;
+      }
+    }
+  }
+
+  td,
+  th {
+    padding: 8px 12px;
+
+    .input-container {
+      width: 100%;
+      margin-bottom: 0!important;
+      display: block;
+    }
+
+    .input-label {
+      display: none;
+    }
+
+    .input-wrapper {
+      width: 100%;
+    }
+
+    &:first-child {
+      border-radius: 3px 0 0 3px;
+    }
+
+    &:last-child {
+      border-radius: 0 3px 3px 0;
+    }
+  }
+
+  th {
+    color: @grey;
+    text-transform: uppercase;
+    .weight(@medium);
+    letter-spacing: 1.5px;
+    font-size: 11px;
+  }
+}
+
+.table__controls {
+  text-align: right;
+}
+
+.night-theme {
+  table {
+    color: @night-paragraph;
+  }
+
+  tbody {
+    background-color: transparent;
+
+    tr {
+      border: 0;
+
+      &:nth-child(odd) {
+        background-color: @dark-4;
+        border-color: transparent;
+
+        td {
+          border: 0;
+        }
+      }
+
+      &:nth-child(even) {
+        background-color: transparent;
+      }
+
+      td {
+        border: 0;
+
+        a {
+          color: @white;
+        }
+      }
+    }
+  }
+}

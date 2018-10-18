@@ -1,14 +1,16 @@
 import { Service } from './service';
 import {
-  TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
-  TObsValue
-} from '../components/shared/forms/Input';
+  TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
+  TObsValue, IObsListInput
+} from 'components/obs/inputs/ObsInput';
+
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
-
+import { $t } from 'services/i18n';
+import { EOrderMovement } from 'obs-studio-node';
 
 export type TSourceFilterType =
   'mask_filter' |
@@ -53,26 +55,26 @@ export class SourceFiltersService extends Service {
   @Inject()
   windowsService: WindowsService;
 
-  getTypesList(): IListOption<TSourceFilterType>[] {
+  getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
-      { description: 'Image Mask/Blend', value: 'mask_filter' },
-      { description: 'Crop/Pad', value: 'crop_filter' },
-      { description: 'Gain', value: 'gain_filter' },
-      { description: 'Color Correction', value: 'color_filter' },
-      { description: 'Scaling/Aspect Ratio', value: 'scale_filter' },
-      { description: 'Scroll', value: 'scroll_filter' },
-      { description: 'Render Delay', value: 'gpu_delay' },
-      { description: 'Color Key', value: 'color_key_filter' },
-      { description: 'Apply LUT', value: 'clut_filter' },
-      { description: 'Sharpen', value: 'sharpness_filter' },
-      { description: 'Chroma Key', value: 'chroma_key_filter' },
-      { description: 'Video Delay (Async)', value: 'async_delay_filter' },
-      { description: 'Noise Suppression', value: 'noise_suppress_filter' },
-      { description: 'Noise Gate', value: 'noise_gate_filter' },
-      { description: 'Compressor', value: 'compressor_filter' },
-      { description: 'VST 2.x Plugin', value: 'vst_filter' },
-      { description: 'Face Mask Plugin', value: 'face_mask_filter' }
+    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
+      { description: $t('Image Mask/Blend'), value: 'mask_filter' },
+      { description: $t('Crop/Pad'), value: 'crop_filter' },
+      { description: $t('Gain'), value: 'gain_filter' },
+      { description: $t('Color Correction'), value: 'color_filter' },
+      { description: $t('Scaling/Aspect Ratio'), value: 'scale_filter' },
+      { description: $t('Scroll'), value: 'scroll_filter' },
+      { description: $t('Render Delay'), value: 'gpu_delay' },
+      { description: $t('Color Key'), value: 'color_key_filter' },
+      { description: $t('Apply LUT'), value: 'clut_filter' },
+      { description: $t('Sharpen'), value: 'sharpness_filter' },
+      { description: $t('Chroma Key'), value: 'chroma_key_filter' },
+      { description: $t('Video Delay (Async)'), value: 'async_delay_filter' },
+      { description: $t('Noise Suppression'), value: 'noise_suppress_filter' },
+      { description: $t('Noise Gate'), value: 'noise_gate_filter' },
+      { description: $t('Compressor'), value: 'compressor_filter' },
+      { description: $t('VST 2.x Plugin'), value: 'vst_filter' },
+      { description: $t('Face Mask Plugin'), value: 'face_mask_filter' }
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -92,9 +94,9 @@ export class SourceFiltersService extends Service {
       const description = listItem.description;
       const flags = obs.Global.getOutputFlagsFromId(type);
       types.push({
-        audio: !!(obs.EOutputFlags.Audio & flags),
-        video: !!(obs.EOutputFlags.Video & flags),
-        async: !!(obs.EOutputFlags.Async & flags),
+        audio: !!(obs.ESourceOutputFlags.Audio & flags),
+        video: !!(obs.ESourceOutputFlags.Video & flags),
+        async: !!(obs.ESourceOutputFlags.Async & flags),
         type,
         description
       });
@@ -107,17 +109,40 @@ export class SourceFiltersService extends Service {
   getTypesForSource(sourceId: string): ISourceFilterType[] {
     const source = this.sourcesService.getSource(sourceId);
     return this.getTypes().filter(filterType => {
-      return (filterType.audio && source.audio) || (filterType.video && source.video);
+      /* Audio filters can be applied to audio sources. */
+      if (source.audio && filterType.audio) {
+        return true;
+      }
+
+      /* We have either a video filter or source */
+      /* Can't apply asynchronous video filters to non-asynchronous video souces. */
+      if (!source.async && filterType.async) {
+        return false;
+      }
+
+      /* Video filters can be applied to video sources. */
+      if (source.video && filterType.video) {
+        return true;
+      }
+
+      return false;
     });
   }
 
 
   add(sourceId: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
     const source = this.sourcesService.getSource(sourceId);
-    const obsFilter = obs.FilterFactory.create(filterType, filterName);
-    source.getObsInput().addFilter(obsFilter);
+    const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
+
+    const obsSource = source.getObsInput()
+    obsSource.addFilter(obsFilter);
+    // The filter should be created with the settings provided, is this necessary?
     if (settings) obsFilter.update(settings);
-    return obsFilter;
+    const filterReference = obsSource.findFilter(filterName);
+    // There is now 2 references to the filter at that point
+    // We need to release one
+    obsFilter.release();
+    return filterReference;
   }
 
 
@@ -145,7 +170,7 @@ export class SourceFiltersService extends Service {
   }
 
 
-  setPropertiesFormData(sourceId: string, filterName: string, properties: TFormData) {
+  setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
   }
@@ -176,13 +201,13 @@ export class SourceFiltersService extends Service {
 
     return {
       type: {
-        description: 'Filter type',
+        description: $t('Filter type'),
         name: 'type',
         value: availableTypesList[0].value,
         options: availableTypesList
       },
       name: {
-        description: 'Filter name',
+        description: $t('Filter name'),
         name: 'name',
         value: 'New filter'
       }
@@ -190,15 +215,42 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getPropertiesFormData(sourceId: string, filterName: string): TFormData {
+  getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
-    return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+
+    // Show SLOBS frontend display names for the sidechain source options
+    formData.forEach(input => {
+      if (input.name === 'sidechain_source') {
+        (input as IObsListInput<string>).options.forEach(option => {
+          if (option.value === 'none') return;
+
+          const source = this.sourcesService.getSourceById(option.value);
+          if (source) option.description = source.name;
+        });
+      }
+    });
+
+    return formData;
+  }
+
+
+  setOrder(sourceId: string, filterName: string, delta: number) {
+    const obsFilter = this.getObsFilter(sourceId, filterName);
+    const obsInput = this.sourcesService.getSource(sourceId).getObsInput();
+    const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
+    let i = Math.abs(delta);
+    while (i--) {
+      obsInput.setFilterOrder(obsFilter, movement);
+    }
   }
 
 
   showSourceFilters(sourceId: string, selectedFilterName = '') {
+    const sourceDisplayName = this.sourcesService.getSource(sourceId).name;
     this.windowsService.showWindow({
       componentName: 'SourceFilters',
+      title: $t('Source filters') + ' (' + sourceDisplayName + ')',
       queryParams: { sourceId, selectedFilterName },
       size: {
         width: 800,
@@ -211,6 +263,7 @@ export class SourceFiltersService extends Service {
   showAddSourceFilter(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'AddSourceFilter',
+      title: $t('Add source filter'),
       queryParams: { sourceId },
       size: {
         width: 600,

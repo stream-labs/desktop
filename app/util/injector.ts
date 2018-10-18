@@ -1,8 +1,8 @@
 import { ServicesManager } from '../services-manager';
 
 /**
- * inject service as getter
- * if serviceName is missed will try to use property name
+ * inject a service as a getter
+ * if serviceName is missed it will try to use a property name to find the service
  */
 export function Inject(serviceName?: string) {
   return function (target: Object, key: string) {

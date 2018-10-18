@@ -2,10 +2,10 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { sleep } from '../helpers/sleep.js';
+import { SceneBuilder } from '../helpers/scene-builder';
+const path = require('path');
 
-useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
-
+useSpectron({ restartAppAfterEachTest: false });
 
 
 test('The default scene exists', async t => {
@@ -16,7 +16,6 @@ test('The default scene exists', async t => {
   t.true(scenes.length === 1);
 
 });
-
 
 
 test('Creating, fetching and removing scenes', async t => {
@@ -44,7 +43,7 @@ test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
 
@@ -65,7 +64,7 @@ test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
@@ -126,13 +125,6 @@ test('Scenes events', async t => {
   eventData = await client.fetchNextEvent();
   t.is(eventData.sceneItemId, image.sceneItemId);
 
-
-  // test unsubscribing
-  await client.unsubscribeAll();
-  await client.request('ScenesService', 'removeScene', scene2.id);
-
-  const promise = client.fetchNextEvent();
-  await t.throws(promise);
 });
 
 
@@ -162,5 +154,96 @@ test('Creating nested scenes', async t => {
   itemsANames = sceneAItems.map(item => item['name']);
 
   t.deepEqual(itemsANames, ['SceneB']);
+
+});
+
+
+test('SceneItem.setSettings()', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
+
+  sceneItem.setTransform({ rotation: 90 });
+
+  t.is(sceneItem.getModel().transform.rotation, 90);
+
+  // rotation must be between 0 and 360
+  sceneItem.setTransform({ rotation: 360 + 90 });
+  t.is(sceneItem.getModel().transform.rotation, 90);
+
+  sceneItem.setTransform({
+    crop: {
+      top: 1.2,
+      bottom: 5.6,
+      left: 7.1,
+      right: 10,
+    }
+  });
+
+  // crop values must be rounded
+  t.deepEqual(sceneItem.getModel().transform.crop, {
+    top: 1,
+    bottom: 6,
+    left: 7,
+    right: 10,
+  });
+
+
+});
+
+
+test('SceneItem.resetTransform()', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
+
+  sceneItem.setTransform({
+    position: { x: 100, y: 100 },
+    scale: { x: 100, y: 100 },
+    crop: { top: 100, right: 100, bottom: 100, left: 100 },
+    rotation: 100,
+  });
+
+  sceneItem.resetTransform();
+
+  t.deepEqual(sceneItem.getModel().transform, {
+    position: { x: 0, y: 0 },
+    scale: { x: 1, y: 1 },
+    crop: { top: 0, right: 0, bottom: 0, left: 0 },
+    rotation: 0,
+  });
+
+
+});
+
+test('SceneItem.addFile()', async t => {
+  const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data', 'sources-files');
+
+  const client = await getClient();
+  const sceneBuilder = new SceneBuilder(client);
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  scene.clear();
+  scene.addFile(dataDir);
+
+  t.true(sceneBuilder.isEqualTo(`
+    sources-files
+      html
+        hello.html: browser_source
+      images
+        moon.png: image_source
+        sun.png: image_source
+      media
+        alertbox.mp4: ffmpeg_source
+        chatbox.mp4: ffmpeg_source
+      text
+        hello.txt: text_gdiplus
+  `));
+
 
 });

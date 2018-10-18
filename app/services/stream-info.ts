@@ -1,13 +1,24 @@
-import { StatefulService, mutation } from './stateful-service';
-import { IChannelInfo, getPlatformService } from './platforms';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { IChannelInfo, getPlatformService } from 'services/platforms';
 import { UserService } from './user';
-import { Inject } from '../util/injector';
+import { Inject } from 'util/injector';
 import { StreamingService } from '../services/streaming';
+import { TwitchService } from 'services/platforms/twitch';
+import { YoutubeService } from 'services/platforms/youtube';
+import { MixerService } from 'services/platforms/mixer';
+import { HostsService } from 'services/hosts';
+import { authorizedHeaders } from 'util/requests';
+import { Subject } from 'rxjs/Subject';
 
 
 interface IStreamInfoServiceState {
   fetching: boolean;
   error: boolean;
+  viewerCount: number;
+  channelInfo: IChannelInfo;
+}
+
+interface IStreamInfo {
   viewerCount: number;
   channelInfo: IChannelInfo;
 }
@@ -23,9 +34,9 @@ const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
  * components to make use of.
  */
 export class StreamInfoService extends StatefulService<IStreamInfoServiceState> {
-
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
+  @Inject() hostsService: HostsService;
 
   static initialState: IStreamInfoServiceState = {
     fetching: false,
@@ -37,6 +48,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   viewerCountInterval: number;
 
+  streamInfoChanged = new Subject<IStreamInfo>();
+
 
   init() {
     this.refreshStreamInfo();
@@ -47,6 +60,10 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
         platform.fetchViewerCount().then(viewers => {
           this.SET_VIEWER_COUNT(viewers);
+          this.streamInfoChanged.next({
+            viewerCount: this.state.viewerCount,
+            channelInfo: this.state.channelInfo
+          });
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
@@ -62,6 +79,10 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
     const platform = getPlatformService(this.userService.platform.type);
     return platform.fetchChannelInfo().then(info => {
       this.SET_CHANNEL_INFO(info);
+      this.streamInfoChanged.next({
+        viewerCount: this.state.viewerCount,
+        channelInfo: this.state.channelInfo
+      });
       this.SET_FETCHING(false);
     }).catch(() => {
       this.SET_FETCHING(false);
@@ -70,16 +91,45 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   }
 
 
-  setStreamInfo(title: string, game: string): Promise<boolean> {
+  setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
+    let promise: Promise<boolean>;
 
-    return platform.putChannelInfo(title, game).then(success => {
+    if (platform instanceof TwitchService || MixerService) {
+      promise = platform.putChannelInfo(title, game);
+    }
+
+    if (platform instanceof YoutubeService) {
+      promise = platform.putChannelInfo(title, description);
+    }
+
+    return promise.then(success => {
       this.refreshStreamInfo();
+      this.createGameAssociation(game);
       return success;
     }).catch(() => {
       this.refreshStreamInfo();
       return false;
     });
+  }
+
+  /**
+   * Used to track in aggregate which overlays streamers are using
+   * most often for which games, in order to offer a better search
+   * experience in the overlay library.
+   * @param game the name of the game
+   */
+  createGameAssociation(game: string) {
+    const url = `https://${this.hostsService.overlays}/api/overlay-games-association`;
+
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const body = `game=${encodeURIComponent(game)}`;
+    const request = new Request(url, { headers, body, method: 'POST' });
+
+    // This is best effort data gathering, don't explicitly handle errors
+    return fetch(request);
   }
 
 

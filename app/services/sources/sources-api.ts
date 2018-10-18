@@ -1,14 +1,15 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
-import { IListOption, TFormData } from '../../components/shared/forms/Input';
+import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 
-export interface ISource {
+export interface ISource extends IResource {
   sourceId: string;
   name: string;
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
@@ -16,21 +17,33 @@ export interface ISource {
   channel?: number;
 }
 
+/**
+ * Used to compare whether 2 sources are functionally
+ * equivalent and should be created as a reference.
+ */
+export interface ISourceComparison {
+  type: TSourceType;
+  propertiesManager: TPropertiesManager;
+  widgetType?: WidgetType;
+  isStreamlabel?: boolean;
+  appId?: string;
+  appSourceId?: string;
+}
 
 export interface ISourceApi extends ISource {
-  displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
+  isSameType(comparison: ISourceComparison): boolean;
   getPropertiesManagerType(): TPropertiesManager;
   getPropertiesManagerSettings(): Dictionary<any>;
   getPropertiesManagerUI(): string;
-  getPropertiesFormData(): TFormData;
-  setPropertiesFormData(properties: TFormData): void;
+  getPropertiesFormData(): TObsFormData;
+  setPropertiesFormData(properties: TObsFormData): void;
   setPropertiesManagerSettings(settings: Dictionary<any>): void;
   hasProps(): boolean;
   setName(newName: string): void;
+  refresh(): void;
 }
-
 
 export interface ISourcesServiceApi {
   createSource(
@@ -39,17 +52,22 @@ export interface ISourcesServiceApi {
     settings?: Dictionary<any>,
     options?: ISourceCreateOptions
   ): ISourceApi;
+  removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[];
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];
+
+  /**
+   * creates a source from a file
+   * source type depends on the file extension
+   */
+  addFile(path: string): ISourceApi;
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;
   showAddSource(sourceType: TSourceType): void;
-  showNameSource(sourceType: TSourceType): void;
-  showNameWidget(widgetType: WidgetType): void;
   sourceAdded: Observable<ISource>;
   sourceUpdated: Observable<ISource>;
   sourceRemoved: Observable<ISource>;
@@ -61,6 +79,7 @@ export interface ISourceCreateOptions {
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
+  isTemporary?: boolean;
 }
 
 export type TSourceType =
@@ -78,20 +97,38 @@ export type TSourceType =
   'wasapi_input_capture' |
   'wasapi_output_capture' |
   'decklink-input' |
-  'scene'
+  'scene' |
+  'ndi_source' |
+  'openvr_capture' |
+  'liv_capture' |
+  'ovrstream_dc_source'
   ;
 
-// Register new properties manager here
-export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
-
-
-
+// Register new properties managers here
+export type TPropertiesManager =
+  | 'default'
+  | 'widget'
+  | 'streamlabels'
+  | 'platformApp';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;
+  temporarySources: Dictionary<ISource>;
 }
 
 export interface IActivePropertyManager {
   manager: IPropertyManager;
   type: TPropertiesManager;
+}
+
+export interface ISourceDisplayData {
+  name: string;
+  description: string;
+  demoFilename?: string;
+  supportList?: string[];
+}
+
+export interface ISourceAddOptions {
+  propertiesManager: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 }

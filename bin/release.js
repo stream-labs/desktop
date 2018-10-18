@@ -11,13 +11,11 @@ const path = require('path');
 const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
-
-let promptToContinue = false;
+const cp = require('child_process');
 
 /**
  * CONFIGURATION
  */
-const channel = 'latest';
 const s3Bucket = 'streamlabs-obs';
 const sentryOrg = 'streamlabs-obs';
 const sentryProject = 'streamlabs-obs';
@@ -25,10 +23,6 @@ const sentryProject = 'streamlabs-obs';
 
 function info(msg) {
   sh.echo(colors.magenta(msg));
-}
-
-function warn(msg) {
-  sh.echo(colors.red(`WARNING: ${msg}`));
 }
 
 function error(msg) {
@@ -40,13 +34,6 @@ function executeCmd(cmd) {
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
-
-    if (promptToContinue) {
-      info('Because this release was succssfully packaged before the process failed, you');
-      info('may safely choose the option "Continue a failed release" when re-running');
-      info('this script.  This will skip packaging and will not use up another version number.');
-    }
-
     sh.exit(1);
   }
 }
@@ -72,6 +59,63 @@ function checkEnv(varName) {
     error(`Missing environment variable ${varName}`);
     sh.exit(1);
   }
+}
+
+async function callSubmodule(moduleName, args) {
+  if (!Array.isArray(args)) args = [];
+
+  return new Promise((resolve, reject) => {
+    const submodule = cp.fork(moduleName, args);
+
+    submodule.on('close', (code) => {
+      if (code !== 0) {
+        reject(code);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+/* We can change the release script to export a function instead.
+ * I already made this into a separate script so I think this is fine */
+async function uploadUpdateFiles(version, appDir) {
+  return callSubmodule(
+    'bin/release-uploader.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--release-dir', appDir,
+    ]
+  );
+}
+
+async function setLatestVersion(version, fileName) {
+  return callSubmodule(
+    'bin/set-latest.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--version-file', fileName
+    ]
+  );
+}
+
+async function setChance(version, chance) {
+  return callSubmodule(
+    'bin/set-chance.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--chance', chance
+    ]
+  );
 }
 
 async function uploadS3File(name, filePath) {
@@ -124,126 +168,151 @@ async function runScript() {
   checkEnv('CSC_KEY_PASSWORD');
   checkEnv('SENTRY_AUTH_TOKEN');
 
-  const deployType = (await inq.prompt({
+  /* Technically speaking, we allow any number of
+   * channels. Maybe in the future, we allow custom
+   * options here? */
+  const isPreview = (await inq.prompt({
     type: 'list',
-    name: 'deployType',
-    message: 'How would you like to release?',
+    name: 'releaseType',
+    message: 'Which type of release would you like to do?',
     choices: [
       {
-        name: 'Merge staging into master and release from master (normal release)',
+        name: 'Normal release (All users will receive this release)',
         value: 'normal'
       },
       {
-        name: 'Release the current branch as-is (high priority hotfix releases only)',
-        value: 'as-is'
-      },
-      {
-        name: 'Continue a failed release (skips all packaging and testing)',
-        value: 'continue'
+        name: 'Preview release',
+        value: 'preview'
       }
     ]
-  })).deployType;
+  })).releaseType === 'preview';
 
-  if (deployType === 'normal') {
-    info('Syncing staging with the origin...');
-    executeCmd('git checkout staging');
-    executeCmd('git pull');
-    executeCmd('git reset --hard origin/staging');
+  let sourceBranch;
+  let targetBranch;
 
-    info('Syncing master with the origin...');
-    executeCmd('git checkout master');
-    executeCmd('git pull');
-    executeCmd('git reset --hard origin/master');
-
-    info('Merging staging into master...');
-    executeCmd('git merge staging');
-  } else if (deployType === 'as-is') {
-    warn('You are about to release the current branch as-is.');
-    warn('You should only do this if you know what you are doing.');
-    warn('The current branch you are about to release should almost definitely be master');
-    if (!await confirm('Are you absolutely sure you want to release the current branch?')) sh.exit(0);
-  } else if (deployType === 'continue') {
-    warn('You are about to deploy the packaged app as-is in your dist/ directory.');
-    warn('You should only run this if a release just failed during one of the following steps:');
-    warn('- Pushing changes to the origin git repository');
-    warn('- Registering the release and source code with sentry');
-    warn('- Uploading the release artifacts to S3');
-    if (!await confirm('Are you absolutely sure you want to continue with the release?')) sh.exit(0);
-  }
-
-  let newVersion;
-
-  if (deployType === 'continue') {
-    const pjson = JSON.parse(fs.readFileSync('package.json'));
-    newVersion = pjson.version;
+  if (isPreview) {
+    // Preview releases always happen from staging
+    sourceBranch = 'staging';
+    targetBranch = 'preview';
   } else {
-    // Make sure the release environment is clean
-    info('Stashing all uncommitted changes...');
-    executeCmd('git add -A');
-    executeCmd('git stash');
-
-    info('Ensuring submodules are up to date...');
-    executeCmd('git submodule update --init --recursive');
-
-    info('Removing old packages...');
-    sh.rm('-rf', 'node_modules');
-
-    info('Installing fresh packages...');
-    executeCmd('yarn install');
-
-    info('Installing node-obs...');
-    executeCmd('yarn install-node-obs');
-
-    info('Compiling assets...');
-    executeCmd('yarn compile');
-
-    info('Running tests...');
-    executeCmd('yarn test');
-
-    info('The current revision has passed testing and is ready to be');
-    info('packaged and released');
-
-    const pjson = JSON.parse(fs.readFileSync('package.json'));
-    const currentVersion = pjson.version;
-
-    info(`The current application version is ${currentVersion}`);
-    newVersion = (await inq.prompt({
+    sourceBranch = (await inq.prompt({
       type: 'list',
-      name: 'newVersion',
-      message: 'What should the new version number be?',
+      name: 'branch',
+      message: 'Which branch would you like to release from?',
       choices: [
-        semver.inc(currentVersion, 'patch'),
-        semver.inc(currentVersion, 'minor'),
-        semver.inc(currentVersion, 'major')
+        {
+          name: 'preview',
+          value: 'preview'
+        },
+        {
+          name: 'staging',
+          value: 'staging'
+        },
+        {
+          name: 'master (hotfix releases only)',
+          value: 'master'
+        }
       ]
-    })).newVersion;
-
-    if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
-
-    pjson.version = newVersion;
-
-    info(`Writing ${newVersion} to package.json...`);
-    fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
-
-    // Packaging the app takes a long time and sometimes fails, so we
-    // do this step before committing and tagging the release.  This way
-    // we can re-run the script without "wasting" a version number.
-    info('Packaging the app...');
-    executeCmd('yarn package');
-
-    info(`Version ${newVersion} is ready to be deployed.`);
-    info('You can find the packaged app at dist/win-unpacked.');
-    info('Please run the packaged application now to ensure it starts up properly.');
-    info('When you have confirmed the packaged app works properly, you');
-    info('can continue with the deploy.');
-
-    if (!await confirm('Are you ready to deploy?')) sh.exit(0);
+    })).branch;
+    targetBranch = 'master';
   }
 
-  // This prints a special error message on exits that lets the user know
-  // they can optionally choose to perform a "continue" release, which will
-  // skip re-packaging the app and will not increase the version number again.
-  promptToContinue = true;
+  // Make sure the release environment is clean
+  info('Stashing all uncommitted changes...');
+  executeCmd('git add -A');
+  executeCmd('git stash');
+
+  // Sync the source branch
+  info(`Syncing ${sourceBranch} with the origin...`);
+  executeCmd('git fetch');
+  executeCmd(`git checkout ${sourceBranch}`);
+  executeCmd('git pull');
+  executeCmd(`git reset --hard origin/${sourceBranch}`);
+
+  if (sourceBranch !== targetBranch) {
+    // Sync the target branch
+    info(`Syncing ${targetBranch} with the origin...`);
+    executeCmd('git fetch');
+    executeCmd(`git checkout ${targetBranch}`);
+    executeCmd('git pull');
+    executeCmd(`git reset --hard origin/${targetBranch}`);
+
+    // Merge the source branch into the target branch
+    info(`Merging ${sourceBranch} into ${targetBranch}...`);
+    executeCmd(`git merge ${sourceBranch}`);
+  }
+
+  info('Removing old packages...');
+  sh.rm('-rf', 'node_modules');
+
+  info('Installing fresh packages...');
+  executeCmd('yarn install');
+
+  info('Compiling assets...');
+  executeCmd('yarn compile:production');
+
+  const pjson = JSON.parse(fs.readFileSync('package.json'));
+  const currentVersion = pjson.version;
+
+  info(`The current application version is ${currentVersion}`);
+
+  let versionOptions;
+
+  if (isPreview) {
+    versionOptions = [
+      semver.inc(currentVersion, 'prerelease', 'preview'),
+      semver.inc(currentVersion, 'prepatch', 'preview'),
+      semver.inc(currentVersion, 'preminor', 'preview'),
+      semver.inc(currentVersion, 'premajor', 'preview')
+    ];
+  } else {
+    versionOptions = [
+      semver.inc(currentVersion, 'patch'),
+      semver.inc(currentVersion, 'minor'),
+      semver.inc(currentVersion, 'major')
+    ];
+  }
+
+  // Remove duplicates
+  versionOptions = [...new Set(versionOptions)];
+
+  const newVersion = (await inq.prompt({
+    type: 'list',
+    name: 'newVersion',
+    message: 'What should the new version number be?',
+    choices: versionOptions
+  })).newVersion;
+
+  const channel = (() => {
+    const components = semver.prerelease(newVersion);
+
+    if (components) return components[0];
+    return 'latest';
+  })();
+
+  if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
+
+  pjson.version = newVersion;
+
+  info(`Writing ${newVersion} to package.json...`);
+  fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
+
+  info('Packaging the app...');
+  executeCmd(`yarn package${isPreview ? ':preview' : ''}`);
+
+  info(`Version ${newVersion} is ready to be deployed.`);
+  info('You can find the packaged app at dist/win-unpacked.');
+  info('Please run the packaged application now to ensure it starts up properly.');
+  info('When you have confirmed the packaged app works properly, you');
+  info('can continue with the deploy.');
+
+  if (!await confirm('Are you ready to deploy?')) sh.exit(0);
+
+  const chance = (await inq.prompt({
+    type: 'input',
+    name: 'chance',
+    message: 'What percentage of the userbase would you like to recieve the update?'
+  })).chance;
 
   info('Committing changes...');
   executeCmd('git add -A');
@@ -253,7 +322,7 @@ async function runScript() {
   executeCmd('git push origin HEAD');
 
   info(`Tagging version ${newVersion}...`);
-  executeCmd(`git tag -f 'v${newVersion}'`);
+  executeCmd(`git tag -f v${newVersion}`);
   executeCmd('git push --tags');
 
   info(`Registering ${newVersion} with sentry...`);
@@ -268,20 +337,14 @@ async function runScript() {
   sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
   info('Discovering publishing artifacts...');
-
   const distDir = path.resolve('.', 'dist');
-  const channelFileName = `${channel}.yml`;
+  const channelFileName = path.parse(sh.ls(path.join(distDir, '*.yml'))[0]).base;
   const channelFilePath = path.join(distDir, channelFileName);
-
-  if (!fs.existsSync(channelFilePath)) {
-    error(`Could not find ${path.resolve(channelFilePath)}`);
-    sh.exit(1);
-  }
 
   info(`Discovered ${channelFileName}`);
 
-  const parsedLatest = yml.safeLoad(fs.readFileSync(channelFilePath));
-  const installerFileName = parsedLatest.path;
+  const parsedChannel = yml.safeLoad(fs.readFileSync(channelFilePath));
+  const installerFileName = parsedChannel.path;
   const installerFilePath = path.join(distDir, installerFileName);
 
   if (!fs.existsSync(installerFilePath)) {
@@ -290,20 +353,26 @@ async function runScript() {
   }
 
   info(`Disovered ${installerFileName}`);
-
   info('Uploading publishing artifacts...');
+
+    /* Use the separate release-uploader script to upload our
+   * win-unpacked content. */
+  await uploadUpdateFiles(newVersion, path.resolve('dist', 'win-unpacked'));
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
   info('Finalizing release with sentry...');
   sentryCli(`finalize "${newVersion}`);
 
-  if (deployType === 'normal') {
-    info('Merging master back into staging...');
-    executeCmd('git checkout staging');
-    executeCmd('git merge master');
-    executeCmd('git push origin HEAD');
-  }
+  info(`Merging ${targetBranch} back into staging...`);
+  executeCmd(`git checkout staging`);
+  executeCmd(`git merge ${targetBranch}`);
+  executeCmd('git push origin HEAD');
+
+  info(`Setting latest version...`);
+
+  await setLatestVersion(newVersion, channel);
+  await setChance(newVersion, chance);
 
   info(`Version ${newVersion} released successfully!`);
 }

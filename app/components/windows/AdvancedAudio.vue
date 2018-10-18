@@ -1,25 +1,30 @@
 <template>
 <modal-layout
-  :showControls="false"
-  title="Advanced Audio Settings">
+  :show-controls="false"
+>
 
   <div slot="content">
 
 
     <table>
+      <thead>
+        <tr>
+          <th>{{ $t('Name') }}</th>
+          <th>{{ $t('Volume ( % )') }}</th>
+          <th>{{ $t('Downmix to Mono') }}</th>
+          <th>{{ $t('Sync Offset ( ms )') }}</th>
+          <th>{{ $t('Audio Monitoring') }}</th>
+          <th>{{ $t('Tracks') }}</th>
+        </tr>
+      </thead>
 
-      <tr>
-        <th>Name</th>
-        <th>Volume ( % )</th>
-        <th>Downmix to Mono</th>
-        <th>Sync Offset ( ms )</th>
-        <th>Audio Monitoring</th>
-        <th>Tracks</th>
-      </tr>
-
-      <tr v-for="audioSource in audioSources">
-        <td>{{ audioSource.displayName }}</td>
-        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name">
+      <tr v-for="audioSource in audioSources" :key="audioSource.name">
+        <td>{{ audioSource.name }}</td>
+        <td
+          v-for="formInput in audioSource.getSettingsForm()"
+          :key="`${audioSource.name}${formInput.name}`"
+          :class="'column-' + formInput.name"
+        >
           <component
               v-if="propertyComponentForType(formInput.type)"
               :is="propertyComponentForType(formInput.type)"
@@ -51,10 +56,5 @@ tr {
       white-space: nowrap;
     }
   }
-}
-
-th,
-td {
-  text-align: left;
 }
 </style>

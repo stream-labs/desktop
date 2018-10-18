@@ -1,5 +1,5 @@
 <template>
-  <ul class="nav-menu">
+  <ul class="nav-menu" :class="{'nav-menu--child': isChild}">
     <slot></slot>
   </ul>
 </template>
@@ -9,21 +9,17 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.nav-menu {
-  margin: 0 0 -20px -20px;
-  flex: 0 0 200px;
-  border-right: 1px solid @day-border;
+.nav-menu:not(.nav-menu--child) {
+  flex: 0 0 240px;
   display: flex;
   flex-direction: column;
-  background: @day-secondary;
-  margin-top: -20px;
-  padding-top: 20px;
+  .padding-top(2);
+  .padding-right(3);
+  margin-left: @0;
 }
 
-.night-theme {
-  .nav-menu {
-    border-color: @night-border;
-    background-color: @night-primary;
-  }
+.nav-menu--child {
+  padding: 0;
+  margin: 0;
 }
 </style>

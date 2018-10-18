@@ -16,6 +16,11 @@ export enum AnchorPoint {
   Center
 }
 
+export enum CenteringAxis {
+  X,
+  Y,
+  Both
+}
 
 // Positions on a positive unit grid
 const AnchorPositions = {
@@ -295,14 +300,23 @@ export class ScalableRectangle implements IScalableRectangle {
    * Centers this rectangle on the provided rectangle
    * without changing the scale.
    */
-  centerOn(rect: ScalableRectangle) {
+  centerOn(rect: ScalableRectangle, axis?: CenteringAxis) {
     // Normalize both rectangles for this operation
     this.normalized(() => rect.normalized(() => {
-      // Anchor both rectangles in the center
+      // Anchor both rectangles in the axis center
       this.withAnchor(AnchorPoint.Center, () => {
         rect.withAnchor(AnchorPoint.Center, () => {
-          this.x = rect.x;
-          this.y = rect.y;
+          switch (axis) {
+            case CenteringAxis.X:
+              this.x = rect.x;
+              break;
+            case CenteringAxis.Y:
+              this.y = rect.y;
+              break;
+            default:
+              this.x = rect.x;
+              this.y = rect.y;
+          }
         });
       });
     }));

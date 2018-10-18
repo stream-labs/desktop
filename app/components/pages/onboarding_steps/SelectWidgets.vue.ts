@@ -35,9 +35,7 @@ export default class SelectWidgets extends Vue {
   created() {
     if (!this.onboardingService.state.completedSteps.includes('ObsImport')) {
       this.selectedWidgets = [
-        WidgetType.AlertBox,
-        WidgetType.EventList,
-        WidgetType.TheJar
+        WidgetType.AlertBox
       ];
     }
   }

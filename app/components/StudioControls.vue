@@ -14,7 +14,9 @@
 .studio-controls {
   height: 240px;
   width: 100%;
-  padding: 20px 10px;
+  .padding-v-sides(2);
+  .padding-h-sides();
+  margin: 0;
 }
 </style>
 
@@ -25,36 +27,40 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 10px;
+  .padding-h-sides();
+  position: relative;
 }
 
 .studio-controls-top {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 10px;
+  .margin-bottom();
   justify-content: space-between;
   flex: 0 0 20px;
 }
 
 .studio-controls__label {
   margin-bottom: 0;
-  .semibold;
-  color: @grey;
+  .weight(@medium);
+  color: @day-title;
+  font-size: 14px;
 }
 
 .studio-controls-selector {
-  background: @day-secondary;
-  .border;
-  .radius;
+  background: @day-section;
+  .radius();
   flex-grow: 1;
   overflow-y: auto;
 }
 
 .night-theme {
   .studio-controls-selector {
-    background: @navy-secondary;
-    border-color: @navy-secondary;
+    background: @night-section;
+  }
+
+  .studio-controls__label {
+    color: @white;
   }
 }
 </style>

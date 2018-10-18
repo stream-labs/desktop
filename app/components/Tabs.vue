@@ -1,18 +1,17 @@
 <template>
-<div>
-  <div>
-    <ul class="Tabs-tabContainer">
-      <li
-        class="Tabs-tab"
-        :class="{ 'Tabs-tab__active': tab.value === selected }"
-        v-for="tab in tabs"
-        @click="showTab(tab.value)">
-        {{ tab.name }}
-      </li>
-    </ul>
+<div class="tabs__container">
+  <div class="tabs" :class="className">
+    <button
+      v-for="tab in tabs"
+      :key="tab.value"
+      class="tab-button"
+      :class="{ active: tab.value === value }"
+      @click="showTab(tab.value)">
+      {{ tab.name }}
+    </button>
   </div>
-  <div class="Tabs-contentContainer">
-    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === selected"/>
+  <div class="tab-content" v-if="!hideContent">
+    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === value"/>
   </div>
 </div>
 </template>
@@ -20,29 +19,36 @@
 <script lang="ts" src="./Tabs.vue.ts"></script>
 
 <style lang="less" scoped>
-.Tabs-tabContainer {
+@import "../styles/index";
+
+.tabs__container {
+  height: 100%;
+}
+
+.tabs {
   display: flex;
-  flex-direction: row;
-  list-style-type: none;
-  margin: 0;
-}
-
-.Tabs-tab {
-  flex-grow: 1;
-  text-align: center;
-  padding: 10px 0;
-  cursor: pointer;
+  background-color: @day-primary;
   box-sizing: border-box;
-  border: 1px solid rgba(0,0,0,0);
-  border-bottom: 1px solid #ccc;
-  &.Tabs-tab__active {
-    border: 1px solid #ccc;
-    border-bottom: 1px solid rgba(0,0,0,0);
-  }
+  position: relative;
+  width: 100%;
+  .padding-top(@0);
+  .padding-bottom(@0);
+  .padding-right(2);
+  .padding-left(2);
+  height: 54px;
+  border-bottom: 1px solid @day-border;
 }
 
-.Tabs-contentContainer {
-  border: 1px solid #ccc;
-  border-top: 0;
+.tab-content {
+  height: calc(~'100% - 54px');
+  position: relative;
+  overflow-y: auto;
+}
+
+.night-theme {
+  .tabs {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
 }
 </style>

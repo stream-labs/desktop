@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "Nincsenek értesítések",
+  "Enable notifications": "Értesítések bekapcsolása",
+  "Enable sound": "Hang bekapcsolása",
+  "Skipped frames detected:": "Átugrott képkockák észlelve:",
+  "Detect skipped frames": "Átugrott képkockák észlelése",
+  "Skipped frames threshold": "Átugrott képkocka küszöb",
+  "Detect lagged frames": "Késő képkockák észlelése",
+  "Lagged frames threshold": "Késő képkocka küszöb",
+  "Detect dropped frames": "Elejtett képkockák észlelése",
+  "Dropped frames threshold": "Elejtett képkocka küszöb",
+  "Show Notifications": "Értesítések Megjelenítése",
+  "Restore Defaults": "Alapértékek Visszaállítása",
+  "Troubleshooter Notifications": "Hibaelhárító Értesítések",
+  "Click to open your Notifications window": "Ide kattintva megnyílik az Értesítési ablak",
+  "Click to read your unread Notifications": "Ide kattintva megnyílnak az olvasatlan Értesítések",
+  "New Notifications": "Új Értesítések",
+  "Log": "Napló"
+}

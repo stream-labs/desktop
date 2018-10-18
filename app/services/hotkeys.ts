@@ -1,10 +1,12 @@
-import { StreamingService } from './streaming';
-import { ScenesService } from './scenes';
-import { SourcesService } from './sources';
-import { KeyListenerService } from './key-listener';
-import { Inject } from '../util/injector';
-import { StatefulService, mutation, ServiceHelper } from './stateful-service';
+import { StreamingService } from 'services/streaming';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from 'services/sources';
+import { TransitionsService } from 'services/transitions';
+import { KeyListenerService } from 'services/key-listener';
+import { Inject } from 'util/injector';
+import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import { defer } from 'lodash';
+import { $t } from 'services/i18n';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -16,6 +18,10 @@ function getSourcesService(): SourcesService {
 
 function getStreamingService(): StreamingService {
   return StreamingService.instance;
+}
+
+function getTransitionsService(): TransitionsService {
+  return TransitionsService.instance;
 }
 
 type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
@@ -62,34 +68,60 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   GENERAL: [
     {
       name: 'TOGGLE_START_STREAMING',
-      description: () => 'Start Streaming',
-      down: () => getStreamingService().startStreaming(),
-      isActive: () => getStreamingService().isStreaming
+      description: () => $t('Start Streaming'),
+      down: () => getStreamingService().toggleStreaming(),
+      isActive: () => {
+        const streamingService = getStreamingService();
+        return streamingService.isStreaming;
+      }
     },
     {
       name: 'TOGGLE_STOP_STREAMING',
-      description: () => 'Stop Streaming',
-      down: () => getStreamingService().stopStreaming(),
-      isActive: () => !getStreamingService().isStreaming
+      description: () => $t('Stop Streaming'),
+      down: () => {
+        const streamingService = getStreamingService();
+        streamingService.toggleStreaming();
+      },
+      isActive: () => {
+        const streamingService = getStreamingService();
+        return !streamingService.isStreaming;
+      }
     },
     {
       name: 'TOGGLE_START_RECORDING',
-      description: () => 'Start Recording',
-      down: () => getStreamingService().startRecording(),
+      description: () => $t('Start Recording'),
+      down: () => getStreamingService().toggleRecording(),
       isActive: () => getStreamingService().isRecording
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
-      description: () => 'Stop Recording',
-      down: () => getStreamingService().stopRecording(),
+      description: () => $t('Stop Recording'),
+      down: () => getStreamingService().toggleRecording(),
       isActive: () => !getStreamingService().isRecording
+    },
+    {
+      name: 'ENABLE_STUDIO_MODE',
+      description: () => $t('Enable Studio Mode'),
+      down: () => getTransitionsService().enableStudioMode(),
+      isActive: () => getTransitionsService().state.studioMode
+    },
+    {
+      name: 'DISABLE_STUDIO_MODE',
+      description: () => $t('Disable Studio Mode'),
+      down: () => getTransitionsService().disableStudioMode(),
+      isActive: () => !getTransitionsService().state.studioMode
+    },
+    {
+      name: 'TRANSITION_STUDIO_MODE',
+      description: () => $t('Transition (Studio Mode)'),
+      down: () => getTransitionsService().executeStudioModeTransition()
     }
   ],
 
   SCENE: [
     {
       name: 'SWITCH_TO_SCENE',
-      description: () => 'Switch to scene',
+      description: () => $t('Switch to scene'),
       down: (sceneId) => getScenesService().makeSceneActive(sceneId)
     }
   ],
@@ -99,7 +131,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Show '${sceneItem.source.displayName}'`;
+        return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
@@ -110,7 +142,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Hide '${sceneItem.source.displayName}'`;
+        return $t('Hide %{sourcename}', { sourcename: sceneItem.source.name });
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,
@@ -121,28 +153,28 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   SOURCE: [
     {
       name: 'TOGGLE_MUTE',
-      description: () => 'Mute',
+      description: () => $t('Mute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, true),
       isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'TOGGLE_UNMUTE',
-      description: () => 'Unmute',
+      description: () => $t('Unmute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'PUSH_TO_MUTE',
-      description: () => 'Push to Mute',
+      description: () => $t('Push to Mute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, true),
       up: (sourceId) => getSourcesService().setMuted(sourceId, false),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'PUSH_TO_TALK',
-      description: () => 'Push to Talk',
+      description: () => $t('Push to Talk'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       up: (sourceId) => getSourcesService().setMuted(sourceId, true),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
@@ -308,6 +340,15 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
 
+  clearAllHotkeys() {
+    this.applyHotkeySet({
+      general: [],
+      sources: {},
+      scenes: {}
+    });
+  }
+
+
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
@@ -335,7 +376,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
-    const sceneItemsIds = scene.items.map(item => item.sceneItemId);
+    const sceneItemsIds = scene.nodes.map(item => item.id);
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 
@@ -491,13 +532,17 @@ export class Hotkey implements IHotkey {
 
     // We defer the actions until after we've decided whether
     // or not to execute each action.
-    if (up) action.upHandler = () => {
-      if (!action.isActive(entityId)) defer(() => up(entityId));
-    };
+    if (up) {
+      action.upHandler = () => {
+        if (!action.isActive(entityId)) defer(() => up(entityId));
+      };
+    }
 
-    if (down) action.downHandler = () => {
-      if (!action.isActive(entityId)) defer(() => down(entityId));
-    };
+    if (down) {
+      action.downHandler = () => {
+        if (!action.isActive(entityId)) defer(() => down(entityId));
+      };
+    }
 
     return action;
   }

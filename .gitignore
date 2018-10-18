@@ -6,9 +6,14 @@ npm-debug.log
 lib/
 rtmp-services/
 text-freetype2/
-data/
+/data/
 dist/
 test-dist/
 bundles/
 node-obs/
 node-boost/
+electron.sln
+electron.VC.db
+.vs/
+plugins/
+yarn-error.log

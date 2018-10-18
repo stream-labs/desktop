@@ -1,26 +1,28 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
-import { TFormData } from '../shared/forms/Input';
-import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
-import { ISourcesServiceApi } from '../../services/sources';
-
-import ModalLayout from '../ModalLayout.vue';
-import SourcePreview from '../shared/SourcePreview.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
+import { Inject } from 'util/injector';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { WindowsService } from 'services/windows';
+import { ISourcesServiceApi } from 'services/sources';
+import ModalLayout from 'components/ModalLayout.vue';
+import Display from 'components/shared/Display.vue';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
+import PlatformAppProperties from 'components/custom-source-properties/PlatformAppProperties.vue';
+import { $t } from 'services/i18n';
+import { Subscription } from 'rxjs/subscription';
+import electron from 'electron';
 
 @Component({
   components: {
     ModalLayout,
-    SourcePreview,
+    Display,
     GenericForm,
     WidgetProperties,
-    StreamlabelProperties
-  },
-  mixins: [windowMixin]
+    StreamlabelProperties,
+    PlatformAppProperties
+  }
 })
 export default class SourceProperties extends Vue {
 
@@ -32,7 +34,22 @@ export default class SourceProperties extends Vue {
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  properties = this.source ? this.source.getPropertiesFormData() : [];
+  properties: TObsFormData = [];
+
+  sourcesSubscription: Subscription;
+
+  mounted() {
+    this.properties = this.source ? this.source.getPropertiesFormData() : [];
+    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        electron.remote.getCurrentWindow().close();
+      }
+    });
+  }
+
+  destroyed() {
+    this.sourcesSubscription.unsubscribe();
+  }
 
 
   get propertiesManagerUI() {
@@ -40,7 +57,7 @@ export default class SourceProperties extends Vue {
   }
 
 
-  onInputHandler(properties: TFormData, changedIndex: number) {
+  onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData(
       [properties[changedIndex]]
@@ -67,7 +84,7 @@ export default class SourceProperties extends Vue {
 
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
-    return source ? `Properties for '${source.displayName}'` : '';
+    return source ? $t('Properties for %{sourceName}', { sourceName: source.name }) : '';
   }
 
 }

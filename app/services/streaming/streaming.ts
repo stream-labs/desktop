@@ -1,161 +1,196 @@
+import { StatefulService, mutation } from 'services/stateful-service';
+import * as obs from '../../../obs-api';
+import { Inject } from 'util/injector';
 import moment from 'moment';
-
-import { Inject } from '../../util/injector';
-import { StatefulService, mutation } from '../stateful-service';
-import { nodeObs } from '../obs-api';
-import { SettingsService } from '../settings';
 import { padStart } from 'lodash';
-import { track } from '../usage-statistics';
-import { WindowsService } from '../windows';
+import { SettingsService } from 'services/settings';
+import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs/Subject';
-import { IStreamingServiceApi, IStreamingServiceState } from './streaming-api';
 import electron from 'electron';
+import {
+  IStreamingServiceApi,
+  IStreamingServiceState,
+  EStreamingState,
+  ERecordingState
+} from './streaming-api';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { $t } from 'services/i18n';
+import { StreamInfoService } from 'services/stream-info';
+import { AnnouncementsService } from 'services/announcements';
+import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
+enum EOBSOutputType {
+  Streaming = 'streaming',
+  Recording = 'recording'
+}
 
-export class StreamingService extends StatefulService<IStreamingServiceState> implements IStreamingServiceApi {
+enum EOBSOutputSignal {
+  Starting = 'starting',
+  Start = 'start',
+  Stopping = 'stopping',
+  Stop = 'stop',
+  Reconnect = 'reconnect',
+  ReconnectSuccess = 'reconnect_success'
+}
 
+interface IOBSOutputSignalInfo {
+  type: EOBSOutputType;
+  signal: EOBSOutputSignal;
+  code: obs.EOutputCode;
+  error: string;
+}
+
+export class StreamingService extends StatefulService<IStreamingServiceState>
+  implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() streamInfoService: StreamInfoService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() private announcementsService: AnnouncementsService;
 
-  static initialState = {
-    isStreaming: false,
-    streamStartTime: null,
-    isRecording: false,
-    recordStartTime: null,
-    streamOk: null
-  } as IStreamingServiceState;
+  streamingStatusChange = new Subject<EStreamingState>();
+  recordingStatusChange = new Subject<ERecordingState>();
 
-  @mutation()
-  START_STREAMING(startTime: string) {
-    this.state.isStreaming = true;
-    this.state.streamStartTime = startTime;
-  }
-
-  @mutation()
-  STOP_STREAMING() {
-    this.state.isStreaming = false;
-    this.state.streamStartTime = null;
-  }
-
-  @mutation()
-  START_RECORDING(startTime: string) {
-    this.state.isRecording = true;
-    this.state.recordStartTime = startTime;
-  }
-
-  @mutation()
-  STOP_RECORDING() {
-    this.state.isRecording = false;
-    this.state.recordStartTime = null;
-  }
-
-  @mutation()
-  SET_STREAM_STATUS(streamOk: boolean) {
-    this.state.streamOk = streamOk;
-  }
-
-
-  streamingStatusChange = new Subject<boolean>();
+  // Dummy subscription for stream deck
+  streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
 
+  static initialState = {
+    streamingStatus: EStreamingState.Offline,
+    streamingStatusTime: new Date().toISOString(),
+    recordingStatus: ERecordingState.Offline,
+    recordingStatusTime: new Date().toISOString()
+  };
 
-  // Only runs once per app lifecycle
   init() {
-
-    // Initialize the stream check interval
-    setInterval(
-      () => {
-        let status;
-
-        if (this.state.isStreaming) {
-          status = nodeObs.OBS_service_isStreamingOutputActive() === '1';
-        } else {
-          status = null;
-        }
-
-        this.SET_STREAM_STATUS(status);
-      },
-      10 * 1000
+    obs.NodeObs.OBS_service_connectOutputSignals(
+      (info: IOBSOutputSignalInfo) => {
+        this.handleOBSOutputSignal(info);
+      }
     );
   }
 
-
-  getModel(): IStreamingServiceState {
+  getModel() {
     return this.state;
   }
 
+  get isStreaming() {
+    return this.state.streamingStatus !== EStreamingState.Offline;
+  }
 
-  @track('stream_start')
+  get isRecording() {
+    return this.state.recordingStatus !== ERecordingState.Offline;
+  }
+
+  /**
+   * @deprecated Use toggleStreaming instead
+   */
   startStreaming() {
-    if (this.state.isStreaming) return;
+    this.toggleStreaming();
+  }
 
-    const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
-    const confirmText = 'Are you sure you want to start streaming?';
+  /**
+   * @deprecated Use toggleStreaming instead
+   */
+  stopStreaming() {
+    this.toggleStreaming();
+  }
 
-    if (shouldConfirm && !confirm(confirmText)) return;
+  toggleStreaming() {
+    if (this.state.streamingStatus === EStreamingState.Offline) {
+      const shouldConfirm = this.settingsService.state.General
+        .WarnBeforeStartingStream;
+      const confirmText = 'Are you sure you want to start streaming?';
 
-    const blankStreamKey = !this.settingsService.state.Stream.key;
+      if (shouldConfirm && !confirm(confirmText)) return;
 
-    if (blankStreamKey) {
-      alert('No stream key has been entered. Please check your settings and add a valid stream key.');
+      this.powerSaveId = electron.remote.powerSaveBlocker.start(
+        'prevent-display-sleep'
+      );
+      obs.NodeObs.OBS_service_startStreaming();
+
+      const recordWhenStreaming = this.settingsService.state.General
+        .RecordWhenStreaming;
+
+      if (
+        recordWhenStreaming &&
+        this.state.recordingStatus === ERecordingState.Offline
+      ) {
+        this.toggleRecording();
+      }
+
       return;
     }
 
-    this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
+    if (
+      this.state.streamingStatus === EStreamingState.Starting ||
+      this.state.streamingStatus === EStreamingState.Live
+    ) {
+      const shouldConfirm = this.settingsService.state.General
+        .WarnBeforeStoppingStream;
+      const confirmText = $t('Are you sure you want to stop streaming?');
 
-    nodeObs.OBS_service_startStreaming();
-    this.START_STREAMING((new Date()).toISOString());
-    this.streamingStatusChange.next(true);
+      if (shouldConfirm && !confirm(confirmText)) return;
 
-    const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+      if (this.powerSaveId) {
+        electron.remote.powerSaveBlocker.stop(this.powerSaveId);
+      }
 
-    if (recordWhenStreaming && !this.state.isRecording) {
-      this.startRecording();
+      obs.NodeObs.OBS_service_stopStreaming(false);
+
+      const keepRecording = this.settingsService.state.General
+        .KeepRecordingWhenStreamStops;
+      if (
+        !keepRecording &&
+        this.state.recordingStatus === ERecordingState.Recording
+      ) {
+        this.toggleRecording();
+      }
+
+      this.announcementsService.updateBanner();
+
+      return;
+    }
+
+    if (this.state.streamingStatus === EStreamingState.Ending) {
+      obs.NodeObs.OBS_service_stopStreaming(true);
+      return;
     }
   }
 
-  @track('stream_end')
-  stopStreaming() {
-    if (!this.state.isStreaming) return;
-
-    const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
-    const confirmText = 'Are you sure you want to stop streaming?';
-
-    if (shouldConfirm && !confirm(confirmText)) return;
-
-    if (this.powerSaveId) electron.remote.powerSaveBlocker.stop(this.powerSaveId);
-
-    nodeObs.OBS_service_stopStreaming();
-    this.STOP_STREAMING();
-    this.SET_STREAM_STATUS(null);
-    this.streamingStatusChange.next(false);
-
-    const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
-
-    if (!keepRecording && this.state.isRecording) {
-      this.stopRecording();
-    }
-  }
-
+  /**
+   * @deprecated Use toggleRecording instead
+   */
   startRecording() {
-    if (this.state.isRecording) return;
-
-    nodeObs.OBS_service_startRecording();
-    this.START_RECORDING((new Date()).toISOString());
+    this.toggleRecording();
   }
 
+  /**
+   * @deprecated Use toggleRecording instead
+   */
   stopRecording() {
-    if (!this.state.isRecording) return;
+    this.toggleRecording();
+  }
 
-    nodeObs.OBS_service_stopRecording();
-    this.STOP_RECORDING();
+  toggleRecording() {
+    if (this.state.recordingStatus === ERecordingState.Recording) {
+      obs.NodeObs.OBS_service_stopRecording();
+      return;
+    }
+
+    if (this.state.recordingStatus === ERecordingState.Offline) {
+      obs.NodeObs.OBS_service_startRecording();
+      return;
+    }
   }
 
   showEditStreamInfo() {
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
-      queryParams: {  },
+      title: $t('Update Stream Info'),
+      queryParams: {},
       size: {
         width: 500,
         height: 400
@@ -163,43 +198,172 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     });
   }
 
-  // Getters / Utilty
-
-  get isStreaming() {
-    return this.state.isStreaming;
+  get delayEnabled() {
+    return this.settingsService.state.Advanced.DelayEnable;
   }
 
-  get streamStartTime() {
-    return moment(this.state.streamStartTime);
+  get delaySeconds() {
+    return this.settingsService.state.Advanced.DelaySec;
   }
 
-  get formattedElapsedStreamTime() {
-    return this.formattedDurationSince(this.streamStartTime);
+  get delaySecondsRemaining() {
+    if (!this.delayEnabled) return 0;
+
+    if (
+      this.state.streamingStatus === EStreamingState.Starting ||
+      this.state.streamingStatus === EStreamingState.Ending
+    ) {
+      const elapsedTime =
+        moment().unix() - this.streamingStateChangeTime.unix();
+      return Math.max(this.delaySeconds - elapsedTime, 0);
+    }
+
+    return 0;
   }
 
-  get streamOk() {
-    return this.state.streamOk;
+  /**
+   * Gives a formatted time that the streaming output has been in
+   * its current state.
+   */
+  get formattedDurationInCurrentStreamingState() {
+    return this.formattedDurationSince(this.streamingStateChangeTime);
   }
 
-  get isRecording() {
-    return this.state.isRecording;
+  get streamingStateChangeTime() {
+    return moment(this.state.streamingStatusTime);
   }
 
-  get recordStartTime() {
-    return moment(this.state.recordStartTime);
+  private sendReconnectingNotification() {
+    const msg = $t('Stream has disconnected, attempting to reconnect.');
+    const existingReconnectNotif = this.notificationsService.getUnread()
+      .filter((notice: INotification) => notice.message === msg);
+    if (existingReconnectNotif.length !== 0) return;
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      showTime: true,
+      message: $t('Stream has disconnected, attempting to reconnect.')
+    });
   }
 
-  get formattedElapsedRecordTime() {
-    return this.formattedDurationSince(this.recordStartTime);
+  private clearReconnectingNotification() {
+    const notice = this.notificationsService.getAll()
+      .find((notice: INotification) => notice.message === $t('Stream has disconnected, attempting to reconnect.'));
+    if (!notice) return;
+    this.notificationsService.markAsRead(notice.id);
   }
 
   private formattedDurationSince(timestamp: moment.Moment) {
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = padStart(duration.seconds().toString(), 2, '0');
     const minutes = padStart(duration.minutes().toString(), 2, '0');
-    const hours = padStart(duration.hours().toString(), 2, '0');
+    const dayHours = duration.days() * 24;
+    const hours = padStart((dayHours + duration.hours()).toString(), 2, '0');
 
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
+    console.debug('OBS Output signal: ', info);
+    if (info.type === EOBSOutputType.Streaming) {
+      const time = new Date().toISOString();
+
+      if (info.signal === EOBSOutputSignal.Start) {
+        this.SET_STREAMING_STATUS(EStreamingState.Live, time);
+        this.streamingStatusChange.next(EStreamingState.Live);
+
+        let streamEncoderInfo: Dictionary<string> = {};
+        let game: string = null;
+
+        try {
+          streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
+          if (this.streamInfoService.state.channelInfo) {
+            game = this.streamInfoService.state.channelInfo.game;
+          }
+        } catch (e) {
+          console.error('Error fetching stream encoder info: ', e);
+        }
+
+        this.usageStatisticsService.recordEvent('stream_start', {
+          ...streamEncoderInfo,
+          game
+        });
+      } else if (info.signal === EOBSOutputSignal.Starting) {
+        this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
+        this.streamingStatusChange.next(EStreamingState.Starting);
+      } else if (info.signal === EOBSOutputSignal.Stop) {
+        this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
+        this.streamingStatusChange.next(EStreamingState.Offline);
+        this.usageStatisticsService.recordEvent('stream_end');
+      } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
+        this.streamingStatusChange.next(EStreamingState.Ending);
+      } else if (info.signal === EOBSOutputSignal.Reconnect) {
+        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
+        this.streamingStatusChange.next(EStreamingState.Reconnecting);
+        this.sendReconnectingNotification();
+      } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
+        this.SET_STREAMING_STATUS(EStreamingState.Live);
+        this.streamingStatusChange.next(EStreamingState.Live);
+        this.clearReconnectingNotification();
+      }
+    } else if (info.type === EOBSOutputType.Recording) {
+      const time = new Date().toISOString();
+
+      if (info.signal === EOBSOutputSignal.Start) {
+        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+        this.recordingStatusChange.next(ERecordingState.Recording);
+      } else if (info.signal === EOBSOutputSignal.Starting) {
+        this.SET_RECORDING_STATUS(ERecordingState.Starting, time);
+        this.recordingStatusChange.next(ERecordingState.Starting);
+      } else if (info.signal === EOBSOutputSignal.Stop) {
+        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+        this.recordingStatusChange.next(ERecordingState.Offline);
+      } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
+        this.recordingStatusChange.next(ERecordingState.Stopping);
+      }
+    }
+
+    if (info.code) {
+      let errorText = '';
+
+      if (info.code === obs.EOutputCode.BadPath) {
+        errorText =
+          $t('Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.');
+      } else if (info.code === obs.EOutputCode.ConnectFailed) {
+        errorText =
+          $t('Failed to connect to the streaming server.  Please check your internet connection.');
+      } else if (info.code === obs.EOutputCode.Disconnected) {
+        errorText =
+          $t('Disconnected from the streaming server.  Please check your internet connection.');
+      } else if (info.code === obs.EOutputCode.InvalidStream) {
+        errorText =
+          $t('Could not access the specified channel or stream key, please double-check your stream key.  ') +
+          $t('If it is correct, there may be a problem connecting to the server.');
+      } else if (info.code === obs.EOutputCode.NoSpace) {
+        errorText = $t('There is not sufficient disk space to continue recording.');
+      } else if (info.code === obs.EOutputCode.Unsupported) {
+        errorText =
+          $t('The output format is either unsupported or does not support more than one audio track.  ') +
+          $t('Please check your settings and try again.');
+      } else if (info.code === obs.EOutputCode.Error) {
+        errorText = $t('An unexpected error occurred:') + info.error;
+      }
+
+      alert(errorText);
+    }
+  }
+
+  @mutation()
+  private SET_STREAMING_STATUS(status: EStreamingState, time?: string) {
+    this.state.streamingStatus = status;
+    if (time) this.state.streamingStatusTime = time;
+  }
+
+  @mutation()
+  private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
+    this.state.recordingStatus = status;
+    this.state.recordingStatusTime = time;
+  }
 }

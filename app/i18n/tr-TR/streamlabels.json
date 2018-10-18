@@ -1,0 +1,19 @@
+{
+  "Label Type": "Etiket Tipi",
+  "Label Template": "Etiket Şablonu",
+  "Item Template": "Öğe Şablonu",
+  "Item Separator": "Öğe Ayracı",
+  "Item Limit": "Gösterilen Limit",
+  "Duration (seconds)": "Süre (saniye)",
+  "Show Clock": "Saati Göster",
+  "Always, show 0:00 when inactive": "Her zaman, eğer inaktif ise 0:00 göster",
+  "Hide when inactive": "İnaktif olduğunda gizle",
+  "Show Count": "Sayacı Göster",
+  "Always, show 0 when inactive": "Her zaman, inaktif ise 0 göster",
+  "Show Latest": "En sonuncuyu göster",
+  "Always, show last person when inactive": "Her zaman, eğer inaktif ise son kişiyi göster",
+  "Include Resubs": "Yeniden Abone Olanları İçersin",
+  "Preview": "Ön İzleme",
+  "Note:": "Not:",
+  "Actual label text may take up to 60 seconds to update": "Etiket yazısı 60 saniyede bir yenilenir"
+}

@@ -1,15 +1,33 @@
 @import "./styles/index";
+@import "./styles/checkboxes";
+@import "./styles/tables";
+@import "./styles/buttons";
+@import "./styles/classes";
+@import "./styles/custom-icons";
+@import "./styles/inputs";
+@import "./styles/sl-vue-tree";
+@import "./styles/tooltips";
+
 body {
-  color: @navy;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .main {
   background: @white;
-}
-
-a {
-  .transition;
-  text-decoration: underline;
+  color: @day-paragraph;
 }
 
 // Layout
@@ -22,87 +40,91 @@ a {
 }
 
 // Type
+h2 {
+  font-family: 'Roboto';
+  font-size: 16px;
+  .weight(@medium);
+  text-transform: capitalize;
+  color: @day-title;
+  margin-bottom: 24px;
+}
+
 h3 {
   font-family: 'Roboto';
   font-size: 14px;
-  .semibold;
+  .weight(@medium);
+  color: @day-title;
 }
 
 h4 {
   font-family: 'Roboto';
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: .7px;
-  .semibold;
+  .text-transform();
+  font-size: 13px;
+  .weight(@medium);
   margin-bottom: 20px;
-  color: @grey;
+  color: @day-title;
+}
+
+label {
+  color: @day-paragraph;
 }
 
 .label--essential {
-  background: @purple;
+  background: @secondary;
   .radius;
-  .semibold;
-  text-transform: uppercase;
-  font-size: 9px;
-  color: white;
-  letter-spacing: .5px;
+  .weight(@medium);
+  font-size: 12px;
+  color: @white;
   padding: 0px 4px;
   margin-left: 10px;
   line-height: 16px
 }
 
+a,
 .link {
-  .semibold;
-  color: @grey;
   .transition;
+  text-decoration: underline;
+  .weight(@medium);
+  color: @day-link;
   text-decoration: none;
+  display: flex;
+  align-items: center;
 
   &:hover {
-    color: @navy;
+    color: @day-link-active;
+
+    .fa,
+    i {
+      color: @day-link-active;
+    }
+  }
+
+  .fa,
+  i {
+    .margin-right();
+    font-size: 15px;
+    color: @icon;
   }
 }
 
+.link--capitalize() {
+  .link();
+  text-transform: capitalize;
+}
+
+.link--pointer {
+  cursor: pointer;
+}
+
 .link--uppercase {
+  .link;
   text-transform: uppercase;
-  letter-spacing: .7px;
+  .letter-spacing;
+  font-size: 12px;
 }
 
 .label--icon {
   margin-right: 4px;
-}
-
-// Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown'
-// On 'dropdown__toggle' use @click="showDropdown = !showDropdown"
-// On 'dropdown__menu' use v-if="showDropdown"
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown__toggle,
-.slide-open__open {
-  .semibold;
-  color: @grey;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-
-  .fa {
-    font-size: 8px;
-    vertical-align: middle;
-    margin-bottom: 2px;
-  }
-}
-
-.dropdown__menu {
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: @white;
-  padding: 8px;
-  min-width: 100px;
-  text-align: left;
-  border-radius: 3px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
 
 .select {
@@ -194,67 +216,59 @@ h4 {
   }
 }
 
-.slide-open__menu {
-  position: absolute;
-  background: @white;
-  right: 0;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  padding: 0 25px;
+.slide-open {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
 }
 
-.slide-open__close {
+.slide-open__menu {
   position: absolute;
-  left: 25px;
-  color: @grey;
-  transition: all 275ms;
-
-  &:hover {
-    .fa {
-      color: @navy;
-    }
-  }
+  background: @day-bg;
+  right: calc(~'100% + 20px');
+  align-self: center;
+  display: flex;
+  z-index: 10;
+  .padding-h-sides();
+  .radius();
+  .day-shadow();
 }
 
 .tabs {
   background: transparent;
   padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  border: 0;
 }
 
 .tab-button {
   border-bottom: 1px solid transparent;
-  height: 45px;
-  margin-right: 10px;
-  text-transform: uppercase;
-  font-size: 12px;
-  .semibold;
-  letter-spacing: .7px;
-  color: @grey;
-  .transition;
+  height: 48px;
+  margin-right: 20px;
+  .link--capitalize();
 
-  .fa {
-    margin-right: 4px;
+  &:focus {
+    outline: 0;
   }
 
-  &.active,
-  &:hover {
-    border-color: @navy;
-    color: @navy;
+  .fa,
+  i {
+    font-size: 15px;
+    vertical-align: middle;
+    color: @icon;
+  }
 
-    .fa {
-      color: @navy;
+  &.is-active,
+  &.active {
+    color: @day-link-active;
+    border-bottom-color: @dark-2;
+
+    .fa,
+    i {
+      color: @day-link-active;
     }
   }
-}
-
-// TODO: eventuall use LESS variables from twitchalerts
-.bgColor-teal {
-  background-color: @teal;
 }
 
 // TODO: add "disable" and "enable" styles for form controls to styleguide
@@ -265,64 +279,19 @@ h4 {
     &.checkbox input:checked~label,
     &.checkbox input~label {
       &:before {
-        border-color: gray;
+        border-color: @day-input-border;
         background: transparent;
       }
 
-      &:after {color: gray}
+      &:after {color: @day-paragraph}
     }
-  }
-}
-
-.checkbox {
-  label {
-    text-transform: none;
   }
 }
 
 // Make select boxes look similar to input boxes
 select {
   .radius;
-  height: 36px;
-}
-
-table {
-  tr {
-    td,
-    th {
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-  }
-}
-
-td,
-th {
-  padding-right: 20px;
-
-  .input-container {
-    width: 100%;
-    margin-bottom: 0;
-    display: block;
-  }
-
-  .input-label {
-    display: none;
-  }
-
-  .input-wrapper {
-    width: 100%;
-  }
-}
-
-th {
-  color: @grey;
-  text-transform: uppercase;
-  .semibold;
-  letter-spacing: 1.5px;
-  font-size: 11px;
-  padding-bottom: 10px;
+  height: 34px;
 }
 
 // Scrolls
@@ -355,11 +324,43 @@ th {
   opacity: 0;
 }
 
+.fade-enter-active {
+  transition: all .4s ease;
+}
+
+.fade-leave-active {
+  transition: all .2s ease;
+}
+
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.v--modal-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.v--modal {
+  background-color: @day-bg;
+}
+
+
+
 // Night theme rules
 .night-theme {
   &.main {
-    background: @night-primary;
-    color: @night-text;
+    background: @night-bg;
+    color: @night-paragraph;
+  }
+
+  .v--modal {
+    background-color: @night-bg;
+  }
+
+  .v--modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
   }
 
   a {
@@ -372,8 +373,24 @@ th {
     border: 1px solid transparent;
   }
 
+  h2 {
+    color: @night-title;
+  }
+
   h3 {
-    color: @grey;
+    color: @night-title;
+  }
+
+  h4 {
+    color: @night-title;
+  }
+
+  label {
+    color: @night-paragraph;
+  }
+
+  ::placeholder {
+    opacity: .4;
   }
 
   .checkbox {
@@ -389,36 +406,51 @@ th {
     }
   }
 
+  a,
   .link {
-    &:hover {
-      color: @white;
+    color: @night-link;
+
+    &:hover,
+    &:focus,
+    &.active {
+      color: @night-link-active;
+
+      .fa,
+      i {
+        color: @night-link-active;
+      }
     }
   }
 
-  .dropdown__menu {
-    background-color: @night-accent-light;
+  .tab-button {
+    color: @night-link;
   }
 
   .slide-open__menu {
-    background-color: @night-primary;
+    background-color: @night-section;
+    border-color: @night-section;
+    .night-shadow;
   }
 
   .slide-open__close {
     &:hover {
-      .fa {
+      .fa,
+      i {
         color: @white;
       }
     }
   }
 
   .tab-button{
+    &.is-active,
     &.active,
     &:hover {
-      color: @white;
+      color: @night-link-active;
       border-bottom-color: @white;
 
-      .fa {
-        color: @white;
+      .fa,
+      i {
+        color: @night-link-active;
       }
     }
   }

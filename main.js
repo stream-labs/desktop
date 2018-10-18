@@ -7,70 +7,43 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
+if (pjson.name === 'slobs-client-preview') {
+  process.env.SLOBS_PREVIEW = true;
+}
+if (pjson.name === 'slobs-client-ipc') {
+  process.env.SLOBS_IPC = true;
+}
 process.env.SLOBS_VERSION = pjson.version;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
-const bt = require('backtrace-node');
-
-function handleFinishedReport() {
-  dialog.showErrorBox(`Unhandled Exception`,
-  'An unexpected error occured and the application must be shut down.\n' +
-  'Information concerning this occasion has been sent for debugging purposes.\n' +
-  'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
-  'Please restart the application.');
-
-  if (app) {
-    app.quit();
-  }
-}
-
-function handleUnhandledException(err) {
-  bt.report(err, {}, handleFinishedReport);
-}
-
-if (pjson.env === 'production') {
-  bt.initialize({
-    disableGlobalHandler: true,
-    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    attributes: {
-      version: pjson.version,
-      processType: 'main'
-    }
-  });
-
-  process.on("uncaughtException", handleUnhandledException);
-
-  crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    submitURL: 
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
-      'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    extra: {
-      version: pjson.version,
-      processType: 'main'
-    }
-  });
-}
-
-const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const _ = require('lodash');
-const { Updater } = require('./updater/Updater.js');
+const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
+const path = require('path');
+const semver = require('semver');
+const windowStateKeeper = require('electron-window-state');
+const obs = require('obs-studio-node');
+
+app.disableHardwareAcceleration();
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-// Initialize the keylistener
-require('node-libuiohook').startHook();
+/* Determine the current release channel we're
+ * on based on name. The channel will always be
+ * the premajor identifier, if it exists.
+ * Otherwise, default to latest. */
+const releaseChannel = (() => {
+  const components = semver.prerelease(pjson.version);
+
+  if (components) return components[0];
+  return 'latest';
+})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -85,7 +58,6 @@ function log(...args) {
 // Windows
 let mainWindow;
 let childWindow;
-let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -94,39 +66,92 @@ let allowMainWindowClose = false;
 let shutdownStarted = false;
 let appShutdownTimeout;
 
-const indexUrl = 'file://' + __dirname + '/index.html';
-
+global.indexUrl = 'file://' + __dirname + '/index.html';
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
-// Lazy require OBS
-let _obs;
-
-function getObs() {
-  if (!_obs) {
-    _obs = require(inAsar ? '../../node-obs' : './node-obs');
-  }
-
-  return _obs;
-}
-
-
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
-  // We use a special cache directory for running tests
-  if (process.env.SLOBS_CACHE_DIR) {
-    app.setPath('userData', process.env.SLOBS_CACHE_DIR);
+
+  { // Initialize obs-studio-server
+    // Set up environment variables for IPC.
+    process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
+    process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
+    // Host a new IPC Server and connect to it.
+    obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
+    obs.NodeObs.SetWorkingDirectory(path.join(
+      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node')
+    );
   }
 
-  mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 1000,
-    show: false,
-    frame: false
+  const bt = require('backtrace-node');
+
+  function handleFinishedReport() {
+    dialog.showErrorBox(`Unhandled Exception`,
+    'An unexpected error occured and the application must be shut down.\n' +
+    'Information concerning this occasion has been sent for debugging purposes.\n' +
+    'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
+    'Please restart the application.');
+
+    if (app) {
+      app.quit();
+    }
+  }
+
+  function handleUnhandledException(err) {
+    bt.report(err, {}, handleFinishedReport);
+  }
+
+  if (pjson.env === 'production') {
+    bt.initialize({
+      disableGlobalHandler: true,
+      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
+      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      attributes: {
+        version: pjson.version,
+        processType: 'main'
+      }
+    });
+
+    process.on('uncaughtException', handleUnhandledException);
+
+    crashReporter.start({
+      productName: 'streamlabs-obs',
+      companyName: 'streamlabs',
+      submitURL:
+        'https://streamlabs.sp.backtrace.io:6098/post?' +
+        'format=minidump&' +
+        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      extra: {
+        version: pjson.version,
+        processType: 'main'
+      }
+    });
+  }
+
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1600,
+    defaultHeight: 1000
   });
+
+  mainWindow = new BrowserWindow({
+    minWidth: 800,
+    minHeight: 600,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    show: false,
+    frame: false,
+    title: 'Streamlabs OBS',
+  });
+
+  mainWindowState.manage(mainWindow);
 
   mainWindow.setMenu(null);
 
@@ -135,7 +160,7 @@ function startApp() {
   // and handle breakpoints on startup
   const LOAD_DELAY = 2000;
   setTimeout(() => {
-    mainWindow.loadURL(indexUrl);
+    mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
   }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
@@ -164,10 +189,12 @@ function startApp() {
     mainWindow.close();
   });
 
+  // Initialize the keylistener
+  require('node-libuiohook').startHook();
+
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    getObs().OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -215,12 +242,7 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    callService('AppService', 'setArgv', process.argv);
-    childWindow.loadURL(indexUrl + '?child=true');
-  });
-
-  ipcMain.on('window-childWindowIsReadyToShow', () => {
-    childWindowIsReadyToShow = true;
+    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -234,7 +256,11 @@ function startApp() {
   });
 
   ipcMain.on('services-message', (event, payload) => {
-    childWindow.webContents.send('services-message', payload);
+    const windows = BrowserWindow.getAllWindows();
+    windows.forEach(window => {
+      if (window.id === mainWindow.id || window.isDestroyed()) return;
+      window.webContents.send('services-message', payload);
+    });
   });
 
 
@@ -248,35 +274,73 @@ function startApp() {
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    openDevTools();
+    // setTimeout(() => {
+    //   openDevTools();
+    // }, 10 * 1000);
   }
-
-  // Initialize various OBS services
-  getObs().OBS_API_initAPI(app.getPath('userData'));
 }
 
-// This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(() => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
+// We use a special cache directory for running tests
+if (process.env.SLOBS_CACHE_DIR) {
+  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+}
+app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+app.setAsDefaultProtocolClient('slobs');
+
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', (event, argv) => {
+    // Check for protocol links in the argv of the other process
+    argv.forEach(arg => {
+      if (arg.match(/^slobs:\/\//)) {
+        mainWindow.send('protocolLink', arg);
+      }
+    });
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+
+      mainWindow.focus();
     }
-
-    mainWindow.focus();
-  }
-});
-
-if (shouldQuit) {
-  app.quit();
+  });
+} else {
+  app.exit();
 }
+
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    (new Updater(startApp)).run();
+    const updateInfo = {
+      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      version: pjson.version,
+      exec: process.argv,
+      cwd: process.cwd(),
+      waitPids: [ process.pid ],
+      appDir: path.dirname(app.getPath('exe')),
+      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
+      versionFileName: `${releaseChannel}.json`
+    };
+
+    console.log(updateInfo);
+    bootstrap(updateInfo).then((updating) => {
+      if (updating) {
+        console.log('Closing for update...');
+        app.exit();
+      } else {
+        startApp();
+      }
+    });
   } else {
     startApp();
   }
+});
+
+app.on('quit', (e, exitCode) => {
+  obs.IPC.disconnect();
 });
 
 ipcMain.on('openDevTools', () => {
@@ -296,35 +360,28 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
       const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
+      childWindow.show();
       childWindow.restore();
-      childWindow.setBounds({
-        x: childX,
-        y: childY,
-        width: windowOptions.size.width,
-        height: windowOptions.size.height
-      });
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
+
+      if (windowOptions.center) {
+        childWindow.setBounds({
+          x: Math.floor(childX),
+          y: Math.floor(childY),
+          width: windowOptions.size.width,
+          height: windowOptions.size.height
+        });
+      }
     } catch (err) {
       log('Recovering from error:', err);
 
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.center();
     }
 
     childWindow.focus();
   }
-
-
-  // show the child window when it will be ready
-  new Promise(resolve => {
-    if (childWindowIsReadyToShow) {
-      resolve();
-      return;
-    }
-    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
-  }).then(() => {
-    // The child window will show itself when rendered
-    childWindow.send('window-setContents', windowOptions);
-  });
 
 });
 
@@ -351,12 +408,12 @@ ipcMain.on('vuex-register', event => {
   // refreshed.  We only want to register it once.
   if (!registeredStores[windowId]) {
     registeredStores[windowId] = win;
-    log('Registered vuex stores: ', _.keys(registeredStores));
+    log('Registered vuex stores: ', Object.keys(registeredStores));
 
     // Make sure we unregister is when it is closed
     win.on('closed', () => {
       delete registeredStores[windowId];
-      log('Registered vuex stores: ', _.keys(registeredStores));
+      log('Registered vuex stores: ', Object.keys(registeredStores));
     });
   }
 
@@ -375,82 +432,11 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   if (senderWindow && !senderWindow.isDestroyed()) {
     const windowId = senderWindow.id;
 
-    _.each(_.omit(registeredStores, [windowId]), win => {
+    Object.keys(registeredStores).filter(id => id !== windowId.toString()).forEach(id => {
+      const win = registeredStores[id];
       if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
   }
-});
-
-
-// Virtual node OBS calls:
-//
-// These are methods that appear upstream to be OBS
-// API calls, but are actually Javascript functions.
-// These should be used sparingly, and are used to
-// ensure atomic operation of a handful of calls.
-const nodeObsVirtualMethods = {
-
-  OBS_test_callbackProxy(num, cb) {
-    setTimeout(() => {
-      cb(num + 1);
-    }, 5000);
-  }
-
-};
-
-// These are called constantly and dirty up the logs.
-// They can be commented out of this list on the rare
-// occasional that they are useful in the log output.
-const filteredObsApiMethods = [
-  'OBS_content_getSourceSize',
-  'OBS_content_getSourceFlags',
-  'OBS_API_getPerformanceStatistics'
-];
-
-// Proxy node OBS calls
-ipcMain.on('obs-apiCall', (event, data) => {
-  let retVal;
-  const shouldLog = !filteredObsApiMethods.includes(data.method);
-
-  if (shouldLog) log('OBS API CALL', data);
-
-  const mappedArgs = data.args.map(arg => {
-    const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
-
-    if (isCallbackPlaceholder) {
-      return (...args) => {
-        if (!event.sender.isDestroyed()) {
-          event.sender.send('obs-apiCallback', {
-            id: arg.id,
-            args
-          });
-        }
-      };
-    }
-
-    return arg;
-  });
-
-  if (nodeObsVirtualMethods[data.method]) {
-    retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
-  } else {
-    retVal = getObs()[data.method](...mappedArgs);
-  }
-
-  if (shouldLog) log('OBS RETURN VALUE', retVal);
-
-  // electron ipc doesn't like returning undefined, so
-  // we return null instead.
-  if (retVal == null) {
-    retVal = null;
-  }
-
-  event.returnValue = retVal;
-});
-
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
 });
 
 ipcMain.on('restartApp', () => {
@@ -465,10 +451,26 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   e.sender.send('notifySourceAttributes', sizes);
 });
 
+ipcMain.on('requestPerformanceStatistics', (e) => {
+  const stats = getObs().OBS_API_getPerformanceStatistics();
+
+  e.sender.send('notifyPerformanceStatistics', stats);
+});
+
 ipcMain.on('streamlabels-writeFile', (e, info) => {
   fs.writeFile(info.path, info.data, err => {
     if (err) {
       console.log('Streamlabels: Error writing file', err);
     }
   });
+});
+
+ipcMain.on('webContents-preventNavigation', (e, id) => {
+  webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
+  });
+});
+
+ipcMain.on('getMainWindowWebContentsId', e => {
+  e.returnValue = mainWindow.webContents.id;
 });

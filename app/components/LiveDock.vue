@@ -1,26 +1,31 @@
 <template>
-<div class="live-dock" :class="{ collapsed, 'live-dock--left': onLeft }">
+<div
+  class="live-dock"
+  :class="{ collapsed, 'live-dock--left': onLeft }"
+  :style="{ width: (liveDockSize * 100) + '%' }">
   <div
-    class="live-dock-chevron icon-btn"
+    class="live-dock-chevron icon-button"
     v-if="collapsed"
     @click="expand">
-    <i class="fa" :class="{
-      'fa-chevron-left': !onLeft,
-      'fa-chevron-right': onLeft
+    <i :class="{
+      'icon-down icon-left': !onLeft,
+      'icon-down icon-right': onLeft
     }" />
   </div>
 
   <transition name="slide-fade">
     <div
-      v-show="!collapsed"
+      :style="liveDockStyles"
       class="live-dock-expanded-contents">
-      <i
-        class="fa live-dock-chevron icon-btn"
-        :class="{
-          'fa-chevron-left': onLeft,
-          'fa-chevron-right': !onLeft
-        }"
-        @click="collapse" />
+      <div
+        class="live-dock-chevron icon-button"
+        @click="collapse">
+        <i
+          :class="{
+          'icon-down icon-left': onLeft,
+          'icon-down icon-right': !onLeft
+          }" />
+      </div>
       <div class="live-dock-header">
         <div class="flex flex--center">
           <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
@@ -33,24 +38,69 @@
         </div>
         <div class="live-dock-viewer-count">
           <i
-            class="fa fa-eye live-dock-viewer-count-toggle label--icon"
             :class="{
-              'fa-eye': !hideViewerCount,
-              'fa-eye-slash': hideViewerCount
+              'icon-view': !hideViewerCount,
+              'icon-hide': hideViewerCount
             }"
             @click="toggleViewerCount"/>
-          <i class="fa fa-user label--icon" />
-          <span class="semibold">{{ viewerCount }}</span> viewers
+          <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
         </div>
       </div>
 
       <div class="live-dock-info">
-        <a @click="showEditStreamInfo" v-if="isTwitch">Edit Stream Info</a>
-        <a @click="refreshChat">Refresh Chat</a>
+        <div class="live-dock-platform-tools">
+          <a
+            @click="showEditStreamInfo"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
+            v-tooltip="editStreamInfoTooltip">
+            <i class="icon-edit" />
+          </a>
+          <a
+            @click="openYoutubeStreamUrl"
+            v-if="isYoutube && isStreaming"
+            v-tooltip="viewStreamTooltip">
+            <i class="icon-studio" />
+          </a>
+          <a
+            @click="openYoutubeControlRoom"
+            v-if="isYoutube && isStreaming"
+            v-tooltip="controlRoomTooltip">
+            <i class="icon-settings" />
+          </a>
+        </div>
+        <div class="flex">
+          <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
+            <i
+              class="live-dock-chat-apps__popout icon-pop-out-1"
+              v-tooltip.left="$t('Pop out to new window')"
+              v-if="isPopOutAllowed"
+              @click="popOut"
+            />
+            <list-input
+              v-model="selectedChat"
+              :metadata="chatAppsListMetadata"
+            />
+          </div>
+          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+        </div>
       </div>
 
-      <div class="live-dock-chat">
-        <chat ref="chat" />
+      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
+        <chat :style="chatStyles()" ref="chat" />
+        <PlatformAppWebview
+          v-for="app in chatApps"
+          v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
+          :style="chatStyles(app.id)"
+          :key="app.id"
+          class="live-dock-platform-app-webview"
+          :appId="app.id"
+          :pageSlot="slot"
+        />
+      </div>
+      <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
+        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
+        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
+        <span>{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>
@@ -67,8 +117,8 @@
   z-index: 1000;
   width: 28%;
   border-left: 1px solid @day-border;
-  padding: 16px 20px 10px;
-  transition: all 275ms;
+  .padding(2);
+  .transition();
 
   &.live-dock--left {
     border-right: 1px solid @day-border;
@@ -80,7 +130,7 @@
   }
 
   &.collapsed {
-    width: 20px;
+    width: 20px!important;
     padding: 0;
   }
 
@@ -91,17 +141,18 @@
 
 .live-dock-chevron {
   cursor: pointer;
-  position: absolute;
-  top: 0;
-  bottom: 0;
+  .absolute(@top: 0, @bottom: 0, @left: 0);
   display: flex;
   align-items: center;
   height: 100%;
-  left: 0px;
-  padding-left: 5px;
+  padding-left: 4px;
 
   &:hover {
     opacity: 1;
+  }
+
+  i {
+    font-size: 6px;
   }
 }
 
@@ -123,7 +174,7 @@
 
 .live-dock-text {
   margin: 0 2px 0 4px;
-  .semibold;
+  .weight(@medium);
 }
 
 .live-dock-expanded-contents {
@@ -137,12 +188,25 @@
   justify-content: space-between;
   margin-bottom: 10px;
 
+  .live-dock-platform-tools {
+    a {
+      padding: 0 8px;
+    }
+  }
+
   @media (max-width: 1200px) {
     font-size: 12px;
   }
 }
 
 .live-dock-viewer-count {
+  .flex();
+  .flex--center();
+
+  i {
+    .margin-right();
+  }
+
   .live-dock-viewer-count-toggle {
     opacity: 0;
     cursor: pointer;
@@ -155,9 +219,30 @@
   }
 }
 
+.live-dock-viewer-count__count {
+  padding-right: 3px;
+}
+
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
+  .flex();
+}
+
+.live-dock-chat--offline {
+  height: 100%;
+}
+
+.live-dock-chat__img--offline {
+  width: 60%;
+  .flex();
+  .flex--center();
+  .flex--column();
+  margin-bottom: 16px;
+}
+
+.live-dock-chat__img--offline-night {
+  display: none;
 }
 
 .live-dock-pulse {
@@ -165,27 +250,32 @@
   height: 10px;
   border-radius: 50%;
   background: @red;
-  margin: 0 6px;
+  margin: 0 8px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
-  animation: livepulse 2s infinite;
 
   &.live-dock-offline {
-    background: @grey;
+    background: @icon;
     animation: none;
   }
 }
 
-@keyframes livepulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-  }
+.live-dock-platform-tools {
+  .flex();
 }
+
+.live-dock-chat-apps__list-input {
+  .margin-right();
+}
+
+.live-dock-chat-apps__popout {
+  .padding();
+  .cursor--pointer();
+}
+
+.live-dock-platform-app-webview {
+  .flex--grow();
+}
+
 
 .night-theme {
   .live-dock {
@@ -196,6 +286,14 @@
   .live-dock-timer,
   .live-dock-viewer-count {
     color: @white;
+  }
+
+  .live-dock-chat__img--offline-day {
+    display: none;
+  }
+
+  .live-dock-chat__img--offline-night {
+    display: flex;
   }
 }
 </style>

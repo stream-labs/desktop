@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "No tienes ninguna notificación",
+  "Enable notifications": "Activar notificaciones",
+  "Enable sound": "Activar sonido",
+  "Skipped frames detected:": "Fotogramas omitidos detectados:",
+  "Detect skipped frames": "Detectar fotogramas omitidos",
+  "Skipped frames threshold": "Umbral de fotogramas omitidos",
+  "Detect lagged frames": "Detectar retraso de codificación de fotogramas",
+  "Lagged frames threshold": "Umbral de retraso de codificación de fotogramas",
+  "Detect dropped frames": "Detectar fotogramas perdidos",
+  "Dropped frames threshold": "Umbral de fotogramas perdidos",
+  "Show Notifications": "Mostrar Notificaciones",
+  "Restore Defaults": "Restaurar Valores Predeterminados",
+  "Troubleshooter Notifications": "Notificaciones del Solucionador de Problemas",
+  "Click to open your Notifications window": "Click para abrir la ventana de Notificaciones",
+  "Click to read your unread Notifications": "Click para leer las Notificaciones no leídas",
+  "New Notifications": "Nuevas Notificaciones",
+  "Log": "Registro"
+}

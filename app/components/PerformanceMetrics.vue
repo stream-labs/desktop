@@ -1,9 +1,9 @@
 <template>
 <div class="performance-metrics flex flex--center">
   <span class="performance-metric-wrapper">
-    <img class="performance-metric-icon" src="../../media/images/icons/cpu.png">
+    <i class="performance-metric-icon icon-cpu"></i>
     <span class="performance-metric">
-      <span class="performance-metric__value">{{ cpuPercent }}%</span> CPU
+      <span class="performance-metric__value">{{ cpuPercent }}%</span> {{ $t('CPU') }}
     </span>
   </span>
 
@@ -17,7 +17,7 @@
   <span class="performance-metric-wrapper">
     <img class="performance-metric-icon" src="../../media/images/icons/dropped-frames.png">
     <span class="performance-metric">
-      <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span> Dropped Frames
+      <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span> {{ $t('Dropped Frames') }}
     </span>
   </span>
 
@@ -32,7 +32,7 @@
 
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../styles/index";
 
 .performance-metrics {
@@ -57,7 +57,7 @@
     opacity: .5;
   }
 
-  @media(max-width: 1200px) {
+  @media(max-width: 1300px) {
     font-size: 12px;
   }
 }
@@ -73,11 +73,15 @@
   margin-right: 4px;
 
   @media(max-width: 1200px) {
+    display: none;
+  }
+
+  @media(max-width: 1300px) {
     height: 12px;
   }
 }
 
 .performance-metric__value {
-  .semibold;
+  .weight(@medium);
 }
 </style>

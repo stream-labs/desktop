@@ -1,0 +1,12 @@
+{
+  "Show details": "Részletek megjelenítése",
+  "Hide details": "Részletek elrejtése",
+  "API token": "API token",
+  "Generate new": "Új létrehozása",
+  "Port": "Port",
+  "IP addresses": "IP címek",
+  "You can now control Streamlabs OBS from your phone.": "Mostantól a telefonodról is irányíthatod a Streamlabs OBS-t.",
+  "To begin, Scan this QR code with your phone.": "Kezdetnek szkenneld be a QR kódot a telefonoddal.",
+  "This feature will only work with the most recent version of the Streamlabs mobile app.": "Ez a funkció csak a Streamlabs mobilalkalmazás legfrissebb verziójával működik.",
+  "Click to show": "Kattints a megjelenítéshez"
+}

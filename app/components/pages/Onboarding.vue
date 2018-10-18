@@ -10,7 +10,7 @@
 @import "../../styles/index";
 
 .onboarding {
-  background-color: @onboarding-bg;
+  background-color: @night-bg;
 }
 </style>
 
@@ -27,10 +27,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    font-size: 12px;
-    letter-spacing: 1px;
-    font-weight: normal;
-    margin-top: 15px;
+    .margin-top(2);
   }
 }
 
@@ -71,25 +68,28 @@
 .onboarding-title {
   color: @white;
   font-size: 22px;
-  margin-bottom: 20px;
-  letter-spacing: .5px;
+  .margin-bottom(3);
 }
 
 .onboarding-title--sm {
   font-size: 15px;
-  .semibold;
+  .weight(@medium);
   color: @white;
 }
 
 .onboarding-desc {
-  color: @grey;
-  margin-bottom: 20px;
-  padding: 0 20px;
+  color: @light-3;
+  .margin-bottom(3);
+  padding: 0 16px;
 }
 
 .setup-later {
-  margin-top: 20px;
-  color: @grey;
+  .margin-top(3);
+  color: @night-paragraph;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   span {
     display: block;
@@ -98,7 +98,9 @@
 
   a {
     text-decoration: underline;
-    transition: all 275ms;
+    .transition();
+    color: @night-paragraph;
+
     &:hover {
       color: @white;
     }
@@ -109,11 +111,11 @@
   width: 100%;
   padding: 30px;
   color: @white;
-  background-color: @night-primary;
-  margin-bottom: 20px;
+  background-color: @night-section;
+  .margin-bottom(2);
   height: 270px;
   position: relative;
-  .radius;
+  .radius();
 
   &.optimizing {
     .running-setup-row {
@@ -147,11 +149,11 @@
 }
 
 .running-setup-row--complete {
-  color: @teal-bright;
+  color: @night-paragraph;
 }
 
 .running-setup-percent {
-  color: @grey;
+  color: @light-3;
 }
 
 .running-setup__deco {
@@ -159,7 +161,7 @@
   top: 0;
   height: 240px;
   width: auto;
-  margin: 15px 0;
+  margin: 16px 0;
 
   img {
     height: 100%;

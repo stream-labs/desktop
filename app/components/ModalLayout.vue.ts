@@ -1,55 +1,42 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { WindowsService } from '../services/windows';
-import { CustomizationService } from '../services/customization';
-import { Inject } from '../util/injector';
-import TitleBar from './TitleBar.vue';
+import { WindowsService } from 'services/windows';
+import { CustomizationService } from 'services/customization';
+import { Inject } from 'util/injector';
+import { AppService } from 'services/app';
+import electron from 'electron';
 
-@Component({
-  components: { TitleBar }
-})
+@Component({})
 export default class ModalLayout extends Vue {
 
   contentStyle: Object = {};
   fixedStyle: Object = {};
 
-  @Inject()
-  customizationService: CustomizationService;
-
-  @Inject()
-  windowsService: WindowsService;
-
-  // The title shown at the top of the window
-  @Prop()
-  title: string;
+  @Inject() customizationService: CustomizationService;
+  @Inject() windowsService: WindowsService;
+  @Inject() appService: AppService;
 
   // Whether the "cancel" and "done" controls should be
   // shown at the bottom of the modal.
-  @Prop({ default: true })
-  showControls: boolean;
+  @Prop({ default: true }) showControls: boolean;
 
   // If controls are shown, whether or not to show the
   // cancel button.
-  @Prop({ default: true })
-  showCancel: boolean;
+  @Prop({ default: true }) showCancel: boolean;
 
   // Will be called when "done" is clicked if controls
   // are enabled
-  @Prop()
-  doneHandler: Function;
+  @Prop() doneHandler: Function;
 
   // Will be called when "cancel" is clicked.  By default
   // this will just close the window.
-  @Prop()
-  cancelHandler: Function;
+  @Prop() cancelHandler: Function;
 
   // Additional CSS styles for the content section
-  @Prop()
-  contentStyles: Dictionary<string>;
+  @Prop() contentStyles: Dictionary<string>;
 
   // The height of the fixed section
-  @Prop()
-  fixedSectionHeight: number;
+  @Prop() fixedSectionHeight: number;
 
   /**
    * Set to true when using custom controls.
@@ -61,8 +48,8 @@ export default class ModalLayout extends Vue {
 
   created() {
     const contentStyle = {
-      padding: '20px',
-      overflow: 'auto'
+      padding: '16px',
+      overflowY: 'auto'
     };
 
     Object.assign(contentStyle, this.contentStyles);
@@ -85,6 +72,18 @@ export default class ModalLayout extends Vue {
     } else {
       this.windowsService.closeChildWindow();
     }
+  }
+
+  done() {
+    if (this.doneHandler) {
+      this.doneHandler();
+    } else {
+      this.windowsService.closeChildWindow();
+    }
+  }
+
+  get loading() {
+    return this.appService.state.loading;
   }
 
 }
