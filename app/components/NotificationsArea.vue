@@ -32,7 +32,7 @@
         'success': notify.type == 'SUCCESS',
       }"
     >
-      {{ notify.message }} <span v-if="notify.showTime"> {{ formatDate(notify.date) }} </span>
+      {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
     </div>
   </div>
 
