@@ -34,9 +34,9 @@ export default class AppPlatformDeveloperSettings extends Vue {
     this.currentlyLoadedUnpackedApp.appToken : '';
 
   get currentlyLoadedUnpackedApp() {
-    if (this.platformAppsService.state.loadedApps.length === 0) return null;
+    if (this.platformAppsService.enabledApps.length === 0) return null;
 
-    return this.platformAppsService.state.loadedApps.find(app => app.unpacked);
+    return this.platformAppsService.enabledApps.find(app => app.unpacked);
   }
 
   loading = false;
@@ -82,7 +82,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
   }
 
   unloadApp() {
-    this.platformAppsService.unloadApps();
+    this.platformAppsService.unloadApp(this.currentlyLoadedUnpackedApp);
   }
 
 }

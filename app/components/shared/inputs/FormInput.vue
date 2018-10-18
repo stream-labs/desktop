@@ -3,7 +3,7 @@
     v-if="options.type"
     :is="componentName"
     :value="value"
-    @input="value => $emit('input', value)"
+    @input="(value, event) => emitInput(value, event)"
     :metadata="options"
   />
 </template>

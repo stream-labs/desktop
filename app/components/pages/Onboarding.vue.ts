@@ -10,6 +10,7 @@ import SceneCollectionsImport from './onboarding_steps/SceneCollectionsImport.vu
 import SelectWidgets from './onboarding_steps/SelectWidgets.vue';
 import { OnboardingService } from '../../services/onboarding';
 import { Inject } from '../../util/injector';
+import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
 
 @Component({
   components: {
@@ -20,7 +21,8 @@ import { Inject } from '../../util/injector';
     OptimizeC,
     SuccessfullyImported,
     SelectWidgets,
-    SceneCollectionsImport
+    SceneCollectionsImport,
+    OptimizeBrandDevice
   }
 })
 export default class Onboarding extends Vue {

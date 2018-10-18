@@ -6,7 +6,7 @@ import {
   TObsFormData,
   IObsListInput
 } from 'components/obs/inputs/ObsInput';
-import { nodeObs } from '../obs-api';
+import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
@@ -112,15 +112,17 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories = nodeObs.OBS_settings_getListCategories();
+    let categories = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories
       .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
 
-    // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
-
-    if (this.platformAppsService.state.devMode) {
+    if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
+      categories = categories.concat(['Experimental']);
+    }
+
+    if (this.platformAppsService.state.loadedApps.filter(app => !app.unpacked).length > 0) {
+      categories = categories.concat('Installed Apps');
     }
 
     return categories;
@@ -128,7 +130,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = nodeObs.OBS_settings_getSettings(categoryName);
+    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -332,7 +334,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       });
     }
 
-    nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
+    obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(
       SettingsService.convertFormDataToState({ [categoryName]: settingsData })
     );

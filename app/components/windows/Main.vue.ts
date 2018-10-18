@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
@@ -32,6 +33,7 @@ import electron from 'electron';
   components: {
     TitleBar,
     TopNav,
+    AppsNav,
     Studio,
     Dashboard,
     BrowseOverlays,
@@ -94,7 +96,7 @@ export default class Main extends Vue {
   }
 
   get platformApps() {
-    return this.platformAppsService.state.loadedApps;
+    return this.platformAppsService.enabledApps;
   }
 
   isAppPersistent(appId: string) {

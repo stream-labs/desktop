@@ -15,7 +15,6 @@ import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
 import { NotificationsService } from './services/notifications';
-import { ObsApiService } from './services/obs-api';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
@@ -92,6 +91,7 @@ import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -136,7 +136,6 @@ export class ServicesManager extends Service {
     KeyListenerService,
     NavigationService,
     NotificationsService,
-    ObsApiService,
     OnboardingService,
     PerformanceService,
     PerformanceMonitorService,
@@ -213,7 +212,8 @@ export class ServicesManager extends Service {
     IncrementalRolloutService,
     AnnouncementsService,
     MediaShareService,
-    ChatbotWidgetService
+    ChatbotWidgetService,
+    BrandDeviceService
   };
 
   private instances: Dictionary<Service> = {};

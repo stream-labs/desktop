@@ -6,6 +6,7 @@ import { Inject } from 'util/injector';
 import Util from 'services/utils';
 import ModalLayout from 'components/ModalLayout.vue';
 import { PlatformAppsService } from 'services/platform-apps';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   components: { PlatformAppWebview, ModalLayout }
@@ -14,6 +15,19 @@ export default class PlatformAppPopOut extends Vue {
 
   @Inject() windowsService: WindowsService;
   @Inject() platformAppsService: PlatformAppsService;
+  unloadSub: Subscription;
+
+  mounted() {
+    this.platformAppsService.appUnload.subscribe(appId => {
+      if (appId === this.params.appId) {
+        this.windowsService.closeOneOffWindow(this.windowId);
+      }
+    });
+  }
+
+  get windowId() {
+    return Util.getCurrentUrlParams().windowId;
+  }
 
   get title() {
     const app = this.platformAppsService.getApp(this.params.appId);
@@ -21,8 +35,7 @@ export default class PlatformAppPopOut extends Vue {
   }
 
   get params() {
-    const windowId = Util.getCurrentUrlParams().windowId;
-    return this.windowsService.getWindowOptions(windowId);
+    return this.windowsService.getWindowOptions(this.windowId);
   }
 
   get appId() {
@@ -31,6 +44,10 @@ export default class PlatformAppPopOut extends Vue {
 
   get pageSlot() {
     return this.params.pageSlot;
+  }
+
+  destroyed() {
+    this.unloadSub.unsubscribe();
   }
 
 }

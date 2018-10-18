@@ -99,18 +99,6 @@ export default class TopNav extends Vue {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
 
-  get topNavApps() {
-    return this.platformAppsService.state.loadedApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
-        return page.slot === EAppPageSlot.TopNav;
-      });
-    });
-  }
-
-  navigateApp(appId: string) {
-    this.navigationService.navigate('PlatformAppContainer', { appId });
-  }
-
   get isDevMode() {
     return Utils.isDevMode();
   }

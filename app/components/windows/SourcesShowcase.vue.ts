@@ -127,7 +127,7 @@ export default class SourcesShowcase extends Vue {
     appId: string;
     source: IAppSource;
   }[] {
-    return this.platformAppsService.state.loadedApps.reduce((sources, app) => {
+    return this.platformAppsService.enabledApps.reduce((sources, app) => {
       if (app.manifest.sources) {
         app.manifest.sources.forEach(source => {
           sources.push({

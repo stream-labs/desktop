@@ -4,6 +4,7 @@ import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
+import { AudioService } from 'services/audio';
 
 interface ISourceFlags {
   audio: boolean;
@@ -23,6 +24,8 @@ interface ISource {
   flags: ISourceFlags;
   size: ISourceSize;
   appId?: string;
+  muted?: boolean;
+  volume?: number;
 }
 
 export class SourcesModule extends Module {
@@ -33,6 +36,7 @@ export class SourcesModule extends Module {
   @Inject() private sourcesService: SourcesService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private scenesService: ScenesService;
+  @Inject() private audioService: AudioService;
 
   constructor() {
     super();
@@ -152,6 +156,14 @@ export class SourcesModule extends Module {
     const source = this.sourcesService.getSource(patch.id);
 
     if (patch.name) source.setName(patch.name);
+
+    if (patch.muted != null) {
+      this.audioService.getSource(patch.id).setMuted(patch.muted);
+    }
+
+    if (patch.volume != null) {
+      this.audioService.getSource(patch.id).setDeflection(patch.volume);
+    }
   }
 
   @apiMethod()
@@ -196,6 +208,12 @@ export class SourcesModule extends Module {
 
     if (source.getPropertiesManagerType() === 'platformApp') {
       serialized.appId = source.getPropertiesManagerSettings().appId;
+    }
+
+    if (source.audio) {
+      const audioSource = this.audioService.getSource(source.sourceId);
+      serialized.volume = audioSource.fader.deflection;
+      serialized.muted = audioSource.muted;
     }
 
     return serialized;

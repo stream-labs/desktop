@@ -55,7 +55,8 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
-  TopNav = 'top_nav'
+  TopNav = 'top_nav',
+  Chat = 'chat'
 }
 
 interface IAppPage {
@@ -102,12 +103,14 @@ export interface ILoadedApp {
   appPath?: string;
   appUrl?: string;
   devPort?: number;
+  icon?: string;
+  enabled: boolean;
 }
 
 interface IPlatformAppServiceState {
   devMode: boolean;
-  storeVisible: boolean;
   loadedApps: ILoadedApp[];
+  storeVisible: boolean;
 }
 
 interface ISubscriptionResponse {
@@ -131,8 +134,8 @@ export class PlatformAppsService extends
 
   static initialState: IPlatformAppServiceState = {
     devMode: false,
-    storeVisible: false,
-    loadedApps: []
+    loadedApps: [],
+    storeVisible: false
   };
 
   appLoad = new Subject<ILoadedApp>();
@@ -165,7 +168,6 @@ export class PlatformAppsService extends
 
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
-
       if (data.appPath && data.appToken) {
         this.installUnpackedApp(data.appPath, data.appToken);
       }
@@ -185,6 +187,7 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
+      .catch(() => []);
   }
 
   /**
@@ -194,14 +197,16 @@ export class PlatformAppsService extends
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
-      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
+      const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
         appUrl: app.cdn_url,
         appToken: app.app_token,
-        poppedOutSlots: []
+        poppedOutSlots: [],
+        icon: app.icon,
+        enabled: !unpackedVersionLoaded
       });
     });
   }
@@ -253,9 +258,10 @@ export class PlatformAppsService extends
 
     this.devServer = new DevServer(appPath, DEV_PORT);
 
-    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id)) {
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id && !loadedApp.unpacked)) {
       // has prod app with same id
-      this.REMOVE_APP(id);
+      // disable prod app
+      this.SET_PROD_APP_ENABLED(id, false);
     }
 
     this.addApp({
@@ -265,12 +271,23 @@ export class PlatformAppsService extends
       appPath,
       appToken,
       devPort: DEV_PORT,
-      poppedOutSlots: []
+      poppedOutSlots: [],
+      enabled: true
     });
+  }
+
+  get enabledApps() {
+    return this.state.loadedApps.filter(app => app.enabled);
+  }
+
+  get productionApps() {
+    return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked)) return;
+
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
@@ -369,31 +386,32 @@ export class PlatformAppsService extends
   }
 
   unloadApps() {
-    this.state.loadedApps.forEach(app => {
-      this.REMOVE_APP(app.id);
-      this.appUnload.next(app.id);
-    });
-    localStorage.removeItem(this.localStorageKey);
-    // TODO: navigate to live if on that topnav tab
+    this.state.loadedApps.forEach(app => this.unloadApp(app));
+  }
 
-    if (this.devServer) {
-      this.devServer.stopListening();
-      this.devServer = null;
+  unloadApp(app: ILoadedApp) {
+    this.REMOVE_APP(app.id);
+    if (app.unpacked) {
+      localStorage.removeItem(this.localStorageKey);
+      if (this.devServer) {
+        this.devServer.stopListening();
+        this.devServer = null;
+      }
     }
-
-    // reload prod apps in case it has same id
-    // mostly for debugging, can remove
-    this.installProductionApps();
+    this.appUnload.next(app.id);
   }
 
   async reloadApp(appId: string) {
-    // TODO  Support Multiple Apps
     const app = this.getApp(appId);
 
+    if (!app.unpacked) {
+      this.appReload.next(appId);
+      return;
+    }
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
-      this.unloadApps();
+      this.unloadApp(app);
       return 'Error: manifest.json is missing!';
     }
 
@@ -423,7 +441,8 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
-      .then(json => json.id_hash);
+      .then(json => json.id_hash)
+      .catch(() => null);
   }
 
   private getIsDevMode(): Promise<boolean> {
@@ -436,7 +455,8 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
-      .then(json => json.dev_mode);
+      .then(json => json.dev_mode)
+      .catch(() => false);
   }
 
   private loadManifestFromDisk(manifestPath: string): Promise<string> {
@@ -502,8 +522,6 @@ export class PlatformAppsService extends
         }
 
         if (details.resourceType === 'script') {
-          console.log('got details', details);
-          console.log('GOT REQUEST', details.url);
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
@@ -566,13 +584,21 @@ export class PlatformAppsService extends
     return !!page.persistent;
   }
 
-  getPageUrlForSource(appId: string, appSourceId: string) {
+  getPageUrlForSource(appId: string, appSourceId: string, settings = '') {
     const app = this.getApp(appId);
 
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
-    return this.getPageUrl(appId, source.file);
+    let url = this.getPageUrl(appId, source.file);
+
+    if (settings) {
+      url = `${url}&settings=${encodeURIComponent(settings)}`;
+    }
+
+    url = `${url}&source=true`;
+
+    return url;
   }
 
   getPageUrl(appId: string, page: string) {
@@ -631,13 +657,22 @@ export class PlatformAppsService extends
     return { width: 600, height: 500 };
   }
 
+  getProductionApps() {
+    return this.state.loadedApps.filter(app => !app.unpacked);
+  }
+
   getApp(appId: string) : ILoadedApp {
+    // edge case for when there are 2 apps with same id
+    // when one is unpacked and one is prod
+    // generally we want to do actions with enabled one first
+    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled === true);
+    if (enabledApp) return enabledApp;
     return this.state.loadedApps.find(app => app.id === appId);
   }
 
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
     const app = this.getApp(appId);
-    if (!app) return;
+    if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
 
@@ -660,6 +695,18 @@ export class PlatformAppsService extends
     });
   }
 
+  setEnabled(appId: string, enabling: boolean) {
+    const app = this.getApp(appId);
+    if (app.enabled === enabling) return;
+
+    if (enabling) {
+      this.appLoad.next(app);
+    } else {
+      this.appUnload.next(appId);
+    }
+    this.SET_PROD_APP_ENABLED(appId, enabling);
+  }
+
   /**
    * Replace for now
    * @param app the app
@@ -671,7 +718,14 @@ export class PlatformAppsService extends
 
   @mutation()
   private REMOVE_APP(appId: string) {
-    this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
+    // edge case for when there are 2 apps with same id
+    // when one is unpacked and one is prod
+    // generally we want to do actions with enabled one first
+    if (this.state.loadedApps.find(app => app.id === appId && app.enabled)) {
+      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId || !app.enabled);
+    } else {
+      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
+    }
   }
 
   @mutation()
@@ -711,4 +765,12 @@ export class PlatformAppsService extends
     this.state.storeVisible = visibility;
   }
 
+  @mutation()
+  private SET_PROD_APP_ENABLED(appId: string, enabled: boolean) {
+    this.state.loadedApps.forEach(app => {
+      if (app.id === appId && !app.unpacked) {
+        app.enabled = enabled;
+      }
+    });
+  }
 }

@@ -1,5 +1,5 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { ObsApiService, EOutputCode } from 'services/obs-api';
+import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import moment from 'moment';
 import { padStart } from 'lodash';
@@ -36,13 +36,12 @@ enum EOBSOutputSignal {
 interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
   signal: EOBSOutputSignal;
-  code: EOutputCode;
+  code: obs.EOutputCode;
   error: string;
 }
 
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
-  @Inject() obsApiService: ObsApiService;
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -66,7 +65,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   };
 
   init() {
-    this.obsApiService.nodeObs.OBS_service_connectOutputSignals(
+    obs.NodeObs.OBS_service_connectOutputSignals(
       (info: IOBSOutputSignalInfo) => {
         this.handleOBSOutputSignal(info);
       }
@@ -110,7 +109,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.powerSaveId = electron.remote.powerSaveBlocker.start(
         'prevent-display-sleep'
       );
-      this.obsApiService.nodeObs.OBS_service_startStreaming();
+      obs.NodeObs.OBS_service_startStreaming();
 
       const recordWhenStreaming = this.settingsService.state.General
         .RecordWhenStreaming;
@@ -139,7 +138,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      this.obsApiService.nodeObs.OBS_service_stopStreaming(false);
+      obs.NodeObs.OBS_service_stopStreaming(false);
 
       const keepRecording = this.settingsService.state.General
         .KeepRecordingWhenStreamStops;
@@ -156,7 +155,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      this.obsApiService.nodeObs.OBS_service_stopStreaming(true);
+      obs.NodeObs.OBS_service_stopStreaming(true);
       return;
     }
   }
@@ -177,12 +176,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      this.obsApiService.nodeObs.OBS_service_stopRecording();
+      obs.NodeObs.OBS_service_stopRecording();
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      this.obsApiService.nodeObs.OBS_service_startRecording();
+      obs.NodeObs.OBS_service_startRecording();
       return;
     }
   }
@@ -329,26 +328,26 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (info.code) {
       let errorText = '';
 
-      if (info.code === EOutputCode.BadPath) {
+      if (info.code === obs.EOutputCode.BadPath) {
         errorText =
           $t('Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.');
-      } else if (info.code === EOutputCode.ConnectFailed) {
+      } else if (info.code === obs.EOutputCode.ConnectFailed) {
         errorText =
           $t('Failed to connect to the streaming server.  Please check your internet connection.');
-      } else if (info.code === EOutputCode.Disconnected) {
+      } else if (info.code === obs.EOutputCode.Disconnected) {
         errorText =
           $t('Disconnected from the streaming server.  Please check your internet connection.');
-      } else if (info.code === EOutputCode.InvalidStream) {
+      } else if (info.code === obs.EOutputCode.InvalidStream) {
         errorText =
           $t('Could not access the specified channel or stream key, please double-check your stream key.  ') +
           $t('If it is correct, there may be a problem connecting to the server.');
-      } else if (info.code === EOutputCode.NoSpace) {
+      } else if (info.code === obs.EOutputCode.NoSpace) {
         errorText = $t('There is not sufficient disk space to continue recording.');
-      } else if (info.code === EOutputCode.Unsupported) {
+      } else if (info.code === obs.EOutputCode.Unsupported) {
         errorText =
           $t('The output format is either unsupported or does not support more than one audio track.  ') +
           $t('Please check your settings and try again.');
-      } else if (info.code === EOutputCode.Error) {
+      } else if (info.code === obs.EOutputCode.Error) {
         errorText = $t('An unexpected error occurred:') + info.error;
       }
 
