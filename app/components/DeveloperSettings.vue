@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="appDeveloperMode" class="section">
+    <div class="section">
       <AppPlatformDeveloperSettings />
     </div>
 

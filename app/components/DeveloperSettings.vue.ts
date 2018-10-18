@@ -6,7 +6,6 @@ import ObsTextInput from './obs/inputs/ObsTextInput.vue';
 import { ITcpServerServiceApi, ITcpServersSettings } from 'services/tcp-server';
 import { ISettingsSubCategory } from 'services/settings';
 import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
-import { PlatformAppsService } from 'services/platform-apps';
 
 @Component({
   components: {
@@ -17,8 +16,8 @@ import { PlatformAppsService } from 'services/platform-apps';
 })
 export default class DeveloperSettings extends Vue {
 
-  @Inject() tcpServerService: ITcpServerServiceApi;
-  @Inject() platformAppsService: PlatformAppsService;
+  @Inject()
+  tcpServerService: ITcpServerServiceApi;
 
   settingsFormData: ISettingsSubCategory[] = null;
 
@@ -44,9 +43,6 @@ export default class DeveloperSettings extends Vue {
     this.tcpServerService.listen();
   }
 
-  get appDeveloperMode() {
-    return this.platformAppsService.state.devMode;
-  }
 
   restoreDefaults() {
     this.tcpServerService.setSettings(this.tcpServerService.getDefaultSettings());
