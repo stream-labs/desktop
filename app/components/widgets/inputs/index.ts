@@ -18,7 +18,7 @@ export enum EWInput {
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
-  filter?: 'in' | 'out'
+  filter?: 'in' | 'out' | 'text'
 }
 
 export const metadata = {

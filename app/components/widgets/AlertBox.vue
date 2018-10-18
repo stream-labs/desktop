@@ -91,10 +91,10 @@
     <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.sound.volume" :metadata="{ min: 0, max: 100 }" />
   </validated-form>
   <validated-form slot="animation-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Show Animation')" type="animation" v-model="selectedVariation.settings.showAnimation" />
-    <v-form-group :title="$t('Hide Animation')" type="animation" v-model="selectedVariation.settings.hideAnimation" />
+    <v-form-group :title="$t('Show Animation')" type="animation" v-model="selectedVariation.settings.showAnimation" :metadata="{ filter: 'in' }" />
+    <v-form-group :title="$t('Hide Animation')" type="animation" v-model="selectedVariation.settings.hideAnimation" :metadata="{ filter: 'out' }" />
     <v-form-group :title="$t('Alert Duration')" type="slider" v-model="selectedVariation.settings.duration" :metadata="{ min: 2, max: 300 }" />
-    <v-form-group :title="$t('Text Animation')" type="dropdown" v-model="selectedVariation.settings.text.animation" v-if="selectedVariation.settings.text" />
+    <v-form-group :title="$t('Text Animation')" type="animation" v-model="selectedVariation.settings.text.animation"  :metadata="{ filter: 'text' }" v-if="selectedVariation.settings.text" />
     <v-form-group :title="$t('Text Delay')" type="slider" v-model="selectedVariation.settings.textDelay" :metadata="{ min: 0, max: 60 }" />
   </validated-form>
   <validated-form slot="alert-properties" @input="save()" v-if="selectedVariation">
@@ -102,7 +102,9 @@
     <v-form-group :title="$t('Min. Amount to Show in Recent Events')" type="number" v-model="minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
       <v-form-group :title="$t('Variation Trigger')" type="dropdown" v-model="selectedVariation.condition" />
-      <v-form-group :title="$t('Variation Frequency')" type="dropdown" v-model="selectedVariation.conditionData" v-if="selectedVariation.condition === 'RANDOM'" />
+      <v-form-group :title="$t('Variation Frequency')" v-if="selectedVariation.condition === 'RANDOM'">
+        <frequency-input v-model="selectedVariation.conditionData" />
+      </v-form-group>
       <v-form-group :title="$t('Variation Amount')" type="number" v-model="selectedVariation.conditionData" v-if="selectedVariation.condition !== 'RANDOM'" />
     </div>
   </validated-form>
