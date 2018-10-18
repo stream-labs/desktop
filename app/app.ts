@@ -121,7 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
       missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]): string  => {
         if (values[0] && typeof values[0].fallback === 'string') {
           if (!isProduction) {
-            console.warn(`i18n missing key - ${key}: ${values[0].fallback}`);
+            // beware: enable following line only when investigating around i18n keys!
+            // this adds huge amount of lines to console.
+
+            // console.warn(`i18n missing key - ${key}: ${values[0].fallback}`);
           }
           return values[0].fallback;
         }
