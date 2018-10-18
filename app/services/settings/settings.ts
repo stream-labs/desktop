@@ -116,7 +116,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     categories = categories
       .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
 
-    if (this.advancedSettingEnabled()) {
+    if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
       categories = categories.concat(['Experimental']);
     }
