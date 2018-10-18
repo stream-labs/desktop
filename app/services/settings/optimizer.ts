@@ -24,7 +24,7 @@ export type OptimizeSettings = {
     audioBitrate?: string
     quality?: string
     colorSpace?: string
-    fpsType?: 'Common FPS Values'| 'Integer FPS Value'| 'Fractional FPS Value'
+    fpsType?: 'Common FPS Values' | 'Integer FPS Value' | 'Fractional FPS Value'
     fpsCommon?: string
     encoder?: 'obs_x264' | 'obs_qsv11'
     keyframeInterval?: number
