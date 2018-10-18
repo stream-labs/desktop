@@ -18,7 +18,7 @@
         v-for="app in platformApps"
         :key="app.id"
         :style="appStyles(app.id)"
-        v-if="(page === 'PlatformAppContainer') || isAppPersistent(app.id)"
+        v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
         :params="{ appId: app.id, poppedOut: isAppPoppedOut(app.id) }" />
       <component
         class="main-page-container"
