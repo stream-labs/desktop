@@ -277,7 +277,7 @@ function startApp() {
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
-  }  
+  }
 }
 
 // We use a special cache directory for running tests
