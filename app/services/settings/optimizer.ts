@@ -3,36 +3,36 @@ import { ISettingsSubCategory } from './settings-api';
 
 export enum OptimizationKey {
     outputMode = 'outputMode',
-    rateControl = 'rateControl',
-    videoBitrate = 'videoBitrate',
-    audioBitrate = 'audioBitrate',
     quality = 'quality',
     colorSpace = 'colorSpace',
     fpsType = 'fpsType',
     fpsCommon = 'fpsCommon',
     encoder = 'encoder',
+    rateControl = 'rateControl',
+    videoBitrate = 'videoBitrate',
     keyframeInterval = 'keyframeInterval',
     encoderPreset = 'encoderPreset',
     profile = 'profile',
     tune = 'tune',
+    audioBitrate = 'audioBitrate',
     audioTrackIndex = 'audioTrackIndex',
 }
 
 // OptimizationKey のキーと完全対応していること
 export type OptimizeSettings = {
     outputMode?: 'Simple' | 'Advanced'
-    rateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
-    videoBitrate?: number
-    audioBitrate?: string
     quality?: string
-    colorSpace?: string
+    colorSpace?: '601' | '709'
     fpsType?: 'Common FPS Values' | 'Integer FPS Value' | 'Fractional FPS Value'
     fpsCommon?: string
     encoder?: 'obs_x264' | 'obs_qsv11'
+    rateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
+    videoBitrate?: number
     keyframeInterval?: number
     encoderPreset?: string
-    profile?: string
+    profile?: 'high' | 'main' | 'baseline'
     tune?: string
+    audioBitrate?: string
     audioTrackIndex?: string
 };
 
@@ -42,17 +42,17 @@ enum CategoryName {
     advanced = 'Advanced',
 }
 
-export type DefinitionParam = {
+export type KeyDescription = {
     key: OptimizationKey,
     category: CategoryName,
     subCategory: string,
     setting: string,
     label?: string,
     lookupValueName?: boolean,
-    dependents?: { value: any, params: DefinitionParam[] }[],
+    dependents?: { value: any, params: KeyDescription[] }[],
 };
 
-const definitionParams: DefinitionParam[] = [
+const AllKeyDescriptions: KeyDescription[] = [
     {
         key: OptimizationKey.outputMode,
         category: CategoryName.output,
@@ -206,17 +206,23 @@ class OptKeyProperty {
     private _label: string;
     private lookupValueName: boolean;
 
-    constructor(options: DefinitionParam) {
-        this.key = options.key;
-        this.category = options.category;
-        this.subCategory = options.subCategory;
-        this.setting = options.setting;
-        if (options.label) {
-            this._label = options.label;
+    constructor(keyDescription: KeyDescription) {
+        this.key = keyDescription.key;
+        this.category = keyDescription.category;
+        this.subCategory = keyDescription.subCategory;
+        this.setting = keyDescription.setting;
+        if (keyDescription.label) {
+            this._label = keyDescription.label;
         } else {
-            this._label = i18nPath('settings', options.category, options.subCategory, options.setting, 'name');
+            this._label = i18nPath(
+                'settings',
+                keyDescription.category,
+                keyDescription.subCategory,
+                keyDescription.setting,
+                'name'
+            );
         }
-        this.lookupValueName = options.lookupValueName;
+        this.lookupValueName = keyDescription.lookupValueName;
     }
 
     get label(): string {
@@ -224,7 +230,7 @@ class OptKeyProperty {
         if (t !== this._label) {
             return t;
         }
-        console.log(`label '${this._label}' not found for ${this.key}`);
+        console.warn(`label '${this._label}' not found for ${this.key}`);
         return this.setting;
     }
 
@@ -251,27 +257,26 @@ type OptimizeItem = {
     newValue?: string
 };
 
-function* iterateDefinitions(params: DefinitionParam[]): IterableIterator<DefinitionParam> {
-    for (const item of params) {
+function* iterateAllKeyDescriptions(keyDescriptionis: KeyDescription[]): IterableIterator<KeyDescription> {
+    for (const item of keyDescriptionis) {
         yield item;
         if (item.dependents) {
             for (const keyParams of item.dependents) {
-                for (const prop of iterateDefinitions(keyParams.params)) {
-                    yield prop;
-                }
+                yield* iterateAllKeyDescriptions(keyParams.params);
             }
         }
     }
 }
 
-function isDependValues(values: OptimizeSettings, items: DefinitionParam[]): boolean {
+// items の中のいずれかの要素を values が保持しているかを確認する
+function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boolean {
     for (const item of items) {
         if (values.hasOwnProperty(item.key)) {
             return true;
         }
         if (item.dependents) {
             for (const dependent of item.dependents) {
-                if (isDependValues(values, dependent.params)) {
+                if (isDependOnItems(values, dependent.params)) {
                     return true;
                 }
             }
@@ -280,8 +285,8 @@ function isDependValues(values: OptimizeSettings, items: DefinitionParam[]): boo
     return false;
 }
 
-function validateDefinitionParams(params: DefinitionParam[]) {
-    const actual = new Set<string>(Array.from(iterateDefinitions(params)).map(d => d.key));
+function validateKeyDescriptions(params: KeyDescription[]) {
+    const actual = new Set<string>(Array.from(iterateAllKeyDescriptions(params)).map(d => d.key));
     const missing = [];
     for (const key of Object.values(OptimizationKey)) {
         if (!actual.has(key)) {
@@ -289,10 +294,10 @@ function validateDefinitionParams(params: DefinitionParam[]) {
         }
     }
     if (missing.length > 0) {
-        console.error(`niconico-optimization: : missing keys in definitionParams: ${missing}`);
+        console.error(`niconico-optimization: : missing keys in keyDescriptions: ${missing}`);
     }
 }
-validateDefinitionParams(definitionParams);
+validateKeyDescriptions(AllKeyDescriptions);
 
 export interface ISettingsAccessor {
     getSettingsFormData(categoryName: string): ISettingsSubCategory[];
@@ -301,13 +306,14 @@ export interface ISettingsAccessor {
     setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
 }
 
-export class Optimizer {
+/**
+ * KeyDescription を通して設定値にアクセスする。
+ */
+export class SettingsKeyAccessor {
     private accessor: ISettingsAccessor;
-    private definitions: DefinitionParam[];
 
     constructor(accessor: ISettingsAccessor) {
         this.accessor = accessor;
-        this.definitions = definitionParams;
     }
 
     private categoryCache = new Map<CategoryName, ISettingsSubCategory[]>();
@@ -328,14 +334,14 @@ export class Optimizer {
         }
     }
 
-    private writeBackCategory(category: CategoryName) {
+    writeBackCategory(category: CategoryName) {
         if (this.modifiedCategories.has(category)) {
             this.updateCategory(category);
             this.modifiedCategories.delete(category);
         }
     }
 
-    private writeBackAllCategories() {
+    writeBackAllCategories() {
         for (const category of this.modifiedCategories) {
             this.updateCategory(category);
         }
@@ -356,15 +362,15 @@ export class Optimizer {
         this.categoryCache.clear();
     }
 
-    private findValue(i: DefinitionParam) {
+    private findValue(i: KeyDescription) {
         return this.accessor.findSettingValue(this.getCategory(i.category), i.subCategory, i.setting);
     }
 
-    private findSetting(i: DefinitionParam) {
+    private findSetting(i: KeyDescription) {
         return this.accessor.findSetting(this.getCategory(i.category), i.subCategory, i.setting);
     }
 
-    private setValue(item: DefinitionParam, value: any) {
+    setValue(item: KeyDescription, value: any) {
         console.log(`setValue: ${item.category}/${item.key}: ${value}`);
         const setting = this.findSetting(item);
         if (setting) {
@@ -400,23 +406,27 @@ export class Optimizer {
         }
     }
 
-    private *getValues(definitions: DefinitionParam[]): IterableIterator<OptimizeSettings> {
-        for (const item of definitions) {
-            let changed = false;
-            const value = this.findValue(item);
-            yield { [item.key]: value };
+    /**
+     * KeyDescriptions を再帰的に渡り歩いて f を呼び出す
+     * @param keyDescriptions 
+     * @param f 
+     */
+    *travarseKeyDescriptions<T>(keyDescriptions: KeyDescription[], f: (d: KeyDescription) => T): IterableIterator<T> {
+        for (const item of keyDescriptions) {
+            yield f(item);
             if (item.dependents) {
                 // cacheオブジェクトの参照ではその後の変更で書き換わってしまうので、元の値をディープコピーして保存する
                 let lastCategorySettings = JSON.parse(JSON.stringify(this.getCategory(item.category)));
+
+                let changed = false;
+                const value = this.findValue(item);
 
                 for (const dependent of item.dependents) {
                     this.setValue(item, dependent.value);
                     if (value !== dependent.value) {
                         changed = true;
                     }
-                    for (const current of this.getValues(dependent.params)) {
-                        yield current;
-                    }
+                    yield* this.travarseKeyDescriptions(dependent.params, f);
                 }
 
                 if (changed) {
@@ -431,13 +441,44 @@ export class Optimizer {
         }
     }
 
-    private setValues(values: OptimizeSettings, definitions: DefinitionParam[]) {
-        for (const item of definitions) {
+    *getValues(keyDescriptions: KeyDescription[]): IterableIterator<OptimizeSettings> {
+        yield* this.travarseKeyDescriptions(keyDescriptions, (item: KeyDescription): OptimizeSettings => {
+
+            /* DEBUG
+            const setting = this.findSetting(item);
+            if (setting && 'options' in setting && Array.isArray(setting.options)) {
+                console.log(
+                    `${item.key}: availableOptions: `,
+                    JSON.stringify(setting.options.map((v: any) => v.value), null, 2)
+                );
+            } // */
+
+            return { [item.key]: this.findValue(item) };
+        });
+    }
+
+    *getSettings(keyDescriptions: KeyDescription[]): IterableIterator<[OptimizationKey, any]> {
+        yield* this.travarseKeyDescriptions(keyDescriptions, (item: KeyDescription): [OptimizationKey, any] => {
+            const setting = this.findSetting(item);
+            return [item.key, setting];
+        });
+    }
+    getSetting(key: OptimizationKey, keyDescriptions: KeyDescription[]): any {
+        for (const kv of this.getSettings(keyDescriptions)) {
+            if (kv[0] === key) {
+                return kv[1];
+            }
+        }
+        return undefined;
+    }
+
+    setValues(values: OptimizeSettings, keyDescriptions: KeyDescription[]) {
+        for (const item of keyDescriptions) {
             const key = item.key;
             if (item.dependents) {
                 let value = this.findValue(item);
                 for (const dependent of item.dependents) {
-                    if (isDependValues(values, dependent.params)) {
+                    if (isDependOnItems(values, dependent.params)) {
                         this.setValue(item, dependent.value);
                         this.setValues(values, dependent.params);
                     }
@@ -453,9 +494,19 @@ export class Optimizer {
             }
         }
     }
+}
+
+export class Optimizer {
+    private accessor: SettingsKeyAccessor;
+    private keyDescriptions: KeyDescription[];
+
+    constructor(accessor: SettingsKeyAccessor, keysNeeded: OptimizeSettings) {
+        this.accessor = accessor;
+        this.keyDescriptions = AllKeyDescriptions;
+    }
 
     getCurrentSettings(): OptimizeSettings {
-        return Object.assign({}, ...this.getValues(this.definitions));
+        return Object.assign({}, ...this.accessor.getValues(this.keyDescriptions));
     }
 
     /**
@@ -480,15 +531,15 @@ export class Optimizer {
         yield* Optimizer.getDifference(this.getCurrentSettings(), expect);
     }
 
-    optimize(best: OptimizeSettings) {
-        this.setValues(best, this.definitions);
-        this.writeBackAllCategories();
+    optimize(optimized: OptimizeSettings) {
+        this.accessor.setValues(optimized, this.keyDescriptions);
+        this.accessor.writeBackAllCategories();
     }
 
     optimizeInfo(current: OptimizeSettings, optimized: OptimizeSettings): [CategoryName, OptimizeItem[]][] {
         const map = new Map<CategoryName, OptimizeItem[]>();
-        for (const definition of iterateDefinitions(this.definitions)) {
-            const opt = new OptKeyProperty(definition);
+        for (const keyDescription of iterateAllKeyDescriptions(this.keyDescriptions)) {
+            const opt = new OptKeyProperty(keyDescription);
             const key = opt.key;
             const category = opt.category;
             let item;
