@@ -86,7 +86,7 @@
       <v-form-group :title="$t('Enable TTS?')" type="bool" v-model="selectedVariation.settings.tts.enabled" />
       <v-form-group :title="$t('Min. Amount to Read')" type="number" v-model="selectedVariation.settings.tts.minAmount" />
       <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.tts.volume" :metadata="{ min: 0, max: 100 }" />
-      <v-form-group :title="$t('Language')" type="dropdown" v-model="selectedVariation.settings.tts.language" />
+      <v-form-group :title="$t('Language')" type="list" v-model="selectedVariation.settings.tts.language" />
       <v-form-group :title="$t('Spam Security')" type="slider" v-model="selectedVariation.settings.tts.security" />
     </div>
   </validated-form>
@@ -105,7 +105,7 @@
     <v-form-group :title="$t('Min. Amount to Trigger Alert')" type="number" v-model="minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
     <v-form-group :title="$t('Min. Amount to Show in Recent Events')" type="number" v-model="minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
-      <v-form-group :title="$t('Variation Trigger')" type="dropdown" v-model="selectedVariation.condition" />
+      <v-form-group :title="$t('Variation Trigger')" type="list" v-model="selectedVariation.condition" />
       <v-form-group :title="$t('Variation Frequency')" v-if="selectedVariation.condition === 'RANDOM'">
         <frequency-input v-model="selectedVariation.conditionData" />
       </v-form-group>
