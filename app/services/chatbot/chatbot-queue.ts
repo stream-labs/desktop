@@ -58,7 +58,7 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   // sockets
   //
   connectToQueueSocketChannels() {
-    let socket = io.connect(this.socketUrl);
+    let socket = io.connect(this.socketUrl, { transports: ['websocket'] });
     socket.emit('authenticate', { token: this.chatbotBaseApiService.state.socketToken });
 
     socket.on('queue.open', (response: IQueueStateResponse) => {
