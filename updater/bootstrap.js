@@ -34,6 +34,13 @@ const mkdir = util.promisify(fs.mkdir);
  * for safety. */
 let statusWindow = null;
 
+function destroyStatusWindow() {
+    if (statusWindow) {
+        statusWindow.close();
+        statusWindow = null;
+    }
+}
+
 async function mkdirMaybe(directory) {
     try {
         await mkdir(directory);
@@ -226,6 +233,7 @@ async function entry(info) {
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
     } catch (error) {
+        console.log('Error when spawning status window!');
         if (statusWindow) statusWindow.close();
         statusWindow = null;
     }
@@ -295,14 +303,16 @@ async function entry(info) {
         shell: true
     });
 
-    if (statusWindow) statusWindow.close();
     return true;
 }
 
 module.exports = async (info) => {
-    return entry(info).catch((error) => {
+    return entry(info).then(status => {
+        destroyStatusWindow();
+        return Promise.resolve(status);
+    }).catch((error) => {
         console.log(error);
-        if (statusWindow) statusWindow.close();
+        destroyStatusWindow();
         return Promise.resolve(false);
     });
 }

@@ -123,10 +123,10 @@ function startApp() {
     crashReporter.start({
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
-      ignoreSystemCrashHandler: true,
       submitURL:
-        'https://sentry.io/api/1283430/minidump/' +
-        '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+        'https://streamlabs.sp.backtrace.io:6098/post?' +
+        'format=minidump&' +
+        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
       extra: {
         version: pjson.version,
         processType: 'main'
@@ -277,7 +277,7 @@ function startApp() {
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
-  }  
+  }
 }
 
 // We use a special cache directory for running tests
@@ -288,28 +288,28 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
-// This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(argv => {
-  // Check for protocol links in the argv of the other process
-  argv.forEach(arg => {
-    if (arg.match(/^slobs:\/\//)) {
-      mainWindow.send('protocolLink', arg);
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', (event, argv) => {
+    // Check for protocol links in the argv of the other process
+    argv.forEach(arg => {
+      if (arg.match(/^slobs:\/\//)) {
+        mainWindow.send('protocolLink', arg);
+      }
+    });
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+
+      mainWindow.focus();
     }
   });
-
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
-    }
-
-    mainWindow.focus();
-  }
-});
-
-if (shouldQuit) {
+} else {
   app.exit();
 }
+
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
