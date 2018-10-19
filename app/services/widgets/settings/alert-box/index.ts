@@ -113,6 +113,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private reshapeVariation(setting: any): IAlertBoxVariation {
+    const imgHref = setting.image_href = '/images/gallery/default.gif' ?
+      'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' : setting.image_href;
     return {
       condition: null,
       conditionData: null,
@@ -127,7 +129,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         customJson: setting.custom_json,
         duration: Math.floor(setting.alert_duration / 1000),
         hideAnimation: setting.hide_animation,
-        image: { href: setting.image_href },
+        image: { href: imgHref },
         layout: setting.layout,
         showAnimation: setting.show_animation,
         sound: { href: setting.sound_href, volume: setting.sound_volume },
