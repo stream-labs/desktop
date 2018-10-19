@@ -264,6 +264,7 @@
     left: 0;
     background-color: @day-section;
     border-right: 1px solid @day-border;
+    overflow-y: auto;
   }
 
   .display {

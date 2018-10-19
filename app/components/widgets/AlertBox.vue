@@ -12,7 +12,7 @@
       </span>
     </div>
     <div class="left-accordion__button">
-      <span class="left-accordion__title">{{ $t('Add Alert') }}</span>
+      <span class="button button--default left-accordion__title">{{ $t('Add Alert') }}</span>
     </div>
     <div v-for="alert in alertTypes" v-if="wData" :key="alert">
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
@@ -153,7 +153,6 @@
 .leftbar {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .variation-tile {
@@ -174,6 +173,14 @@
 
   &:hover {
     cursor: pointer;
+  }
+}
+
+.variation-tile.active {
+  border: 1px solid @teal;
+
+  .variation-tile__image-box {
+    border: 1px solid @teal-light-opac;
   }
 }
 
@@ -202,6 +209,13 @@
     background-color: @night-section-alt;
     box-shadow: 0 2px @night-shadow;
     border-color: @night-border;
+  }
+  .variation-tile.active {
+    border: 1px solid @teal;
+
+    .variation-tile__image-box {
+      border: 1px solid @teal-light-opac;
+    }
   }
   .variation-tile__image-box {
     background-color: @night-secondary;
