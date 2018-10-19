@@ -21,9 +21,7 @@ export class IpcServerService extends Service {
 
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
-      const response: IJsonRpcResponse<
-        any
-      > = this.servicesManager.executeServiceRequest(request);
+      const response: IJsonRpcResponse<any> = this.exec(request);
       ipcRenderer.send('services-response', response);
     };
     ipcRenderer.on('services-request', this.requestHandler);
@@ -32,6 +30,10 @@ export class IpcServerService extends Service {
     this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(
       event => this.sendEvent(event)
     );
+  }
+
+  exec(request: IJsonRpcRequest) {
+    return this.servicesManager.executeServiceRequest(request);
   }
 
   stopListening() {
