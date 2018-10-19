@@ -107,13 +107,13 @@
 
 
 .app-tab {
-  padding: 8px 10px;
-  opacity: 0.8;
-  font-weight: bold;
+  .padding();
+  color: @day-paragraph;
+  .weight(@medium);
   cursor: pointer;
 
   &.is-active {
-    opacity: 1;
+    color: @day-title;
   }
 }
 
@@ -125,6 +125,13 @@
   .apps-nav {
     background-color: @night-primary;
     border-color: @night-border;
+  }
+  .app-tab {
+    color: @night-paragraph;
+
+      &.is-active {
+        color: @night-title;
+      }
   }
 }
 </style>
