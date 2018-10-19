@@ -387,6 +387,7 @@ export class Optimizer {
             const value = this.findValue(item);
             yield { [item.key]: value };
             if (item.dependents) {
+                // cacheオブジェクトの参照ではその後の変更で書き換わってしまうので、元の値をディープコピーして保存する
                 let lastCategorySettings = JSON.parse(JSON.stringify(this.getCategory(item.category)));
 
                 for (const dependent of item.dependents) {
