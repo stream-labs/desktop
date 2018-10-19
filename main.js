@@ -20,10 +20,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const { Updater } = require('./updater/Updater.js');
+const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
+const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 const pid = require('process').pid;
@@ -34,6 +35,17 @@ app.disableHardwareAcceleration();
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
+
+/* Determine the current release channel we're
+ * on based on name. The channel will always be
+ * the premajor identifier, if it exists.
+ * Otherwise, default to latest. */
+const releaseChannel = (() => {
+  const components = semver.prerelease(pjson.version);
+
+  if (components) return components[0];
+  return 'latest';
+})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -57,7 +69,6 @@ let shutdownStarted = false;
 let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
-
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -116,10 +127,10 @@ function startApp() {
     crashReporter.start({
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
-      ignoreSystemCrashHandler: true,
       submitURL:
-        'https://sentry.io/api/1283430/minidump/' +
-        '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+        'https://streamlabs.sp.backtrace.io:6098/post?' +
+        'format=minidump&' +
+        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
       extra: {
         version: pjson.version,
         processType: 'main'
@@ -271,7 +282,7 @@ function startApp() {
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
-  }  
+  }
 }
 
 // We use a special cache directory for running tests
@@ -282,32 +293,52 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
-// This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(argv => {
-  // Check for protocol links in the argv of the other process
-  argv.forEach(arg => {
-    if (arg.match(/^slobs:\/\//)) {
-      mainWindow.send('protocolLink', arg);
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', (event, argv) => {
+    // Check for protocol links in the argv of the other process
+    argv.forEach(arg => {
+      if (arg.match(/^slobs:\/\//)) {
+        mainWindow.send('protocolLink', arg);
+      }
+    });
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+
+      mainWindow.focus();
     }
   });
-
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
-    }
-
-    mainWindow.focus();
-  }
-});
-
-if (shouldQuit) {
+} else {
   app.exit();
 }
 
+
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    (new Updater(startApp)).run();
+    const updateInfo = {
+      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      version: pjson.version,
+      exec: process.argv,
+      cwd: process.cwd(),
+      waitPids: [ process.pid ],
+      appDir: path.dirname(app.getPath('exe')),
+      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
+      versionFileName: `${releaseChannel}.json`
+    };
+
+    console.log(updateInfo);
+    bootstrap(updateInfo).then((updating) => {
+      if (updating) {
+        console.log('Closing for update...');
+        app.exit();
+      } else {
+        startApp();
+      }
+    });
   } else {
     startApp();
   }

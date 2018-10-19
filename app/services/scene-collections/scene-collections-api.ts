@@ -20,6 +20,13 @@ export interface ISceneCollectionsServiceApi {
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]>;
 
   /**
+   * Install a new overlay from a file path
+   * @param filePath the location of the overlay file
+   * @param name the name of the overlay
+   */
+  loadOverlay(filePath: string, name: string): Promise<void>;
+
+  /**
    * Contains a list of collections
    */
   collections: ISceneCollectionsManifestEntry[];
