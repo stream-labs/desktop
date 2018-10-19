@@ -56,11 +56,15 @@ export interface IAlertBoxVariation {
       color2: string,
       font: string,
       format: string,
+      resubFormat?: string,
+      tierUpgradeFormat?: string,
       size: number,
       thickness: number
     };
     textDelay: number;
     type: string;
+    useCustomImage?: boolean;
+    moderation?: string;
     message?: {
       minAmount: number;
       allowEmotes: boolean;
@@ -76,6 +80,15 @@ export interface IAlertBoxVariation {
       security: number;
       volume: number;
     };
+    gif?: {
+      enabled: boolean;
+      gfycatLibraryEnabled: boolean;
+      animation: string;
+      libraryDefaults: string;
+      libraryEnabled: boolean;
+      minAmount: number;
+      duration: number;
+    }
   }
 }
 
@@ -535,6 +548,7 @@ IAlertBoxTiltifySettings {}
 export interface IAlertBoxSetting {
   enabled: boolean;
   showMessage: boolean;
+  showResubMessage?: boolean;
   variations: IAlertBoxVariation[]
 }
 

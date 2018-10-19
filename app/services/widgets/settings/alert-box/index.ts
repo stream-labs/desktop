@@ -64,7 +64,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     const triagedSettings = this.triageSettings(settings);
     Object.keys(triagedSettings).forEach((key) => {
       if (key === 'subs') {
-        triagedSettings['subs'] = this.varifySetting({ ...triagedSettings['subs'], ...triagedSettings['resubs'] });
+        triagedSettings['subs'] = this.varifySetting({
+          showResubMessage: triagedSettings['resubs'].show_message,
+          ...triagedSettings['subs'],
+          ...triagedSettings['resubs']
+        });
       } else if (this.apiNames().includes(key) && key !== 'resubs') {
         triagedSettings[key] = this.varifySetting(triagedSettings[key]);
       }
@@ -101,11 +105,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private varifySetting(setting: any): IAlertBoxSetting {
-    const { show_message, enabled, variations, ...rest } = setting;
+    const { show_message, enabled, variations, showResubMessage, ...rest } = setting;
     const defaultVariation = this.reshapeVariation(rest);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({ id: uuid(), ...variation }))
     idVariations.unshift(defaultVariation);
-    return { showMessage: show_message, enabled, variations: idVariations };
+    return { showMessage: show_message, enabled, variations: idVariations, showResubMessage };
   }
 
   private reshapeVariation(setting: any): IAlertBoxVariation {
@@ -121,7 +125,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         customHtmlEnabled: setting.custom_html_enabled,
         customJs: setting.custom_js,
         customJson: setting.custom_json,
-        duration: setting.alert_duration,
+        duration: Math.floor(setting.alert_duration / 1000),
         hideAnimation: setting.hide_animation,
         image: { href: setting.image_href },
         layout: setting.layout,
@@ -133,11 +137,24 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           color2: setting.font_color2,
           font: setting.font,
           format: setting.message_template,
+          resubFormat: setting.resub_message_template,
+          tierUpgradeFormat: setting.tier_upgrade_message_template,
           size: setting.font_size,
           thickness: setting.font_weight
         },
         textDelay: setting.text_delay,
         type: '',
+        useCustomImage: setting.use_custom_image,
+        moderation: setting.moderation,
+        gif: {
+          enabled: setting.gif_enabled,
+          gfycatLibraryEnabled: setting.gfycat_library_enabled,
+          animation: setting.gif_animation,
+          libraryDefaults: setting.gif_library_defaults,
+          libraryEnabled: setting.gif_library_enabled,
+          minAmount: setting.gifs_min_amount_to_share,
+          duration: setting.max_gif_duration
+        },
         message: {
           minAmount: setting.message_min_amount || setting.alert_message_min_amount,
           allowEmotes: setting.message_allow_emotes,
@@ -180,7 +197,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_font_size`]: settings.text.size,
       [`${prefix}_font_weight`]: settings.text.thickness,
       [`${prefix}_text_delay`]: settings.textDelay,
+      [`${prefix}_resub_message_template`]: settings.text.resubFormat,
+      [`${prefix}_tier_upgrade_message_template`]: settings.text.tierUpgradeFormat,
       [`${prefix}_alert_message_min_amount`]: settings.message.minAmount,
+      [`${prefix}_use_custom_image`]: settings.useCustomImage,
+      [`${prefix}_moderation`]: settings.moderation,
       [`${prefix}_message_allow_emotes`]: settings.message.allowEmotes,
       [`${prefix}_message_font`]: settings.message.font,
       [`${prefix}_message_font_color`]: settings.message.color,
@@ -190,7 +211,14 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_tts_min_amount`]: settings.tts.minAmount,
       [`${prefix}_tts_language`]: settings.tts.language,
       [`${prefix}_tts_security`]: settings.tts.security,
-      [`${prefix}_tts_volume`]: settings.tts.volume
+      [`${prefix}_tts_volume`]: settings.tts.volume,
+      [`${prefix}_gif_enabled`]: settings.gif.enabled,
+      [`${prefix}_gfycat_library_enabled`]: settings.gif.gfycatLibraryEnabled,
+      [`${prefix}_gif_animation`]: settings.gif.animation,
+      [`${prefix}_gif_library_defaults`]: settings.gif.libraryDefaults,
+      [`${prefix}_gif_library_enabled`]: settings.gif.libraryEnabled,
+      [`${prefix}_gifs_min_amount_to_share`]: settings.gif.minAmount,
+      [`${prefix}_max_gif_duration`]: settings.gif.duration
     };
   }
 
@@ -245,6 +273,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
+      settingsObj.show_resub_message = settings.subs.showResubMessage;
     });
     return settingsObj;
   }
