@@ -130,7 +130,6 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     crashHandler.unregisterProcess(this.pid);
-    crashHandler.terminateCrashHandler(this.pid);
     this.START_LOADING();
 
     this.crashReporterService.beginShutdown();

@@ -350,6 +350,7 @@ app.on('ready', () => {
 });
 
 app.on('quit', (e, exitCode) => {
+  crashHandler.terminateCrashHandler(this.pid);
   obs.IPC.disconnect();
 });
 
