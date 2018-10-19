@@ -16,6 +16,7 @@ import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
@@ -171,10 +172,10 @@ export class SceneCollectionsService extends Service
    * @param shouldAttemptRecovery whether a new copy of the file should
    * be downloaded from the server if loading fails.
    */
+  @RunInLoadingMode()
   async load(id: string, shouldAttemptRecovery = true): Promise<void> {
-    this.startLoadingOperation();
-    await this.deloadCurrentApplicationState();
 
+    await this.deloadCurrentApplicationState();
     try {
       await this.setActiveCollection(id);
       await this.readCollectionDataAndLoadIntoApplicationState(id);
@@ -192,7 +193,6 @@ export class SceneCollectionsService extends Service
       }
     }
 
-    this.finishLoadingOperation();
   }
 
   /**
@@ -201,12 +201,12 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
+  @RunInLoadingMode()
   async create(options: ISceneCollectionInternalCreateOptions = {}): Promise<ISceneCollectionsManifestEntry> {
-    this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
-    const id: string = uuid();
+    const id = uuid();
 
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
@@ -220,7 +220,6 @@ export class SceneCollectionsService extends Service
 
     this.collectionLoaded = true;
     await this.save();
-    this.finishLoadingOperation();
     return this.getCollection(id);
   }
 
@@ -303,13 +302,12 @@ export class SceneCollectionsService extends Service
    * @param name the name of the overlay
    * @param progressCallback a callback that receives progress of the download
    */
+  @RunInLoadingMode()
   async installOverlay(
     url: string,
     name: string,
     progressCallback?: (info: IDownloadProgress) => void
   ) {
-    this.startLoadingOperation();
-
     const pathName = await this.overlaysPersistenceService.downloadOverlay(
       url,
       progressCallback
@@ -323,8 +321,8 @@ export class SceneCollectionsService extends Service
    * @param filePath the location of the overlay file
    * @param name the name of the overlay
    */
+  @RunInLoadingMode()
   async loadOverlay(filePath: string, name: string) {
-    this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
     const id: string = uuid();
@@ -341,7 +339,6 @@ export class SceneCollectionsService extends Service
 
     this.collectionLoaded = true;
     await this.save();
-    this.finishLoadingOperation();
   }
 
   /**
@@ -601,25 +598,6 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Should be called before any loading operations
-   */
-  private startLoadingOperation() {
-    this.windowsService.closeChildWindow();
-    this.windowsService.closeAllOneOffs();
-    this.appService.startLoading();
-    this.disableAutoSave();
-  }
-
-  /**
-   * Should be called after any laoding operations
-   */
-  private finishLoadingOperation() {
-    this.appService.finishLoading();
-    this.tcpServerService.startRequestsHandling();
-    this.enableAutoSave();
-  }
-
-  /**
    * Creates the scenes and sources that come in by default
    * in an empty scene collection.
    */
@@ -673,7 +651,7 @@ export class SceneCollectionsService extends Service
 
   private autoSaveInterval: number;
 
-  private enableAutoSave() {
+  enableAutoSave() {
     if (this.autoSaveInterval) return;
     this.autoSaveInterval = window.setInterval(() => {
       this.save();
@@ -681,7 +659,7 @@ export class SceneCollectionsService extends Service
     }, 60 * 1000);
   }
 
-  private disableAutoSave() {
+  disableAutoSave() {
     if (this.autoSaveInterval) clearInterval(this.autoSaveInterval);
     this.autoSaveInterval = null;
   }

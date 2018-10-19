@@ -3,7 +3,7 @@ import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { Inject } from 'util/injector';
+import { getResource, Inject } from 'util/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -26,6 +26,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
+import uuid from 'uuid';
 
 interface IAppState {
   loading: boolean;
@@ -68,6 +69,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
+  private loadingPromises: Dictionary<Promise<any>> = {};
 
   @track('app_start')
   async load() {
@@ -144,13 +146,42 @@ export class AppService extends StatefulService<IAppState> {
     }, 300);
   }
 
-  startLoading() {
-    this.START_LOADING();
+  /**
+   * Show loading, block the nav-buttons and disable autosaving
+   * If called several times - unlock the screen only after the last function/promise has been finished
+   * Should be called for any scene-collections loading operations
+   * @see RunInLoadingMode decorator
+   */
+  async runInLoadingMode(fn: () => Promise<any> | void) {
+
+    if (!this.state.loading) {
+      this.START_LOADING();
+      this.windowsService.closeChildWindow();
+      this.windowsService.closeAllOneOffs();
+      this.sceneCollectionsService.disableAutoSave();
+    }
+
+    const result = fn();
+    let returningValue = result;
+    if (result instanceof Promise) {
+      const promiseId = uuid();
+      this.loadingPromises[promiseId] = result;
+      returningValue = await result;
+      delete this.loadingPromises[promiseId];
+    }
+
+    if (Object.keys(this.loadingPromises).length > 0) {
+      // some loading operations are still in progress
+      // don't stop the loading mode
+      return returningValue;
+    }
+
+    this.tcpServerService.startRequestsHandling();
+    this.sceneCollectionsService.enableAutoSave();
+    this.FINISH_LOADING();
+    return returningValue;
   }
 
-  finishLoading() {
-    this.FINISH_LOADING();
-  }
 
   @mutation()
   private START_LOADING() {
