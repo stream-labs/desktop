@@ -14,13 +14,13 @@
     <div class="left-accordion__button">
       <span class="button button--default left-accordion__title">{{ $t('Add Alert') }}</span>
     </div>
-    <div v-for="alert in alertTypes" v-if="wData" :key="alert">
-      <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
+    <div v-for="alert in alertTypes" v-if="wData" :key="alert" style="position: relative;">
+      <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click.stop="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
-        <div class="left-accordion__input">
-          <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
-        </div>
+      </div>
+      <div class="left-accordion__input">
+        <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
       </div>
       <div
         v-if="wData && selectedAlert === alert"
@@ -138,7 +138,7 @@
 }
 
 .left-accordion__title {
-  width: 200px;
+  width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -147,7 +147,9 @@
 }
 
 .left-accordion__input {
-  margin-left: auto;
+  position: absolute;
+  top: 14px;
+  right: 16px;
 }
 
 .leftbar {
