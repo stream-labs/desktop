@@ -21,7 +21,7 @@ export default class StartStreamingButton extends Vue {
 
   @Prop() disabled: boolean;
 
-  async toggleStreaming() {
+  toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
       return;
@@ -34,7 +34,15 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.state.streamingStatus;
   }
 
+  get programFetching() {
+    return this.streamingService.state.programFetching;
+  }
+
   getStreamButtonLabel() {
+    if (this.programFetching) {
+      return $t('streaming.programFetching');
+    }
+
     if (this.streamingStatus === EStreamingState.Live) {
       return $t('streaming.endStream');
     }
@@ -62,16 +70,12 @@ export default class StartStreamingButton extends Vue {
     return $t('streaming.goLive');
   }
 
-  getIsRedButton() {
-    return this.streamingStatus !== EStreamingState.Offline;
-  }
-
   get isStreaming() {
     return this.streamingService.isStreaming;
   }
 
   get isDisabled() {
-    return this.disabled ||
+    return this.disabled || this.programFetching ||
       ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
       ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
   }

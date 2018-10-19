@@ -16,6 +16,7 @@ export enum ERecordingState {
 }
 
 export interface IStreamingServiceState {
+  programFetching: boolean;
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
   recordingStatus: ERecordingState;

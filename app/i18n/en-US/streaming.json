@@ -12,6 +12,7 @@
   "optimizedProfileForAverageCpUs": "Optimized profile for average CPUs",
   "optimizedProfileForWeakCpUs": "Optimized profile for weak CPUs",
   "recording": "REC",
+  "programFetching": "FETCHING",
   "endStream": "END STREAM",
   "starting": "STARTING",
   "startingWithDelay": "STARTING %{delaySeconds}s",

@@ -1,7 +1,7 @@
 <template>
 <button
   class="button button--go-live"
-  :class="{ 'button--soft-warning': getIsRedButton() }"
+  :class="{ 'button--soft-warning': isStreaming }"
   :disabled="isDisabled"
   @click="toggleStreaming"
   data-test="StartStreamingButton"
