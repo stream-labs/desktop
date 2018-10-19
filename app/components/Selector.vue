@@ -52,9 +52,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  .padding-h-sides();
+  .padding-h-sides(2);
+  line-height: 32px;
   cursor: pointer;
   justify-content: space-between;
   color: @day-paragraph;

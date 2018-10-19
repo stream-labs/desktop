@@ -1,6 +1,6 @@
 <template>
   <span class="text-center">
-    <div class="timer-wrapper inline-block">
+    <div class="timer-wrapper">
 
       <div style="padding-right: 2px;">
         <div class="timer cursor-pointer" :class="{ wide: hasHours && hasSeconds }" @click="showTimerDropdown = !showTimerDropdown">
@@ -24,12 +24,12 @@
           class="timer-icon-top"
           @mousedown="beginHold(increment, hasSeconds ? second : minute)"
           @mouseup="releaseHold()"
-          @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
+          @mouseout="releaseHold()"><i class="icon-dropdown"></i></div>
         <div
           class="timer-icon-bottom"
           @mousedown="beginHold(decrement, hasSeconds ? second : minute)"
           @mouseup="releaseHold()"
-          @mouseout="releaseHold()"><i class="fas fa-chevron-down"></i></div>
+          @mouseout="releaseHold()"><i class="icon-dropdown"></i></div>
       </div>
 
       <div v-if="showTimerDropdown" class="timer timer-dropdown" :class="{ wide: hasHours && hasSeconds }">
@@ -92,27 +92,29 @@
   .timer-wrapper {
     width: auto;
     position: relative;
+    display: inline-block;
   }
 
   .timer {
     box-shadow: none;
     font-size: 14px;
-    background: @day-button;
+    background: @day-dropdown-bg;
     font-family: 'Roboto';
-    padding: 5px 0px;
-    border: 1px solid transparent;
+    border: 1px solid @day-dropdown-border;
     position: relative;
     display: flex;
     justify-content: flex-start;
     width: 90px;
-    padding-left: 8px;
+    height: 32px;
+    line-height: 32px;
+    .padding-h-sides();
     .radius();
 
     &:active,
     &:focus {
       box-shadow: none;
-      border-color: transparent;
-      background-color: @day-button;
+      border-color: @day-dropdown-border;
+      background-color: @day-dropdown-bg;
       outline: none;
     }
 
@@ -122,7 +124,7 @@
     }
 
     div {
-      margin-right: 8px;
+      .margin-right();
     }
   }
 
@@ -137,26 +139,27 @@
   }
 
   .timer-icon-top {
-    top: -2px;
+    top: 2px;
+
+    .icon-dropdown {
+      transform: rotate(-180deg);
+      display: inline-block;
+    }
   }
 
   .timer-icon-bottom {
-    bottom: 17px;
-  }
-
-  .fa-xs {
-    font-size: .75em !important;
+    bottom: 20px;
   }
 
   .timer-dropdown {
     position: absolute;
     overflow-y: hidden;
     width: 90px;
-    margin-top: 2px;
     padding: 0;
     z-index: 10;
     left: 0;
     .radius();
+    height: 200px;
   }
 
   .timer.wide,
@@ -185,10 +188,6 @@
     border-radius: 4px;
   }
 
-  .inline-block {
-    display: inline-block;
-  }
-
   .timer-footer {
     display: flex;
     justify-content: space-around;
@@ -196,16 +195,16 @@
 
   .night-theme {
     .timer {
-      border-color: transparent;
+      border-color: @night-dropdown-border;
       box-shadow: none;
-      background: @night-button;
+      background: @night-dropdown-bg;
       color: @white;
 
       &:active,
       &:focus {
+        border-color: @night-dropdown-border;
         box-shadow: none;
-        border-color: transparent;
-        background: @night-button;
+        background: @night-dropdown-bg;
       }
     }
   }

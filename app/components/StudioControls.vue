@@ -42,9 +42,6 @@
 
 .studio-controls__label {
   margin-bottom: 0;
-  .weight(@medium);
-  color: @day-title;
-  font-size: 14px;
 }
 
 .studio-controls-selector {
