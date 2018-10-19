@@ -48,12 +48,12 @@
       "LICENSE",
       "AGREEMENT.sjis"
     ],
+    "detectUpdateChannel": false,
     "publish": {
-      "provider": "github",
-      "owner": "n-air-app",
-      "repo": "n-air-app",
-      "host": "github.com",
-      "releaseType": "draft"
+      "provider": "generic",
+      "useMultipleRangeRequest": false,
+      "channel": "latest",
+      "url": "https://n-air-app.nicovideo.jp/download/windows"
     },
     "nsis": {
       "license": "AGREEMENT.sjis",
