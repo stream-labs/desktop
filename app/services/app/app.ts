@@ -130,6 +130,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     crashHandler.unregisterProcess(this.pid);
+    crashHandler.terminateCrashHandler(this.pid);
     this.START_LOADING();
 
     this.crashReporterService.beginShutdown();
@@ -146,7 +147,6 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
-      crashHandler.terminateCrashHandler(this.pid);
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
