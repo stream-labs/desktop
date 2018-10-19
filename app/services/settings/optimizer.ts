@@ -91,11 +91,25 @@ const definitionParams: DefinitionParam[] = [
                                 }]
                             },
                             {
+                                key: OptimizationKey.keyframeInterval,
+                                category: CategoryName.output,
+                                subCategory: 'Streaming',
+                                label: 'settings.keyframeInterval',
+                                setting: 'keyint_sec',
+                            },
+                            {
                                 key: OptimizationKey.encoderPreset,
                                 category: CategoryName.output,
                                 subCategory: 'Streaming',
                                 setting: 'preset',
                                 label: 'settings.encoderPreset',
+                                lookupValueName: true,
+                            },
+                            {
+                                key: OptimizationKey.profile,
+                                category: CategoryName.output,
+                                subCategory: 'Streaming',
+                                setting: 'profile',
                                 lookupValueName: true,
                             },
                             {
@@ -107,20 +121,6 @@ const definitionParams: DefinitionParam[] = [
                             },
                         ]
                     }]
-                },
-                {
-                    key: OptimizationKey.keyframeInterval,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    label: 'settings.keyframeInterval',
-                    setting: 'keyint_sec',
-                },
-                {
-                    key: OptimizationKey.profile,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    setting: 'profile',
-                    lookupValueName: true,
                 },
                 {
                     key: OptimizationKey.audioTrackIndex,
@@ -395,18 +395,33 @@ export class Optimizer {
         }
     }
 
-    private *getValues(definitions: DefinitionParam[]): IterableIterator<{}> {
+    private *getValues(definitions: DefinitionParam[]): IterableIterator<OptimizeSettings> {
         for (const item of definitions) {
+            let changed = false;
             const value = this.findValue(item);
             yield { [item.key]: value };
             if (item.dependents) {
+                // cacheオブジェクトの参照ではその後の変更で書き換わってしまうので、元の値をディープコピーして保存する
+                let lastCategorySettings = JSON.parse(JSON.stringify(this.getCategory(item.category)));
+
                 for (const dependent of item.dependents) {
                     this.setValue(item, dependent.value);
+                    if (value !== dependent.value) {
+                        changed = true;
+                    }
                     for (const current of this.getValues(dependent.params)) {
                         yield current;
                     }
                 }
-                this.setValue(item, value);
+
+                if (changed) {
+                    // まず値を変更した上で書き戻し、
+                    this.setValue(item, value);
+                    this.writeBackCategory(item.category);
+                    // 次に元の値群を書き戻すことで依存値が書き戻せる
+                    this.categoryCache.set(item.category, lastCategorySettings);
+                    this.updateCategory(item.category);
+                }
             }
         }
     }
