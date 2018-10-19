@@ -27,6 +27,8 @@ const path = require('path');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
+const pid = require('process').pid;
+const crashHandler = require('crash-handler');
 
 app.disableHardwareAcceleration();
 
@@ -75,6 +77,9 @@ function openDevTools() {
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+
+  crashHandler.startCrashHandler();
+  crashHandler.registerProcess(pid, false);
 
   { // Initialize obs-studio-server
     // Set up environment variables for IPC.
@@ -166,6 +171,7 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
       shutdownStarted = true;
+      crashHandler.unregisterProcess(pid);
       childWindow.destroy();
       mainWindow.send('shutdown');
 
