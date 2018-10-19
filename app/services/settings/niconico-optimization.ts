@@ -28,6 +28,7 @@ export function getBestSettingsForNiconico(options: { bitrate: number }): Optimi
 
     return {
         outputMode: 'Advanced',
+        rateControl: 'CBR',
         videoBitrate: (options.bitrate - audioBitrate),
         audioBitrate: audioBitrate.toString(10),
         quality: quality,

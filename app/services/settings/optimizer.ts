@@ -3,6 +3,7 @@ import { ISettingsSubCategory } from './settings-api';
 
 export enum OptimizationKey {
     outputMode = 'outputMode',
+    rateControl = 'rateControl',
     videoBitrate = 'videoBitrate',
     audioBitrate = 'audioBitrate',
     quality = 'quality',
@@ -20,6 +21,7 @@ export enum OptimizationKey {
 // OptimizationKey のキーと完全対応していること
 export type OptimizeSettings = {
     outputMode?: 'Simple' | 'Advanced'
+    rateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
     videoBitrate?: number
     audioBitrate?: string
     quality?: string
@@ -61,13 +63,6 @@ const definitionParams: DefinitionParam[] = [
             value: 'Advanced',
             params: [
                 {
-                    key: OptimizationKey.audioBitrate,
-                    category: CategoryName.output,
-                    subCategory: 'Audio - Track 1',
-                    setting: 'Track1Bitrate',
-                    label: 'settings.audioBitrate',
-                },
-                {
                     key: OptimizationKey.encoder,
                     category: CategoryName.output,
                     subCategory: 'Streaming',
@@ -77,11 +72,23 @@ const definitionParams: DefinitionParam[] = [
                         value: 'obs_x264',
                         params: [
                             {
-                                key: OptimizationKey.videoBitrate,
+                                key: OptimizationKey.rateControl,
                                 category: CategoryName.output,
                                 subCategory: 'Streaming',
-                                setting: 'bitrate',
-                                label: 'settings.videoBitrate',
+                                setting: 'rate_control',
+                                lookupValueName: true,
+                                dependents: [{
+                                    value: 'CBR',
+                                    params: [
+                                        {
+                                            key: OptimizationKey.videoBitrate,
+                                            category: CategoryName.output,
+                                            subCategory: 'Streaming',
+                                            setting: 'bitrate',
+                                            label: 'settings.videoBitrate',
+                                        },
+                                    ]
+                                }]
                             },
                             {
                                 key: OptimizationKey.keyframeInterval,
@@ -120,6 +127,13 @@ const definitionParams: DefinitionParam[] = [
                     category: CategoryName.output,
                     subCategory: 'Streaming',
                     setting: 'TrackIndex',
+                },
+                {
+                    key: OptimizationKey.audioBitrate,
+                    category: CategoryName.output,
+                    subCategory: 'Audio - Track 1',
+                    setting: 'Track1Bitrate',
+                    label: 'settings.audioBitrate',
                 },
             ]
         }]
