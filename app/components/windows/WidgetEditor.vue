@@ -78,21 +78,21 @@
                 :metadata="{ type: 'html' }"
               />
               <code-editor
-                      v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
-                      key="css"
-                      :value="wData"
-                      :metadata="{ type: 'css' }"
+                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+                key="css"
+                :value="wData"
+                :metadata="{ type: 'css' }"
               />
               <code-editor
-                      v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
-                      key="js"
-                      :value="wData"
-                      :metadata="{ type: 'js' }"
+                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+                key="js"
+                :value="wData"
+                :metadata="{ type: 'js' }"
               />
               <custom-fields-editor
-                      v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
-                      key="customFields"
-                      :value="wData"
+                v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+                key="customFields"
+                :value="wData"
               />
             </div>
           </div>
