@@ -1,4 +1,4 @@
-import { getResource } from '../../util/injector';
+import { getResource } from 'util/injector';
 import { AppService } from './app';
 
 export function RunInLoadingMode(): any {

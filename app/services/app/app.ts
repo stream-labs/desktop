@@ -26,7 +26,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
-import uuid from 'uuid';
+import uuid from 'uuid/v4';
 
 interface IAppState {
   loading: boolean;
@@ -162,23 +162,30 @@ export class AppService extends StatefulService<IAppState> {
     }
 
     const result = fn();
+    let error: Error = null;
     let returningValue = result;
     if (result instanceof Promise) {
       const promiseId = uuid();
       this.loadingPromises[promiseId] = result;
-      returningValue = await result;
+      try {
+        returningValue = await result;
+      } catch (e) {
+        error = e;
+      }
       delete this.loadingPromises[promiseId];
     }
 
     if (Object.keys(this.loadingPromises).length > 0) {
       // some loading operations are still in progress
       // don't stop the loading mode
+      if (error) throw error;
       return returningValue;
     }
 
     this.tcpServerService.startRequestsHandling();
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
+    if (error) throw error;
     return returningValue;
   }
 
