@@ -99,7 +99,7 @@
       </div>
     </div>
 
-    <div class="sources">
+    <div class="sources" :class="{'sources--has-platform-apps' : showAppSources}">
       <div class="source-group">
         <h2>{{ $t('Standard') }}</h2>
         <ul class="source-list">
@@ -221,18 +221,22 @@ h2 {
   display: flex;
   flex: 1 0 auto;
 
+  &.sources--has-platform-apps {
+    .source-group {
+      flex: 0 0 33%;
+    }
+  }
+
   .source-group {
+    margin: -16px 0px -16px 0px;
+    padding: 16px 16px 16px 0;
+    flex: 0 0 50%;
+
     &:last-child {
       padding: 16px 0 16px 16px;
       border-right: none;
     }
   }
-}
-
-.source-group {
-  margin: -16px 0px -16px 0px;
-  padding: 16px 16px 16px 0;
-  flex: 0 0 33%;
 }
 
 .source-list {
