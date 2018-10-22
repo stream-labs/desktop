@@ -69,29 +69,31 @@
               v-model="currentCodeTab"
               @input="value => updateCodeTab(value)"
             />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
-              key="html"
-              :value="wData"
-              :metadata="{ type: 'html' }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
-              key="css"
-              :value="wData"
-              :metadata="{ type: 'css' }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
-              key="js"
-              :value="wData"
-              :metadata="{ type: 'js' }"
-            />
-            <custom-fields-editor
-              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
-              key="customFields"
-              :value="wData"
-            />
+            <div v-if="canShowEditor">
+              <code-editor
+                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+                key="html"
+                :value="wData"
+                :metadata="{ type: 'html' }"
+              />
+              <code-editor
+                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+                key="css"
+                :value="wData"
+                :metadata="{ type: 'css' }"
+              />
+              <code-editor
+                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+                key="js"
+                :value="wData"
+                :metadata="{ type: 'js' }"
+              />
+              <custom-fields-editor
+                v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+                key="customFields"
+                :value="wData"
+              />
+            </div>
           </div>
           <div v-else-if="loadingFailed" style="padding: 8px;">
             <div>{{ $t('Failed to load settings') }}</div>
