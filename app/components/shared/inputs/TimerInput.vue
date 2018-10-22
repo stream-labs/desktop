@@ -170,12 +170,13 @@
   .time-slot-box {
     overflow-y: auto;
     height: 200px;
-    padding: 10px;
+    padding: 0;
     margin: 0 !important;
+    width: 50%;
   }
 
   .time-slot {
-    padding: 5px 0;
+    .padding-h-sides();
     display: block;
   }
 
@@ -184,7 +185,7 @@
   }
 
   .active {
-    background: rgba(0,0,0,0.4);
+    background: @light-3;
     border-radius: 4px;
   }
 
@@ -206,6 +207,10 @@
         box-shadow: none;
         background: @night-dropdown-bg;
       }
+    }
+
+    .active {
+      background: @dark-2;
     }
   }
 </style>
