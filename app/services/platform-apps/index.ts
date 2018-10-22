@@ -485,9 +485,6 @@ export class PlatformAppsService extends
 
   exposeAppApi(appId: string, webContentsId: number) {
     const app = this.getApp(appId);
-
-
-
     const api = this.apiManager.getApi(app);
 
     // Namespace under v1 for now.  Eventually we may want to add
