@@ -17,6 +17,8 @@ import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
+import { IAlertBoxData } from 'services/widgets/settings/alert-box';
+import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 
 @Component({
   components: {
@@ -38,6 +40,7 @@ export default class WidgetEditor extends Vue {
   @Inject() private projectorService: ProjectorService;
 
   @Prop() isAlertBox?: boolean;
+  @Prop() selectedVariation?: IAlertBoxVariation;
 
   /**
    * Declaration of additional sections in the right panel
@@ -81,6 +84,7 @@ export default class WidgetEditor extends Vue {
   }
 
   get customCodeIsEnabled() {
+    if (this.selectedVariation) { return this.selectedVariation.settings.customHtmlEnabled }
     return this.wData && this.wData.settings.custom_enabled;
   }
 
@@ -153,7 +157,20 @@ export default class WidgetEditor extends Vue {
   }
 
   toggleCustomCode(enabled: boolean) {
-    const newSettings = { ...this.wData.settings, custom_enabled: enabled };
-    this.widget.getSettingsService().saveSettings(newSettings)
+    let newSettings = { ...this.wData.settings, custom_enabled: enabled };
+    if (this.selectedVariation) {
+      newSettings = { ...this.wData.settings };
+      Object.keys(newSettings).forEach((type) => {
+        const variations = newSettings[type].variations;
+        const found = variations && variations.find(
+          (vari: IAlertBoxVariation) => this.selectedVariation.id === vari.id
+        );
+        if (found) {
+          found.settings.customHtmlEnabled = true;
+        }
+      });
+    }
+    console.log(newSettings);
+    this.widget.getSettingsService().saveSettings(newSettings);
   }
 }

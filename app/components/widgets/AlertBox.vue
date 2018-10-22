@@ -3,6 +3,7 @@
   :navItems="navItems"
   :isAlertBox="true"
   :slots="[{ value: 'layout', label: $t('Layout') }]"
+  :selectedVariation="selectedVariation"
 >
   <!-- Left Toolbar -->
   <div slot="leftbar">

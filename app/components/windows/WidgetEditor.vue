@@ -74,25 +74,25 @@
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
               key="html"
-              :value="wData"
+              :value="selectedVariation || wData"
               :metadata="{ type: 'html' }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
               key="css"
-              :value="wData"
+              :value="selectedVariation || wData"
               :metadata="{ type: 'css' }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
               key="js"
-              :value="wData"
+              :value="selectedVariation || wData"
               :metadata="{ type: 'js' }"
             />
             <custom-fields-editor
               v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
               key="customFields"
-              :value="wData"
+              :value="selectedVariation || wData"
             />
           </div>
           <div v-else-if="loadingFailed" style="padding: 8px;">
