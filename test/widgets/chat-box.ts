@@ -4,70 +4,61 @@ import { addSource } from '../helpers/spectron/sources';
 import { logIn, blankSlate } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
+import { metadata } from '../../app/components/widgets/inputs';
+import { $t } from '../../app/services/i18n';
 
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Set stream-boss health', async t => {
 
-  if (!await logIn(t)) return;
 
+test('Chatbox', async t => {
   const client = t.context.app.client;
   await logIn(t);
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
+  await addSource(t, 'Chatbox', '__Chat Box', false);
 
-  const setButtonSelector = 'button=Set Stream Boss Health';
-  const resetButtonSelector = 'button=Reset Stream Boss';
-
-  if (await client.isVisible(resetButtonSelector)) {
-    await client.click(resetButtonSelector);
-  }
-
-  await client.waitForVisible(setButtonSelector);
-  await client.click(setButtonSelector);
-  await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
-
-  t.pass();
-
-});
-
-
-test('Stream Boss Manage Battle settings', async t => {
-  const client = t.context.app.client;
-  await logIn(t);
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
-
-  await client.click('li=Manage Battle');
+  await client.click('li=Visual Settings');
+  const formName = 'visual-properties-form';
 
   const formMonkey = new FormMonkey(t, true);
 
   const testSet1 = {
-    boss_heal: false,
-    fade_time: 5,
-    skin: 'noimage',
-    follow_multiplier: 1,
-    bit_multiplier: 2,
-    sub_multiplier: 3,
-    donation_multiplier: 4
+    theme: 'boxed',
+    show_moderator_icons: false,
+    show_subscriber_icons: false,
+    show_turbo_icons: false,
+    show_premium_icons: false,
+    show_bits_icons: false,
+    show_coin_icons: false,
+    show_bttv_emotes: false,
+    show_franker_emotes: false,
+    show_smf_emotes: false,
+    background_color: '#FFFFFF',
+    message_hide_delay: 10
   };
 
-  await formMonkey.fill('manage-battle-form', testSet1);
+  await formMonkey.fill(formName, testSet1);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('manage-battle-form', testSet1));
+  t.true(await formMonkey.includes(formName, testSet1));
 
   const testSet2 = {
-    boss_heal: true,
-    fade_time: 10,
-    skin: 'default',
-    follow_multiplier: 5,
-    bit_multiplier: 1,
-    sub_multiplier: 300,
-    donation_multiplier: 200
+    theme: 'twitch',
+    show_moderator_icons: true,
+    show_subscriber_icons: true,
+    show_turbo_icons: true,
+    show_premium_icons: true,
+    show_bits_icons: true,
+    show_coin_icons: true,
+    show_bttv_emotes: true,
+    show_franker_emotes: true,
+    show_smf_emotes: true,
+    background_color: '#000000',
+    message_hide_delay: 60
   };
 
-  await formMonkey.fill('manage-battle-form', testSet2);
+  await formMonkey.fill(formName, testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('manage-battle-form', testSet2));
+  t.true(await formMonkey.includes(formName, testSet2));
 });
 
 

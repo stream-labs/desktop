@@ -57,7 +57,7 @@ export class FormMonkey {
 
     for (const input of inputs) {
       if (!(input.name in formData)) {
-        this.log(`field "${name}" skipped`);
+        // skip no-name fields
         continue;
       }
 
@@ -73,7 +73,11 @@ export class FormMonkey {
           await this.setBoolValue(input.selector, value);
           break;
         case 'list':
+        case 'fontFamily':
           await this.setListValue(input.selector, value);
+          break;
+        case 'color':
+          await this.setColorValue(input.selector, value);
           break;
         case 'slider':
         case 'font-size':
@@ -118,7 +122,11 @@ export class FormMonkey {
           value = await this.getBoolValue(input.selector);
           break;
         case 'list':
+        case 'fontFamily':
           value = await this.getListValue(input.selector);
+          break;
+        case 'color':
+          value = await this.getColorValue(input.selector);
           break;
         case 'slider':
         case 'font-size':
@@ -138,14 +146,17 @@ export class FormMonkey {
 
   async includes(formName: string, expectedData: Dictionary<any>): Promise<boolean> {
     const formData = await this.read(formName);
+    this.log('check form includes expected data:');
+    this.log(formData);
+    this.log(expectedData);
     return isMatch(formData, expectedData);
   }
 
   async setTextValue(selector: string, value: string) {
     const inputSelector = selector + ' input';
-    await this.client.click(inputSelector);
-    await this.client.clearElement(selector + ' input');
-    await this.client.setValue(selector + ' input', value);
+    // await this.client.click(inputSelector);
+    await this.client.clearElement(inputSelector);
+    await this.client.setValue(inputSelector, value);
   }
 
   async getTextValue(selector: string): Promise<string> {
@@ -159,6 +170,18 @@ export class FormMonkey {
   async setListValue(selector: string, value: string) {
     await this.client.click(`${selector} .multiselect`);
     await this.client.click(`${selector} [data-option-value="${value}"]`);
+  }
+
+  async setColorValue(selector: string, value: string) {
+    await this.client.click(`${selector} .colorpicker__input`); // open colorpicker
+    value = value.substr(1); // get rid of # character in value
+    const inputSelector = `${selector} .vc-input__input`;
+    await this.setInputValue(inputSelector, value);
+    await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
+  }
+
+  async getColorValue(selector: string) {
+    return await this.client.getValue(`${selector} .colorpicker__input`);
   }
 
   async getListValue(selector: string): Promise<string> {
@@ -222,6 +245,13 @@ export class FormMonkey {
   async getSliderValue(sliderInputSelector: string): Promise<number> {
     // fetch the value from the slider's tooltip
     return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip`));
+  }
+
+  async setInputValue(selector: string, value: string) {
+    await this.client.click(selector);
+    await (this.client.keys(['Control', 'a']) as any as Promise<any>); // clear
+    await (this.client.keys('Control') as any as Promise<any>); // release ctrl key
+    await (this.client.keys(value) as any as Promise<any>); // type text
   }
 
   private log(...args: any[]) {

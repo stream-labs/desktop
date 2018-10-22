@@ -42,7 +42,7 @@
       <v-form-group v-model="wData.settings.donation_multiplier" :metadata="metadata.donation_multiplier"/>
     </validated-form>
 
-    <div slot="visual-properties" @input="save()" name="visual-settings-form" v-if="loaded">
+    <validated-form slot="visual-properties" @input="save()" name="visual-settings-form" v-if="loaded">
       <v-form-group v-model="wData.settings.kill_animation" :metadata="metadata.kill_animation"/>
       <v-form-group>
         <bool-input v-model="wData.settings.bg_transparent" :metadata="metadata.bg_transparent"/>
@@ -51,8 +51,9 @@
       <v-form-group v-model="wData.settings.text_color" :metadata="metadata.text_color"/>
       <v-form-group v-model="wData.settings.bar_text_color" :metadata="metadata.bar_text_color"/>
       <v-form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
+      <v-form-group v-model="wData.settings.bar_bg_color" :metadata="metadata.bar_bg_color"/>
       <v-form-group v-model="wData.settings.font" :metadata="metadata.font"/>
-    </div>
+    </validated-form>
   </widget-editor>
 </template>
 

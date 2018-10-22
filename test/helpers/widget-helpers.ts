@@ -1,6 +1,6 @@
 import { GenericTestContext } from 'ava';
-import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from '../../app/services/scenes';
+import { getClient } from './api-client';
+import { IScenesServiceApi } from '../../app/services/scenes/index';
 import { WebsocketService } from '../../app/services/websocket';
 
 export async function waitForWidgetSettingsSync(t: GenericTestContext<any>) {
