@@ -7,12 +7,12 @@
   <!-- Left Toolbar -->
   <div slot="leftbar">
     <div class="left-accordion__button">
-      <span class="left-accordion__title" :class="{ active: selectedAlert === 'general' }">
+      <span style="text-transform: uppercase;" :class="{ active: selectedAlert === 'general' }">
         {{ $t('General Settings') }}
       </span>
     </div>
     <div class="left-accordion__button">
-      <span class="button button--default left-accordion__title">{{ $t('Add Alert') }}</span>
+      <span class="button button--default add-alert-button">{{ $t('Add Alert') }}</span>
     </div>
     <div v-for="alert in alertTypes" v-if="wData" :key="alert" style="position: relative;">
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click.stop="selectAlertType(alert)">
@@ -135,6 +135,12 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.add-alert-button {
+  width: 100%;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
 .left-accordion__title {
