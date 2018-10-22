@@ -145,9 +145,14 @@ export class PlatformAppsService extends
 
   private localStorageKey = 'PlatformAppsUnpacked';
 
-  apiManager = new PlatformAppsApi();
+  // Lazy initialize the API
+  private _apiManager: PlatformAppsApi;
+  private get apiManager() {
+    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
+    return this._apiManager;
+  }
 
-  devServer: DevServer;
+  private devServer: DevServer;
 
   /**
    * Using initialize because it needs to be async
