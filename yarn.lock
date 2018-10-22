@@ -172,10 +172,6 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
-"@streamlabs/obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.26/iojs-v3.0.0-signed.tar.gz":
-  version "0.3.21"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.26/iojs-v3.0.0-signed.tar.gz#e11e6850a8b9c7cc557a46a46ffa624d27c7b112"
-
 "@streamlabs/obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.28/iojs-v3.0.4-signed.tar.gz", "obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.28/iojs-v3.0.4-signed.tar.gz":
   version "0.3.21"
   resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.28/iojs-v3.0.4-signed.tar.gz#a3f09b529ec78ef54addec42ba65e849f34a6de5"
