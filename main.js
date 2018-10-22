@@ -175,7 +175,8 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
       shutdownStarted = true;
-      crashHandler.unregisterProcess(pid);
+      crashHandler.terminateCrashHandler(this.pid);
+      // crashHandler.unregisterProcess(pid);
       childWindow.destroy();
       mainWindow.send('shutdown');
 
@@ -350,7 +351,6 @@ app.on('ready', () => {
 });
 
 app.on('quit', (e, exitCode) => {
-  crashHandler.terminateCrashHandler(this.pid);
   obs.IPC.disconnect();
 });
 
