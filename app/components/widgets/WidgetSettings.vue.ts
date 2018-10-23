@@ -7,6 +7,7 @@ import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
+import { Debounce } from 'lodash-decorators';
 
 export interface IWidgetNavItem {
   value: string;
@@ -28,7 +29,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   requestState: 'success' | 'pending' | 'fail' = 'pending';
 
   fontFamilyTooltip = $t(
-    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' + 
+    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' +
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
   );
 
@@ -73,6 +74,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.widget.refresh();
   }
 
+  @Debounce(500)
   async save() {
     if (this.requestState === 'pending') return;
     try {
