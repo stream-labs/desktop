@@ -33,10 +33,8 @@ const windowId = Utils.getCurrentUrlParams().windowId;
 window['obs'] = window['require']('obs-studio-node');
 
 if (windowId === 'main') {
-  console.log('main');
   window['obs'].IPC.host(remote.process.env.SLOBS_IPC_PATH);
 } else {
-  console.log('child');
   window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
 }
 
