@@ -85,11 +85,21 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   get minTriggerAmount() {
-    return ''
+    switch (this.selectedAlert) {
+      case 'bits':
+        return this.wData.settings.bits_alert_min_amount;
+      case 'donations':
+        return this.wData.settings.donation_alert_min_amount;
+      case 'hosts':
+        return this.wData.settings.host_viewer_minimum;
+      case 'raids':
+        return this.wData.settings.raid_raider_minimum;
+    }
   }
 
   get minRecentEvents() {
-    return ''
+    return this.selectedAlert === 'donation' ?
+      this.wData.settings.recent_events_donation_min_amount : this.wData.settings.recent_events_host_min_viewer_count;
   }
 
   selectAlertType(alertName: string) {
