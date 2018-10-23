@@ -161,8 +161,15 @@ export class AppService extends StatefulService<IAppState> {
       this.sceneCollectionsService.disableAutoSave();
     }
 
-    const result = fn();
     let error: Error = null;
+    let result: any = null;
+
+    try {
+      result = fn();
+    } catch (e) {
+      error = null;
+    }
+
     let returningValue = result;
     if (result instanceof Promise) {
       const promiseId = uuid();
