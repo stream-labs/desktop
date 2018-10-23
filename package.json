@@ -65,7 +65,6 @@
     "serial": true
   },
   "dependencies": {
-    "@streamlabs/obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.28/iojs-v3.0.4-signed.tar.gz",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
     "electron-window-state": "^4.1.1",
