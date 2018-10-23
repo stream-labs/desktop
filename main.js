@@ -176,6 +176,7 @@ function startApp() {
     if (!shutdownStarted) {
       shutdownStarted = true;
       childWindow.destroy();
+      crashHandler.unregisterProcess(pid);
       mainWindow.send('shutdown');
 
       // We give the main window 10 seconds to acknowledge a request
