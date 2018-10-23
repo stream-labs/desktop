@@ -129,7 +129,7 @@ export class AppService extends StatefulService<IAppState> {
 
   @track('app_close')
   private shutdownHandler() {
-    // crashHandler.unregisterProcess(this.pid);
+    crashHandler.unregisterProcess(this.pid);
     this.START_LOADING();
 
     this.crashReporterService.beginShutdown();
@@ -138,6 +138,7 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
+      crashHandler.terminateCrashHandler(this.pid);
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();

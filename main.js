@@ -175,8 +175,6 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
       shutdownStarted = true;
-      crashHandler.terminateCrashHandler(this.pid);
-      // crashHandler.unregisterProcess(pid);
       childWindow.destroy();
       mainWindow.send('shutdown');
 
