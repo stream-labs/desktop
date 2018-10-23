@@ -41,7 +41,7 @@ export interface IAlertBoxVariation {
   settings: {
     customCss: string;
     customHtml: string;
-    customHtmlEnabled: string;
+    customHtmlEnabled: boolean;
     customJs: string;
     customJson: string;
     duration: number;

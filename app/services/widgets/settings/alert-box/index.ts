@@ -51,6 +51,44 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     }
   }
 
+  newVariation(type: string): IAlertBoxVariation {
+    return {
+      condition: 'RANDOM',
+      conditions: [],
+      conditionData: '3',
+      name: 'New Variation',
+      id: uuid(),
+      settings: {
+        customCss: '',
+        customHtml: '',
+        customHtmlEnabled: false,
+        customJs: '',
+        customJson: '',
+        duration: 2,
+        hideAnimation: 'fadeOut',
+        image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
+        layout: 'above',
+        showAnimation: 'fadeIn',
+        sound: { href: '', volume: 80 },
+        text: {
+          animation: 'tada',
+          color: '#FFFFFF',
+          color2: '#32C3A6',
+          font: 'Open Sans',
+          format: '',
+          resubFormat: null,
+          tierUpgradeFormat: null,
+          size: 32,
+          thickness: 400
+        },
+        textDelay: 0,
+        type: type,
+        useCustomImage: null,
+        moderation: null
+      }
+    };
+  }
+
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
     const { settings, ...rest } = data;
     const newSettings = this.transformSettings(settings);
