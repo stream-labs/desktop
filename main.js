@@ -28,8 +28,6 @@ const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 
-app.disableHardwareAcceleration();
-
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
@@ -81,7 +79,7 @@ function startApp() {
     process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
     process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
     // Host a new IPC Server and connect to it.
-    obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
+    obs.IPC.host(process.env.SLOBS_IPC_PATH);
     obs.NodeObs.SetWorkingDirectory(path.join(
       app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
       'node_modules',
@@ -445,18 +443,6 @@ ipcMain.on('restartApp', () => {
   mainWindow.close();
 });
 
-ipcMain.on('requestSourceAttributes', (e, names) => {
-  const sizes = require('obs-studio-node').getSourcesSize(names);
-
-  e.sender.send('notifySourceAttributes', sizes);
-});
-
-ipcMain.on('requestPerformanceStatistics', (e) => {
-  const stats = getObs().OBS_API_getPerformanceStatistics();
-
-  e.sender.send('notifyPerformanceStatistics', stats);
-});
-
 ipcMain.on('streamlabels-writeFile', (e, info) => {
   fs.writeFile(info.path, info.data, err => {
     if (err) {
@@ -473,4 +459,9 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
 
 ipcMain.on('getMainWindowWebContentsId', e => {
   e.returnValue = mainWindow.webContents.id;
+});
+
+ipcMain.on('requestPerformanceStats', e => {
+  const stats = app.getAppMetrics();
+  e.sender.send('performanceStatsResponse', stats);
 });

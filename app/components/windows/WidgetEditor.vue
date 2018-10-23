@@ -21,7 +21,6 @@
           <toggle-input :value="customCodeIsEnabled" @input="value => toggleCustomCode(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
-        <div class="custom-code__divider" :class="{ hidden: currentTopTab !== 'code' }" />
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
@@ -32,14 +31,14 @@
         <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
-            <span class="subsection__title">{{ slot.label }}</span>
+            <h2 class="subsection__title">{{ slot.label }}</h2>
             <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
           <div class="subsection">
-            <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
+            <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
             <ul style="margin: 0;">
               <li
-                class="subsection__content settings-title"
+                class="settings-title"
                 v-for="setting in navItems"
                 :class="{ active: currentSetting === setting.value }"
                 :key="setting.value"
@@ -48,7 +47,7 @@
             </ul>
           </div>
           <div class="subsection">
-            <span class="subsection__title">{{ $t('Selected Properties') }}</span>
+            <h2 class="subsection__title">{{ $t('Selected Properties') }}</h2>
             <div class="subsection__content" v-if="currentSetting !== 'source'">
               <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed"/>
               <div v-else>
@@ -71,6 +70,7 @@
               v-model="currentCodeTab"
               @input="value => updateCodeTab(value)"
             />
+          <div v-if="canShowEditor">
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
               key="html"
@@ -95,6 +95,7 @@
               :value="selectedVariation || wData"
             />
           </div>
+          </div>
           <div v-else-if="loadingFailed" style="padding: 8px;">
             <div>{{ $t('Failed to load settings') }}</div>
             <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
@@ -113,24 +114,7 @@
   @import "../../styles/index";
 
   .widget-editor__top-tabs {
-    height: 36px !important;
-    width: 100%;
-
-    .tab-button {
-      text-transform: uppercase;
-      height: 36px;
-      font-size: 12px;
-      position: relative;
-      bottom: -1px;
-      z-index: 1;
-    }
-  }
-
-  .night-theme {
-    .widget-editor__top-tabs {
-      background-color: @night-section !important;
-      border-bottom: 1px solid @night-slider-bg !important;
-    }
+    .margin-h-sides(2);
   }
 
   .top-settings {
@@ -138,14 +122,11 @@
       margin-bottom: 0;
       width: auto;
       flex-direction: column;
-      margin-right: 8px;
-      margin-bottom: 16px;
+      .margin-right(2);
+      .margin-bottom(2);
     }
     .int-input{
       width: 60px;
-    }
-    input[type=text] {
-      height: 28px;
     }
   }
 
@@ -172,15 +153,15 @@
   }
 
   .window-container {
-    border: 1px solid @day-border;
+    overflow: hidden;
+    .radius();
+    .border();
   }
 
   .top-settings {
-    height: 50px;
     width: 100%;
     display: flex;
     align-items: center;
-    font-size: 12px;
 
     > div {
       display: flex;
@@ -203,7 +184,7 @@
   }
 
   .window-container {
-    height: calc(~"100% - 51px");
+    height: calc(~"100% - 66px");
   }
 
   .test-button {
@@ -279,14 +260,13 @@
   .sidebar {
     width: 30%;
     height: 100%;
-    font-size: 12px;
     position: absolute;
     right: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-left: 1px solid @day-border;
-    background-color: @day-section;
+    background-color: @day-bg;
     .transition();
     transition-delay: 300ms;
   }
@@ -308,17 +288,17 @@
   }
 
   .subsection__title {
-    display: block;
     width: 100%;
-    padding: 8px;
-    text-transform: uppercase;
-    background-color: @light-2;
+    .padding-h-sides(2);
+    .padding-v-sides();
+    .text-transform();
     border-bottom: 1px solid @day-border;
     white-space: nowrap;
+    .margin-bottom(@0);
   }
 
   .subsection__content {
-    padding: 8px;
+    .padding(2);
     overflow: hidden;
     overflow-y: auto;
     width: 100%;
@@ -336,13 +316,19 @@
   .settings-title {
     margin: 0;
     list-style: none;
-    border-bottom: 1px solid @day-secondary;
     .transition();
+    cursor: pointer;
+    .padding-h-sides(2);
+    line-height: 32px;
 
     &:hover,
     &.active {
-      cursor: pointer;
-      background-color: @teal-light-opac;
+      background-color: @light-3;
+    }
+
+    &.active {
+      color: @day-title;
+      .weight(@medium);
     }
   }
 
@@ -352,24 +338,25 @@
     position: absolute;
     bottom: 0;
     border-top: 1px solid @day-border;
-    background-color: @day-section;
+    background-color: @day-bg;
     .transition();
   }
 
   .custom-code {
     position: absolute;
     display: flex;
-    margin: 8px;
     top: 0;
-    left: 200px;
-    padding-left: 8px;
+    left: 215px;
     align-items: center;
     height: 24px;
+    .margin-left();
+    .padding-left();
     .transition();
-    transition-delay: 600ms;
+    border-left: 1px solid @day-border;
+    margin: 12px 0;
 
     span {
-      padding-left: 8px;
+      .padding-left();
     }
   }
 
@@ -377,25 +364,7 @@
     left: 100px;
     opacity: 0;
     border-left: none;
-    transition: none;
-    transition-delay: 0ms;
-  }
-
-  .custom-code__divider {
-    position: absolute;
-    left: 100px;
-    border-right: 1px solid @day-border;
-    width: 100px;
-    margin: 8px;
-    height: 24px;
-    top: 0;
-    background-color: @white;
-    transition-delay: 600ms;
-  }
-
-  .custom-code__divider.hidden {
-    border-right: none;
-    transition-delay: 0ms;
+    z-index: -1;
   }
 
   .custom-code__alert {
@@ -403,8 +372,8 @@
     width: 6px;
     height: 6px;
     position: absolute;
-    top: 50%;
-    left: 194px;
+    top: calc(~"50% - 3px");
+    left: 200px;
     transform: translate(0, -50%);
     background-color: @light-4;
   }
@@ -418,44 +387,58 @@
   }
 
   .night-theme {
-    .window-container {
-      border-color: @night-slider-bg;
-    }
-    .display, .content-container, .left-toolbar {
+    .display,
+    .content-container,
+    .left-toolbar {
       background-color: @night-section-bg;
     }
-    .custom-code__divider {
-      background-color: @night-section;
-      border-color: @night-slider-bg;
+
+    .window-container {
+      border-color: @night-border;
+    }
+
+    .custom-code {
+      border-color: @night-border;
     }
     .left-toolbar {
       border-color: @night-slider-bg;
     }
     .sidebar {
-      background-color: @night-section;
-      border-color: @night-slider-bg;
+      background-color: @night-bg;
+      border-color: @night-border;
     }
+
     .subsection:not(:first-of-type) .subsection__title {
-      border-color: @night-slider-bg;
+      border-color: @night-border;
     }
+
     .subsection__title {
-      background-color: @night-accent-dark;
-      border-color: @night-slider-bg;
+      background-color: @night-section;
+      border-color: @night-border;
     }
+
     .settings-title {
       border-color: @night-accent-dark;
+
       &:hover,
       &.active {
-        background-color: @night-primary;
+        background-color: @night-hover;
+      }
+
+      &.active {
+        color: @night-title;
       }
     }
+
     .code-editor {
-      border-color: @night-slider-bg;
-      background-color: @night-section-bg;
+      border-color: @night-border;
+      background-color: @night-bg;
     }
+
     .custom-code__alert {
       background-color: @dark-4;
     }
+
     .custom-code__alert.active {
       background-color: @teal;
     }

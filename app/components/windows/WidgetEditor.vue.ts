@@ -69,6 +69,7 @@ export default class WidgetEditor extends Vue {
   currentSetting = this.navItems[0].value;
   readonly settingsState = this.widget.getSettingsService().state;
   animating = false;
+  canShowEditor = false;
 
   get loaded() {
     return !!this.settingsState.data;
@@ -145,7 +146,11 @@ export default class WidgetEditor extends Vue {
     this.animating = true;
     this.currentTopTab = value;
     // Animation takes 600ms to complete before we can re-render the OBS display
-    setTimeout(() => this.animating = false, 600);
+    setTimeout(() => {
+      this.animating = false;
+      this.canShowEditor = true; // vue-codemirrow has rendering issues if we attempt to animate it just after mount
+    }, 600);
+
   }
 
   updateCodeTab(value: string) {

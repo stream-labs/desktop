@@ -52,7 +52,8 @@
 
 .mixer-item {
   position: relative;
-  .padding();
+  .padding-h-sides(2);
+  .padding-v-sides();
 
   .source-name {
     flex: 1
