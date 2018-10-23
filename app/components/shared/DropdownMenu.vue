@@ -8,7 +8,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      <span>{{ title }}</span> <i :class="icon || 'icon-down'"/>
+      <span>{{ title }}</span> <i :class="icon || 'icon-dropdown'"/>
     </button>
 
   </popper>
@@ -22,7 +22,7 @@
   top: 5px !important;
   background-color: @day-primary;
   .radius();
-  padding: 10px;
+  .padding();
   max-height: 166px;
   overflow-y: auto;
   z-index: 200000;
@@ -46,14 +46,9 @@
 
   .fa,
   i {
-    margin-left: 8px;
-    font-size: 10px;
+    .margin-left();
     padding: 3px; // easier to click
     .icon-hover();
-
-    &.icon-down {
-      font-size: 6px;
-    }
   }
 
   &:focus {
@@ -66,7 +61,7 @@
   height: 1px;
   background-color: @grey;
   opacity: .2;
-  margin: 10px 0;
+  .margin-v-sides();
 }
 
 .dropdown-menu__item {
