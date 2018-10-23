@@ -50,6 +50,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   alertTypes = this.alertBoxService.apiNames();
 
+  addAlertMenuOpen = false;
   selectedAlert = 'general';
   selectedId = 'default';
 
@@ -97,5 +98,9 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   selectVariation(id: string) {
     this.selectedId = id;
+  }
+
+  toggleAddAlertMenu() {
+    this.addAlertMenuOpen = !this.addAlertMenuOpen;
   }
 }

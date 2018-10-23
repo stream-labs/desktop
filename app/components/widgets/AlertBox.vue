@@ -9,14 +9,24 @@
   <div slot="leftbar">
     <div class="left-accordion__button">
       <span style="text-transform: uppercase;" :class="{ active: selectedAlert === 'general' }">
-        {{ $t('General Settings') }}
+        {{ $t('Global Settings') }}
       </span>
     </div>
     <div class="left-accordion__button">
-      <span class="button button--default add-alert-button">{{ $t('Add Alert') }}</span>
+      <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
+      <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
+        <button
+          v-for="type in alertTypes"
+          class="button button--action"
+          :key="type"
+          @click="addAlert(type)"
+        >
+          {{ $t('Add ') }}{{ alertName(type) }}
+        </button>
+      </div>
     </div>
     <div v-for="alert in alertTypes" v-if="wData" :key="alert" style="position: relative;">
-      <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click.stop="selectAlertType(alert)">
+      <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
@@ -43,7 +53,7 @@
     <alert-layout-input v-model="selectedVariation.settings.layout" v-if="selectedVariation" />
   </div>
 
-  <!-- General Settings -->
+  <!-- Global Settings -->
   <validated-form slot="general-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" />
     <v-form-group :title="$t('Global Alert Delay')" type="slider" v-model="wData.settings.alert_delay" :metadata="{ min: 0, max: 30 }" />
@@ -144,6 +154,23 @@
   font-size: 12px;
 }
 
+.add-alert-dropdown {
+  position: absolute;
+  left: 0;
+  top: 50px;
+  background-color: @white;
+  z-index: 1;
+  box-shadow: 0 2px @day-shadow;
+  padding: 8px;
+  .button {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    line-height: 12px;
+    margin-bottom: 4px;
+  }
+}
+
 .left-accordion__title {
   width: 100px;
   white-space: nowrap;
@@ -213,6 +240,10 @@
 .night-theme {
   .left-accordion__button {
     border-color: @night-border;
+  }
+  .add-alert-dropdown {
+    background-color: @night-secondary;
+    box-shadow: 0 2px @night-shadow;
   }
   .variation-tile {
     background-color: @night-section-alt;
