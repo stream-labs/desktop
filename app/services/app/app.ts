@@ -147,6 +147,7 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
+      obs.IPC.disconnect();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

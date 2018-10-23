@@ -348,10 +348,6 @@ app.on('ready', () => {
   }
 });
 
-app.on('quit', (e, exitCode) => {
-  obs.IPC.disconnect();
-});
-
 ipcMain.on('openDevTools', () => {
   openDevTools();
 });
