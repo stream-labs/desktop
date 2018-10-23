@@ -63,12 +63,12 @@
 .goal-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px;
-  border-bottom: 1px solid @day-secondary;
+  .padding();
+  border-bottom: 1px solid @day-border;
 }
 
 .goal-row:last-of-type {
-  margin-bottom: 8px;
+  .margin-bottom();
 }
 
 .loading-spinner {
@@ -86,7 +86,7 @@
 
 .night-theme {
   .goal-row {
-    border-color: @night-accent-dark;
+    border-color: @night-border;
   }
 }
 </style>

@@ -267,7 +267,7 @@ h2 {
   &.source--active {
     color: @day-title;
     .weight(@medium);
-    background-color: @light-2;
+    background-color: @light-3;
   }
 
   >div {

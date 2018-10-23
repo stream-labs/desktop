@@ -28,8 +28,6 @@ const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 
-app.disableHardwareAcceleration();
-
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
@@ -81,7 +79,7 @@ function startApp() {
     process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
     process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
     // Host a new IPC Server and connect to it.
-    obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
+    obs.IPC.host(process.env.SLOBS_IPC_PATH);
     obs.NodeObs.SetWorkingDirectory(path.join(
       app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
       'node_modules',
