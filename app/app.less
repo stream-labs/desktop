@@ -40,6 +40,15 @@ body {
 }
 
 // Type
+h1 {
+  font-family: 'Roboto';
+  font-size: 20px;
+  .weight(@bold);
+  text-transform: capitalize;
+  color: @day-title;
+  margin-bottom: 24px;
+}
+
 h2 {
   font-family: 'Roboto';
   font-size: 16px;
@@ -373,14 +382,9 @@ select {
     border: 1px solid transparent;
   }
 
-  h2 {
-    color: @night-title;
-  }
-
-  h3 {
-    color: @night-title;
-  }
-
+  h1,
+  h2,
+  h3,
   h4 {
     color: @night-title;
   }

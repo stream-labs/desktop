@@ -85,6 +85,13 @@
     </div>
     <div class="top-nav-item">
       <a
+        @click="navigateHelp"
+        class="link">
+        <i class="icon-question"></i>
+      </a>
+    </div>
+    <div class="top-nav-item">
+      <a
         @click="openSettingsWindow"
         class="link">
         <i class="icon-settings"/><span>{{ $t('Settings') }}</span>
