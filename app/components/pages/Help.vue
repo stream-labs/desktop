@@ -1,7 +1,7 @@
 <template>
   <div class="help-page">
     <div class="callout callout--discord">
-      <span>Join 200K+ others on the Streamlabs OBS Discord for free 24h support.</span>
+      <span>Join 200K+ others on the <a @click="openDiscord">Streamlabs OBS Discord</a> for free 24h support.</span>
       <button class="button button--discord" @click="openDiscord">Join Discord <i class="icon-discord"></i></button>
     </div>
     <div class="help-page__section">
@@ -12,45 +12,61 @@
 
       <div class="help-item">
         <div class="help-item__info">
-          <h2>Streamlabs OBS Quickstart</h2>
-          <div>How to download, install, and Go Live with Streamlabs OBS.</div>
+          <div>
+            <h2>Streamlabs OBS Quickstart</h2>
+            <div>How to download, install, and Go Live with Streamlabs OBS.</div>
+          </div>
+          <a @click="openYoutubeQuickstart">View on Youtube</a>
         </div>
         <div class="help-item__video">
           <iframe
             width="'100%'"
             height="'auto'"
             src="https://www.youtube.com/embed/d--1z_W9IVw"
-            frameborder="0" allow="autoplay; encrypted-media"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
             allowfullscreen></iframe>
-        </div>
+          </div>
       </div>
       <div class="help-item">
         <div class="help-item__info">
-          <h2>Merch Store Setup</h2>
-          <div>Build a Streamlabs automated Merch Store in under 60 seconds.</div>
-        </div>
-        <iframe
-          width="'100%'"
-          height="'auto'"
-          src="https://www.youtube.com/watch?v=epd8cYG2ArI"
-          frameborder="0" allow="autoplay; encrypted-media"
-          allowfullscreen></iframe>
-      </div>
-      <div class="help-item">
-        <div class="help-item__info">
-          <h2>Affiliates Guide</h2>
-          <div>Earn revenue and raise money for charity by sharing Streamlabs OBS with your friends.</div>
+          <div>
+            <h2>Merch Store Setup</h2>
+            <div>Build a Streamlabs automated Merch Store in under 60 seconds.</div>
+          </div>
+          <a @click="openYoutubeMerch">View on Youtube</a>
         </div>
         <div class="help-item__video">
           <iframe
             width="'100%'"
             height="'auto'"
-            src="https://www.youtube.com/watch?v=cHMyxE5NsFQ"
-            frameborder="0" allow="autoplay; encrypted-media"
+            src="https://www.youtube.com/embed/epd8cYG2ArI"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
             allowfullscreen></iframe>
-        </div>
+          </div>
       </div>
+      <div class="help-item">
+        <div class="help-item__info">
+          <div>
+            <h2>Affiliates Guide</h2>
+            <div>Earn revenue and raise money for charity by sharing Streamlabs OBS with your friends.</div>
+          </div>
+          <a @click="openYoutubeAffiliates">View on Youtube</a>
+        </div>
+        <div class="help-item__video">
+          <iframe
+            width="'100%'"
+            height="'auto'"
+            src="https://www.youtube.com/embed/cHMyxE5NsFQ"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen></iframe>
+          </div>
+      </div>
+      <div class="help-view-more" @click="openYoutube">View More</div>
     </div>
+
     <div class="help-page__section">
       <div class="help-page__header">
         <h1>Troubleshooting</h1>
@@ -58,40 +74,60 @@
       </div>
       <div class="help-item">
         <div class="help-item__info">
-          <h2>Frame Management Help</h2>
-          <div>Spot issues with CPU and GPU usage while streaming.</div>
+          <div>
+            <h2>Frame Management Help</h2>
+            <div>Spot issues with CPU and GPU usage while streaming.</div>
+          </div>
+          <a @click="openYoutubeFrames">View on Youtube</a>
         </div>
-        <iframe
-          width="'100%'"
-          height="'auto'"
-          src="https://www.youtube.com/watch?v=WnRhaZaQ2ns"
-          frameborder="0" allow="autoplay; encrypted-media"
-          allowfullscreen></iframe>
-      </div>
-      <div class="help-item">
-        <div class="help-item__info">
-          <h2>Troubleshooting Alerts</h2>
-          <div>Identify and correct issues with your alerts.</div>
-        </div>
-        <iframe
-          width="'100%'"
-          height="'auto'"
-          src="https://www.youtube.com/watch?v=GfVQ9KhBlDU"
-          frameborder="0" allow="autoplay; encrypted-media"
-          allowfullscreen></iframe>
-      </div>
-      <div class="help-item">
-        <div class="help-item__info">
-          <h2>How To Stream On Twitch</h2>
-          <div>Make sure your account is linked, check your donation settings and import a free overlay.</div>
+        <div class="help-item__video">
           <iframe
             width="'100%'"
             height="'auto'"
-            src="https://youtu.be/aplbiAgZjtY"
-            frameborder="0" allow="autoplay; encrypted-media"
+            src="https://www.youtube.com/embed/WnRhaZaQ2ns"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen></iframe>
+          </div>
+      </div>
+      <div class="help-item">
+        <div class="help-item__info">
+          <div>
+            <h2>Troubleshooting Alerts</h2>
+            <div>Identify and correct issues with your alerts.</div>
+          </div>
+          <a @click="openYoutubeTroublshoot">View on Youtube</a>
+        </div>
+        <div class="help-item__video">
+          <iframe
+            width="'100%'"
+            height="'auto'"
+            src="https://www.youtube.com/embed/GfVQ9KhBlDU"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen></iframe>
+          </div>
+      </div>
+      <div class="help-item">
+        <div class="help-item__info">
+          <div>
+            <h2>How To Stream On Twitch</h2>
+            <div>Make sure your account is linked, check your donation settings and import a free overlay.</div>
+          </div>
+          <a @click="openYoutubeTwitch">View on Youtube</a>
+        </div>
+        <div class="help-item__video">
+          <iframe
+            width="'100%'"
+            height="'auto'"
+            src="https://www.youtube.com/embed/aplbiAgZjtY"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
             allowfullscreen></iframe>
         </div>
       </div>
+
+      <div class="help-view-more" @click="openYoutube">View More</div>
     </div>
   </div>
 </template>
@@ -124,6 +160,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  a {
+    display: inline-block;
+    color: @white;
+    .weight(@medium);
+  }
 }
 
 .button--discord {
@@ -150,6 +192,7 @@
   .padding(2);
   display: grid;
   grid-template-columns: 3fr 2fr;
+  grid-column-gap: 24px;
   .margin-bottom(2);
 
   h2 {
@@ -161,8 +204,23 @@
   }
 }
 
+.help-item__video {
+  text-align: right;
+}
+
+.help-view-more {
+  background-color: @day-section;
+  .radius();
+  .padding(2);
+  text-align: center;
+  .weight(@medium);
+  cursor: pointer;
+  .margin-top();
+}
+
 .night-theme {
-  .help-item {
+  .help-item,
+  .help-view-more {
     background-color: @night-section-alt;
   }
 }

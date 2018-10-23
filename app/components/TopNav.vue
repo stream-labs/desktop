@@ -78,16 +78,10 @@
     </div>
     <div class="top-nav-item">
       <a
-        @click="openDiscord"
-        class="link">
-        <i class="icon-discord"></i><span>Discord</span>
-      </a>
-    </div>
-    <div class="top-nav-item">
-      <a
         @click="navigateHelp"
         class="link">
         <i class="icon-question"></i>
+        <span>{{ $t('Help') }}</span>
       </a>
     </div>
     <div class="top-nav-item">
@@ -157,7 +151,7 @@
 }
 
 .link {
-  @media(max-width: 1500px) {
+  @media(max-width: 1600px) {
     span {
       display: none;
     }
