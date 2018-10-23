@@ -445,18 +445,6 @@ ipcMain.on('restartApp', () => {
   mainWindow.close();
 });
 
-ipcMain.on('requestSourceAttributes', (e, names) => {
-  const sizes = require('obs-studio-node').getSourcesSize(names);
-
-  e.sender.send('notifySourceAttributes', sizes);
-});
-
-ipcMain.on('requestPerformanceStatistics', (e) => {
-  const stats = getObs().OBS_API_getPerformanceStatistics();
-
-  e.sender.send('notifyPerformanceStatistics', stats);
-});
-
 ipcMain.on('streamlabels-writeFile', (e, info) => {
   fs.writeFile(info.path, info.data, err => {
     if (err) {
@@ -473,4 +461,9 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
 
 ipcMain.on('getMainWindowWebContentsId', e => {
   e.returnValue = mainWindow.webContents.id;
+});
+
+ipcMain.on('requestPerformanceStats', e => {
+  const stats = app.getAppMetrics();
+  e.sender.send('performanceStatsResponse', stats);
 });
