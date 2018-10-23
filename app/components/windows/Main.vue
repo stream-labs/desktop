@@ -8,20 +8,27 @@
 
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
-      <apps-nav v-if="platformApps.length > 0"></apps-nav>
+      <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
         <custom-loader></custom-loader>
       </div>
 
+      <!--
+        The style tag on this element is a hack to prevent a visual glitch when switching back to editor.
+        It shouldn't technically be necessary, but if it is removed, the editor component renders
+        in first, followed by the persistent app webview being removed a split-second later.  This
+        causes the display to be rendered small, and then snaps up to its full size, which is jarring.
+      -->
       <PlatformAppWebview
         class="main-page-container"
         v-for="app in platformApps"
         :key="app.id"
-        :style="appStyles(app.id)"
         v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
         :appId="app.id"
         :pageSlot="appPageSlot"
-        :poppedOut="isAppPoppedOut(app.id)" />
+        :poppedOut="isAppPoppedOut(app.id)"
+        :style="{ position: isAppVisible(app.id) ? 'inherit' : 'absolute' }"
+        :visible="isAppVisible(app.id)" />
       <component
         class="main-page-container"
         v-if="page !== 'PlatformAppContainer' && !shouldLockContent"

@@ -12,6 +12,7 @@ export default class PlatformAppWebview extends Vue {
   @Prop() appId: string;
   @Prop() pageSlot: EAppPageSlot;
   @Prop() poppedOut: boolean;
+  @Prop({ default: true }) visible: boolean;
 
   $refs: {
     appView: Electron.WebviewTag;
@@ -89,6 +90,17 @@ export default class PlatformAppWebview extends Vue {
 
   get appPartition() {
     return this.platformAppsService.getAppPartition(this.appId);
+  }
+
+  get webviewStyles() {
+    if (this.visible) {
+      return {};
+    } else {
+      return {
+        position: 'absolute',
+        top: '-10000px'
+      };
+    }
   }
 
 }
