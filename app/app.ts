@@ -28,16 +28,21 @@ import OneOffWindow from 'components/windows/OneOffWindow.vue';
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+const windowId = Utils.getCurrentUrlParams().windowId;
 
 window['obs'] = window['require']('obs-studio-node');
 
-{ // Set up things for IPC
-  // Connect to the IPC Server
+if (windowId === 'main') {
+  console.log('main');
+  window['obs'].IPC.host(remote.process.env.SLOBS_IPC_PATH);
+} else {
+  console.log('child');
   window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
-  document.addEventListener('close', (e) => {
-    window['obs'].IPC.disconnect();
-  });
 }
+
+document.addEventListener('close', (e) => {
+  window['obs'].IPC.disconnect();
+});
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -109,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const i18nService: I18nService = I18nService.instance;
-  const windowId = Utils.getCurrentUrlParams().windowId;
 
   if (Utils.isMainWindow()) {
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());

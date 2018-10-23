@@ -26,6 +26,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
+import path from 'path';
 
 interface IAppState {
   loading: boolean;
@@ -72,6 +73,12 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   async load() {
     this.START_LOADING();
+
+    obs.NodeObs.SetWorkingDirectory(path.join(
+      electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node')
+    );
 
     // Initialize OBS
     obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
