@@ -38,7 +38,7 @@ if (windowId === 'main') {
   window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
 }
 
-document.addEventListener('close', (e) => {
+window.addEventListener('beforeunload', (e) => {
   window['obs'].IPC.disconnect();
 });
 
