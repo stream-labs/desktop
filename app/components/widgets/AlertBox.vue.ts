@@ -120,5 +120,14 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     this.selectedAlert = type;
     this.selectedId = newVariation.id;
     this.addAlertMenuOpen = false;
+    this.save();
+  }
+
+  removeVariation(id: string) {
+    this.selectedId = 'default';
+    this.wData.settings[this.selectedAlert].variations = this.wData.settings[this.selectedAlert].variations.filter(
+      (variation: IAlertBoxVariation) => variation.id !== id
+    );
+    this.save();
   }
 }

@@ -38,6 +38,7 @@ export interface IAlertBoxVariation {
   conditions: { type: string, description: string }[];
   name: string;
   id: string;
+  deleteable?: boolean;
   settings: {
     customCss: string;
     customHtml: string;

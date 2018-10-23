@@ -57,6 +57,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditions: [],
       conditionData: '3',
       name: 'New Variation',
+      deleteable: true,
       id: uuid(),
       settings: {
         customCss: '',

@@ -45,6 +45,10 @@
           <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
           <span class="variation-tile__name">{{ variation.name }}</span>
         </div>
+        <div class="variation-tile__toolbar">
+          <i v-if="variation.deleteable" class="icon-trash" @click.stop="removeVariation(variation.id)" />
+          <i v-if="variation.id !== 'default'" class="icon-edit" />
+        </div>
       </div>
     </div>
   </div>
@@ -235,6 +239,16 @@
   width: 100%;
   padding: 4px;
   background-color: @day-shadow;
+}
+
+.variation-tile__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 2px;
+
+  i {
+    margin-left: 4px;
+  }
 }
 
 .night-theme {
