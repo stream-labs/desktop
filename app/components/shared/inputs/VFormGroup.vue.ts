@@ -20,4 +20,8 @@ export default class VFormGroup extends BaseFormGroup {
 
   @Prop()
   title: string;
+
+  created() {
+    super.created();
+  }
 }
