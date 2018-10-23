@@ -41,7 +41,7 @@ export class Display {
   private selectionSubscription: Subscription;
 
   sourceId: string;
-  
+
   boundDestroy: any;
   boundClose: any;
   displayDestroyed: boolean;

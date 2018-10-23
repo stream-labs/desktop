@@ -1,4 +1,4 @@
-import { Module, EApiPermissions, TApiModule, IApiContext } from './modules/module';
+import { Module, TApiModule, IApiContext } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';

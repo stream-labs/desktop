@@ -26,7 +26,7 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
-import PlatformAppContainer from '../pages/PlatformAppContainer.vue';
+import PlatformAppWebview from '../PlatformAppWebview.vue';
 import electron from 'electron';
 
 @Component({
@@ -46,7 +46,7 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
-    PlatformAppContainer,
+    PlatformAppWebview,
     PlatformAppStore
   }
 })
@@ -117,6 +117,8 @@ export default class Main extends Vue {
       };
     }
   }
+
+  appPageSlot = EAppPageSlot.TopNav;
 
   /**
    * Only certain pages get locked out while the application

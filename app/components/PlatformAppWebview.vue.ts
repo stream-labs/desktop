@@ -11,6 +11,7 @@ export default class PlatformAppWebview extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Prop() appId: string;
   @Prop() pageSlot: EAppPageSlot;
+  @Prop() poppedOut: boolean;
 
   $refs: {
     appView: Electron.WebviewTag;

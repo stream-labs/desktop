@@ -13,13 +13,15 @@
         <custom-loader></custom-loader>
       </div>
 
-      <PlatformAppContainer
+      <PlatformAppWebview
         class="main-page-container"
         v-for="app in platformApps"
         :key="app.id"
         :style="appStyles(app.id)"
         v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
-        :params="{ appId: app.id, poppedOut: isAppPoppedOut(app.id) }" />
+        :appId="app.id"
+        :pageSlot="appPageSlot"
+        :poppedOut="isAppPoppedOut(app.id)" />
       <component
         class="main-page-container"
         v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
