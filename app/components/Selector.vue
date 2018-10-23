@@ -100,14 +100,14 @@
 .night-theme {
   .sortable-ghost,
   .sortable-chosen {
-    background: @night-hover;
+    background: @dark-4;
   }
 
   .selector-item {
     color: @grey;
 
     &.selector-item--active {
-      background-color: @night-hover;
+      background-color: @dark-4;
       color: @white;
     }
   }

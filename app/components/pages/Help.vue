@@ -20,8 +20,6 @@
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/d--1z_W9IVw"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -38,8 +36,6 @@
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/epd8cYG2ArI"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -56,8 +52,6 @@
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/cHMyxE5NsFQ"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -82,8 +76,6 @@
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/WnRhaZaQ2ns"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -96,12 +88,10 @@
             <h2>Troubleshooting Alerts</h2>
             <div>Identify and correct issues with your alerts.</div>
           </div>
-          <a @click="openYoutubeTroublshoot">View on Youtube</a>
+          <a @click="openYoutubeTroubleshoot">View on Youtube</a>
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/GfVQ9KhBlDU"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -118,8 +108,6 @@
         </div>
         <div class="help-item__video">
           <iframe
-            width="'100%'"
-            height="'auto'"
             src="https://www.youtube.com/embed/aplbiAgZjtY"
             frameborder="0"
             allow="autoplay; encrypted-media"
@@ -191,7 +179,7 @@
   .radius(2);
   .padding(2);
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 5fr 2fr;
   grid-column-gap: 24px;
   .margin-bottom(2);
 
@@ -201,6 +189,18 @@
 
   iframe {
     .radius(2);
+    width: 100%;
+    height: 140px;
+  }
+}
+
+.help-item__info {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+
+  a {
+    text-decoration: underline;
   }
 }
 
@@ -215,7 +215,7 @@
   text-align: center;
   .weight(@medium);
   cursor: pointer;
-  .margin-top();
+  .margin-top(3);
 }
 
 .night-theme {

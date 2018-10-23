@@ -151,10 +151,8 @@
 }
 
 .link {
-  @media(max-width: 1600px) {
-    span {
-      display: none;
-    }
+  span {
+    display: none;
   }
 }
 
