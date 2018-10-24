@@ -7,6 +7,7 @@
         @input="emitInput($event.target.value)"
         :name="uuid"
         v-validate="validate"
+        :disabled="metadata.disabled"
     />
   </span>
 </template>

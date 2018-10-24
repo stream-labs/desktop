@@ -43,11 +43,20 @@
       >
         <div class="variation-tile__image-box">
           <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
-          <span class="variation-tile__name">{{ variation.name }}</span>
+          <div class="variation-tile__name">
+            <input
+              type="text"
+              :value="variation.name"
+              :disabled="editingName !== variation.id"
+              :ref="`${variation.id}-name-input`"
+              @input="nameInputHandler($event.target.value)"
+              @blur="nameBlurHandler(variation.id)"
+            />
+          </div>
         </div>
         <div class="variation-tile__toolbar">
           <i v-if="variation.deleteable" class="icon-trash" @click.stop="removeVariation(variation.id)" />
-          <i v-if="variation.id !== 'default'" class="icon-edit" />
+          <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
         </div>
       </div>
     </div>
@@ -239,6 +248,11 @@
   width: 100%;
   padding: 4px;
   background-color: @day-shadow;
+
+  input, input:disabled {
+    background-color: transparent;
+    border: none;
+  }
 }
 
 .variation-tile__toolbar {

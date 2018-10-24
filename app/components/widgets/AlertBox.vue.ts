@@ -39,6 +39,8 @@ const alertNameMap = () => ({
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
 
+  $refs: { [key: string]: HTMLElement };
+
   afterFetch() {
     this.alertTypes = this.alertTypes.filter((type) => this.wData.settings[type]);
     console.log(this.wData);
@@ -53,6 +55,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   addAlertMenuOpen = false;
   selectedAlert = 'general';
   selectedId = 'default';
+  editingName: string = null;
 
   get selectedVariation() {
     if (this.selectedAlert === 'general') { return this.wData }
@@ -73,7 +76,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
       { value: 'title', label: $t('Title Message') },
       { value: 'media', label: $t('Image & Video') },
       { value: 'audio', label: $t('Audio') },
-      { value: 'animation', label: $t('Animation') },
+      { value: 'animation', label: $t('Animation') }
     ];
     if (this.selectedVariation.settings.message) {
       baseItems.push({ value: 'message', label: $t('Donor Message') })
@@ -129,5 +132,20 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
       (variation: IAlertBoxVariation) => variation.id !== id
     );
     this.save();
+  }
+
+  editName(id: string) {
+    this.editingName = id;
+    const field = <HTMLInputElement>this.$refs[`${id}-name-input`][0];
+    this.$nextTick(() => field.focus());
+  }
+
+  nameInputHandler(eventData: string) {
+    this.selectedVariation.name = eventData;
+  }
+
+  nameBlurHandler(id: string) {
+    this.save();
+    this.editingName = null;
   }
 }
