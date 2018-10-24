@@ -129,7 +129,7 @@
     <v-form-group :title="$t('Min. Amount to Trigger Alert')" type="number" v-model="minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
     <v-form-group :title="$t('Min. Amount to Show in Recent Events')" type="number" v-model="minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
-      <v-form-group :title="$t('Variation Condition')" type="list" v-model="selectedVariation.condition" />
+      <v-form-group :title="$t('Variation Condition')" type="list" v-model="selectedVariation.condition" :metadata="{ options: conditions }" />
       <v-form-group :title="$t('Variation Frequency')" v-if="selectedVariation.condition === 'RANDOM'">
         <frequency-input v-model="selectedVariation.conditionData" />
       </v-form-group>

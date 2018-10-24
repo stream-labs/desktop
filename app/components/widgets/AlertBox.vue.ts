@@ -100,6 +100,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     }
   }
 
+  get conditions() {
+    return this.alertBoxService.conditionsByType(this.selectedAlert);
+  }
+
   get minRecentEvents() {
     return this.selectedAlert === 'donation' ?
       this.wData.settings.recent_events_donation_min_amount : this.wData.settings.recent_events_host_min_viewer_count;

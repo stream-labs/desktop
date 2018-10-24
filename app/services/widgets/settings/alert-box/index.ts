@@ -4,28 +4,7 @@ import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVariation } from './alert-box-api';
-
-const API_NAME_MAP =  {
-  bit: 'bits',
-  donation: 'donations',
-  donordrivedonation: 'donordrive',
-  pledge: 'patreon',
-  eldonation: 'extraLife',
-  justgivingdonation: 'justGiving',
-  merch: 'merch',
-  resub: 'resubs',
-  gamewispsubscription: 'gamewisp',
-  sub: 'subs',
-  tiltifydonation: 'tiltify',
-  treat: 'treat',
-  follow: 'follows',
-  host: 'hosts',
-  raid: 'raids'
-};
-
-const REGEX_TESTERS = Object.keys(API_NAME_MAP).map((key) => (
-  { name: API_NAME_MAP[key], tester: new RegExp(`^${key}s?_|show_${key}_`) }
-));
+import { API_NAME_MAP, REGEX_TESTERS, newVariation, conditions } from './alert-box-data';
 
 export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; }
 
@@ -51,43 +30,12 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     }
   }
 
+  conditionsByType(type: string) {
+    return conditions().base.concat(conditions()[type]);
+  }
+
   newVariation(type: string): IAlertBoxVariation {
-    return {
-      condition: 'RANDOM',
-      conditions: [],
-      conditionData: '3',
-      name: 'New Variation',
-      deleteable: true,
-      id: uuid(),
-      settings: {
-        customCss: '',
-        customHtml: '',
-        customHtmlEnabled: false,
-        customJs: '',
-        customJson: '',
-        duration: 2,
-        hideAnimation: 'fadeOut',
-        image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
-        layout: 'above',
-        showAnimation: 'fadeIn',
-        sound: { href: '', volume: 80 },
-        text: {
-          animation: 'tada',
-          color: '#FFFFFF',
-          color2: '#32C3A6',
-          font: 'Open Sans',
-          format: '',
-          resubFormat: null,
-          tierUpgradeFormat: null,
-          size: 32,
-          thickness: 400
-        },
-        textDelay: 0,
-        type: type,
-        useCustomImage: null,
-        moderation: null
-      }
-    };
+    return newVariation(type);
   }
 
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
