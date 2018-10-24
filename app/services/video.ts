@@ -16,6 +16,9 @@ const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 export interface IDisplayOptions {
   sourceId?: string;
   paddingSize?: number;
+  electronWindowId?: number;
+  slobsWindowId?: string;
+  paddingColor?: IRGBColor;
 }
 
 export class Display {
@@ -36,7 +39,8 @@ export class Display {
     height: 0
   };
 
-  windowId: string;
+  electronWindowId: number;
+  slobsWindowId: string;
 
   private selectionSubscription: Subscription;
 
@@ -47,19 +51,21 @@ export class Display {
   displayDestroyed: boolean;
 
   constructor(public name: string, options: IDisplayOptions = {}) {
-    this.windowId = Utils.isChildWindow() ? 'child' : 'main';
-
     this.sourceId = options.sourceId;
+    this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
+    this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
+
+    const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     if (this.sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
-        remote.getCurrentWindow().getNativeWindowHandle(),
+        electronWindow.getNativeWindowHandle(),
         this.sourceId,
         name
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
-        remote.getCurrentWindow().getNativeWindowHandle(),
+        electronWindow.getNativeWindowHandle(),
         name
       );
     }
@@ -69,7 +75,16 @@ export class Display {
       this.switchGridlines(state.selectedIds.length <= 1);
     });
 
-    obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    if (options.paddingColor) {
+      obs.NodeObs.OBS_content_setPaddingColor(
+        name,
+        options.paddingColor.r,
+        options.paddingColor.g,
+        options.paddingColor.b
+      );
+    } else {
+      obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    }
 
     if (options.paddingSize != null) {
       obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
@@ -79,7 +94,7 @@ export class Display {
 
     this.boundClose = this.remoteClose.bind(this);
 
-    remote.getCurrentWindow().on('close', this.boundClose);
+    electronWindow.on('close', this.boundClose);
   }
 
   /**
@@ -107,7 +122,7 @@ export class Display {
   }
 
   getScaledRectangle(rect: ClientRect): IRectangle {
-    const factor: number = this.windowsService.state[this.windowId].scaleFactor;
+    const factor: number = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
     return {
       x: rect.left * factor,
@@ -140,7 +155,7 @@ export class Display {
   }
 
   destroy() {
-    remote.getCurrentWindow().removeListener('close', this.boundClose);
+    remote.BrowserWindow.fromId(this.electronWindowId).removeListener('close', this.boundClose);
     this.remoteClose();
   }
 

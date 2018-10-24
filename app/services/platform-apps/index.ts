@@ -5,7 +5,7 @@ import fs from 'fs';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions } from './api/modules/module';
+import { EApiPermissions, IWebviewTransform } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
@@ -16,6 +16,7 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
+import { Observable } from 'rxjs/Observable';
 
 const DEV_PORT = 8081;
 
@@ -483,9 +484,21 @@ export class PlatformAppsService extends
     });
   }
 
-  exposeAppApi(appId: string, webContentsId: number) {
+  exposeAppApi(
+    appId: string,
+    webContentsId: number,
+    electronWindowId: number,
+    slobsWindowId: string,
+    transform: Observable<IWebviewTransform>
+  ) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app);
+    const api = this.apiManager.getApi(
+      app,
+      webContentsId,
+      electronWindowId,
+      slobsWindowId,
+      transform
+    );
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.

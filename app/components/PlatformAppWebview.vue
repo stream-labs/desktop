@@ -1,5 +1,8 @@
 <template>
-<div class="platform-app-container" :style="webviewStyles">
+<div
+  class="platform-app-container"
+  ref="resizeContainer"
+  :style="webviewStyles">
   <webview
     v-if="renderWebview && !poppedOut"
     class="platform-app-webview"

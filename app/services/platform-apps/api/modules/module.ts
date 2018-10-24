@@ -12,10 +12,18 @@ export enum EApiPermissions {
   Hotkeys = 'slobs.hotkeys'
 }
 
+export interface IWebviewTransform {
+  pos: IVec2;
+  size: IVec2;
+  visible: boolean;
+}
+
 export interface IApiContext {
   app: ILoadedApp;
-  // windowId: number; // The id of the window containing the calling webview
-  // visibilityChanged: Observable<boolean>;
+  webContentsId: number;
+  electronWindowId: number;
+  slobsWindowId: string;
+  webviewTransform: Observable<IWebviewTransform>;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;
