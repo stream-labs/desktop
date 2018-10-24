@@ -132,7 +132,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           }
         }
       });
-      if (!testSuccess && !/smfredemption/.test(key)) newSettings[key] = settings[key];
+      if (['alert_delay', 'moderation_delay'].includes(key)) {
+        newSettings[key] = Math.floor(settings[key] / 1000);
+      } else if (!testSuccess && !/smfredemption/.test(key)) {
+        newSettings[key] = settings[key];
+      }
 
       // These settings are handled differently and purposely dropped on the floor in reshapeVariation
       newSettings.bits_alert_min_amount = settings.bits_alert_min_amount;
