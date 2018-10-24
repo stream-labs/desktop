@@ -20,6 +20,8 @@ function parseXml(xml: String): Promise<object> {
   return new Promise((resolve, reject) => {
     parseString(xml, (err, result) => {
       if (err) {
+        // sentryに送る
+        console.error(err, xml);
         reject(err);
       } else {
         resolve(result);
