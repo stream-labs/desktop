@@ -74,8 +74,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     }
     const baseItems = [
       { value: 'title', label: $t('Title Message') },
-      { value: 'media', label: $t('Image & Video') },
-      { value: 'audio', label: $t('Audio') },
+      { value: 'media', label: $t('Media') },
       { value: 'animation', label: $t('Animation') }
     ];
     if (this.selectedVariation.settings.message) {

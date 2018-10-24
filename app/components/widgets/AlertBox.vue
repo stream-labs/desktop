@@ -93,7 +93,13 @@
     </div>
   </validated-form>
   <validated-form slot="media-properties" @input="save()" v-if="selectedVariation">
-    <media-gallery-input v-model="selectedVariation.settings.image.href" v-if="selectedVariation.settings.image" />
+    <v-form-group :title="$t('Image/Video File')">
+      <media-gallery-input v-model="selectedVariation.settings.image.href" v-if="selectedVariation.settings.image" />
+    </v-form-group>
+    <v-form-group :title="$t('Sound File')" v-if="selectedVariation.settings.sound">
+      <sound-input v-model="selectedVariation.settings.sound.href" />
+    </v-form-group>
+    <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.sound.volume" :metadata="{ min: 0, max: 100 }" v-if="selectedVariation.settings.sound" />
   </validated-form>
   <validated-form slot="message-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Show Message?')" type="bool" v-model="selectedVariation.showMessage" />
@@ -113,10 +119,6 @@
       <v-form-group :title="$t('Language')" type="list" v-model="selectedVariation.settings.tts.language" />
       <v-form-group :title="$t('Spam Security')" type="slider" v-model="selectedVariation.settings.tts.security" />
     </div>
-  </validated-form>
-  <validated-form slot="audio-properties" @input="save()" v-if="selectedVariation && selectedVariation.settings.sound">
-    <sound-input v-model="selectedVariation.settings.sound.href" />
-    <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.sound.volume" :metadata="{ min: 0, max: 100 }" />
   </validated-form>
   <validated-form slot="animation-properties" @input="save()" v-if="selectedVariation">
     <v-form-group :title="$t('Show Animation')" type="animation" v-model="selectedVariation.settings.showAnimation" :metadata="{ filter: 'in' }" />
@@ -252,6 +254,7 @@
   input, input:disabled {
     background-color: transparent;
     border: none;
+    cursor: pointer;
   }
 }
 
