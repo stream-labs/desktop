@@ -23,4 +23,8 @@ export default class HFormGroup extends BaseFormGroup {
   @Prop()
   readonly title: string;
 
+  created() {
+    super.created();
+  }
+
 }

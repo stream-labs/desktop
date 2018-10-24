@@ -1,4 +1,4 @@
-import { Prop } from 'vue-property-decorator';
+import { Prop, Watch, Component } from 'vue-property-decorator';
 import Vue from 'vue';
 import { ErrorField } from 'vee-validate';
 import { EInputType, IInputMetadata } from './index';
@@ -24,19 +24,14 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
 
   inputErrors: ErrorField[] = [];
 
-  /**
-   * contains ValidatedForm if exist
-   */
-  protected form: ValidatedForm = (() => {
-    let comp: Vue = this;
-    do {
-      comp = comp.$parent;
-    } while (comp && !(comp instanceof ValidatedForm));
-    return comp as ValidatedForm;
-  })();
-
   created() {
     if (!this.form) return;
+
+    // if type is not defined that means we can have several components in slot
+    // these components must care about how to send an input-event to a form themselves
+    if (!this.options.type) this.delegateChildrenEvents = false;
+
+    // collect errors
     this.form.validated.subscribe(errors => {
       this.inputErrors = errors.filter(error => error.field == this.uuid);
     });

@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.11.2-preview.4",
+  "version": "0.11.2-preview.6",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -107,7 +107,7 @@
     "css-element-queries": "^1.0.2",
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
-    "electron": "3.0.4",
+    "electron": "3.0.5",
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
     "emojione": "3.1.7",

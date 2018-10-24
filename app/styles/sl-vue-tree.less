@@ -17,7 +17,7 @@
 }
 
 .sl-vue-tree-selected>.sl-vue-tree-node-item {
-  background-color: @light-2!important;
+  background-color: @light-3!important;
   color: @day-title!important;
   .weight(@medium);
 }
@@ -31,13 +31,18 @@
   border: 0!important;
   height: auto;
   margin-top: 0;
-  .padding-h-sides()!important;
+  .padding-h-sides(2)!important;
   .transition();
   cursor: pointer;
+  line-height: 32px;
 
   &:hover {
     color: @day-paragraph;
   }
+}
+
+.sl-vue-tree-title {
+  display: flex;
 }
 
 .sl-vue-tree-cursor {
@@ -47,7 +52,7 @@
 }
 
 .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-  background-color: @light-2!important;
+  background-color: @light-3!important;
 }
 
 // sl-vue-tree styles within a window

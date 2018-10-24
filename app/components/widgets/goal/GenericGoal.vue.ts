@@ -42,8 +42,8 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   }
 
   async saveGoal() {
-    this.requestState = 'pending';
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    this.requestState = 'pending';
     await this.service.saveGoal(this.goalCreateOptions);
     this.requestState = 'success';
   }

@@ -6,30 +6,30 @@
   outline: 0;
   vertical-align: baseline;
   font-style: normal;
-  min-height: 18px;
-  line-height: 18px;
-  min-width: 18px;
+  min-height: 16px;
+  line-height: 16px;
+  min-width: 16px;
   .margin-bottom();
 
   label {
     margin: 0;
-    line-height: 19px;
+    line-height: 16px;
     cursor: auto;
     position: relative;
     display: inline-block;
     width: auto;
     padding-left: 28px;
     outline: 0;
-    transition: color .1s ease;
+    .transition();
     color: @day-paragraph;
-    .weight();
+    .weight(@normal);
 
     &:before {
       position: absolute;
       top: 0;
       left: 0;
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       content: '';
       background: transparent;
       .radius();
@@ -60,21 +60,20 @@
 
     &:before {
       border-color: @teal;
-      background-color: @teal-light-opac;
+      background-color: @teal;
     }
   }
 
   input:checked~label:after {
     position: absolute;
     left: 3px;
-    top: 3px;
+    top: 0px;
     opacity: 1;
-    color: @teal;
+    color: @white;
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     content: '\f00c';
-    font-size: 13px;
-    line-height: 13px;
+    font-size: 10px;
   }
 }
 
@@ -82,8 +81,8 @@
   label:before {
     content: '';
     transform: none;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 500rem;
     top: 0;
     left: 0;
@@ -91,8 +90,8 @@
 
   input:checked~label:after {
     content: '';
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     background-color: @teal;
     border-radius: 20px;
     left: 4px;
@@ -116,7 +115,7 @@
       color: @night-paragraph;
 
       &:before {
-        border-color: @teal-med-opac;
+        border-color: @night-input-border;
       }
     }
 
