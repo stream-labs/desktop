@@ -130,7 +130,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
-
+    obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
 
     this.ipcServerService.stopListening();
