@@ -10,11 +10,11 @@
       <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
       <div class="footer">
         <span class="filename">{{ fileName || 'Default' }}</span>
-        <div class="flex flex--v-center">
-          <a @click="updateValue">{{ $t('Change Media') }}</a>
+        <div>
           <i @click="toggleUrlUpload" class="icon-link" />
           <i @click="previewImage" class="fa fa-search-plus" />
           <i @click="clearImage" class="icon-close" />
+          <span class="change-media" @click="updateValue">{{ $t('Change Media') }}</span>
         </div>
       </div>
     </div>
@@ -43,6 +43,12 @@
   }
 }
 
+.change-media {
+  text-transform: uppercase;
+  color: @night-text;
+  font-size: 11px;
+}
+
 .footer {
   display: flex;
   position: absolute;
@@ -52,12 +58,15 @@
   right: 1px;
   height: 30px;
   justify-content: space-between;
+  align-items: baseline;
   padding: 6px;
   background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
   border-radius: 0 0 @radius @radius;
 
   i {
     margin-left: 10px;
+    position: relative;
+    top: 2px;
   }
 
   .icon-close {
@@ -66,10 +75,11 @@
 }
 
 .filename {
-  max-width: 150px;
+  max-width: 50px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 12px;
 }
 
 i {
