@@ -124,9 +124,9 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     const newVariation = this.alertBoxService.newVariation(type);
     this.wData.settings[type].variations.push(newVariation);
     this.selectedAlert = type;
-    this.selectedId = newVariation.id;
     this.addAlertMenuOpen = false;
     this.save();
+    this.$nextTick(() => this.editName(newVariation.id));
   }
 
   removeVariation(id: string) {
