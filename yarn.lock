@@ -3366,6 +3366,10 @@ cosmiconfig@^2.1.0, cosmiconfig@^2.1.1:
     parse-json "^2.2.0"
     require-from-string "^1.1.0"
 
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.10/iojs-v3.0.4-crash-handler.tar.gz":
+  version "0.0.1"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.10/iojs-v3.0.4-crash-handler.tar.gz#d1d81a1d55492b4066a4e0d10f5def950e5bc12a"
+
 crc32-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/crc32-stream/-/crc32-stream-2.0.0.tgz#e3cdd3b4df3168dd74e3de3fbbcb7b297fe908f4"
@@ -8480,9 +8484,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.30/iojs-v3.0.4-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.35/iojs-v3.0.4-signed.tar.gz":
   version "0.3.21"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.30/iojs-v3.0.4-signed.tar.gz#121cc470ce6549b28fe8957a2111506641c7b2f5"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.35/iojs-v3.0.4-signed.tar.gz#783796253e39b668ba576f918fb0aa8834eeccb5"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
