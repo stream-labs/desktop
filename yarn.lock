@@ -8006,9 +8006,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.4/iojs-v3.0.1-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v3.0.4-node-libuiohook.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.4/iojs-v3.0.1-node-libuiohook.tar.gz#e345664c2c9a7f1a68b796531f700b6b36e7bcaa"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v3.0.4-node-libuiohook.tar.gz#3f5cf4fcbc7ccd331557347bbc275102e2ee7982"
 
 node-pre-gyp@^0.10.0:
   version "0.10.0"
