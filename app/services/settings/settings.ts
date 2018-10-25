@@ -1,10 +1,11 @@
+import { invert, cloneDeep } from 'lodash';
 import { StatefulService, mutation } from 'services/stateful-service';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
   TObsFormData,
-  IObsListInput
+  IObsListInput, IObsInput
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -14,12 +15,13 @@ import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
 import {
+  IOutputSettingsDeprecated,
   VideoEncodingOptimizationService,
-  IOutputSettings
 } from '../video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
+import { encoderFieldsMap, StreamEncoderSettings, obsEncoderToEncoder } from './stream-encoder';
 
 export interface ISettingsState {
   General: {
@@ -76,6 +78,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private windowsService: WindowsService;
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private streamEncoderSettings: StreamEncoderSettings;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -130,7 +133,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -168,70 +171,22 @@ export class SettingsService extends StatefulService<ISettingsState>
       categoryName === 'Output' &&
       this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
     ) {
-      const outputSettings: IOutputSettings = this.videoEncodingOptimizationService.getCurrentOutputSettings();
-
-      const indexSubCategory = settings.indexOf(
-        settings.find((category: any) => {
-          return category.nameSubCategory === 'Streaming';
-        })
+      const encoder = obsEncoderToEncoder(
+        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
+        this.findSettingValue(settings, 'Streaming', 'StreamEncoder')
       );
-
-      const parameters = settings[indexSubCategory].parameters;
-
       // Setting preset visibility
-      const indexPreset = parameters.indexOf(
-        parameters.find((parameter: any) => {
-          return parameter.name === outputSettings.presetField;
-        })
-      );
-      settings[indexSubCategory].parameters[indexPreset].visible = false;
-
-      // Setting encoder settings value
-      const indexX264Settings = parameters.indexOf(
-        parameters.find((parameter: any) => {
-          return parameter.name === outputSettings.encoderSettingsField;
-        })
-      );
-      settings[indexSubCategory].parameters[indexX264Settings].visible = false;
+      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
+      // Setting encoder settings visibility
+      if (encoder == 'x264') {
+        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, { visible: false });
+      }
     }
 
     return settings;
   }
 
-  /**
-   * Returns some information about the user's streaming settings.
-   * This is used in aggregate to improve our optimized video encoding.
-   *
-   * P.S. Settings needs a refactor... badly
-   */
-  getStreamEncoderSettings() {
-    const output = this.getSettingsFormData('Output');
-    const video = this.getSettingsFormData('Video');
-
-    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
-      this.findSettingValue(output, 'Streaming', 'StreamEncoder');
-    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
-      this.findSettingValue(output, 'Streaming', 'Preset') ||
-      this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
-      this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
-      this.findSettingValue(output, 'Streaming', 'target_usage') ||
-      this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
-      this.findSettingValue(output, 'Streaming', 'AMDPreset');
-    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
-      this.findSettingValue(output, 'Streaming', 'VBitrate');
-    const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
-    const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
-
-    return  {
-      encoder,
-      preset,
-      bitrate,
-      baseResolution,
-      outputResolution
-    };
-  }
-
-  private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+  findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
     let settingValue: any;
 
     settings.find(subCategory => {
@@ -248,6 +203,22 @@ export class SettingsService extends StatefulService<ISettingsState>
     });
 
     return settingValue;
+  }
+
+  private patchSetting(settingsFormData: ISettingsSubCategory[], name: string, patch: Partial<IObsInput<TObsValue>>) {
+    settingsFormData = cloneDeep(settingsFormData);
+    for (let subcategory of settingsFormData) {
+      for (let field of subcategory.parameters) {
+        if (field.name != name) continue;
+        Object.assign(field, patch);
+      }
+    }
+    return settingsFormData;
+  }
+
+  setSettingValue(category: string, name: string, value: TObsValue) {
+    const newSettings = this.patchSetting(this.getSettingsFormData(category), name, { value });
+    this.setSettings(category, newSettings);
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
@@ -321,6 +292,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
+    console.log('set settings', settingsData);
     if (categoryName === 'Audio') return this.setAudioSettings(settingsData);
 
     const dataToSave = [];

@@ -25,7 +25,7 @@
         :loading="searchingGames"
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
-      <div v-if="areAvailableProfiles">
+      <div v-if="hasAvalablePresets">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
@@ -59,18 +59,21 @@
             <label>Profile</label>
           </div>
           <div class="input-wrapper">
-            <multiselect
-              :allowEmpty="false"
-              :options="profiles"
-              track-by="value"
-              :close-on-select="true"
-              label="description"
-              v-model="encoderProfile">
-              <template slot="option" slot-scope="props">
-                <div class="edit-stream-info-option-desc">{{ props.option.description }}</div>
-                <div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>
-              </template>
-            </multiselect>
+
+            <FormInput type="list" v-model="selectedPresetType" :metadata="presetInputMetadata"/>
+
+            <!--<multiselect-->
+              <!--:allowEmpty="false"-->
+              <!--:options="profiles"-->
+              <!--track-by="value"-->
+              <!--:close-on-select="true"-->
+              <!--label="description"-->
+              <!--v-model="encoderProfile">-->
+              <!--<template slot="option" slot-scope="props">-->
+                <!--<div class="edit-stream-info-option-desc">{{ props.option.description }}</div>-->
+                <!--<div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>-->
+              <!--</template>-->
+            <!--</multiselect>-->
           </div>
         </div>
       </div>

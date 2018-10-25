@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { ObsTextInput, ObsListInput, ObsBoolInput }from 'components/obs/inputs';
 import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
@@ -16,11 +16,13 @@ import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
 import {
   VideoEncodingOptimizationService,
-  IEncoderPreset
+  IEncoderPresetDeprecated, IEncoderProfile
 } from 'services/video-encoding-optimizations';
+import { IListMetadata } from 'components/shared/inputs';
+import FormInput from 'components/shared/inputs/FormInput.vue';
 
 interface IMultiSelectProfiles {
-  value: IEncoderPreset;
+  value: IEncoderPresetDeprecated;
   description: string;
   longDescription: string;
 }
@@ -31,6 +33,7 @@ interface IMultiSelectProfiles {
     ObsTextInput,
     ObsListInput,
     ObsBoolInput,
+    FormInput,
     Multiselect
   }
 })
@@ -47,9 +50,13 @@ export default class EditStreamInfo extends Vue {
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
-  areAvailableProfiles = false;
   useOptimizedProfile = false;
-  isGenericProfiles = false;
+  selectedPresetType: string = '';
+
+  @Watch('selectedPresetType')
+  onSelectChange(value: string) {
+    console.log('selection changed', value);
+  }
 
   // Form Models:
 
@@ -79,10 +86,22 @@ export default class EditStreamInfo extends Vue {
     value: false
   };
 
-  encoderProfile: IMultiSelectProfiles;
+  encoderPresets: IEncoderProfile[] = [];
 
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
+
+  get isGenericProfiles() {
+    return this.encoderPresets.length && this.encoderPresets[0].game == 'Generic';
+  }
+
+  get hasAvalablePresets() {
+    return !!this.encoderPresets.length;
+  }
+
+  get selectedPreset() {
+    return this.encoderPresets.find(preset => preset.preset === this.selectedPresetType);
+  }
 
   created() {
     this.debouncedGameSearch = debounce(
@@ -132,36 +151,21 @@ export default class EditStreamInfo extends Vue {
     }
   }
 
-  loadAvailableProfiles() {
-    if (!this.midStreamMode) {
-      const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        this.gameModel.value
-      );
+  async loadAvailableProfiles() {
+    if (this.midStreamMode) return;
+    this.encoderPresets = [];
+    this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
+    this.selectedPresetType = this.encoderPresets[0] && this.encoderPresets[0].preset || '';
+  }
 
-      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
-
-      this.areAvailableProfiles = availableProfiles.length > 0 || genericProfiles.length > 0;
-
-      if (this.areAvailableProfiles) {
-        let profiles: IEncoderPreset[] = [];
-
-        if (availableProfiles.length > 0) {
-          profiles = availableProfiles;
-          this.isGenericProfiles = false;
-        } else {
-          profiles = genericProfiles;
-          this.isGenericProfiles = true;
-        }
-
-        this.encoderProfile = {
-          value: profiles[0],
-          description: profiles[0].profile.description,
-          longDescription: profiles[0].profile.longDescription,
-        };
+  get presetInputMetadata(): IListMetadata<string> {
+    let options = this.encoderPresets.map((preset, index) => {
+      return {
+        value: preset.preset,
+        title: `${preset.game} ${preset.encoder} (${preset.encoder})`
       }
-    }
+    });
+    return { options };
   }
 
   // For some reason, v-model doesn't work with ListInput
@@ -190,7 +194,7 @@ export default class EditStreamInfo extends Vue {
           if (this.midStreamMode) {
             this.windowsService.closeChildWindow();
           } else {
-            this.goLive();
+            // this.goLive();
           }
         } else {
           this.updateError = true;
@@ -198,10 +202,8 @@ export default class EditStreamInfo extends Vue {
         }
       });
 
-    if (this.areAvailableProfiles && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(
-        this.encoderProfile.value
-      );
+    if (this.hasAvalablePresets && this.useOptimizedProfile) {
+      this.videoEncodingOptimizationService.applyProfile(this.selectedPreset);
     }
   }
 
@@ -250,25 +252,5 @@ export default class EditStreamInfo extends Vue {
 
   get infoError() {
     return this.streamInfoService.state.error;
-  }
-
-  get profiles() {
-    const multiselectArray: IMultiSelectProfiles[] = [];
-    let profiles = this.videoEncodingOptimizationService.getGameProfiles(
-      this.gameModel.value
-    );
-    if (profiles.length === 0) {
-      profiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
-    }
-    profiles.forEach(profile => {
-      multiselectArray.push({
-        value: profile,
-        description: profile.profile.description,
-        longDescription: profile.profile.longDescription,
-      });
-    });
-    return multiselectArray;
   }
 }
