@@ -27,8 +27,6 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
-const crashHandler = window['require']('crash-handler');
-
 interface IAppState {
   loading: boolean;
   argv: string[];
@@ -71,12 +69,9 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
 
-  private pid = require('process').pid;
-
   @track('app_start')
   async load() {
     this.START_LOADING();
-    crashHandler.registerProcess(this.pid, false);
 
     // Initialize OBS
     obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
@@ -130,7 +125,6 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
-    obs.NodeObs.StopCrashHandler();
 
     this.crashReporterService.beginShutdown();
 
@@ -146,7 +140,6 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
-      obs.IPC.disconnect();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
