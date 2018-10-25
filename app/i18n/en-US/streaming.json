@@ -4,7 +4,7 @@
   "badPathError": "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.",
   "connectFailedError": "Failed to connect to the streaming server.  Please check your internet connection.",
   "disconnectedError": "Disconnected from the streaming server.  Please check your internet connection.",
-  "invalidStreamError": "Could not access the specified channel or stream key, please double-check your stream key. If it is correct, there may be a problem connecting to the server.",
+  "invalidStreamError": "Could not access niconico account information or stream key, please make sure you logged in to niconico if you wish to stream niconico, otherwise double-check your stream key. If it is correct, there may be a problem connecting to the server.",
   "noSpaceError": "There is not sufficient disk space to continue recording.",
   "unsupportedError": "The output format is either unsupported or does not support more than one audio track. Please check your settings and try again.",
   "error": "An unexpected error occurred:",
