@@ -74,7 +74,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.widget.refresh();
   }
 
-  @Debounce(1000)
+
+  @Debounce(500)
   async save() {
     if (this.requestState === 'pending') return;
     try {

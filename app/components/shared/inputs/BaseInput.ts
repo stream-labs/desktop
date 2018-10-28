@@ -17,15 +17,50 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   readonly metadata: TMetadataType;
 
   /**
+   * true if the component listens and re-emits child-inputs events
+   */
+  delegateChildrenEvents = true;
+
+  /**
    * uuid serves to link input field and validator message
    */
   readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
 
+  /**
+   * contains ValidatedForm if exist
+   */
+  protected form: ValidatedForm = null;
+
+  /**
+   * contains parent-input if exist
+   */
+  protected parentInput: BaseInput<any, any> = null;
+
+  constructor() {
+    super();
+
+    // try to find parent-form and parent-input
+    let comp: Vue = this;
+    do {
+      comp = comp.$parent;
+      if (!this.parentInput && comp instanceof BaseInput) {
+        this.parentInput = comp;
+      }
+    } while (comp && !(comp instanceof ValidatedForm));
+
+    if (!comp) return;
+    this.form = comp as ValidatedForm;
+  }
+
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
-    if (this.$parent instanceof ValidatedForm) {
-      this.$parent.emitInput(eventData, event);
-    }
+
+    const needToSendEventToForm = (
+      this.form &&
+      !this.parentInput || (this.parentInput && !this.parentInput.delegateChildrenEvents)
+    );
+
+    if (needToSendEventToForm) this.form.emitInput(eventData, event);
   }
 
   getValidations() {

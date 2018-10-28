@@ -98,6 +98,7 @@ export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
+  beta: boolean;
   appToken: string;
   poppedOutSlots: EAppPageSlot[];
   appPath?: string;
@@ -144,9 +145,14 @@ export class PlatformAppsService extends
 
   private localStorageKey = 'PlatformAppsUnpacked';
 
-  apiManager = new PlatformAppsApi();
+  // Lazy initialize the API
+  private _apiManager: PlatformAppsApi;
+  private get apiManager() {
+    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
+    return this._apiManager;
+  }
 
-  devServer: DevServer;
+  private devServer: DevServer;
 
   /**
    * Using initialize because it needs to be async
@@ -195,13 +201,17 @@ export class PlatformAppsService extends
    */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
+
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
+
       const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
+
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
+        beta: app.is_beta,
         appUrl: app.cdn_url,
         appToken: app.app_token,
         poppedOutSlots: [],
@@ -268,6 +278,7 @@ export class PlatformAppsService extends
       id,
       manifest,
       unpacked: true,
+      beta: false,
       appPath,
       appToken,
       devPort: DEV_PORT,

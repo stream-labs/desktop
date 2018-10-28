@@ -2,10 +2,10 @@
 
   <div>
     <!-- title -->
-    <div class="flex margin-vertical--10">
-      <div>
+    <div class="form-group__title form-group__title--vertical">
+      <label>
         {{ options.title }}
-      </div>
+      </label>
       <div v-if="options.tooltip" class="tooltip">
         <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
       </div>
@@ -43,14 +43,23 @@
 <style lang="less" scoped>
   @import "../../../styles/index";
 
+  .form-group__title {
+    display: flex;
+    align-items: center;
+  }
+
+  .form-group__title--vertical {
+    .margin-bottom();
+  }
+
   .slots {
     width: 100%;
   }
 
   .tooltip {
     position: relative;
-    margin-left: 8px;
-    font-size: 16px;
+    .margin-left();
+    font-size: 14px;
     align-self: center;
     display: inline-block;
     z-index: 1;
