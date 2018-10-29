@@ -59,21 +59,7 @@
             <label>Profile</label>
           </div>
           <div class="input-wrapper">
-
             <FormInput type="list" v-model="selectedPresetType" :metadata="presetInputMetadata"/>
-
-            <!--<multiselect-->
-              <!--:allowEmpty="false"-->
-              <!--:options="profiles"-->
-              <!--track-by="value"-->
-              <!--:close-on-select="true"-->
-              <!--label="description"-->
-              <!--v-model="encoderProfile">-->
-              <!--<template slot="option" slot-scope="props">-->
-                <!--<div class="edit-stream-info-option-desc">{{ props.option.description }}</div>-->
-                <!--<div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>-->
-              <!--</template>-->
-            <!--</multiselect>-->
           </div>
         </div>
       </div>
@@ -94,7 +80,7 @@
       class="button button--default"
       :disabled="updatingInfo"
       @click="cancel">
-      Cancel
+      $('Cancel')
     </button>
     <button
       class="button button--action"
