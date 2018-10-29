@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 const webfont = require('webfont').default;
-const dashify = require('dashify');
 
 const writeFile = promisify(fs.writeFile);
 
@@ -17,10 +16,6 @@ async function main() {
     fontHeight: 1024,
     ascent: 1024,
     normalize: true,
-    glyphTransformFn: (metadata) => ({
-      ...metadata,
-      name: dashify(metadata.name)
-    })
   });
 
   return Promise.all([

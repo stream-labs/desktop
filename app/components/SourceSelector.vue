@@ -53,7 +53,7 @@
             <i v-else-if="node.data.type === 'text_ft2_source'" class="icon-text"/>
             <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"/>
             <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"/>
-            <i v-else-if="node.data.type === 'ndi_source'" class="icon-ndi"/>
+            <i v-else-if="node.data.type === 'ndi_source'" class="icon-NDI"/>
             <i v-else-if="node.data.type === 'decklink-input'" class="icon-blackmagic"/>
             <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"/>
             <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"/>

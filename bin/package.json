@@ -6,8 +6,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@octokit/rest": "^15.9.5",
-    "@sentry/cli": "^1.35.4",
-    "dashify": "^1.0.0"
+    "@sentry/cli": "^1.35.4"
   },
   "devDependencies": {
     "7zip-bin": "^2.2.7",
