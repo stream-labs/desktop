@@ -50,7 +50,6 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   afterFetch() {
     this.alertTypes = this.alertTypes.filter((type) => this.wData.settings[type]);
-    console.log(this.wData);
   }
 
   alertName(alertType: string) {
