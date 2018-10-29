@@ -101,7 +101,6 @@ export class WebsocketService extends Service {
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
         this.socket.on('event', (e: any) => {
-          console.log('socket event', e);
           this.socketEvent.next(e);
         });
       });
