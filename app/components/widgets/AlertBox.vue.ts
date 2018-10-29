@@ -28,6 +28,13 @@ const alertNameMap = () => ({
   raids: $t('Raids')
 });
 
+const triggerAmountMap = {
+  bits: 'bits_alert_min_amount',
+  donations: 'donation_alert_min_amount',
+  hosts: 'host_viewer_minimum',
+  raids: 'raid_raider_minimum'
+};
+
 @Component({
   components: {
     WidgetEditor,
@@ -87,16 +94,11 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   get minTriggerAmount() {
-    switch (this.selectedAlert) {
-      case 'bits':
-        return this.wData.settings.bits_alert_min_amount;
-      case 'donations':
-        return this.wData.settings.donation_alert_min_amount;
-      case 'hosts':
-        return this.wData.settings.host_viewer_minimum;
-      case 'raids':
-        return this.wData.settings.raid_raider_minimum;
-    }
+    return this.wData.settings[triggerAmountMap[this.selectedAlert]];
+  }
+
+  set minTriggerAmount(value: number) {
+    this.wData.settings[triggerAmountMap[this.selectedAlert]] = value;
   }
 
   get conditions() {
