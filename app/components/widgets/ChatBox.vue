@@ -25,7 +25,7 @@
 
   <validated-form slot="font-properties" name="font-properties-form" key="font-properties" v-if="loaded" @input="save()">
     <v-form-group type="color" v-model="wData.settings.text_color" :metadata="metadata.text_color"/>
-    <v-form-group type="fontSize" v-model="wData.settings.text_size"/>
+    <v-form-group type="fontSize" v-model="wData.settings.text_size" :metadata="metadata.text_size"/>
   </validated-form>
 
   <validated-form slot="chatter-properties" key="chatter-properties" name="chatter-properties" v-if="loaded" @input="save()">

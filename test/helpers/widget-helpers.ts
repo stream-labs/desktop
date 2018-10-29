@@ -11,9 +11,7 @@ export async function waitForWidgetSettingsSync(t: GenericTestContext<any>) {
   websocketService.socketEvent.subscribe(() => void 0);
 
   return await apiClient.waitForEvent((event: Dictionary<any>) => {
-    console.log('caught an event', event);
-
-    // maybe there is better way to distinguish WidgetEvents, but check the event type for now
+    // maybe there is better way to distinguish WidgetEvents, but just check the event type for now
     return (typeof event.type == 'string') && event.type.includes('SettingsUpdate');
   });
 }

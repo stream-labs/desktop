@@ -1,18 +1,15 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
-import { logIn, blankSlate } from '../helpers/spectron/user';
+import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
-import { metadata } from '../../app/components/widgets/inputs';
-import { $t } from '../../app/services/i18n';
-
 
 useSpectron({ appArgs: '--nosync' });
 
 
 
-test('Chatbox', async t => {
+test('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
   await logIn(t);
   await addSource(t, 'Chatbox', '__Chat Box', false);
@@ -62,34 +59,31 @@ test('Chatbox', async t => {
 });
 
 
-test('Stream Boss Manage Visual Settings', async t => {
+test('Chatbox Font Settings', async t => {
   const client = t.context.app.client;
   await logIn(t);
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
+  await addSource(t, 'Chatbox', '__Chat Box', false);
 
-  await client.click('li=Visual Settings');
+  await client.click('li=Font Settings');
+  const formName = 'font-properties-form';
 
   const formMonkey = new FormMonkey(t, true);
 
   const testSet1 = {
     text_color: '#FF0000',
-    bar_text_color: '#FF0000',
-    bar_color: '#FF0000',
-    bar_bg_color: '#FF0000',
-    font: 'Sacramento'
+    text_size: 20
   };
-  await formMonkey.fill('visual-settings-form', testSet1);
+
+  await formMonkey.fill(formName, testSet1);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet1));
+  t.true(await formMonkey.includes(formName, testSet1));
 
   const testSet2 = {
-    text_color: '#FFFFFF',
-    bar_text_color: '#FFFFFF',
-    bar_color: '#FFFFFF',
-    bar_bg_color: '#46E65A',
-    font: 'Roboto'
+    text_color: '#F8E71C',
+    text_size: 15
   };
-  await formMonkey.fill('visual-settings-form', testSet2);
+
+  await formMonkey.fill(formName, testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet2));
+  t.true(await formMonkey.includes(formName, testSet2));
 });

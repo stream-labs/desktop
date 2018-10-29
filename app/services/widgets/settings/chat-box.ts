@@ -76,10 +76,10 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       show_smf_emotes: metadata.bool({ title: $t('Enable Supermegafan Emotes')}),
 
       text_color: metadata.color({
-        title: $t('Font Size'),
+        title: $t('Text Color'),
         tooltip: $t('A hex code for the base text color.')
       }),
-      text_size: metadata.fontSize({ title: $t('Font Size')}),
+      text_size: metadata.fontSize({ title: $t('Font Size'), min: 10, max: 80}),
       muted_chatters: metadata.textArea({ title: $t('Muted Chatters')}),
       hide_commands: metadata.bool({ title: $t('Hide Commands')}),
 

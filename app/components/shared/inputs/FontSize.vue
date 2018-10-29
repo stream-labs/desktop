@@ -1,7 +1,7 @@
 <template>
   <slider-input
     data-role="input"
-    data-type="font"
+    data-type="fontSize"
     :data-name="options.name"
     :metadata="sliderOptions"
     :value="sliderValue"

@@ -80,8 +80,8 @@ export class FormMonkey {
           await this.setColorValue(input.selector, value);
           break;
         case 'slider':
-        case 'font-size':
-        case 'font-weight':
+        case 'fontSize':
+        case 'fontWeight':
           await this.setSliderValue(input.selector, value);
           break;
         default:
@@ -129,8 +129,8 @@ export class FormMonkey {
           value = await this.getColorValue(input.selector);
           break;
         case 'slider':
-        case 'font-size':
-        case 'font-weight':
+        case 'fontSize':
+        case 'fontWeight':
           value = await this.getSliderValue(input.selector);
           break;
         default:
