@@ -177,27 +177,3 @@ export interface IEncoderProfile {
   resolutionOut: string;
   options: string;
 }
-//
-// export const PRESETS_DB: IEncoderProfile[] = [
-//   {
-//     game: 'Rocket League',
-//     encoder: 'x264',
-//     bitrate_min: 0,
-//     bitrate_max: 3,
-//     preset: 'ultrafast',
-//     resolution_in: '1920x1080',
-//     resolution_out: '1920x1080',
-//     encoderOptions: 'nal-hrd=cbr:trellis=0:me=dia:force-cfr=1:deblock=’0:1:0’rc-lookahead=10:ref=0:chroma-qp-offset=-2:bframes=0:subme=1:b_adapt=1:mixed-refs=0:cabac=1:qpstep=4:b_pyramid=2:mbtree=0:chroma_me=0:psy=1:8x8dct=0:fast_pskip=1:lookahead_threads=6'
-//   },
-//
-//   {
-//     game: 'Rocket League',
-//     encoder: 'x264',
-//     bitrate_min: 3,
-//     bitrate_max: 4.5,
-//     preset: 'veryfast',
-//     resolution_in: '1920x1080',
-//     resolution_out: '1920x1080',
-//     encoderOptions: 'nal-hrd=cbr:trellis=0:me=dia:force-cfr=1:deblock=’0:1:0’rc-lookahead=10:ref=0:chroma-qp-offset=-2:bframes=0:subme=1:b_adapt=1:mixed-refs=0:cabac=1:qpstep=4:b_pyramid=2:mbtree=0:chroma_me=0:psy=1:8x8dct=0:fast_pskip=1:lookahead_threads=6'
-//   }
-// ];
