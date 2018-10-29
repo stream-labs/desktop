@@ -1,5 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, ObsInput, IObsNumberInputValue } from './ObsInput';
+import { Debounce } from 'lodash-decorators';
 
 @Component
 class ObsIntInput extends ObsInput<IObsNumberInputValue> {
@@ -13,6 +14,7 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
     input: HTMLInputElement
   };
 
+  @Debounce(1000) // fields with min value don't work well without Debounce
   updateValue(value: string) {
     let formattedValue = String(isNaN(parseInt(value)) ? 0 : parseInt(value));
     if (this.value.type == 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
