@@ -39,7 +39,7 @@ test('Stream Boss Manage Battle settings', async t => {
 
   await client.click('li=Manage Battle');
 
-  const formMonkey = new FormMonkey(t, true);
+  const formMonkey = new FormMonkey(t);
 
   const testSet1 = {
     boss_heal: false,

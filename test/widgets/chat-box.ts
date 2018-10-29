@@ -67,7 +67,7 @@ test('Chatbox Font Settings', async t => {
   await client.click('li=Font Settings');
   const formName = 'font-properties-form';
 
-  const formMonkey = new FormMonkey(t, true);
+  const formMonkey = new FormMonkey(t);
 
   const testSet1 = {
     text_color: '#FF0000',

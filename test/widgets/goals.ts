@@ -17,7 +17,7 @@ async function testGoal(t: GenericTestContext<any>, goalType: string) {
   await client.click('li=Visual Settings');
   const formName = 'visual-properties-form';
 
-  const formMonkey = new FormMonkey(t, true);
+  const formMonkey = new FormMonkey(t);
 
   const testSet1 = {
     layout: 'standard',
