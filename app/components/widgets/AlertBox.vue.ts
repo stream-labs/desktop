@@ -93,6 +93,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     return baseItems;
   }
 
+  get conditions() {
+    return this.alertBoxService.conditionsByType(this.selectedAlert);
+  }
+
   get minTriggerAmount() {
     return this.wData.settings[triggerAmountMap[this.selectedAlert]];
   }
@@ -101,13 +105,18 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     this.wData.settings[triggerAmountMap[this.selectedAlert]] = value;
   }
 
-  get conditions() {
-    return this.alertBoxService.conditionsByType(this.selectedAlert);
-  }
 
   get minRecentEvents() {
     return this.selectedAlert === 'donation' ?
       this.wData.settings.recent_events_donation_min_amount : this.wData.settings.recent_events_host_min_viewer_count;
+  }
+
+  set minRecentEvents(value: number) {
+    if (this.selectedAlert === 'donation') {
+      this.wData.settings.recent_events_donation_min_amount = value;
+    } else {
+      this.wData.settings.recent_events_host_min_viewer_count = value;
+    }
   }
 
   selectAlertType(alertName: string) {
