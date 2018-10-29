@@ -228,7 +228,6 @@ export default class StudioEditor extends Vue {
 
       if (this.isCropping) {
         this.crop(converted.x, converted.y, options);
-        this.crop(converted.x, converted.y, options);
       } else {
         this.resize(converted.x, converted.y, options);
       }
