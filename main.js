@@ -286,28 +286,29 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
-if (app.requestSingleInstanceLock()) {
-  app.on('second-instance', (event, argv) => {
-    // Check for protocol links in the argv of the other process
-    argv.forEach(arg => {
-      if (arg.match(/^slobs:\/\//)) {
-        mainWindow.send('protocolLink', arg);
-      }
-    });
 
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      }
-
-      mainWindow.focus();
+// This ensures that only one copy of our app can run at once.
+const shouldQuit = app.makeSingleInstance(argv => {
+  // Check for protocol links in the argv of the other process
+  argv.forEach(arg => {
+    if (arg.match(/^slobs:\/\//)) {
+      mainWindow.send('protocolLink', arg);
     }
   });
-} else {
+
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+
+    mainWindow.focus();
+  }
+});
+
+if (shouldQuit) {
   app.exit();
 }
-
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
