@@ -10,7 +10,7 @@ import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from 
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
 import { CustomizationService } from './services/customization';
-import { HostsService } from './services/hosts';
+import { HostsService, UrlService } from './services/hosts';
 import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
@@ -121,6 +121,7 @@ export class ServicesManager extends Service {
     AudioSource,
     CustomizationService,
     HostsService,
+    UrlService,
     HotkeysService,
     Hotkey,
     KeyListenerService,

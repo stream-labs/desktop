@@ -162,7 +162,7 @@ export default class EditStreamInfo extends Vue {
     let options = this.encoderPresets.map((preset, index) => {
       return {
         value: preset.preset,
-        title: `${preset.game} ${preset.encoder} (${preset.encoder})`
+        title: `${preset.game} ${preset.encoder} (${preset.preset})`
       }
     });
     return { options };
@@ -194,7 +194,7 @@ export default class EditStreamInfo extends Vue {
           if (this.midStreamMode) {
             this.windowsService.closeChildWindow();
           } else {
-            // this.goLive();
+            this.goLive();
           }
         } else {
           this.updateError = true;

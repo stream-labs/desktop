@@ -3,7 +3,7 @@ import * as obs from '../../../obs-api';
 import { execSync } from 'child_process';
 import { mutation, StatefulService } from '../stateful-service';
 import { Inject } from '../../util/injector';
-import { HostsService } from '../hosts';
+import { UrlService } from '../hosts';
 import { InitAfter } from '../../util/service-observer';
 import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
@@ -49,7 +49,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     urls: null
   };
 
-  @Inject() private hostsService: HostsService;
+  @Inject() private urlsService: UrlService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private scenesService: ScenesService;
@@ -205,7 +205,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       this.state.SystemVersion
     ].join(' ');
 
-    const res = await fetch(`https://${ this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`);
+    const res = await fetch(this.urlsService.getStreamlabsApi(`intelconfig/${id}`));
     if (!res.ok) return null;
     return res.json();
   }

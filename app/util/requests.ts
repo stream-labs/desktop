@@ -1,6 +1,7 @@
 // Helper methods for making HTTP requests
 
 import fs from 'fs';
+import humps from 'humps';
 
 /**
  * Passing this function as your first "then" handler when making
@@ -12,6 +13,18 @@ import fs from 'fs';
 export function handleErrors(response: Response): Promise<Response> {
   if (response.ok) return Promise.resolve(response);
   return Promise.reject(response);
+}
+
+/**
+ * transforms response keys to lowerCamelCase
+ * helps to keep consistent code style in the project
+ */
+export function camelize(response: Response): Promise<any> {
+  return new Promise(resolve => {
+    return response.json().then(json => {
+      resolve(humps.camelizeKeys(json))
+    })
+  });
 }
 
 export function requiresToken() {

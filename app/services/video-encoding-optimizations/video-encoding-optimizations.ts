@@ -1,12 +1,11 @@
 import { Service } from 'services/service';
-import { SettingsService, ISettingsSubCategory, StreamEncoderSettings } from 'services/settings';
+import { SettingsService, StreamEncoderSettings } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
-import {
-  PRESETS_DB,
-  IEncoderProfile
-} from './definitions';
+import { IEncoderProfile } from './definitions';
 import { cloneDeep } from 'lodash';
+import { camelize, handleErrors } from '../../util/requests';
+import { UrlService } from '../hosts';
 
 export * from './definitions';
 
@@ -59,6 +58,7 @@ export class VideoEncodingOptimizationService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() streamEncoderSettings: StreamEncoderSettings;
+  @Inject() urlService: UrlService;
 
   init() {
     this.streamingService.streamingStatusChange.subscribe(status => {
@@ -72,22 +72,37 @@ export class VideoEncodingOptimizationService extends Service {
     });
   }
 
+  /**
+   * returns profiles according to the current encoder settings
+   */
   async fetchGameProfiles(game: string): Promise<IEncoderProfile[]> {
 
-    return PRESETS_DB.filter(profile => {
-      return profile.game === game;
-    });
+    const profiles: IEncoderProfile[] =
+      await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game}`))
+      .then(handleErrors)
+      .then(camelize);
 
+    const settings = this.streamEncoderSettings.getSettings();
+
+    return profiles.filter(profile => {
+      return (
+        profile.encoder === settings.encoder &&
+        profile.resolutionIn == settings.inputResolution &&
+        profile.resolutionOut == settings.outputResolution &&
+        profile.bitrateMax >= settings.bitrate &&
+        profile.bitrateMin <= settings.bitrate
+      )
+    });
   }
 
   applyProfile(encoderProfile: IEncoderProfile) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
     this.streamEncoderSettings.setSettings({
-      outputResolution: encoderProfile.resolution_out,
-      inputResolution: encoderProfile.resolution_in,
+      outputResolution: encoderProfile.resolutionOut,
+      inputResolution: encoderProfile.resolutionIn,
       encoder: encoderProfile.encoder,
       mode: 'Advanced',
-      encoderOptions: encoderProfile.encoderOptions,
+      encoderOptions: encoderProfile.options,
       preset: encoderProfile.preset
     });
     this.isUsingEncodingOptimizations = true;
