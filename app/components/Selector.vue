@@ -37,8 +37,7 @@
 }
 
 .sortable-drag {
-  border: 1px solid #ddd;
-  background-color: #eee;
+  border-color: @day-input-border;
 }
 
 .selector-list {
@@ -53,11 +52,12 @@
   flex-direction: row;
   align-items: center;
   .padding-h-sides(2);
-  line-height: 32px;
+  line-height: 30px;
   cursor: pointer;
   justify-content: space-between;
   color: @day-paragraph;
   .transition();
+  border: 1px solid transparent;
 
   &.selector-item--active {
     background-color: @light-3;
@@ -101,6 +101,10 @@
   .sortable-ghost,
   .sortable-chosen {
     background: @dark-4;
+  }
+
+  .sortable-drag {
+    border-color: @night-input-border;
   }
 
   .selector-item {
