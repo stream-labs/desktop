@@ -221,21 +221,10 @@ h2 {
   display: flex;
   flex: 1 0 auto;
 
-  &.sources--has-platform-apps {
-    .source-group {
-      flex: 0 0 33%;
-    }
-  }
-
   .source-group {
     margin: -16px 0px -16px 0px;
     padding: 16px 16px 16px 0;
-    flex: 0 0 50%;
-
-    &:last-child {
-      padding: 16px 0 16px 16px;
-      border-right: none;
-    }
+    flex: 1;
   }
 }
 
@@ -262,6 +251,11 @@ h2 {
   background-color: @day-section;
   width: 49%;
   .radius();
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
 
   &:hover,
   &.source--active {
@@ -270,7 +264,7 @@ h2 {
     background-color: @light-3;
   }
 
-  >div {
+  > div {
     white-space: nowrap;
     text-overflow: ellipsis;
     max-width: 100%;
