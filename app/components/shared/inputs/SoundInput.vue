@@ -80,7 +80,7 @@
 
 .change-media {
   text-transform: uppercase;
-  color: @night-text;
+  color: @night-paragraph;
 }
 
 .night-theme {

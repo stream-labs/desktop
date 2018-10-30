@@ -31,7 +31,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    return `https://${host}/slobs/login?_=${Date.now()}&skip_splash=true&external=electron&youtube&force_verify&origin=slobs`;
+    return `https://${host}/slobs/login?_=${Date.now()}` +
+      '&skip_splash=true&external=electron&youtube&force_verify&origin=slobs';
   }
 
   get oauthToken() {

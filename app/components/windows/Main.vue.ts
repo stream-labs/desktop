@@ -27,6 +27,7 @@ import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
 import PlatformAppWebview from '../PlatformAppWebview.vue';
+import Help from '../pages/Help.vue';
 import electron from 'electron';
 
 @Component({
@@ -47,7 +48,8 @@ import electron from 'electron';
     Chatbot,
     DesignSystem,
     PlatformAppWebview,
-    PlatformAppStore
+    PlatformAppStore,
+    Help
   }
 })
 export default class Main extends Vue {

@@ -11,7 +11,8 @@ export type TAppPage =
   | 'Chatbot'
   | 'DesignSystem'
   | 'PlatformAppContainer'
-  | 'PlatformAppStore';
+  | 'PlatformAppStore'
+  | 'Help';
 
 interface INavigationState {
   currentPage: TAppPage;

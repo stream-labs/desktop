@@ -339,7 +339,7 @@
     border-color: @night-accent-light;
   }
   .progress-slider__fill {
-    background-color: @night-text;
+    background-color: @night-paragraph;
   }
   .progress-slider {
     background-color: @night-slider-bg;

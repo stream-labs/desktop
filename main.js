@@ -20,11 +20,10 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const bootstrap = require('./updater/bootstrap.js');
+const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
-const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 
@@ -32,16 +31,7 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-/* Determine the current release channel we're
- * on based on name. The channel will always be
- * the premajor identifier, if it exists.
- * Otherwise, default to latest. */
-const releaseChannel = (() => {
-  const components = semver.prerelease(pjson.version);
-
-  if (components) return components[0];
-  return 'latest';
-})();
+app.disableHardwareAcceleration();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -65,6 +55,7 @@ let shutdownStarted = false;
 let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
+
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -286,52 +277,33 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
-if (app.requestSingleInstanceLock()) {
-  app.on('second-instance', (event, argv) => {
-    // Check for protocol links in the argv of the other process
-    argv.forEach(arg => {
-      if (arg.match(/^slobs:\/\//)) {
-        mainWindow.send('protocolLink', arg);
-      }
-    });
 
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      }
-
-      mainWindow.focus();
+// This ensures that only one copy of our app can run at once.
+const shouldQuit = app.makeSingleInstance(argv => {
+  // Check for protocol links in the argv of the other process
+  argv.forEach(arg => {
+    if (arg.match(/^slobs:\/\//)) {
+      mainWindow.send('protocolLink', arg);
     }
   });
-} else {
+
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+
+    mainWindow.focus();
+  }
+});
+
+if (shouldQuit) {
   app.exit();
 }
 
-
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    const updateInfo = {
-      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
-      version: pjson.version,
-      exec: process.argv,
-      cwd: process.cwd(),
-      waitPids: [ process.pid ],
-      appDir: path.dirname(app.getPath('exe')),
-      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
-      cacheDir: app.getPath('userData'),
-      versionFileName: `${releaseChannel}.json`
-    };
-
-    console.log(updateInfo);
-    bootstrap(updateInfo).then((updating) => {
-      if (updating) {
-        console.log('Closing for update...');
-        app.exit();
-      } else {
-        startApp();
-      }
-    });
+    (new Updater(startApp)).run();
   } else {
     startApp();
   }
