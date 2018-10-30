@@ -34,7 +34,7 @@ export default class Dashboard extends Vue {
       });
     });
 
-    this.i18nService.setWebviewLocale(this.$refs.dashboard);
+    I18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
       electron.remote.shell.openExternal(e.url);
     });
