@@ -10,8 +10,8 @@ export class ObsPluginsModule extends Module {
   @Inject() obsUserPluginsService: ObsUserPluginsService;
 
   @apiMethod()
-  initializeModule(ctx: IApiContext, dllFile: string) {
-    this.obsUserPluginsService.initializeModule(dllFile);
+  async initializeModule(ctx: IApiContext, dllFile: string) {
+    await this.obsUserPluginsService.initializeModule(dllFile);
   }
 
 }
