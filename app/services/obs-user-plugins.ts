@@ -20,9 +20,12 @@ export class ObsUserPluginsService extends Service {
   }
 
   initializeModule(dllFile: string) {
+    const name = path.parse(dllFile).name;
+    const dataDir = path.join(this.dataDir, name);
+    this.ensureDirectory(dataDir);
     const module = obs.ModuleFactory.open(
       path.join(this.pluginsDir, dllFile),
-      this.dataDir
+      dataDir
     );
     module.initialize();
   }
