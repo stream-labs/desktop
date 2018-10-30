@@ -200,6 +200,8 @@ export class PlatformAppsService extends
    * Install production apps
    */
   async installProductionApps() {
+    if (this.userService.platform.type !== 'twitch') return;
+
     const productionApps = await this.fetchProductionApps();
 
     productionApps.forEach(app => {
