@@ -25,7 +25,7 @@
         </button>
       </div>
     </div>
-    <div v-for="alert in alertTypes" v-if="wData" :key="alert" style="position: relative;">
+    <div v-for="alert in alertTypes" v-if="wData && wData.settings[alert]" :key="alert" style="position: relative;" >
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
@@ -62,9 +62,9 @@
     </div>
   </div>
 
-  <div slot="layout">
+  <validated-form slot="layout" @input="save()">
     <alert-layout-input v-model="selectedVariation.settings.layout" v-if="selectedVariation" />
-  </div>
+  </validated-form>
 
   <!-- Global Settings -->
   <validated-form slot="general-properties" @input="save()" v-if="selectedVariation">
