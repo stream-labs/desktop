@@ -292,7 +292,6 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
-    console.log('set settings', settingsData);
     if (categoryName === 'Audio') return this.setAudioSettings(settingsData);
 
     const dataToSave = [];
