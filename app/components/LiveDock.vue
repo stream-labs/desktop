@@ -51,7 +51,7 @@
         <div class="live-dock-platform-tools">
           <a
             @click="showEditStreamInfo"
-            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
             v-tooltip="editStreamInfoTooltip">
             <i class="icon-edit" />
           </a>
@@ -81,7 +81,9 @@
               :metadata="chatAppsListMetadata"
             />
           </div>
-          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+            {{ $t('Refresh Chat') }}
+          </a>
         </div>
       </div>
 

@@ -55,7 +55,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'mixer';
+export type TPlatform = 'twitch' | 'youtube' | 'mixer' | 'facebook';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
