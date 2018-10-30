@@ -20,7 +20,7 @@ import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
 import { PersistentStatefulService } from './services/persistent-stateful-service';
 import { SettingsService } from './services/settings';
-import { StreamEncoderSettings } from './services/settings';
+import { StreamEncoderSettingsService } from './services/settings';
 import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
@@ -132,7 +132,7 @@ export class ServicesManager extends Service {
     PerformanceMonitorService,
     PersistentStatefulService,
     SettingsService,
-    StreamEncoderSettings,
+    StreamEncoderSettingsService,
     SourceFiltersService,
     SourcesService,
     Source,

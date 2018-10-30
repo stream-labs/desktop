@@ -59,7 +59,7 @@ export class UrlService extends Service {
   @Inject('HostsService') private hosts: HostsService;
 
   get protocol() {
-    return Util.useLocalHost() ? 'http://' : 'https//';
+    return Util.useLocalHost() ? 'http://' : 'https://';
   }
 
   getStreamlabsApi(endpoint: string) {

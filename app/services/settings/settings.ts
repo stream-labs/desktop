@@ -21,7 +21,7 @@ import {
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
-import { encoderFieldsMap, StreamEncoderSettings, obsEncoderToEncoder } from './stream-encoder';
+import { encoderFieldsMap, StreamEncoderSettingsService, obsEncoderToEncoder } from './stream-encoder';
 
 export interface ISettingsState {
   General: {
@@ -78,7 +78,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private windowsService: WindowsService;
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
-  @Inject() private streamEncoderSettings: StreamEncoderSettings;
+  @Inject() private streamEncoderSettingsService: StreamEncoderSettingsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;

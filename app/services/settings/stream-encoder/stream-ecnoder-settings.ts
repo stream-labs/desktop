@@ -3,17 +3,41 @@ import { Service } from 'services/service';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
 
-export type TEncoder = 'x264' | 'qsv' | 'nvenc';
+export enum EEncoder {
+  x264 = 'x264',
+  qsv = 'qsv',
+  nvenc = 'nvenc',
+  amd = 'amd'
+}
+
+enum EObsEncoder {
+  x264 = 'x264',
+  obs_x264 = 'obs_x264',
+  nvenc = 'nvenc',
+  ffmpeg_nvenc = 'ffmpeg_nvenc',
+  amd = 'amd',
+  amd_amf_h264 = 'amd_amf_h264',
+  qsv = 'qsv',
+  obs_qsv11 = 'obs_qsv11'
+}
 
 export interface IStreamEncoderSettings {
   mode: 'Simple' | 'Advanced';
-  encoder: TEncoder;
+  encoder: EEncoder;
   bitrate: number;
   inputResolution: string;
   outputResolution: string;
   preset: string;
   encoderOptions: string;
 }
+
+const simpleEncoderToAndancedEncoderMap = {
+  'x264': 'obs_x264',
+  'qsv': 'obs_qsv11',
+  'nvenc': 'ffmpeg_nvenc',
+  'amd': 'amd_amf_h26'
+};
+
 
 /**
  * each encoder have different set of fields
@@ -24,24 +48,20 @@ export const encoderFieldsMap = {
   qsv: { preset: 'QSVPreset' }
 };
 
-const encoderToObsEncoderMap = {
-  'x264': 'obs_x264',
-  'qsv': 'obs_qsv11',
-  'nvenc': 'ffmpeg_nvenc'
-};
 
-function encoderToObsEncoder(encoder: TEncoder) {
-  return encoderToObsEncoderMap[encoder];
+function simpleEncoderToAdvancedEncoder(encoder: EEncoder) {
+  return simpleEncoderToAndancedEncoderMap[encoder];
 }
 
 /**
  * returns a short encoder name if exists
  */
-export function obsEncoderToEncoder(obsEncoder: string): TEncoder | string {
-  return invert(encoderToObsEncoderMap)[obsEncoder] || obsEncoder;
+export function obsEncoderToEncoder(obsEncoder: EObsEncoder): EEncoder {
+  const encoder = invert(simpleEncoderToAndancedEncoderMap)[obsEncoder] || obsEncoder;
+  return encoder as EEncoder;
 }
 
-export class StreamEncoderSettings extends Service {
+export class StreamEncoderSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
 
   /**
@@ -58,7 +78,7 @@ export class StreamEncoderSettings extends Service {
     const encoder = obsEncoderToEncoder(
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder')
-    ) as TEncoder;
+    ) as EEncoder;
     const preset: string = this.settingsService.findSettingValue(output, 'Streaming', 'preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
@@ -95,9 +115,16 @@ export class StreamEncoderSettings extends Service {
 
     if (settingsPatch.encoder) {
       if (currentSettings.mode == 'Advanced') {
-        this.settingsService.setSettingValue('Output', 'Encoder', encoderToObsEncoder(settingsPatch.encoder));
+        this.settingsService.setSettingValue(
+          'Output',
+          'Encoder',
+          simpleEncoderToAdvancedEncoder(settingsPatch.encoder));
       } else {
-        this.settingsService.setSettingValue('Output', 'StreamEncoder', encoderToObsEncoder(settingsPatch.encoder));
+        this.settingsService.setSettingValue(
+          'Output',
+          'StreamEncoder',
+          simpleEncoderToAdvancedEncoder(settingsPatch.encoder)
+        );
       }
     }
 

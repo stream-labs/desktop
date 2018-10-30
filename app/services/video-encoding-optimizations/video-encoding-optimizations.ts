@@ -1,5 +1,5 @@
 import { Service } from 'services/service';
-import { SettingsService, StreamEncoderSettings } from 'services/settings';
+import { SettingsService, StreamEncoderSettingsService } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
 import { IEncoderProfile } from './definitions';
@@ -28,14 +28,6 @@ export * from './definitions';
  - We apply the old settings
  We now support the x264 / QSV / NVENC encoders
  We're also doing some resolution switching
-
- Encoder = x264
- BitrateMin =  0
- BitrateMax =  3
- preset = ultrafast
- resolution_in = 1920x1080
- resolution_out = 1920x1080
- options = nal-hrd=cbr:trellis=0:me=dia:force-cfr=1:deblock=’0:1:0’rc-lookahead=20:ref=0:chroma-qp-offset=-2:bframes=0:subme=0:b_adapt=1:mixed-refs=0:cabac=1:qpstep=4:b_pyramid=2:mbtree=0:chroma_me=1:psy=1:8x8dct=0:fast_pskip=1:lookahead_threads=6
  */
 
 enum OutputMode {
@@ -55,10 +47,10 @@ export class VideoEncodingOptimizationService extends Service {
   private isUsingEncodingOptimizations = false;
   private currentOutputSettings: IOutputSettingsDeprecated;
 
-  @Inject() settingsService: SettingsService;
-  @Inject() streamingService: StreamingService;
-  @Inject() streamEncoderSettings: StreamEncoderSettings;
-  @Inject() urlService: UrlService;
+  @Inject() private settingsService: SettingsService;
+  @Inject() private streamingService: StreamingService;
+  @Inject() private streamEncoderSettingsService: StreamEncoderSettingsService;
+  @Inject() private urlService: UrlService;
 
   init() {
     this.streamingService.streamingStatusChange.subscribe(status => {
@@ -77,12 +69,19 @@ export class VideoEncodingOptimizationService extends Service {
    */
   async fetchGameProfiles(game: string): Promise<IEncoderProfile[]> {
 
-    const profiles: IEncoderProfile[] =
-      await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game}`))
+    // try to fetch game-specific profile
+    let profiles: IEncoderProfile[] = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game}`))
       .then(handleErrors)
       .then(camelize);
 
-    const settings = this.streamEncoderSettings.getSettings();
+    // if no game-specific profile found then fetch generic profiles
+    if (!profiles.length) {
+      profiles = await fetch(this.urlService.getStreamlabsApi(`gamepresets/Generic`))
+        .then(handleErrors)
+        .then(camelize);
+    }
+
+    const settings = this.streamEncoderSettingsService.getSettings();
 
     return profiles.filter(profile => {
       return (
@@ -97,7 +96,7 @@ export class VideoEncodingOptimizationService extends Service {
 
   applyProfile(encoderProfile: IEncoderProfile) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
-    this.streamEncoderSettings.setSettings({
+    this.streamEncoderSettingsService.setSettings({
       outputResolution: encoderProfile.resolutionOut,
       inputResolution: encoderProfile.resolutionIn,
       encoder: encoderProfile.encoder,

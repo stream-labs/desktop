@@ -14,18 +14,9 @@ import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
-import {
-  VideoEncodingOptimizationService,
-  IEncoderPresetDeprecated, IEncoderProfile
-} from 'services/video-encoding-optimizations';
+import { VideoEncodingOptimizationService, IEncoderProfile } from 'services/video-encoding-optimizations';
 import { IListMetadata } from 'components/shared/inputs';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-
-interface IMultiSelectProfiles {
-  value: IEncoderPresetDeprecated;
-  description: string;
-  longDescription: string;
-}
 
 @Component({
   components: {
