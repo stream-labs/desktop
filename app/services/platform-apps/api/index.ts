@@ -11,6 +11,7 @@ import { ExternalModule } from './modules/external';
 import { AppModule } from './modules/app';
 import { NotificationsModule } from './modules/notifications';
 import { HotkeysModule } from './modules/hotkeys';
+import { ObsPluginsModule } from './modules/obs-plugins';
 
 export class PlatformAppsApi {
 
@@ -29,6 +30,7 @@ export class PlatformAppsApi {
     this.registerModule(new AppModule());
     this.registerModule(new NotificationsModule());
     this.registerModule(new HotkeysModule());
+    this.registerModule(new ObsPluginsModule());
   }
 
   private registerModule(module: Module) {
