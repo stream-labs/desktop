@@ -14,8 +14,12 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
     input: HTMLInputElement
   };
 
-  @Debounce(1000) // fields with min value don't work well without Debounce
-  updateValue(value: string) {
+  updateValue(value: string, force = false) {
+    if (!force && this.value.minVal) {
+      // fields with min value don't work well without Debounce
+      this.updateValueDebounced(value);
+      return;
+    }
     let formattedValue = String(isNaN(parseInt(value)) ? 0 : parseInt(value));
     if (this.value.type == 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
       formattedValue = '0';
@@ -35,6 +39,12 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
     }
     // Emit the number value through the input event
     this.emitInput({ ...this.value, value: Number(formattedValue) });
+  }
+
+
+  @Debounce(1000)
+  updateValueDebounced(value: string) {
+    this.updateValue(value, true);
   }
 
   increment() {
