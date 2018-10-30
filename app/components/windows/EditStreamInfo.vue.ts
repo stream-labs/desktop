@@ -53,11 +53,6 @@ export default class EditStreamInfo extends Vue {
   useOptimizedProfile = false;
   selectedPresetType: string = '';
 
-  @Watch('selectedPresetType')
-  onSelectChange(value: string) {
-    console.log('selection changed', value);
-  }
-
   // Form Models:
 
   streamTitleModel: IObsInput<string> = {
