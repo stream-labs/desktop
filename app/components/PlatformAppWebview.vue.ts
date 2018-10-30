@@ -26,15 +26,17 @@ export default class PlatformAppWebview extends Vue {
 
   renderWebview = true;
 
-  transformSubject = new BehaviorSubject<IWebviewTransform>({
-    pos: { x: 0, y: 0 },
-    size: { x: 0, y: 0 },
-    visible: this.visible
-  });
+  transformSubjectId: string;
 
   resizeInterval: number;
 
   mounted() {
+    this.transformSubjectId = this.platformAppsService.createTransformSubject({
+      pos: { x: 0, y: 0 },
+      size: { x: 0, y: 0 },
+      visible: this.visible
+    });
+
     this.checkResize();
 
     this.resizeInterval = window.setInterval(() => {
@@ -81,7 +83,7 @@ export default class PlatformAppWebview extends Vue {
         webContents.id,
         electron.remote.getCurrentWindow().id,
         Utils.getCurrentUrlParams().windowId,
-        this.transformSubject
+        this.transformSubjectId
       );
 
       /**
@@ -104,6 +106,7 @@ export default class PlatformAppWebview extends Vue {
   destroyed() {
     this.reloadSub.unsubscribe();
     if (this.resizeInterval) clearInterval(this.resizeInterval);
+    this.platformAppsService.removeTransformSubject(this.transformSubjectId);
   }
 
   get appUrl() {
@@ -149,7 +152,7 @@ export default class PlatformAppWebview extends Vue {
       y: rect.top
     };
 
-    this.transformSubject.next({
+    this.platformAppsService.nextTransformSubject(this.transformSubjectId, {
       pos: { x: rect.left, y: rect.top },
       size: { x: rect.width, y: rect.height },
       visible: this.visible

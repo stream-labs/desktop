@@ -16,7 +16,8 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;
 
@@ -489,7 +490,7 @@ export class PlatformAppsService extends
     webContentsId: number,
     electronWindowId: number,
     slobsWindowId: string,
-    transform: Observable<IWebviewTransform>
+    transformSubjectId: string
   ) {
     const app = this.getApp(appId);
     const api = this.apiManager.getApi(
@@ -497,7 +498,7 @@ export class PlatformAppsService extends
       webContentsId,
       electronWindowId,
       slobsWindowId,
-      transform
+      this.getTransformSubject(transformSubjectId)
     );
 
     // Namespace under v1 for now.  Eventually we may want to add
@@ -729,6 +730,30 @@ export class PlatformAppsService extends
       this.appUnload.next(appId);
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
+  }
+
+  /* These functions exist primary to work around our n window
+   * system because rxjs subjects are not serializable
+   */
+
+  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
+
+  createTransformSubject(initial: IWebviewTransform) {
+    const id = uuid();
+    this.transformSubjects[id] = new BehaviorSubject(initial);
+    return id;
+  }
+
+  getTransformSubject(id: string) {
+    return this.transformSubjects[id];
+  }
+
+  removeTransformSubject(id: string) {
+    delete this.transformSubjects[id];
+  }
+
+  nextTransformSubject(id: string, value: IWebviewTransform) {
+    this.transformSubjects[id].next(value);
   }
 
   /**
