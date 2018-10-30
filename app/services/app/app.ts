@@ -26,6 +26,8 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
+import fs from 'fs';
+import path from 'path';
 
 interface IAppState {
   loading: boolean;
@@ -72,6 +74,8 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   async load() {
     this.START_LOADING();
+
+    await this.setupPluginDirectories();
 
     // Initialize OBS
     obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
@@ -142,6 +146,39 @@ export class AppService extends StatefulService<IAppState> {
       obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
+  }
+
+  private async setupPluginDirectories() {
+    // Make a best effort but don't stop SLOBS from loading
+    try {
+      const appData = electron.remote.app.getPath('appData');
+      const pluginsDir = path.join(appData, 'slobs-plugins');
+      await this.ensureDirectory(pluginsDir);
+      await this.ensureDirectory(path.join(pluginsDir, 'obs-plugins'));
+      await this.ensureDirectory(path.join(pluginsDir, 'obs-plugins', '64bit'));
+      await this.ensureDirectory(path.join(pluginsDir, 'data'));
+      await this.ensureDirectory(path.join(pluginsDir, 'data', 'obs-plugins'));
+    } catch (e) {
+      console.error('Error creating plugin directories', e);
+    }
+  }
+
+  private async ensureDirectory(dirPath: string) {
+    return new Promise((resolve, reject) => {
+      fs.exists(dirPath, exists => {
+        if (exists) {
+          resolve();
+        } else {
+          fs.mkdir(dirPath, err => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }
+      });
+    });
   }
 
   startLoading() {
