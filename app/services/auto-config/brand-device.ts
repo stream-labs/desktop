@@ -49,7 +49,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     urls: null
   };
 
-  @Inject() private urlsService: UrlService;
+  @Inject() private urlService: UrlService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private scenesService: ScenesService;
@@ -205,7 +205,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       this.state.SystemVersion
     ].join(' ');
 
-    const res = await fetch(this.urlsService.getStreamlabsApi(`intelconfig/${id}`));
+    const res = await fetch(this.urlService.getStreamlabsApi(`intelconfig/${id}`));
     if (!res.ok) return null;
     return res.json();
   }
