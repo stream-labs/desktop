@@ -26,6 +26,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
+import { ObsUserPluginsService } from 'services/obs-user-plugins';
 
 interface IAppState {
   loading: boolean;
@@ -68,10 +69,13 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
+  @Inject() private obsUserPluginsService: ObsUserPluginsService;
 
   @track('app_start')
   async load() {
     this.START_LOADING();
+
+    await this.obsUserPluginsService.initialize();
 
     // Initialize OBS
     obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
