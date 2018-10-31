@@ -11,7 +11,7 @@ useSpectron({ appArgs: '--nosync' });
 async function testGoal(t: GenericTestContext<any>, goalType: string) {
 
   const client = t.context.app.client;
-  await logIn(t);
+  if (!await logIn(t)) return;
   await addSource(t, goalType, goalType, false);
 
   await client.click('li=Visual Settings');

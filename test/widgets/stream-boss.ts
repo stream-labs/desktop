@@ -34,7 +34,7 @@ test('Set stream-boss health', async t => {
 
 test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
-  await logIn(t);
+  if (!await logIn(t)) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Manage Battle');
@@ -73,7 +73,7 @@ test('Stream Boss Manage Battle settings', async t => {
 
 test('Stream Boss Manage Visual Settings', async t => {
   const client = t.context.app.client;
-  await logIn(t);
+  if (!await logIn(t)) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Visual Settings');
