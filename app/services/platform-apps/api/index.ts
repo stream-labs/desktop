@@ -1,4 +1,4 @@
-import { Module, EApiPermissions, TApiModule, IApiContext } from './modules/module';
+import { Module, TApiModule, IApiContext, IWebviewTransform } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
@@ -11,6 +11,9 @@ import { ExternalModule } from './modules/external';
 import { AppModule } from './modules/app';
 import { NotificationsModule } from './modules/notifications';
 import { HotkeysModule } from './modules/hotkeys';
+import { ObsPluginsModule } from './modules/obs-plugins';
+import { DisplayModule } from './modules/display';
+import { Observable } from 'rxjs/Observable';
 
 export class PlatformAppsApi {
 
@@ -29,6 +32,8 @@ export class PlatformAppsApi {
     this.registerModule(new AppModule());
     this.registerModule(new NotificationsModule());
     this.registerModule(new HotkeysModule());
+    this.registerModule(new ObsPluginsModule());
+    this.registerModule(new DisplayModule());
   }
 
   private registerModule(module: Module) {
@@ -41,10 +46,22 @@ export class PlatformAppsApi {
    * replaced with a method that returns a rejected promise
    * explaining the lack of permissions.
    */
-  getApi(app: ILoadedApp) {
+  getApi(
+    app: ILoadedApp,
+    webContentsId: number,
+    electronWindowId: number,
+    slobsWindowId: string,
+    webviewTransform: Observable<IWebviewTransform>
+  ) {
     const api: Dictionary<TApiModule> = {};
 
-    const context: IApiContext = { app };
+    const context: IApiContext = {
+      app,
+      webContentsId,
+      electronWindowId,
+      slobsWindowId,
+      webviewTransform
+    };
 
     Object.keys(this.modules).forEach(moduleName => {
       api[moduleName] = {};

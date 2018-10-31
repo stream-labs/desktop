@@ -38,6 +38,12 @@ interface IResource {
   resourceId: string;
 }
 
+interface IRGBColor {
+  r: number;
+  g: number;
+  b: number;
+}
+
 // list of modules without type definitions
 declare module 'raven-js/*';
 declare module 'v-tooltip';
