@@ -42,7 +42,7 @@ export default class OptimizeNiconico extends Vue {
   }
 
   optimizeAndGoLive() {
-    this.settingsService.optimizeForNiconico(this.settings.delta);
+    this.settingsService.optimizeForNiconico(this.settings.best);
     this.streamingService.toggleStreaming();
     this.windowsService.closeChildWindow();
   }
