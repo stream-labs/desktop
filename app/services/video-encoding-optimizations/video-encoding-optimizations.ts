@@ -76,7 +76,7 @@ export class VideoEncodingOptimizationService extends Service {
 
     // if no game-specific profile found then fetch generic profiles
     if (!profiles.length) {
-      profiles = await fetch(this.urlService.getStreamlabsApi(`gamepresets/Generic`))
+      profiles = await fetch(this.urlService.getStreamlabsApi('gamepresets/Generic'))
         .then(handleErrors)
         .then(camelize);
     }
