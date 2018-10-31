@@ -136,7 +136,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           size: setting.font_size,
           thickness: setting.font_weight
         },
-        textDelay: setting.text_delay,
+        textDelay: Math.floor(setting.text_delay / 1000),
         type: '',
         useCustomImage: setting.use_custom_image,
         moderation: setting.moderation,
@@ -147,7 +147,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           libraryDefaults: setting.gif_library_defaults,
           libraryEnabled: setting.gif_library_enabled,
           minAmount: setting.gifs_min_amount_to_share,
-          duration: setting.max_gif_duration
+          duration: setting.max_gif_duration ? Math.floor(setting.max_gif_duration / 1000) : null
         },
         message: {
           minAmount: setting.message_min_amount || setting.alert_message_min_amount,

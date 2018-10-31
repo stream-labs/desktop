@@ -45,7 +45,7 @@
 
 .change-media {
   text-transform: uppercase;
-  color: @night-text;
+  color: @night-paragraph;
   font-size: 11px;
 }
 
