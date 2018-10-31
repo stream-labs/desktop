@@ -148,7 +148,7 @@
 
 .left-accordion__button {
   display: flex;
-  border-top: 1px solid @day-border;
+  border-bottom: 1px solid @day-border;
   padding: 12px;
   font-size: 12px;
   position: relative;

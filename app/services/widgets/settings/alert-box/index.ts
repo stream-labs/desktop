@@ -74,6 +74,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         triagedSettings[key] = this.varifySetting(triagedSettings[key]);
       }
     })
+    // resubs are folded into the sub settings
+    triagedSettings['resubs'] = null;
 
     return triagedSettings;
   }
