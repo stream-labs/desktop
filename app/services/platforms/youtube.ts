@@ -253,4 +253,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
       this.ableToStream();
     });
   }
+
+  beforeGoLive() {
+    return Promise.resolve();
+  }
 }
