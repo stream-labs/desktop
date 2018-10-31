@@ -1,10 +1,9 @@
-import { Service } from '../service';
 import { StatefulService, mutation } from './../stateful-service';
 import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
+import { handleErrors, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 
 interface IFacebookPage{
@@ -122,7 +121,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchPages() {
-    const host = this.hostsService.streamlabs;
     const url = `${this.apiBase}/me/accounts`;
     const headers = this.getHeaders(true);
     const request = new Request(url, { headers });
@@ -143,7 +141,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
             id: activePage[0].id
           });
         }
-        return;
       });
   }
 
@@ -201,7 +198,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       .then(handleErrors)
       .then(response => response.json())
       .then(json => {
-        console.log(json, 'FUUUUUU');
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
          const settings = this.settingsService.getSettingsFormData('Stream');
@@ -266,19 +262,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     return Promise.resolve(JSON.parse(''));
   }
 
-  getChatUrl(mode: string): Promise<string> {
-    return new Promise((resolve) => {
-      resolve('https://www.facebook.com/gaming/streamer/chat/');
-    });
+  getChatUrl(): Promise<string> {
+    return Promise.resolve('https://www.facebook.com/gaming/streamer/chat/');
   }
 
   beforeGoLive() {
-    return new Promise((resolve) => {
-      this.fetchPages().then(() => {
-        this.fbGoLive().then(() => {
-          resolve();
-        });
-      });
-    });
+    return this.fetchPages()
+        .then(this.fbGoLive);
   }
 }
