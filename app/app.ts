@@ -34,7 +34,7 @@ window['obs'] = window['require']('obs-studio-node');
 { // Set up things for IPC
   // Connect to the IPC Server
   window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
-  document.addEventListener('close', (e) => {
+  electron.remote.getCurrentWindow().on('close', () => {
     window['obs'].IPC.disconnect();
   });
 }
