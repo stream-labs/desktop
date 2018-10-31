@@ -281,6 +281,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
       this.DELETE_ONE_OFF_WINDOW(windowId);
     });
 
+    this.updateScaleFactor(windowId);
+    newWindow.on('move', () => this.updateScaleFactor(windowId));
+
     if (Util.isDevMode()) {
       newWindow.webContents.openDevTools({ mode: 'detach' });
     }

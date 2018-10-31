@@ -91,8 +91,8 @@
 
 .change-media {
   text-transform: uppercase;
-  color: @night-text;
   font-size: 11px;
+  color: @night-paragraph;
 }
 
 .night-theme {

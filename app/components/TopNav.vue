@@ -80,7 +80,8 @@
       <a
         @click="openDiscord"
         class="link">
-        <i class="icon-discord"></i><span>Discord</span>
+        <i class="icon-question"></i>
+        <span>{{ $t('Help') }}</span>
       </a>
     </div>
     <div class="top-nav-item">
@@ -150,10 +151,8 @@
 }
 
 .link {
-  @media(max-width: 1500px) {
-    span {
-      display: none;
-    }
+  span {
+    display: none;
   }
 }
 
