@@ -5,6 +5,7 @@ import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVariation } from './alert-box-api';
 import { API_NAME_MAP, REGEX_TESTERS, newVariation, conditions } from './alert-box-data';
+import { IWidgetSettings } from '../../widgets-api';
 
 export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; }
 
@@ -36,6 +37,18 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
 
   newVariation(type: string): IAlertBoxVariation {
     return newVariation(type);
+  }
+
+  toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation: IAlertBoxVariation) {
+    const newSettings = { ...data };
+    Object.keys(newSettings).forEach((type) => {
+      const variations = newSettings[type].variations;
+      const found = variations && variations.find((vari: IAlertBoxVariation) => variation.id === vari.id);
+      if (found) {
+        found.settings.customHtmlEnabled = enabled;
+      }
+    });
+    this.saveSettings(newSettings);
   }
 
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {

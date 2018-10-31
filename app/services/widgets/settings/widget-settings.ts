@@ -70,6 +70,10 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return this.state.data;
   }
 
+  toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation?: any) {
+    this.saveSettings({ ...data, custom_enabled: enabled });
+  }
+
   protected async loadData() {
     // load widget settings data into state
     const isFirstLoading = !this.state.data;

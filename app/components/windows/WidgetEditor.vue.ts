@@ -162,20 +162,6 @@ export default class WidgetEditor extends Vue {
   }
 
   toggleCustomCode(enabled: boolean) {
-    let newSettings = { ...this.wData.settings, custom_enabled: enabled };
-    if (this.selectedVariation) {
-      newSettings = { ...this.wData.settings };
-      Object.keys(newSettings).forEach((type) => {
-        const variations = newSettings[type].variations;
-        const found = variations && variations.find(
-          (vari: IAlertBoxVariation) => this.selectedVariation.id === vari.id
-        );
-        if (found) {
-          found.settings.customHtmlEnabled = true;
-        }
-      });
-    }
-    console.log(newSettings);
-    this.widget.getSettingsService().saveSettings(newSettings);
+    this.widget.getSettingsService().toggleCustomCode(enabled, this.wData.settings, this.selectedVariation);
   }
 }
