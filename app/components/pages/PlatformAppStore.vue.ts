@@ -17,6 +17,10 @@ export default class PlatformAppStore extends Vue {
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
 
+  @Prop() params: {
+    appId?: string;
+  };
+
   $refs: {
     appStoreWebview: Electron.WebviewTag;
   };
@@ -54,6 +58,6 @@ export default class PlatformAppStore extends Vue {
   }
 
   get appStoreUrl() {
-    return this.userService.appStoreUrl();
+    return this.userService.appStoreUrl(this.params.appId);
   }
 }
