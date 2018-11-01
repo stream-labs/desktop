@@ -55,6 +55,14 @@ export class SceneCollectionsStateService extends StatefulService<
       }
     } catch (e) {
       console.warn('Error loading manifest file from disk');
+      // 存在しない場合はそのまま初期化してよいのでスルー
+
+      // 存在しない以外の理由で失敗する場合は上書きしてしまうので問題がある
+      if (e.code !== 'ENOENT') {
+        console.error('Error loading manifest file from disk : %o', e);
+
+        // TODO: 上書き確認をする https://github.com/n-air-app/n-air-app/pull/180
+      }
     }
 
     await this.flushManifestFile();
