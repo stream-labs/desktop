@@ -12,6 +12,7 @@
   "optimizedProfileForAverageCpUs": "平均的なCPUに最適化されたプロファイル",
   "optimizedProfileForWeakCpUs": "低性能なCPUに最適化されたプロファイル",
   "recording": "REC",
+  "programFetching": "番組取得中",
   "endStream": "配信終了",
   "starting": "配信開始中",
   "startingWithDelay": "配信開始中 %{delaySeconds}秒",
