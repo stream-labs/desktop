@@ -2,7 +2,7 @@ import * as widgetInputComponents from './inputs';
 import {
   inputComponents as sharedInputComponents,
   metadata as sharedMetadata,
-  EInputType, IInputMetadata
+  EInputType, IInputMetadata, IListMetadata
 } from 'components/shared/inputs';
 
 
@@ -16,6 +16,7 @@ export const inputComponents = {
 export enum EWInput {
   animation = 'animation',
   frequency = 'frequency',
+  sectionedMultiselect = 'sectionedMultiselect',
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
@@ -25,6 +26,12 @@ export interface IAnimationMetadata extends IInputMetadata {
 export const metadata = {
   ...sharedMetadata,
   animation: (options: IAnimationMetadata) => ({ type: EWInput.animation, ...options } as IAnimationMetadata),
-  frequency: (options: IInputMetadata) => ({ type: EWInput.frequency, ...options } as IInputMetadata)
+  frequency: (options: IInputMetadata) => ({ type: EWInput.frequency, ...options } as IInputMetadata),
+  sectionedMultiselect: (options: IListMetadata<{ label: string, options: { value: string, label: string }[] }>) => (
+    {
+      type: EWInput.sectionedMultiselect,
+      ...options
+    } as IListMetadata<{ label: string, options: { value: string, label: string }[] }>
+  ),
 };
 

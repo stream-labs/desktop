@@ -50,6 +50,11 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   afterFetch() {
     this.alertTypes = this.alertTypes.filter((type) => this.wData.settings[type]);
+    const languages = this.wData.tts_languages;
+    this.languages = Object.keys(languages).map((category) => ({
+      label: category,
+      options: Object.keys(languages[category]).map((key) => ({ value: key, label: languages[category][key] }))
+    })).sort((a, _b) => a.label === 'Legacy Voice' ? -1 : 0);
   }
 
   alertName(alertType: string) {
@@ -62,9 +67,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   selectedAlert = 'general';
   selectedId = 'default';
   editingName: string = null;
+  languages: any[] = [];
 
   get metadata() {
-    return this.service.getMetadata(this.selectedAlert);
+    return this.service.getMetadata(this.selectedAlert, this.languages);
   }
 
   get selectedVariation() {

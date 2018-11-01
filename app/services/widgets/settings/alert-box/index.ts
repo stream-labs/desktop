@@ -9,7 +9,7 @@ import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
 
-export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; }
+export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; tts_languages?: any[]; }
 
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
@@ -53,7 +53,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     this.saveSettings(newSettings);
   }
 
-  getMetadata(type: string) {
+  getMetadata(type: string, languages: any[]) {
     return {
       moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
       alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
@@ -77,7 +77,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         min: 1,
         interval: 1
       }),
-      ttsLanguage: metadata.list({ title: $t('Language'), options: [] }),
+      ttsLanguage: metadata.sectionedMultiselect({ title: $t('Language'), options: languages }),
       conditions: metadata.list({ title: $t('Variation Condition'), options: this.conditionsByType(type) }),
       fontSize: metadata.fontSize({ title: $t('Font Size') }),
       fontFamily: metadata.fontFamily({ title: $t('Font') }),
