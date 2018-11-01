@@ -7,12 +7,7 @@
 >
   <!-- Left Toolbar -->
   <div slot="leftbar">
-    <div class="left-accordion__button">
-      <span style="text-transform: uppercase;" :class="{ active: selectedAlert === 'general' }">
-        {{ $t('Global Settings') }}
-      </span>
-    </div>
-    <div class="left-accordion__button">
+    <div class="left-accordion__button alert-button">
       <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
       <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
         <button
@@ -24,6 +19,11 @@
           {{ $t('Add ') }}{{ alertName(type) }}
         </button>
       </div>
+    </div>
+    <div class="left-accordion__button">
+      <span style="text-transform: uppercase;" :class="{ active: selectedAlert === 'general' }">
+        {{ $t('Global Settings') }}
+      </span>
     </div>
     <div v-for="alert in alertTypes" v-if="wData && wData.settings[alert]" :key="alert" style="position: relative;" >
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
@@ -151,6 +151,10 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.left-accordion__button.alert-button {
+  padding: 7.5px;
 }
 
 .add-alert-button {

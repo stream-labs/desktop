@@ -9,7 +9,7 @@
     </div>
 
     <div class="window-container">
-      <div style="position: relative;">
+      <div class="editor-tabs" :class="{ pushed: isAlertBox }">
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
@@ -28,7 +28,6 @@
         <div class="display">
           <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
         </div>
-        <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <h2 class="subsection__title">{{ slot.label }}</h2>
@@ -101,8 +100,9 @@
             <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
           </div>
         </div>
-
       </div>
+
+      <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
     </div>
   </div>
 </modal-layout>
@@ -114,7 +114,7 @@
   @import "../../styles/index";
 
   .widget-editor__top-tabs {
-    .margin-h-sides(2);
+    padding: 0 16px !important;
   }
 
   .top-settings {
@@ -191,6 +191,16 @@
     margin-left: auto;
   }
 
+  .editor-tabs {
+    position: relative;
+  }
+
+  .editor-tabs.pushed {
+    right: 0;
+    width: 80%;
+    margin-left: auto;
+  }
+
   .content-container {
     display: flex;
     width: 100%;
@@ -239,12 +249,12 @@
 
   .left-toolbar {
     width: 20%;
-    height: 100%;
+    height: calc(~"100% - 66px");
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    background-color: @day-section;
-    border-right: 1px solid @day-border;
+    border: 1px solid @day-border;
+    background-color: @day-bg;
     overflow-y: auto;
   }
 
@@ -388,9 +398,12 @@
 
   .night-theme {
     .display,
-    .content-container,
-    .left-toolbar {
+    .content-container {
       background-color: @night-section;
+    }
+
+    .left-toolbar {
+      background-color: @night-bg;
     }
 
     .window-container {
