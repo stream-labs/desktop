@@ -14,7 +14,8 @@ export const inputComponents = {
 };
 
 export enum EWInput {
-  animation = 'animation'
+  animation = 'animation',
+  frequency = 'frequency',
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
@@ -23,6 +24,7 @@ export interface IAnimationMetadata extends IInputMetadata {
 
 export const metadata = {
   ...sharedMetadata,
-  animation: (options: IAnimationMetadata) => ({ type: EWInput.animation, ...options } as IAnimationMetadata)
+  animation: (options: IAnimationMetadata) => ({ type: EWInput.animation, ...options } as IAnimationMetadata),
+  frequency: (options: IInputMetadata) => ({ type: EWInput.frequency, ...options } as IInputMetadata)
 };
 

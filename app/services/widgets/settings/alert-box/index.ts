@@ -6,6 +6,8 @@ import { InheritMutations } from 'services/stateful-service';
 import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVariation } from './alert-box-api';
 import { API_NAME_MAP, REGEX_TESTERS, newVariation, conditions } from './alert-box-data';
 import { IWidgetSettings } from '../../widgets-api';
+import { $t } from 'services/i18n';
+import { metadata } from 'components/widgets/inputs';
 
 export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; }
 
@@ -49,6 +51,58 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       }
     });
     this.saveSettings(newSettings);
+  }
+
+  getMetadata(type: string) {
+    return {
+      moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
+      alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
+      textThickness: metadata.slider({ title: $t('Font Weight'), min: 300, max: 900, interval: 100 }),
+      soundVolume: metadata.slider({ title: $t('Volume'), min: 0, max: 100 }),
+      messageWeight: metadata.slider({ title: $t('Font Weight'), min: 300, max: 900, interval: 100 }),
+      ttsVolume: metadata.slider({ title: $t('Volume'), min: 0, max: 100 }),
+      duration: metadata.slider({ title: $t('Alert Duration'), min: 2, max: 300 }),
+      textDelay: metadata.slider({ title: $t('Text Delay'), min: 0, max: 60 }),
+      ttsSecurity: metadata.slider({
+        title: $t('Spam Security'),
+        description: $t(
+          'This slider helps you filter shared media before it can be submitted.\n' +
+          '1: No security\n' +
+          '2: 65%+ rating, 5k+ views\n' +
+          '3: 75%+ rating, 40k+ views\n' +
+          '4: 80%+ rating, 300k+ views\n' +
+          '5: 85%+ rating, 900k+ views'
+        ),
+        max: 5,
+        min: 1,
+        interval: 1
+      }),
+      ttsLanguage: metadata.list({ title: $t('Language'), options: [] }),
+      conditions: metadata.list({ title: $t('Variation Condition'), options: this.conditionsByType(type) }),
+      fontSize: metadata.fontSize({ title: $t('Font Size') }),
+      fontFamily: metadata.fontFamily({ title: $t('Font') }),
+      minAmount: metadata.number({ title: $t('Min. Amount to Show') }),
+      conditionData: metadata.number({ title: $t('Variation Amount') }),
+      minTriggerAmount: metadata.number({ title: $t('Min. Amount to Trigger Alert') }),
+      minRecentEvents: metadata.number({ title: $t('Min. Amount to Show in Recent Events') }),
+      ttsMinAmount: metadata.number({ title: $t('Min. Amount to Read') }),
+      showAnimation: metadata.animation({ title: $t('Show Animation'), filter: 'in' }),
+      hideAnimation: metadata.animation({ title: $t('Hide Animation'), filter: 'out' }),
+      textAnimation: metadata.animation({ title: $t('Text Animation'), filter: 'text' }),
+      bgColor: metadata.color({ title: $t('Background Color') }),
+      primaryColor: metadata.color({ title: $t('Text Color Primary') }),
+      secondaryColor: metadata.color({ title: $t('Text Color Secondary') }),
+      textColor: metadata.color({ title: $t('Text Color') }),
+      showMessage: metadata.bool({ title: $t('Show Message?') }),
+      messageEmojis: metadata.bool({ title: $t('Allow Twitch Emojis?') }),
+      ttsEnabled: metadata.bool({ title: $t('Enable TTS?') }),
+      unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
+      unlimitedMediaMod: metadata.toggle({ title: $t('Unlimited Media Sharing Alert Moderation Delay') }),
+      imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
+      soundFile: metadata.sound({ title: $t('Sound File') }),
+      variationFrequency: metadata.frequency({ title: $t('Variation Frequency') }),
+      template: metadata.textArea({ title: $t('Message Template') })
+    };
   }
 
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {

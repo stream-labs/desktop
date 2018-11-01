@@ -126,7 +126,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return settings;
   }
 
-  getMetadata(): Dictionary<IInputMetadata>  {
+  getMetadata(options?: any): Dictionary<IInputMetadata>  {
     return {};
   }
 

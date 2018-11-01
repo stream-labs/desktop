@@ -17,6 +17,9 @@ export enum EInputType {
   code = 'code',
   file = 'file',
   timer = 'timer',
+  toggle = 'toggle',
+  mediaGallery = 'mediaGallery',
+  sound = 'sound',
 }
 
 /**
@@ -69,7 +72,7 @@ export interface IListOption<TValue> {
 }
 
 export interface IMediaGalleryMetadata extends IInputMetadata {
-  clearImage: string;
+  clearImage?: string;
   filter?: 'audio' | 'image';
 }
 
@@ -77,7 +80,6 @@ export interface IFileMetadata extends IInputMetadata {
   filters?: Electron.FileFilter[];
   directory?: boolean;
 }
-
 
 // a helper for creating metadata
 export const metadata = {
@@ -93,6 +95,13 @@ export const metadata = {
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
   file: (options: IFileMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
+  toggle: (options: IInputMetadata) => ({ type: EInputType.toggle, ...options } as IInputMetadata),
+  mediaGallery: (options: IMediaGalleryMetadata) => (
+    { type: EInputType.mediaGallery, ...options } as IMediaGalleryMetadata
+  ),
+  sound: (options: IMediaGalleryMetadata) => (
+    { type: EInputType.sound, ...options } as IMediaGalleryMetadata
+  ),
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html

@@ -68,74 +68,64 @@
 
   <!-- Global Settings -->
   <validated-form slot="general-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" />
-    <v-form-group :title="$t('Global Alert Delay')" type="slider" v-model="wData.settings.alert_delay" :metadata="{ min: 0, max: 30 }" />
+    <v-form-group v-model="wData.settings.background_color" :metadata="metadata.bgColor" />
+    <v-form-group v-model="wData.settings.alert_delay" :metadata="metadata.alertDelay" />
   </validated-form>
   <validated-form slot="moderation-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Unlimited Alert Moderation Delay')">
-      <toggle-input v-model="wData.settings.unlimited_alert_moderation_enabled" />
-    </v-form-group>
-    <v-form-group :title="$t('Alert Moderation delay')" type="slider" v-model="wData.settings.moderation_delay" />
-    <v-form-group :title="$t('Unlimited Media Sharing Alert Moderation Delay')">
-      <toggle-input v-model="wData.settings.unlimited_media_moderation_delay" />
-    </v-form-group>
+    <v-form-group v-model="wData.settings.unlimited_alert_moderation_enabled" :metadata="metadata.unlimitedAlertMod" />
+    <v-form-group v-model="wData.settings.moderation_delay" :metadata="metadata.moderationDelay" />
+    <v-form-group v-model="wData.settings.unlimited_media_moderation_delay" :metadata="metadata.unlimitedMediaMod" />
   </validated-form>
 
   <!-- Alert-Specific Settings -->
   <validated-form slot="title-properties" key="title-properties" @input="save()" v-if="selectedVariation">
     <div v-if="selectedVariation.settings.text">
-      <v-form-group :title="$t('Message Template')" type="textArea" v-model="selectedVariation.settings.text.format" />
-      <v-form-group :title="$t('Font')" type="fontFamily" v-model="selectedVariation.settings.text.font" />
-      <v-form-group :title="$t('Font Size')" type="fontSize" v-model="selectedVariation.settings.text.size" />
-      <v-form-group :title="$t('Font Weight')" type="slider" v-model="selectedVariation.settings.text.thickness" :metadata="{ min: 300, max: 900, interval: 100 }" />
-      <v-form-group :title="$t('Text Color Primary')" type="color" v-model="selectedVariation.settings.text.color" />
-      <v-form-group :title="$t('Text Color secondary')" type="color" v-model="selectedVariation.settings.text.color2" />
+      <v-form-group v-model="selectedVariation.settings.text.format" :metadata="metadata.template" />
+      <v-form-group v-model="selectedVariation.settings.text.font" :metadata="metadata.fontFamily" />
+      <v-form-group v-model="selectedVariation.settings.text.size" :metadata="metadata.fontSize" />
+      <v-form-group v-model="selectedVariation.settings.text.thickness" :metadata="metadata.textThickness" />
+      <v-form-group v-model="selectedVariation.settings.text.color" :metadata="metadata.primaryColor" />
+      <v-form-group v-model="selectedVariation.settings.text.color2" :metadata="metadata.secondaryColor" />
     </div>
   </validated-form>
   <validated-form slot="media-properties" key="media-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Image/Video File')">
-      <media-gallery-input v-model="selectedVariation.settings.image.href" v-if="selectedVariation.settings.image" />
-    </v-form-group>
-    <v-form-group :title="$t('Sound File')" v-if="selectedVariation.settings.sound">
-      <sound-input v-model="selectedVariation.settings.sound.href" />
-    </v-form-group>
-    <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.sound.volume" :metadata="{ min: 0, max: 100 }" v-if="selectedVariation.settings.sound" />
+    <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
+    <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
+    <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
   </validated-form>
   <validated-form slot="message-properties" key="message-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Show Message?')" type="bool" v-model="selectedVariation.showMessage" />
+    <v-form-group v-model="selectedVariation.showMessage" :metadata="metadata.showMessage" />
     <div v-if="selectedVariation.settings.message">
-      <v-form-group :title="$t('Min. Amount to Show')" type="number" v-model="selectedVariation.settings.message.minAmount" />
-      <v-form-group :title="$t('Font')" type="fontFamily" v-model="selectedVariation.settings.message.font" />
-      <v-form-group :title="$t('Font Size')" type="fontSize" v-model="selectedVariation.settings.message.size" />
-      <v-form-group :title="$t('Font Weight')" type="slider" v-model="selectedVariation.settings.message.weight" :metadata="{ min: 300, max: 900, interval: 100 }" />
-      <v-form-group :title="$t('Text Color')" type="color" v-model="selectedVariation.settings.message.color" />
-      <v-form-group :title="$t('Allow Twitch Emojis?')" type="bool" v-model="selectedVariation.settings.message.allowEmojis" />
+      <v-form-group v-model="selectedVariation.settings.message.minAmount" :metadata="metadata.minAmount" />
+      <v-form-group v-model="selectedVariation.settings.message.font" :metadata="metadata.fontFamily" />
+      <v-form-group v-model="selectedVariation.settings.message.size" :metadata="metadata.fontSize" />
+      <v-form-group v-model="selectedVariation.settings.message.weight" :metadata="metadata.messageWeight" />
+      <v-form-group v-model="selectedVariation.settings.message.color" :metadata="metadata.textColor" />
+      <v-form-group v-model="selectedVariation.settings.message.allowEmojis" :metadata="metadata.messageEmojis" />
     </div>
     <div v-if="selectedVariation.settings.tts">
       <span>{{ $t('Text to Speech') }}</span>
-      <v-form-group :title="$t('Enable TTS?')" type="bool" v-model="selectedVariation.settings.tts.enabled" />
-      <v-form-group :title="$t('Min. Amount to Read')" type="number" v-model="selectedVariation.settings.tts.minAmount" />
-      <v-form-group :title="$t('Volume')" type="slider" v-model="selectedVariation.settings.tts.volume" :metadata="{ min: 0, max: 100 }" />
-      <v-form-group :title="$t('Language')" type="list" v-model="selectedVariation.settings.tts.language" />
-      <v-form-group :title="$t('Spam Security')" type="slider" v-model="selectedVariation.settings.tts.security" />
+      <v-form-group v-model="selectedVariation.settings.tts.enabled" :metadata="metadata.ttsEnabled" />
+      <v-form-group v-model="selectedVariation.settings.tts.minAmount" :metadata="metadata.ttsMinAmount" />
+      <v-form-group v-model="selectedVariation.settings.tts.volume" :metadata="metadata.ttsVolume" />
+      <v-form-group v-model="selectedVariation.settings.tts.language" :metadata="metadata.ttsLanguage" />
+      <v-form-group v-model="selectedVariation.settings.tts.security" :metadata="metadata.ttsSecurity" />
     </div>
   </validated-form>
   <validated-form slot="animation-properties" key="animation-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Show Animation')" type="animation" v-model="selectedVariation.settings.showAnimation" :metadata="{ filter: 'in' }" />
-    <v-form-group :title="$t('Hide Animation')" type="animation" v-model="selectedVariation.settings.hideAnimation" :metadata="{ filter: 'out' }" />
-    <v-form-group :title="$t('Alert Duration')" type="slider" v-model="selectedVariation.settings.duration" :metadata="{ min: 2, max: 300 }" />
-    <v-form-group :title="$t('Text Animation')" type="animation" v-model="selectedVariation.settings.text.animation"  :metadata="{ filter: 'text' }" v-if="selectedVariation.settings.text" />
-    <v-form-group :title="$t('Text Delay')" type="slider" v-model="selectedVariation.settings.textDelay" :metadata="{ min: 0, max: 60 }" />
+    <v-form-group v-model="selectedVariation.settings.showAnimation" :metadata="metadata.showAnimation" />
+    <v-form-group v-model="selectedVariation.settings.hideAnimation" :metadata="metadata.hideAnimation" />
+    <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />
+    <v-form-group v-model="selectedVariation.settings.text.animation"  :metadata="metadata.textAnimation" v-if="selectedVariation.settings.text" />
+    <v-form-group v-model="selectedVariation.settings.textDelay" :metadata="metadata.textDelay" />
   </validated-form>
   <validated-form slot="alert-properties" key="alert-properties" @input="save()" v-if="selectedVariation">
-    <v-form-group :title="$t('Min. Amount to Trigger Alert')" type="number" v-model="minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
-    <v-form-group :title="$t('Min. Amount to Show in Recent Events')" type="number" v-model="minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
+    <v-form-group v-model="minTriggerAmount" :metadata="metadata.minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
+    <v-form-group v-model="minRecentEvents" :metadata="metadata.minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
-      <v-form-group :title="$t('Variation Condition')" type="list" v-model="selectedVariation.condition" :metadata="{ options: conditions }" />
-      <v-form-group :title="$t('Variation Frequency')" v-if="selectedVariation.condition === 'RANDOM'">
-        <frequency-input v-model="selectedVariation.conditionData" />
-      </v-form-group>
-      <v-form-group :title="$t('Variation Amount')" type="number" v-model="selectedVariation.conditionData" v-if="selectedVariation.condition !== 'RANDOM'" />
+      <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
+      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variationFrequency" v-if="selectedVariation.condition === 'RANDOM'" />
+      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.conditionData" v-if="selectedVariation.condition !== 'RANDOM'" />
     </div>
   </validated-form>
 </widget-editor>
