@@ -69,6 +69,7 @@ export interface IListOption<TValue> {
   value: TValue;
   title: string;
   description?: string;
+  options?: { label: string, value: string }[];
 }
 
 export interface IMediaGalleryMetadata extends IInputMetadata {

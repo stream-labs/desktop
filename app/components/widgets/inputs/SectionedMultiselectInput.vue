@@ -6,8 +6,8 @@
   track-by="value"
   label="label"
   :allow-empty="false"
-  :value="value"
-  @input="emitInput"/>
+  :value="displayValue"
+  @input="(option) => emitInput(option.value)"/>
 </template>
 
 <script lang="ts" src="./SectionedMultiselectInput.vue.ts"></script>
