@@ -129,7 +129,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       }
     })
     // resubs are folded into the sub settings
-    triagedSettings['resubs'] = null;
+    triagedSettings['resubs'] = undefined;
 
     return triagedSettings;
   }
