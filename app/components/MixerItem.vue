@@ -77,6 +77,11 @@
     opacity: 0.4;
   }
 
+  &.muted .icon-mute {
+    color: @text-active;
+    opacity: 1;
+  }
+
   .controls {
     width: 60px;
     text-align: right;

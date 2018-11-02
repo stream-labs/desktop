@@ -63,10 +63,18 @@
 
 .vue-slider {
   background-color: @bg-secondary !important;
+
+  .muted & {
+    background-color: darken(@bg-secondary, 10%) !important;
+  }
 }
 
 .vue-slider-process {
   background-color: @text-secondary !important;
+
+  .muted & {
+    background-color: darken(@text-secondary, 40%) !important;
+  }
 }
 
 .vue-slider-dot {
