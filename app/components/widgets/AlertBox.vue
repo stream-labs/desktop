@@ -236,6 +236,7 @@
 .variation-tile__image-box {
   width: 100%;
   display: block;
+  height: 60px;
   margin: 4px auto;
   overflow: hidden;
   position: relative;
