@@ -174,7 +174,7 @@ const definitionParams: DefinitionParam[] = [
 ];
 
 export interface OptimizedSettings {
-    delta: OptimizeSettings;
+    best: OptimizeSettings;
     current: OptimizeSettings;
     info: [CategoryName, {
         key: string,
@@ -351,6 +351,11 @@ export class Optimizer {
         }
     }
 
+    clearCache() {
+        this.writeBackAllCategories();
+        this.categoryCache.clear();
+    }
+
     private findValue(i: DefinitionParam) {
         return this.accessor.findSettingValue(this.getCategory(i.category), i.subCategory, i.setting);
     }
@@ -453,8 +458,30 @@ export class Optimizer {
         return Object.assign({}, ...this.getValues(this.definitions));
     }
 
-    optimize(optimized: OptimizeSettings) {
-        this.setValues(optimized, this.definitions);
+    /**
+     * 期待する前提 expect のうち、現在の値 current と異なる値を持つものだけを列挙する
+     * @param current 現在の設定
+     * @param expect 期待する設定
+     */
+    static *getDifference(current: OptimizeSettings, expect: OptimizeSettings): IterableIterator<OptimizeSettings> {
+        // 最適化の必要な値を抽出する
+        for (const key of Object.getOwnPropertyNames(expect)) {
+            if (current[key] !== expect[key]) {
+                yield { [key]: expect[key] };
+            }
+        }
+    }
+
+    /**
+     * 現在値から expect に更新するための差分を列挙する
+     * @param expect 期待する設定
+     */
+    *getDifferenceFromCurrent(expect: OptimizeSettings): IterableIterator<OptimizeSettings> {
+        yield* Optimizer.getDifference(this.getCurrentSettings(), expect);
+    }
+
+    optimize(best: OptimizeSettings) {
+        this.setValues(best, this.definitions);
         this.writeBackAllCategories();
     }
 

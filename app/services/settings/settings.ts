@@ -29,7 +29,8 @@ import {
   ISettingsAccessor,
   OptimizeSettings,
   OptimizedSettings,
-  Optimizer
+  Optimizer,
+  OptimizationKey
 } from './optimizer';
 import { getBestSettingsForNiconico } from './niconico-optimization';
 
@@ -441,29 +442,38 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
-    const best = getBestSettingsForNiconico({bitrate});
+    const best = getBestSettingsForNiconico({ bitrate });
     const opt = new Optimizer(this);
 
     const current = opt.getCurrentSettings();
 
     // 最適化の必要な値を抽出する
-    let delta: OptimizeSettings = {}
-    for (const key of Object.getOwnPropertyNames(best)) {
-      if (current[key] !== best[key]) {
-        delta[key] = best[key];
-      }
-    }
+    const delta: OptimizeSettings = Object.assign({}, ...Optimizer.getDifference(current, best));
 
     return Object.keys(delta).length > 0 ? {
       current,
-      delta,
+      best,
       info: opt.optimizeInfo(current, delta)
     } : undefined;
   }
 
-  optimizeForNiconico(delta: OptimizeSettings) {
+  optimizeForNiconico(best: OptimizeSettings) {
+    const MAX_TRY = 3;
+
     const opt = new Optimizer(this);
-    opt.optimize(delta);
+
+    for (let retry = MAX_TRY; retry > 0; --retry) {
+      opt.optimize(best);
+
+      // 確実に書き込めたか確認するため、読み込み直す
+      opt.clearCache();
+      const delta = [...opt.getDifferenceFromCurrent(best)]
+      if (delta.length === 0) {
+        return;
+      }
+      console.error('optimizeForNiconico: optimization setting is not set perfectly: ', JSON.stringify(delta));
+    }
+    console.error('FAILED');
   }
 
   private findSubCategory(settings: ISettingsSubCategory[], category: string): ISettingsSubCategory[] {

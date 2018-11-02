@@ -267,7 +267,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           }
         });
       } else {
-        this.settingsService.optimizeForNiconico(settings.delta);
+        this.settingsService.optimizeForNiconico(settings.best);
         this.toggleStreaming();
       }
     } else {
