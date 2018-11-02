@@ -20,8 +20,8 @@
         </button>
       </div>
     </div>
-    <div class="left-accordion__button">
-      <span style="text-transform: uppercase;" :class="{ active: selectedAlert === 'general' }">
+    <div class="left-accordion__button" :class="{ active: selectedAlert === 'general' }" @click="selectAlertType('general')">
+      <span style="text-transform: uppercase;">
         {{ $t('Global Settings') }}
       </span>
     </div>
@@ -157,6 +157,10 @@
   padding: 7.5px;
 }
 
+.left-accordion__button.active {
+  background-color: @teal-light-opac;
+}
+
 .add-alert-button {
   width: 100%;
   text-transform: uppercase;
@@ -265,6 +269,9 @@
 .night-theme {
   .left-accordion__button {
     border-color: @night-border;
+  }
+  .left-accordion__button.active {
+    background-color: @night-secondary;
   }
   .add-alert-dropdown {
     background-color: @night-secondary;

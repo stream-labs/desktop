@@ -21,7 +21,7 @@
           <toggle-input :value="customCodeIsEnabled" @input="value => toggleCustomCode(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
-        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
+        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" v-if="topTabs.length > 1" />
       </div>
 
       <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
