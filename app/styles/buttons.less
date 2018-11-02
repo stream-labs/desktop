@@ -6,9 +6,10 @@
   .weight(@medium);
   font-family: 'Roboto';
   .text-transform();
-  height: 34px;
-  line-height: 32px;
-  padding: 0 12px;
+  height: 32px;
+  line-height: 30px;
+  .padding-h-sides();
+  .padding-v-sides(@0);
 
   &:focus,
   &:visited {
@@ -35,7 +36,6 @@
     background-color: darken(@day-button, 2%);
     color: @day-title;
   }
-
 
   &.is-disabled,
   &:disabled {

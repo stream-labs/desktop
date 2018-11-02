@@ -57,8 +57,8 @@
 
   .tooltip {
     position: relative;
-    margin-left: 8px;
-    font-size: 16px;
+    .margin-left();
+    font-size: 14px;
     align-self: center;
     display: inline-block;
     z-index: 1;

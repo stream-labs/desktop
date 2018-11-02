@@ -73,6 +73,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('DesignSystem');
   }
 
+  navigateHelp() {
+    this.navigationService.navigate('Help');
+  }
+
   featureIsEnabled(feature: EAvailableFeatures) {
     return this.incrementalRolloutService.featureIsEnabled(feature);
   }
@@ -118,7 +122,10 @@ export default class TopNav extends Vue {
   }
 
   get appStoreVisible() {
-    return this.platformAppsService.state.storeVisible && this.isUserLoggedIn;
+    return (this.platformAppsService.state.storeVisible
+      || this.featureIsEnabled(this.availableFeatures.platform))
+      && this.userService.isLoggedIn()
+      && this.userService.platform.type === 'twitch';
   }
 
   get loading() {

@@ -7,7 +7,7 @@
     </div>
     <div
       v-else>
-      <a class="link link--uppercase" @click="login">
+      <a class="link" @click="login">
         <i class="fas fa-sign-in-alt"/> {{ $t('Login') }}
       </a>
     </div>

@@ -6,7 +6,6 @@ import { testSourceExists, selectTestSource, clickRemoveSource } from './sources
 export async function logOut(t: GenericTestContext<any>) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
-  await t.context.app.client.alertAccept();
 }
 
 export async function logIn(t: GenericTestContext<any>): Promise<boolean> {

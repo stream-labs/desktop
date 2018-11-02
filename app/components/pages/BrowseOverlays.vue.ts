@@ -59,7 +59,7 @@ export default class BrowseOverlays extends Vue {
       }
     });
 
-    this.i18nService.setWebviewLocale(this.$refs.overlaysWebview);
+    I18nService.setWebviewLocale(this.$refs.overlaysWebview);
   }
 
   async installOverlay(

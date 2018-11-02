@@ -1,4 +1,5 @@
 import { ILoadedApp } from '../..';
+import { Observable } from 'rxjs/Observable';
 
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',
@@ -11,9 +12,18 @@ export enum EApiPermissions {
   Hotkeys = 'slobs.hotkeys'
 }
 
-// TODO: What else should be included here?
+export interface IWebviewTransform {
+  pos: IVec2;
+  size: IVec2;
+  visible: boolean;
+}
+
 export interface IApiContext {
   app: ILoadedApp;
+  webContentsId: number;
+  electronWindowId: number;
+  slobsWindowId: string;
+  webviewTransform: Observable<IWebviewTransform>;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;
