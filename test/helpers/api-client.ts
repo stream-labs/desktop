@@ -4,6 +4,7 @@ import { Subject } from 'rxjs/Subject';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
+const snp = require('node-win32-np');
 
 
 const PIPE_NAME = 'slobs';
@@ -114,34 +115,16 @@ export class ApiClient {
 
 
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
-    this.log('SYNC_REQUEST:', resourceId, methodName, ...args);
+    const id = String(this.nextRequestId++);
+    const requestBody: IJsonRpcRequest = {
+      jsonrpc: '2.0',
+      id,
+      method: methodName,
+      params: { resource: resourceId, args }
+    };
 
-    const stringifiedArgs = args.map(arg => {
-      if (typeof arg === 'string') {
-        return `\"${arg}\"`;
-      } else if (typeof arg === 'object') {
-        return JSON.stringify(arg);
-      } else {
-        return arg;
-      }
-    });
-
-    const process = spawnSync(
-      'node',
-      ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, ...stringifiedArgs],
-      { timeout: 5000 }
-    );
-
-    const err = process.stderr.toString();
-    const responseStr = process.stdout.toString();
-
-    if (err) {
-      this.log('SYNC_RESPONSE_ERR:', err);
-      throw err;
-    }
-    this.log('SYNC_RESPONSE:', responseStr);
-    const response = JSON.parse(responseStr);
-    return response;
+    const response = this.sendMessageSync(requestBody);
+    return JSON.parse(response.toString()).result;
   }
 
 
@@ -170,6 +153,31 @@ export class ApiClient {
     });
   }
 
+  sendMessageSync(message: string | Object) {
+    let requestBody: IJsonRpcRequest = message as IJsonRpcRequest;
+    if (typeof message === 'string') {
+      try {
+        requestBody = JSON.parse(message);
+      } catch (e) {
+        throw 'Invalid JSON';
+      }
+    }
+
+    if (!requestBody.id) throw 'id is required';
+
+    const rawMessage = JSON.stringify(requestBody) + '\n';
+    this.log('Sent:', rawMessage);
+
+    const client = new snp.Client(PIPE_PATH);
+    client.write(Buffer.from(rawMessage));
+
+    /* \x0a is being used as a message delimiter for
+     * JSON-RPC messages. */
+    const response = client.read_until('\x0a');
+    client.close();
+
+    return Buffer.concat(response);
+  }
 
   onMessageHandler(data: ArrayBuffer) {
     data.toString().split('\n').forEach(rawMessage => {
