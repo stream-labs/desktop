@@ -23,7 +23,7 @@
         class="main-page-container"
         v-for="app in platformApps"
         :key="app.id"
-        v-if="((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id)"
+        v-if="(page !== 'Onboarding') && (((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id))"
         :appId="app.id"
         :pageSlot="appPageSlot"
         :poppedOut="isAppPoppedOut(app.id)"
