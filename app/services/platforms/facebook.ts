@@ -64,7 +64,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   get authUrl() {
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&facebook&force_verify&origin=slobs`;
-    return `https://${host}/login?${query}`;
+    return `https://${host}/slobs/login?${query}`;
   }
 
   get oauthToken() {
