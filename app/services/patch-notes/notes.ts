@@ -5,7 +5,7 @@ export const notes: IPatchNotes = {
   title: 'Bug Fixes 🔧',
   showChest: false,
   notes: [
-    'Fixed as issue that would sometimes result in a "Failed to load scene collection" message',
+    'Fixed an issue that would sometimes result in a "Failed to load scene collection" message',
     'Fixed visual flickering in volmeters',
     'Fixed a source of crashes on Windows 7',
     'Fixed various input bugs in widget settings',
