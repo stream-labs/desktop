@@ -5,7 +5,8 @@ import { FacebookService } from './facebook';
 
 export interface IChannelInfo {
   title: string;
-  game: string;
+  game?: string;
+  description?: string;
 }
 
 export interface IGame {
@@ -32,7 +33,7 @@ export interface IPlatformService {
 
   fetchUserInfo: () => Promise<IUserInfo>;
 
-  putChannelInfo: (streamTitle: string, streamGame: string) => Promise<boolean>;
+  putChannelInfo: (channelInfo: IChannelInfo) => Promise<boolean>;
 
   searchGames: (searchString: string) => Promise<IGame[]>;
 

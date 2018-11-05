@@ -35,7 +35,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     liveVideoId: null,
     streamProperties: {
       title: 'Streamlabs OBS',
-      description: 'Generic description for a live stream'
+      description: 'Generic description for a live stream',
+      game: null
     }
   };
 
@@ -55,8 +56,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   @mutation()
-  private SET_STREAM_PROPERTIES(title: string, description: string) {
-    this.state.streamProperties = { title, description };
+  private SET_STREAM_PROPERTIES(title: string, description: string, game: string) {
+    this.state.streamProperties = { title, description, game };
   }
 
   apiBase = 'https://graph.facebook.com';
@@ -238,13 +239,16 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     });
   }
 
-  putChannelInfo(streamTitle: string, streamDescription: string): Promise<boolean> {
-    this.SET_STREAM_PROPERTIES(streamTitle, streamDescription);
+  putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {
+    this.SET_STREAM_PROPERTIES(title, description, game);
     if (this.state.liveVideoId) {
       const headers = this.getPageHeaders(true);
       const data = {
-        title: streamTitle,
-        description: streamDescription
+        title: title,
+        description: description,
+        game_specs: {
+          name: game
+        }
       };
        const request = new Request(`${this.apiBase}/${this.state.liveVideoId}`, {
         method: 'POST',
@@ -267,7 +271,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   beforeGoLive() {
-    return this.fetchPages()
-        .then(this.fbGoLive);
+    return this.fetchPages().then(() => this.fbGoLive());
   }
 }

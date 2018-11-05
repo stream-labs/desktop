@@ -16,6 +16,8 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
+import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from 'services/platforms';
+import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
@@ -47,6 +49,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
+  @Inject() userService: UserService;
   @Inject() private announcementsService: AnnouncementsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -98,30 +101,29 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
+  finishStartStreaming() {
+    const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+    const confirmText = 'Are you sure you want to start streaming?';
+    if (shouldConfirm && !confirm(confirmText)) return;
+    this.powerSaveId = electron.remote.powerSaveBlocker.start(
+      'prevent-display-sleep'
+    );
+    obs.NodeObs.OBS_service_startStreaming();
+    const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+    if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
+      this.toggleRecording();
+    }
+    return;
+  }
+
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      const shouldConfirm = this.settingsService.state.General
-        .WarnBeforeStartingStream;
-      const confirmText = 'Are you sure you want to start streaming?';
-
-      if (shouldConfirm && !confirm(confirmText)) return;
-
-      this.powerSaveId = electron.remote.powerSaveBlocker.start(
-        'prevent-display-sleep'
-      );
-      obs.NodeObs.OBS_service_startStreaming();
-
-      const recordWhenStreaming = this.settingsService.state.General
-        .RecordWhenStreaming;
-
-      if (
-        recordWhenStreaming &&
-        this.state.recordingStatus === ERecordingState.Offline
-      ) {
-        this.toggleRecording();
+      if (this.userService.isLoggedIn) {
+        const service = getPlatformService(this.userService.platform.type);
+        service.beforeGoLive().then(() => this.finishStartStreaming());
+        return;
       }
-
-      return;
+      this.finishStartStreaming();
     }
 
     if (

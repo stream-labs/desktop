@@ -94,17 +94,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
-    let promise: Promise<boolean>;
 
-    if (platform instanceof TwitchService || platform instanceof MixerService) {
-      promise = platform.putChannelInfo(title, game);
-    }
-
-    if (platform instanceof YoutubeService || platform instanceof FacebookService) {
-      promise = platform.putChannelInfo(title, description);
-    }
-
-    return promise.then(success => {
+    return platform.putChannelInfo({ title, game, description }).then(success => {
       this.refreshStreamInfo();
       this.createGameAssociation(game);
       return success;

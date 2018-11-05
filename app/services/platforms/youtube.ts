@@ -200,13 +200,13 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
   }
 
   @requiresToken()
-  putChannelInfo(streamTitle: string, streamDescription: string): Promise<boolean> {
+  putChannelInfo({ title, description }: IChannelInfo): Promise<boolean> {
     return this.fetchDescription().then(autopublishString => {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      const fullDescription = autopublishString.concat(streamDescription);
-      const data = { snippet: { title: streamTitle, description: fullDescription }, id: this.liveStreamId };
+      const fullDescription = autopublishString.concat(description);
+      const data = { snippet: { title: title, description: fullDescription }, id: this.liveStreamId };
       const endpoint = 'liveBroadcasts?part=snippet';
 
       const request = new Request(
