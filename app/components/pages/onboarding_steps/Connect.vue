@@ -32,7 +32,7 @@
           class="button button--fb"
           :disabled="loadingState"
           @click="authPlatform('facebook')">
-          <i class="fa" :class="iconForPlatform('facebook')" /> Facebook
+          <i :class="iconForPlatform('facebook')" /> Facebook
         </button>
       </div>
       <div class="setup-later" v-if="!isSecurityUpgrade">
