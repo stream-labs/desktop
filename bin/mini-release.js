@@ -75,31 +75,31 @@ async function uploadS3File(name, filePath) {
 
     const stream = fs.createReadStream(filePath);
     const upload = new AWS.S3.ManagedUpload({
-      params: {
-        Bucket: process.env.RELEASE_S3_BUCKET_NAME,
-        Key: `windows/${name}`,
-        Body: stream
-      },
-      queueSize: 1
+        params: {
+            Bucket: process.env.RELEASE_S3_BUCKET_NAME,
+            Key: `windows/${name}`,
+            Body: stream
+        },
+        queueSize: 1
     });
 
     const bar = new ProgressBar(`${name} [:bar] :percent :etas`, {
-      total: 100,
-      clear: true
+        total: 100,
+        clear: true
     });
 
     upload.on('httpUploadProgress', progress => {
-      bar.update(progress.loaded / progress.total);
+        bar.update(progress.loaded / progress.total);
     });
 
     try {
-      await upload.promise();
+        await upload.promise();
     } catch (err) {
-      error(`Upload of ${name} failed`);
-      sh.echo(err);
-      sh.exit(1);
+        error(`Upload of ${name} failed`);
+        sh.echo(err);
+        sh.exit(1);
     }
-  }
+}
 
 function generateNewVersion(previousTag, now = Date.now()) {
     // previous tag should be following rule:
@@ -146,7 +146,7 @@ function splitToLines(lines) {
 
 function readPatchNoteFile(patchNoteFileName) {
     try {
-        const lines = splitToLines(fs.readFileSync(patchNoteFileName, {encoding: 'utf8'}));
+        const lines = splitToLines(fs.readFileSync(patchNoteFileName, { encoding: 'utf8' }));
         const version = lines.shift();
         return {
             version,
@@ -168,11 +168,11 @@ function writePatchNoteFile(patchNoteFileName, version, lines) {
 }
 
 function getTagCommitId(tag) {
-    return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, {silent: true}).stdout;
+    return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, { silent: true }).stdout;
 }
 
-async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
-    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, {silent: true}).stdout;
+async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
+    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, { silent: true }).stdout;
 
     let promises = [];
     for (const line of merges.split(/\r?\n/)) {
@@ -181,7 +181,7 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
             continue;
         }
         const number = parseInt(pr[1], 10);
-        promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+        promises.push(octokit.pullRequests.get({ owner, repo, number }).catch(e => { info(e); return { data: {} } }));
     }
 
     function level(line) {
@@ -206,7 +206,7 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
             }
         }
 
-        summary.sort((a,b) => {
+        summary.sort((a, b) => {
             const d = level(a) - level(b);
             if (d) {
                 return d;
@@ -293,7 +293,7 @@ async function runScript() {
     info('checking current tag...');
     const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
 
-    const baseDir = executeCmd('git rev-parse --show-cdup', {silent: true}).stdout.trim();
+    const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
 
     let defaultVersion = generateNewVersion(previousTag);
     let notes = '';
@@ -328,7 +328,7 @@ async function runScript() {
 
     if (!notes) {
         // get pull request description from github.com
-        const github = new OctoKit({baseUrl: 'https://api.github.com'});
+        const github = new OctoKit({ baseUrl: 'https://api.github.com' });
         github.authenticate({
             type: 'token',
             token: process.env.NAIR_GITHUB_TOKEN
@@ -340,10 +340,10 @@ async function runScript() {
         }, previousTag);
         notes = prMerges;
 
-        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {silent: true}).stdout;
-	if (directCommits) {
+        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, { silent: true }).stdout;
+        if (directCommits) {
             notes = prMerges + '\nDirect Commits:\n' + directCommits;
-	}
+        }
 
         info(notes);
 
@@ -431,9 +431,9 @@ async function runScript() {
     // electron-updaterがエラーとなってしまう可能性がある
 
     info(`uploading artifacts to s3...`);
-    await uploadS3File(path.basename(binaryFilePath),binaryFilePath);
-    await uploadS3File(path.basename(blockmapFilePath),blockmapFilePath);
-    await uploadS3File(path.basename(latestYml),latestYml);
+    await uploadS3File(path.basename(binaryFilePath), binaryFilePath);
+    await uploadS3File(path.basename(blockmapFilePath), blockmapFilePath);
+    await uploadS3File(path.basename(latestYml), latestYml);
 
     // upload to the github directly via GitHub API...
 
