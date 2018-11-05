@@ -457,30 +457,55 @@ async function runScript() {
         prerelease
     });
 
-    info(`uploading ${latestYml}...`);
-    const ymlResult = await octokit.repos.uploadAsset({
+    async function uploadToGithub({ url, name, pathname, contentType }) {
+        if (!name) {
+            name = path.basename(pathname);
+        }
+        info(`uploading ${name} to github...`);
+
+        const MAX_RETRY = 3;
+        for (let retry = 0; retry < MAX_RETRY; ++retry) {
+            try {
+                return await octokit.repos.uploadAsset({
+                    url,
+                    name,
+                    file: fs.createReadStream(pathname),
+                    contentLength: fs.statSync(pathname).size,
+                    contentType
+                });
+            } catch (e) {
+                if ('code' in e && 'status' in e) {
+                    error(`${e.name}: '${e.message}', code = ${e.code}, status = ${e.status}`);
+                    if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
+                        // retry
+                    } else {
+                        break;
+                    }
+                } else {
+                    error(`${e.name}: ${e.message}`);
+                    break;
+                }
+            }
+        }
+        error('failed!');
+        sh.exit(1);
+    }
+
+    await uploadToGithub({
         url: result.data.upload_url,
-        file: fs.createReadStream(latestYml),
-        name: path.basename(latestYml),
-        contentLength: fs.statSync(latestYml).size,
+        pathname: latestYml,
         contentType: 'application/json',
     });
 
-    info(`uploading ${blockmapFilePath}...`);
-    await octokit.repos.uploadAsset({
+    await uploadToGithub({
         url: result.data.upload_url,
-        name: blockmapFile,
-        file: fs.createReadStream(blockmapFilePath),
-        contentLength: fs.statSync(blockmapFilePath).size,
+        pathname: blockmapFilePath,
         contentType: 'application/octet-stream',
     });
 
-    info(`uploading ${binaryFile}...`);
-    await octokit.repos.uploadAsset({
+    await uploadToGithub({
         url: result.data.upload_url,
-        name: binaryFile,
-        file: fs.createReadStream(binaryFilePath),
-        contentLength: fs.statSync(binaryFilePath).size,
+        pathname: binaryFilePath,
         contentType: 'application/octet-stream',
     });
 
