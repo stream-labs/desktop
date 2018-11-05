@@ -13,6 +13,7 @@ interface IStreamInfoServiceState {
 }
 
 const PLATFORM_STATUS_UPDATE_INTERVAL = 60 * 1000;
+const SENTRY_REPORTING_RATIO = 0.10;
 
 /**
  * The stream info service is responsible for keeping
@@ -40,11 +41,21 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
         platform.fetchViewerCount().then(viewers => {
           this.SET_VIEWER_COUNT(viewers);
+        }, e => {
+          // Sentryに送信する量を間引く
+          if (Math.random() < SENTRY_REPORTING_RATIO) {
+            console.error(e);
+          }
         });
 
         if (platform instanceof NiconicoService) {
           platform.fetchCommentCount().then(comments => {
             this.SET_COMMENT_COUNT(comments);
+          }, e => {
+            // Sentryに送信する量を間引く
+            if (Math.random() < SENTRY_REPORTING_RATIO) {
+              console.error(e);
+            }
           });
         }
       }

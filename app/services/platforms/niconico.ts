@@ -19,6 +19,8 @@ function parseXml(xml: String): Promise<object> {
   return new Promise((resolve, reject) => {
     parseString(xml, (err, result) => {
       if (err) {
+        // sentryに送る
+        console.error(err, xml);
         reject(err);
       } else {
         resolve(result);
@@ -387,11 +389,7 @@ export class NiconicoService extends Service implements IPlatformService {
   fetchViewerCount(): Promise<number> {
     return this.fetchPlayerStatus()
       .then(o => {
-        try {
-          return o['stream'][0]['watch_count'][0]
-        } catch {
-          return 0;
-        }
+        return o['stream'][0]['watch_count'][0]
       });
   }
 
@@ -399,11 +397,7 @@ export class NiconicoService extends Service implements IPlatformService {
   fetchCommentCount(): Promise<number> {
     return this.fetchPlayerStatus()
       .then(o => {
-        try {
-          return o['stream'][0]['comment_count'][0];
-        } catch {
-          return 0;
-        }
+        return o['stream'][0]['comment_count'][0];
       });
   }
 
