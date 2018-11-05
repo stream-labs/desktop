@@ -258,6 +258,10 @@ async function runScript() {
     const skipLocalModificationCheck = false; // for DEBUG
     const skipBuild = false; // for DEBUG
 
+    const enableUploadToS3 = true;
+    const enableUploadToGitHub = true;
+    const enableUploadToSentry = true;
+
     // Start by figuring out if this environment is configured properly
     // for releasing.
     checkEnv('CSC_LINK');
@@ -425,15 +429,19 @@ async function runScript() {
 
     executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
 
-    // upload to releases s3 bucket via aws-sdk...
-    // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
-    // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
-    // electron-updaterがエラーとなってしまう可能性がある
+    if (enableUploadToS3) {
+        // upload to releases s3 bucket via aws-sdk...
+        // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
+        // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
+        // electron-updaterがエラーとなってしまう可能性がある
 
-    info(`uploading artifacts to s3...`);
-    await uploadS3File(path.basename(binaryFilePath), binaryFilePath);
-    await uploadS3File(path.basename(blockmapFilePath), blockmapFilePath);
-    await uploadS3File(path.basename(latestYml), latestYml);
+        info(`uploading artifacts to s3...`);
+        await uploadS3File(path.basename(binaryFilePath), binaryFilePath);
+        await uploadS3File(path.basename(blockmapFilePath), blockmapFilePath);
+        await uploadS3File(path.basename(latestYml), latestYml);
+    } else {
+        info('uploading artifacts to s3: SKIP');
+    }
 
     // upload to the github directly via GitHub API...
 
@@ -491,23 +499,27 @@ async function runScript() {
         sh.exit(1);
     }
 
-    await uploadToGithub({
-        url: result.data.upload_url,
-        pathname: latestYml,
-        contentType: 'application/json',
-    });
+    if (enableUploadToGitHub) {
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: latestYml,
+            contentType: 'application/json',
+        });
 
-    await uploadToGithub({
-        url: result.data.upload_url,
-        pathname: blockmapFilePath,
-        contentType: 'application/octet-stream',
-    });
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: blockmapFilePath,
+            contentType: 'application/octet-stream',
+        });
 
-    await uploadToGithub({
-        url: result.data.upload_url,
-        pathname: binaryFilePath,
-        contentType: 'application/octet-stream',
-    });
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: binaryFilePath,
+            contentType: 'application/octet-stream',
+        });
+    } else {
+        info('uploading to GitHub: SKIP');
+    }
 
     if (draft) {
         // open release edit page on github
@@ -522,8 +534,12 @@ async function runScript() {
         info(`Version ${newVersion} is released!`);
     }
 
-    info('uploading to sentry...');
-    uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+    if (enableUploadToSentry) {
+        info('uploading to sentry...');
+        uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+    } else {
+        info('uploading to sentry: SKIP');
+    }
 
     // done.
 }
