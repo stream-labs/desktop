@@ -5,7 +5,7 @@ import fs from 'fs';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions } from './api/modules/module';
+import { EApiPermissions, IWebviewTransform } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
@@ -16,6 +16,8 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;
 
@@ -200,6 +202,8 @@ export class PlatformAppsService extends
    * Install production apps
    */
   async installProductionApps() {
+    if (this.userService.platform.type !== 'twitch') return;
+
     const productionApps = await this.fetchProductionApps();
 
     productionApps.forEach(app => {
@@ -483,9 +487,21 @@ export class PlatformAppsService extends
     });
   }
 
-  exposeAppApi(appId: string, webContentsId: number) {
+  exposeAppApi(
+    appId: string,
+    webContentsId: number,
+    electronWindowId: number,
+    slobsWindowId: string,
+    transformSubjectId: string
+  ) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app);
+    const api = this.apiManager.getApi(
+      app,
+      webContentsId,
+      electronWindowId,
+      slobsWindowId,
+      this.getTransformSubject(transformSubjectId)
+    );
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
@@ -716,6 +732,30 @@ export class PlatformAppsService extends
       this.appUnload.next(appId);
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
+  }
+
+  /* These functions exist primary to work around our n window
+   * system because rxjs subjects are not serializable
+   */
+
+  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
+
+  createTransformSubject(initial: IWebviewTransform) {
+    const id = uuid();
+    this.transformSubjects[id] = new BehaviorSubject(initial);
+    return id;
+  }
+
+  getTransformSubject(id: string) {
+    return this.transformSubjects[id];
+  }
+
+  removeTransformSubject(id: string) {
+    delete this.transformSubjects[id];
+  }
+
+  nextTransformSubject(id: string, value: IWebviewTransform) {
+    this.transformSubjects[id].next(value);
   }
 
   /**

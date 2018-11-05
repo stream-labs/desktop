@@ -26,6 +26,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
+import { ObsUserPluginsService } from 'services/obs-user-plugins';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -70,6 +71,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
+  @Inject() private obsUserPluginsService: ObsUserPluginsService;
 
   private pid = require('process').pid;
 
@@ -77,6 +79,8 @@ export class AppService extends StatefulService<IAppState> {
   async load() {
     this.START_LOADING();
     crashHandler.registerProcess(this.pid, false);
+
+    await this.obsUserPluginsService.initialize();
 
     // Initialize OBS
     obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);

@@ -7,7 +7,8 @@ import Utils from 'services/utils';
 
 
 export enum EAvailableFeatures {
-  chatbot = 'slobs--chatbot'
+  chatbot = 'slobs--chatbot',
+  platform = 'slobs--platform'
 }
 
 interface IIncrementalRolloutServiceState {
@@ -32,7 +33,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   }
 
   featureIsEnabled(feature: EAvailableFeatures): boolean {
-    if (Utils.isDevMode() || Utils.isPreview()) return true; //always show for dev mode and preview
+    if (Utils.isDevMode()) return true; //always show for dev mode
 
     return this.availableFeatures.indexOf(feature) > -1;
   }

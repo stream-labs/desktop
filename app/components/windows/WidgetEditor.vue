@@ -361,7 +361,7 @@
   .night-theme {
     .display,
     .content-container {
-      background-color: @night-section-bg;
+      background-color: @night-section;
     }
 
     .window-container {

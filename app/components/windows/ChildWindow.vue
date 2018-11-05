@@ -46,7 +46,7 @@
   .blank-slate,
   .child-window-titlebar {
     background-color: @night-primary;
-    color: @night-text;
+    color: @night-paragraph;
   }
 }
 </style>
