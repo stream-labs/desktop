@@ -6,6 +6,7 @@ install:
   - yarn compile:ci
 
 test_script:
+  - yarn test:unit
   - yarn test
   # - yarn screentest
   # - 7z a screentest.zip test-dist\screentest\*

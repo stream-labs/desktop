@@ -234,6 +234,12 @@
   version "2.0.29"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-2.0.29.tgz#5002e14f75e2d71e564281df0431c8c1b4a2a36a"
 
+"@types/node-fetch@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.2.tgz#8c5da14d70321e4c4ecd5db668e3f93cf6c7399f"
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "8.0.48"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.48.tgz#4e7da6e849d9e50be5865effaa55b1870ae4eede"
@@ -6666,6 +6672,10 @@ nise@^1.4.2:
 node-dir@0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
+
+node-fetch@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.2.0.tgz#4ee79bde909262f9775f731e3656d0db55ced5b5"
 
 "node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz":
   version "0.0.2"
