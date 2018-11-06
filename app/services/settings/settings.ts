@@ -1,10 +1,10 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import {
-  obsValuesToInputValues,
   inputValuesToObsValues,
-  TObsValue,
+  IObsListInput,
+  obsValuesToInputValues,
   TObsFormData,
-  IObsListInput
+  TObsValue
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -13,13 +13,11 @@ import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
-import {
-  VideoEncodingOptimizationService,
-  IOutputSettings
-} from '../video-encoding-optimizations';
-import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
+import { IOutputSettings, VideoEncodingOptimizationService } from '../video-encoding-optimizations';
+import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EDeviceType } from '../hardware';
 
 export interface ISettingsState {
   General: {
@@ -278,7 +276,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         visible: true,
         options: [{ description: 'Disabled', value: null }].concat(
           audioDevices
-            .filter(device => device.type === 'output')
+            .filter(device => device.type === EDeviceType.audioOutput)
             .map(device => {
               return { description: device.description, value: device.id };
             })
@@ -305,7 +303,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         enabled: true,
         visible: true,
         options: [{ description: 'Disabled', value: null }].concat(
-          audioDevices.filter(device => device.type === 'input').map(device => {
+          audioDevices.filter(device => device.type === EDeviceType.audioInput).map(device => {
             return { description: device.description, value: device.id };
           })
         )

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
+import { cloneDeep } from 'lodash';
 import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
@@ -27,6 +28,7 @@ import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
+import { HardwareService } from 'services/hardware';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -62,6 +64,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private userService: UserService;
   @Inject() private navigationService: NavigationService;
   @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private hardwareService: HardwareService;
 
   /**
    * Maps a source id to a property manager
@@ -135,17 +138,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   ): Source {
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
-
-    if (type === 'browser_source') {
-      if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
-    }
-
-    if (type === 'text_gdiplus') {
-      if (settings.text === void 0) settings.text = name;
-    }
-
-    const obsInput = obs.InputFactory.create(type, id, settings);
+    const obsInputSettings = this.getObsSourceSettings(type, settings);
+    const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
 
@@ -246,6 +240,31 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.removeSource(source.sourceId);
   }
 
+
+  getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
+    const resolvedSettings = cloneDeep(settings);
+
+    // setup default settings
+    if (type === 'browser_source') {
+      if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
+      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
+    }
+
+    if (type === 'text_gdiplus') {
+      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    }
+
+    Object.keys(resolvedSettings).forEach(propName => {
+      // device_id is unique for each PC
+      // so we allow to provide a device name instead device id
+      // resolve the device id by the device name here
+      if (!['device_id', 'video_device_id'].includes(propName)) return;
+        const device = this.hardwareService.getDeviceByName(settings[propName]);
+        const deviceId = device ? device.id : settings[propName];
+        resolvedSettings[propName] = deviceId
+    });
+    return resolvedSettings;
+  }
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();

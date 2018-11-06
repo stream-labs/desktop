@@ -46,7 +46,8 @@ export class Source implements ISourceApi {
   }
 
   updateSettings(settings: Dictionary<any>) {
-    this.getObsInput().update(settings);
+    const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
+    this.getObsInput().update(obsInputSettings);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 

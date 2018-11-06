@@ -8,17 +8,15 @@
     class="add-source">
     <!-- Standard sources -->
     <add-source-info
-      v-for="source in availableSources"
-      :key="source.value"
-      v-if="inspectedSource === source.value"
-      :name="sourceData(source.value).name"
-      :description="sourceData(source.value).description"
-      :showSupport="!!sourceData(source.value).supportList"
+      v-if="inspectedSourceDefinition"
+      :name="inspectedSourceDefinition.name"
+      :description="inspectedSourceDefinition.description"
+      :showSupport="!inspectedSourceDefinition.prefabId && !!sourceData(inspectedSourceDefinition.type).supportList"
     >
-      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(source.value, 'day')" />
-      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(source.value, 'night')"/>
+      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(inspectedSourceDefinition.type, 'day')" />
+      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(inspectedSourceDefinition.type, 'night')"/>
       <ul slot="support-list" class="source-support__list">
-        <li v-for="support in sourceData(source.value).supportList" :key="support">
+        <li v-for="support in sourceData(inspectedSourceDefinition.type).supportList" :key="support">
           {{ support }}
         </li>
       </ul>
@@ -105,12 +103,12 @@
         <ul class="source-list">
           <li
             v-for="source in availableSources"
-            :key="source.value"
+            :key="source.id"
             class="source source--standard"
-            :class="{'source--active': inspectedSource === source.value}"
-            @click="inspectSource(source.value)"
-            @dblclick="selectSource(source.value)">
-            {{ $t(source.description) }}
+            :class="{'source--active': inspectedSource === source.id}"
+            @click="inspectSource(source.id)"
+            @dblclick="source.prefabId ? selectPrefab(source.prefabId) : selectSource(source.id)">
+            {{ $t(source.name) }}
           </li>
         </ul>
       </div>
