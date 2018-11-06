@@ -14,7 +14,7 @@
     {{ $t("This app is currently popped out into an external window.") }}"
   </div>
   <div class="callout" v-if="callout">
-    <i class="fas fa-exclamation-circle"></i> {{ $t("Attention: some apps have Sources that you need to add from the Editor. After setup, we recommended navigating to the Editor and clicking Add Source to check.") }}
+    <i class="fas fa-exclamation-circle"></i> {{ $t("Attention: some apps have Sources that you need to add from the Editor. After setup, we recommend navigating to the Editor and clicking Add Source to check.") }}
     <i class="icon-close" @click="closeCallout()"></i>
   </div>
 </div>
