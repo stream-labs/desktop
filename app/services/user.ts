@@ -19,6 +19,7 @@ import {
 import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
@@ -264,9 +265,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.sceneCollectionsService.setupNewUser();
   }
 
+  @RunInLoadingMode()
   async logOut() {
     // Attempt to sync scense before logging out
-    this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
     // signs out of chatbot
@@ -275,7 +276,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.navigationService.navigate('Studio');
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
-    this.appService.finishLoading();
     this.platformAppsService.unloadApps();
   }
 
