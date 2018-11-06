@@ -228,7 +228,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * its current state.
    */
   get formattedDurationInCurrentStreamingState() {
-    return this.formattedDurationSince(this.streamingStateChangeTime);
+    const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
+    if (formattedTime === '03:50:00' && this.userService.platform.type ===  'facebook') {
+      const msg = $t('You are 10 minutes away from the 4 hour stream limit');
+      const existingTimeupNotif = this.notificationsService.getUnread()
+        .filter((notice: INotification) => notice.message === msg);
+      if (existingTimeupNotif.length !== 0) return formattedTime;
+      this.notificationsService.push({
+        type: ENotificationType.INFO,
+        lifeTime: 600000,
+        showTime: true,
+        message: msg
+      });
+    }
+    return formattedTime;
   }
 
   get streamingStateChangeTime() {
@@ -244,7 +257,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       type: ENotificationType.WARNING,
       lifeTime: -1,
       showTime: true,
-      message: $t('Stream has disconnected, attempting to reconnect.')
+      message: msg
     });
   }
 
