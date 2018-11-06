@@ -474,13 +474,15 @@ async function runScript() {
         const MAX_RETRY = 3;
         for (let retry = 0; retry < MAX_RETRY; ++retry) {
             try {
-                return await octokit.repos.uploadAsset({
+                const result = await octokit.repos.uploadAsset({
                     url,
                     name,
                     file: fs.createReadStream(pathname),
                     contentLength: fs.statSync(pathname).size,
                     contentType
                 });
+                info('done.');
+                return result;
             } catch (e) {
                 if ('code' in e && 'status' in e) {
                     error(`${e.name}: '${e.message}', code = ${e.code}, status = ${e.status}`);
