@@ -159,4 +159,10 @@ export default class PlatformAppWebview extends Vue {
     });
   }
 
+  callout = true;
+
+  closeCallout() {
+    this.callout = false;
+  }
+
 }

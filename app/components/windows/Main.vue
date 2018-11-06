@@ -64,6 +64,7 @@
   display: flex;
   flex-direction: column;
   width: 72%;
+  position: relative;
 }
 
 .main-spacer {
