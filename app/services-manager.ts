@@ -81,6 +81,8 @@ import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import { HardwareService } from 'services/hardware';
+import { PrefabsService, Prefab } from 'services/prefabs';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -194,7 +196,10 @@ export class ServicesManager extends Service {
     MediaShareService,
     ChatbotWidgetService,
     BrandDeviceService,
-    ObsUserPluginsService
+    ObsUserPluginsService,
+    HardwareService,
+    PrefabsService,
+    Prefab
   };
 
   private instances: Dictionary<Service> = {};
