@@ -75,31 +75,31 @@ async function uploadS3File(name, filePath) {
 
     const stream = fs.createReadStream(filePath);
     const upload = new AWS.S3.ManagedUpload({
-      params: {
-        Bucket: process.env.RELEASE_S3_BUCKET_NAME,
-        Key: `windows/${name}`,
-        Body: stream
-      },
-      queueSize: 1
+        params: {
+            Bucket: process.env.RELEASE_S3_BUCKET_NAME,
+            Key: `windows/${name}`,
+            Body: stream
+        },
+        queueSize: 1
     });
 
     const bar = new ProgressBar(`${name} [:bar] :percent :etas`, {
-      total: 100,
-      clear: true
+        total: 100,
+        clear: true
     });
 
     upload.on('httpUploadProgress', progress => {
-      bar.update(progress.loaded / progress.total);
+        bar.update(progress.loaded / progress.total);
     });
 
     try {
-      await upload.promise();
+        await upload.promise();
     } catch (err) {
-      error(`Upload of ${name} failed`);
-      sh.echo(err);
-      sh.exit(1);
+        error(`Upload of ${name} failed`);
+        sh.echo(err);
+        sh.exit(1);
     }
-  }
+}
 
 function generateNewVersion(previousTag, now = Date.now()) {
     // previous tag should be following rule:
@@ -146,7 +146,7 @@ function splitToLines(lines) {
 
 function readPatchNoteFile(patchNoteFileName) {
     try {
-        const lines = splitToLines(fs.readFileSync(patchNoteFileName, {encoding: 'utf8'}));
+        const lines = splitToLines(fs.readFileSync(patchNoteFileName, { encoding: 'utf8' }));
         const version = lines.shift();
         return {
             version,
@@ -168,11 +168,11 @@ function writePatchNoteFile(patchNoteFileName, version, lines) {
 }
 
 function getTagCommitId(tag) {
-    return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, {silent: true}).stdout;
+    return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, { silent: true }).stdout;
 }
 
-async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
-    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, {silent: true}).stdout;
+async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
+    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, { silent: true }).stdout;
 
     let promises = [];
     for (const line of merges.split(/\r?\n/)) {
@@ -181,7 +181,7 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
             continue;
         }
         const number = parseInt(pr[1], 10);
-        promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+        promises.push(octokit.pullRequests.get({ owner, repo, number }).catch(e => { info(e); return { data: {} } }));
     }
 
     function level(line) {
@@ -206,7 +206,7 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
             }
         }
 
-        summary.sort((a,b) => {
+        summary.sort((a, b) => {
             const d = level(a) - level(b);
             if (d) {
                 return d;
@@ -258,6 +258,10 @@ async function runScript() {
     const skipLocalModificationCheck = false; // for DEBUG
     const skipBuild = false; // for DEBUG
 
+    const enableUploadToS3 = true;
+    const enableUploadToGitHub = true;
+    const enableUploadToSentry = true;
+
     // Start by figuring out if this environment is configured properly
     // for releasing.
     checkEnv('CSC_LINK');
@@ -293,7 +297,7 @@ async function runScript() {
     info('checking current tag...');
     const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
 
-    const baseDir = executeCmd('git rev-parse --show-cdup', {silent: true}).stdout.trim();
+    const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
 
     let defaultVersion = generateNewVersion(previousTag);
     let notes = '';
@@ -328,7 +332,7 @@ async function runScript() {
 
     if (!notes) {
         // get pull request description from github.com
-        const github = new OctoKit({baseUrl: 'https://api.github.com'});
+        const github = new OctoKit({ baseUrl: 'https://api.github.com' });
         github.authenticate({
             type: 'token',
             token: process.env.NAIR_GITHUB_TOKEN
@@ -340,10 +344,10 @@ async function runScript() {
         }, previousTag);
         notes = prMerges;
 
-        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {silent: true}).stdout;
-	if (directCommits) {
+        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, { silent: true }).stdout;
+        if (directCommits) {
             notes = prMerges + '\nDirect Commits:\n' + directCommits;
-	}
+        }
 
         info(notes);
 
@@ -425,15 +429,19 @@ async function runScript() {
 
     executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
 
-    // upload to releases s3 bucket via aws-sdk...
-    // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
-    // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
-    // electron-updaterがエラーとなってしまう可能性がある
+    if (enableUploadToS3) {
+        // upload to releases s3 bucket via aws-sdk...
+        // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
+        // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
+        // electron-updaterがエラーとなってしまう可能性がある
 
-    info(`uploading artifacts to s3...`);
-    await uploadS3File(path.basename(binaryFilePath),binaryFilePath);
-    await uploadS3File(path.basename(blockmapFilePath),blockmapFilePath);
-    await uploadS3File(path.basename(latestYml),latestYml);
+        info(`uploading artifacts to s3...`);
+        await uploadS3File(path.basename(binaryFilePath), binaryFilePath);
+        await uploadS3File(path.basename(blockmapFilePath), blockmapFilePath);
+        await uploadS3File(path.basename(latestYml), latestYml);
+    } else {
+        info('uploading artifacts to s3: SKIP');
+    }
 
     // upload to the github directly via GitHub API...
 
@@ -457,32 +465,63 @@ async function runScript() {
         prerelease
     });
 
-    info(`uploading ${latestYml}...`);
-    const ymlResult = await octokit.repos.uploadAsset({
-        url: result.data.upload_url,
-        file: fs.createReadStream(latestYml),
-        name: path.basename(latestYml),
-        contentLength: fs.statSync(latestYml).size,
-        contentType: 'application/json',
-    });
+    async function uploadToGithub({ url, name, pathname, contentType }) {
+        if (!name) {
+            name = path.basename(pathname);
+        }
+        info(`uploading ${name} to github...`);
 
-    info(`uploading ${blockmapFilePath}...`);
-    await octokit.repos.uploadAsset({
-        url: result.data.upload_url,
-        name: blockmapFile,
-        file: fs.createReadStream(blockmapFilePath),
-        contentLength: fs.statSync(blockmapFilePath).size,
-        contentType: 'application/octet-stream',
-    });
+        const MAX_RETRY = 3;
+        for (let retry = 0; retry < MAX_RETRY; ++retry) {
+            try {
+                const result = await octokit.repos.uploadAsset({
+                    url,
+                    name,
+                    file: fs.createReadStream(pathname),
+                    contentLength: fs.statSync(pathname).size,
+                    contentType
+                });
+                info('done.');
+                return result;
+            } catch (e) {
+                if ('code' in e && 'status' in e) {
+                    error(`${e.name}: '${e.message}', code = ${e.code}, status = ${e.status}`);
+                    if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
+                        // retry
+                    } else {
+                        break;
+                    }
+                } else {
+                    error(`${e.name}: ${e.message}`);
+                    break;
+                }
+            }
+        }
+        error('failed!');
+        sh.exit(1);
+    }
 
-    info(`uploading ${binaryFile}...`);
-    await octokit.repos.uploadAsset({
-        url: result.data.upload_url,
-        name: binaryFile,
-        file: fs.createReadStream(binaryFilePath),
-        contentLength: fs.statSync(binaryFilePath).size,
-        contentType: 'application/octet-stream',
-    });
+    if (enableUploadToGitHub) {
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: latestYml,
+            contentType: 'application/json',
+        });
+
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: blockmapFilePath,
+            contentType: 'application/octet-stream',
+        });
+
+        await uploadToGithub({
+            url: result.data.upload_url,
+            pathname: binaryFilePath,
+            contentType: 'application/octet-stream',
+        });
+    } else {
+        info('uploading to GitHub: SKIP');
+    }
 
     if (draft) {
         // open release edit page on github
@@ -497,8 +536,12 @@ async function runScript() {
         info(`Version ${newVersion} is released!`);
     }
 
-    info('uploading to sentry...');
-    uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+    if (enableUploadToSentry) {
+        info('uploading to sentry...');
+        uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+    } else {
+        info('uploading to sentry: SKIP');
+    }
 
     // done.
 }
