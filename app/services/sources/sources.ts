@@ -29,6 +29,7 @@ import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService } from 'services/hardware';
+import { AudioService } from '../audio';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -65,6 +66,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private navigationService: NavigationService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private hardwareService: HardwareService;
+  @Inject() private audioService: AudioService;
 
   /**
    * Maps a source id to a property manager
@@ -167,6 +169,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
+
+    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
   }
 
   removeSource(id: string) {

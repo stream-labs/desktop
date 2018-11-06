@@ -104,7 +104,7 @@ export default class SourcesShowcase extends Vue {
   inspectSource(inspectedSource: string, appId?: string, appSourceId?: string) {
     this.inspectedSource = this.inspectedSourceType = inspectedSource;
     const prefab = this.prefabsService.getPrefab(inspectedSource);
-    if (prefab) this.inspectedSourceType = prefab.getPrefabSourceModel().model.type;
+    if (prefab) this.inspectedSourceType = prefab.getPrefabSourceModel().type;
     if (appId) this.inspectedAppId = appId;
     if (appSourceId) this.inspectedAppSourceId = appSourceId;
   }
@@ -158,7 +158,7 @@ export default class SourcesShowcase extends Vue {
       if (!prefabSourceModel) return;
       sourcesList.push({
         id: prefab.id,
-        type: prefabSourceModel.model.type,
+        type: prefabSourceModel.type,
         name: prefab.name,
         description: prefab.description,
         prefabId: prefab.id

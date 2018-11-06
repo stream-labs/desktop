@@ -1,5 +1,12 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { ISource, ISourceCreateOptions, Source, SourcesService, TPropertiesManager } from 'services/sources';
+import {
+  ISource,
+  ISourceCreateOptions,
+  Source,
+  SourcesService,
+  TPropertiesManager,
+  TSourceType
+} from 'services/sources';
 import { ScenesService, TSceneNode, TSceneNodeType } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { mutation, ServiceHelper } from '../stateful-service';
@@ -8,11 +15,17 @@ import { TObsValue } from 'components/obs/inputs/ObsInput';
 import Utils from '../utils';
 import Vue from 'vue';
 
-interface IPrefabSource {
-  model: ISource,
+interface IPrefabSourceCreateOptions {
+  name: string,
+  type: TSourceType,
   settings: Dictionary<TObsValue>,
   createOptions: ISourceCreateOptions,
 }
+
+interface IPrefabSource extends IPrefabSourceCreateOptions {
+  id: string;
+}
+
 
 interface IPrefab {
   id: string;
@@ -20,11 +33,11 @@ interface IPrefab {
   description: string;
   type: 'source' | TSceneNodeType; // only `source` type is supported for now
   sources: Dictionary<IPrefabSource>;
-  version: 1; // add a schema version for case if we need to use migrations in the future
 }
 
 interface IPrefabsServiceState {
   prefabs: Dictionary<IPrefab>;
+  version: 1; // add a schema version for case if we need to use migrations in the future
 }
 
 interface IPrefabAddToSceneOptions {
@@ -37,37 +50,42 @@ interface IPrefabAddToSceneOptions {
 export class PrefabsService extends PersistentStatefulService<IPrefabsServiceState> {
 
   static defaultState: IPrefabsServiceState = {
+    version: 1,
     prefabs: {}
   };
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
 
+  registerFromExistingSource(sourceId: string, name: string, description = ''): Prefab {
+    const source = this.sourcesService.getSource(sourceId);
+    return this.registerSourcePrefab({
+      type: source.type,
+      name: name,
+      settings: source.getSettings(),
+      createOptions: {
+        propertiesManager: source.getPropertiesManagerType(),
+        propertiesManagerSettings: source.getPropertiesManagerSettings()
+      }
+    }, description);
+  }
+
   /**
    * register a single-source prefab
    */
-  registerFromSource(sourceId: string, name: string, description = ''): Prefab {
-    const source = this.sourcesService.getSource(sourceId);
+  registerSourcePrefab(prefabSourceModel: IPrefabSourceCreateOptions, description = '') {
     const id = uuid();
     const prefabModel: IPrefab = {
       id,
-      name,
+      name: prefabSourceModel.name,
       description,
       type: 'source',
       sources: {
         [id]: {
-          model: {
-            ...source.getModel(),
-            sourceId: id
-          },
-          settings: source.getSettings(),
-          createOptions: {
-            propertiesManager: source.getPropertiesManagerType(),
-            propertiesManagerSettings: source.getPropertiesManagerSettings()
-          },
+          ...prefabSourceModel,
+          id
         }
-      },
-      version: 1
+      }
     };
     this.REGISTER_PREFAB(prefabModel);
     return this.getPrefab(id);
@@ -90,6 +108,10 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
     this.REMOVE_PREFAB(id);
   }
 
+  removePrefabs() {
+    this.getPrefabs().forEach(prefab => this.removePrefab(prefab.id));
+  }
+
   @mutation()
   private REGISTER_PREFAB(prefabModel: IPrefab) {
     Vue.set(this.state.prefabs, prefabModel.id, prefabModel);
@@ -108,7 +130,6 @@ export class Prefab implements IPrefab {
   readonly name: string;
   readonly description: string;
   readonly type: 'source' | TSceneNodeType;
-  readonly version: 1;
   readonly sources: Dictionary<IPrefabSource>;
 
   @Inject() private prefabsService: PrefabsService;
@@ -128,8 +149,8 @@ export class Prefab implements IPrefab {
     const scene = this.scenesService.getScene(sceneId);
     const prefabSourceModel = this.getPrefabSourceModel();
     const source = this.sourcesService.createSource(
-      name || options.name,
-      prefabSourceModel.model.type,
+      options.name || prefabSourceModel.name,
+      prefabSourceModel.type,
       prefabSourceModel.settings,
       prefabSourceModel.createOptions
     );
