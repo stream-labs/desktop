@@ -2,6 +2,7 @@ import { IPropertyManager } from './properties-managers/properties-manager';
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
+import { IAudioSource } from '../audio';
 
 export interface ISource extends IResource {
   sourceId: string;
@@ -79,6 +80,7 @@ export interface ISourceCreateOptions {
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
+  audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
 }
 

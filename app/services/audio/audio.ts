@@ -36,7 +36,6 @@ interface IAudioSourceData {
   stream?: Observable<IVolmeter>;
 }
 
-@InitAfter('SourcesService')
 export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 
   static initialState: IAudioSourcesState = {
