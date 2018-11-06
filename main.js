@@ -67,11 +67,7 @@ function openDevTools() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  crashHandler.startCrashHandler(path.join(
-    app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-    'node_modules',
-    'crash-handler')
-  );
+  crashHandler.startCrashHandler(app.getAppPath());
   crashHandler.registerProcess(pid, false);
 
   { // Initialize obs-studio-server
