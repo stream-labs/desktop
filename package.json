@@ -124,6 +124,7 @@
     "lodash": "4.17.10",
     "lodash-decorators": "4.3.1",
     "moment": "2.22.2",
+    "node-win32-np": "1.0.6",
     "pixelmatch": "4.0.2",
     "pngjs": "3.3.3",
     "progress": "2.0.0",
