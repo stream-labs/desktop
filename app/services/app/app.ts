@@ -99,7 +99,7 @@ export class AppService extends StatefulService<IAppState> {
     const onboarded = this.onboardingService.startOnboardingIfRequired();
 
     electron.ipcRenderer.on('shutdown', () => {
-      // electron.ipcRenderer.send('acknowledgeShutdown');
+      electron.ipcRenderer.send('acknowledgeShutdown');
       this.shutdownHandler();
     });
 
