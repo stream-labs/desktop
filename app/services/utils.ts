@@ -142,5 +142,4 @@ export default class Utils {
       });
     });
   }
-
 }
