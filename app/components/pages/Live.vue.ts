@@ -36,7 +36,7 @@ export default class Live extends Vue {
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
   mounted() {
-    this.i18nService.setWebviewLocale(this.$refs.webview);
+    I18nService.setWebviewLocale(this.$refs.webview);
 
     this.$refs.webview.addEventListener('new-window', e => {
       const match = e.url.match(/dashboard\/([^\/^\?]*)/);

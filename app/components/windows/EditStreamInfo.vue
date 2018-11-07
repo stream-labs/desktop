@@ -123,7 +123,7 @@
 
 .night-theme {
   .edit-stream-info-option-longdes {
-    color: @night-text;
+    color: @night-paragraph;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-<div class="top-nav">
+<div class="top-nav" :class="{'loading': loading}">
   <!--<button
       @click="navigateOnboarding"
       class="button button--action"
@@ -63,7 +63,7 @@
         <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
       </button>
     </div>
-    <div class="top-nav-item" v-if="isDevMode">
+    <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item" v-if="isDevMode">
@@ -80,7 +80,8 @@
       <a
         @click="openDiscord"
         class="link">
-        <i class="icon-discord"></i><span>Discord</span>
+        <i class="icon-question"></i>
+        <span>{{ $t('Help') }}</span>
       </a>
     </div>
     <div class="top-nav-item">
@@ -139,6 +140,14 @@
   border-bottom: 1px solid @day-border;
   flex: 0 0 48px;
   z-index: 1;
+
+  // block the nav buttons while loading
+  &.loading:after {
+    content: '';
+    .absolute(0, 0, 0, 0);
+    background-color: black;
+    opacity: 0;
+  }
 }
 
 .top-nav-right {
@@ -150,10 +159,8 @@
 }
 
 .link {
-  @media(max-width: 1500px) {
-    span {
-      display: none;
-    }
+  span {
+    display: none;
   }
 }
 

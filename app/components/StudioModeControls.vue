@@ -25,7 +25,7 @@
   height: 60px;
   display: flex;
   align-items: center;
-  color: @night-text;
+  color: @night-paragraph;
   background-color: @navy-secondary;
 
   &.stacked {
