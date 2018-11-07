@@ -19,7 +19,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
 
-  static defaultState: IIncrementalRolloutServiceState = {
+  static initialState: IIncrementalRolloutServiceState = {
     availableFeatures: []
   }
 
