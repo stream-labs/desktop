@@ -317,7 +317,7 @@ export class ObsImporterService extends Service {
       const audioSource = configJSON[channelName];
       if (audioSource) {
         const newSource = this.sourcesService.createSource(
-          channelName,
+          audioSource.name,
           audioSource.id,
           {},
           { channel: i + 1 }
