@@ -1,4 +1,5 @@
 import electron from 'electron';
+import * as fs from 'fs';
 import * as obs from '../../../obs-api';
 import { execSync } from 'child_process';
 import { mutation, StatefulService } from '../stateful-service';
@@ -8,14 +9,10 @@ import { InitAfter } from '../../util/service-observer';
 import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { TSourceType } from '../sources';
 import { ScenesService } from '../scenes';
-import { cloneDeep } from 'lodash';
-import { IObsListInput } from '../../components/obs/inputs/ObsInput';
 import {IpcServerService} from '../ipc-server';
-import {AudioService, IAudioSource} from '../audio';
-import * as fs from 'fs';
-import { PrefabsService } from '../prefabs';
+import {AudioService} from '../audio';
+import { PrefabsService } from 'services/prefabs';
 
 interface IBrandDeviceUrls {
   system_sku: string;

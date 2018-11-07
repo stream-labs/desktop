@@ -1,8 +1,8 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
-import { WidgetType } from '../widgets';
+import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs/Observable';
-import { IAudioSource } from '../audio';
+import { IAudioSource } from 'services/audio';
 
 export interface ISource extends IResource {
   sourceId: string;
