@@ -11,7 +11,6 @@ import {
   isPathProperty
 } from '../../../util/properties-type-guards';
 import { $t } from 'services/i18n/index';
-import { HardwareService } from '../../../services/hardware';
 
 /**
  * all possible OBS properties types
