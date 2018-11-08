@@ -333,9 +333,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
-    this.SET_SETTINGS(
-      SettingsService.convertFormDataToState({ [categoryName]: settingsData })
-    );
+    this.loadSettingsIntoStore();
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
