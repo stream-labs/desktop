@@ -6,6 +6,7 @@ import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/stateful-service';
 import { BaseGoalService } from './base-goal';
+import { formMetadata } from 'components/shared/inputs';
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;
@@ -72,7 +73,7 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
   }
 
   getMetadata() {
-    return {
+    return formMetadata({
 
       // CREATE BOSS
 
@@ -179,7 +180,7 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
         title: $t('Font')
       })
 
-    };
+    });
   }
 
 }

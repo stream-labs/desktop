@@ -1,8 +1,8 @@
 <template>
-  <span class="text-input">
+  <span class="text-input" data-role="input" data-type="text" :data-name="options.name">
     <input
         type="text"
-        :placeholder="metadata.placeholder"
+        :placeholder="options.placeholder"
         :value="value"
         @input="emitInput($event.target.value)"
         :name="uuid"
