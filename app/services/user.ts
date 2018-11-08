@@ -90,9 +90,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      async (e: Electron.Event, auth: any) => {
-        this.LOGIN(auth);
-        await this.sceneCollectionsService.setupNewUser();
+      async (e: Electron.Event, auth: IPlatformAuth) => {
+        const service = getPlatformService(auth.platform.type);
+        this.login(service, auth);
       }
     );
   }
@@ -259,9 +259,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-    this.userLogin.next(auth);
     this.setRavenContext();
     service.setupStreamSettings(auth);
+    this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
   }
 

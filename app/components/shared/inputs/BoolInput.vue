@@ -1,6 +1,6 @@
 <template>
 <!-- <div class="input-container"> -->
-  <div class="input-wrapper">
+  <div class="input-wrapper" data-role="input" data-type="bool" :data-name="options.name">
     <div class="checkbox" @click="handleClick">
       <input
         type="checkbox"
