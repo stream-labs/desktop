@@ -1,5 +1,9 @@
 <template>
-<form :data-vv-scope="validationScopeId" @submit.prevent="$emit('submit')">
+<form
+  :data-vv-scope="validationScopeId"
+  @submit.prevent="$emit('submit')"
+  :name="name"
+>
   <slot></slot>
 </form>
 </template>
