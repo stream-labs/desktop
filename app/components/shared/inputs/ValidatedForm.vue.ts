@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import Vue from 'vue';
 import uuid from 'uuid';
 import { ErrorField } from 'vee-validate';
@@ -12,6 +12,8 @@ import { Subject } from 'rxjs/Subject';
  */
 @Component({})
 export default class ValidatedForm extends Vue {
+
+  @Prop() name: string;
 
   validated = new Subject<ErrorField[]>();
   validationScopeId = uuid();

@@ -1,9 +1,10 @@
+import uuid from 'uuid/v4';
 import { StatefulService, mutation } from 'services/stateful-service';
 import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { Inject } from 'util/injector';
+import { getResource, Inject } from 'util/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -27,6 +28,8 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+
+const crashHandler = window['require']('crash-handler');
 
 interface IAppState {
   loading: boolean;
@@ -70,10 +73,15 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
+  private loadingPromises: Dictionary<Promise<any>> = {};
+
+
+  private pid = require('process').pid;
 
   @track('app_start')
   async load() {
     this.START_LOADING();
+    crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
 
@@ -129,6 +137,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
+    obs.NodeObs.StopCrashHandler();
 
     this.crashReporterService.beginShutdown();
 
@@ -137,6 +146,7 @@ export class AppService extends StatefulService<IAppState> {
 
     window.setTimeout(async () => {
       obs.NodeObs.OBS_Volmeter_ReleaseVolmeters();
+      obs.NodeObs.OBS_Fader_ReleaseFaders();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
@@ -145,17 +155,61 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
+      obs.IPC.disconnect();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
 
-  startLoading() {
-    this.START_LOADING();
+  /**
+   * Show loading, block the nav-buttons and disable autosaving
+   * If called several times - unlock the screen only after the last function/promise has been finished
+   * Should be called for any scene-collections loading operations
+   * @see RunInLoadingMode decorator
+   */
+  async runInLoadingMode(fn: () => Promise<any> | void) {
+
+    if (!this.state.loading) {
+      this.START_LOADING();
+      this.windowsService.closeChildWindow();
+      this.windowsService.closeAllOneOffs();
+      this.sceneCollectionsService.disableAutoSave();
+    }
+
+    let error: Error = null;
+    let result: any = null;
+
+    try {
+      result = fn();
+    } catch (e) {
+      error = null;
+    }
+
+    let returningValue = result;
+    if (result instanceof Promise) {
+      const promiseId = uuid();
+      this.loadingPromises[promiseId] = result;
+      try {
+        returningValue = await result;
+      } catch (e) {
+        error = e;
+      }
+      delete this.loadingPromises[promiseId];
+    }
+
+    if (Object.keys(this.loadingPromises).length > 0) {
+      // some loading operations are still in progress
+      // don't stop the loading mode
+      if (error) throw error;
+      return returningValue;
+    }
+
+    this.tcpServerService.startRequestsHandling();
+    this.sceneCollectionsService.enableAutoSave();
+    this.FINISH_LOADING();
+    if (error) throw error;
+    return returningValue;
   }
 
-  finishLoading() {
-    this.FINISH_LOADING();
-  }
 
   @mutation()
   private START_LOADING() {
