@@ -151,7 +151,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const data = {
       title: this.state.streamProperties.title,
       description: this.state.streamProperties.description,
-      game_specs: { name: 'League of Legends' }
+      game_specs: { name: this.state.streamProperties.game }
     };
     const request = new Request(url, { method: 'POST', headers, body: JSON.stringify(data) });
     return fetch(request)
