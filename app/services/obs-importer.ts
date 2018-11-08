@@ -220,10 +220,10 @@ export class ObsImporterService extends Service {
               this.audioService
                 .getSource(source.sourceId)
                 .setSettings({
-                  ["audioMixers"]: sourceJSON.mixers,
-                  ["monitoringType"]: sourceJSON.monitoring_type,
-                  ["syncOffset"]: sourceJSON.sync / 1000000,
-                  ["forceMono"]: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
+                  ['audioMixers']: sourceJSON.mixers,
+                  ['monitoringType']: sourceJSON.monitoring_type,
+                  ['syncOffset']: sourceJSON.sync / 1000000,
+                  ['forceMono']: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
                 });
             }
 
@@ -344,10 +344,10 @@ export class ObsImporterService extends Service {
         this.audioService
           .getSource(newSource.sourceId)
           .setSettings({
-            ["audioMixers"]: audioSource.mixers,
-            ["monitoringType"]: audioSource.monitoring_type,
-            ["syncOffset"]: audioSource.sync / 1000000,
-            ["forceMono"]: !!(audioSource.flags & obs.ESourceFlags.ForceMono),
+            ['audioMixers']: audioSource.mixers,
+            ['monitoringType']: audioSource.monitoring_type,
+            ['syncOffset']: audioSource.sync / 1000000,
+            ['forceMono']: !!(audioSource.flags & obs.ESourceFlags.ForceMono),
           });
       }
     });
