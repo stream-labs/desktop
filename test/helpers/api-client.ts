@@ -290,6 +290,22 @@ export class ApiClient {
     });
   }
 
+  waitForEvent<TEvent extends Dictionary<any>>(constraint: (event: TEvent) => boolean): Promise<TEvent> {
+    return new Promise((resolve, reject) => {
+      const subscr = this.eventReceived.subscribe(event => {
+        if (!constraint(event)) return;
+        subscr.unsubscribe();
+        resolve(event);
+      });
+
+      // stop waiting on timeout
+      setTimeout(() => {
+        subscr.unsubscribe();
+        reject('Promise timeout')
+      }, PROMISE_TIMEOUT);
+    });
+  }
+
 
   private getResourceTypeName(resourceId: string): string {
     return resourceId.split('[')[0];

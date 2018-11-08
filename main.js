@@ -26,6 +26,8 @@ const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
+const pid = require('process').pid;
+const crashHandler = require('crash-handler');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -64,6 +66,9 @@ function openDevTools() {
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+
+  crashHandler.startCrashHandler(app.getAppPath());
+  crashHandler.registerProcess(pid, false);
 
   { // Initialize obs-studio-server
     // Set up environment variables for IPC.
