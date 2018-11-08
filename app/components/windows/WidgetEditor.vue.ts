@@ -138,7 +138,7 @@ export default class WidgetEditor extends Vue {
 
   get topTabs() {
     const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
-    if (this.selectedVariation && !this.selectedVariation.settings.customHtmlEnabled) { return firstTab; }
+    if (this.selectedVariation && !this.selectedVariation.id) { return firstTab; }
     return this.apiSettings.customCodeAllowed ?
       firstTab.concat([{ value: 'code', name: $t('HTML CSS') }]) : firstTab;
   }
