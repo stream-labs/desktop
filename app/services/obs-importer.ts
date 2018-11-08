@@ -52,6 +52,10 @@ interface IOBSConfigSource {
   muted: boolean;
   volume: number;
   filters:IOBSConfigFilter[];
+  mixers: number;
+  monitoring_type: number;
+  sync: number;
+  flags: number;
 }
 
 interface IOBSConfigTransition {
@@ -213,6 +217,14 @@ export class ObsImporterService extends Service {
               this.audioService
                 .getSource(source.sourceId)
                 .setMul(sourceJSON.volume);
+              this.audioService
+                .getSource(source.sourceId)
+                .setSettings({
+                  ['audioMixers']: sourceJSON.mixers,
+                  ['monitoringType']: sourceJSON.monitoring_type,
+                  ['syncOffset']: sourceJSON.sync / 1000000,
+                  ['forceMono']: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
+                });
             }
 
             // Adding the filters
@@ -317,7 +329,7 @@ export class ObsImporterService extends Service {
       const audioSource = configJSON[channelName];
       if (audioSource) {
         const newSource = this.sourcesService.createSource(
-          channelName,
+          audioSource.name,
           audioSource.id,
           {},
           { channel: i + 1 }
@@ -329,6 +341,14 @@ export class ObsImporterService extends Service {
         this.audioService
           .getSource(newSource.sourceId)
           .setMul(audioSource.volume);
+        this.audioService
+          .getSource(newSource.sourceId)
+          .setSettings({
+            ['audioMixers']: audioSource.mixers,
+            ['monitoringType']: audioSource.monitoring_type,
+            ['syncOffset']: audioSource.sync / 1000000,
+            ['forceMono']: !!(audioSource.flags & obs.ESourceFlags.ForceMono),
+          });
       }
     });
   }
