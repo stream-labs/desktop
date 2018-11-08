@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.11.2-preview.17",
+  "version": "0.11.2-preview.18",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -67,12 +67,13 @@
   "dependencies": {
     "aws-sdk": "^2.344.0",
     "backtrace-node": "^0.7.3",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.14/iojs-v2.0.8-crash-handler.tar.gz",
     "electron-updater": "^3.0.1",
     "electron-window-state": "^4.1.1",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.44/iojs-v2.0.8-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.46/iojs-v2.0.8-signed.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
