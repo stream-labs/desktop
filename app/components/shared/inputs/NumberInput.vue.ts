@@ -11,14 +11,17 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   @Prop()
   readonly metadata: INumberMetadata;
 
-  emitInput(eventData: string) {
-    if (!isNaN(parseFloat(eventData))) {
-      // if is a string of valid number
-      // convert to number
-      super.emitInput(parseFloat(eventData));
-      return;
+  $refs: {
+    input: HTMLInputElement;
+  };
+
+  emitInput(value: string) {
+    let formattedValue = value;
+    if (isNaN(Number(formattedValue))) formattedValue = '0';
+    if (formattedValue !== value) {
+      this.$refs.input.value = formattedValue;
     }
-    super.emitInput(eventData);
+    super.emitInput(Number(formattedValue));
   }
 
   getValidations() {
