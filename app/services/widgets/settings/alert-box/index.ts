@@ -174,7 +174,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private reshapeVariation(setting: any): IAlertBoxVariation {
-    const imgHref = setting.image_href = '/images/gallery/default.gif' ?
+    const imgHref = setting.image_href === '/images/gallery/default.gif' ?
       'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' : setting.image_href;
     return {
       condition: null,
