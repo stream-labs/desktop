@@ -117,7 +117,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      if (this.userService.isLoggedIn) {
+      if (this.userService.isLoggedIn && this.userService.platform) {
         const service = getPlatformService(this.userService.platform.type);
         service.beforeGoLive().then(() => this.finishStartStreaming());
         return;
