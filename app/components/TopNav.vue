@@ -78,7 +78,7 @@
     </div>
     <div class="top-nav-item">
       <a
-        @click="openDiscord"
+        @click="navigateHelp"
         class="link">
         <i class="icon-question"></i>
         <span>{{ $t('Help') }}</span>
