@@ -113,7 +113,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
     }
-    return;
   }
 
   toggleStreaming() {
@@ -124,6 +123,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return;
       }
       this.finishStartStreaming();
+      return;
     }
 
     if (
@@ -280,6 +280,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
+
     if (info.type === EOBSOutputType.Streaming) {
       const time = new Date().toISOString();
 
