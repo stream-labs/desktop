@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import SliderInput from './SliderInput.vue';
-import { IInputMetadata } from './index';
+import { INumberMetadata } from './index';
 import { metadata } from 'components/shared/inputs'
 
 @Component({
@@ -11,14 +11,14 @@ import { metadata } from 'components/shared/inputs'
     SliderInput
   }
 })
-export default class FontSize extends BaseInput<string, IInputMetadata>{
+export default class FontSize extends BaseInput<string, INumberMetadata>{
   @Prop()
   readonly value: string;
 
   @Prop()
-  readonly metadata: IInputMetadata;
+  readonly metadata: INumberMetadata;
 
-  sliderOptions = metadata.slider({min: 8, max: 144});
+  sliderOptions = metadata.slider({min: 8, max: 144, ...this.options as {min : number; max: number}});
 
   get sliderValue() {
     return parseInt(this.value, 10);

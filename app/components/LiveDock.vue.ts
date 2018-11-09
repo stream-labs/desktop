@@ -206,12 +206,14 @@ export default class LiveDock extends Vue {
         value: 'default'
       }
     ];
-    this.chatApps.forEach(chatApp => {
-      options.push({
-        title: chatApp.manifest.name,
-        value: chatApp.id
-      })
-    });
+    this.chatApps
+      .filter(app => !app.poppedOutSlots.includes(this.slot))
+      .forEach(chatApp => {
+        options.push({
+          title: chatApp.manifest.name,
+          value: chatApp.id
+        })
+      });
     return metadataHelper.list({ options })
   }
 
@@ -236,8 +238,12 @@ export default class LiveDock extends Vue {
     return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.Chat);
   }
 
-  chatStyles(appId = 'default') {
-    if (this.selectedChat === appId) {
+  isAppVisible(appId: string) {
+    return this.selectedChat === appId;
+  }
+
+  get defaultChatStyles() {
+    if (this.selectedChat === 'default') {
       return {};
     } else {
       return {

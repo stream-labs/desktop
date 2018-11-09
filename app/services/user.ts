@@ -19,6 +19,7 @@ import {
 import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
@@ -89,9 +90,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      async (e: Electron.Event, auth: any) => {
-        this.LOGIN(auth);
-        await this.sceneCollectionsService.setupNewUser();
+      async (e: Electron.Event, auth: IPlatformAuth) => {
+        const service = getPlatformService(auth.platform.type);
+        this.login(service, auth);
       }
     );
   }
@@ -209,12 +210,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
-  appStoreUrl() {
+  appStoreUrl(appId?: string) {
     const host = this.hostsService.platform;
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    let url = `https://${host}/slobs-store`;
 
-    return `https://${host}/slobs-store?token=${token}&mode=${nightMode}`;
+    if (appId) {
+      url = `${url}/app/${appId}`;
+    }
+
+    return `${url}?token=${token}&mode=${nightMode}`;
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
@@ -253,15 +259,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-    this.userLogin.next(auth);
     this.setRavenContext();
     service.setupStreamSettings(auth);
+    this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
   }
 
+  @RunInLoadingMode()
   async logOut() {
     // Attempt to sync scense before logging out
-    this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
     // signs out of chatbot
@@ -270,7 +276,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.navigationService.navigate('Studio');
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
-    this.appService.finishLoading();
     this.platformAppsService.unloadApps();
   }
 

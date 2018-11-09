@@ -36,6 +36,7 @@ export async function focusChild(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  appArgs?: string;
   afterStartCb?(t: any): Promise<any>;
 
   /**
@@ -67,6 +68,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
+        options.appArgs ? options.appArgs : '',
         '.'
       ],
       env: {
