@@ -1,5 +1,5 @@
 <template>
-<div>
+<div data-role="input" data-type="color" :data-name="options.name">
 
     <div class="input-wrapper">
       <div class="colorpicker">

@@ -12,6 +12,7 @@ import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { AppService } from '../services/app';
 
 @Component({
   components: {
@@ -19,6 +20,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
   }
 })
 export default class TopNav extends Vue {
+  @Inject() appService: AppService;
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
@@ -124,5 +126,9 @@ export default class TopNav extends Vue {
       || this.featureIsEnabled(this.availableFeatures.platform))
       && this.userService.isLoggedIn()
       && this.userService.platform.type === 'twitch';
+  }
+
+  get loading() {
+    return this.appService.state.loading;
   }
 }

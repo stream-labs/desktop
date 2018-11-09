@@ -1,7 +1,7 @@
 <template>
-  <span class="number-input">
+  <span class="number-input" data-role="input" data-type="number" :data-name="options.name">
     <input
-        type="number"
+        type="text"
         :placeholder="options.placeholder"
         :value="value"
         @input="emitInput($event.target.value)"

@@ -19,11 +19,7 @@
           <a @click="openYoutubeQuickstart">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/d--1z_W9IVw"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/d--1z_W9IVw?controls=0"></webview>
           </div>
       </div>
       <div class="help-item">
@@ -35,11 +31,7 @@
           <a @click="openYoutubeMerch">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/epd8cYG2ArI"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/epd8cYG2ArI?controls=0"></webview>
           </div>
       </div>
       <div class="help-item">
@@ -51,11 +43,7 @@
           <a @click="openYoutubeAffiliates">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/cHMyxE5NsFQ"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/cHMyxE5NsFQ?controls=0"></webview>
           </div>
       </div>
       <div class="help-view-more" @click="openYoutube">View More</div>
@@ -75,11 +63,7 @@
           <a @click="openYoutubeFrames">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/WnRhaZaQ2ns"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/WnRhaZaQ2ns?controls=0"></webview>
           </div>
       </div>
       <div class="help-item">
@@ -91,11 +75,7 @@
           <a @click="openYoutubeTroubleshoot">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/GfVQ9KhBlDU"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/GfVQ9KhBlDU?controls=0"></webview>
           </div>
       </div>
       <div class="help-item">
@@ -107,11 +87,7 @@
           <a @click="openYoutubeTwitch">View on Youtube</a>
         </div>
         <div class="help-item__video">
-          <iframe
-            src="https://www.youtube.com/embed/aplbiAgZjtY"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
+          <webview src="https://www.youtube.com/embed/aplbiAgZjtY?controls=0"></webview>
         </div>
       </div>
 
@@ -187,10 +163,11 @@
     .margin-bottom(2);
   }
 
-  iframe {
+  webview {
     .radius(2);
     width: 100%;
     height: 140px;
+    overflow: hidden;
   }
 }
 
