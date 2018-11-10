@@ -51,7 +51,6 @@ app.disableHardwareAcceleration();
 function log(...args) {
   if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
     electronLog.log(...args);
-    //console.log(...args);
   }
 }
 
