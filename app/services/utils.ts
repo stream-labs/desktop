@@ -20,17 +20,20 @@ export default class Utils {
     return this.getUrlParams(window.location.href);
   }
 
+  static getWindowId(): string {
+    return this.getCurrentUrlParams().windowId;
+  }
 
   static getUrlParams(url: string) {
     return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
   static isMainWindow(): boolean {
-    return this.getCurrentUrlParams().windowId === 'main';
+    return this.getWindowId() === 'main';
   }
 
   static isChildWindow(): boolean {
-    return this.getCurrentUrlParams().windowId === 'child';
+    return this.getWindowId() === 'child';
   }
 
   static isDevMode() {
