@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const consoleError = console.error;
 console.error = function (...args: any[]) {
   logError(args[0]);
-  consoleError.call(console, args);
+  consoleError.call(console, ...args);
 };
 
 function logError(error: Error | string) {
