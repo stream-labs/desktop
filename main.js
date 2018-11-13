@@ -26,6 +26,9 @@ const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
+const pid = require('process').pid;
+const crashHandler = require('crash-handler');
+const electronLog = require('electron-log');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -37,9 +40,17 @@ app.disableHardwareAcceleration();
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////
 
+(function setupLogger() {
+  // default logs path is %USERPROFILE%\AppData\Roaming\<app name>\log.log
+  electronLog.transports.file.level = 'info';
+  // Set approximate maximum log size in bytes. When it exceeds,
+  // the archived log will be saved as the log.old.log file
+  electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+})();
+
 function log(...args) {
   if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
-    console.log(...args);
+    electronLog.log(...args);
   }
 }
 
@@ -64,6 +75,9 @@ function openDevTools() {
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+
+  crashHandler.startCrashHandler(app.getAppPath());
+  crashHandler.registerProcess(pid, false);
 
   { // Initialize obs-studio-server
     // Set up environment variables for IPC.

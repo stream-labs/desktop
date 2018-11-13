@@ -3204,6 +3204,10 @@ cosmiconfig@^2.1.0, cosmiconfig@^2.1.1:
     parse-json "^2.2.0"
     require-from-string "^1.1.0"
 
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.14/iojs-v2.0.8-crash-handler.tar.gz":
+  version "0.0.1"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.14/iojs-v2.0.8-crash-handler.tar.gz#fa38ee8d3578fed729282b978ef16b3369f7ce8f"
+
 crc32-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/crc32-stream/-/crc32-stream-2.0.0.tgz#e3cdd3b4df3168dd74e3de3fbbcb7b297fe908f4"
@@ -3958,6 +3962,11 @@ electron-is-dev@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-0.3.0.tgz#14e6fda5c68e9e4ecbeff9ccf037cbd7c05c5afe"
   integrity sha1-FOb9pcaOnk7L7/nM8DfL18BcWv4=
+
+electron-log@^2.2.17:
+  version "2.2.17"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.17.tgz#e71e2ebb949fc96ded7cdb99eeee7202e48981d2"
+  integrity sha512-v+Af5W5z99ehhaLOfE9eTSXUwjzh2wFlQjz51dvkZ6ZIrET6OB/zAZPvsuwT6tm3t5x+M1r+Ed3U3xtPZYAyuQ==
 
 electron-osx-sign@0.4.10:
   version "0.4.10"
@@ -7557,6 +7566,11 @@ node-pre-gyp@^0.6.29:
     tar "~2.2.1"
     tar-pack "~3.3.0"
 
+node-win32-np@1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/node-win32-np/-/node-win32-np-1.0.6.tgz#761237777e8b222ef4dba3a2b622b7a53d2b4b97"
+  integrity sha512-SVLiJ07vkLEpuQpJAh9HbUHlmUbpbtoini9V9aBNs+VbJCJl80nVSxmy+aQW34fQxLW60z35hi9ePpqJT6Hekw==
+
 nomnom@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/nomnom/-/nomnom-1.8.1.tgz#2151f722472ba79e50a76fc125bb8c8f2e4dc2a7"
@@ -7764,9 +7778,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.41/iojs-v2.0.8-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.46/iojs-v2.0.8-signed.tar.gz":
   version "0.3.21"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.41/iojs-v2.0.8-signed.tar.gz#be3b92a5ec95f0a12c592c11f2700d9801ad4df8"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.46/iojs-v2.0.8-signed.tar.gz#a9dda3c504a340543cc27a246bc6f19bf666693d"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

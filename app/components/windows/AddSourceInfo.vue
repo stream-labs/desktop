@@ -2,11 +2,10 @@
 <div>
   <div class="source-info">
     <div class="source-info__text">
-      <h3>{{ name }}</h3>
+      <h2>{{ name }}</h2>
       <div class="desc">{{ description }}</div>
 
       <div class="source-support" v-if="showSupport">
-        <div class="source-support__label">{{ $t('Supports') }}</div>
         <slot name="support-list"></slot>
       </div>
     </div>
@@ -36,9 +35,18 @@
 .source-info__text {
   flex: 0 0 50%;
 
-  h3,
+  h2 {
+    .margin-bottom();
+  }
+
   .desc {
-    margin-bottom: 12px;
+    height: 62px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    .margin-bottom(2);
   }
 }
 
@@ -63,26 +71,22 @@
   }
 }
 
+.source-support {
+  overflow: hidden;
+}
+
 .source-support__list {
   margin-bottom: 0;
-  margin-left: 15px;
+  .margin-left(2);
   display: flex;
   flex-wrap: wrap;
   flex: 250px;
-  height: 64px;
+  height: 88px;
   flex-direction: column;
 
   li {
     padding-right: 50px;
   }
-}
-
-.source-support__label {
-  font-size: 11px;
-  text-transform: uppercase;
-  .letter-spacing();
-  .weight(@medium);
-  margin-bottom: 5px;
 }
 
 .source-info__body {

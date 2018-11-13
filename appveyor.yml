@@ -1,7 +1,7 @@
 build: off
 
 install:
-  - ps: Install-Product node 8
+  - ps: Install-Product node 8 x64
   - yarn install --frozen-lockfile --check-files
   - yarn compile:ci
 
