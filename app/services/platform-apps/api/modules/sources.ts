@@ -24,7 +24,6 @@ interface ISource {
   flags: ISourceFlags;
   size: ISourceSize;
   appId?: string;
-  appSourceId?: string;
   muted?: boolean;
   volume?: number;
 }
@@ -208,9 +207,7 @@ export class SourcesModule extends Module {
     };
 
     if (source.getPropertiesManagerType() === 'platformApp') {
-      const settings = source.getPropertiesManagerSettings();
-      serialized.appId = settings.appId;
-      serialized.appSourceId = settings.appSourceId;
+      serialized.appId = source.getPropertiesManagerSettings().appId;
     }
 
     if (source.audio) {
