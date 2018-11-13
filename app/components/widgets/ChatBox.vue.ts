@@ -20,15 +20,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
   }
 })
 export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService> {
-  textColorTooltip = $t('A hex code for the base text color.');
-
-  backgroundColorTooltip = $t(
-    'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.'
-  );
-
-  backgroundColorDescription = $t(
-    'Note: This background color is for preview purposes only. It will not be shown in your stream.'
-  );
 
   navItems = [
     { value: 'visual', label: $t('Visual Settings') },

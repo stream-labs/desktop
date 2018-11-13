@@ -3,6 +3,8 @@ import { WidgetType } from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/stateful-service';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { formMetadata } from '../../../components/shared/inputs';
+import { $t } from '../../i18n';
 
 export interface IChatBoxSettings extends IWidgetSettings {
   theme: string;
@@ -48,7 +50,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
   }
 
   getMetadata() {
-    return {
+    return formMetadata({
       theme: metadata.list({
         options: [
           { title: 'Clean', value: 'standard' },
@@ -58,11 +60,38 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
           { title: 'Chunky', value: 'chunky' }
         ]
       }),
+      always_show_messages: metadata.bool({ title: $t('Always Show Messages')}),
       message_hide_delay: metadata.slider({
         min: 0,
         max: 200
+      }),
+      show_moderator_icons: metadata.bool({ title: $t('Show Moderator Badges')}),
+      show_subscriber_icons: metadata.bool({ title: $t('Show Subscriber Badges')}),
+      show_turbo_icons: metadata.bool({ title: $t('Show Turbo Badges')}),
+      show_premium_icons: metadata.bool({ title: $t('Show Twitch Prime Badges')}),
+      show_bits_icons: metadata.bool({ title: $t('Show Bits Badges')}),
+      show_coin_icons: metadata.bool({ title: $t('Show Top Coin Holder Badges')}),
+      show_bttv_emotes: metadata.bool({ title: $t('Enable BetterTTV Emotes')}),
+      show_franker_emotes: metadata.bool({ title: $t('Enable FrankerFaceZ Emotes')}),
+      show_smf_emotes: metadata.bool({ title: $t('Enable Supermegafan Emotes')}),
+
+      text_color: metadata.color({
+        title: $t('Text Color'),
+        tooltip: $t('A hex code for the base text color.')
+      }),
+      text_size: metadata.fontSize({ title: $t('Font Size'), min: 10, max: 80}),
+      muted_chatters: metadata.textArea({ title: $t('Muted Chatters')}),
+      hide_commands: metadata.bool({ title: $t('Hide Commands')}),
+
+      background_color: metadata.color({
+        title: $t('Background Color'),
+        description: $t('Note: This background color is for preview purposes only.' +
+          'It will not be shown in your stream.'),
+        tooltip: $t('A hex code for the widget background. This is for preview purposes only.' +
+          'It will not be shown in your stream.')
       })
-    };
+
+    });
   }
 
   protected patchAfterFetch(data: IChatBoxData): IChatBoxData {
