@@ -73,7 +73,7 @@ export default class Dashboard extends Vue {
   }
 
   async testAudio(volume: number) {
-    return this.facemasksService.playTestAudio(volume);
+    return;
   }
 
   async navigate(page: TAppPage) {
