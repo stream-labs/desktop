@@ -458,22 +458,32 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   optimizeForNiconico(best: OptimizeSettings) {
-    const MAX_TRY = 3;
+    const MAX_TRY = 4;
 
     const opt = new Optimizer(this);
 
-    for (let retry = MAX_TRY; retry > 0; --retry) {
+    for (let retry = 0; retry < MAX_TRY; ++retry) {
       opt.optimize(best);
 
       // 確実に書き込めたか確認するため、読み込み直す
       opt.clearCache();
       const delta = [...opt.getDifferenceFromCurrent(best)]
       if (delta.length === 0) {
+        // send to Sentry
+        if (retry > 0) {
+          console.error(`optimizeForNiconico: リトライ ${retry} 回で救済`);
+        } else {
+          console.error('optimizeForNiconico: 一発で成功');
+        }
         return;
       }
-      console.error('optimizeForNiconico: optimization setting is not set perfectly: ', JSON.stringify(delta));
+      console.info(
+        `optimizeForNiconico: #${retry}: optimization setting is not set perfectly: `,
+        JSON.stringify(delta)
+      );
     }
-    console.error('FAILED');
+    // send to Sentry
+    console.error('optimizeForNiconico: 最適化リトライ満了したが設定できなかった');
   }
 
   private findSubCategory(settings: ISettingsSubCategory[], category: string): ISettingsSubCategory[] {
