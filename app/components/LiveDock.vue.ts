@@ -19,13 +19,15 @@ import {
 } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
+import ResizingBar from 'components/shared/ResizingBar.vue';
 
 @Component({
   components: {
     Chat,
     Slider,
     ListInput,
-    PlatformAppWebview
+    PlatformAppWebview,
+    ResizingBar
   }
 })
 export default class LiveDock extends Vue {

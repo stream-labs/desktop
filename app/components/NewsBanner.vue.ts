@@ -3,11 +3,17 @@ import { shell } from 'electron';
 import emojione from 'emojione';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
+import { Component } from 'vue-property-decorator';
 
+@Component({})
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
 
   proceessingClose = false;
+
+  mounted() {
+    console.log('NewsBannerMounted', this);
+  }
 
   get currentBanner() {
     return this.announcementsService.state;

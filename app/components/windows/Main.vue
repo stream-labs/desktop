@@ -2,7 +2,7 @@
 <div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
   <div class="main-spacer"></div>
-  <news-banner />
+  <news-banner key="news-banner"/>
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 

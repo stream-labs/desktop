@@ -26,7 +26,7 @@ module.exports = {
     filename: '[name].js'
   },
 
-  devtool: 'source-map',
+  devtool: 'inline-cheap-module-source-map',
 
   target: 'electron-renderer',
 
