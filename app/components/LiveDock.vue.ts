@@ -63,12 +63,18 @@ export default class LiveDock extends Vue {
   }
 
   mounted() {
+    const width = this.customizationService.state.livedockSize;
+    if (width < 1) {
+      // migrate from old percentage value to the pixel value
+      this.resetWidth();
+    }
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
       }
+      this.updateWidth();
     }, 100);
   }
 
@@ -257,21 +263,37 @@ export default class LiveDock extends Vue {
   }
 
   onResizeStopHandler(offset: number) {
-    console.log('resizestop', offset);
-    // calculate new livedock width
     offset = this.onLeft ? offset : -offset;
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const pxToPercent = 1 / appRect.width;
-    const offsetInPercent = offset * pxToPercent;
-    const minWidth = 0.15;
-    const maxWidth = 0.50;
-    let newWidth = this.customizationService.state.livedockSize + offsetInPercent;
-    newWidth = Math.max(minWidth, newWidth);
-    newWidth = Math.min(maxWidth, newWidth);
-
+    this.setWidth(this.customizationService.state.livedockSize + offset);
     this.customizationService.setSettings({
-      previewEnabled: true,
-      livedockSize: newWidth
+      previewEnabled: true
     });
   }
+
+  setWidth(width: number) {
+    this.customizationService.setSettings({
+      livedockSize: this.validateWidth(width)
+    });
+  }
+
+  validateWidth(width: number): number {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const minWidth = 290;
+    const maxWidth = appRect.width / 2;
+    width = Math.max(minWidth, width);
+    width = Math.min(maxWidth, width);
+    return width;
+  }
+
+  updateWidth() {
+    const width = this.customizationService.state.livedockSize;
+    if (width !== this.validateWidth(width)) this.setWidth(width);
+  }
+
+  resetWidth() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const defaultWidth = appRect.width * 0.28;
+    this.setWidth(defaultWidth);
+  }
+
 }

@@ -30,7 +30,8 @@ export class CustomizationService
     hideViewerCount: false,
     livedockCollapsed: true,
     previewSize: 300,
-    livedockSize: 0.28,
+    livedockSize: 0,
+    livedockDefaultSize: 0.28,
     performanceMode: false,
     previewEnabled: true,
     chatZoomFactor: 1,
@@ -49,14 +50,6 @@ export class CustomizationService
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
     this.setSettings({previewEnabled: true}); // preview is always enabled on app start
-
-    // migrate livedockSize from % to float number
-    const livedockSize = this.state.livedockSize;
-    if (livedockSize > LIVEDOCK_MAX_SIZE) {
-      this.setSettings({
-        livedockSize: CustomizationService.defaultState.livedockSize
-      });
-    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {

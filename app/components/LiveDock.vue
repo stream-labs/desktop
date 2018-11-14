@@ -2,7 +2,7 @@
 <div
   class="live-dock"
   :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize * 100) + '%' }">
+  :style="{ width: (liveDockSize) + 'px' }">
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
