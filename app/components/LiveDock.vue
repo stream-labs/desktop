@@ -3,9 +3,6 @@
   class="live-dock"
   :class="{ collapsed, 'live-dock--left': onLeft }"
   :style="{ width: (liveDockSize * 100) + '%' }">
-
-  <resizing-bar key="resizing-bar"/>
-
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
@@ -15,6 +12,12 @@
       'icon-down icon-right': onLeft
     }" />
   </div>
+
+  <resize-bar
+    :position="onLeft ? 'right' : 'left'"
+    @onresizestart="onResizeStartHandler"
+    @onresizestop="onResizeStopHandler"
+  />
 
   <transition name="slide-fade">
     <div

@@ -19,7 +19,7 @@ import {
 } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
-import ResizingBar from 'components/shared/ResizingBar.vue';
+import ResizeBar from 'components/shared/ResizeBar.vue';
 
 @Component({
   components: {
@@ -27,7 +27,7 @@ import ResizingBar from 'components/shared/ResizingBar.vue';
     Slider,
     ListInput,
     PlatformAppWebview,
-    ResizingBar
+    ResizeBar
   }
 })
 export default class LiveDock extends Vue {
@@ -249,5 +249,29 @@ export default class LiveDock extends Vue {
         top: '-10000px'
       };
     }
+  }
+
+  onResizeStartHandler() {
+    console.log('resizestart');
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  onResizeStopHandler(offset: number) {
+    console.log('resizestop', offset);
+    // calculate new livedock width
+    offset = this.onLeft ? offset : -offset;
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const pxToPercent = 1 / appRect.width;
+    const offsetInPercent = offset * pxToPercent;
+    const minWidth = 0.15;
+    const maxWidth = 0.50;
+    let newWidth = this.customizationService.state.livedockSize + offsetInPercent;
+    newWidth = Math.max(minWidth, newWidth);
+    newWidth = Math.min(maxWidth, newWidth);
+
+    this.customizationService.setSettings({
+      previewEnabled: true,
+      livedockSize: newWidth
+    });
   }
 }

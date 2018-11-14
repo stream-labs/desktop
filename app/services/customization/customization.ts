@@ -32,6 +32,7 @@ export class CustomizationService
     previewSize: 300,
     livedockSize: 0.28,
     performanceMode: false,
+    previewEnabled: true,
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
@@ -47,6 +48,7 @@ export class CustomizationService
   init() {
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
+    this.setSettings({previewEnabled: true}); // preview is always enabled on app start
 
     // migrate livedockSize from % to float number
     const livedockSize = this.state.livedockSize;
@@ -73,6 +75,10 @@ export class CustomizationService
 
   get nightMode() {
     return this.state.nightMode;
+  }
+
+  get previewEnabled(): boolean {
+    return !this.state.performanceMode && this.state.previewEnabled;
   }
 
   setNightMode(val: boolean) {
