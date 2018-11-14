@@ -425,7 +425,6 @@ export class AudioSource implements IAudioSourceApi {
   }
 
 
-
   setMul(mul: number) {
     this.audioService.setFader(this.sourceId, { mul });
   }
