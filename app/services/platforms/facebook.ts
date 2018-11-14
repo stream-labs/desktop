@@ -3,7 +3,7 @@ import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders } from '../../util/requests';
+import { handleErrors, authorizedHeaders, requiresToken } from '../../util/requests';
 import { UserService } from '../user';
 
 interface IFacebookPage{
@@ -196,8 +196,15 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     return Promise.resolve(true);
   }
 
+  @requiresToken()
   searchGames(searchString: string): Promise<IGame[]> {
-    return Promise.resolve(JSON.parse(''));
+    const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`
+    const headers = this.getHeaders(true);
+    const request = new Request(url, { method: 'GET', headers });
+    return fetch(request)
+      .then(handleErrors)
+      .then(resp => resp.json())
+      .then((json: any) => json.data);
   }
 
   getChatUrl(): Promise<string> {

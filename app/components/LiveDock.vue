@@ -88,7 +88,7 @@
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-        <chat :style="defaultChatStyles()" ref="chat" />
+        <chat :style="defaultChatStyles" ref="chat" />
         <PlatformAppWebview
           v-for="app in chatApps"
           v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
