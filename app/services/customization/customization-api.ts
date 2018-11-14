@@ -11,7 +11,7 @@ export interface ICustomizationServiceState {
   livedockCollapsed: boolean;
   previewSize: number;
   livedockSize: number;
-  livedockDefaultSize: number;
+  bottomdockSize: number;
   performanceMode: boolean;
   previewEnabled: boolean;
   chatZoomFactor: number;

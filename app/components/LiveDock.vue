@@ -14,6 +14,7 @@
   </div>
 
   <resize-bar
+    v-if="!collapsed"
     :position="onLeft ? 'right' : 'left'"
     @onresizestart="onResizeStartHandler"
     @onresizestop="onResizeStopHandler"

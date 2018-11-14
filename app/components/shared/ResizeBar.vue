@@ -18,6 +18,7 @@
 .resize-bar {
   position: absolute;
   background-color: rgba(50, 50, 50, 0);
+  z-index: 1000;
 
   &.top {
     .absolute(0, 0, auto, 0);
