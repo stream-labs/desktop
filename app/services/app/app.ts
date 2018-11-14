@@ -28,6 +28,7 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -73,6 +74,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
 
@@ -113,6 +115,7 @@ export class AppService extends StatefulService<IAppState> {
 
     this.facemasksService;
 
+    this.incrementalRolloutService;
     this.shortcutsService;
     this.streamlabelsService;
 

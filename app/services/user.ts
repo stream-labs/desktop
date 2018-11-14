@@ -72,6 +72,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   userLogin = new Subject<IPlatformAuth>();
+  userLogout = new Subject();
 
   init() {
     super.init();
@@ -275,6 +276,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
     this.LOGOUT();
+    this.userLogout.next();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.platformAppsService.unloadApps();
   }
