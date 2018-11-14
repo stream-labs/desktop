@@ -150,12 +150,12 @@ export class AppService extends StatefulService<IAppState> {
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
-      this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_Volmeter_ReleaseVolmeters();
       obs.NodeObs.OBS_Fader_ReleaseFaders();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
       obs.IPC.disconnect();
+      this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
