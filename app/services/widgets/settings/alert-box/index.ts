@@ -26,7 +26,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       previewUrl: `https://${ this.getHost() }/alert-box/v3/${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox`,
-      settingsUpdateEvent: 'alertBoxSettingsUpdate',
+      settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
       testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
