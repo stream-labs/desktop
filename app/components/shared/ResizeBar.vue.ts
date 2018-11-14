@@ -1,11 +1,14 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+/**
+ * This component can be added to any block as a resize control
+ */
 @Component({})
 export default class ResizeBar extends Vue {
 
   @Prop({default: 'left'})
-  position: 'left' | 'right' | 'top';
+  position: 'left' | 'right' | 'top'; // TODO: bottom if needed
 
   @Prop({default: 0})
   value: number;
