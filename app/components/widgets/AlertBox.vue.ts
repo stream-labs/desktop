@@ -161,6 +161,8 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   editName(id: string) {
     this.editingName = id;
     this.selectedId = id;
+    // Above is done here with a stop propagation in the input to avoid possible race conditions which would lead to
+    // this.selectedVariation potentially being incorrect
     const field = <HTMLInputElement>this.$refs[`${id}-name-input`][0];
     this.$nextTick(() => field.focus());
   }

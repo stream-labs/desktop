@@ -8,7 +8,7 @@ import { CustomizationService } from 'services/customization';
 @Component({
   components: { ImagePickerInput }
 })
-export default class ImageLayoutInput extends BaseInput<string, IListMetadata<string>> {
+export default class AlertLayoutInput extends BaseInput<string, IListMetadata<string>> {
   @Inject() customizationService: CustomizationService;
 
   @Prop()
