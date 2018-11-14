@@ -65,20 +65,27 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   /**
    * fetch SystemInformation and download configuration links if we have ones
    */
-  async fetchDeviceInfo() {
-    if (!this.serviceEnabled()) return;
+  async fetchDeviceInfo(): Promise<boolean> {
+    if (!this.serviceEnabled()) return false;
 
-    // fetch system info via PowerShell
-    const msSystemInformation = execSync('Powershell gwmi -namespace root\\wmi -class MS_SystemInformation')
-      .toString()
-      .split('\n');
+    try {
+      // fetch system info via PowerShell
+      const msSystemInformation = execSync('Powershell gwmi -namespace root\\wmi -class MS_SystemInformation')
+        .toString()
+        .split('\n');
 
-    // save system info to state
-    msSystemInformation.forEach(record => {
-      const [key, value] = record.split(':').map(item => item.trim());
-      if (!key) return;
-      if (this.state[key] !== void 0) this.SET_SYSTEM_PARAM(key as keyof IMsSystemInfo, value);
-    });
+      // save system info to state
+      msSystemInformation.forEach(record => {
+        const [key, value] = record.split(':').map(item => item.trim());
+        if (!key) return;
+        if (this.state[key] !== void 0) this.SET_SYSTEM_PARAM(key as keyof IMsSystemInfo, value);
+      });
+    } catch (e) {
+      // unfortunately, for some users we can't run Powershell
+      console.error(e);
+      return false;
+    }
+
 
     // uncomment the code below to test brand device steps
     // this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
@@ -88,6 +95,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
 
 
     this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
+    return true;
   }
 
   async startAutoConfig(): Promise<boolean> {
