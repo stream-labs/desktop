@@ -9,9 +9,10 @@ import { Subject } from 'rxjs/Subject';
 export type TSocketEvent =
   IStreamlabelsSocketEvent |
   IDonationSocketEvent |
-  IFacemaskSocketEvent |
+  IFacemaskDonationSocketEvent |
   IFollowSocketEvent |
-  ISubscriptionSocketEvent
+  ISubscriptionSocketEvent |
+  IAlertPlayingSocketEvent
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -31,13 +32,11 @@ interface IDonationSocketEvent {
   }[];
 }
 
-interface IFacemaskSocketEvent {
-  type: 'facemask';
+interface IFacemaskDonationSocketEvent {
+  type: 'facemaskdonation';
   message: {
-    name: string;
-    formattedAmount: string;
     facemask: string;
-    message: string;
+    _id: string;
   }[];
 }
 
@@ -53,6 +52,14 @@ interface ISubscriptionSocketEvent {
   message: {
     name: string;
   }[];
+}
+
+interface IAlertPlayingSocketEvent {
+  type: 'alertPlaying';
+  message: {
+    facemask?: string;
+    _id: string;
+  }
 }
 
 export class WebsocketService extends Service {
