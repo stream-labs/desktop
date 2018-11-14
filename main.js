@@ -340,10 +340,10 @@ app.on('ready', () => {
       versionFileName: `${releaseChannel}.json`
     };
 
-    console.log(updateInfo);
+    log(updateInfo);
     bootstrap(updateInfo).then((updating) => {
       if (updating) {
-        console.log('Closing for update...');
+        log('Closing for update...');
         app.exit();
       } else {
         startApp();
