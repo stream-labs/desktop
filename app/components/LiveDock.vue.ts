@@ -258,7 +258,6 @@ export default class LiveDock extends Vue {
   }
 
   onResizeStartHandler() {
-    console.log('resizestart');
     this.customizationService.setSettings({ previewEnabled: false });
   }
 

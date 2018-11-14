@@ -11,9 +11,6 @@ export default class NewsBanner extends Vue {
 
   proceessingClose = false;
 
-  mounted() {
-    console.log('NewsBannerMounted', this);
-  }
 
   get currentBanner() {
     return this.announcementsService.state;
