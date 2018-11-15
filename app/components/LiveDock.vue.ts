@@ -264,9 +264,11 @@ export default class LiveDock extends Vue {
   onResizeStopHandler(offset: number) {
     offset = this.onLeft ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.customizationService.setSettings({
-      previewEnabled: true
-    });
+    setTimeout(() => {
+      this.customizationService.setSettings({
+        previewEnabled: true
+      });
+    }, 500);
   }
 
   setWidth(width: number) {
