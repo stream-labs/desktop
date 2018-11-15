@@ -96,6 +96,7 @@ import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 import { SubGoalService } from 'services/widgets/settings/sub-goal';
 import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
+import { AlertBoxService }from 'services/widgets/settings/alert-box';
 
 const { ipcRenderer } = electron;
 
@@ -192,6 +193,7 @@ export class ServicesManager extends Service {
     IncrementalRolloutService,
     AnnouncementsService,
     MediaShareService,
+    AlertBoxService,
     ChatbotWidgetService,
     BrandDeviceService,
     ObsUserPluginsService

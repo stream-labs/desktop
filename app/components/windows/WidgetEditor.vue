@@ -9,7 +9,7 @@
     </div>
 
     <div class="window-container">
-      <div style="position: relative;">
+      <div class="editor-tabs" :class="{ pushed: isAlertBox }">
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
@@ -21,10 +21,10 @@
           <toggle-input :value="customCodeIsEnabled" @input="value => toggleCustomCode(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
-        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
+        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" v-if="topTabs.length > 1" />
       </div>
 
-      <div class="content-container" :class="{ vertical: currentTopTab === 'code' }">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
         <div class="display">
           <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
         </div>
@@ -69,39 +69,40 @@
               v-model="currentCodeTab"
               @input="value => updateCodeTab(value)"
             />
-            <div v-if="canShowEditor">
-              <code-editor
-                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
-                key="html"
-                :value="wData"
-                :metadata="{ type: 'html' }"
-              />
-              <code-editor
-                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
-                key="css"
-                :value="wData"
-                :metadata="{ type: 'css' }"
-              />
-              <code-editor
-                v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
-                key="js"
-                :value="wData"
-                :metadata="{ type: 'js' }"
-              />
-              <custom-fields-editor
-                v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
-                key="customFields"
-                :value="wData"
-              />
-            </div>
+          <div v-if="canShowEditor">
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+              key="html"
+              :value="selectedVariation || wData"
+              :metadata="{ type: 'html' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+              key="css"
+              :value="selectedVariation || wData"
+              :metadata="{ type: 'css' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+              key="js"
+              :value="selectedVariation || wData"
+              :metadata="{ type: 'js' }"
+            />
+            <custom-fields-editor
+              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+              key="customFields"
+              :value="selectedVariation || wData"
+            />
+          </div>
           </div>
           <div v-else-if="loadingFailed" style="padding: 8px;">
             <div>{{ $t('Failed to load settings') }}</div>
             <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
           </div>
         </div>
-
       </div>
+
+      <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
     </div>
   </div>
 </modal-layout>
@@ -113,7 +114,7 @@
   @import "../../styles/index";
 
   .widget-editor__top-tabs {
-    .margin-h-sides(2);
+    padding: 0 16px !important;
   }
 
   .top-settings {
@@ -190,6 +191,16 @@
     margin-left: auto;
   }
 
+  .editor-tabs {
+    position: relative;
+  }
+
+  .editor-tabs.pushed {
+    right: 0;
+    width: 80%;
+    margin-left: auto;
+  }
+
   .content-container {
     display: flex;
     width: 100%;
@@ -218,6 +229,33 @@
     .display {
       transform: scale(1, 0.63) translate(0, -29%);
     }
+  }
+
+  .content-container.has-leftbar {
+    .code-editor {
+      width: 80%;
+      right: 0;
+    }
+    .display {
+      transform: scale(0.7, 0.7) translate(-3.7%);
+    }
+  }
+
+  .content-container.has-leftbar.vertical {
+    .display {
+      transform: scale(0.6, 0.6) translate(5%, -31%);
+    }
+  }
+
+  .left-toolbar {
+    width: 20%;
+    height: calc(~"100% - 66px");
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border: 1px solid @day-border;
+    background-color: @day-bg;
+    overflow-y: auto;
   }
 
   .display {
@@ -364,6 +402,10 @@
       background-color: @night-section;
     }
 
+    .left-toolbar {
+      background-color: @night-bg;
+    }
+
     .window-container {
       border-color: @night-border;
     }
@@ -371,7 +413,9 @@
     .custom-code {
       border-color: @night-border;
     }
-
+    .left-toolbar {
+      border-color: @night-slider-bg;
+    }
     .sidebar {
       background-color: @night-bg;
       border-color: @night-border;
