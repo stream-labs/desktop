@@ -110,7 +110,7 @@
 <script lang="ts" src="./LiveDock.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .live-dock {
   position: relative;
@@ -130,7 +130,7 @@
   }
 
   &.collapsed {
-    width: 20px!important;
+    width: 20px !important;
     padding: 0;
   }
 
@@ -152,7 +152,7 @@
   }
 
   i {
-    font-size: 6px;
+    font-size: 10px;
   }
 }
 
@@ -275,7 +275,6 @@
 .live-dock-platform-app-webview {
   .flex--grow();
 }
-
 
 .night-theme {
   .live-dock {
