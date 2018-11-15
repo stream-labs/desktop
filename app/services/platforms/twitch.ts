@@ -138,9 +138,9 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   @requiresToken()
-  putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
+  putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
     const headers = this.getHeaders(true);
-    const data = { channel: { status : streamTitle, game : streamGame } };
+    const data = { channel: { status: title, game: game } };
     const request = new Request(`https://api.twitch.tv/kraken/channels/${this.twitchId}`, {
       method: 'PUT',
       headers,
@@ -192,4 +192,7 @@ export class TwitchService extends Service implements IPlatformService {
       .then(json => json.results[0].hits);
   }
 
+  beforeGoLive() {
+    return Promise.resolve();
+  }
 }
