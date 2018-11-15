@@ -3,9 +3,11 @@ import { shell } from 'electron';
 import emojione from 'emojione';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
+import { NavigationService } from 'services/navigation';
 
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
+  @Inject() navigationService: NavigationService;
 
   proceessingClose = false;
 
@@ -28,6 +30,10 @@ export default class NewsBanner extends Vue {
   }
 
   followLink() {
-    shell.openExternal(this.currentBanner.link);
+    if (this.currentBanner.navTarget) {
+      this.navigationService.navigate(this.currentBanner.navTarget);
+    } else {
+      shell.openExternal(this.currentBanner.link);
+    }
   }
 }
