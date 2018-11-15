@@ -48,7 +48,7 @@ export class SourcesModule extends Module {
     this.sourcesService.sourceUpdated.subscribe(sourceData => {
       const source = this.sourcesService.getSourceById(sourceData.sourceId);
       this.sourceUpdated.next(this.serializeSource(source));
-    })
+    });
     this.sourcesService.sourceRemoved.subscribe(sourceData => {
       this.sourceRemoved.next(sourceData.sourceId);
     });
@@ -71,6 +71,13 @@ export class SourcesModule extends Module {
   @apiMethod()
   getSources() {
     return this.sourcesService.getSources().map(source => this.serializeSource(source));
+  }
+
+  @apiMethod()
+  getSource(_ctx: IApiContext, id: string): ISource | null {
+    const source = this.sourcesService.getSource(id);
+
+    return source ? this.serializeSource(source) : null;
   }
 
   @apiMethod()
@@ -156,7 +163,9 @@ export class SourcesModule extends Module {
 
     const source = this.sourcesService.getSource(patch.id);
 
-    if (patch.name) source.setName(patch.name);
+    if (patch.name) {
+      source.setName(patch.name);
+    }
 
     if (patch.muted != null) {
       this.audioService.getSource(patch.id).setMuted(patch.muted);
