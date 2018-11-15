@@ -2,17 +2,16 @@
   <div>
     <div class="media-box">
       <div class="url-uploader" v-if="showUrlUpload">
-        <h-form-group :title="$t('Image URL')" >
-          <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
-        </h-form-group>
+        {{ $t('Image URL') }}
+        <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
         <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
       <div class="footer">
-        <span>{{ fileName || $t('No Sound') }}</span>
+        <span class="filename">{{ fileName || $t('No Sound') }}</span>
         <div>
-          <i @click="clearSound" class="icon-close" />
-          <i @click="previewSound" class="fa fa-search-plus" />
           <i @click="toggleUrlUpload" class="icon-link" />
+          <i @click="previewSound" class="fa fa-search-plus" />
+          <i @click="clearSound" class="icon-close" />
           <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
         </div>
       </div>
@@ -43,9 +42,12 @@
   height: 30px;
   padding: 6px;
   justify-content: space-between;
+  align-items: baseline;
 
   i {
     margin-left: 10px;
+    position: relative;
+    top: 2px;
   }
 
   .icon-close {
@@ -59,6 +61,14 @@
     cursor: pointer;
     color: @white;
   }
+}
+
+.filename {
+  max-width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
 }
 
 .url-uploader {
@@ -80,6 +90,7 @@
 
 .change-media {
   text-transform: uppercase;
+  font-size: 11px;
   color: @night-paragraph;
 }
 
