@@ -3204,9 +3204,9 @@ cosmiconfig@^2.1.0, cosmiconfig@^2.1.1:
     parse-json "^2.2.0"
     require-from-string "^1.1.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.15/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.16/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.15/iojs-v2.0.8-crash-handler.tar.gz#94feab1f13b7e6ab0d0c2f07dedb9463558822b8"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.16/iojs-v2.0.8-crash-handler.tar.gz#ae019aa8e82725f5f90e72cd25e2485b95bcc1cf"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
