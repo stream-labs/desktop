@@ -4,8 +4,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { IWebviewTransform } from 'services/platform-apps/api/modules/module';
 import Utils from 'services/utils';
 
 @Component({})
@@ -61,6 +59,11 @@ export default class PlatformAppWebview extends Vue {
         });
       }
     });
+  }
+
+  @Watch('poppedOut')
+  handlePopoutChange() {
+    this.$nextTick(() => this.attachWebviewListeners());
   }
 
   attachWebviewListeners() {
