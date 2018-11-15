@@ -231,8 +231,8 @@
 }
 
 .badge--new {
-  background: rgba(135, 54, 224, 0.08);
-  color: #8736e0;
+  background: @purple-semi;
+  color: @purple;
 }
 
 .night-theme {
@@ -272,8 +272,8 @@
   }
 
   .badge--new {
-    background: #8736e0;
-    color: #ffffff;
+    background: @purple;
+    color: @white;
   }
 }
 </style>
