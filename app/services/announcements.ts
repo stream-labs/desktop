@@ -11,8 +11,8 @@ interface IAnnouncementsInfo {
   subHeader: string;
   linkTitle: string;
   thumbnail: string;
-  link?: string;
-  navTarget?: TAppPage;
+  link: string;
+  link_target: 'external' | 'slobs';
 }
 
 export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
@@ -26,7 +26,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     link: null,
     linkTitle: null,
     thumbnail: null,
-    navTarget: null
+    link_target: null
   };
 
   async updateBanner() {

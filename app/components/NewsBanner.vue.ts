@@ -3,7 +3,7 @@ import { shell } from 'electron';
 import emojione from 'emojione';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
-import { NavigationService } from 'services/navigation';
+import { NavigationService, TAppPage } from 'services/navigation';
 
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
@@ -30,8 +30,8 @@ export default class NewsBanner extends Vue {
   }
 
   followLink() {
-    if (this.currentBanner.navTarget) {
-      this.navigationService.navigate(this.currentBanner.navTarget);
+    if (this.currentBanner.link_target === 'slobs') {
+      this.navigationService.navigate(this.currentBanner.link as TAppPage);
     } else {
       shell.openExternal(this.currentBanner.link);
     }
