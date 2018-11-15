@@ -18,6 +18,7 @@ import {
   VideoEncodingOptimizationService,
   IEncoderPreset
 } from 'services/video-encoding-optimizations';
+import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -88,7 +89,7 @@ export default class EditStreamInfo extends Vue {
 
   encoderProfile: IMultiSelectProfiles;
 
-  facebookPages: { pages: any[], page_id: string };
+  facebookPages: IStreamlabsFacebookPages;
 
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
@@ -118,7 +119,7 @@ export default class EditStreamInfo extends Vue {
       }
     ];
     this.pageModel.value = this.facebookPages.page_id;
-    this.pageModel.options = this.facebookPages.pages.map((page: any) => (
+    this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
       { value: page.id, description: `${page.name} | ${page.category}` }
     ));
     this.loadAvailableProfiles();

@@ -12,6 +12,17 @@ interface IFacebookPage{
   id: string;
 }
 
+export interface IStreamlabsFacebookPage {
+  id: string;
+  category: string;
+  name: string;
+}
+
+export interface IStreamlabsFacebookPages {
+  pages: IStreamlabsFacebookPage[];
+  page_id: string;
+}
+
 interface IFacebookServiceState {
   pages: IFacebookPage[];
   activePage: IFacebookPage;
