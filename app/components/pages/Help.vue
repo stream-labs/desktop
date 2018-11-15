@@ -20,7 +20,7 @@
             <a @click="showMoreInfo(idx)">Read More</a>
           </div>
           <div class="help-item__thumbnail" @click="openVideo(video.link)">
-            <img :src="video.image">
+            <img :src="require(`../../../media/images/yt-thumbnails/${video.image}`)">
           </div>
         </div>
         <div v-show="video.readMore" class="help-item__more-info">
@@ -52,7 +52,7 @@
             <a @click="showMoreInfo(idx)">Read More</a>
           </div>
           <div class="help-item__thumbnail" @click="openVideo(video.link)">
-            <img :src="video.image">
+            <img :src="require(`../../../media/images/yt-thumbnails/${video.image}`)">
           </div>
         </div>
         <div v-show="video.readMore" class="help-item__more-info">
@@ -74,7 +74,7 @@
 <script lang="ts" src="./Help.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .help-page {
   .padding(3);
@@ -161,7 +161,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, .16);
+    background-color: rgba(0, 0, 0, 0.16);
   }
 }
 
