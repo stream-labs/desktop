@@ -13,7 +13,7 @@
       class="tab-button"
       :class="{ active: page === 'Dashboard' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
+      <i class="icon-dashboard"/> <span class="tab-button__text">{{ $t('Dashboard') }}</span>
     </button>
     <button
       @click="navigateChatBot"
@@ -21,7 +21,7 @@
       v-if="featureIsEnabled(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-community"/> <span>{{ $t('Chatbot') }}</span>
+      <i class="icon-community"/> <span class="tab-button__text">{{ $t('Chatbot') }}</span>
     </button>
     <button
       v-if="appStoreVisible"
@@ -29,7 +29,7 @@
       class="tab-button"
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-store"/> <span>{{ $t('App Store') }}</span>
+      <i class="icon-store"/> <span class="tab-button__text">{{ $t('App Store') }}</span>
       <span class="badge badge--new">{{ $t('New') }}</span>
     </button>
     <button
@@ -37,21 +37,21 @@
       class="tab-button"
       :class="{ 'is-active': page === 'BrowseOverlays' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-themes"/> <span>{{ $t('Themes') }}</span>
+      <i class="icon-themes"/> <span class="tab-button__text">{{ $t('Themes') }}</span>
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
       :class="{ 'is-active': page === 'Studio' }"
       :disabled="locked">
-      <i class="icon-studio"/> <span>{{ $t('Editor') }}</span>
+      <i class="icon-studio"/> <span class="tab-button__text">{{ $t('Editor') }}</span>
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
       :class="{ 'is-active': page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-live-dashboard"/> <span>{{ $t('Live') }}</span>
+      <i class="icon-live-dashboard"/> <span class="tab-button__text">{{ $t('Live') }}</span>
     </button>
   </div>
 
@@ -157,6 +157,14 @@
   text-align: right;
   justify-content: flex-end;
   align-items: center;
+}
+
+.tab-button__text {
+  display: none;
+
+  @media (min-width: 1280px) {
+    display: inline;
+  }
 }
 
 .link {
