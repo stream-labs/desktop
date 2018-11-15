@@ -30,6 +30,7 @@
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span>{{ $t('App Store') }}</span>
+      <span class="badge badge--new">{{ $t('New') }}</span>
     </button>
     <button
       @click="navigateOverlays"
@@ -101,7 +102,7 @@
 <script lang="ts" src="./TopNav.vue.ts"></script>
 
 <style lang="less">
-@import "../styles/index";
+@import '../styles/index';
 
 .top-nav-item {
   .margin-left(2);
@@ -117,9 +118,9 @@
   }
 
   &.top-nav-item--active {
-    >a {
-      >i,
-      >span {
+    > a {
+      > i,
+      > span {
         color: @teal;
       }
     }
@@ -128,14 +129,14 @@
 </style>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 .top-nav {
   display: flex;
   flex-direction: row;
   align-items: center;
   .padding-h-sides(2);
   position: relative;
-  max-width:  none;
+  max-width: none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 48px;
@@ -208,6 +209,24 @@
   left: -2px;
 }
 
+.badge {
+  .radius();
+  font-size: 12px;
+  margin: 0 0 0 8px;
+  padding: 0 4px;
+  text-transform: capitalize;
+  vertical-align: text-bottom;
+  border: 1px solid transparent;
+  line-height: 16px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.badge--new {
+  background: rgba(135, 54, 224, 0.08);
+  color: #8736e0;
+}
+
 .night-theme {
   .top-nav {
     background-color: @night-primary;
@@ -233,7 +252,7 @@
   }
 
   .theme-toggle__bg {
-    background-color: rgba(255, 255, 255, .2);
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .theme-toggle__icon--moon {
@@ -242,6 +261,11 @@
 
   .theme-toggle__icon--sun {
     display: none;
+  }
+
+  .badge--new {
+    background: #8736e0;
+    color: #ffffff;
   }
 }
 </style>
