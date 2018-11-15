@@ -18,6 +18,7 @@ import {
   VideoEncodingOptimizationService,
   IEncoderPreset
 } from 'services/video-encoding-optimizations';
+import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -73,6 +74,13 @@ export default class EditStreamInfo extends Vue {
     options: []
   };
 
+  pageModel: IObsListInput<string> = {
+    name: 'stream_page',
+    description: $t('Facebook Page'),
+    value: '',
+    options: []
+  };
+
   doNotShowAgainModel: IObsInput<boolean> = {
     name: 'do_not_show_again',
     description: $t('Do not show this message when going live'),
@@ -81,16 +89,19 @@ export default class EditStreamInfo extends Vue {
 
   encoderProfile: IMultiSelectProfiles;
 
+  facebookPages: IStreamlabsFacebookPages;
+
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
 
-  created() {
+  async created() {
     this.debouncedGameSearch = debounce(
       (search: string) => this.onGameSearchChange(search),
       500
     );
 
     if (this.streamInfoService.state.channelInfo) {
+      this.facebookPages = await this.fetchFacebookPages();
       this.populateModels();
     } else {
       // If the stream info pre-fetch failed, we should try again now
@@ -107,6 +118,10 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
+    this.pageModel.value = this.facebookPages.page_id;
+    this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
+      { value: page.id, description: `${page.name} | ${page.category}` }
+    ));
     this.loadAvailableProfiles();
   }
 
@@ -234,6 +249,10 @@ export default class EditStreamInfo extends Vue {
     return this.userService.platform.type === 'mixer';
   }
 
+  get isFacebook() {
+    return this.userService.platform.type === 'facebook';
+  }
+
   get submitText() {
     if (this.midStreamMode) return 'Update';
 
@@ -250,6 +269,14 @@ export default class EditStreamInfo extends Vue {
 
   get infoError() {
     return this.streamInfoService.state.error;
+  }
+
+  fetchFacebookPages() {
+    return this.userService.getFacebookPages();
+  }
+
+  setFacebookPageId(model: IObsListInput<string>) {
+    this.userService.postFacebookPage(model.value);
   }
 
   get profiles() {
