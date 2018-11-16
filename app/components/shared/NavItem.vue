@@ -17,30 +17,26 @@
 .nav-item {
   cursor: pointer;
   list-style: none;
-  border-left: 4px solid transparent;
-  padding: 8px 0 8px 36px;
-  opacity: 0.7;
+  color: @text-secondary;
+  padding: 12px 0 12px 36px;
   font-size: 16px;
-  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
   &.active {
     opacity: 1;
-    background: @bg-secondary;
-    .semibold;
-    border-color: @text-primary;
     color: @text-primary;
+    background: @padding-color;
+    .semibold;
 
     i {
-      color: @text-primary;
+       color: @text-primary;
     }
   }
 
-  &:hover {
-    opacity: 1;
-    background: @bg-secondary;
+  &:not(.active):hover {
+    background: @padding-color;
   }
 
   &.disabled {
