@@ -21,9 +21,9 @@ export default class AlertLayoutInput extends BaseInput<string, IListMetadata<st
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
     return [
-      { description: `./media/images/alert-box/layout-bottom-${nightMode}.png`, value: 'above'},
-      { description: `./media/images/alert-box/layout-over-${nightMode}.png`, value: 'banner'},
-      { description: `./media/images/alert-box/layout-side-${nightMode}.png`, value: 'side' }
+      { description: require(`../../../../media/images/alert-box/layout-bottom-${nightMode}.png`), value: 'above'},
+      { description: require(`../../../../media/images/alert-box/layout-over-${nightMode}.png`), value: 'banner'},
+      { description: require(`../../../../media/images/alert-box/layout-side-${nightMode}.png`), value: 'side' }
     ];
   }
 
