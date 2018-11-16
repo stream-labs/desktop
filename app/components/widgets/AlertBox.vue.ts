@@ -35,6 +35,11 @@ const triggerAmountMap = {
   raids: 'raid_raider_minimum'
 };
 
+const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids'];
+const HAS_DONOR_MESSAGE = [
+  'donations', 'bits', 'subs', 'merch', 'patreon', 'extraLife', 'donordrive', 'justGiving', 'tiltify', 'treat'
+];
+
 @Component({
   components: {
     WidgetEditor,
@@ -93,10 +98,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
       { value: 'media', label: $t('Media') },
       { value: 'animation', label: $t('Animation') }
     ];
-    if (this.selectedVariation.settings.message) {
+    if (HAS_DONOR_MESSAGE.includes(this.selectedAlert)) {
       baseItems.push({ value: 'message', label: $t('Donor Message') })
     }
-    if (['donations', 'bits', 'hosts', 'raids'].includes(this.selectedAlert) || this.selectedId !== 'default') {
+    if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId !== 'default') {
       baseItems.push({ value: 'alert', label: $t('Alert Settings') })
     }
     return baseItems;
