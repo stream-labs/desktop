@@ -33,6 +33,13 @@
         <li>{{ $t('If none of these worked, lower your bitrate') }}</li>
       </ul>
 
+      <div class="inline-controls">
+        <p v-if="isStreaming">
+          {{ $t('Stop streaming to access these controls:')}}
+        </p>
+        <GenericFormGroups v-model="streamingSettings" @input="saveStreamingSettings" />
+        <GenericFormGroups v-model="outputSettings" @input="saveOutputSettings" />
+      </div>
     </div>
 
 
@@ -99,14 +106,35 @@
 <script lang="ts" src="./Troubleshooter.vue.ts"></script>
 
 <style lang="less" scoped>
-  @import "../../styles/index";
+@import '../../styles/index';
 
-  .fa-warning {
-    color: @red;
+.fa-warning {
+  color: @red;
+}
+
+p,
+ul {
+  margin-bottom: 15px;
+}
+
+.inline-controls /deep/ .section-title {
+  display: none;
+}
+
+.inline-controls /deep/ .section-content--opened {
+  margin-top: 0;
+}
+
+.inline-controls /deep/ .input-container {
+  display: block;
+
+  .input-label {
+    margin-bottom: 8px;
   }
 
-  p, ul {
-    margin-bottom: 15px;
+  .input-wrapper,
+  .int-input {
+    width: 100%;
   }
-
+}
 </style>
