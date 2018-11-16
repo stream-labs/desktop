@@ -19,6 +19,7 @@ import {
   IEncoderPreset
 } from 'services/video-encoding-optimizations';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { shell } from 'electron';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -51,6 +52,7 @@ export default class EditStreamInfo extends Vue {
   areAvailableProfiles = false;
   useOptimizedProfile = false;
   isGenericProfiles = false;
+  hasPages = false;
 
   // Form Models:
 
@@ -94,14 +96,13 @@ export default class EditStreamInfo extends Vue {
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
 
-  async created() {
+  created() {
     this.debouncedGameSearch = debounce(
       (search: string) => this.onGameSearchChange(search),
       500
     );
 
     if (this.streamInfoService.state.channelInfo) {
-      this.facebookPages = await this.fetchFacebookPages();
       this.populateModels();
     } else {
       // If the stream info pre-fetch failed, we should try again now
@@ -109,7 +110,8 @@ export default class EditStreamInfo extends Vue {
     }
   }
 
-  populateModels() {
+  async populateModels() {
+    this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
     this.gameModel.options = [
@@ -119,9 +121,12 @@ export default class EditStreamInfo extends Vue {
       }
     ];
     this.pageModel.value = this.facebookPages.page_id;
-    this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
-      { value: page.id, description: `${page.name} | ${page.category}` }
-    ));
+    this.pageModel.options = this.facebookPages.pages
+      .filter((page: IStreamlabsFacebookPage) => ['Gaming Video Creator'].includes(page.category))
+      .map((page: IStreamlabsFacebookPage) => ({ value: page.id, description: `${page.name} | ${page.category}` }));
+
+    this.hasPages = !!this.facebookPages.pages.length;
+
     this.loadAvailableProfiles();
   }
 
@@ -277,6 +282,10 @@ export default class EditStreamInfo extends Vue {
 
   setFacebookPageId(model: IObsListInput<string>) {
     this.userService.postFacebookPage(model.value);
+  }
+
+  openFBPageCreateLink() {
+    shell.openExternal('https://www.facebook.com/pages/creation/')
   }
 
   get profiles() {

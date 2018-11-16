@@ -25,7 +25,16 @@
         :loading="searchingGames"
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
-      <ObsListInput v-if="isFacebook" :value="pageModel" @input="(pageId) => setFacebookPageId(pageId)" />
+      <div class="warning" v-if="isFacebook && !hasPages">
+        {{ $t('It looks like you don\'t have any Streaming Pages. Head to ') }}
+        <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        {{ $t(' to create a streaming-enabled page, and then logging out and back in to see that page.') }}
+      </div>
+      <ObsListInput
+        v-if="isFacebook && hasPages && !midStreamMode"
+        :value="pageModel"
+        @input="(pageId) => setFacebookPageId(pageId)"
+      />
       <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
@@ -96,7 +105,7 @@
     </button>
     <button
       class="button button--action"
-      :disabled="updatingInfo"
+      :disabled="updatingInfo || (isFacebook && !hasPages)"
       @click="updateAndGoLive">
       <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" />
       {{ submitText }}
