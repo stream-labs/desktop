@@ -123,7 +123,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (this.prefabsService.getPrefab(this.inspectedSource as string)) {
+    if (this.prefabsService.getPrefab(this.inspectedSource)) {
       this.selectPrefab(this.inspectedSource as string)
     } else if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
       this.selectSource(this.inspectedSource as TSourceType);

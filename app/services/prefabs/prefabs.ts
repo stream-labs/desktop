@@ -17,6 +17,7 @@ import Vue from 'vue';
 
 interface IPrefabSourceCreateOptions {
   name: string,
+  description?: string,
   type: TSourceType,
   settings: Dictionary<TObsValue>,
   createOptions: ISourceCreateOptions,
@@ -61,24 +62,25 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
     const source = this.sourcesService.getSource(sourceId);
     return this.registerSourcePrefab({
       type: source.type,
-      name: name,
+      name,
+      description,
       settings: source.getSettings(),
       createOptions: {
         propertiesManager: source.getPropertiesManagerType(),
         propertiesManagerSettings: source.getPropertiesManagerSettings()
       }
-    }, description);
+    });
   }
 
   /**
    * register a single-source prefab
    */
-  registerSourcePrefab(prefabSourceModel: IPrefabSourceCreateOptions, description = '') {
+  registerSourcePrefab(prefabSourceModel: IPrefabSourceCreateOptions) {
     const id = uuid();
     const prefabModel: IPrefab = {
       id,
       name: prefabSourceModel.name,
-      description,
+      description: prefabSourceModel.description,
       type: 'source',
       sources: {
         [id]: {
@@ -110,6 +112,16 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
 
   removePrefabs() {
     this.getPrefabs().forEach(prefab => this.removePrefab(prefab.id));
+  }
+
+  /**
+   * @deprecated
+   * only for the brand-device onboarding
+   */
+  addPrefabToActiveScene(prefabName: string) {
+    const prefab = this.getPrefabs().find(prefab => prefab.name == prefabName);
+    if (!prefab) return;
+    prefab.addToScene(this.scenesService.activeSceneId);
   }
 
   @mutation()

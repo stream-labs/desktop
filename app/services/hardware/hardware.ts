@@ -4,8 +4,8 @@ import uuid from 'uuid/v4';
 
 export enum EDeviceType {
   audioInput = 'audioInput',
-  audioOutput = 'audioInput',
-  videoInput = 'audioInput'
+  audioOutput = 'audioOutput',
+  videoInput = 'videoInput'
 }
 
 export interface IDevice {
