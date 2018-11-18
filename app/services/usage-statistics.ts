@@ -5,7 +5,8 @@ import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, handleErrors } from 'util/requests';
+import { Debounce } from 'lodash-decorators';
 
 export type TUsageEvent =
   'stream_start' |
@@ -22,6 +23,18 @@ interface IUsageApiData {
   data: string;
 }
 
+type TAnalyticsEvent = 'TCP_API_REQUEST'; // add more types if you need
+
+interface IAnalyticsEvent {
+  product: string;
+  version: number;
+  event: string;
+  value?: any;
+  time?: string;
+  count?: number;
+  uuid?: string;
+  saveUser?: boolean;
+}
 
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -43,6 +56,8 @@ export class UsageStatisticsService extends Service {
 
   installerId: string;
   version = electron.remote.process.env.SLOBS_VERSION;
+
+  private anaiticsEvents: IAnalyticsEvent[] = [];
 
   init() {
     this.loadInstallerId();
@@ -114,4 +129,30 @@ export class UsageStatisticsService extends Service {
     return fetch(request);
   }
 
+  recordAnalyticsEvent(event: string, value: any) {
+    this.anaiticsEvents.push({
+      event,
+      value,
+      product: 'SLOBS',
+      version: this.version,
+      count: 1
+    });
+    this.sendAnalytics();
+  }
+
+  @Debounce(2 * 60 * 1000)
+  private sendAnalytics() {
+    const data = { analyticsTokens: [ ...this.anaiticsEvents ] };
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    this.anaiticsEvents.length = 0;
+
+    const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/analytics/slobs/ping`, {
+      method: 'post',
+      headers: authorizedHeaders(this.userService.apiToken),
+      body: JSON.stringify(data || {})
+    });
+    fetch(request).then(handleErrors);
+  }
 }
