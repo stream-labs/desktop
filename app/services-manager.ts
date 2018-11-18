@@ -1,11 +1,12 @@
 import electron from 'electron';
 import uuid from 'uuid/v4';
-import { Service } from './services/service';
-import { AutoConfigService } from './services/auto-config';
-import { ObsImporterService } from './services/obs-importer';
-import { YoutubeService } from './services/platforms/youtube';
-import { TwitchService } from './services/platforms/twitch';
-import { MixerService } from './services/platforms/mixer';
+import { Service } from 'services/service';
+import { AutoConfigService } from 'services/auto-config';
+import { ObsImporterService } from 'services/obs-importer';
+import { YoutubeService } from 'services/platforms/youtube';
+import { TwitchService } from 'services/platforms/twitch';
+import { MixerService } from 'services/platforms/mixer';
+import { FacebookService } from 'services/platforms/facebook';
 import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
@@ -74,7 +75,6 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
 import { FacemasksService } from 'services/facemasks';
-import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
@@ -97,6 +97,7 @@ import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 import { SubGoalService } from 'services/widgets/settings/sub-goal';
 import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
+import { AlertBoxService }from 'services/widgets/settings/alert-box';
 
 const { ipcRenderer } = electron;
 
@@ -111,6 +112,7 @@ export class ServicesManager extends Service {
     YoutubeService,
     TwitchService,
     MixerService,
+    FacebookService,
     ScenesService,
     SceneItemNode,
     SceneItem,
@@ -173,7 +175,6 @@ export class ServicesManager extends Service {
     MediaBackupService,
     WebsocketService,
     FacemasksService,
-    ProfanityFilterService,
     I18nService,
     OutageNotificationsService,
     BitGoalService,
@@ -194,6 +195,7 @@ export class ServicesManager extends Service {
     IncrementalRolloutService,
     AnnouncementsService,
     MediaShareService,
+    AlertBoxService,
     ChatbotWidgetService,
     BrandDeviceService,
     ObsUserPluginsService

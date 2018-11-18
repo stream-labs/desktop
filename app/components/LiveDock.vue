@@ -58,7 +58,7 @@
         <div class="live-dock-platform-tools">
           <a
             @click="showEditStreamInfo"
-            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
             v-tooltip="editStreamInfoTooltip">
             <i class="icon-edit" />
           </a>
@@ -88,11 +88,13 @@
               :metadata="chatAppsListMetadata"
             />
           </div>
-          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+            {{ $t('Refresh Chat') }}
+          </a>
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
+      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
         <chat :style="defaultChatStyles" ref="chat" />
         <PlatformAppWebview
           v-for="app in chatApps"
@@ -117,7 +119,7 @@
 <script lang="ts" src="./LiveDock.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .live-dock {
   position: relative;
@@ -137,7 +139,7 @@
   }
 
   &.collapsed {
-    width: 20px!important;
+    width: 20px !important;
     padding: 0;
   }
 
@@ -159,7 +161,7 @@
   }
 
   i {
-    font-size: 6px;
+    font-size: 10px;
   }
 }
 
@@ -282,7 +284,6 @@
 .live-dock-platform-app-webview {
   .flex--grow();
 }
-
 
 .night-theme {
   .live-dock {

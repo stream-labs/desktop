@@ -72,6 +72,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   userLogin = new Subject<IPlatformAuth>();
+  userLogout = new Subject();
 
   init() {
     super.init();
@@ -275,8 +276,37 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
     this.LOGOUT();
+    this.userLogout.next();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.platformAppsService.unloadApps();
+  }
+
+  getFacebookPages() {
+    if (this.platform.type !== 'facebook') return;
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  postFacebookPage(pageId: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(
+      url,
+      { headers, method: 'POST', body: JSON.stringify({ page_id: pageId, page_type: 'page' }) }
+    );
+    try {
+      fetch(request);
+    } catch {
+      console.error(new Error('Could not set Facebook page'));
+    }
   }
 
   /**

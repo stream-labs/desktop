@@ -4,10 +4,12 @@ import emojione from 'emojione';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
 import { Component } from 'vue-property-decorator';
+import { NavigationService, TAppPage } from 'services/navigation';
 
 @Component({})
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
+  @Inject() navigationService: NavigationService;
 
   proceessingClose = false;
 
@@ -31,6 +33,10 @@ export default class NewsBanner extends Vue {
   }
 
   followLink() {
-    shell.openExternal(this.currentBanner.link);
+    if (this.currentBanner.link_target === 'slobs') {
+      this.navigationService.navigate(this.currentBanner.link as TAppPage);
+    } else {
+      shell.openExternal(this.currentBanner.link);
+    }
   }
 }

@@ -15,10 +15,8 @@ import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
-import { ProfanityFilterService } from 'util/profanity';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from 'services/streaming';
-const notificationAudio = require('../../media/sound/facemask4.wav');
 
 interface IFacemasksServiceState {
   device: IInputDeviceSelection;
@@ -43,13 +41,6 @@ interface IFacemask {
   is_intro: boolean;
 }
 
-interface IProfanitySettings {
-  profanity_custom_words: string;
-  profanity_default_words: boolean;
-  profanity_mode: number;
-  profanity_names: boolean;
-}
-
 interface IFacemaskSettings {
   enabled: boolean;
   facemasks: IFacemask[];
@@ -65,6 +56,11 @@ interface IFacemaskAlertMessage {
   message: string;
 }
 
+interface IFacemaskDonation {
+  eventId: string;
+  facemask: string;
+}
+
 interface IDownloadProgress {
   uuid: string;
   progress: number;
@@ -74,17 +70,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() websocketService: WebsocketService;
-  @Inject() profanityFilterService: ProfanityFilterService;
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() streamingService: StreamingService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
-  queue: IFacemaskAlertMessage[] = [];
-  playing = false;
-  interval: number = null;
   facemaskFilter: obs.IFilter = null;
   socketConnectionActive = false;
+
+  registeredDonations = {};
 
   settings: IFacemaskSettings = {
     enabled: false,
@@ -99,17 +93,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   downloadProgress: IDownloadProgress[] = [];
 
-  profanitySettings: IProfanitySettings = {
-    profanity_custom_words: '',
-    profanity_default_words: true,
-    profanity_mode: 1,
-    profanity_names: true,
-  };
-
   static defaultState: IFacemasksServiceState = {
     device: { name: null, value: null },
     modtimeMap: {},
-    active: false
+    active: false,
   };
 
   init() {
@@ -172,9 +159,23 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.sourcesService.sourceAdded.subscribe(e => this.onSourceAdded(e));
   }
 
+  registerDonationEvent(donation: IFacemaskDonation) {
+    this.registeredDonations[donation.eventId] = donation.facemask;
+  }
+
+  playDonationEvent(donation: IFacemaskDonation) {
+    if (this.registeredDonations[donation.eventId] && this.facemaskFilter) {
+      delete this.registeredDonations[donation.eventId];
+      this.trigger(donation.facemask);
+    }
+  }
+
   onSocketEvent(event: TSocketEvent) {
-    if (event.type === 'donation' && event.message[0].facemask) {
-      this.enqueueAlert(event.message[0]);
+    if (event.type === 'facemaskdonation') {
+      this.registerDonationEvent({ facemask: event.message[0].facemask, eventId: event.message[0]._id });
+    }
+    if (event.type === 'alertPlaying' && event.message.facemask) {
+      this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
     }
   }
 
@@ -184,145 +185,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  playAlerts() {
-    if (!this.playing && this.queue.length) {
-      this.playing = true;
-      this.playQueuedAlert();
-      this.interval = window.setInterval(() => this.playQueuedAlert(), (this.settings.duration * 1000) + 2000);
-    }
-  }
-
-  playQueuedAlert() {
-    if (this.queue.length && this.facemaskFilter) {
-      const alert = this.queue.shift();
-      this.trigger(alert.facemask, alert.message, alert.name, alert.formattedAmount);
-    } else {
-      this.playing = false;
-      clearInterval(this.interval);
-    }
-  }
-
-  playTestAudio(volume: number) {
-    const alertSound = new Audio(notificationAudio);
-    alertSound.volume = volume / 100;
-
-    alertSound.play();
-  }
-
-  playAudio() {
-    const alertSound = new Audio(notificationAudio);
-    alertSound.volume = this.settings.audio_volume / 100;
-
-    alertSound.play();
-  }
-
-  enqueueAlert(message: IFacemaskAlertMessage) {
-    this.queue.push(message);
-    this.playAlerts();
-  }
-
-  trigger(mask: string, message: string, name: string, formattedAmount: string) {
-    const clean = this.profanitize(message, name);
+  trigger(mask: string) {
     this.updateFilter({
       Mask: `${mask}.json`,
-      alertText: clean['message'],
-      donorName: `${clean['name']} donated ${formattedAmount}`,
       alertActivate: true
     });
-    this.playAudio();
     setTimeout(() => {
       this.facemaskFilter.update({ alertActivate: false });
-    }, 1000);
+    }, 500);
   }
 
   updateFilter(settings: Dictionary<TObsValue>) {
     if (this.facemaskFilter) this.facemaskFilter.update(settings);
-  }
-
-  playTestAlert() {
-    if (this.active && this.socketConnectionActive) {
-      const availableMasks = Object.keys(this.state.modtimeMap).filter(uuid  => {
-        return this.settings.facemasks.some(mask => mask.uuid === uuid) && !this.state.modtimeMap[uuid].intro;
-      });
-
-
-      if (availableMasks.length) {
-        const testMask = availableMasks[Math.floor(Math.random() * availableMasks.length)];
-        this.enqueueAlert({
-          name: 'Streamlabs',
-          formattedAmount: '$10.00',
-          facemask: testMask,
-          message: 'This is a test Face Mask donation alert'
-        });
-      }
-    }
-  }
-
-  profanitize(message: string, name: string) {
-    const custom_words_list = this.profanitySettings.profanity_custom_words.trim();
-    const custom_words = custom_words_list.length ? custom_words_list.replace(/\s\s+/g, ' ').split(' ') : [];
-    const custom_words_regex = custom_words.length ? this.profanityFilterService.getListRegex(custom_words) : null;
-
-    let hasProfanity = false;
-
-    try {
-      if (this.profanitySettings.profanity_names) {
-        const namePres = this.profanityFilterService.processString(name, {
-          extraRegex: custom_words_regex,
-          useDefaultRegex: this.profanitySettings.profanity_default_words,
-          isName: true,
-        });
-
-        name = namePres[0];
-      }
-
-      // Replace bad word characters with *
-      if (this.profanitySettings.profanity_mode === 1) {
-        const pres = this.profanityFilterService.processString(message, {
-          extraRegex: custom_words_regex,
-          useDefaultRegex: this.profanitySettings.profanity_default_words,
-          replace: false,
-        });
-        message = pres[0];
-        hasProfanity = pres[1];
-      // Replace bad words with happy words
-      } else if (this.profanitySettings.profanity_mode === 2) {
-        const pres = this.profanityFilterService.processString(message, {
-          extraRegex: custom_words_regex,
-          useDefaultRegex: this.profanitySettings.profanity_default_words,
-          replace: true,
-        });
-        message = pres[0];
-        hasProfanity = pres[1];
-      // Clear message if any profanity present
-      } else if (this.profanitySettings.profanity_mode === 3 || this.profanitySettings.profanity_mode === 4) {
-        const pres = this.profanityFilterService.processString(message, {
-          extraRegex: custom_words_regex,
-          useDefaultRegex: this.profanitySettings.profanity_default_words,
-          replace: false,
-        });
-
-        if (pres[1]) {
-          message = '';
-          hasProfanity = true;
-        }
-      }
-    } catch (ex) {
-      return { profanity: hasProfanity, message, from: 'Anonymous', name: 'Anonymous' };
-    }
-
-    return { profanity: hasProfanity, message, from: name, name };
-  }
-
-  configureProfanityFilter() {
-    this.fetchProfanityFilterSettings().then(response => {
-      this.profanitySettings = {
-        profanity_custom_words: response.settings.profanity_custom_words,
-        profanity_default_words: response.settings.profanity_default_words,
-        profanity_mode: parseInt(response.settings.profanity_mode, 10),
-        profanity_names: response.settings.profanity_names,
-      };
-    });
   }
 
   getInputDevicesList() {
@@ -363,7 +237,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   checkFacemaskSettings(settings:IFacemaskSettings) {
     this.settings = settings;
     if (settings.enabled) {
-      this.configureProfanityFilter();
       const uuids = settings.facemasks.map((mask: IFacemask) => {
         return { uuid: mask.uuid, intro: mask.is_intro };
       });
@@ -497,7 +370,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         }
       }
     } else {
-      this.SET_ACTIVE(false);
+      this.facemaskFilter = null;
     }
   }
 

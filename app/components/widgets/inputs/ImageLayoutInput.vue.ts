@@ -15,8 +15,8 @@ export default class ImageLayoutInput extends BaseInput<string, IListMetadata<st
   readonly metadata: IListMetadata<string>;
 
   layoutOptions = [
-    { description: './media/images/layout-image-side.png', value: 'side' },
-    { description: './media/images/layout-image-above.png', value: 'above'}
+    { description: require('../../../../media/images/layout-image-side.png'), value: 'side' },
+    { description: require('../../../../media/images/layout-image-above.png'), value: 'above'}
   ];
 
   get meta(): IListMetadata<string> {

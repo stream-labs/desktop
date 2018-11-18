@@ -28,6 +28,7 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -73,6 +74,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
 
@@ -113,6 +115,7 @@ export class AppService extends StatefulService<IAppState> {
 
     this.facemasksService;
 
+    this.incrementalRolloutService;
     this.shortcutsService;
     this.streamlabelsService;
 
@@ -145,17 +148,17 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
-      obs.NodeObs.OBS_Volmeter_ReleaseVolmeters();
-      obs.NodeObs.OBS_Fader_ReleaseFaders();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
-      this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_Volmeter_ReleaseVolmeters();
+      obs.NodeObs.OBS_Fader_ReleaseFaders();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
       obs.IPC.disconnect();
+      this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

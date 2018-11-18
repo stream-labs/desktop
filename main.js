@@ -20,10 +20,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const { Updater } = require('./updater/Updater.js');
+const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
+const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 const pid = require('process').pid;
@@ -35,6 +36,17 @@ if (process.argv.includes('--clearCacheDir')) {
 }
 
 app.disableHardwareAcceleration();
+
+/* Determine the current release channel we're
+ * on based on name. The channel will always be
+ * the premajor identifier, if it exists.
+ * Otherwise, default to latest. */
+const releaseChannel = (() => {
+  const components = semver.prerelease(pjson.version);
+
+  if (components) return components[0];
+  return 'latest';
+})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -66,7 +78,6 @@ let shutdownStarted = false;
 let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
-
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -317,7 +328,27 @@ if (shouldQuit) {
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    (new Updater(startApp)).run();
+    const updateInfo = {
+      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      version: pjson.version,
+      exec: process.argv,
+      cwd: process.cwd(),
+      waitPids: [ process.pid ],
+      appDir: path.dirname(app.getPath('exe')),
+      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
+      versionFileName: `${releaseChannel}.json`
+    };
+
+    log(updateInfo);
+    bootstrap(updateInfo).then((updating) => {
+      if (updating) {
+        log('Closing for update...');
+        app.exit();
+      } else {
+        startApp();
+      }
+    });
   } else {
     startApp();
   }
