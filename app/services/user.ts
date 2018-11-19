@@ -209,12 +209,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
-  appStoreUrl() {
+  appStoreUrl(appId?: string) {
     const host = this.hostsService.platform;
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    let url = `https://${host}/slobs-store`;
 
-    return `https://${host}/slobs-store?token=${token}&mode=${nightMode}`;
+    if (appId) {
+      url = `${url}/app/${appId}`;
+    }
+
+    return `${url}?token=${token}&mode=${nightMode}`;
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {

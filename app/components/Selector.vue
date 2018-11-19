@@ -37,8 +37,7 @@
 }
 
 .sortable-drag {
-  border: 1px solid #ddd;
-  background-color: #eee;
+  border-color: @day-input-border;
 }
 
 .selector-list {
@@ -52,16 +51,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  .padding-h-sides();
+  .padding-h-sides(2);
+  line-height: 30px;
   cursor: pointer;
   justify-content: space-between;
   color: @day-paragraph;
   .transition();
+  border: 1px solid transparent;
 
   &.selector-item--active {
-    background-color: @light-2;
+    background-color: @light-3;
     color: @day-title;
     .weight(@medium);
 
@@ -101,14 +100,18 @@
 .night-theme {
   .sortable-ghost,
   .sortable-chosen {
-    background: @night-hover;
+    background: @dark-4;
+  }
+
+  .sortable-drag {
+    border-color: @night-input-border;
   }
 
   .selector-item {
     color: @grey;
 
     &.selector-item--active {
-      background-color: @night-hover;
+      background-color: @dark-4;
       color: @white;
     }
   }

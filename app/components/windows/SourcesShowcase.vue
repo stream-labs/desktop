@@ -85,7 +85,7 @@
       v-if="inspectedSource === null">
       <div class="source-welcome">
         <div class="source-info__text">
-          <h3>{{ $t('Welcome to sources!') }}</h3>
+          <h2>{{ $t('Welcome to sources!') }}</h2>
           <ol>
             <li>{{ $t('Browse through our Standard and Widget sources') }}</li>
             <li>{{ $t('Click a source to get more details about it') }}</li>
@@ -101,7 +101,7 @@
 
     <div class="sources" :class="{'sources--has-platform-apps' : showAppSources}">
       <div class="source-group">
-        <h2>{{ $t('Standard') }}</h2>
+        <h3>{{ $t('Standard') }}</h3>
         <ul class="source-list">
           <li
             v-for="source in availableSources"
@@ -116,7 +116,7 @@
       </div>
 
       <div class="source-group" v-if="loggedIn">
-        <h2>{{ $t('Widgets') }}</h2>
+        <h3>{{ $t('Widgets') }}</h3>
         <div class="source-list">
           <div
             v-for="type in iterableWidgetTypes"
@@ -142,7 +142,7 @@
       </div>
 
       <div class="source-group" v-if="showAppSources">
-        <h2>{{ $t('Apps') }}</h2>
+        <h3>{{ $t('Apps') }}</h3>
         <ul class="source-list">
           <li
             v-for="appSource in availableAppSources"
@@ -182,8 +182,8 @@
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
-  flex: 0 0 210px;
-  height: 210px;
+  flex: 0 0 225px;
+  height: 225px;
   align-items: flex-start;
 }
 
@@ -212,31 +212,18 @@ h2 {
 .source-welcome {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   width: 100%;
 }
 
 .sources {
   .padding(2);
-  display: flex;
-  flex: 1 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 16px;
+}
 
-  &.sources--has-platform-apps {
-    .source-group {
-      flex: 0 0 33%;
-    }
-  }
-
-  .source-group {
-    margin: -16px 0px -16px 0px;
-    padding: 16px 16px 16px 0;
-    flex: 0 0 50%;
-
-    &:last-child {
-      padding: 16px 0 16px 16px;
-      border-right: none;
-    }
-  }
+.sources--has-platform-apps {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .source-list {
@@ -262,15 +249,20 @@ h2 {
   background-color: @day-section;
   width: 49%;
   .radius();
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
 
   &:hover,
   &.source--active {
     color: @day-title;
     .weight(@medium);
-    background-color: @light-2;
+    background-color: @light-3;
   }
 
-  >div {
+  > div {
     white-space: nowrap;
     text-overflow: ellipsis;
     max-width: 100%;

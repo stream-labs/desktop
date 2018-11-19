@@ -5,7 +5,7 @@ import fs from 'fs';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions } from './api/modules/module';
+import { EApiPermissions, IWebviewTransform } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
@@ -16,6 +16,8 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;
 
@@ -98,6 +100,7 @@ export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
+  beta: boolean;
   appToken: string;
   poppedOutSlots: EAppPageSlot[];
   appPath?: string;
@@ -144,9 +147,14 @@ export class PlatformAppsService extends
 
   private localStorageKey = 'PlatformAppsUnpacked';
 
-  apiManager = new PlatformAppsApi();
+  // Lazy initialize the API
+  private _apiManager: PlatformAppsApi;
+  private get apiManager() {
+    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
+    return this._apiManager;
+  }
 
-  devServer: DevServer;
+  private devServer: DevServer;
 
   /**
    * Using initialize because it needs to be async
@@ -194,14 +202,20 @@ export class PlatformAppsService extends
    * Install production apps
    */
   async installProductionApps() {
+    if (this.userService.platform.type !== 'twitch') return;
+
     const productionApps = await this.fetchProductionApps();
+
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
+
       const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
+
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
+        beta: app.is_beta,
         appUrl: app.cdn_url,
         appToken: app.app_token,
         poppedOutSlots: [],
@@ -268,6 +282,7 @@ export class PlatformAppsService extends
       id,
       manifest,
       unpacked: true,
+      beta: false,
       appPath,
       appToken,
       devPort: DEV_PORT,
@@ -472,9 +487,21 @@ export class PlatformAppsService extends
     });
   }
 
-  exposeAppApi(appId: string, webContentsId: number) {
+  exposeAppApi(
+    appId: string,
+    webContentsId: number,
+    electronWindowId: number,
+    slobsWindowId: string,
+    transformSubjectId: string
+  ) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app);
+    const api = this.apiManager.getApi(
+      app,
+      webContentsId,
+      electronWindowId,
+      slobsWindowId,
+      this.getTransformSubject(transformSubjectId)
+    );
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
@@ -705,6 +732,30 @@ export class PlatformAppsService extends
       this.appUnload.next(appId);
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
+  }
+
+  /* These functions exist primary to work around our n window
+   * system because rxjs subjects are not serializable
+   */
+
+  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
+
+  createTransformSubject(initial: IWebviewTransform) {
+    const id = uuid();
+    this.transformSubjects[id] = new BehaviorSubject(initial);
+    return id;
+  }
+
+  getTransformSubject(id: string) {
+    return this.transformSubjects[id];
+  }
+
+  removeTransformSubject(id: string) {
+    delete this.transformSubjects[id];
+  }
+
+  nextTransformSubject(id: string, value: IWebviewTransform) {
+    this.transformSubjects[id].next(value);
   }
 
   /**

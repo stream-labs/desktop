@@ -1,9 +1,12 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/Subscription';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { IWebviewTransform } from 'services/platform-apps/api/modules/module';
+import Utils from 'services/utils';
 
 @Component({})
 export default class PlatformAppWebview extends Vue {
@@ -11,16 +14,35 @@ export default class PlatformAppWebview extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Prop() appId: string;
   @Prop() pageSlot: EAppPageSlot;
+  @Prop() poppedOut: boolean;
+  @Prop({ default: true }) visible: boolean;
 
   $refs: {
     appView: Electron.WebviewTag;
+    resizeContainer: HTMLDivElement;
   }
 
   reloadSub: Subscription;
 
   renderWebview = true;
 
+  transformSubjectId: string;
+
+  resizeInterval: number;
+
   mounted() {
+    this.transformSubjectId = this.platformAppsService.createTransformSubject({
+      pos: { x: 0, y: 0 },
+      size: { x: 0, y: 0 },
+      visible: this.visible
+    });
+
+    this.checkResize();
+
+    this.resizeInterval = window.setInterval(() => {
+      this.checkResize();
+    }, 500);
+
     this.attachWebviewListeners();
 
     this.reloadSub = this.platformAppsService.appReload.subscribe((appId) => {
@@ -56,18 +78,35 @@ export default class PlatformAppWebview extends Vue {
       // is destroyed and it is replaced with another one.
       const webContents = this.$refs.appView.getWebContents();
 
-      this.platformAppsService.exposeAppApi(this.appId, webContents.id);
+      this.platformAppsService.exposeAppApi(
+        this.appId,
+        webContents.id,
+        electron.remote.getCurrentWindow().id,
+        Utils.getCurrentUrlParams().windowId,
+        this.transformSubjectId
+      );
 
       /**
        * This has to be done from the main process to work properly
        * @see https://github.com/electron/electron/issues/1378
        */
       electron.ipcRenderer.send('webContents-preventNavigation', webContents.id);
+
+      // We allow opening dev tools for beta apps only
+      if (app.beta) {
+        webContents.on('before-input-event', (e, input) => {
+          if ((input.type === 'keyDown') && (input.code === 'KeyI') && input.control && input.shift) {
+            this.$refs.appView.openDevTools();
+          }
+        });
+      }
     });
   }
 
   destroyed() {
     this.reloadSub.unsubscribe();
+    if (this.resizeInterval) clearInterval(this.resizeInterval);
+    this.platformAppsService.removeTransformSubject(this.transformSubjectId);
   }
 
   get appUrl() {
@@ -79,6 +118,45 @@ export default class PlatformAppWebview extends Vue {
 
   get appPartition() {
     return this.platformAppsService.getAppPartition(this.appId);
+  }
+
+  get webviewStyles() {
+    if (this.visible) {
+      return {};
+    } else {
+      return {
+        position: 'absolute',
+        top: '-10000px'
+      };
+    }
+  }
+
+  currentPosition: IVec2;
+
+  checkResize() {
+    const rect = this.$refs.resizeContainer.getBoundingClientRect();
+
+    if (this.currentPosition == null ||
+      rect.left !== this.currentPosition.x ||
+      rect.top !== this.currentPosition.y) {
+
+      this.emitTransform();
+    }
+  }
+
+  @Watch('visible')
+  emitTransform() {
+    const rect = this.$refs.resizeContainer.getBoundingClientRect();
+    this.currentPosition = {
+      x: rect.left,
+      y: rect.top
+    };
+
+    this.platformAppsService.nextTransformSubject(this.transformSubjectId, {
+      pos: { x: rect.left, y: rect.top },
+      size: { x: rect.width, y: rect.height },
+      visible: this.visible
+    });
   }
 
 }

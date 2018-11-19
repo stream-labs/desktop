@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
-import { $t, I18nService } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 
 @Component({
   components: { ModalLayout }
@@ -17,7 +17,7 @@ export default class RecentEvents extends Vue {
   };
 
   mounted() {
-    this.i18nService.setWebviewLocale(this.$refs.webview);
+    I18nService.setWebviewLocale(this.$refs.webview);
   }
 
   get recentEventsUrl() {

@@ -61,6 +61,21 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     I18nService.vueI18nInstance = instance;
   }
 
+  static setWebviewLocale(webview: Electron.WebviewTag) {
+    // use a static method here because it allows to accept unserializable arguments like webview from other windows
+    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
+    const locale = i18nService.state.locale;
+    webview.addEventListener('dom-ready', () => {
+      webview.executeJavaScript(`
+        var langCode = $.cookie('langCode');
+        if (langCode !== '${locale}') {
+           $.cookie('langCode', '${locale}');
+           window.location.reload();
+        }
+      `);
+    });
+  }
+
   private availableLocales: Dictionary<string> = {};
   private loadedDictionaries: Dictionary<Dictionary<string>> = {};
   private isLoaded = false;
@@ -127,19 +142,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     this.SET_LOCALE(locale);
     electron.remote.app.relaunch();
     electron.remote.app.quit();
-  }
-
-  setWebviewLocale(webview: Electron.WebviewTag) {
-    const locale = this.state.locale;
-    webview.addEventListener('dom-ready', () => {
-      webview.executeJavaScript(`
-        var langCode = $.cookie('langCode');
-        if (langCode !== '${locale}') {
-           $.cookie('langCode', '${locale}');
-           window.location.reload();
-        }
-      `);
-    });
   }
 
   getLocaleFormData(): TObsFormData {

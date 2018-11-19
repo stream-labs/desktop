@@ -1,9 +1,9 @@
 <template>
-<div class="container">
+<div class="widget-layout-picker">
   <div
     v-for="option in metadata.options"
     :key="option.value"
-    class="image-container radius"
+    class="widget-layout-picker__option"
     :class="[value === option.value ? 'active' : '']"
     @click="emitInput(option.value)"
   >
@@ -17,26 +17,23 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 
-.container {
+.widget-layout-picker {
   width: 100%;
   max-width: 370px;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat( auto-fit, 64px);
+  grid-column-gap: 8px;
 }
 
-.image-container {
-  width: 56px;
-  height: 56px;
-  border: 1px solid @day-input-border;
-  margin: 2px;
+.widget-layout-picker__option {
+  width: 64px;
+  height: 64px;
+  border: 1px solid @day-solid-input;
+  background-color: @day-solid-input;
   .transition();
   position: relative;
   .radius();
-
-  &:hover {
-    border-color: @teal-light-opac;
-    cursor: pointer;
-  }
+  cursor: pointer;
 
   img {
     height: 48px;
@@ -48,20 +45,19 @@
   }
 
   &.active {
-    background-color: @teal-light-opac;
-    border-color: @teal-med-opac;
+    background-color: @dark-2;
+    border-color: @dark-2
   }
 }
 
 .night-theme {
-  .image-container {
+  .widget-layout-picker__option {
     border-color: @night-border;
+    background-color: @night-solid-input;
 
-    &:hover {
-      border-color: @teal-light-opac;
-    }
     &.active {
-      border-color: @teal-med-opac;
+      background-color: @dark-2;
+      border-color: @dark-2
     }
   }
 }
