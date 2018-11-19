@@ -9,6 +9,7 @@ import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { Inject } from 'util/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import { FacemasksService } from 'services/facemasks';
 
 const alertNameMap = () => ({
   bits: $t('Bits'),
@@ -25,7 +26,8 @@ const alertNameMap = () => ({
   treat: $t('TreatStream'),
   follows: $t('Follows'),
   hosts: $t('Hosts'),
-  raids: $t('Raids')
+  raids: $t('Raids'),
+  facemasks: $t('Facemask Donations'),
 });
 
 const triggerAmountMap = {
@@ -50,6 +52,7 @@ const HAS_DONOR_MESSAGE = [
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
+  @Inject() facemasksService: FacemasksService;
 
   $refs: { [key: string]: HTMLElement };
 
@@ -179,5 +182,15 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   nameBlurHandler(id: string) {
     this.save();
     this.editingName = null;
+  }
+
+  handleFacemaskInput() {
+    if (this.selectedAlert === 'facemasks') {
+      const { duration } = this.selectedVariation;
+      const { enabled } = this.wData.settings.facemasks;
+      this.facemasksService.updateFacemaskSettings({ duration, enabled });
+    } else {
+      this.save();
+    }
   }
 }
