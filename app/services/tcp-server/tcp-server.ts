@@ -15,6 +15,7 @@ import {
   IJsonRpcResponse
 } from 'services/jsonrpc';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
+import { UsageStatisticsService } from '../usage-statistics';
 
 const net = require('net');
 
@@ -62,6 +63,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   };
 
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
   private servicesManager: ServicesManager = ServicesManager.instance;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
@@ -341,6 +343,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
+        this.usageStatisticsService.recordAnalyticsEvent('TCP_API_REQUEST', request);
 
         const errorMessage = this.validateRequest(request);
 
