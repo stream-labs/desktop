@@ -10,8 +10,26 @@
   <validated-form slot="categories-properties" @input="save()" v-if="loaded">
     <button @click="addCategory()">{{ $t('Add Category') }}</button>
     <button @click="clearCategories()">{{ $t('Clear All') }}</button>
-    <v-form-group v-for="category in wData.settings.categories">
+    <v-form-group :title="$t('Categories')">
+      <div v-for="category in wData.settings.categories">
+        <text-input v-model="category.prize" /><color-input v-model="category.color" /><i class="icon-close" />
+      </div>
     </v-form-group>
+  </validated-form>
+
+  <validated-form slot="section-properties" @input="save()" v-if="loaded">
+  </validated-form>
+
+  <validated-form slot="font-properties" @input="save()" v-if="loaded">
+  </validated-form>
+
+  <validated-form slot="border-properties" @input="save()" v-if="loaded">
+  </validated-form>
+
+  <validated-form slot="ticker-properties" @input="save()" v-if="loaded">
+  </validated-form>
+
+  <validated-form slot="image-properties" @input="save()" v-if="loaded">
   </validated-form>
 </widget-editor>
 </template>
