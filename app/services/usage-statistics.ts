@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleErrors } from 'util/requests';
-import { Debounce } from 'lodash-decorators';
+import { Throttle } from 'lodash-decorators';
 
 export type TUsageEvent =
   'stream_start' |
@@ -140,7 +140,7 @@ export class UsageStatisticsService extends Service {
     this.sendAnalytics();
   }
 
-  @Debounce(2 * 60 * 1000)
+  @Throttle(2 * 60 * 1000)
   private sendAnalytics() {
     const data = { analyticsTokens: [ ...this.anaiticsEvents ] };
     const headers = authorizedHeaders(this.userService.apiToken);
