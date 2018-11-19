@@ -122,7 +122,6 @@ export default class EditStreamInfo extends Vue {
     ];
     this.pageModel.value = this.facebookPages.page_id;
     this.pageModel.options = this.facebookPages.pages
-      .filter((page: IStreamlabsFacebookPage) => ['Gaming Video Creator'].includes(page.category))
       .map((page: IStreamlabsFacebookPage) => ({ value: page.id, description: `${page.name} | ${page.category}` }));
 
     this.hasPages = !!this.facebookPages.pages.length;
@@ -216,6 +215,18 @@ export default class EditStreamInfo extends Vue {
           this.updateError = true;
           this.updatingInfo = false;
         }
+      })
+      .catch((e) => {
+        this.$toasted.show(
+          e,
+          {
+            position: 'bottom-center',
+            className: 'toast-alert',
+            duration: 1000,
+            singleton: true
+          }
+        );
+        this.updatingInfo = false;
       });
 
     if (this.areAvailableProfiles && this.useOptimizedProfile) {
@@ -226,9 +237,9 @@ export default class EditStreamInfo extends Vue {
   }
 
   goLive() {
-    this.streamingService.startStreaming();
-    this.navigationService.navigate('Live');
-    this.windowsService.closeChildWindow();
+      this.streamingService.startStreaming();
+      this.navigationService.navigate('Live');
+      this.windowsService.closeChildWindow();
   }
 
   cancel() {
@@ -285,7 +296,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   openFBPageCreateLink() {
-    shell.openExternal('https://www.facebook.com/gaming/pages/create')
+    shell.openExternal('https://www.facebook.com/pages/creation/')
   }
 
   get profiles() {

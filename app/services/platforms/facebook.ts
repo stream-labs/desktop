@@ -173,7 +173,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
         return;
-      });
+      })
   }
 
   fetchViewerCount(): Promise<number> {
@@ -187,9 +187,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fbGoLive() {
-    return new Promise((resolve) => (
-      this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve()
-    ));
+    return new Promise((resolve, reject) => (
+      this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve()));
   }
 
   putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {

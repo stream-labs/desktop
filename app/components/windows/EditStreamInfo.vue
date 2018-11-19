@@ -84,7 +84,7 @@
           </div>
         </div>
       </div>
-      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
+      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode && !isFacebook"/>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}

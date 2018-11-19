@@ -94,6 +94,9 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
+    if (this.userService.platform.type === 'facebook' && game === '') {
+      return Promise.reject('You must select a game.');
+    }
 
     return platform.putChannelInfo({ title, game, description }).then(success => {
       this.refreshStreamInfo();
