@@ -1,6 +1,7 @@
 import * as inputs from './inputs';
 import { Validator } from 'vee-validate';
 import { $t } from 'services/i18n';
+import { cloneDeep } from 'lodash';
 
 export const inputComponents = inputs;
 
@@ -17,6 +18,9 @@ export enum EInputType {
   code = 'code',
   file = 'file',
   timer = 'timer',
+  toggle = 'toggle',
+  mediaGallery = 'mediaGallery',
+  sound = 'sound',
 }
 
 /**
@@ -30,6 +34,7 @@ export interface IInputMetadata {
   tooltip?: string;
   disabled?: boolean;
   uuid?: string;
+  name?: string;
 }
 
 export interface INumberMetadata extends IInputMetadata {
@@ -66,10 +71,11 @@ export interface IListOption<TValue> {
   value: TValue;
   title: string;
   description?: string;
+  options?: { label: string, value: string }[];
 }
 
 export interface IMediaGalleryMetadata extends IInputMetadata {
-  clearImage: string;
+  clearImage?: string;
   filter?: 'audio' | 'image';
 }
 
@@ -78,8 +84,7 @@ export interface IFileMetadata extends IInputMetadata {
   directory?: boolean;
 }
 
-
-// a helper for creating metadata
+// a helper for creating metadata for inputs
 export const metadata = {
   timer: (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata),
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
@@ -89,11 +94,32 @@ export const metadata = {
   color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),
   slider: (options: ISliderMetadata) => ({ type: EInputType.slider, ...options } as ISliderMetadata),
   textArea: (options: ITextMetadata) => ({ type: EInputType.textArea, ...options } as ITextMetadata),
-  fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
+  fontSize: (options: INumberMetadata) => ({ type: EInputType.fontSize, ...options } as INumberMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
   file: (options: IFileMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
+  toggle: (options: IInputMetadata) => ({ type: EInputType.toggle, ...options } as IInputMetadata),
+  mediaGallery: (options: IMediaGalleryMetadata) => (
+    { type: EInputType.mediaGallery, ...options } as IMediaGalleryMetadata
+  ),
+  sound: (options: IMediaGalleryMetadata) => (
+    { type: EInputType.sound, ...options } as IMediaGalleryMetadata
+  ),
 };
+
+// a helper for creating metadata for forms
+export function formMetadata<TMetadataType extends Dictionary<IInputMetadata>>
+(inputsMetadata: TMetadataType): TMetadataType {
+
+  // setup object key as a name property
+  const formMetadata = cloneDeep(inputsMetadata);
+  Object.keys(inputsMetadata).forEach((key) => {
+    if (formMetadata[key]['name']) return;
+    formMetadata[key]['name'] = key;
+  });
+
+  return formMetadata;
+}
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html
 const validationMessages = {

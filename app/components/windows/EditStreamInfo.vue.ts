@@ -17,6 +17,7 @@ import { $t } from 'services/i18n';
 import { VideoEncodingOptimizationService, IEncoderProfile } from 'services/video-encoding-optimizations';
 import { IListMetadata } from 'components/shared/inputs';
 import FormInput from 'components/shared/inputs/FormInput.vue';
+import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 
 @Component({
   components: {
@@ -66,6 +67,13 @@ export default class EditStreamInfo extends Vue {
     options: []
   };
 
+  pageModel: IObsListInput<string> = {
+    name: 'stream_page',
+    description: $t('Facebook Page'),
+    value: '',
+    options: []
+  };
+
   doNotShowAgainModel: IObsInput<boolean> = {
     name: 'do_not_show_again',
     description: $t('Do not show this message when going live'),
@@ -74,8 +82,11 @@ export default class EditStreamInfo extends Vue {
 
   encoderPresets: IEncoderProfile[] = [];
 
+  facebookPages: IStreamlabsFacebookPages;
+
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
+
 
   get isGenericProfiles() {
     return this.encoderPresets.length && this.encoderPresets[0].game == 'Generic';
@@ -86,16 +97,17 @@ export default class EditStreamInfo extends Vue {
   }
 
   get selectedPreset() {
-    return this.encoderPresets.find(preset => preset.preset === this.selectedPresetType);
+    return this.encoderPresets.find(preset => preset.presetIn === this.selectedPresetType);
   }
 
-  created() {
+  async created() {
     this.debouncedGameSearch = debounce(
       (search: string) => this.onGameSearchChange(search),
       500
     );
 
     if (this.streamInfoService.state.channelInfo) {
+      this.facebookPages = await this.fetchFacebookPages();
       this.populateModels();
     } else {
       // If the stream info pre-fetch failed, we should try again now
@@ -112,6 +124,10 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
+    this.pageModel.value = this.facebookPages.page_id;
+    this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
+      { value: page.id, description: `${page.name} | ${page.category}` }
+    ));
     this.loadAvailableProfiles();
   }
 
@@ -141,14 +157,14 @@ export default class EditStreamInfo extends Vue {
     if (this.midStreamMode) return;
     this.encoderPresets = [];
     this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
-    this.selectedPresetType = this.encoderPresets[0] && this.encoderPresets[0].preset || '';
+    this.selectedPresetType = this.encoderPresets[0] && this.encoderPresets[0].presetIn || '';
   }
 
   get presetInputMetadata(): IListMetadata<string> {
     let options = this.encoderPresets.map((preset, index) => {
       return {
-        value: preset.preset,
-        title: `${preset.game} ${preset.encoder} (${preset.preset})`
+        value: preset.presetIn,
+        title: `${preset.game} ${preset.encoder} (${preset.presetIn})`
       }
     });
     return { options };
@@ -222,6 +238,10 @@ export default class EditStreamInfo extends Vue {
     return this.userService.platform.type === 'mixer';
   }
 
+  get isFacebook() {
+    return this.userService.platform.type === 'facebook';
+  }
+
   get submitText() {
     if (this.midStreamMode) return 'Update';
 
@@ -239,4 +259,13 @@ export default class EditStreamInfo extends Vue {
   get infoError() {
     return this.streamInfoService.state.error;
   }
+
+  fetchFacebookPages() {
+    return this.userService.getFacebookPages();
+  }
+
+  setFacebookPageId(model: IObsListInput<string>) {
+    this.userService.postFacebookPage(model.value);
+  }
+
 }

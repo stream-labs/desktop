@@ -5,7 +5,8 @@ export interface IEncoderProfile {
   encoder: EEncoder;
   bitrateMin: number;
   bitrateMax: number;
-  preset: string;
+  presetIn: string;
+  presetOut: string;
   resolutionIn: string;
   resolutionOut: string;
   options: string;

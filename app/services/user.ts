@@ -19,6 +19,7 @@ import {
 import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
@@ -71,6 +72,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   userLogin = new Subject<IPlatformAuth>();
+  userLogout = new Subject();
 
   init() {
     super.init();
@@ -89,9 +91,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      async (e: Electron.Event, auth: any) => {
-        this.LOGIN(auth);
-        await this.sceneCollectionsService.setupNewUser();
+      async (e: Electron.Event, auth: IPlatformAuth) => {
+        const service = getPlatformService(auth.platform.type);
+        this.login(service, auth);
       }
     );
   }
@@ -258,15 +260,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-    this.userLogin.next(auth);
     this.setRavenContext();
     service.setupStreamSettings(auth);
+    this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
   }
 
+  @RunInLoadingMode()
   async logOut() {
     // Attempt to sync scense before logging out
-    this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
     // signs out of chatbot
@@ -274,9 +276,37 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
     this.LOGOUT();
+    this.userLogout.next();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
-    this.appService.finishLoading();
     this.platformAppsService.unloadApps();
+  }
+
+  getFacebookPages() {
+    if (this.platform.type !== 'facebook') return;
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  postFacebookPage(pageId: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(
+      url,
+      { headers, method: 'POST', body: JSON.stringify({ page_id: pageId, page_type: 'page' }) }
+    );
+    try {
+      fetch(request);
+    } catch {
+      console.error(new Error('Could not set Facebook page'));
+    }
   }
 
   /**

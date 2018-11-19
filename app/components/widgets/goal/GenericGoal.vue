@@ -14,7 +14,7 @@
 
     <div v-else>
       <div class="section__body" v-if="requestState !== 'pending'">
-        <validated-form ref="form">
+        <validated-form ref="form" name="new-goal-form">
           <v-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
           <v-form-group v-model="goalCreateOptions.goal_amount" :metadata="metadata.goal_amount"/>
           <v-form-group v-model="goalCreateOptions.manual_goal_amount" :metadata="metadata.manual_goal_amount"/>
@@ -28,26 +28,15 @@
     </div>
   </validated-form>
 
-
-  <validated-form slot="visual-properties" v-if="loaded" @input="save()">
-    <v-form-group type="list" :title="$t('Layout')" v-model="wData.settings.layout" :metadata="metadata.layout"/>
-    <v-form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
-    <v-form-group type="color" :title="$t('Bar Color')" v-model="wData.settings.bar_color"/>
-    <v-form-group type="color" :title="$t('Bar Background Color')" v-model="wData.settings.bar_bg_color"/>
-    <v-form-group type="color" :title="$t('Text Color')" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
-    <v-form-group type="color" :title="$t('Bar Text Color')" v-model="wData.settings.bar_text_color"/>
-    <v-form-group
-        type="slider"
-        :title="$t('Bar Thickness')"
-        v-model="wData.settings.bar_thickness"
-        :metadata="metadata.bar_thickness"
-    />
-    <v-form-group
-      :title="$t('Font Family')"
-      type="fontFamily"
-      v-model="wData.settings.font"
-      :metadata="{ tooltip: fontFamilyTooltip }"
-    />
+  <validated-form slot="visual-properties" name="visual-properties-form" v-if="loaded" @input="save()">
+    <v-form-group v-model="wData.settings.layout" :metadata="metadata.layout"/>
+    <v-form-group v-model="wData.settings.background_color" :metadata="metadata.background_color"/>
+    <v-form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
+    <v-form-group v-model="wData.settings.bar_bg_color" :metadata="metadata.bar_bg_color"/>
+    <v-form-group v-model="wData.settings.text_color" :metadata="metadata.text_color"/>
+    <v-form-group v-model="wData.settings.bar_text_color" :metadata="metadata.bar_text_color"/>
+    <v-form-group v-model="wData.settings.bar_thickness" :metadata="metadata.bar_thickness"/>
+    <v-form-group v-model="wData.settings.font" :metadata="metadata.font"/>
   </validated-form>
 
 

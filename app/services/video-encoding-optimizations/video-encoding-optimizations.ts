@@ -70,13 +70,13 @@ export class VideoEncodingOptimizationService extends Service {
   async fetchGameProfiles(game: string): Promise<IEncoderProfile[]> {
 
     // try to fetch game-specific profile
-    let profiles: IEncoderProfile[] = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game}`))
+    let profiles: IEncoderProfile[] = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game.toUpperCase()}`))
       .then(handleErrors)
       .then(camelize);
 
     // if no game-specific profile found then fetch generic profiles
     if (!profiles.length) {
-      profiles = await fetch(this.urlService.getStreamlabsApi('gamepresets/Generic'))
+      profiles = await fetch(this.urlService.getStreamlabsApi('gamepresets/DEFAULT'))
         .then(handleErrors)
         .then(camelize);
     }
@@ -86,10 +86,10 @@ export class VideoEncodingOptimizationService extends Service {
     return profiles.filter(profile => {
       return (
         profile.encoder === settings.encoder &&
-        profile.resolutionIn == settings.inputResolution &&
-        profile.resolutionOut == settings.outputResolution &&
+        profile.resolutionIn == settings.outputResolution,
         profile.bitrateMax >= settings.bitrate &&
-        profile.bitrateMin <= settings.bitrate
+        profile.bitrateMin <= settings.bitrate &&
+        profile.presetIn == settings.preset
       )
     });
   }
@@ -98,11 +98,10 @@ export class VideoEncodingOptimizationService extends Service {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
     this.streamEncoderSettingsService.setSettings({
       outputResolution: encoderProfile.resolutionOut,
-      inputResolution: encoderProfile.resolutionIn,
       encoder: encoderProfile.encoder,
       mode: 'Advanced',
       encoderOptions: encoderProfile.options,
-      preset: encoderProfile.preset
+      preset: encoderProfile.presetOut
     });
     this.isUsingEncodingOptimizations = true;
   }

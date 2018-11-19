@@ -1,9 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { Multiselect } from 'vue-multiselect';
-import { IInputMetadata, IListOption } from '../../shared/inputs';
+import { IInputMetadata } from '../../shared/inputs';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { IAnimationMetadata } from './index'
+import { $t } from 'services/i18n';
 
 
 const COMMON_ANIMATIONS = [
@@ -37,6 +37,17 @@ const OUT_ANIMATIONS = [
   'slideOutDown', 'slideOutLeft', 'slideOutRight', 'slideOutUp'
 ];
 
+const textAnimations = () => ([
+  { title: $t('None'), value: '' },
+  { title: $t('Bounce'), value: 'bounce' },
+  { title: $t('Pulse'), value: 'pulse' },
+  { title: $t('Rubber Band'), value: 'rubberBand' },
+  { title: $t('Tada'), value: 'tada' },
+  { title: $t('Wave'), value: 'wave' },
+  { title: $t('Wiggle'), value: 'wiggle' },
+  { title: $t('Wobble'), value: 'wobble' }
+]);
+
 
 @Component({
   components: { ListInput }
@@ -64,6 +75,10 @@ export default class AnimationInput extends BaseInput<string, IAnimationMetadata
       animations.push(...OUT_ANIMATIONS);
     } else {
       animations.push( ...IN_ANIMATIONS, ...OUT_ANIMATIONS);
+    }
+
+    if (this.options.filter === 'text') {
+      return { ...this.options, options: textAnimations() };
     }
 
     return {
