@@ -129,7 +129,7 @@ export class UsageStatisticsService extends Service {
     return fetch(request);
   }
 
-  recordAnalyticsEvent(event: string, value: any) {
+  recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
     this.anaiticsEvents.push({
       event,
       value,
