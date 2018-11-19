@@ -304,6 +304,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       .then(response => response.json());
   }
 
+  updateFacemaskSettings(settingsData: Partial<IFacemaskSettings>) {
+    return;
+  }
+
   fetchInstallUpdate(uuid:string) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
