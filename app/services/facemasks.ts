@@ -329,6 +329,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
+  updateFacemaskSettings(settingsData: Partial<IFacemaskSettings>) {
+    return;
+  }
+
   fetchProfanityFilterSettings() {
     return this.formRequest('slobs/widget/settings?widget=donation_page');
   }

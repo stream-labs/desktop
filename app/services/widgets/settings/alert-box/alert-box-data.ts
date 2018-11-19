@@ -30,6 +30,7 @@ export const API_NAME_MAP = {
   support: 'support',
   like: 'likes',
   star: 'stars',
+  facemaskdonation: 'facemasks',
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
