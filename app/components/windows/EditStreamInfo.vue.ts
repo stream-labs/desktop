@@ -124,10 +124,12 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
-    this.pageModel.value = this.facebookPages.page_id;
-    this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
-      { value: page.id, description: `${page.name} | ${page.category}` }
-    ));
+    if (this.facebookPages) {
+      this.pageModel.value = this.facebookPages.page_id;
+      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
+        { value: page.id, description: `${page.name} | ${page.category}` }
+      ));
+    }
     this.loadAvailableProfiles();
   }
 
@@ -158,6 +160,7 @@ export default class EditStreamInfo extends Vue {
     this.encoderPresets = [];
     this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
     this.selectedPresetType = this.encoderPresets[0] && this.encoderPresets[0].presetIn || '';
+    console.log('loaded', this.encoderPresets);
   }
 
   get presetInputMetadata(): IListMetadata<string> {
