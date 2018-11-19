@@ -29,7 +29,10 @@
 .hotkey {
   display: flex;
   flex-direction: row;
-  margin-bottom: 20px;
+
+  & + & {
+    margin-top: 20px;
+  }
 }
 
 .Hotkey-description {

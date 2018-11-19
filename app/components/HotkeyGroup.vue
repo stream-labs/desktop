@@ -13,9 +13,7 @@
       {{ title }}
     </h4>
   </div>
-  <div v-for="hotkey in hotkeys">
-    <hotkey v-show="!collapsed" :hotkey="hotkey" />
-  </div>
+  <hotkey v-for="hotkey in hotkeys" v-show="!collapsed" :hotkey="hotkey" />
 </div>
 </template>
 
