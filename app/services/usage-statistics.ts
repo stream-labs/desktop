@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleErrors } from 'util/requests';
-import { Debounce } from 'lodash-decorators';
+import { Throttle } from 'lodash-decorators';
 
 export type TUsageEvent =
   'stream_start' |
@@ -129,18 +129,19 @@ export class UsageStatisticsService extends Service {
     return fetch(request);
   }
 
-  recordAnalyticsEvent(event: string, value: any) {
+  recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
     this.anaiticsEvents.push({
       event,
       value,
       product: 'SLOBS',
       version: this.version,
-      count: 1
+      count: 1,
+      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : void 0
     });
     this.sendAnalytics();
   }
 
-  @Debounce(2 * 60 * 1000)
+  @Throttle(2 * 60 * 1000)
   private sendAnalytics() {
     const data = { analyticsTokens: [ ...this.anaiticsEvents ] };
     const headers = authorizedHeaders(this.userService.apiToken);
