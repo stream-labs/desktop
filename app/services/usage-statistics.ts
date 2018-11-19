@@ -135,7 +135,8 @@ export class UsageStatisticsService extends Service {
       value,
       product: 'SLOBS',
       version: this.version,
-      count: 1
+      count: 1,
+      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : void 0
     });
     this.sendAnalytics();
   }
