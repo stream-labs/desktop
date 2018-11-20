@@ -40,6 +40,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0 2px;
   color: @text-primary;
   background-color: @bg-primary;
 }
@@ -57,6 +58,7 @@
   height: 100%;
   padding: 16px;
   overflow: auto;
+  background-color: @padding-color;
 
   &.bareContent {
     padding: 0;
@@ -73,7 +75,7 @@
 
 .modal-layout-controls {
   background-color: @bg-primary;
-  box-shadow: 0 -5px 10px 2px #2F3340;
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
   padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;

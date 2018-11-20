@@ -184,7 +184,7 @@
 
 .source-info {
   padding: 0 20px;
-  background-color: @bg-primary;
+  background-color: @padding-color;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

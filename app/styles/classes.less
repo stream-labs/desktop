@@ -44,11 +44,11 @@
 }
 
 .section {
-  padding: 16px 16px 0;
-  margin-bottom: 16px;
-  border-bottom: 2px solid @bg-secondary;
+  padding: 16px;
+  border-bottom: 1px solid @bg-primary;
+  background-color: @padding-color;
   &:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
   }
 
   .button {
@@ -58,12 +58,14 @@
 
 .section-title--dropdown {
   h4 {
-    margin-bottom: 16px;
     cursor: pointer;
+    margin-bottom: 0;
   }
 }
 
 .section-content--dropdown {
+  margin-top: 16px;
+  
   > div {
     div {
       &:last-child {

@@ -51,6 +51,8 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .settings {
   display: flex;
   align-content: stretch;
@@ -67,6 +69,7 @@
   flex-grow: 1;
   margin: 0;
   overflow-y: auto;
+  background-color: @padding-color;
 }
 </style>
 

@@ -13,8 +13,11 @@
       {{ title }}
     </h4>
   </div>
-  <div v-for="hotkey in hotkeys">
-    <hotkey v-show="!collapsed" :hotkey="hotkey" />
+  <div
+      v-show="!collapsed"
+      class="section-content section-content--dropdown"
+  >
+    <hotkey v-for="hotkey in hotkeys" :hotkey="hotkey" />
   </div>
 </div>
 </template>

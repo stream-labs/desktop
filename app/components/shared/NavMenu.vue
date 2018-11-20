@@ -14,7 +14,7 @@
   flex: 0 0 220px;
   display: flex;
   flex-direction: column;
-  padding-top: 16px;
+  background-color: @bg-secondary;
 }
 
 </style>

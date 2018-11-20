@@ -22,8 +22,9 @@
   flex-direction: row;
   align-items: end;
   padding-top: 6px;
-  border-bottom: 1px solid @bg-secondary;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
   vertical-align: top;
+  z-index: 1;
 }
 
 .titlebar-icon {
