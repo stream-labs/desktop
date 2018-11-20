@@ -262,7 +262,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // device_id is unique for each PC
       // so we allow to provide a device name instead device id
       // resolve the device id by the device name here
-      if (!['device_id', 'video_device_id'].includes(propName)) return;
+      if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
       const device = this.hardwareService.getDeviceByName(settings[propName]);
       const deviceId = device ? device.id : settings[propName];
       resolvedSettings[propName] = deviceId
