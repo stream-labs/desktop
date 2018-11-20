@@ -296,7 +296,8 @@ export default class EditStreamInfo extends Vue {
   }
 
   openFBPageCreateLink() {
-    shell.openExternal('https://www.facebook.com/pages/creation/')
+    shell.openExternal('https://www.facebook.com/pages/creation/');
+    this.windowsService.closeChildWindow();
   }
 
   get profiles() {

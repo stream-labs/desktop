@@ -26,9 +26,9 @@
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
       <div class="warning" v-if="isFacebook && !hasPages">
-        {{ $t('It looks like you don\'t have any Streaming Pages. Head to ') }}
+        {{ $t('It looks like you don\'t have any Pages. Head to ') }}
         <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
-        {{ $t(' to create a streaming-enabled page, and then logging out and back in to see that page.') }}
+        {{ $t(' to create a page, and then trying again.') }}
       </div>
       <ObsListInput
         v-if="isFacebook && hasPages && !midStreamMode"
