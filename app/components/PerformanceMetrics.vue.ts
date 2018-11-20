@@ -7,6 +7,7 @@ import { SettingsService } from '../services/settings';
 import { Inject } from '../util/injector';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
+import { CustomizationService } from 'services/customization';
 
 @Component({})
 export default class PerformanceMetrics extends Vue {
@@ -15,6 +16,7 @@ export default class PerformanceMetrics extends Vue {
   @Inject() userService: UserService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() settingsService: SettingsService;
+  @Inject() customizationService: CustomizationService;
 
   visitorTooltip = $t('common.numberOfVisitors');
   commentTooltip = $t('common.numberOfComments');
@@ -36,6 +38,7 @@ export default class PerformanceMetrics extends Vue {
   }
 
   get frameRate() {
+    if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return this.performanceService.state.frameRate.toFixed(2);
   }
 
@@ -61,16 +64,19 @@ export default class PerformanceMetrics extends Vue {
   }
 
   get droppedFrames() {
+    if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return this.performanceService.state.numberDroppedFrames;
   }
 
   get percentDropped() {
+    if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return (this.performanceService.state.percentageDroppedFrames || 0).toFixed(
       1
     );
   }
 
   get bandwidth() {
+    if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return this.performanceService.state.bandwidth.toFixed(0);
   }
 

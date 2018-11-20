@@ -562,5 +562,6 @@
   "videoBitrate": "Video Bitrate (kbps)",
   "audioBitrate": "Audio Bitrate (kbps)",
   "keyframeInterval": "Keyframe Interval (in seconds)",
-  "encoderPreset": "Encoder Preset"
+  "encoderPreset": "Encoder Preset",
+  "pollingPerformanceStatistics": "activate performance statistics"
 }

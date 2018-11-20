@@ -562,5 +562,6 @@
   "videoBitrate": "映像ビットレート  (kbps)",
   "audioBitrate": "音声ビットレート  (kbps)",
   "keyframeInterval": "キーフレーム間隔(秒)",
-  "encoderPreset": "エンコーダープリセット"
+  "encoderPreset": "エンコーダープリセット",
+  "pollingPerformanceStatistics": "パフォーマンス統計情報を取得する"
 }

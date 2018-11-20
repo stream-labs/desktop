@@ -19,7 +19,7 @@
       <label>{{ $t('settings.cacheManagement')}}</label>
     </div>
     <p>{{ $t('settings.cacheClearDescription')}}</p>
-  
+
     <a class="button button--action" @click="showCacheDir">
       {{ $t('settings.showCacheDirectory')}}
     </a>
@@ -27,8 +27,7 @@
     <a class="button button--action" @click="deleteCacheDir">
       {{ $t('settings.deleteCacheAndRestart') }}
     </a>
- 
- 
+
     <div class="input-label">
       <label for="cacheId">{{ $t('settings.cacheId')}}</label>
     </div>
@@ -44,7 +43,12 @@
         </label>
         <button class="cacheid-copy" @click="copyToClipboard(cacheId);"><i class="icon-clipboard-copy"/>{{ $t('settings.cacheIdCopy')}}</button>
     </div>
+  </div>
 
+  <div class="section">
+    <BoolInput
+      :value="pollingPerformanceStatisticsModel"
+      @input="setPollingPerformanceStatistics" />
   </div>
 </div>
 </template>
