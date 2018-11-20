@@ -2,30 +2,32 @@ import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/wi
 import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
+import { $t } from 'services/i18n';
+import { metadata } from 'components/widgets/inputs';
 
 export interface ISpinWheelSettings extends IWidgetSettings {
-  borderColor: string;
+  resultColor: string;
+  resultTemplate: string;
+  rotationSpeed: number;
+  slowRate: number;
+  hideTimeout: number;
   categories: { color: string, prize: string }[];
+  sections: { category: number, weight: number }[];
+  font: string;
+  fontColor: string;
+  fontSize: number;
+  fontWeight: number;
+  labelText: { height: number, width: number };
+  innerBorderWidth: number;
+  outerBorderWidth: number;
+  borderColor: string;
+  ticker: { size: number, tone: string, url: string };
   centerImage: {
     border: { color: string, enabled: boolean, width: number },
     default: string,
     enabled: true,
     size: number
   };
-  font: string;
-  fontColor: string;
-  fontSize: number;
-  fontWeight: number;
-  hideTimeout: number;
-  innerBorderWidth: number;
-  labelText: { height: number, width: number };
-  outerBorderWidth: number;
-  resultColor: string;
-  resultTemplate: string;
-  rotationSpeed: number;
-  sections: { category: number, weight: number }[];
-  slowRate: number;
-  ticker: { size: number, tone: string, url: string };
 }
 
 export interface ISpinWheelData extends IWidgetData { settings: ISpinWheelSettings; }
@@ -45,5 +47,31 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
       customCodeAllowed: true,
       customFieldsAllowed: true
     }
+  }
+
+  getMetadata() {
+    return {
+      resultTemplate: metadata.textArea({ title: $t('Results Template') }),
+      resultColor: metadata.color({ title: $t('Results Color') }),
+      hideTimeout: metadata.slider({ title: $t('Hide Timeout'), min: 1, max: 100 }),
+      rotationSpeed: metadata.number({ title: $t('Rotation Speed') }),
+      slowRate: metadata.number({ title: $t('Slowdown Rate') }),
+      fontFamily: metadata.fontFamily({ title: $t('Font') }),
+      fontSize: metadata.fontSize({ title: $t('Font Size') }),
+      fontColor: metadata.color({ title: $t('Font Color') }),
+      fontWeight: metadata.slider({ title: $t('Font Weight'), min: 300, max: 900, interval: 100 }),
+      labelHeight: metadata.slider({ title: $t('Label Height'), min: 1, max: 100 }),
+      labelWidth: metadata.slider({ title: $t('Label Width'), min: 1, max: 100 }),
+      borderColor: metadata.color({ title: $t('Border Color') }),
+      tickerUrl: metadata.mediaGallery({ title: $t('Ticker Image') }),
+      tickerSize: metadata.slider({ title: $t('Ticker Size'), min: 1, max: 100 }),
+      tickerTone: metadata.sound({ title: $t('Ticker Tone') }),
+      centerEnabled: metadata.toggle({ title: $t('Center Image Enabled') }),
+      centerDefault: metadata.mediaGallery({ title: $t('Center Image') }),
+      centerSize: metadata.slider({ title: $t('Center Image Size'), min: 1, max: 100 }),
+      centerBorderEnabled: metadata.toggle({ title: $t('Center Image Border Enabled') }),
+      centerBorderColor: metadata.color({ title: $t('Center Image Border Color') }),
+      centerBorderWidth: metadata.slider({ title: $t('Center Image Border Width'), min: 1, max: 100 }),
+    };
   }
 }

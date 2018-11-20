@@ -390,41 +390,21 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
-    // show a custom component for widgets below
-    const widgetsWhitelist = [
-      WidgetType.BitGoal,
-      WidgetType.DonationGoal,
-      WidgetType.FollowerGoal,
-      WidgetType.ChatBox,
-      WidgetType.ViewerCount,
-      WidgetType.DonationTicker,
-      WidgetType.Credits,
-      WidgetType.EventList,
-      WidgetType.StreamBoss,
-      WidgetType.TipJar,
-      WidgetType.SubGoal,
-      WidgetType.MediaShare,
-      WidgetType.SponsorBanner,
-      WidgetType.AlertBox
-    ];
-
     if (isWidget && this.userService.isLoggedIn()) {
       const widgetType = source.getPropertiesManagerSettings().widgetType;
-      if (widgetsWhitelist.includes(widgetType)) {
-        const componentName = this.widgetsService.getWidgetComponent(widgetType);
+      const componentName = this.widgetsService.getWidgetComponent(widgetType);
 
-        this.windowsService.showWindow({
-          componentName,
-          title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
-          queryParams: { sourceId },
-          size: {
-            width: 900,
-            height: 1024
-          }
-        });
+      this.windowsService.showWindow({
+        componentName,
+        title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
+        queryParams: { sourceId },
+        size: {
+          width: 900,
+          height: 1024
+        }
+      });
 
-        return;
-      }
+      return;
     }
 
     // Figure out if we should redirect to settings

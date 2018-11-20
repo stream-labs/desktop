@@ -97,7 +97,8 @@ import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 import { SubGoalService } from 'services/widgets/settings/sub-goal';
 import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
-import { AlertBoxService }from 'services/widgets/settings/alert-box';
+import { AlertBoxService } from 'services/widgets/settings/alert-box';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 
 const { ipcRenderer } = electron;
 
@@ -189,6 +190,7 @@ export class ServicesManager extends Service {
     CreditsService,
     EventListService,
     TipJarService,
+    SpinWheelService,
     SponsorBannerService,
     SubGoalService,
     MediaGalleryService,
