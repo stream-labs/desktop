@@ -116,6 +116,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   populateModels() {
+    console.log('populate start');
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
     this.gameModel.options = [
@@ -130,6 +131,8 @@ export default class EditStreamInfo extends Vue {
         { value: page.id, description: `${page.name} | ${page.category}` }
       ));
     }
+
+    console.log('populate almost done');
     this.loadAvailableProfiles();
   }
 
@@ -156,10 +159,11 @@ export default class EditStreamInfo extends Vue {
   }
 
   async loadAvailableProfiles() {
+    console.log('load presets');
     if (this.midStreamMode) return;
     this.encoderPresets = [];
     this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
-    this.selectedPresetType = this.encoderPresets[0] && this.encoderPresets[0].presetIn || '';
+    this.selectedPresetType = (this.encoderPresets[0] && this.encoderPresets[0].presetIn) || '';
     console.log('loaded', this.encoderPresets);
   }
 

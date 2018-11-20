@@ -89,8 +89,8 @@ export class StreamEncoderSettingsService extends Service {
     const bitrate: number = this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate');
     const inputResolution: string = this.settingsService.findSettingValue(video, 'Untitled', 'Base');
-    const outputResolution: string = mode == 'Advanced' ?
-      this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') :
+    const outputResolution: string =
+      this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') ||
       this.settingsService.findSettingValue(video, 'Untitled', 'Output');
     const encoderOptions = this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'x264opts')

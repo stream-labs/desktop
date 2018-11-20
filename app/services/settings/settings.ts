@@ -14,10 +14,7 @@ import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
-import {
-  IOutputSettingsDeprecated,
-  VideoEncodingOptimizationService,
-} from '../video-encoding-optimizations';
+import { VideoEncodingOptimizationService, } from 'services/video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -193,7 +190,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       if (subCategory.nameSubCategory === category) {
         subCategory.parameters.find(param => {
           if (param.name === setting) {
-            settingValue = param.value || (param as IObsListInput<string>).options[0].value;
+            settingValue = param.value !== void 0 ? param.value : (param as IObsListInput<string>).options[0].value;
             return true;
           }
         });

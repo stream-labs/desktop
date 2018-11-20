@@ -1,1 +1,1 @@
-export * from './stream-ecnoder-settings';
+export * from './stream-encoder-settings';
