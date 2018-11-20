@@ -120,12 +120,14 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
-    this.pageModel.value = this.facebookPages.page_id;
-    this.pageModel.options = this.facebookPages.pages
-      .map((page: IStreamlabsFacebookPage) => ({ value: page.id, description: `${page.name} | ${page.category}` }));
 
-    this.hasPages = !!this.facebookPages.pages.length;
-
+    if (this.facebookPages) {
+      this.pageModel.value = this.facebookPages.page_id;
+      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
+        { value: page.id, description: `${page.name} | ${page.category}` }
+      ));
+      this.hasPages = !!this.facebookPages.pages.length;
+    }
     this.loadAvailableProfiles();
   }
 

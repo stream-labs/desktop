@@ -26,7 +26,7 @@ export default class PlatformAppStore extends Vue {
   };
 
   mounted() {
-    this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
+    this.$refs.appStoreWebview.addEventListener('did-finish-load', () => {
       if (Utils.isDevMode()) {
         this.$refs.appStoreWebview.openDevTools();
       }
