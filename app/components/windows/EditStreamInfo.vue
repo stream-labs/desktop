@@ -3,7 +3,7 @@
   :show-controls="false"
   :customControls="true">
   <div slot="content">
-    <div v-if="infoLoading">
+    <div v-if="infoLoading || populatingModels">
       <i class="fa fa-spinner fa-pulse" />
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
@@ -13,7 +13,7 @@
       <a @click="goLive">{{ $t('just go live.') }}</a>
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
-    <div v-if="!infoLoading && !infoError">
+    <div v-if="!infoLoading && !infoError && !populatingModels">
       <ObsTextInput v-model="streamTitleModel" />
       <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
       <ObsListInput

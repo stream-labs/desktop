@@ -53,6 +53,7 @@ export default class EditStreamInfo extends Vue {
   useOptimizedProfile = false;
   isGenericProfiles = false;
   hasPages = false;
+  populatingModels = false;
 
   // Form Models:
 
@@ -111,6 +112,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateModels() {
+    this.populatingModels = true;
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
@@ -129,6 +131,7 @@ export default class EditStreamInfo extends Vue {
       this.hasPages = !!this.facebookPages.pages.length;
     }
     this.loadAvailableProfiles();
+    this.populatingModels = false;
   }
 
   onGameSearchChange(searchString: string) {
