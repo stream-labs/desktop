@@ -173,7 +173,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
         return;
-      })
+      });
   }
 
   fetchViewerCount(): Promise<number> {
