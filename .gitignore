@@ -17,3 +17,4 @@ electron.VC.db
 .vs/
 plugins/
 yarn-error.log
+.opt-in
