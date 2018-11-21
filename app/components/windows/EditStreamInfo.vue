@@ -41,7 +41,7 @@
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use {{gameModel.value}} encoder settings</span></label>
+                <label><span>Use {{gameModel.value}} optimized encoder settings</span></label>
               </div>
               <div v-else>
                 <input
@@ -52,7 +52,7 @@
                   <span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
-                      :title="$t('Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends')">
+                      :title="$t('Optimized encoder gives equivalent quality while reducing usage.')">
                     </i>
                   </span>
                 </label>

@@ -1,13 +1,12 @@
-import { Service } from 'services/service';
-import { SettingsService, StreamEncoderSettingsService } from 'services/settings';
+import { QUALITY_ORDER, SettingsService, StreamEncoderSettingsService } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
 import { IEncoderProfile } from './definitions';
 import { cloneDeep } from 'lodash';
 import { camelize, handleErrors } from '../../util/requests';
 import { UrlService } from '../hosts';
-import { mutation, StatefulService } from '../stateful-service';
-import { PersistentStatefulService } from '../persistent-stateful-service';
+import { mutation } from 'services/stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
 
 export * from './definitions';
 
@@ -32,11 +31,16 @@ export * from './definitions';
  We're also doing some resolution switching
  */
 
+export enum EPresetType {
+  HIGH_PRERFORMANCE = 0,
+  HIGH_QUALITY = 1
+}
+
 interface IVideoEncodingOptimizationServiceState {
   useOptimizedProfile: boolean,
   lastLoadedGame: string,
   lastLoadedProfiles: IEncoderProfile[],
-  lastSelectedPreset: string;
+  lastSelectedPreset: EPresetType;
 }
 
 export class VideoEncodingOptimizationService
@@ -46,7 +50,7 @@ export class VideoEncodingOptimizationService
     useOptimizedProfile: false,
     lastLoadedGame: '',
     lastLoadedProfiles: [],
-    lastSelectedPreset: ''
+    lastSelectedPreset: 0
   };
 
   private previousSettings: any;
@@ -72,7 +76,37 @@ export class VideoEncodingOptimizationService
   /**
    * returns profiles according to the current encoder settings
    */
-  async fetchGameProfiles(game: string): Promise<IEncoderProfile[]> {
+  async fetchProfilesForCurrentSettings(game: string): Promise<IEncoderProfile[]> {
+    const settings = this.streamEncoderSettingsService.getSettings();
+    const profiles = await this.fetchAvailableGameProfiles(game);
+    if (!profiles.length) return [];
+
+    let filteredProfiles = profiles.filter(profile => {
+      return (
+        profile.encoder === settings.encoder &&
+        profile.resolutionIn == settings.outputResolution &&
+        profile.bitrateMax >= settings.bitrate &&
+        profile.bitrateMin <= settings.bitrate
+      )
+    });
+
+    if (filteredProfiles.length !== 2) {
+      console.error(new Error(`${filteredProfiles.length} found for ${game}, 2 profiles expected`));
+      return null;
+    }
+
+    filteredProfiles = filteredProfiles.sort((profile1, profile2) => {
+      return QUALITY_ORDER.indexOf(profile1.presetIn) - QUALITY_ORDER.indexOf(profile2.presetIn);
+    });
+
+
+    return filteredProfiles;
+  }
+
+  /**
+   * returns profiles according to the game name
+   */
+  private async fetchAvailableGameProfiles(game: string): Promise<IEncoderProfile[]> {
     if (!game) return [];
 
     let profiles: IEncoderProfile[] = [];
@@ -80,7 +114,6 @@ export class VideoEncodingOptimizationService
     if (game == this.state.lastLoadedGame) {
       profiles = this.state.lastLoadedProfiles;
     } else {
-      this.SAVE_LAST_SELECTED_PRESET('');
       // try to fetch game-specific profile
       profiles = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game.toUpperCase()}`))
         .then(handleErrors)
@@ -94,26 +127,13 @@ export class VideoEncodingOptimizationService
         .then(camelize);
     }
 
-    const settings = this.streamEncoderSettingsService.getSettings();
-
     this.CACHE_PROFILES(game, profiles);
-
-    let filteredProfiles = profiles.filter(profile => {
-      return (
-        profile.encoder === settings.encoder &&
-        profile.resolutionIn == settings.outputResolution &&
-        profile.bitrateMax >= settings.bitrate &&
-        profile.bitrateMin <= settings.bitrate
-      )
-    });
-
-
-    return filteredProfiles;
+    return profiles;
   }
 
-  applyProfile(encoderProfile: IEncoderProfile) {
+  applyProfile(encoderProfile: IEncoderProfile, presetType: EPresetType) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
-    this.SAVE_LAST_SELECTED_PRESET(encoderProfile.presetIn);
+    this.SAVE_LAST_SELECTED_PRESET(presetType);
     this.streamEncoderSettingsService.setSettings({
       outputResolution: encoderProfile.resolutionOut,
       encoder: encoderProfile.encoder,
@@ -132,9 +152,10 @@ export class VideoEncodingOptimizationService
     );
   }
 
-  applyProfileFromCache() {
+  async applyProfileFromCache() {
     if (!this.canApplyProfileFromCache()) return;
-    //this.
+    const profiles = await this.fetchProfilesForCurrentSettings(this.state.lastLoadedGame);
+    this.applyProfile(profiles[this.state.lastSelectedPreset], this.state.lastSelectedPreset);
   }
 
   getIsUsingEncodingOptimizations() {
@@ -161,7 +182,7 @@ export class VideoEncodingOptimizationService
   }
 
   @mutation()
-  private SAVE_LAST_SELECTED_PRESET(preset: string) {
+  private SAVE_LAST_SELECTED_PRESET(preset: number) {
     this.state.lastSelectedPreset = preset;
   }
 }

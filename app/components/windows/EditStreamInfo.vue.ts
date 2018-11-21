@@ -14,7 +14,7 @@ import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
-import { VideoEncodingOptimizationService, IEncoderProfile } from 'services/video-encoding-optimizations';
+import { VideoEncodingOptimizationService, IEncoderProfile, EPresetType } from 'services/video-encoding-optimizations';
 import { IListMetadata } from 'components/shared/inputs';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
@@ -44,7 +44,7 @@ export default class EditStreamInfo extends Vue {
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
-  selectedPresetType: string = '';
+  selectedPresetType = 0;
 
   // Form Models:
 
@@ -99,7 +99,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get isGenericProfiles() {
-    return this.encoderPresets.length && this.encoderPresets[0].game == 'Generic';
+    return this.encoderPresets.length && this.encoderPresets[0].game == 'DEFAULT';
   }
 
   get hasAvailablePresets() {
@@ -107,7 +107,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get selectedPreset() {
-    return this.encoderPresets.find(preset => preset.presetIn === this.selectedPresetType);
+    return this.encoderPresets[this.selectedPresetType];
   }
 
   async created() {
@@ -168,19 +168,17 @@ export default class EditStreamInfo extends Vue {
   async loadAvailableProfiles() {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
-    this.encoderPresets = [];
-    this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
-    this.selectedPresetType =
-      this.videoEncodingOptimizationService.state.lastSelectedPreset ||
-      (this.encoderPresets[0] && this.encoderPresets[0].presetIn) || '';
+    this.encoderPresets =
+      await this.videoEncodingOptimizationService.fetchProfilesForCurrentSettings(this.gameModel.value);
+    this.selectedPresetType = this.videoEncodingOptimizationService.state.lastSelectedPreset;
     this.searchProfilesPending = false;
   }
 
-  get presetInputMetadata(): IListMetadata<string> {
-    let options = this.encoderPresets.map((preset, index) => {
+  get presetInputMetadata(): IListMetadata<number> {
+    let options = this.encoderPresets.map((preset, index: EPresetType) => {
       return {
-        value: preset.presetIn,
-        title: `${preset.game} ${preset.encoder} (${preset.presetIn})`
+        value: index,
+        title: `${ (index === EPresetType.HIGH_PRERFORMANCE ? ' High Performance' : 'High Quality') } ${preset.encoder}`
       }
     });
     return { options };
@@ -221,7 +219,7 @@ export default class EditStreamInfo extends Vue {
       });
 
     if (this.hasAvailablePresets && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(this.selectedPreset);
+      this.videoEncodingOptimizationService.applyProfile(this.selectedPreset, this.selectedPresetType);
     }
   }
 

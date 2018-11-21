@@ -21,7 +21,7 @@ enum EObsEncoder {
   obs_qsv11 = 'obs_qsv11'
 }
 
-const qualityOrder =  [
+export const QUALITY_ORDER =  [
 
   // x264
   'ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower',
