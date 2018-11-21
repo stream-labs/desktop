@@ -44,28 +44,42 @@ export class SceneCollectionsStateService extends StatefulService<
   async loadManifestFile() {
     await this.ensureDirectory();
 
+    let sceneCollectionsManifest: ISceneCollectionsManifest | null = null;
     try {
-      const data = this.readCollectionFile('manifest');
-
-      if (data) {
-        const parsed = JSON.parse(data);
-        const recovered = await this.checkAndRecoverManifest(parsed);
-
-        if (recovered) this.LOAD_STATE(recovered);
-      }
+      sceneCollectionsManifest = await this._loadManifestFile();
     } catch (e) {
-      console.warn('Error loading manifest file from disk');
-      // 存在しない場合はそのまま初期化してよいのでスルー
+      console.warn('Error loading manifest file from disk(original):', e);
+      try {
+        // バックアップから読み込み
+        sceneCollectionsManifest = await this._loadManifestFile(true);
 
-      // 存在しない以外の理由で失敗する場合は上書きしてしまうので問題がある
-      if (e.code !== 'ENOENT') {
-        console.error('Error loading manifest file from disk : %o', e);
-
-        // TODO: 上書き確認をする https://github.com/n-air-app/n-air-app/pull/180
+        // sentryに結果を送信（元のエラーはbreadcrumbで拾う）
+        if (sceneCollectionsManifest) {
+          console.error('Recovered from backup');
+        } else {
+          console.error('Backup of manifest file is absent');
+        }
+      } catch (backupError) {
+        console.error('Error loading manifest file from disk(backup):', backupError);
       }
     }
 
+    if (sceneCollectionsManifest) {
+      this.LOAD_STATE(sceneCollectionsManifest);
+    }
+
     await this.flushManifestFile();
+    await this.flushManifestFile(true);
+  }
+
+  private async _loadManifestFile(backup?: boolean): Promise<ISceneCollectionsManifest | null> {
+    const exists = await this.collectionFileExists('manifest', backup);
+    if (!exists) return null;
+
+    const data = this.readCollectionFile('manifest', backup);
+
+    const parsed = JSON.parse(data);
+    return this.checkAndRecoverManifest(parsed);
   }
 
   /**
@@ -97,9 +111,9 @@ export class SceneCollectionsStateService extends StatefulService<
    * The manifest file is simply a copy of the Vuex state of this
    * service, persisted to disk.
    */
-  async flushManifestFile() {
+  async flushManifestFile(backup?: boolean) {
     const data = JSON.stringify(this.state, null, 2);
-    await this.writeDataToCollectionFile('manifest', data);
+    await this.writeDataToCollectionFile('manifest', data, backup);
   }
 
   /**
