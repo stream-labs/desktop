@@ -21,6 +21,19 @@ enum EObsEncoder {
   obs_qsv11 = 'obs_qsv11'
 }
 
+const qualityOrder =  [
+
+  // x264
+  'ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower',
+
+  // NVENC
+  'hp', 'fast', 'bd', 'llhp', 'default', 'll', 'llhq', 'hq', 'medium', 'slow', 'losslesshp', 'lossless',
+
+  // QSV
+  1, 2, 3, 4, 5, 6, 7
+];
+
+
 export interface IStreamEncoderSettings {
   mode: 'Simple' | 'Advanced';
   encoder: EEncoder;

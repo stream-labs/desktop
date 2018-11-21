@@ -11,3 +11,8 @@ export interface IEncoderProfile {
   resolutionOut: string;
   options: string;
 }
+
+export interface IGameProfiles {
+  highPerformance: IEncoderProfile,
+  highQuality: IEncoderProfile
+}

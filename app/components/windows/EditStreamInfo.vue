@@ -26,7 +26,12 @@
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
       <ObsListInput v-if="isFacebook" :value="pageModel" @input="(pageId) => setFacebookPageId(pageId)" />
-      <div v-if="hasAvalablePresets">
+
+      <h-form-group v-if="searchProfilesPending">
+        {{ $t('Checking optimized setting for') }} {{ gameModel.value }}...
+      </h-form-group>
+
+      <div v-if="hasAvailablePresets">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
@@ -81,7 +86,7 @@
       class="button button--default"
       :disabled="updatingInfo"
       @click="cancel">
-      $('Cancel')
+      {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"

@@ -18,6 +18,7 @@ import { VideoEncodingOptimizationService, IEncoderProfile } from 'services/vide
 import { IListMetadata } from 'components/shared/inputs';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
   components: {
@@ -26,6 +27,7 @@ import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/plat
     ObsListInput,
     ObsBoolInput,
     FormInput,
+    HFormGroup,
     Multiselect
   }
 })
@@ -42,7 +44,6 @@ export default class EditStreamInfo extends Vue {
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
-  useOptimizedProfile = false;
   selectedPresetType: string = '';
 
   // Form Models:
@@ -87,12 +88,21 @@ export default class EditStreamInfo extends Vue {
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
 
+  searchProfilesPending = false;
+
+  get useOptimizedProfile() {
+    return this.videoEncodingOptimizationService.state.useOptimizedProfile;
+  }
+
+  set useOptimizedProfile(enabled: boolean) {
+    this.videoEncodingOptimizationService.useOptimizedProfile(enabled);
+  }
 
   get isGenericProfiles() {
     return this.encoderPresets.length && this.encoderPresets[0].game == 'Generic';
   }
 
-  get hasAvalablePresets() {
+  get hasAvailablePresets() {
     return !!this.encoderPresets.length;
   }
 
@@ -115,8 +125,7 @@ export default class EditStreamInfo extends Vue {
     }
   }
 
-  populateModels() {
-    console.log('populate start');
+  async populateModels() {
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
     this.gameModel.options = [
@@ -131,9 +140,7 @@ export default class EditStreamInfo extends Vue {
         { value: page.id, description: `${page.name} | ${page.category}` }
       ));
     }
-
-    console.log('populate almost done');
-    this.loadAvailableProfiles();
+    await this.loadAvailableProfiles();
   }
 
   onGameSearchChange(searchString: string) {
@@ -159,12 +166,14 @@ export default class EditStreamInfo extends Vue {
   }
 
   async loadAvailableProfiles() {
-    console.log('load presets');
     if (this.midStreamMode) return;
+    this.searchProfilesPending = true;
     this.encoderPresets = [];
     this.encoderPresets = await this.videoEncodingOptimizationService.fetchGameProfiles(this.gameModel.value);
-    this.selectedPresetType = (this.encoderPresets[0] && this.encoderPresets[0].presetIn) || '';
-    console.log('loaded', this.encoderPresets);
+    this.selectedPresetType =
+      this.videoEncodingOptimizationService.state.lastSelectedPreset ||
+      (this.encoderPresets[0] && this.encoderPresets[0].presetIn) || '';
+    this.searchProfilesPending = false;
   }
 
   get presetInputMetadata(): IListMetadata<string> {
@@ -211,7 +220,7 @@ export default class EditStreamInfo extends Vue {
         }
       });
 
-    if (this.hasAvalablePresets && this.useOptimizedProfile) {
+    if (this.hasAvailablePresets && this.useOptimizedProfile) {
       this.videoEncodingOptimizationService.applyProfile(this.selectedPreset);
     }
   }
