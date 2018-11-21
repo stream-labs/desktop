@@ -3,6 +3,7 @@ import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import { $t } from 'services/i18n';
+import { formMetadata } from 'components/shared/inputs';
 import { metadata } from 'components/widgets/inputs';
 
 export interface ISpinWheelSettings extends IWidgetSettings {
@@ -46,11 +47,11 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
       settingsUpdateEvent: 'spinwheelSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true
-    }
+    };
   }
 
   getMetadata() {
-    return {
+    return formMetadata({
       resultTemplate: metadata.textArea({ title: $t('Results Template') }),
       resultColor: metadata.color({ title: $t('Results Color') }),
       hideTimeout: metadata.slider({ title: $t('Hide Timeout'), min: 1, max: 100 }),
@@ -63,6 +64,8 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
       labelHeight: metadata.slider({ title: $t('Label Height'), min: 1, max: 100 }),
       labelWidth: metadata.slider({ title: $t('Label Width'), min: 1, max: 100 }),
       borderColor: metadata.color({ title: $t('Border Color') }),
+      innerBorderWidth: metadata.slider({ title: $t('Inner Border Width'), min: 1, max: 100 }),
+      outerBorderWidth: metadata.slider({ title: $t('Outer Border Width'), min: 1, max: 100 }),
       tickerUrl: metadata.mediaGallery({ title: $t('Ticker Image') }),
       tickerSize: metadata.slider({ title: $t('Ticker Size'), min: 1, max: 100 }),
       tickerTone: metadata.sound({ title: $t('Ticker Tone') }),
@@ -72,6 +75,19 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
       centerBorderEnabled: metadata.toggle({ title: $t('Center Image Border Enabled') }),
       centerBorderColor: metadata.color({ title: $t('Center Image Border Color') }),
       centerBorderWidth: metadata.slider({ title: $t('Center Image Border Width'), min: 1, max: 100 }),
-    };
+    });
+  }
+
+  protected patchAfterFetch(data: any): ISpinWheelData {
+    data.settings.categories = JSON.parse(data.settings.categories);
+    data.settings.sections = JSON.parse(data.settings.sections);
+    return data;
+  }
+
+  protected patchBeforeSend(settings: ISpinWheelSettings): any {
+    const newSettings: any = { ...settings };
+    newSettings.categories = JSON.stringify(settings.categories);
+    newSettings.sections = JSON.stringify(settings.sections);
+    return newSettings;
   }
 }

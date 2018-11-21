@@ -9,11 +9,13 @@
   </validated-form>
 
   <validated-form slot="categories-properties" @input="save()" v-if="loaded">
-    <button @click="addCategory()">{{ $t('Add Category') }}</button>
-    <button @click="clearCategories()">{{ $t('Clear All') }}</button>
     <v-form-group :title="$t('Categories')">
-      <div v-for="category in wData.settings.categories">
-        <text-input v-model="category.prize" /><color-input v-model="category.color" /><i class="icon-close" />
+      <button class="button button--action" @click="addCategory()">{{ $t('Add Category') }}</button>
+      <button class="button button--default" @click="clearCategories()">{{ $t('Clear All') }}</button>
+      <div v-for="category in wData.settings.categories" :key="category.prize">
+        <text-input v-model="category.prize" />
+        <color-input v-model="category.color" />
+        <i class="icon-close" @click="removeCategory(category.prize)" />
       </div>
     </v-form-group>
   </validated-form>
@@ -31,7 +33,7 @@
   </validated-form>
 
   <validated-form slot="border-properties" @input="save()" v-if="loaded">
-    <v-form-group v-model="wData.settings.borderColor" :metadata="metadata.boderColor" />
+    <v-form-group v-model="wData.settings.borderColor" :metadata="metadata.borderColor" />
     <v-form-group v-model="wData.settings.innerBorderWidth" :metadata="metadata.innerBorderWidth" />
     <v-form-group v-model="wData.settings.outerBorderWidth" :metadata="metadata.outerBorderWidth" />
   </validated-form>

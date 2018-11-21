@@ -23,6 +23,9 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 })
 export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelService> {
 
+  get metadata() {
+    return this.service.getMetadata();
+  }
 
   navItems = [
     { value: 'manage-wheel', label: $t('Manage Spin Wheel') },
@@ -41,5 +44,11 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
 
   addCategory() {
     this.wData.settings.categories.push({ color: '#ffffff', prize: 'Donut' });
+    this.save();
+  }
+
+  removeCategory(prize: string) {
+    this.wData.settings.categories = this.wData.settings.categories.filter((cat) => cat.prize !== prize);
+    this.save();
   }
 }
