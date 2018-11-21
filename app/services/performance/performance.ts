@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { nodeObs } from './obs-api';
+import { nodeObs } from 'services/obs-api';
 import electron from 'electron';
 import { Inject } from 'util/injector';
 
@@ -41,9 +41,9 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    this.intervalId = window.setInterval(() => {
+    this.intervalId = setInterval(() => {
       this.updateStatistics();
-    }, 2 * 1000);
+    }, 2 * 1000) as any;
   }
 
   stop() {
