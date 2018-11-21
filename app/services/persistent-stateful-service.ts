@@ -16,7 +16,6 @@ export abstract class PersistentStatefulService<
     const persisted =
       JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
 
-    console.log('load from local storage ', persisted);
     return merge({}, this.defaultState, persisted);
   }
 
@@ -37,7 +36,6 @@ export abstract class PersistentStatefulService<
           PersistentService.defaultState,
           JSON.parse(val)
         );
-        console.log('save to local storage', JSON.stringify(valueToSave));
         localStorage.setItem(
           PersistentService.localStorageKey,
           JSON.stringify(valueToSave)
