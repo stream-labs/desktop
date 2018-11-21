@@ -9,18 +9,29 @@
   </validated-form>
 
   <validated-form slot="categories-properties" @input="save()" v-if="loaded">
-    <v-form-group :title="$t('Categories')">
+    <v-form-group>
       <button class="button button--action" @click="addCategory()">{{ $t('Add Category') }}</button>
       <button class="button button--default" @click="clearCategories()">{{ $t('Clear All') }}</button>
-      <div v-for="category in wData.settings.categories" :key="category.prize">
+      <div v-for="category in wData.settings.categories" :key="category.prize" class="category-container">
         <text-input v-model="category.prize" />
-        <color-input v-model="category.color" />
-        <i class="icon-close" @click="removeCategory(category.prize)" />
+        <div class="category-box">
+          <color-input v-model="category.color" />
+          <i class="icon-close" @click="removeCategory(category.prize)" />
+        </div>
       </div>
     </v-form-group>
   </validated-form>
 
   <validated-form slot="section-properties" @input="save()" v-if="loaded">
+    <v-form-group v-for="(section, i) in wData.settings.sections" :key="section.key">
+      <div class="section-weight-box">
+        <list-input v-model="section.category" :metadata="metadata.sectionWeightList" />
+        <i v-if="i !== 0" class="fa fa-chevron-up" @click="moveSection(section.key, -1)" />
+        <i v-if="i < wData.settings.sections.length - 1" class="fa fa-chevron-down" @click="moveSection(section.key, 1)" />
+        <i class="icon-close" @click="removeSection(section.key)" />
+      </div>
+      <slider-input v-model="section.weight" :metadata="metadata.sectionWeightSlider" />
+    </v-form-group>
   </validated-form>
 
   <validated-form slot="font-properties" @input="save()" v-if="loaded">
@@ -57,5 +68,47 @@
 
 <script lang="ts" src="./SpinWheel.vue.ts"></script>
 
-<style lang="less" scoped>
+<style lang="less">
+  .category-container {
+    margin-top: 16px;
+  }
+
+  .category-box {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+
+    i {
+      margin-left: 4px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .section-weight-box {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    i {
+      margin-left: 4px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    div {
+      width: 140px;
+      margin-right: auto;
+      position: relative;
+
+    }
+
+    .multiselect__select {
+      min-width: 0;
+    }
+  }
 </style>

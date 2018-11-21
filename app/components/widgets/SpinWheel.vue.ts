@@ -24,7 +24,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelService> {
 
   get metadata() {
-    return this.service.getMetadata();
+    return this.service.getMetadata(this.sectionOptions);
   }
 
   navItems = [
@@ -40,6 +40,7 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
 
   clearCategories() {
     this.wData.settings.categories = [];
+    this.save();
   }
 
   addCategory() {
@@ -49,6 +50,22 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
 
   removeCategory(prize: string) {
     this.wData.settings.categories = this.wData.settings.categories.filter((cat) => cat.prize !== prize);
+    this.save();
+  }
+
+  get sectionOptions() {
+    return this.wData.settings.categories.map((cat, i) => ({ title: cat.prize, value: i + 1 }));
+  }
+
+  removeSection(key: string) {
+    this.wData.settings.sections = this.wData.settings.sections.filter((sect) => sect.key !== key);
+    this.save();
+  }
+
+  moveSection(key: string, idxMod: number) {
+    const sections = this.wData.settings.sections;
+    const idx = sections.findIndex((sect) => sect.key === key);
+    [sections[idx], sections[idx + idxMod]] = [sections[idx + idxMod], sections[idx]];
     this.save();
   }
 }
