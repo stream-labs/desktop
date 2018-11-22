@@ -1,4 +1,9 @@
-import { QUALITY_ORDER, SettingsService, StreamEncoderSettingsService } from 'services/settings';
+import {
+  IStreamEncoderSettings,
+  QUALITY_ORDER,
+  SettingsService,
+  StreamEncoderSettingsService
+} from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
 import { IEncoderProfile } from './definitions';
@@ -134,13 +139,17 @@ export class VideoEncodingOptimizationService
   applyProfile(encoderProfile: IEncoderProfile, presetType: EPresetType) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
     this.SAVE_LAST_SELECTED_PRESET(presetType);
-    this.streamEncoderSettingsService.setSettings({
+    const newSettings: Partial<IStreamEncoderSettings> = {
       outputResolution: encoderProfile.resolutionOut,
       encoder: encoderProfile.encoder,
       mode: 'Advanced',
       encoderOptions: encoderProfile.options,
       preset: encoderProfile.presetOut
-    });
+    };
+
+    console.log('Apply encoder settings', newSettings);
+
+    this.streamEncoderSettingsService.setSettings(newSettings);
     this.isUsingEncodingOptimizations = true;
   }
 
