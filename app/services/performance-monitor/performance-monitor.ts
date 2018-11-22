@@ -100,7 +100,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       const framesRendered = currentStats.framesRendered - this.state.framesRendered;
       const laggedFactor = framesLagged / framesRendered;
 
-      if (framesRendered && laggedFactor >= laggedThreshold) {
+      if (framesRendered !== 0 && laggedFactor >= laggedThreshold) {
         this.pushLaggedFramesNotify(laggedFactor);
       }
     }
