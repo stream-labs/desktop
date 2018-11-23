@@ -3,9 +3,9 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { focusChild } from '../helpers/spectron/index';
+import { focusChild } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
-import { IAudioServiceApi } from '../../app/services/audio/audio-api';
+import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
 
 const fs = require('fs');

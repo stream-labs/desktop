@@ -1,5 +1,5 @@
 import { Service } from '../service';
-import { StatefulService, mutation } from './../stateful-service';
+import { StatefulService, mutation } from '../stateful-service';
 import { IPlatformService, IChannelInfo, IPlatformAuth } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';

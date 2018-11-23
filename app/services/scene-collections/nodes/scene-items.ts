@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { Scene } from '../../scenes/scene';
+import { Scene } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';

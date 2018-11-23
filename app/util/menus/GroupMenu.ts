@@ -2,7 +2,7 @@ import { uniq } from 'lodash';
 import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
-import { Inject } from '../../util/injector';
+import { Inject } from '../injector';
 import { $t } from 'services/i18n';
 
 export class GroupMenu extends Menu {

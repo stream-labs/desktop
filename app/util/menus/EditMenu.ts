@@ -1,4 +1,4 @@
-import { Inject } from '../../util/injector';
+import { Inject } from '../injector';
 import { Menu } from './Menu';
 import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';

@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 
 import { IChatbotTimer, IChatbotErrorResponse } from 'services/chatbot';
 
-import { ITextMetadata, INumberMetadata, EInputType } from 'components/shared/inputs/index';
+import { ITextMetadata, INumberMetadata, EInputType } from '../../../shared/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({

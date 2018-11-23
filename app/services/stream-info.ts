@@ -2,7 +2,7 @@ import { StatefulService, mutation } from 'services/stateful-service';
 import { IChannelInfo, getPlatformService } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'util/injector';
-import { StreamingService } from '../services/streaming';
+import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs';

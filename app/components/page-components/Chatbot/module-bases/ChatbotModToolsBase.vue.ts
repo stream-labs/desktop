@@ -21,7 +21,7 @@ import {
   INumberMetadata,
   ISliderMetadata,
   IInputMetadata,
-} from 'components/shared/inputs/index';
+} from '../../../shared/inputs';
 
 interface IChatbotPunishmentMetadata {
   type: IListMetadata<string>;

@@ -7,7 +7,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { IQuotePreferencesGeneralSettings } from 'services/chatbot';
 
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType } from '../../../shared/inputs';
 
 @Component({
   components: { ValidatedForm },

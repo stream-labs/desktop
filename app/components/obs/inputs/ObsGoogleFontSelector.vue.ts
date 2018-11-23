@@ -2,7 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 import { FontLibraryService } from '../../../services/font-library';
 import { Inject } from '../../../util/injector';
-import { SourcesService } from '../../../services/sources/index';
+import { SourcesService } from '../../../services/sources';
 import { ObsInput, IGoogleFont } from './ObsInput';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 import * as fi from 'node-fontinfo';

@@ -2,7 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import { ITextMetadata } from 'components/shared/inputs/index';
+import { ITextMetadata } from '../../../shared/inputs';
 
 import { NEW_LINK_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 

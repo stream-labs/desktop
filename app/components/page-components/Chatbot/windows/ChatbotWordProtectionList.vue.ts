@@ -7,7 +7,7 @@ import {
   IListMetadata,
   INumberMetadata,
   EInputType,
-} from 'components/shared/inputs/index';
+} from '../../../shared/inputs';
 
 import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 

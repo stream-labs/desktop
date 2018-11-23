@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './../stateful-service';
+import { StatefulService, mutation } from '../stateful-service';
 import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
