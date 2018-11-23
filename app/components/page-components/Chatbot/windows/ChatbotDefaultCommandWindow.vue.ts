@@ -73,6 +73,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     )
   }
 
+  get isLoyaltyCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'loyalty' &&
+      this.defaultCommandToUpdate.commandName === 'points'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }

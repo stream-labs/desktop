@@ -14,6 +14,7 @@ import { ChatbotApiService, ChatbotBaseApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
+import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
 
 @Component({
   components: {
@@ -28,7 +29,8 @@ import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBann
     ChatbotQuotes,
     ChatbotQueue,
     ToggleInput,
-    ChatbotBanner
+    ChatbotBanner,
+    ChatbotLoyalty
   }
 })
 export default class Chatbot extends Vue {
@@ -49,7 +51,7 @@ export default class Chatbot extends Vue {
     { title: 'Mod Tools', enabled: true },
     { title: 'Quotes', enabled: true },
     { title: 'Queue', enabled: true },
-    { title: 'Currency', enabled: false },
+    { title: 'Loyalty', enabled: true },
     { title: 'Poll', enabled: false },
     { title: 'Betting', enabled: false }
   ];
@@ -64,7 +66,7 @@ export default class Chatbot extends Vue {
     'Mod Tools': 'fas fa-ban',
     Quotes: 'fas fa-quote-left',
     Queue: 'fas fa-list-ul',
-    Currency: 'fas fa-dollar-sign',
+    Loyalty: 'fas fa-dollar-sign',
     Poll: 'icon-suggestions',
     Betting: 'fas fa-money-bill-wave'
   };
@@ -83,8 +85,7 @@ export default class Chatbot extends Vue {
   }
 
   mounted() {
-    this.chatbotApiService.Base
-      .logIn()
+    this.chatbotApiService.Base.logIn()
       .then(response => {
         this.authenticated = true;
       })
@@ -93,4 +94,3 @@ export default class Chatbot extends Vue {
       });
   }
 }
-

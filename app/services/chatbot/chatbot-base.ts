@@ -49,6 +49,8 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
 
   logIn() {
+
+
     return new Promise((resolve, reject) => {
       const url = this.apiEndpoint('login');
       const headers = authorizedHeaders(this.userService.apiToken);
@@ -65,7 +67,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
           resolve(true);
-        })
+        }).then(this.fetchChatbotGlobalEnabled)
         .catch(err => {
           reject(err);
         });
@@ -187,6 +189,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
+    console.log(response.api_token);
     Vue.set(this.state, 'apiToken', response.api_token);
   }
 

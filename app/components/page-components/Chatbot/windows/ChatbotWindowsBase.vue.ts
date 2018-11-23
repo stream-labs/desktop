@@ -42,6 +42,27 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
+  onToggleLoyaltyPreferencesWindowHandler() {
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
+        break;
+      case 'ChatbotLoyaltyPreferencesWindow':
+        const loyaltyPointsCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['loyalty'].points;
+
+        this.chatbotApiService.Common.openDefaultCommandWindow({
+          ...loyaltyPointsCommand,
+          slugName: 'loyalty',
+          commandName: 'points'
+        });
+        break;
+    }
+  }
+
   onToggleQuoteWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;

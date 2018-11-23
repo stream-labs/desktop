@@ -52,7 +52,7 @@
   z-index: 1;
   width: 100%;
   padding: 15px;
-  height: 54px;
+  height: 48px;
   border-bottom: 1px solid @day-border;
   cursor: pointer;
   text-align: right;

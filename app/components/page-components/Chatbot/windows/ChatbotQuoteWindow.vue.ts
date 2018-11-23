@@ -13,7 +13,7 @@ import {
 @Component({
   components: { ValidatedForm }
 })
-export default class ChatbotTimerWindow extends ChatbotWindowsBase {
+export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
 
   $refs: {
     form: ValidatedForm;

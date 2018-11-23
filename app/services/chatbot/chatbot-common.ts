@@ -10,9 +10,12 @@ import {
   IDefaultCommand,
   IChatbotTimer,
   IQuote,
+  IChatbotLoyalty
 } from './chatbot-interfaces';
 
-export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
+export class ChatbotCommonService extends PersistentStatefulService<
+  IChatbotCommonServiceState
+> {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {
@@ -21,7 +24,8 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     defaultCommandToUpdate: null,
     timerToUpdate: null,
     quoteToUpdate: null,
-    modBannerVisible: true
+    modBannerVisible: true,
+    loyaltyToUpdate: null
   };
 
   hideModBanner() {
@@ -147,6 +151,42 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openLoyaltyWindow(loyalty?: IChatbotLoyalty) {
+    if (loyalty) {
+      this.SET_LOYALTY_TO_UPDATE(loyalty);
+    }
+    this.windowsService.showWindow({
+      componentName: 'ChatbotLoyaltyWindow',
+      title: $t('Chatbot Loyalty Window'),
+      size: {
+        width: 475,
+        height: 229
+      }
+    });
+  }
+
+  openLoyaltyAddAllWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotLoyaltyAddAllWindow',
+      title: $t('Chatbot Loyalty Add Window'),
+      size: {
+        width: 475,
+        height: 192
+      }
+    });
+  }
+
+  openLoyaltyPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotLoyaltyPreferencesWindow',
+      title: $t('Chatbot Loyalty Preferences'),
+      size: {
+        width: 650,
+        height: 580
+      }
+    });
+  }
+
   openQueuePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQueuePreferencesWindow',
@@ -219,5 +259,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private SET_QUOTE_TO_UPDATE(quote: IQuote) {
     Vue.set(this.state, 'quoteToUpdate', quote);
+  }
+
+  @mutation()
+  private SET_LOYALTY_TO_UPDATE(loyalty: IChatbotLoyalty) {
+    Vue.set(this.state, 'loyaltyToUpdate', loyalty);
   }
 }

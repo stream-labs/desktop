@@ -9,6 +9,7 @@ export interface IChatbotCommonServiceState {
   timerToUpdate: IChatbotTimer;
   quoteToUpdate: IQuote;
   modBannerVisible: boolean;
+  loyaltyToUpdate: IChatbotLoyalty;
 }
 
 // responses
@@ -59,6 +60,11 @@ export interface ITimersResponse {
   data: ITimersData;
 }
 
+export interface ILoyaltyResponse {
+  pagination: IChatbotPagination;
+  data: ILoyaltyData;
+}
+
 export interface IChatAlertsResponse {
   settings: IChatAlertsData;
   enabled: boolean;
@@ -96,6 +102,11 @@ export interface IQuotePreferencesResponse {
 
 export interface IQueuePreferencesResponse {
   settings: IQueuePreferencesData;
+  enabled: boolean;
+}
+
+export interface ILoyaltyPreferencesResponse {
+  settings: ILoyaltyPreferencesData;
   enabled: boolean;
 }
 
@@ -404,6 +415,79 @@ export interface ISongRequestGeneral {
   filter_level: number;
   music_only: boolean;
 }
+
+// loyalty
+export interface ILoyaltyData {
+  [id: number]: IChatbotLoyalty;
+}
+
+export interface IChatbotLoyalty {
+  id?: number;
+  user_id?: number;
+  viewer_id?: number;
+  points?: number;
+  time?: number;
+  created_at?: string;
+  updated_at?: string;
+  viewer?:{
+    id?: number;
+    platform?: string;
+    platform_id?: string;
+    name?: string;
+    created_at?: string;
+    updated_at?: string;
+  }
+}
+
+export interface ILoyaltyPreferencesData {
+  commands: ILoyaltyCommands;
+  general: ILoyaltyGeneral;
+  advanced: ILoyaltyAdvanced;
+}
+
+export interface ILoyaltyCommands {
+  [id: string]: ILoyaltyCommand;
+}
+
+export interface ILoyaltyCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IChatbotAliases;
+}
+
+export interface ILoyaltyGeneral{
+  name: string;
+  interval: ILoyaltyInterval;
+  payout:ILoyaltyPayout;
+}
+
+export interface ILoyaltyInterval{
+  live: number;
+}
+
+export interface ILoyaltyPayout{
+  live: number;
+  active: number;
+}
+export interface ILoyaltyAdvanced{
+  event:ILoyaltyEvents;
+  donations:ILoyaltyDonations;
+}
+export interface ILoyaltyEvents{
+  on_follow: number;
+  on_host: number;
+  on_member: number;
+  on_raid: number;
+  on_sub: number;
+}
+export interface ILoyaltyDonations{
+  extralife: number;
+  streamlabs: number;
+  superchat: number;
+}
+
 
 // dictionaries
 export enum ChatbotAutopermitEnums {

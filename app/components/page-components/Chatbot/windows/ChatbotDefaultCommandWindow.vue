@@ -38,6 +38,13 @@
             <span> {{ $t('Song Request Preferences') }} </span>
             <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
+                    <div
+            @click="onToggleLoyaltyPreferencesWindowHandler"
+            v-if="isLoyaltyCommand"
+          >
+            <span> {{ $t('Loyalty Preferences') }} </span>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -180,7 +187,7 @@
   z-index: 1;
   width: 100%;
   padding: 15px;
-  height: 54px;
+  height: 48px;
   border-bottom: 1px solid @day-border;
   cursor: pointer;
   text-align: right;
