@@ -9,10 +9,9 @@ import { ISelectionServiceApi } from '../../services/selection';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class NameScene extends Vue {
-
   name = '';
   error = '';
 
@@ -29,9 +28,9 @@ export default class NameScene extends Vue {
   selectionService: ISelectionServiceApi;
 
   options: {
-    sceneToDuplicate?: string, // id of scene
-    rename?: string, // id of scene
-    itemsToGroup?: string[]
+    sceneToDuplicate?: string; // id of scene
+    rename?: string; // id of scene
+    itemsToGroup?: string[];
   } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
@@ -59,12 +58,9 @@ export default class NameScene extends Vue {
       this.scenesService.getScene(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
-      const newScene = this.scenesService.createScene(
-        this.name,
-        {
-          duplicateSourcesFromScene: this.options.sceneToDuplicate,
-        }
-      );
+      const newScene = this.scenesService.createScene(this.name, {
+        duplicateSourcesFromScene: this.options.sceneToDuplicate,
+      });
       if (this.options.itemsToGroup) {
         activeScene.getSelection(this.options.itemsToGroup).moveTo(newScene.id);
         const sceneItem = activeScene.addSource(newScene.id);
@@ -76,5 +72,4 @@ export default class NameScene extends Vue {
       this.windowsService.closeChildWindow();
     }
   }
-
 }

@@ -1,7 +1,11 @@
 import { ApiClient } from './api-client';
 import {
-  ISceneApi, ISceneItemApi, IScenesServiceApi, TSceneNode, TSceneNodeApi,
-  TSceneNodeType
+  ISceneApi,
+  ISceneItemApi,
+  IScenesServiceApi,
+  TSceneNode,
+  TSceneNodeApi,
+  TSceneNodeType,
 } from '../../app/services/scenes';
 import { TSourceType } from '../../app/services/sources';
 
@@ -38,7 +42,6 @@ interface ISceneBuilderNode {
  *
  */
 export class SceneBuilder {
-
   private scenesService: IScenesServiceApi;
 
   /**
@@ -51,7 +54,7 @@ export class SceneBuilder {
    */
   private offsetSize = 2;
 
-  constructor (api: ApiClient) {
+  constructor(api: ApiClient) {
     this.scenesService = api.getResource<IScenesServiceApi>('ScenesService');
   }
 
@@ -98,9 +101,11 @@ export class SceneBuilder {
 
       const nextLineLevel = nextLine.search(/[^ ]/) / this.offsetSize;
 
-      if (nextLineLevel > currentLineLevel) { // level down
+      if (nextLineLevel > currentLineLevel) {
+        // level down
         foldersStack.push(node);
-      } else if (nextLineLevel < currentLineLevel) { // level up
+      } else if (nextLineLevel < currentLineLevel) {
+        // level up
         let i = currentLineLevel - nextLineLevel;
         while (i--) foldersStack.pop();
       }
@@ -113,21 +118,21 @@ export class SceneBuilder {
     if (!line.trim()) return null;
     const isItem = line.indexOf(':') !== -1;
     if (isItem) {
-      const [fullMatch, name, delemiter, sourceType] =
-        line.match(/([a-zA-Z_ .\-\d]+)(:)([a-zA-Z_ \d]*)/);
+      const [fullMatch, name, delemiter, sourceType] = line.match(
+        /([a-zA-Z_ .\-\d]+)(:)([a-zA-Z_ \d]*)/,
+      );
       return {
         name: name.trim(),
         type: 'item',
-        sourceType: (sourceType.trim() || this.defaultSourceType) as TSourceType
+        sourceType: (sourceType.trim() || this.defaultSourceType) as TSourceType,
       };
     }
     return {
       name: line.trim(),
       type: 'folder',
-      children: []
+      children: [],
     };
   }
-
 
   build(scetch: string): ISceneBuilderNode[] {
     this.scene.clear();
@@ -137,6 +142,7 @@ export class SceneBuilder {
 
   isEqualTo(sketch: string): boolean {
     // normalize sketch
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     sketch = this.getSketch(this.parse(sketch));
     const sceneSketch = this.getSceneScketch();
     if (sketch === sceneSketch) return true;
@@ -145,10 +151,7 @@ export class SceneBuilder {
   }
 
   getSceneSchema(folderId?: string): ISceneBuilderNode[] {
-    const nodes = folderId ?
-      this.scene.getFolder(folderId).getNodes() :
-      this.scene.getRootNodes();
-
+    const nodes = folderId ? this.scene.getFolder(folderId).getNodes() : this.scene.getRootNodes();
 
     return nodes.map(sceneNode => {
       if (sceneNode.isFolder()) {
@@ -156,7 +159,7 @@ export class SceneBuilder {
           name: sceneNode.name,
           id: sceneNode.id,
           type: 'folder' as TSceneNodeType,
-          children: this.getSceneSchema(sceneNode.id)
+          children: this.getSceneSchema(sceneNode.id),
         };
       }
 
@@ -164,9 +167,8 @@ export class SceneBuilder {
         name: sceneNode.name,
         id: sceneNode.id,
         type: 'item' as TSceneNodeType,
-        sourceType: (sceneNode as ISceneItemApi).getSource().type
+        sourceType: (sceneNode as ISceneItemApi).getSource().type,
       };
-
     });
   }
 
@@ -175,22 +177,29 @@ export class SceneBuilder {
   }
 
   getSketch(nodes: ISceneBuilderNode[], sketch?: string, level?: number): string {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     sketch = sketch || '';
+
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     level = level || 0;
+
     nodes.forEach(node => {
+      // tslint:disable-next-line:no-parameter-reassignment TODO
       sketch += ' '.repeat(level);
 
       if (node.type === 'item') {
+        // tslint:disable-next-line:no-parameter-reassignment TODO
         sketch += `${node.name}: ${node.sourceType}\n`;
       } else if (node.type === 'folder') {
+        // tslint:disable-next-line:no-parameter-reassignment TODO
         sketch += `${node.name}\n`;
+        // tslint:disable-next-line:no-parameter-reassignment TODO
         sketch = this.getSketch(node.children, sketch, level + 1);
       }
     });
 
     return sketch;
   }
-
 
   private buildNodes(nodes: ISceneBuilderNode[], parentId?: string): ISceneBuilderNode[] {
     nodes.reverse().forEach(node => {
@@ -205,10 +214,8 @@ export class SceneBuilder {
 
       node.id = sceneNode.id;
       if (parentId) sceneNode.setParent(parentId);
-
     });
 
     return nodes;
   }
-
 }

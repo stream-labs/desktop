@@ -4,12 +4,10 @@ import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -19,12 +17,12 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -43,7 +41,7 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
     this.chatbotApiService
       .updateCapsProtection({
         enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection
+        settings: this.capsProtection,
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

@@ -9,7 +9,6 @@ import uuid from 'uuid';
 import { stockImages, stockSounds } from './stock-library';
 import { $t } from '../i18n';
 
-
 export interface IMediaGalleryFile {
   href: string;
   fileName: string;
@@ -41,12 +40,11 @@ const fileTypeMap = {
   gif: 'image',
   jpeg: 'image',
   webm: 'image',
-  svg: 'image'
+  svg: 'image',
 };
 
 const DEFAULT_MAX_USAGE = 1024 * Math.pow(1024, 2);
 const DEFAULT_MAX_FILE_SIZE = 25 * Math.pow(1024, 2);
-
 
 export class MediaGalleryService extends Service {
   @Inject() private userService: UserService;
@@ -63,7 +61,7 @@ export class MediaGalleryService extends Service {
       ...item,
       type: 'image',
       isStock: true,
-      size: 0
+      size: 0,
     };
   });
 
@@ -72,7 +70,7 @@ export class MediaGalleryService extends Service {
       ...item,
       type: 'audio',
       isStock: true,
-      size: 0
+      size: 0,
     };
   });
 
@@ -84,7 +82,7 @@ export class MediaGalleryService extends Service {
 
   async pickFile(props?: IMediaGalleryProps): Promise<IMediaGalleryFile> {
     const promiseId = uuid();
-    const promise = new Promise<IMediaGalleryFile> ((resolve, reject) => {
+    const promise = new Promise<IMediaGalleryFile>((resolve, reject) => {
       this.promises[promiseId] = { resolve, reject };
     });
     this.showMediaGallery(promiseId, props);
@@ -112,7 +110,7 @@ export class MediaGalleryService extends Service {
 
     const req = this.formRequest('api/v5/slobs/uploads', {
       body: formData,
-      method: 'POST'
+      method: 'POST',
     });
 
     await fetch(req);
@@ -141,8 +139,8 @@ export class MediaGalleryService extends Service {
       queryParams: { promiseId, ...props },
       size: {
         width: 1100,
-        height: 680
-      }
+        height: 680,
+      },
     });
   }
 
@@ -155,8 +153,7 @@ export class MediaGalleryService extends Service {
 
   private async fetchFiles(): Promise<IMediaGalleryFile[]> {
     const req = this.formRequest('api/v5/slobs/uploads');
-    const files: { href: string, size?: number }[] = await fetch(req)
-      .then(resp => resp.json());
+    const files: { href: string; size?: number }[] = await fetch(req).then(resp => resp.json());
 
     const uploads = files.map(item => {
       const fileName = decodeURIComponent(item.href.split(/[\\/]/).pop());
@@ -180,14 +177,14 @@ export class MediaGalleryService extends Service {
         const resp = rawRes.json();
         return {
           maxUsage: resp.body.max_allowed_upload_usage,
-          maxFileSize: resp.body.max_allowed_upload_fize_size
+          maxFileSize: resp.body.max_allowed_upload_fize_size,
         };
       });
       return fileSize;
     } catch (e) {
       return {
         maxUsage: DEFAULT_MAX_USAGE,
-        maxFileSize: DEFAULT_MAX_FILE_SIZE
+        maxFileSize: DEFAULT_MAX_FILE_SIZE,
       };
     }
   }

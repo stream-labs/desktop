@@ -1,6 +1,5 @@
 import { ISettingsSubCategory } from '../settings';
 
-
 export interface ITcpServersSettings {
   token: string;
   namedPipe: {

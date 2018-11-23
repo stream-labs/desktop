@@ -3,27 +3,23 @@ import electron, { clipboard } from 'electron';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
-import {
-  MediaGalleryService,
-  IMediaGalleryFile,
-  IMediaGalleryInfo
-} from 'services/media-gallery';
+import { MediaGalleryService, IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
 
 const getTypeMap = () => ({
   title: {
     image: $t('Images'),
-    audio: $t('Sounds')
+    audio: $t('Sounds'),
   },
   noFilesCopy: {
-    image: $t('You don\'t have any uploaded images!'),
-    audio: $t('You don\'t have any uploaded sounds!')
+    image: $t("You don't have any uploaded images!"),
+    audio: $t("You don't have any uploaded sounds!"),
   },
   noFilesBtn: {
     image: $t('Upload An Image'),
-    audio: $t('Upload A Sound')
-  }
+    audio: $t('Upload A Sound'),
+  },
 });
 
 interface IToast {
@@ -33,7 +29,7 @@ interface IToast {
 }
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;
@@ -75,21 +71,18 @@ export default class MediaGallery extends Vue {
   }
 
   get noFilesCopy() {
-    return (
-      this.typeMap.noFilesCopy[this.type] ||
-      $t('You don\'t have any uploaded files!')
-    );
+    return this.typeMap.noFilesCopy[this.type] || $t("You don't have any uploaded files!");
   }
 
   get noFilesBtn() {
     return this.typeMap.noFilesBtn[this.type] || $t('Upload A File');
   }
 
-  get totalUsage( ) {
+  get totalUsage() {
     return this.galleryInfo ? this.galleryInfo.totalUsage : 0;
   }
 
-  get maxUsage( ) {
+  get maxUsage() {
     return this.galleryInfo ? this.galleryInfo.maxUsage : 0;
   }
 
@@ -114,10 +107,7 @@ export default class MediaGallery extends Vue {
     const divisor = Math.pow(10, places);
     const base = Math.log(bytes) / Math.log(1024);
     const suffix = ['', 'KB', 'MB', 'GB', 'TB'][Math.floor(base)];
-    return (
-      Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor +
-      suffix
-    );
+    return Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor + suffix;
   }
 
   onDragOver() {
@@ -136,7 +126,7 @@ export default class MediaGallery extends Vue {
     electron.remote.dialog.showOpenDialog(
       electron.remote.getCurrentWindow(),
       { properties: ['openFile', 'multiSelections'] },
-      this.upload
+      this.upload,
     );
   }
 
@@ -161,7 +151,7 @@ export default class MediaGallery extends Vue {
       return this.$toasted.show($t('Not a supported file type'), {
         duration: 1000,
         position: 'top-right',
-        className: 'toast-alert'
+        className: 'toast-alert',
       });
     }
     this.selectedFile = file;
@@ -171,14 +161,11 @@ export default class MediaGallery extends Vue {
       audio.play();
     }
 
-    if (select === true) this.handleSelect();
+    if (select) this.handleSelect();
   }
 
   handleSelect() {
-    this.mediaGalleryService.resolveFileSelect(
-      this.promiseId,
-      this.selectedFile
-    );
+    this.mediaGalleryService.resolveFileSelect(this.promiseId, this.selectedFile);
     this.windowsService.closeChildWindow();
   }
 
@@ -188,16 +175,14 @@ export default class MediaGallery extends Vue {
         electron.remote.getCurrentWindow(),
         {
           type: 'warning',
-          message: $t(
-            'Are you sure you want to delete this file? This action is irreversable.'
-          ),
-          buttons: [$t('Cancel'), $t('OK')]
+          message: $t('Are you sure you want to delete this file? This action is irreversable.'),
+          buttons: [$t('Cancel'), $t('OK')],
         },
         async ok => {
           if (!ok || !this.selectedFile) return;
           this.galleryInfo = await this.mediaGalleryService.deleteFile(this.selectedFile);
           this.selectedFile = null;
-        }
+        },
       );
     }
   }
@@ -209,12 +194,9 @@ export default class MediaGallery extends Vue {
       async filename => {
         if (!this.selectedFile) return;
         this.setBusy($t('Downloading...'));
-        await this.mediaGalleryService.downloadFile(
-          filename,
-          this.selectedFile
-        );
+        await this.mediaGalleryService.downloadFile(filename, this.selectedFile);
         this.setNotBusy();
-      }
+      },
     );
   }
 
@@ -227,7 +209,7 @@ export default class MediaGallery extends Vue {
   private setBusy(text: string) {
     this.busy = this.$toasted.show(text, {
       position: 'top-center',
-      className: 'toast-busy'
+      className: 'toast-busy',
     });
   }
 
@@ -242,13 +224,13 @@ export default class MediaGallery extends Vue {
       this.$toasted.show($t('URL Copied'), {
         duration: 1000,
         position: 'top-right',
-        className: 'toast-success'
+        className: 'toast-success',
       });
     } catch (e) {
       this.$toasted.show($t('Failed to copy URL'), {
         duration: 1000,
         position: 'top-right',
-        className: 'toast-alert'
+        className: 'toast-alert',
       });
     }
   }

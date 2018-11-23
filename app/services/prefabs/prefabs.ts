@@ -5,7 +5,7 @@ import {
   Source,
   SourcesService,
   TPropertiesManager,
-  TSourceType
+  TSourceType,
 } from 'services/sources';
 import { ScenesService, TSceneNode, TSceneNodeType } from 'services/scenes';
 import { Inject } from '../../util/injector';
@@ -16,17 +16,16 @@ import Utils from '../utils';
 import Vue from 'vue';
 
 interface IPrefabSourceCreateOptions {
-  name: string,
-  description?: string,
-  type: TSourceType,
-  settings: Dictionary<TObsValue>,
-  createOptions: ISourceAddOptions,
+  name: string;
+  description?: string;
+  type: TSourceType;
+  settings: Dictionary<TObsValue>;
+  createOptions: ISourceAddOptions;
 }
 
 interface IPrefabSource extends IPrefabSourceCreateOptions {
   id: string;
 }
-
 
 interface IPrefab {
   id: string;
@@ -49,10 +48,9 @@ interface IPrefabAddToSceneOptions {
  * Allows to add pre-configured items to scene
  */
 export class PrefabsService extends PersistentStatefulService<IPrefabsServiceState> {
-
   static defaultState: IPrefabsServiceState = {
     version: 1,
-    prefabs: {}
+    prefabs: {},
   };
 
   @Inject() private sourcesService: SourcesService;
@@ -61,14 +59,14 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   registerFromExistingSource(sourceId: string, name: string, description = ''): Prefab {
     const source = this.sourcesService.getSource(sourceId);
     return this.registerSourcePrefab({
-      type: source.type,
       name,
       description,
+      type: source.type,
       settings: source.getSettings(),
       createOptions: {
         propertiesManager: source.getPropertiesManagerType(),
-        propertiesManagerSettings: source.getPropertiesManagerSettings()
-      }
+        propertiesManagerSettings: source.getPropertiesManagerSettings(),
+      },
     });
   }
 
@@ -85,9 +83,9 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
       sources: {
         [id]: {
           ...prefabSourceModel,
-          id
-        }
-      }
+          id,
+        },
+      },
     };
     this.REGISTER_PREFAB(prefabModel);
     return this.getPrefab(id);
@@ -102,7 +100,7 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   }
 
   getPrefabByName(name: string): Prefab {
-    const id = Object.keys(this.state.prefabs).find(id => this.state.prefabs[id].name == name);
+    const id = Object.keys(this.state.prefabs).find(id => this.state.prefabs[id].name === name);
     return this.getPrefab(id);
   }
 
@@ -119,7 +117,7 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
    * only for the brand-device onboarding
    */
   addPrefabToActiveScene(prefabName: string) {
-    const prefab = this.getPrefabs().find(prefab => prefab.name == prefabName);
+    const prefab = this.getPrefabs().find(prefab => prefab.name === prefabName);
     if (!prefab) return;
     prefab.addToScene(this.scenesService.activeSceneId);
   }
@@ -134,7 +132,6 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
     Vue.delete(this.state.prefabs, id);
   }
 }
-
 
 @ServiceHelper()
 export class Prefab implements IPrefab {
@@ -164,7 +161,7 @@ export class Prefab implements IPrefab {
       options.name || prefabSourceModel.name,
       prefabSourceModel.type,
       prefabSourceModel.settings,
-      prefabSourceModel.createOptions
+      prefabSourceModel.createOptions,
     );
     return scene.addSource(source.sourceId);
   }

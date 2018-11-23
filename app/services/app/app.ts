@@ -56,7 +56,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: electron.remote.process.argv
+    argv: electron.remote.process.argv,
   };
 
   private autosaveInterval: number;
@@ -76,7 +76,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   private loadingPromises: Dictionary<Promise<any>> = {};
-
 
   private pid = require('process').pid;
 
@@ -104,7 +103,7 @@ export class AppService extends StatefulService<IAppState> {
     // the apps to already be in place when their sources are created.
     await this.platformAppsService.initialize();
 
-    await this.sceneCollectionsService.initialize()
+    await this.sceneCollectionsService.initialize();
 
     const onboarded = this.onboardingService.startOnboardingIfRequired();
 
@@ -168,7 +167,6 @@ export class AppService extends StatefulService<IAppState> {
    * @see RunInLoadingMode decorator
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
-
     if (!this.state.loading) {
       this.START_LOADING();
       this.windowsService.closeChildWindow();
@@ -210,7 +208,6 @@ export class AppService extends StatefulService<IAppState> {
     if (error) throw error;
     return returningValue;
   }
-
 
   @mutation()
   private START_LOADING() {

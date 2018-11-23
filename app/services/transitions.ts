@@ -354,9 +354,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const id = uuid();
     this.ADD_CONNECTION({
       id,
+      transitionId,
       fromSceneId: fromId,
       toSceneId: toId,
-      transitionId,
     });
     return this.getConnection(id);
   }
@@ -417,9 +417,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
             // We really wanna make sure we're getting the right property
             if (setting.name && setting.name === 'path' && isUrl(setting.value as string)) {
               return { ...setting, value: '' };
-            } else {
-              return setting;
             }
+
+            return setting;
           }),
         );
       });
