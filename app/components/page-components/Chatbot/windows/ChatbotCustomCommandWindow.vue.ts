@@ -8,7 +8,12 @@ import { $t } from 'services/i18n';
 
 import { ICustomCommand, IChatbotErrorResponse } from 'services/chatbot';
 
-import { EInputType, IListMetadata, ITextMetadata, INumberMetadata } from '../../../shared/inputs';
+import {
+  EInputType,
+  IListMetadata,
+  ITextMetadata,
+  INumberMetadata,
+} from 'components/shared/inputs';
 
 @Component({
   components: {

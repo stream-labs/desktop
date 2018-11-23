@@ -30,7 +30,9 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
     if (this.step === 1) {
       await this.chatbotApiService.updateSongRequestPreferencesData({ settings: this.settings });
       this.step++;
-    } else this.chatbotCommonService.closeChildWindow();
+    } else {
+      this.chatbotCommonService.closeChildWindow();
+    }
   }
 
   onTogglePrevHandler() {

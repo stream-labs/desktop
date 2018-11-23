@@ -8,8 +8,12 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { IListMetadata, ITextMetadata, INumberMetadata, EInputType } from '../../../shared/inputs';
-
+import {
+  IListMetadata,
+  ITextMetadata,
+  INumberMetadata,
+  EInputType,
+} from 'components/shared/inputs';
 import { IAlertMessage, NEW_ALERT_MODAL_ID, ChatbotAlertType } from 'services/chatbot';
 
 interface INewAlertMetadata {

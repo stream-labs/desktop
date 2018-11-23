@@ -4,10 +4,8 @@ import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
 import { IQuotePreferencesGeneralSettings } from 'services/chatbot';
-
-import { EInputType } from '../../../shared/inputs';
+import { EInputType } from 'components/shared/inputs';
 
 @Component({
   components: { ValidatedForm },

@@ -4,7 +4,6 @@ import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
 import { IQuote, IChatbotErrorResponse } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
