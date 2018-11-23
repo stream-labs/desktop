@@ -3,7 +3,7 @@
     <div
       class="section"
       v-for="(formGroup, groupIndex) in value"
-      :key="formGroup.nameSubCategory"
+      :key="formGroup.nameSubCategory + groupIndex"
       v-if="hasAnyVisibleSettings(formGroup)"
       ref="container">
 
