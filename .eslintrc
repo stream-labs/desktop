@@ -37,5 +37,10 @@
       "varsIgnorePattern": "^_",
       "argsIgnorePattern": "^_"
     } ]
-  }
+  },
+  "overrides": [{
+    "files": "app/**/*.ts",
+    "parser": "typescript-eslint-parser",
+    "plugins": ["typescript"]
+  }]
 }

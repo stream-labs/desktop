@@ -4514,6 +4514,13 @@ eslint-plugin-react@^7.11.0:
     jsx-ast-utils "^2.0.1"
     prop-types "^15.6.2"
 
+eslint-plugin-typescript@^0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-typescript/-/eslint-plugin-typescript-0.13.0.tgz#07fa9a166dee1daff14716c70fb8fb7c6583d852"
+  integrity sha512-dN8EwZfkOobYJ6VCFJ0Kd39OLSectdJlkG5L+VmA2BtMunZALQus6XLx21Gkj6vmfmUDk6uEGCB7JCszhvZoTA==
+  dependencies:
+    requireindex "~1.1.0"
+
 eslint-plugin-vue@2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-vue/-/eslint-plugin-vue-2.1.0.tgz#50ed0b7e9a2389d90e689743a3cc26b502441b69"
@@ -7262,6 +7269,11 @@ lodash.topairs@4.3.0:
   resolved "https://registry.yarnpkg.com/lodash.topairs/-/lodash.topairs-4.3.0.tgz#3b6deaa37d60fb116713c46c5f17ea190ec48d64"
   integrity sha1-O23qo31g+xFnE8RsXxfqGQ7EjWQ=
 
+lodash.unescape@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/lodash.unescape/-/lodash.unescape-4.0.1.tgz#bf2249886ce514cda112fae9218cdc065211fc9c"
+  integrity sha1-vyJJiGzlFM2hEvrpIYzcBlIR/Jw=
+
 lodash.union@~4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.union/-/lodash.union-4.6.0.tgz#48bb5088409f16f1821666641c44dd1aaae3cd88"
@@ -7287,7 +7299,7 @@ lodash@4.17.10, lodash@^4.14.0, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5,
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
   integrity sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
 
-lodash@4.17.11, lodash@^4.2.1, lodash@^4.5.1:
+lodash@4.17.11, lodash@^4.17.11, lodash@^4.2.1, lodash@^4.5.1:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
@@ -10212,6 +10224,11 @@ require-uncached@^1.0.3:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
 
+requireindex@~1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.1.0.tgz#e5404b81557ef75db6e49c5a72004893fe03e162"
+  integrity sha1-5UBLgVV+91225JxacgBIk/4D4WI=
+
 requires-port@1.0.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
@@ -10475,7 +10492,7 @@ semver-diff@^2.0.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.4.1.tgz#e059c09d8571f0540823733433505d3a2f00b18e"
   integrity sha512-WfG/X9+oATh81XtllIo/I8gOiY9EXRdv1cQdyykeXK17YcUW3EXUAi2To4pcH6nZtJPr7ZOpM5OMyWJZm+8Rsg==
 
-semver@^5.0.3, semver@^5.5.0:
+semver@5.5.0, semver@^5.0.3, semver@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
   integrity sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
@@ -11754,6 +11771,24 @@ typedoc@0.11.1:
     shelljs "^0.8.1"
     typedoc-default-themes "^0.5.0"
     typescript "2.7.2"
+
+typescript-eslint-parser@^21.0.1:
+  version "21.0.1"
+  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-21.0.1.tgz#710ea628a72144e1ec3a1d6b9f5b2b0a5a520e04"
+  integrity sha512-rdtAzg0eTTv/+YRLBJZBAAuOHHyYiElE2HdkaOGf9kKGce811zP3JRPzDybCJQamdsxyEsMe6CyIk2JCEnw/4g==
+  dependencies:
+    eslint-scope "^4.0.0"
+    eslint-visitor-keys "^1.0.0"
+    lodash "^4.17.11"
+    typescript-estree "5.0.0"
+
+typescript-estree@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/typescript-estree/-/typescript-estree-5.0.0.tgz#6aaa33b96abf5edce165099630e2ccd997a95609"
+  integrity sha512-/FHoH7ECP+Y6CLS7MdRD0Hu7b3HgsD7k6ArNWgoXK3fW0eSZGj+t04Mf4aQ6EBj04WoHALkReYMfGbTzaDPKEg==
+  dependencies:
+    lodash.unescape "4.0.1"
+    semver "5.5.0"
 
 typescript@2.7.2:
   version "2.7.2"
