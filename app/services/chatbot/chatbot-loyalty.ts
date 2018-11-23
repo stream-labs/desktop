@@ -98,12 +98,14 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
       });
   }
 
-  updateLoyaltyPreferences(data: ILoyaltyPreferencesResponse) {
+  updateLoyaltyPreferences(data: ILoyaltyPreferencesResponse, closeChild: boolean = true) {
     return this.chatbotBaseApiService.api('POST','settings/loyalty',data).then(
       (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchLoyaltyPreferences();
-          this.chatbotCommonService.closeChildWindow();
+          if(closeChild){
+            this.chatbotCommonService.closeChildWindow();
+          }
         }
       }
     )

@@ -29,12 +29,22 @@ export default class ChatbotLoyalty extends ChatbotBase {
     this.chatbotApiService.Common.openLoyaltyAddAllWindow();
   }
 
+  onEnableLoyaltyHandler(){
+    let newSettings = this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse;
+    newSettings.enabled = true;
+    this.chatbotApiService.Loyalty.updateLoyaltyPreferences(newSettings, false);
+  }
+
   onOpenLoyaltyWindowHandler(loyalty?: ILoyaltyData) {
     this.chatbotApiService.Common.openLoyaltyWindow(loyalty);
   }
 
   get totalPages() {
     return this.chatbotApiService.Loyalty.state.loyaltyResponse.pagination.total;
+  }
+
+  get enabled(){
+    return this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse.enabled;
   }
 
   get currentPage() {
