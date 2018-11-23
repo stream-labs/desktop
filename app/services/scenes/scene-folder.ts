@@ -13,7 +13,7 @@ import { ISceneItemFolder } from './scenes-api';
 export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
   name: string;
 
-  private sceneFolderState: ISceneItemFolder;
+  private readonly sceneFolderState: ISceneItemFolder;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;

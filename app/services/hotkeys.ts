@@ -459,7 +459,7 @@ export class Hotkey implements IHotkey {
 
   @Inject() private hotkeysService: HotkeysService;
 
-  private hotkeyModel: IHotkey;
+  private readonly hotkeyModel: IHotkey;
 
   constructor(hotkeyModel: IHotkey) {
     Object.assign(this, hotkeyModel);

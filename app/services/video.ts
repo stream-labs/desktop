@@ -42,7 +42,7 @@ export class Display {
   electronWindowId: number;
   slobsWindowId: string;
 
-  private selectionSubscription: Subscription;
+  private readonly selectionSubscription: Subscription;
 
   sourceId: string;
 

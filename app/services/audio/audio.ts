@@ -310,7 +310,7 @@ export class AudioSource implements IAudioSourceApi {
   @Inject()
   private sourcesService: SourcesService;
 
-  private audioSourceState: IAudioSource;
+  private readonly audioSourceState: IAudioSource;
 
   constructor(sourceId: string) {
     this.audioSourceState = this.audioService.state.audioSources[sourceId];

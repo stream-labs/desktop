@@ -40,7 +40,7 @@ export class Scene implements ISceneApi {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
 
-  private sceneState: IScene;
+  private readonly sceneState: IScene;
 
   constructor(sceneId: string) {
     this.sceneState = this.scenesService.state.scenes[sceneId];

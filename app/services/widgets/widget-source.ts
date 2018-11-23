@@ -16,7 +16,7 @@ export class WidgetSource implements IWidgetSource {
   readonly sourceId: string;
   readonly previewSourceId: string;
 
-  private widgetSourceState: IWidgetSource;
+  private readonly widgetSourceState: IWidgetSource;
 
   constructor(sourceId: string) {
     this.widgetSourceState = this.widgetsService.state.widgetSources[sourceId];

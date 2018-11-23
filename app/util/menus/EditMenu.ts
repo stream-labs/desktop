@@ -33,7 +33,8 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
 
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
-  private source: Source;
+
+  private readonly source: Source;
 
   constructor(private options: IEditMenuOptions) {
     super();

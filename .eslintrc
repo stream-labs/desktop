@@ -14,7 +14,7 @@
     "node": true
   },
   "globals": {
-    "Electron": false,
+    "Electron": false
   },
   "settings": {
     "import/resolver": "webpack"
