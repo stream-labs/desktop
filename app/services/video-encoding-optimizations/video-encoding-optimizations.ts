@@ -67,6 +67,7 @@ export class VideoEncodingOptimizationService
   @Inject() private urlService: UrlService;
 
   init() {
+    super.init();
     this.streamingService.streamingStatusChange.subscribe(status => {
       if (
         status === EStreamingState.Offline &&

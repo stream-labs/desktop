@@ -57,7 +57,7 @@ const simpleEncoderToAndancedEncoderMap = {
  */
 export const encoderFieldsMap = {
   x264: { preset: 'preset', encoderOptions: 'x264opts' },
-  nvenc: { preset: 'NVENCPreset' },
+  nvenc: { preset: 'preset' },
   qsv: { preset: 'QSVPreset' }
 };
 
@@ -144,7 +144,7 @@ export class StreamEncoderSettingsService extends Service {
     const encoder = settingsPatch.encoder || currentSettings.encoder;
 
     if (settingsPatch.outputResolution) {
-      this.settingsService.setSettingValue('Output', 'RescaleRes', settingsPatch.outputResolution);
+      this.settingsService.setSettingValue('Video', 'Output', settingsPatch.outputResolution);
     }
 
     if (settingsPatch.preset) {

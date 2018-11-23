@@ -203,6 +203,8 @@ export default class EditStreamInfo extends Vue {
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
+    this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
+
     this.streamInfoService
       .setStreamInfo(this.streamTitleModel.value, this.streamDescriptionModel.value, this.gameModel.value)
       .then(success => {
