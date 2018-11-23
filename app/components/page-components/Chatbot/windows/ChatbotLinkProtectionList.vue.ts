@@ -4,12 +4,10 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { ITextMetadata } from 'components/shared/inputs/index';
 
-import {
-  NEW_LINK_PROTECTION_LIST_MODAL_ID
-} from 'services/chatbot';
+import { NEW_LINK_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotLinkProtectionList extends ChatbotBase {
   $refs: {
@@ -28,7 +26,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
 
   textInputMetadata: ITextMetadata = {
     required: true,
-    placeholder: 'Add a link to add to list'
+    placeholder: 'Add a link to add to list',
   };
 
   get NEW_LINK_PROTECTION_LIST_MODAL_ID() {
@@ -36,11 +34,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   }
 
   get isDuplicate() {
-    return (
-      this.value.length > 0 &&
-      this.newListItem &&
-      this.value.indexOf(this.newListItem) > -1
-    );
+    return this.value.length > 0 && this.newListItem && this.value.indexOf(this.newListItem) > -1;
   }
 
   onAddingNewItemHandler(editedItem?: string, index: number = -1) {

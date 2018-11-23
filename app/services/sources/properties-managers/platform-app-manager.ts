@@ -38,8 +38,9 @@ export class PlatformAppManager extends PropertiesManager {
 
         // Force an update, since the URL probably didn't change, so
         // the browser source won't automatically reload it
-        (this.obsSource.properties.get('refreshnocache') as obs.IButtonProperty)
-          .buttonClicked(this.obsSource);
+        (this.obsSource.properties.get('refreshnocache') as obs.IButtonProperty).buttonClicked(
+          this.obsSource,
+        );
       }
     });
 
@@ -65,7 +66,7 @@ export class PlatformAppManager extends PropertiesManager {
     const url = this.platformAppsService.getPageUrlForSource(
       this.settings.appId,
       this.settings.appSourceId,
-      this.settings.appSettings
+      this.settings.appSettings,
     );
 
     // This app was uninstalled or unsubscribed to

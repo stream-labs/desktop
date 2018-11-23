@@ -53,21 +53,20 @@ export interface IEventListData extends IWidgetData {
 
 @InheritMutations()
 export class EventListService extends WidgetSettingsService<IEventListData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.EventList,
       url: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
+      previewUrl: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,
       settingsUpdateEvent: 'eventListSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
-    }
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+    };
   }
 
   getMetadata() {
@@ -78,14 +77,13 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
           { title: 'Boxed', value: 'boxed' },
           { title: 'Twitch', value: 'twitch' },
           { title: 'Old School', value: 'oldschool' },
-          { title: 'Chunky', value: 'chunky' }
-        ]
+          { title: 'Chunky', value: 'chunky' },
+        ],
       }),
       message_hide_delay: metadata.slider({
         min: 0,
-        max: 200
-      })
+        max: 200,
+      }),
     };
   }
-
 }

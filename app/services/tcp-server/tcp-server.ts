@@ -12,17 +12,15 @@ import {
   E_JSON_RPC_ERROR,
   IJsonRpcEvent,
   IJsonRpcRequest,
-  IJsonRpcResponse
+  IJsonRpcResponse,
 } from 'services/jsonrpc';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from '../usage-statistics';
 
 const net = require('net');
 
-
 const LOCAL_HOST_NAME = '127.0.0.1';
 const WILDCARD_HOST_NAME = '0.0.0.0';
-
 
 interface IClient {
   id: number;
@@ -47,19 +45,19 @@ interface IServer {
 
 const TCP_PORT = 28194;
 
-export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceApi {
-
+export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
+  implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {
     token: '',
     namedPipe: {
       enabled: true,
-      pipeName: 'slobs'
+      pipeName: 'slobs',
     },
     websockets: {
       enabled: false,
       port: 59650,
-      allowRemote: false
-    }
+      allowRemote: false,
+    },
   };
 
   @Inject() private jsonrpcService: JsonrpcService;
@@ -73,19 +71,16 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   // enable to debug
   private enableLogs = false;
 
-
   init() {
     super.init();
     this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
   }
-
 
   listen() {
     this.listenConnections(this.createTcpServer());
     if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
-
 
   /**
    * stop handle any requests
@@ -99,7 +94,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   startRequestsHandling() {
     this.isRequestsHandlingStopped = false;
   }
-
 
   stopListening() {
     this.servers.forEach(server => server.close());
@@ -115,18 +109,16 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       websockets: {
         ...defaultWebsoketsSettings,
         enabled: true,
-        allowRemote: true
-      }
+        allowRemote: true,
+      },
     });
 
     this.listen();
   }
 
-
   getDefaultSettings(): ITcpServersSettings {
     return TcpServerService.defaultState;
   }
-
 
   setSettings(settings: Partial<ITcpServersSettings>) {
     const needToGenerateToken =
@@ -146,7 +138,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         nameSubCategory: 'Named Pipe',
         codeSubCategory: 'namedPipe',
         parameters: [
-          <IObsInput<boolean>> {
+          <IObsInput<boolean>>{
             value: settings.namedPipe.enabled,
             name: 'enabled',
             description: 'Enabled',
@@ -155,21 +147,21 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: true,
           },
 
-          <IObsInput<string>> {
+          <IObsInput<string>>{
             value: settings.namedPipe.pipeName,
             name: 'pipeName',
             description: 'Pipe Name',
             type: 'OBS_PROPERTY_TEXT',
             visible: true,
             enabled: settings.namedPipe.enabled,
-          }
-        ]
+          },
+        ],
       },
       {
         nameSubCategory: 'Websockets',
         codeSubCategory: 'websockets',
         parameters: [
-          <IObsInput<boolean>> {
+          <IObsInput<boolean>>{
             value: settings.websockets.enabled,
             name: 'enabled',
             description: 'Enabled',
@@ -178,7 +170,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: true,
           },
 
-          <IObsInput<boolean>> {
+          <IObsInput<boolean>>{
             value: settings.websockets.allowRemote,
             name: 'allowRemote',
             description: 'Allow Remote Connections',
@@ -187,7 +179,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: settings.websockets.enabled,
           },
 
-          <IObsInput<number>> {
+          <IObsInput<number>>{
             value: settings.websockets.port,
             name: 'port',
             description: 'Port',
@@ -196,9 +188,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             maxVal: 65535,
             visible: true,
             enabled: settings.websockets.enabled,
-          }
-        ]
-      }
+          },
+        ],
+      },
     ];
   }
 
@@ -212,7 +204,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           interface: ifaceName,
           address: interfaceInfo.address,
           family: interfaceInfo.family,
-          internal: interfaceInfo.internal
+          internal: interfaceInfo.internal,
         });
       });
     });
@@ -223,7 +215,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     const buf = new Uint8Array(20);
     crypto.randomFillSync(buf);
     let token = '';
-    buf.forEach(val => token += val.toString(16));
+    buf.forEach(val => (token += val.toString(16)));
     this.setSettings({ token });
     return token;
   }
@@ -231,13 +223,12 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private listenConnections(server: IServer) {
     this.servers.push(server);
 
-    server.nativeServer.on('connection', (socket) => this.onConnectionHandler(socket, server));
+    server.nativeServer.on('connection', socket => this.onConnectionHandler(socket, server));
 
-    server.nativeServer.on('error', (error) => {
+    server.nativeServer.on('error', error => {
       throw error;
     });
   }
-
 
   private createNamedPipeServer(): IServer {
     const settings = this.state.namedPipe;
@@ -248,10 +239,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       nativeServer: server,
       close() {
         server.close();
-      }
+      },
     };
   }
-
 
   private createTcpServer(): IServer {
     const server = net.createServer();
@@ -261,10 +251,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       nativeServer: server,
       close() {
         server.close();
-      }
+      },
     };
   }
-
 
   private createWebsoketsServer(): IServer {
     const settings = this.state.websockets;
@@ -272,27 +261,27 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     const sockjs = require('sockjs');
     const websocketsServer = sockjs.createServer();
     const httpServer = http.createServer();
-    websocketsServer.installHandlers(httpServer, { prefix:'/api' });
+    websocketsServer.installHandlers(httpServer, { prefix: '/api' });
     httpServer.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
     return {
       type: 'websockets',
       nativeServer: websocketsServer,
       close() {
         httpServer.close();
-      }
+      },
     };
   }
-
 
   private onConnectionHandler(socket: WritableStream, server: IServer) {
     this.log('new connection', socket);
 
     const id = this.nextClientId++;
     const client: IClient = {
-      id, socket,
+      id,
+      socket,
       subscriptions: [],
       listenAllSubscriptions: false,
-      isAuthorized: false
+      isAuthorized: false,
     };
     this.clients[id] = client;
 
@@ -313,7 +302,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     });
   }
 
-
   private authorizeClient(client: IClient) {
     client.isAuthorized = true;
   }
@@ -329,11 +317,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.log('tcp request', data);
 
     if (this.isRequestsHandlingStopped) {
-
-      this.sendResponse(client, this.jsonrpcService.createError(null, {
-        code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-        message: 'API server is busy. Try again later'
-      }));
+      this.sendResponse(
+        client,
+        this.jsonrpcService.createError(null, {
+          code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+          message: 'API server is busy. Try again later',
+        }),
+      );
 
       return;
     }
@@ -350,7 +340,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         if (errorMessage) {
           const errorResponse = this.jsonrpcService.createError(request, {
             code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-            message: errorMessage
+            message: errorMessage,
           });
           this.sendResponse(client, errorResponse);
           return;
@@ -373,26 +363,27 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       } catch (e) {
         this.sendResponse(
           client,
-          this.jsonrpcService.createError(null,{
+          this.jsonrpcService.createError(null, {
             code: E_JSON_RPC_ERROR.INVALID_REQUEST,
-            message: 'Make sure that the request is valid json. ' +
-            'If request string contains multiple requests, ensure requests are separated ' +
-            'by a single newline character LF ( ASCII code 10)'
-          }));
+            message:
+              'Make sure that the request is valid json. ' +
+              'If request string contains multiple requests, ensure requests are separated ' +
+              'by a single newline character LF ( ASCII code 10)',
+          }),
+        );
       }
     });
   }
-
 
   private onServiceEventHandler(event: IJsonRpcResponse<IJsonRpcEvent>) {
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
-      const needToSendEvent = client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
+      const needToSendEvent =
+        client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
       if (needToSendEvent) this.sendResponse(client, event);
     });
   }
-
 
   private validateRequest(request: IJsonRpcRequest): string {
     let message = '';
@@ -402,28 +393,24 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     return message;
   }
 
-
   private hadleTcpServerDirectives(client: IClient, request: IJsonRpcRequest) {
-
     // handle auth
-    if (
-      request.method === 'auth' &&
-      request.params.resource === 'TcpServerService'
-    ) {
+    if (request.method === 'auth' && request.params.resource === 'TcpServerService') {
       if (this.state.token && request.params.args[0] === this.state.token) {
         this.authorizeClient(client);
-        this.sendResponse(client,{
+        this.sendResponse(client, {
           jsonrpc: '2.0',
           id: request.id,
-          result: true
+          result: true,
         });
       } else {
         this.sendResponse(
           client,
-          this.jsonrpcService.createError(request,{
+          this.jsonrpcService.createError(request, {
             code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-            message: 'Invalid token'
-          }));
+            message: 'Invalid token',
+          }),
+        );
       }
 
       return true;
@@ -432,13 +419,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     if (!client.isAuthorized) {
       this.sendResponse(
         client,
-        this.jsonrpcService.createError(request,{
+        this.jsonrpcService.createError(request, {
           code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-          message: 'Authorization required. Use TcpServerService.auth(token) method'
-        }));
+          message: 'Authorization required. Use TcpServerService.auth(token) method',
+        }),
+      );
       return true;
     }
-
 
     // handle unsubscribing by clearing client subscriptions
     if (
@@ -447,10 +434,10 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     ) {
       const subscriptionInd = client.subscriptions.indexOf(request.params.resource);
       if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);
-      this.sendResponse(client,{
+      this.sendResponse(client, {
         jsonrpc: '2.0',
         id: request.id,
-        result: subscriptionInd !== -1
+        result: subscriptionInd !== -1,
       });
       return true;
     }
@@ -461,21 +448,19 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       request.params.resource === 'TcpServerService'
     ) {
       client.listenAllSubscriptions = true;
-      this.sendResponse(client,{
+      this.sendResponse(client, {
         jsonrpc: '2.0',
         id: request.id,
-        result: true
+        result: true,
       });
       return true;
     }
   }
 
-
   private onDisconnectHandler(client: IClient) {
     this.log('client disconnected');
     delete this.clients[client.id];
   }
-
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
     this.log('send response', response);

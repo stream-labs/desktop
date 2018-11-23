@@ -40,19 +40,23 @@ export interface IRequestHandler {
  * This class allows injection of functions into webviews.
  */
 export class GuestApiService extends Service {
-
   handlers: Dictionary<Function> = {};
 
   init() {
-    electron.ipcRenderer.on('guestApiRequest', (event: Electron.Event, request: IGuestApiRequest) => {
-      const { webContentsId } = request;
+    electron.ipcRenderer.on(
+      'guestApiRequest',
+      (event: Electron.Event, request: IGuestApiRequest) => {
+        const { webContentsId } = request;
 
-      if (this.handlers[webContentsId]) {
-        this.handlers[webContentsId](request);
-      } else {
-        console.error(`Received guest API request from unregistered webContents ${webContentsId}`);
-      }
-    });
+        if (this.handlers[webContentsId]) {
+          this.handlers[webContentsId](request);
+        } else {
+          console.error(
+            `Received guest API request from unregistered webContents ${webContentsId}`,
+          );
+        }
+      },
+    );
   }
 
   /**
@@ -84,14 +88,14 @@ export class GuestApiService extends Service {
       const contents = electron.remote.webContents.fromId(webContentsId);
 
       const mappedArgs = request.args.map(arg => {
-        const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__guestApiCallback;
+        const isCallbackPlaceholder = typeof arg === 'object' && arg && arg.__guestApiCallback;
 
         if (isCallbackPlaceholder) {
           return (...args: any[]) => {
             const callbackObj: IGuestApiCallback = {
               requestId: request.id,
               callbackId: arg.id,
-              args
+              args,
             };
 
             this.safeSend(contents, 'guestApiCallback', callbackObj);
@@ -108,7 +112,7 @@ export class GuestApiService extends Service {
         const response: IGuestApiResponse = {
           id: request.id,
           error: true,
-          result: `Error: The function ${request.methodPath.join('.')} does not exist!`
+          result: `Error: The function ${request.methodPath.join('.')} does not exist!`,
         };
         this.safeSend(contents, 'guestApiResponse', response);
         return;
@@ -122,7 +126,7 @@ export class GuestApiService extends Service {
             const response: IGuestApiResponse = {
               id: request.id,
               error: false,
-              result
+              result,
             };
 
             this.safeSend(contents, 'guestApiResponse', response);
@@ -133,13 +137,13 @@ export class GuestApiService extends Service {
             const response: IGuestApiResponse = {
               id: request.id,
               error: true,
-              result
+              result,
             };
 
             this.safeSend(contents, 'guestApiResponse', response);
           });
       }
-    }
+    };
 
     webContents.send('guestApiReady');
   }
@@ -168,7 +172,7 @@ export class GuestApiService extends Service {
       const endpoint = handler[path[0]];
 
       // Make sure this actually looks like an endpoint
-      if ((endpoint instanceof Function) || (endpoint instanceof Observable)) return endpoint;
+      if (endpoint instanceof Function || endpoint instanceof Observable) return endpoint;
       return;
     }
 

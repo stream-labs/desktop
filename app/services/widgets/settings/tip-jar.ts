@@ -14,13 +14,13 @@ interface ITipJarSettings extends IWidgetSettings {
   background_color: string;
   background: any;
   custom_html_enabled: boolean;
-  text: { color: string, font: string, show: boolean, size: number };
+  text: { color: string; font: string; show: boolean; size: number };
   types: {
-    tips: { enabled: boolean, minimum_amount?: number, tiers: ITipDarTierData[] },
-    twitch_bits: { enabled: boolean, minimum_amount?: number },
-    twitch_follows: { enabled: boolean, image_src?: string },
-    twitch_resubs: { enabled: boolean, minimum_amount?: number },
-    twitch_subs: { enabled: boolean, minimum_amount?: number }
+    tips: { enabled: boolean; minimum_amount?: number; tiers: ITipDarTierData[] };
+    twitch_bits: { enabled: boolean; minimum_amount?: number };
+    twitch_follows: { enabled: boolean; image_src?: string };
+    twitch_resubs: { enabled: boolean; minimum_amount?: number };
+    twitch_subs: { enabled: boolean; minimum_amount?: number };
   };
 }
 
@@ -36,19 +36,18 @@ export interface ITipJarData extends IWidgetData {
 
 @InheritMutations()
 export class TipJarService extends WidgetSettingsService<ITipJarData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.TipJar,
       url: `https://${this.getHost()}/widgets/tip-jar/v1/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
+      previewUrl: `https://${this.getHost()}/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/tipjar`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/tipjar`,
       settingsUpdateEvent: 'tipJarSettingsUpdate',
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
-    }
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+    };
   }
 
   protected patchAfterFetch(data: any): ITipJarData {
@@ -62,6 +61,4 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
     data.background.color = data.background_color;
     return data;
   }
-
-
 }

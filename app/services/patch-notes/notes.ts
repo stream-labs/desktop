@@ -10,7 +10,6 @@ export const notes: IPatchNotes = {
     'Fixed some issues when editing widget settings',
     'Fixed a source of errors on shutdown',
     'Fixed infinite loading when opening Widget Editor in some cases',
-    'Fixed an invalid server error in some cases'
-    
-  ]
+    'Fixed an invalid server error in some cases',
+  ],
 };

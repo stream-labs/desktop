@@ -49,14 +49,14 @@ export class OutageNotificationsService extends Service {
 
     action = this.jsonrpcService.createRequest(
       Service.getResourceId(this.notificationsService),
-      'showNotifications'
+      'showNotifications',
     );
 
     if (url) {
       action = this.jsonrpcService.createRequest(
         Service.getResourceId(this),
         'openBrowserWindow',
-        url
+        url,
       );
     }
 
@@ -64,7 +64,7 @@ export class OutageNotificationsService extends Service {
       message,
       type: ENotificationType.WARNING,
       lifeTime: -1,
-      action
+      action,
     });
   }
 
@@ -120,5 +120,4 @@ export class OutageNotificationsService extends Service {
   private get messageUrl() {
     return `https://s3-us-west-2.amazonaws.com/${S3_BUCKET}/${S3_KEY}`;
   }
-
 }

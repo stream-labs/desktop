@@ -13,10 +13,9 @@ interface IColor {
 }
 
 @Component({
-  components: { ColorPicker: VueColor.Sketch }
+  components: { ColorPicker: VueColor.Sketch },
 })
 class ObsColorInput extends ObsInput<IObsInput<number>> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -30,18 +29,11 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
 
   @debounce(500)
   setValue(rgba: IColor) {
-
     if (!_.isEqual(rgba, this.obsColor)) {
-      const intColor = Utils.rgbaToInt(
-        rgba.r,
-        rgba.g,
-        rgba.b,
-        Math.round(255 * rgba.a),
-      );
+      const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, Math.round(255 * rgba.a));
       this.emitInput({ ...this.value, value: intColor });
     }
   }
-
 
   mounted() {
     this.setValue(this.obsColor);
@@ -65,10 +57,9 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
   get swatchStyle() {
     return {
       backgroundColor: '#' + this.hexColor,
-      opacity: this.obsColor.a || 1
+      opacity: this.obsColor.a || 1,
     };
   }
-
 
   get obsColor(): IColor {
     const rgba = Utils.intToRgba(this.value.value);
@@ -76,7 +67,7 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
       r: rgba.r,
       g: rgba.g,
       b: rgba.b,
-      a: Number((rgba.a / 255).toFixed(2))
+      a: Number((rgba.a / 255).toFixed(2)),
     };
   }
 
@@ -85,7 +76,6 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
     if (result.length === 1) result = '0' + result;
     return result;
   }
-
 }
 
 ObsColorInput.obsType = 'OBS_PROPERTY_COLOR';

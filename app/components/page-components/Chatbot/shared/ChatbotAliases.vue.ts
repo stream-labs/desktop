@@ -1,9 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
-import {
-  ITextMetadata,
-} from 'components/shared/inputs/index';
+import { ITextMetadata } from 'components/shared/inputs/index';
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
@@ -13,14 +11,12 @@ export default class ChatbotAliases extends ChatbotBase {
   newAlias: string = '';
 
   textInputMetadata: ITextMetadata = {
-    placeholder: '!example'
+    placeholder: '!example',
   };
 
   get isDuplicate() {
     // remove "!" and check the rest
-    const existingWithoutPrefix = this.value.map(alias =>
-      alias.replace('!', '')
-    );
+    const existingWithoutPrefix = this.value.map(alias => alias.replace('!', ''));
     const newWithoutPrefix = this.newAlias.replace('!', '');
     return (
       existingWithoutPrefix.length > 0 &&

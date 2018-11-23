@@ -5,7 +5,7 @@ import uuid from 'uuid/v4';
 export enum EDeviceType {
   audioInput = 'audioInput',
   audioOutput = 'audioOutput',
-  videoInput = 'videoInput'
+  videoInput = 'videoInput',
 }
 
 export interface IDevice {
@@ -20,10 +20,9 @@ export interface IHardwareServiceState {
 }
 
 export class HardwareService extends StatefulService<IHardwareServiceState> {
-
   static initialState: IHardwareServiceState = {
     devices: [],
-    dshowDevices: []
+    dshowDevices: [],
   };
 
   init() {
@@ -53,50 +52,52 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid());
     const obsVideoInput = obs.InputFactory.create('dshow_input', uuid());
 
-    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
+    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
+      (item: { name: string; value: string }) => {
         devices.push({
           id: item.value,
           description: item.name,
-          type: EDeviceType.audioInput
+          type: EDeviceType.audioInput,
         });
-      });
+      },
+    );
 
-    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
+    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
+      (item: { name: string; value: string }) => {
         devices.push({
           id: item.value,
           description: item.name,
-          type: EDeviceType.audioOutput
+          type: EDeviceType.audioOutput,
         });
-      });
+      },
+    );
 
-    (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
+    (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items.forEach(
+      (item: { name: string; value: string }) => {
         dshowDevices.push({
           id: item.value,
           description: item.name,
-          type: EDeviceType.videoInput
+          type: EDeviceType.videoInput,
         });
-      });
+      },
+    );
 
-    const audioDeviceIdProp = (obsVideoInput.properties.get('audio_device_id') as obs.IListProperty);
+    const audioDeviceIdProp = obsVideoInput.properties.get('audio_device_id') as obs.IListProperty;
     // audioDeviceIdProp can be null if no devices exist
     if (audioDeviceIdProp) {
-      audioDeviceIdProp.details.items
-        .forEach((item: { name: string, value: string}) => {
-          dshowDevices.push({
-            id: item.value,
-            description: item.name,
-            type: EDeviceType.audioInput
-          });
+      audioDeviceIdProp.details.items.forEach((item: { name: string; value: string }) => {
+        dshowDevices.push({
+          id: item.value,
+          description: item.name,
+          type: EDeviceType.audioInput,
         });
+      });
     }
 
     obsAudioInput.release();
     obsAudioOutput.release();
     obsVideoInput.release();
-    return { devices, dshowDevices};
+    return { devices, dshowDevices };
   }
 
   @mutation()

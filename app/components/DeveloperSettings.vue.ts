@@ -12,11 +12,10 @@ import { PlatformAppsService } from 'services/platform-apps';
   components: {
     GenericFormGroups,
     ObsTextInput,
-    AppPlatformDeveloperSettings
-  }
+    AppPlatformDeveloperSettings,
+  },
 })
 export default class DeveloperSettings extends Vue {
-
   @Inject() tcpServerService: ITcpServerServiceApi;
   @Inject() platformAppsService: PlatformAppsService;
 
@@ -32,7 +31,7 @@ export default class DeveloperSettings extends Vue {
     return {
       description: 'API Token',
       value: this.tcpServerService.state.token,
-      masked: true
+      masked: true,
     };
   }
 
@@ -53,7 +52,6 @@ export default class DeveloperSettings extends Vue {
     this.settingsFormData = this.getApiSettingsFormData();
   }
 
-
   save(settingsData: ISettingsSubCategory[]) {
     const settings: Partial<ITcpServersSettings> = {};
     settingsData.forEach(subCategory => {
@@ -69,5 +67,4 @@ export default class DeveloperSettings extends Vue {
   private getApiSettingsFormData(): ISettingsSubCategory[] {
     return this.tcpServerService.getApiSettingsFormData();
   }
-
 }

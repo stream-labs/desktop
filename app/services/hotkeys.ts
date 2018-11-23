@@ -26,7 +26,6 @@ function getTransitionsService(): TransitionsService {
 
 type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
 
-
 /**
  * Represents the key bound to a hotkey action
  */
@@ -39,7 +38,6 @@ export interface IBinding {
     meta: boolean;
   };
 }
-
 
 interface IHotkeyAction {
   name: string;
@@ -54,7 +52,6 @@ interface IHotkeyAction {
   upHandler?(): void;
 }
 
-
 /**
  * All possible hotkeys should be defined in this object.
  * All information about the hotkey and its behavior is
@@ -62,8 +59,8 @@ interface IHotkeyAction {
  *
  * WARNING: Changing the name of existing hotkey actions
  * will cause people to lose their saved keybindings. The
-* name shouldn't really change after it is added.
-*/
+ * name shouldn't really change after it is added.
+ */
 const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   GENERAL: [
     {
@@ -73,7 +70,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       isActive: () => {
         const streamingService = getStreamingService();
         return streamingService.isStreaming;
-      }
+      },
     },
     {
       name: 'TOGGLE_STOP_STREAMING',
@@ -85,103 +82,108 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       isActive: () => {
         const streamingService = getStreamingService();
         return !streamingService.isStreaming;
-      }
+      },
     },
     {
       name: 'TOGGLE_START_RECORDING',
       description: () => $t('Start Recording'),
       down: () => getStreamingService().toggleRecording(),
-      isActive: () => getStreamingService().isRecording
+      isActive: () => getStreamingService().isRecording,
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
       description: () => $t('Stop Recording'),
       down: () => getStreamingService().toggleRecording(),
-      isActive: () => !getStreamingService().isRecording
+      isActive: () => !getStreamingService().isRecording,
     },
     {
       name: 'ENABLE_STUDIO_MODE',
       description: () => $t('Enable Studio Mode'),
       down: () => getTransitionsService().enableStudioMode(),
-      isActive: () => getTransitionsService().state.studioMode
+      isActive: () => getTransitionsService().state.studioMode,
     },
     {
       name: 'DISABLE_STUDIO_MODE',
       description: () => $t('Disable Studio Mode'),
       down: () => getTransitionsService().disableStudioMode(),
-      isActive: () => !getTransitionsService().state.studioMode
+      isActive: () => !getTransitionsService().state.studioMode,
     },
     {
       name: 'TRANSITION_STUDIO_MODE',
       description: () => $t('Transition (Studio Mode)'),
-      down: () => getTransitionsService().executeStudioModeTransition()
-    }
+      down: () => getTransitionsService().executeStudioModeTransition(),
+    },
   ],
 
   SCENE: [
     {
       name: 'SWITCH_TO_SCENE',
       description: () => $t('Switch to scene'),
-      down: (sceneId) => getScenesService().makeSceneActive(sceneId)
-    }
+      down: sceneId => getScenesService().makeSceneActive(sceneId),
+    },
   ],
 
   SCENE_ITEM: [
     {
       name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
-      description: (sceneItemId) => {
+      description: sceneItemId => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
         return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
       },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(true)
+      shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+      isActive: sceneItemId => getScenesService().getSceneItem(sceneItemId).visible,
+      down: sceneItemId =>
+        getScenesService()
+          .getSceneItem(sceneItemId)
+          .setVisibility(true),
     },
 
     {
       name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
-      description: (sceneItemId) => {
+      description: sceneItemId => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
         return $t('Hide %{sourcename}', { sourcename: sceneItem.source.name });
       },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(false)
-    }
+      shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+      isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+      down: sceneItemId =>
+        getScenesService()
+          .getSceneItem(sceneItemId)
+          .setVisibility(false),
+    },
   ],
 
   SOURCE: [
     {
       name: 'TOGGLE_MUTE',
       description: () => $t('Mute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, true),
+      isActive: sourceId => getSourcesService().getSource(sourceId).muted,
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'TOGGLE_UNMUTE',
       description: () => $t('Unmute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, false),
+      isActive: sourceId => !getSourcesService().getSource(sourceId).muted,
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'PUSH_TO_MUTE',
       description: () => $t('Push to Mute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, true),
+      up: sourceId => getSourcesService().setMuted(sourceId, false),
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'PUSH_TO_TALK',
       description: () => $t('Push to Talk'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    }
-  ]
+      down: sourceId => getSourcesService().setMuted(sourceId, false),
+      up: sourceId => getSourcesService().setMuted(sourceId, true),
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
+    },
+  ],
 };
-
 
 /**
  * Represents a serialized Hotkey
@@ -204,16 +206,13 @@ export interface IHotkeysSet {
   scenes: Dictionary<IHotkey[]>;
 }
 
-
 interface IHotkeysServiceState {
   hotkeys: IHotkey[]; // only bound hotkeys are stored
 }
 
-
 export class HotkeysService extends StatefulService<IHotkeysServiceState> {
-
   static initialState: IHotkeysServiceState = {
-    hotkeys: []
+    hotkeys: [],
   };
 
   @Inject()
@@ -230,7 +229,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
    */
   private registeredHotkeys: Hotkey[];
 
-
   init() {
     this.scenesService.sceneAdded.subscribe(() => this.invalidate());
     this.scenesService.sceneRemoved.subscribe(() => this.invalidate());
@@ -240,11 +238,9 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.sourcesService.sourceRemoved.subscribe(() => this.invalidate());
   }
 
-
   addHotkey(hotkeyModel: IHotkey) {
     this.ADD_HOTKEY(hotkeyModel);
   }
-
 
   private invalidate() {
     this.registeredHotkeys = null;
@@ -256,10 +252,9 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     HOTKEY_ACTIONS.GENERAL.forEach(action => {
       hotkeys.push({
         actionName: action.name,
-        bindings: []
+        bindings: [],
       });
     });
-
 
     this.scenesService.scenes.forEach(scene => {
       scene.getItems().forEach(sceneItem => {
@@ -267,7 +262,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
           hotkeys.push({
             actionName: action.name,
             bindings: [],
-            sceneItemId: sceneItem.sceneItemId
+            sceneItemId: sceneItem.sceneItemId,
           });
         });
       });
@@ -276,18 +271,17 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         hotkeys.push({
           actionName: action.name,
           bindings: [],
-          sceneId: scene.id
+          sceneId: scene.id,
         });
       });
     });
-
 
     this.sourcesService.getSources().forEach(source => {
       HOTKEY_ACTIONS.SOURCE.forEach(action => {
         hotkeys.push({
           actionName: action.name,
           bindings: [],
-          sourceId: source.sourceId
+          sourceId: source.sourceId,
         });
       });
     });
@@ -305,20 +299,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.registeredHotkeys = hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel));
   }
 
-
   getHotkey(obj: IHotkey): Hotkey {
     return new Hotkey(obj);
   }
-
 
   getHotkeys(): Hotkey[] {
     if (!this.registeredHotkeys) this.updateRegisteredHotkeys();
     return this.registeredHotkeys.filter(hotkey => hotkey.shouldApply);
   }
 
-
   getHotkeysSet(): IHotkeysSet {
-
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
@@ -335,44 +325,40 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return {
       general: this.getGeneralHotkeys(),
       sources: sourcesHotkeys,
-      scenes: scenesHotkeys
+      scenes: scenesHotkeys,
     };
   }
-
 
   clearAllHotkeys() {
     this.applyHotkeySet({
       general: [],
       sources: {},
-      scenes: {}
+      scenes: {},
     });
   }
-
 
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
     Object.keys(hotkeySet.scenes).forEach(sceneId => hotkeys.push(...hotkeySet.scenes[sceneId]));
-    Object.keys(hotkeySet.sources).forEach(sourceId => hotkeys.push(...hotkeySet.sources[sourceId]));
+    Object.keys(hotkeySet.sources).forEach(sourceId =>
+      hotkeys.push(...hotkeySet.sources[sourceId]),
+    );
     this.setHotkeys(hotkeys);
     this.bindHotkeys();
   }
-
 
   getGeneralHotkeys(): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.type === 'GENERAL');
   }
 
-
   getSourceHotkeys(sourceId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sourceId === sourceId);
   }
 
-
   getSceneHotkeys(sceneId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneId === sceneId);
   }
-
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
@@ -380,16 +366,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 
-
   getSceneItemHotkeys(sceneItemId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneItemId === sceneItemId);
   }
 
-
   unregisterAll() {
     this.keyListenerService.unregisterAll();
   }
-
 
   private setHotkeys(hotkeys: IHotkey[]) {
     this.CLEAR_HOTKEYS();
@@ -398,7 +381,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
     this.invalidate();
   }
-
 
   bindHotkeys() {
     this.unregisterAll();
@@ -428,7 +410,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler()),
       });
     });
 
@@ -438,23 +420,20 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeyup',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler()),
       });
     });
   }
-
 
   @mutation()
   private ADD_HOTKEY(hotkeyObj: IHotkey) {
     this.state.hotkeys.push(hotkeyObj);
   }
 
-
   @mutation()
   private SET_BINDINGS(hotkeyInd: number, bindings: IBinding[]) {
     this.state.hotkeys[hotkeyInd].bindings = bindings;
   }
-
 
   @mutation()
   private CLEAR_HOTKEYS() {
@@ -482,7 +461,6 @@ export class Hotkey implements IHotkey {
 
   private hotkeyModel: IHotkey;
 
-
   constructor(hotkeyModel: IHotkey) {
     Object.assign(this, hotkeyModel);
     this.hotkeyModel = hotkeyModel;
@@ -493,7 +471,7 @@ export class Hotkey implements IHotkey {
       this.type = 'SCENE_ITEM';
     } else if (this.sceneId) {
       this.type = 'SCENE';
-    } else  {
+    } else {
       this.type = 'GENERAL';
     }
 
@@ -504,31 +482,31 @@ export class Hotkey implements IHotkey {
     this.shouldApply = this.action.shouldApply(entityId);
   }
 
-
   isSameHotkey(other: IHotkey) {
-    return (this.actionName === other.actionName) &&
-      (this.sceneId === other.sceneId) &&
-      (this.sourceId === other.sourceId) &&
-      (this.sceneItemId === other.sceneItemId);
+    return (
+      this.actionName === other.actionName &&
+      this.sceneId === other.sceneId &&
+      this.sourceId === other.sourceId &&
+      this.sceneItemId === other.sceneItemId
+    );
   }
-
 
   getModel(): IHotkey {
     return { ...this.hotkeyModel };
   }
 
-
   private getAction(entityId: string): IHotkeyAction {
-    const action = { ...HOTKEY_ACTIONS[this.type].find(action => {
-      return action.name === this.actionName;
-    }) };
+    const action = {
+      ...HOTKEY_ACTIONS[this.type].find(action => {
+        return action.name === this.actionName;
+      }),
+    };
 
     const { up, down } = action;
 
     // Fill in optional functions with some defaults
     if (!action.isActive) action.isActive = () => false;
     if (!action.shouldApply) action.shouldApply = () => true;
-
 
     // We defer the actions until after we've decided whether
     // or not to execute each action.

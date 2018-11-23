@@ -3,14 +3,13 @@ import { IObsInput, TObsType, ObsInput } from './ObsInput';
 
 @Component
 class ObsNumberInput extends ObsInput<IObsInput<number>> {
-
   static obsType: TObsType[];
 
   @Prop()
   value: IObsInput<number>;
 
   $refs: {
-    input: HTMLInputElement
+    input: HTMLInputElement;
   };
 
   updateValue(value: string) {
@@ -22,7 +21,6 @@ class ObsNumberInput extends ObsInput<IObsInput<number>> {
     // Emit the number value through the input event
     this.emitInput({ ...this.value, value: Number(formattedValue) });
   }
-
 }
 
 ObsNumberInput.obsType = ['OBS_PROPERTY_DOUBLE', 'OBS_PROPERTY_FLOAT'];

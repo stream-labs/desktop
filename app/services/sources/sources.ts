@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import { cloneDeep } from 'lodash';
-import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
+import {
+  IObsListOption,
+  setupConfigurableDefaults,
+  TObsValue,
+} from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -17,10 +21,14 @@ import { StreamlabelsManager } from './properties-managers/streamlabels-manager'
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
 import {
-  IActivePropertyManager, ISource, ISourceAddOptions, ISourcesServiceApi, ISourcesState,
+  IActivePropertyManager,
+  ISource,
+  ISourceAddOptions,
+  ISourcesServiceApi,
+  ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager
+  TPropertiesManager,
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
@@ -29,7 +37,6 @@ import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
-
 
 const SOURCES_UPDATE_INTERVAL = 1000;
 const AudioFlag = obs.ESourceOutputFlags.Audio;
@@ -41,14 +48,13 @@ export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   widget: WidgetManager,
   streamlabels: StreamlabelsManager,
-  platformApp: PlatformAppManager
+  platformApp: PlatformAppManager,
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
-
   static initialState = {
     sources: {},
-    temporarySources: {} // don't save temporarySources in the config file
+    temporarySources: {}, // don't save temporarySources in the config file
   } as ISourcesState;
 
   sourceAdded = new Subject<ISource>();
@@ -69,17 +75,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
    */
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
-
   protected init() {
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
 
-    this.scenesService.itemRemoved.subscribe(
-      (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
+    this.scenesService.itemRemoved.subscribe(sceneSourceModel =>
+      this.onSceneItemRemovedHandler(sceneSourceModel),
     );
 
-    this.scenesService.sceneRemoved.subscribe(
-      (sceneModel) => this.removeSource(sceneModel.id)
-    );
+    this.scenesService.sceneRemoved.subscribe(sceneModel => this.removeSource(sceneModel.id));
   }
 
   @mutation()
@@ -89,11 +92,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @mutation()
   private ADD_SOURCE(addOptions: {
-    id: string, name: string,
-    type: TSourceType,
-    channel?: number,
-    isTemporary?: boolean,
-    propertiesManagerType?: TPropertiesManager
+    id: string;
+    name: string;
+    type: TSourceType;
+    channel?: number;
+    isTemporary?: boolean;
+    propertiesManagerType?: TPropertiesManager;
   }) {
     const id = addOptions.id;
     const sourceModel: ISource = {
@@ -115,7 +119,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel: addOptions.channel
+      channel: addOptions.channel,
     };
 
     if (addOptions.isTemporary) {
@@ -143,14 +147,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
   }
 
-
   createSource(
     name: string,
     type: TSourceType,
     settings: Dictionary<any> = {},
-    options: ISourceAddOptions = {}
+    options: ISourceAddOptions = {},
   ): Source {
-
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
@@ -173,7 +175,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type,
       channel: options.channel,
       isTemporary: options.isTemporary,
-      propertiesManagerType: managerType
+      propertiesManagerType: managerType,
     });
     const source = this.getSource(id);
     const muted = obsInput.muted;
@@ -183,7 +185,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
       manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
-      type: managerType
+      type: managerType,
     };
 
     if (source.hasProps()) setupConfigurableDefaults(obsInput);
@@ -195,7 +197,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   removeSource(id: string) {
     const source = this.getSource(id);
 
-    if (!source) throw  new Error(`Source ${id} not found`);
+    if (!source) throw new Error(`Source ${id} not found`);
 
     /* When we release sources, we need to make
      * sure we reset the channel it's set to,
@@ -215,9 +217,22 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   addFile(path: string): Source {
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
-      ffmpeg_source: ['mp4', 'ts', 'mov', 'flv', 'mkv', 'avi', 'mp3', 'ogg', 'aac', 'wav', 'gif', 'webm'],
+      ffmpeg_source: [
+        'mp4',
+        'ts',
+        'mov',
+        'flv',
+        'mkv',
+        'avi',
+        'mp3',
+        'ogg',
+        'aac',
+        'wav',
+        'gif',
+        'webm',
+      ],
       browser_source: ['html'],
-      text_gdiplus: ['txt']
+      text_gdiplus: ['txt'],
     };
     let ext = path.split('.').splice(-1)[0];
     if (!ext) return null;
@@ -233,13 +248,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       } else if (type === 'browser_source') {
         settings = {
           is_local_file: true,
-          local_file: path
+          local_file: path,
         };
       } else if (type === 'ffmpeg_source') {
         settings = {
           is_local_file: true,
           local_file: path,
-          looping: true
+          looping: true,
         };
       } else if (type === 'text_gdiplus') {
         settings = { text: fs.readFileSync(path).toString() };
@@ -272,9 +287,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // resolve the device id by the device name here
       if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
 
-      const device = type === 'dshow_input' ?
-        this.hardwareService.getDshowDeviceByName(settings[propName]) :
-        this.hardwareService.getDeviceByName(settings[propName]);
+      const device =
+        type === 'dshow_input'
+          ? this.hardwareService.getDshowDeviceByName(settings[propName])
+          : this.hardwareService.getDeviceByName(settings[propName]);
 
       if (!device) return;
       resolvedSettings[propName] = device.id;
@@ -288,7 +304,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     // setup default settings
     if (type === 'browser_source') {
       if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
-      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
+      if (resolvedSettings.url === void 0) {
+        resolvedSettings.url = 'https://streamlabs.com/browser-source';
+      }
     }
 
     if (type === 'text_gdiplus') {
@@ -317,10 +335,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
-      { description: 'OvrStream', value: 'ovrstream_dc_source' }
+      { description: 'OvrStream', value: 'ovrstream_dc_source' },
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    const availableWhitelistedType = whitelistedTypes.filter(type =>
+      obsAvailableTypes.includes(type.value),
+    );
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
 
@@ -344,9 +364,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     activeItems.forEach((item, index) => {
       const source = this.state.sources[item.sourceId];
 
-      if ((source.width !== sourcesSize[index].width) || (source.height !== sourcesSize[index].height)) {
-        const size = { id: item.sourceId, width: sourcesSize[index].width,
-          height: sourcesSize[index].height };
+      if (
+        source.width !== sourcesSize[index].width ||
+        source.height !== sourcesSize[index].height
+      ) {
+        const size = {
+          id: item.sourceId,
+          width: sourcesSize[index].width,
+          height: sourcesSize[index].height,
+        };
         this.UPDATE_SOURCE(size);
       }
       this.updateSourceFlags(source, sourcesSize[index].outputFlags);
@@ -369,9 +395,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
         if (!source) return;
 
-        if ((source.width !== update.width) || (source.height !== update.height)) {
-          const size = { id: source.sourceId, width: update.width,
-            height: update.height };
+        if (source.width !== update.width || source.height !== update.height) {
+          const size = { id: source.sourceId, width: update.width, height: update.height };
           this.UPDATE_SOURCE(size);
         }
         this.updateSourceFlags(source, update.outputFlags);
@@ -379,19 +404,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
   }
 
-  private updateSourceFlags(source: ISource, flags: number, doNotEmit? : boolean) {
+  private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
-    if ((source.audio !== audio) || (source.video !== video)) {
+    if (source.audio !== audio || source.video !== video) {
       this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }
   }
-
 
   setMuted(id: string, muted: boolean) {
     const source = this.getSource(id);
@@ -399,7 +423,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.sourceState);
   }
-
 
   reset() {
     this.RESET_SOURCES();
@@ -411,7 +434,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.getSource(id);
   }
 
-
   getSourcesByName(name: string): Source[] {
     const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
@@ -419,21 +441,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
-
   get sources(): Source[] {
-    return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.sourceId));
+    return Object.values(this.state.sources).map(sourceModel =>
+      this.getSource(sourceModel.sourceId),
+    );
   }
-
 
   getSource(id: string): Source {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
   }
 
-
   getSources() {
     return this.sources;
   }
-
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
@@ -455,7 +475,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.SubGoal,
       WidgetType.MediaShare,
       WidgetType.SponsorBanner,
-      WidgetType.AlertBox
+      WidgetType.AlertBox,
     ];
 
     if (isWidget && this.userService.isLoggedIn()) {
@@ -469,8 +489,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           queryParams: { sourceId },
           size: {
             width: 900,
-            height: 1024
-          }
+            height: 1024,
+          },
         });
 
         return;
@@ -490,7 +510,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         if (page && page.redirectPropertiesToTopNavSlot) {
           this.navigationService.navigate('PlatformAppContainer', {
             appId: app.id,
-            sourceId: source.sourceId
+            sourceId: source.sourceId,
           });
 
           // If we navigated, we don't want to open source properties,
@@ -507,11 +527,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 800
-      }
+        height: 800,
+      },
     });
   }
-
 
   showShowcase() {
     this.windowsService.showWindow({
@@ -519,11 +538,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('Add Source'),
       size: {
         width: 1200,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
-
 
   showAddSource(sourceType: TSourceType, sourceAddOptions?: ISourceAddOptions) {
     this.windowsService.showWindow({
@@ -532,8 +550,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
-        height: 540
-      }
+        height: 540,
+      },
     });
   }
 
@@ -544,9 +562,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceId },
       size: {
         width: 400,
-        height: 250
-      }
+        height: 250,
+      },
     });
   }
-
 }

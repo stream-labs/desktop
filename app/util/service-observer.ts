@@ -6,7 +6,7 @@ import { Service } from '../services/service';
  * In this case observer-service is like a "plugin" for observable service.
  */
 export function InitAfter(observableServiceName: string) {
-  return function (target: typeof Service) {
+  return function(target: typeof Service) {
     const observeList = ObserveList.instance;
     observeList.add({ observerServiceName: target.name, observableServiceName });
   };
@@ -17,14 +17,11 @@ interface IObservation {
   observableServiceName: string;
 }
 
-
 export class ObserveList extends Service {
-
   observations: {
-    observerServiceName: string,
-    observableServiceName: string
+    observerServiceName: string;
+    observableServiceName: string;
   }[] = [];
-
 
   add(observation: IObservation) {
     this.observations.push(observation);

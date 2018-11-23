@@ -51,8 +51,8 @@ import electron from 'electron';
     DesignSystem,
     PlatformAppWebview,
     PlatformAppStore,
-    Help
-  }
+    Help,
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -113,16 +113,11 @@ export default class Main extends Vue {
   }
 
   isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(
-      appId,
-      EAppPageSlot.TopNav
-    );
+    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
   }
 
   isAppPoppedOut(appId: string) {
-    return this.platformAppsService
-      .getApp(appId)
-      .poppedOutSlots.includes(EAppPageSlot.TopNav);
+    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
   }
 
   isAppVisible(appId: string) {

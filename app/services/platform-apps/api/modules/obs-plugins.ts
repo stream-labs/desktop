@@ -3,7 +3,6 @@ import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { Inject } from 'util/injector';
 
 export class ObsPluginsModule extends Module {
-
   readonly moduleName = 'ObsPlugins';
   readonly permissions: EApiPermissions[] = [];
 
@@ -13,5 +12,4 @@ export class ObsPluginsModule extends Module {
   async initializeModule(ctx: IApiContext, dllFile: string) {
     await this.obsUserPluginsService.initializeModule(dllFile);
   }
-
 }

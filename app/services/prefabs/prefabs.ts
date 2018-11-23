@@ -5,7 +5,7 @@ import {
   Source,
   SourcesService,
   TPropertiesManager,
-  TSourceType
+  TSourceType,
 } from 'services/sources';
 import { ScenesService, TSceneNode, TSceneNodeType } from 'services/scenes';
 import { Inject } from '../../util/injector';
@@ -16,17 +16,16 @@ import Utils from '../utils';
 import Vue from 'vue';
 
 interface IPrefabSourceCreateOptions {
-  name: string,
-  description?: string,
-  type: TSourceType,
-  settings: Dictionary<TObsValue>,
-  createOptions: ISourceAddOptions,
+  name: string;
+  description?: string;
+  type: TSourceType;
+  settings: Dictionary<TObsValue>;
+  createOptions: ISourceAddOptions;
 }
 
 interface IPrefabSource extends IPrefabSourceCreateOptions {
   id: string;
 }
-
 
 interface IPrefab {
   id: string;
@@ -49,10 +48,9 @@ interface IPrefabAddToSceneOptions {
  * Allows to add pre-configured items to scene
  */
 export class PrefabsService extends PersistentStatefulService<IPrefabsServiceState> {
-
   static defaultState: IPrefabsServiceState = {
     version: 1,
-    prefabs: {}
+    prefabs: {},
   };
 
   @Inject() private sourcesService: SourcesService;
@@ -67,8 +65,8 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
       settings: source.getSettings(),
       createOptions: {
         propertiesManager: source.getPropertiesManagerType(),
-        propertiesManagerSettings: source.getPropertiesManagerSettings()
-      }
+        propertiesManagerSettings: source.getPropertiesManagerSettings(),
+      },
     });
   }
 
@@ -85,9 +83,9 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
       sources: {
         [id]: {
           ...prefabSourceModel,
-          id
-        }
-      }
+          id,
+        },
+      },
     };
     this.REGISTER_PREFAB(prefabModel);
     return this.getPrefab(id);
@@ -135,7 +133,6 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   }
 }
 
-
 @ServiceHelper()
 export class Prefab implements IPrefab {
   readonly id: string;
@@ -164,7 +161,7 @@ export class Prefab implements IPrefab {
       options.name || prefabSourceModel.name,
       prefabSourceModel.type,
       prefabSourceModel.settings,
-      prefabSourceModel.createOptions
+      prefabSourceModel.createOptions,
     );
     return scene.addSource(source.sourceId);
   }

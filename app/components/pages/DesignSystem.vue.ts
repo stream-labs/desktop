@@ -11,19 +11,19 @@ import { metadata } from 'components/shared/inputs';
   components: {
     DropdownMenu,
     HFormGroup,
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class DesignSystem extends Vue {
-  dropdownItems =  {
+  dropdownItems = {
     dropdownItem1: {
       id: '1',
-      name: 'League of Legends'
+      name: 'League of Legends',
     },
     dropdownItem2: {
       id: '2',
-      name: 'IRL Exploring'
-    }
+      name: 'IRL Exploring',
+    },
   };
 
   exampleSettings = {
@@ -34,7 +34,7 @@ export default class DesignSystem extends Vue {
     checkbox_3: true,
     checkbox_4: false,
     slider: 20,
-  }
+  };
 
   activeDropdownItem = this.dropdownItems.dropdownItem1;
   activeId = this.dropdownItems.dropdownItem1.id;

@@ -2,11 +2,7 @@ import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import {
-  ENotificationType,
-  NotificationsService,
-  INotification
-} from 'services/notifications';
+import { ENotificationType, NotificationsService, INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
 const notificationAudio = require('../../media/sound/ding.wav');
 const QUEUE_TIME = 5000;
@@ -47,10 +43,7 @@ export default class NotificationsArea extends Vue {
       this.onNotificationsReadHandler(ids);
     });
 
-    this.checkQueueIntervalId = window.setInterval(
-      () => this.checkQueue(),
-      QUEUE_TIME
-    );
+    this.checkQueueIntervalId = window.setInterval(() => this.checkQueue(), QUEUE_TIME);
 
     this.sizeCheckIntervalId = window.setInterval(() => {
       if (!this.$refs.notificationsContainer) return;
@@ -69,8 +62,7 @@ export default class NotificationsArea extends Vue {
   }
 
   get unreadCount() {
-    return this.notificationsService.getUnread(ENotificationType.WARNING)
-      .length;
+    return this.notificationsService.getUnread(ENotificationType.WARNING).length;
   }
 
   get settings() {
@@ -123,8 +115,7 @@ export default class NotificationsArea extends Vue {
       }
       Vue.nextTick(() => {
         this.notifications.push({ ...notify, outdated: false });
-        if (notify.lifeTime !== -1)
-          window.setTimeout(() => this.hideOutdated(), notify.lifeTime);
+        if (notify.lifeTime !== -1) window.setTimeout(() => this.hideOutdated(), notify.lifeTime);
       });
     });
   }

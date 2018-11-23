@@ -33,16 +33,15 @@ export class WidgetTester {
   }
 }
 
-
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
 }
 
 @InitAfter('SourcesService')
-export class WidgetsService extends StatefulService<IWidgetSourcesState> implements IWidgetsServiceApi {
-
+export class WidgetsService extends StatefulService<IWidgetSourcesState>
+  implements IWidgetsServiceApi {
   static initialState: IWidgetSourcesState = {
-    widgetSources: {}
+    widgetSources: {},
   };
 
   @Inject() userService: UserService;
@@ -52,7 +51,6 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
   @Inject() videoService: VideoService;
 
   protected init() {
-
     // sync widgetSources with sources
 
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
@@ -61,9 +59,15 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
 
     this.sourcesService.sourceUpdated.subscribe(sourceModel => {
       // sync widgets when propertiesManagerType has been changed
-      if (sourceModel.propertiesManagerType === 'widget' && !this.state.widgetSources[sourceModel.sourceId]) {
+      if (
+        sourceModel.propertiesManagerType === 'widget' &&
+        !this.state.widgetSources[sourceModel.sourceId]
+      ) {
         this.register(sourceModel.sourceId);
-      } else if (sourceModel.propertiesManagerType !== 'widget' && this.state.widgetSources[sourceModel.sourceId]) {
+      } else if (
+        sourceModel.propertiesManagerType !== 'widget' &&
+        this.state.widgetSources[sourceModel.sourceId]
+      ) {
         this.unregister(sourceModel.sourceId);
       }
     });
@@ -93,17 +97,17 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
         url: widget.url(
           this.hostsService.streamlabs,
           this.userService.widgetToken,
-          this.userService.platform.type
+          this.userService.platform.type,
         ),
         width: widget.width,
-        height: widget.height
+        height: widget.height,
       },
       {
         propertiesManager: 'widget',
         propertiesManagerSettings: {
-          widgetType: type
-        }
-      }
+          widgetType: type,
+        },
+      },
     );
 
     const sceneItem = scene.addSource(source.sourceId);
@@ -123,8 +127,8 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
       source.setTransform({
         position: {
           x: rect.x,
-          y: rect.y
-        }
+          y: rect.y,
+        },
       });
     }, 1500);
 
@@ -140,7 +144,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
     return WidgetDefinitions[type].url(
       this.hostsService.streamlabs,
       this.userService.widgetToken,
-      this.userService.platform.type
+      this.userService.platform.type,
     );
   }
 
@@ -161,10 +165,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
     }).map(tester => {
       return new WidgetTester(
         tester.name,
-        tester.url(
-          this.hostsService.streamlabs,
-          this.userService.platform.type
-        )
+        tester.url(this.hostsService.streamlabs, this.userService.platform.type),
       );
     });
   }
@@ -179,17 +180,19 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
       throw new Error('PreviewSource is already watching');
     }
 
-    this.previewSourceWatchers[previewSourceId] = this.sourcesService.sourceUpdated.subscribe(sourceModel => {
-      if (sourceModel.sourceId !== sourceId) return;
-      const widget = this.getWidgetSource(sourceId);
-      const source = widget.getSource();
-      const newPreviewSettings = cloneDeep(source.getSettings());
-      delete newPreviewSettings.shutdown;
-      newPreviewSettings.url = widget.getSettingsService().getApiSettings().previewUrl;
-      const previewSource = widget.getPreviewSource();
-      previewSource.updateSettings(newPreviewSettings);
-      previewSource.refresh();
-    });
+    this.previewSourceWatchers[previewSourceId] = this.sourcesService.sourceUpdated.subscribe(
+      sourceModel => {
+        if (sourceModel.sourceId !== sourceId) return;
+        const widget = this.getWidgetSource(sourceId);
+        const source = widget.getSource();
+        const newPreviewSettings = cloneDeep(source.getSettings());
+        delete newPreviewSettings.shutdown;
+        newPreviewSettings.url = widget.getSettingsService().getApiSettings().previewUrl;
+        const previewSource = widget.getPreviewSource();
+        previewSource.updateSettings(newPreviewSettings);
+        previewSource.refresh();
+      },
+    );
   }
 
   stopSyncPreviewSource(previewSourceId: string) {
@@ -226,7 +229,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
     this.ADD_WIDGET_SOURCE({
       sourceId: source.sourceId,
       type: widgetType,
-      previewSourceId: ''
+      previewSourceId: '',
     });
   }
 
@@ -259,7 +262,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
       x: widgetItem.transform.position.x / this.videoService.baseWidth,
       y: widgetItem.transform.position.y / this.videoService.baseHeight,
       scaleX: widgetItem.transform.scale.x / this.videoService.baseWidth,
-      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight
+      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight,
     };
   }
 
@@ -315,12 +318,12 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
     widgetItem.setTransform({
       position: {
         x: widget.x * this.videoService.baseWidth,
-        y: widget.y * this.videoService.baseHeight
+        y: widget.y * this.videoService.baseHeight,
       },
       scale: {
         x: widget.scaleX * this.videoService.baseWidth,
-        y: widget.scaleY * this.videoService.baseHeight
-      }
+        y: widget.scaleY * this.videoService.baseHeight,
+      },
     });
   }
 

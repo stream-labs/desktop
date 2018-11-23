@@ -3,17 +3,15 @@ import { Multiselect } from 'vue-multiselect';
 import { IListMetadata, IListOption } from 'components/shared/inputs/index';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 
-interface IMultiselectListOption{
+interface IMultiselectListOption {
   description: string;
   value: number;
 }
 
 @Component({
-  components: { Multiselect }
+  components: { Multiselect },
 })
-
 export default class ListInput extends BaseInput<number, IListMetadata<number>> {
-
   @Prop()
   readonly value: number;
 
@@ -26,7 +24,6 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
   @Prop({ default: 'Select Option' })
   readonly placeholder: string;
 
-
   onInputHandler(option: IMultiselectListOption) {
     if (option) {
       this.emitInput(option.value);
@@ -38,8 +35,8 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
     const options = super.getOptions();
     return {
       ...options,
-      allowEmpty: !!options.allowEmpty // undefined value is not working for vue-multiselect
-    }
+      allowEmpty: !!options.allowEmpty, // undefined value is not working for vue-multiselect
+    };
   }
 
   get currentMultiselectValue() {
@@ -53,7 +50,6 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
     return options[0];
   }
 
-
   get multiselectOptions(): IMultiselectListOption[] {
     return this.options.options.map(item => {
       return { value: item.value, description: item.title };
@@ -63,5 +59,4 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
   get selectedOption(): IListOption<number> {
     return this.options.options.find(option => option.value === this.value);
   }
-
 }

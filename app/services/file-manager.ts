@@ -51,7 +51,7 @@ export class FileManagerService extends Service {
         data,
         locked: false,
         version: 0,
-        dirty: true
+        dirty: true,
       };
     }
 
@@ -65,7 +65,7 @@ export class FileManagerService extends Service {
     const opts = {
       validateJSON: false,
       retries: 0,
-      ...options
+      ...options,
     };
 
     // If this is the first read of this file, do a blocking synchronous read
@@ -82,7 +82,7 @@ export class FileManagerService extends Service {
         if (opts.retries > 0) {
           this.read(filePath, {
             ...opts,
-            retries: opts.retries - 1
+            retries: opts.retries - 1,
           });
         } else {
           throw e;
@@ -93,7 +93,7 @@ export class FileManagerService extends Service {
         data,
         locked: false,
         version: 0,
-        dirty: false
+        dirty: false,
       };
     }
 
@@ -108,7 +108,7 @@ export class FileManagerService extends Service {
       data: this.read(trueSource),
       locked: false,
       version: 0,
-      dirty: true
+      dirty: true,
     };
 
     this.flush(trueDest);
@@ -119,12 +119,13 @@ export class FileManagerService extends Service {
    * be called before shutdown.
    */
   async flushAll() {
-    const promises = Object.keys(this.files).filter(filePath => {
-      return this.files[filePath].dirty;
-    })
-    .map(filePath => {
-      return this.flush(filePath);
-    });
+    const promises = Object.keys(this.files)
+      .filter(filePath => {
+        return this.files[filePath].dirty;
+      })
+      .map(filePath => {
+        return this.flush(filePath);
+      });
 
     await promises;
   }

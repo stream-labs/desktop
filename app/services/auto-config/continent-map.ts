@@ -245,5 +245,5 @@ export const continentMap = {
   YT: 'Africa',
   ZA: 'Africa',
   ZM: 'Africa',
-  ZW: 'Africa'
+  ZW: 'Africa',
 };

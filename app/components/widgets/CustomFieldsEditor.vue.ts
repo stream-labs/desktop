@@ -14,13 +14,13 @@ import { debounce } from 'lodash-decorators';
 const { ToggleInput } = inputComponents;
 
 type TCustomFieldType =
-  'colorpicker' |
-  'slider' |
-  'textfield' |
-  'fontpicker' |
-  'dropdown' |
-  'image-input' |
-  'sound-input';
+  | 'colorpicker'
+  | 'slider'
+  | 'textfield'
+  | 'fontpicker'
+  | 'dropdown'
+  | 'image-input'
+  | 'sound-input';
 
 export interface ICustomField {
   label: string;
@@ -34,11 +34,10 @@ export interface ICustomField {
 }
 
 const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
-
   customField1: {
     label: 'Color Picker Example',
     type: 'colorpicker',
-    value: '#000EF0'
+    value: '#000EF0',
   },
 
   customField2: {
@@ -47,19 +46,19 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     value: 3,
     max: 200,
     min: 100,
-    steps: 4
+    steps: 4,
   },
 
   customField3: {
     label: 'Textfield Example',
     type: 'textfield',
-    value: 'Hi There'
+    value: 'Hi There',
   },
 
   customField4: {
     label: 'Font Picker Example',
     type: 'fontpicker',
-    value: 'Open Sans'
+    value: 'Open Sans',
   },
 
   customField5: {
@@ -68,9 +67,9 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     options: {
       optionA: 'Option A',
       optionB: 'Option B',
-      optionC: 'Option C'
+      optionC: 'Option C',
     },
-    value: 'optionB'
+    value: 'optionB',
   },
 
   // TODO:
@@ -85,19 +84,16 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
   //   type: 'sound-input',
   //   value: null
   // }
-
 };
-
 
 @Component({
   components: {
     CodeInput,
     ToggleInput,
-    HFormGroup
-  }
+    HFormGroup,
+  },
 })
 export default class CustomFieldsEditor extends Vue {
-
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
@@ -121,16 +117,15 @@ export default class CustomFieldsEditor extends Vue {
     this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
   }
 
-  get inputsData(): { value: number | string, metadata: IInputMetadata, fieldName: string }[] {
+  get inputsData(): { value: number | string; metadata: IInputMetadata; fieldName: string }[] {
     const fields: Dictionary<ICustomField> = this.customFields;
-    return Object.keys(fields).map((fieldName) => {
+    return Object.keys(fields).map(fieldName => {
       const field = fields[fieldName];
       const inputValue = field.value;
       let inputMetadata: IInputMetadata;
       switch (field.type) {
-
         case 'colorpicker':
-          inputMetadata = metadata.color({ title: field.label});
+          inputMetadata = metadata.color({ title: field.label });
           break;
 
         case 'slider':
@@ -138,7 +133,7 @@ export default class CustomFieldsEditor extends Vue {
             title: field.label,
             max: field.max,
             min: field.min,
-            interval:  field.steps
+            interval: field.steps,
           });
           break;
 
@@ -151,8 +146,8 @@ export default class CustomFieldsEditor extends Vue {
             title: field.label,
             options: Object.keys(field.options).map(key => ({
               value: key,
-              title: field.options[key]
-            }))
+              title: field.options[key],
+            })),
           });
           break;
 
@@ -160,20 +155,16 @@ export default class CustomFieldsEditor extends Vue {
         default:
           inputMetadata = null;
           break;
-
       }
       return { value: inputValue, metadata: inputMetadata, fieldName };
     });
   }
 
-
   async save() {
-
     this.isLoading = true;
 
     const newData = cloneDeep(this.value);
     newData.settings['custom_json'] = this.customFields;
-
 
     try {
       await this.settingsService.saveSettings(newData.settings);
@@ -223,10 +214,8 @@ export default class CustomFieldsEditor extends Vue {
     !!this.customFields ? this.removeFields() : this.addDefaultFields();
   }
 
-
   emitInput(newValue: IWidgetData) {
     this.$emit('input', newValue);
     this.editorInputValue = newValue.settings['custom_json'];
   }
-
 }

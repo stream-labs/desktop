@@ -9,7 +9,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
  * Base class for input-component layouts
  */
 export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadata> {
-
   @Prop()
   readonly type: EInputType;
 

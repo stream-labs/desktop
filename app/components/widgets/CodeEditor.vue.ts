@@ -12,11 +12,10 @@ import { debounce } from 'lodash-decorators';
 @Component({
   components: {
     CodeInput,
-    BoolInput
-  }
+    BoolInput,
+  },
 })
 export default class CodeEditor extends Vue {
-
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
@@ -25,7 +24,8 @@ export default class CodeEditor extends Vue {
   @Prop()
   value: IWidgetData;
 
-  editorInputValue = this.value.settings['custom_' + this.metadata.type] || this.value.settings[this.alertBoxValue];
+  editorInputValue =
+    this.value.settings['custom_' + this.metadata.type] || this.value.settings[this.alertBoxValue];
 
   private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
@@ -39,12 +39,13 @@ export default class CodeEditor extends Vue {
   }
 
   get alertBoxValue() {
-    const capitalizedType = this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
+    const capitalizedType =
+      this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
     return `custom${capitalizedType}`;
   }
 
   get hasChanges() {
-    return (this.serverInputValue !== this.editorInputValue);
+    return this.serverInputValue !== this.editorInputValue;
   }
 
   get canSave() {

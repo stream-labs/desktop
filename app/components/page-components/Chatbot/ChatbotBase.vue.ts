@@ -2,10 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 
-import {
-  ChatbotApiService,
-  ChatbotCommonService,
-} from 'services/chatbot';
+import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
 
 import { CustomizationService } from 'services/customization';
 import Tabs from 'components/Tabs.vue';
@@ -20,15 +17,15 @@ import {
   ChatbotPunishments,
 } from 'services/chatbot';
 
-import { IListOption } from 'components/shared/inputs'
+import { IListOption } from 'components/shared/inputs';
 
 @Component({
   components: {
     ...inputComponents,
     VFormGroup,
     Tabs,
-    DropdownMenu
-  }
+    DropdownMenu,
+  },
 })
 export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
@@ -56,12 +53,12 @@ export default class ChatbotBase extends Vue {
         if (typeof ChatbotPermissionsEnums[b] === 'number') {
           a.push({
             title: b.split('_').join(' '),
-            value: ChatbotPermissionsEnums[b]
+            value: ChatbotPermissionsEnums[b],
           });
         }
         return a;
       },
-      []
+      [],
     );
     return permissions;
   }
@@ -72,12 +69,12 @@ export default class ChatbotBase extends Vue {
         if (typeof ChatbotAutopermitEnums[b] === 'number') {
           a.push({
             title: b.split('_').join(' '),
-            value: ChatbotAutopermitEnums[b]
+            value: ChatbotAutopermitEnums[b],
           });
         }
         return a;
       },
-      []
+      [],
     );
     return permissions;
   }
@@ -86,7 +83,7 @@ export default class ChatbotBase extends Vue {
     return Object.keys(ChatbotResponseTypes).map(responseType => {
       return {
         value: ChatbotResponseTypes[responseType],
-        title: responseType
+        title: responseType,
       };
     });
   }
@@ -95,7 +92,7 @@ export default class ChatbotBase extends Vue {
     return Object.keys(ChatbotPunishments).map(punishmentType => {
       return {
         value: ChatbotPunishments[punishmentType],
-        title: punishmentType
+        title: punishmentType,
       };
     });
   }

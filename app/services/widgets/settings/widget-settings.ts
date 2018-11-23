@@ -2,15 +2,16 @@ import { cloneDeep } from 'lodash';
 import { HostsService } from 'services/hosts';
 import { Inject } from '../../../util/injector';
 import { UserService } from 'services/user';
+import { handleErrors, authorizedHeaders } from '../../../util/requests';
 import {
-  handleErrors,
-  authorizedHeaders
-} from '../../../util/requests';
-import {
-  IWidgetApiSettings, IWidgetData, IWidgetSettings,
-  IWidgetSettingsGenericState, IWidgetSettingsServiceApi,
-  IWidgetSettingsState, TWIdgetLoadingState,
-  WidgetsService
+  IWidgetApiSettings,
+  IWidgetData,
+  IWidgetSettings,
+  IWidgetSettingsGenericState,
+  IWidgetSettingsServiceApi,
+  IWidgetSettingsState,
+  TWIdgetLoadingState,
+  WidgetsService,
 } from 'services/widgets';
 import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
@@ -20,12 +21,12 @@ import { WebsocketService } from 'services/websocket';
 export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   loadingState: 'none',
   data: null,
-  rawData: null
+  rawData: null,
 };
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
 
-interface ISocketEvent{
+interface ISocketEvent {
   type: string;
   message: Dictionary<any>;
 }
@@ -35,9 +36,7 @@ interface ISocketEvent{
  */
 export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   extends StatefulService<IWidgetSettingsState<TWidgetData>>
-  implements IWidgetSettingsServiceApi
-{
-
+  implements IWidgetSettingsServiceApi {
   @Inject() private hostsService: HostsService;
   @Inject() protected userService: UserService;
   @Inject() private widgetsService: WidgetsService;
@@ -47,13 +46,12 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 
   abstract getApiSettings(): IWidgetApiSettings;
 
-
   init() {
-    this.websocketService.socketEvent.subscribe(event  => {
+    this.websocketService.socketEvent.subscribe(event => {
       const apiSettings = this.getApiSettings();
       if (event.type == 'alertProfileChanged') this.onWidgetThemeChange();
       if (event.type !== apiSettings.settingsUpdateEvent) return;
-      this.onSettingsUpdatedHandler(event as ISocketEvent)
+      this.onSettingsUpdatedHandler(event as ISocketEvent);
     });
   }
 
@@ -90,7 +88,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     try {
       rawData = await this.request({
         url: apiSettings.dataFetchUrl,
-        method: 'GET'
+        method: 'GET',
       });
     } catch (e) {
       if (isFirstLoading) this.SET_LOADING_STATE('fail');
@@ -133,7 +131,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return settings;
   }
 
-  getMetadata(...options: any[]): Dictionary<IInputMetadata>  {
+  getMetadata(...options: any[]): Dictionary<IInputMetadata> {
     return {};
   }
 
@@ -143,12 +141,11 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return await this.request({
       url: apiSettings.settingsSaveUrl,
       method: 'POST',
-      body
+      body,
     });
   }
 
-
-  async request(req: { url: string, method?: THttpMethod, body?: any }): Promise<any> {
+  async request(req: { url: string; method?: THttpMethod; body?: any }): Promise<any> {
     const method = req.method || 'GET';
     const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');
@@ -156,7 +153,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     const request = new Request(req.url, {
       headers,
       method,
-      body: req.body ? JSON.stringify(req.body) : void 0
+      body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
     return fetch(request)

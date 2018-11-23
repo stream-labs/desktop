@@ -12,7 +12,6 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
-
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -23,12 +22,10 @@ async function focusWindow(t: any, regex: RegExp) {
   }
 }
 
-
 // Focuses the main window
 export async function focusMain(t: any) {
   await focusWindow(t, /windowId=main$/);
 }
-
 
 // Focuses the child window
 export async function focusChild(t: any) {
@@ -52,12 +49,12 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true
+  restartAppAfterEachTest: true,
 };
 
 export interface ITestContext {
-  cacheDir: string,
-  app: Application
+  cacheDir: string;
+  app: Application;
 }
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
@@ -80,7 +77,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
         options.appArgs ? options.appArgs : '',
-        '.'
+        '.',
       ],
       env: {
         NODE_ENV: 'test',
@@ -136,13 +133,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function stopApp() {
     await context.app.stop();
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       rimraf(context.cacheDir, resolve);
     });
     appIsRunning = false;
   }
 
-  test.beforeEach(async t  => {
+  test.beforeEach(async t => {
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);

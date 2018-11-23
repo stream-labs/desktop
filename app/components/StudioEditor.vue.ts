@@ -31,10 +31,9 @@ interface IResizeOptions {
 }
 
 @Component({
-  components: { Display }
+  components: { Display },
 })
 export default class StudioEditor extends Vue {
-
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private videoService: VideoService;
@@ -58,7 +57,6 @@ export default class StudioEditor extends Vue {
     display: HTMLDivElement;
   };
 
-
   onOutputResize(region: IRectangle) {
     this.renderedWidth = region.width;
     this.renderedHeight = region.height;
@@ -74,7 +72,6 @@ export default class StudioEditor extends Vue {
   getStudioTransitionName() {
     return this.transitionsService.studioTransitionName;
   }
-
 
   /*****************
    * Mouse Handling *
@@ -94,7 +91,6 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseDblClick(event: MouseEvent) {
-
     const overSource = this.sceneItems.find(source => {
       return this.isOverSource(event, source);
     });
@@ -104,8 +100,8 @@ export default class StudioEditor extends Vue {
     const parent = overSource.getParent();
 
     if (
-      (this.customizationService.getSettings().folderSelection) &&
-      (!parent || parent && parent.isSelected())
+      this.customizationService.getSettings().folderSelection &&
+      (!parent || (parent && parent.isSelected()))
     ) {
       this.selectionService.select(overSource.id);
     } else if (parent) {
@@ -117,12 +113,12 @@ export default class StudioEditor extends Vue {
     this.dragHandler = new DragHandler(event, {
       displaySize: {
         x: this.renderedWidth,
-        y: this.renderedHeight
+        y: this.renderedHeight,
       },
       displayOffset: {
         x: this.renderedOffsetX,
-        y: this.renderedOffsetY
-      }
+        y: this.renderedOffsetY,
+      },
     });
   }
 
@@ -146,7 +142,6 @@ export default class StudioEditor extends Vue {
 
       // Either select a new source, or deselect all sources
       if (overSource) {
-
         let overNode: TSceneNode = overSource;
         if (this.customizationService.getSettings().folderSelection) {
           overNode = overSource.hasParent() ? overSource.getParent() : overSource;
@@ -165,15 +160,14 @@ export default class StudioEditor extends Vue {
         this.selectionService.reset();
       }
 
-
-      if ((event.button === 2)) {
+      if (event.button === 2) {
         let menu: EditMenu;
         if (overSource) {
           this.selectionService.add(overSource.sceneItemId);
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
-            selectedSourceId: overSource.sourceId
+            selectedSourceId: overSource.sourceId,
           });
         } else {
           menu = new EditMenu({ selectedSceneId: this.scene.id });
@@ -201,10 +195,7 @@ export default class StudioEditor extends Vue {
     const mousePosY = event.offsetY - this.renderedOffsetY;
 
     const factor = this.windowsService.state.main.scaleFactor;
-    const converted = this.convertScalarToBaseSpace(
-      mousePosX * factor,
-      mousePosY * factor
-    );
+    const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
@@ -218,12 +209,12 @@ export default class StudioEditor extends Vue {
         n: { anchor: AnchorPoint.South, lockX: true },
         s: { anchor: AnchorPoint.North, lockX: true },
         e: { anchor: AnchorPoint.West, lockY: true },
-        w: { anchor: AnchorPoint.East, lockY: true }
+        w: { anchor: AnchorPoint.East, lockY: true },
       };
 
       const options = {
         ...optionsMap[name],
-        lockRatio: !event.shiftKey
+        lockRatio: !event.shiftKey,
       };
 
       if (this.isCropping) {
@@ -242,10 +233,8 @@ export default class StudioEditor extends Vue {
       });
 
       if (overSource && this.canDrag) {
-
-        const overNode = !overSource.isSelected() && overSource.hasParent() ?
-          overSource.getParent() :
-          overSource;
+        const overNode =
+          !overSource.isSelected() && overSource.hasParent() ? overSource.getParent() : overSource;
 
         // Make this source active
         if (event.ctrlKey || overNode.isSelected()) {
@@ -274,39 +263,38 @@ export default class StudioEditor extends Vue {
         switch (options.anchor) {
           case AnchorPoint.East: {
             const croppableWidth = rect.width - rect.crop.right - 2;
-            const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
+            const distance = croppableWidth * rect.scaleX - (rect.x - x);
             rect.crop.left = Math.round(_.clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
 
           case AnchorPoint.West: {
             const croppableWidth = rect.width - rect.crop.left - 2;
-            const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
+            const distance = croppableWidth * rect.scaleX + (rect.x - x);
             rect.crop.right = Math.round(_.clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
 
           case AnchorPoint.South: {
             const croppableHeight = rect.height - rect.crop.bottom - 2;
-            const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
+            const distance = croppableHeight * rect.scaleY - (rect.y - y);
             rect.crop.top = Math.round(_.clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
 
           case AnchorPoint.North: {
             const croppableHeight = rect.height - rect.crop.top - 2;
-            const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
+            const distance = croppableHeight * rect.scaleY + (rect.y - y);
             rect.crop.bottom = Math.round(_.clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
         }
-
       });
     });
 
     this.scene.getItem(source.sceneItemId).setTransform({
       position: { x: rect.x, y: rect.y },
-      crop: rect.crop
+      crop: rect.crop,
     });
   }
 
@@ -314,14 +302,14 @@ export default class StudioEditor extends Vue {
     // x & y are mouse positions in video space
     x: number,
     y: number,
-    options: IResizeOptions
+    options: IResizeOptions,
   ) {
     // Set defaults
     const opts = {
       lockRatio: true,
       lockX: false,
       lockY: false,
-      ...options
+      ...options,
     };
 
     const source = this.resizeRegion.item;
@@ -354,12 +342,12 @@ export default class StudioEditor extends Vue {
     this.scene.getItem(source.sceneItemId).setTransform({
       position: {
         x: rect.x,
-        y: rect.y
+        y: rect.y,
       },
       scale: {
         x: rect.scaleX,
-        y: rect.scaleY
-      }
+        y: rect.scaleY,
+      },
     });
   }
 
@@ -392,10 +380,7 @@ export default class StudioEditor extends Vue {
   isOverBox(event: MouseEvent, x: number, y: number, width: number, height: number) {
     const factor = this.windowsService.state.main.scaleFactor;
 
-    const mouse = this.convertVectorToBaseSpace(
-      event.offsetX * factor,
-      event.offsetY * factor
-    );
+    const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
 
     const box = { x, y, width, height };
 
@@ -424,13 +409,7 @@ export default class StudioEditor extends Vue {
     const rect = new ScalableRectangle(source.getRectangle());
     rect.normalize();
 
-    return this.isOverBox(
-      event,
-      rect.x,
-      rect.y,
-      rect.scaledWidth,
-      rect.scaledHeight
-    );
+    return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
   }
 
   // Determines if the given mouse event is over any
@@ -451,7 +430,7 @@ export default class StudioEditor extends Vue {
   convertScalarToBaseSpace(x: number, y: number) {
     return {
       x: (x * this.baseWidth) / this.renderedWidth,
-      y: (y * this.baseHeight) / this.renderedHeight
+      y: (y * this.baseHeight) / this.renderedHeight,
     };
   }
 
@@ -506,11 +485,10 @@ export default class StudioEditor extends Vue {
     return regions;
   }
 
-
   generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
     const renderedRegionRadius = 5;
     const factor = this.windowsService.state.main.scaleFactor;
-    const regionRadius = renderedRegionRadius * factor * this.baseWidth / this.renderedWidth;
+    const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 
@@ -525,72 +503,71 @@ export default class StudioEditor extends Vue {
         width,
         height,
         cursor: 'nwse-resize',
-        item
+        item,
       },
       {
         name: 'n',
-        x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
+        x: rect.x + rect.scaledWidth / 2 - regionRadius,
         y: rect.y - regionRadius,
         width,
         height,
         cursor: 'ns-resize',
-        item
+        item,
       },
       {
         name: 'ne',
-        x: (rect.x + rect.scaledWidth) - regionRadius,
+        x: rect.x + rect.scaledWidth - regionRadius,
         y: rect.y - regionRadius,
         width,
         height,
         cursor: 'nesw-resize',
-        item
+        item,
       },
       {
         name: 'e',
-        x: (rect.x + rect.scaledWidth) - regionRadius,
-        y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
+        x: rect.x + rect.scaledWidth - regionRadius,
+        y: rect.y + rect.scaledHeight / 2 - regionRadius,
         width,
         height,
         cursor: 'ew-resize',
-        item
+        item,
       },
       {
         name: 'se',
-        x: (rect.x + rect.scaledWidth) - regionRadius,
-        y: (rect.y + rect.scaledHeight) - regionRadius,
+        x: rect.x + rect.scaledWidth - regionRadius,
+        y: rect.y + rect.scaledHeight - regionRadius,
         width,
         height,
         cursor: 'nwse-resize',
-        item
+        item,
       },
       {
         name: 's',
-        x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
-        y: (rect.y + rect.scaledHeight) - regionRadius,
+        x: rect.x + rect.scaledWidth / 2 - regionRadius,
+        y: rect.y + rect.scaledHeight - regionRadius,
         width,
         height,
         cursor: 'ns-resize',
-        item
+        item,
       },
       {
         name: 'sw',
         x: rect.x - regionRadius,
-        y: (rect.y + rect.scaledHeight) - regionRadius,
+        y: rect.y + rect.scaledHeight - regionRadius,
         width,
         height,
         cursor: 'nesw-resize',
-        item
+        item,
       },
       {
         name: 'w',
         x: rect.x - regionRadius,
-        y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
+        y: rect.y + rect.scaledHeight / 2 - regionRadius,
         width,
         height,
         cursor: 'ew-resize',
-        item
-      }
+        item,
+      },
     ];
   }
-
 }

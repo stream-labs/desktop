@@ -5,7 +5,7 @@ import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { VueSlider }
+  components: { VueSlider },
 })
 export default class SliderInput extends Vue {
   @Prop() value: number;

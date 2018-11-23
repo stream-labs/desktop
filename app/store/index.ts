@@ -18,11 +18,10 @@ const mutations = {
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
-  }
+  },
 };
 
-const actions = {
-};
+const actions = {};
 
 const plugins: any[] = [];
 
@@ -38,10 +37,9 @@ plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     const servicesManager: ServicesManager = ServicesManager.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
-
       const mutationToSend: IMutation = {
         type: mutation.type,
-        payload: mutation.payload
+        payload: mutation.payload,
       };
 
       if (servicesManager.isMutationBufferingEnabled()) {
@@ -62,7 +60,7 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
       state,
-      __vuexSyncIgnore: true
+      __vuexSyncIgnore: true,
     });
     makeStoreReady(store);
   });
@@ -74,7 +72,6 @@ plugins.push((store: Store<any>) => {
 
   ipcRenderer.send('vuex-register');
 });
-
 
 let store: Store<any> = null;
 
@@ -88,12 +85,12 @@ export function createStore(): Promise<Store<any>> {
 
   store = new Vuex.Store({
     modules: {
-      ...statefulServiceModules
+      ...statefulServiceModules,
     },
     plugins,
     mutations,
     actions,
-    strict: debug
+    strict: debug,
   });
 
   StatefulService.setupVuexStore(store);
@@ -104,7 +101,10 @@ export function createStore(): Promise<Store<any>> {
 }
 
 export function commitMutation(mutation: IMutation) {
-  store.commit(mutation.type, Object.assign({}, mutation.payload, {
-    __vuexSyncIgnore: true
-  }));
+  store.commit(
+    mutation.type,
+    Object.assign({}, mutation.payload, {
+      __vuexSyncIgnore: true,
+    }),
+  );
 }

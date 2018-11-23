@@ -22,7 +22,6 @@ interface IDisplayEntry {
 }
 
 export class DisplayModule extends Module {
-
   readonly moduleName = 'Display';
   readonly permissions: EApiPermissions[] = [];
 
@@ -36,7 +35,7 @@ export class DisplayModule extends Module {
       electronWindowId: ctx.electronWindowId,
       slobsWindowId: ctx.slobsWindowId,
       paddingColor: options.paddingColor,
-      paddingSize: options.paddingSize || 0
+      paddingSize: options.paddingSize || 0,
     });
 
     display.resize(options.size.x, options.size.y);
@@ -46,8 +45,8 @@ export class DisplayModule extends Module {
       size: options.size,
       webviewVisible: true,
       webviewPosition: { x: 0, y: 0 },
-      display
-    }
+      display,
+    };
 
     const sub = ctx.webviewTransform.subscribe(transform => {
       const displayEntry = this.displays[displayId];
@@ -92,7 +91,7 @@ export class DisplayModule extends Module {
       displayEntry.display.resize(displayEntry.size.x, displayEntry.size.y);
       displayEntry.display.move(
         displayEntry.webviewPosition.x + displayEntry.position.x,
-        displayEntry.webviewPosition.y + displayEntry.position.y
+        displayEntry.webviewPosition.y + displayEntry.position.y,
       );
     } else {
       displayEntry.display.resize(0, 0);
@@ -114,5 +113,4 @@ export class DisplayModule extends Module {
 
     return this.displays[displayId];
   }
-
 }

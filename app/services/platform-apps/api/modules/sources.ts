@@ -1,4 +1,11 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
+import {
+  Module,
+  EApiPermissions,
+  apiMethod,
+  apiEvent,
+  NotImplementedError,
+  IApiContext,
+} from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
@@ -30,7 +37,6 @@ interface ISource {
 }
 
 export class SourcesModule extends Module {
-
   moduleName = 'Sources';
   permissions = [EApiPermissions.ScenesSources];
 
@@ -99,7 +105,7 @@ export class SourcesModule extends Module {
     const source = this.getAppSourceForApp(sourceId, ctx.app.id);
 
     source.setPropertiesManagerSettings({
-      appSettings: settings
+      appSettings: settings,
     });
   }
 
@@ -119,11 +125,7 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   createSource(ctx: IApiContext, name: string, type: TSourceType, settings: Dictionary<any> = {}) {
-    const source = this.sourcesService.createSource(
-      name,
-      type,
-      settings
-    );
+    const source = this.sourcesService.createSource(name, type, settings);
 
     return this.serializeSource(source);
   }
@@ -133,25 +135,17 @@ export class SourcesModule extends Module {
    */
   @apiMethod()
   createAppSource(ctx: IApiContext, name: string, appSourceId: string) {
-    const size = this.platformAppsService.getAppSourceSize(
-      ctx.app.id,
-      appSourceId
-    );
+    const size = this.platformAppsService.getAppSourceSize(ctx.app.id, appSourceId);
 
     // TODO: We support other app source types in the future
-    const source = this.sourcesService.createSource(
-      name,
-      'browser_source',
-      size,
-      {
-        propertiesManager: 'platformApp',
-        propertiesManagerSettings: {
-          appId: ctx.app.id,
-          appSourceId,
-          appSettings: {}
-        }
-      }
-    );
+    const source = this.sourcesService.createSource(name, 'browser_source', size, {
+      propertiesManager: 'platformApp',
+      propertiesManagerSettings: {
+        appId: ctx.app.id,
+        appSourceId,
+        appSettings: {},
+      },
+    });
 
     return this.serializeSource(source);
   }
@@ -208,12 +202,12 @@ export class SourcesModule extends Module {
       flags: {
         audio: source.audio,
         video: source.video,
-        async: source.async
+        async: source.async,
       },
       size: {
         width: source.width,
-        height: source.height
-      }
+        height: source.height,
+      },
     };
 
     if (source.getPropertiesManagerType() === 'platformApp') {
@@ -230,6 +224,4 @@ export class SourcesModule extends Module {
 
     return serialized;
   }
-
 }
-

@@ -26,7 +26,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     link: null,
     linkTitle: null,
     thumbnail: null,
-    link_target: null
+    link_target: null,
   };
 
   async updateBanner() {
@@ -43,10 +43,10 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   private async fetchBanner() {
-    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
-      const newState = await fetch(req).then((rawResp) => rawResp.json());
+      const newState = await fetch(req).then(rawResp => rawResp.json());
       return newState.id ? newState : this.state;
     } catch (e) {
       return this.state;
@@ -57,16 +57,17 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const endpoint = 'api/v5/slobs/announcement/close';
     const postData = {
       method: 'POST',
-      body: JSON.stringify({ clientId: this.userService.getLocalUserId(), announcementId: this.state.id }),
-      headers: new Headers({ 'Content-Type': 'application/json' })
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: this.state.id,
+      }),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
     };
     const req = this.formRequest(endpoint, postData);
     try {
       await fetch(req);
       this.CLEAR_BANNER();
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   private formRequest(endpoint: string, options: any = {}) {

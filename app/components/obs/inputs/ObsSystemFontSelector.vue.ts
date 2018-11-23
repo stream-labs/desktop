@@ -26,20 +26,19 @@ interface IFontSelect extends HTMLElement {
 }
 
 @Component({
-  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector }
+  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector },
 })
-export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>{
-
+export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>> {
   @Prop()
   value: IObsInput<IObsFont>;
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 
   $refs: {
-    family: HTMLInputElement,
-    font: IFontSelect,
-    size: HTMLInputElement,
-  }
+    family: HTMLInputElement;
+    font: IFontSelect;
+    size: HTMLInputElement;
+  };
 
   // CSS styles for a particular font
   styleForFont(font: IFontDescriptor) {
@@ -52,7 +51,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     return {
       fontFamily: font.family,
       fontWeight: font.weight,
-      fontStyle
+      fontStyle,
     };
   }
 
@@ -62,14 +61,14 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     if (fonts) {
       return {
         family: fonts[0].family,
-        fonts
+        fonts,
       };
     }
 
     return { family: '', fonts: [] };
   }
 
-  setFamily(family: {family: string, fonts: IFontDescriptor[]}) {
+  setFamily(family: { family: string; fonts: IFontDescriptor[] }) {
     // When a new family is selected, we have to select a
     // default style.  This will be "Regular" if it exists.
     // Otherwise, it will be the first family on the list.
@@ -88,13 +87,13 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
 
     this.setFont({
       face: family.family,
-      flags: this.getFlagsFromFont(selected_font)
+      flags: this.getFlagsFromFont(selected_font),
     });
   }
 
   getFlagsFromFont(font: IFontDescriptor) {
-    const flags = 
-      (font.italic  ? EFontStyle.Italic : 0) |
+    const flags =
+      (font.italic ? EFontStyle.Italic : 0) |
       (font.oblique ? EFontStyle.Italic : 0) |
       (font.weight > 400 ? EFontStyle.Bold : 0);
 
@@ -176,10 +175,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   }
 
   get fontFamilies() {
-    return _.sortBy(_.map(this.fontsByFamily, fonts => {
-      return this.fontsToFamily(fonts);
-    }), 'family');
+    return _.sortBy(
+      _.map(this.fontsByFamily, fonts => {
+        return this.fontsToFamily(fonts);
+      }),
+      'family',
+    );
   }
-
-
 }

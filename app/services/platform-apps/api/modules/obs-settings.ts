@@ -2,9 +2,7 @@ import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { SettingsService, ISettingsState } from 'services/settings';
 import { Inject } from 'util/injector';
 
-
 export class ObsSettingsModule extends Module {
-
   moduleName = 'ObsSettings';
   permissions = [EApiPermissions.ObsSettings];
 
@@ -38,5 +36,4 @@ export class ObsSettingsModule extends Module {
       this.settingsService.setSettings(categoryName, formSubCategories);
     });
   }
-
 }

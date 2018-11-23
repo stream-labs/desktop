@@ -5,11 +5,10 @@ import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import moment from 'moment';
 
-
 @Component({
   components: {
-    ChatbotPagination
-  }
+    ChatbotPagination,
+  },
 })
 export default class ChatbotQuotes extends ChatbotBase {
   searchQuery = '';

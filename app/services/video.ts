@@ -36,7 +36,7 @@ export class Display {
     x: 0,
     y: 0,
     width: 0,
-    height: 0
+    height: 0,
   };
 
   electronWindowId: number;
@@ -61,13 +61,10 @@ export class Display {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         this.sourceId,
-        name
+        name,
       );
     } else {
-      obs.NodeObs.OBS_content_createDisplay(
-        electronWindow.getNativeWindowHandle(),
-        name
-      );
+      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
     }
     this.displayDestroyed = false;
 
@@ -80,7 +77,7 @@ export class Display {
         name,
         options.paddingColor.r,
         options.paddingColor.g,
-        options.paddingColor.b
+        options.paddingColor.b,
       );
     } else {
       obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
@@ -107,11 +104,12 @@ export class Display {
     const trackingFun = () => {
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
-      if ((rect.x !== this.currentPosition.x) ||
-        (rect.y !== this.currentPosition.y) ||
-        (rect.width !== this.currentPosition.width) ||
-        (rect.height !== this.currentPosition.height)) {
-
+      if (
+        rect.x !== this.currentPosition.x ||
+        rect.y !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      ) {
         this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
       }
@@ -128,7 +126,7 @@ export class Display {
       x: rect.left * factor,
       y: rect.top * factor,
       width: rect.width * factor,
-      height: rect.height * factor
+      height: rect.height * factor,
     };
   }
 
@@ -169,7 +167,7 @@ export class Display {
 
     this.outputRegion = {
       ...position,
-      ...size
+      ...size,
     };
 
     this.outputRegionCallbacks.forEach(cb => {
@@ -192,7 +190,6 @@ export class Display {
 }
 
 export class VideoService extends Service {
-
   @Inject()
   settingsService: SettingsService;
 
@@ -203,23 +200,32 @@ export class VideoService extends Service {
 
     // Watch for changes to the base resolution.
     // This seems super freaking hacky.
-    this.settingsService.store.watch(state => {
-      return state.SettingsService.Video.Base;
-    }, () => {
-      // This gives the setting time to propagate
-      setTimeout(() => {
-        Object.values(this.activeDisplays).forEach(display => {
-          display.refreshOutputRegion();
-        });
-      }, 1000);
-    });
+    this.settingsService.store.watch(
+      state => {
+        return state.SettingsService.Video.Base;
+      },
+      () => {
+        // This gives the setting time to propagate
+        setTimeout(() => {
+          Object.values(this.activeDisplays).forEach(display => {
+            display.refreshOutputRegion();
+          });
+        }, 1000);
+      },
+    );
   }
 
   // Generates a random string:
   // https://gist.github.com/6174/6062387
   getRandomDisplayId() {
-    return Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+      Math.random()
+        .toString(36)
+        .substring(2, 15)
+    );
   }
 
   getScreenRectangle() {
@@ -227,7 +233,7 @@ export class VideoService extends Service {
       x: 0,
       y: 0,
       width: this.baseWidth,
-      height: this.baseHeight
+      height: this.baseHeight,
     });
   }
 
@@ -246,8 +252,7 @@ export class VideoService extends Service {
 
     return {
       width,
-      height
+      height,
     };
   }
-
 }

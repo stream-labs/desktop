@@ -18,8 +18,8 @@ Vue.use(VModal);
     ModalLayout,
     TransitionSettings,
     Tabs,
-    ConnectionSettings
-  }
+    ConnectionSettings,
+  },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
@@ -32,18 +32,19 @@ export default class SceneTransitions extends Vue {
   tabs: ITab[] = [
     {
       name: 'Transitions',
-      value: 'transitions'
+      value: 'transitions',
     },
     {
       name: 'Connections',
-      value: 'connections'
-    }
+      value: 'connections',
+    },
   ];
 
   selectedTab = 'transitions';
 
-  redundantConnectionTooltip =
-    $t('This connection is redundant because another connection already connects these scenes.');
+  redundantConnectionTooltip = $t(
+    'This connection is redundant because another connection already connects these scenes.',
+  );
 
   get transitionsEnabled() {
     return this.scenesService.scenes.length > 1;
@@ -62,7 +63,7 @@ export default class SceneTransitions extends Vue {
   addTransition() {
     const transition = this.transitionsService.createTransition(
       ETransitionType.Cut,
-      'New Transition'
+      'New Transition',
     );
     this.editTransition(transition.id);
   }
@@ -95,7 +96,7 @@ export default class SceneTransitions extends Vue {
     const connection = this.transitionsService.addConnection(
       this.scenesService.scenes[0].id,
       this.scenesService.scenes[1].id,
-      this.transitions[0].id
+      this.transitions[0].id,
     );
     this.editConnection(connection.id);
   }

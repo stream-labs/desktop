@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { ObsTextInput, ObsListInput, ObsBoolInput }from 'components/obs/inputs';
+import { ObsTextInput, ObsListInput, ObsBoolInput } from 'components/obs/inputs';
 import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
@@ -16,7 +16,7 @@ import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
 import {
   VideoEncodingOptimizationService,
-  IEncoderPreset
+  IEncoderPreset,
 } from 'services/video-encoding-optimizations';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import { shell } from 'electron';
@@ -33,8 +33,8 @@ interface IMultiSelectProfiles {
     ObsTextInput,
     ObsListInput,
     ObsBoolInput,
-    Multiselect
-  }
+    Multiselect,
+  },
 })
 export default class EditStreamInfo extends Vue {
   @Inject() streamInfoService: StreamInfoService;
@@ -60,34 +60,34 @@ export default class EditStreamInfo extends Vue {
   streamTitleModel: IObsInput<string> = {
     name: 'stream_title',
     description: $t('Title'),
-    value: ''
+    value: '',
   };
 
   streamDescriptionModel: IObsTextInputValue = {
     name: 'stream_description',
     description: 'Description',
     value: '',
-    multiline: true
+    multiline: true,
   };
 
   gameModel: IObsListInput<string> = {
     name: 'stream_game',
     description: $t('Game'),
     value: '',
-    options: []
+    options: [],
   };
 
   pageModel: IObsListInput<string> = {
     name: 'stream_page',
     description: $t('Facebook Page'),
     value: '',
-    options: []
+    options: [],
   };
 
   doNotShowAgainModel: IObsInput<boolean> = {
     name: 'do_not_show_again',
     description: $t('Do not show this message when going live'),
-    value: false
+    value: false,
   };
 
   encoderProfile: IMultiSelectProfiles;
@@ -98,19 +98,17 @@ export default class EditStreamInfo extends Vue {
   debouncedGameSearch: (search: string) => void;
 
   async created() {
-    this.debouncedGameSearch = debounce(
-      (search: string) => this.onGameSearchChange(search),
-      500
-    );
+    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
 
     if (this.streamInfoService.state.channelInfo) {
       this.populatingModels = true;
       if (this.isFacebook) {
         const service = getPlatformService('facebook');
-        await service.prepopulateInfo()
+        await service
+          .prepopulateInfo()
           .then((info: IChannelInfo) => {
             if (!info) return;
-            this.streamInfoService.setStreamInfo(info.title, info.description, info.game)
+            this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
           })
           .then(() => this.populateModels());
       } else {
@@ -131,15 +129,16 @@ export default class EditStreamInfo extends Vue {
     this.gameModel.options = [
       {
         description: this.streamInfoService.state.channelInfo.game,
-        value: this.streamInfoService.state.channelInfo.game
-      }
+        value: this.streamInfoService.state.channelInfo.game,
+      },
     ];
 
     if (this.facebookPages) {
       this.pageModel.value = this.facebookPages.page_id;
-      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
-        { value: page.id, description: `${page.name} | ${page.category}` }
-      ));
+      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
+        value: page.id,
+        description: `${page.name} | ${page.category}`,
+      }));
       this.hasPages = !!this.facebookPages.pages.length;
     }
     this.loadAvailableProfiles();
@@ -159,7 +158,7 @@ export default class EditStreamInfo extends Vue {
           games.forEach(game => {
             this.gameModel.options.push({
               description: game.name,
-              value: game.name
+              value: game.name,
             });
           });
         }
@@ -170,12 +169,10 @@ export default class EditStreamInfo extends Vue {
   loadAvailableProfiles() {
     if (!this.midStreamMode) {
       const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        this.gameModel.value
+        this.gameModel.value,
       );
 
-      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
+      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
 
       this.areAvailableProfiles = availableProfiles.length > 0 || genericProfiles.length > 0;
 
@@ -212,14 +209,18 @@ export default class EditStreamInfo extends Vue {
     if (this.doNotShowAgainModel.value) {
       alert(
         $t('You will not be asked again to update your stream info when going live.  ') +
-        $t('You can re-enable this from the settings.')
+          $t('You can re-enable this from the settings.'),
       );
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
     this.streamInfoService
-      .setStreamInfo(this.streamTitleModel.value, this.streamDescriptionModel.value, this.gameModel.value)
+      .setStreamInfo(
+        this.streamTitleModel.value,
+        this.streamDescriptionModel.value,
+        this.gameModel.value,
+      )
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -232,23 +233,18 @@ export default class EditStreamInfo extends Vue {
           this.updatingInfo = false;
         }
       })
-      .catch((e) => {
-        this.$toasted.show(
-          e,
-          {
-            position: 'bottom-center',
-            className: 'toast-alert',
-            duration: 1000,
-            singleton: true
-          }
-        );
+      .catch(e => {
+        this.$toasted.show(e, {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 1000,
+          singleton: true,
+        });
         this.updatingInfo = false;
       });
 
     if (this.areAvailableProfiles && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(
-        this.encoderProfile.value
-      );
+      this.videoEncodingOptimizationService.applyProfile(this.encoderProfile.value);
     }
   }
 
@@ -318,13 +314,9 @@ export default class EditStreamInfo extends Vue {
 
   get profiles() {
     const multiselectArray: IMultiSelectProfiles[] = [];
-    let profiles = this.videoEncodingOptimizationService.getGameProfiles(
-      this.gameModel.value
-    );
+    let profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
     if (profiles.length === 0) {
-      profiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
+      profiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
     }
     profiles.forEach(profile => {
       multiselectArray.push({

@@ -4,9 +4,14 @@ import { mutation } from '../stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
-  ICustomizationSettings
+  ICustomizationSettings,
 } from './customization-api';
-import { IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
+import {
+  IObsInput,
+  IObsListInput,
+  IObsNumberInputValue,
+  TObsFormData,
+} from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
@@ -17,11 +22,8 @@ const LIVEDOCK_MAX_SIZE = 0.5;
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
  */
-export class CustomizationService
-  extends PersistentStatefulService<ICustomizationServiceState>
-  implements ICustomizationServiceApi
-{
-
+export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
+  implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
     nightMode: true,
     updateStreamInfoOnLive: true,
@@ -41,15 +43,15 @@ export class CustomizationService
     folderSelection: false,
     experimental: {
       // put experimental features here
-    }
+    },
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
 
   init() {
     super.init();
-    this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
-    this.setSettings({previewEnabled: true}); // preview is always enabled on app start
+    this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+    this.setSettings({ previewEnabled: true }); // preview is always enabled on app start
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -106,7 +108,7 @@ export class CustomizationService
     const settings = this.getSettings();
 
     return [
-      <IObsInput<boolean>> {
+      <IObsInput<boolean>>{
         value: settings.nightMode,
         name: 'nightMode',
         description: $t('Night mode'),
@@ -115,14 +117,17 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IObsListInput<boolean>> {
+      <IObsListInput<boolean>>{
         value: settings.folderSelection,
         name: 'folderSelection',
         description: $t('Scene item selection mode'),
         type: 'OBS_PROPERTY_LIST',
         options: [
           { value: true, description: $t('Single click selects group. Double click selects item') },
-          { value: false, description: $t('Double click selects group. Single click selects item') }
+          {
+            value: false,
+            description: $t('Double click selects group. Single click selects item'),
+          },
         ],
         visible: true,
         enabled: true,
@@ -137,7 +142,7 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IObsNumberInputValue> {
+      <IObsNumberInputValue>{
         value: settings.chatZoomFactor,
         name: 'chatZoomFactor',
         description: $t('Chat Text Size'),
@@ -150,7 +155,7 @@ export class CustomizationService
         usePercentages: true,
       },
 
-      <IObsInput<boolean>>  {
+      <IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
         description: $t('Enable BetterTTV emotes for Twitch'),
@@ -159,21 +164,19 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IObsInput<boolean>>  {
+      <IObsInput<boolean>>{
         value: settings.enableFFZEmotes,
         name: 'enableFFZEmotes',
         description: $t('Enable FrankerFaceZ emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
-      }
-
+      },
     ];
   }
 
   getExperimentalSettingsFormData(): TObsFormData {
-    return [
-    ];
+    return [];
   }
 
   restoreDefaults() {
@@ -184,5 +187,4 @@ export class CustomizationService
   private SET_SETTINGS(settingsPatch: Partial<ICustomizationSettings>) {
     Object.assign(this.state, settingsPatch);
   }
-
 }

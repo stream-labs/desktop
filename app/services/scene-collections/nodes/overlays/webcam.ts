@@ -36,7 +36,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
     this.data = {
       width: rect.scaledWidth / this.videoService.baseWidth,
-      height: rect.scaledHeight / this.videoService.baseHeight
+      height: rect.scaledHeight / this.videoService.baseHeight,
     };
   }
 
@@ -60,7 +60,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0
+      bottom: 0,
     };
     let scale: number;
 
@@ -109,7 +109,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
     // Figure out which resolutions this device can run at
     const resolutionOptions = (deviceProperties.get(
-      'resolution'
+      'resolution',
     ) as IListProperty).details.items.map(item => {
       return this.resStringToResolution(item.value as string);
     });
@@ -177,7 +177,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
         x: scale,
         y: scale,
       },
-      crop
+      crop,
     });
   }
 
@@ -186,7 +186,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
     return {
       value: resString,
       width: parseInt(parts[0], 10),
-      height: parseInt(parts[1], 10)
+      height: parseInt(parts[1], 10),
     };
   }
 }

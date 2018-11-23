@@ -17,13 +17,11 @@ const MIME_TYPES = {
   '.ttf': 'application/font-ttf',
   '.eot': 'application/vnd.ms-fontobject',
   '.otf': 'application/font-otf',
-  '.svg': 'application/image/svg+xml'
+  '.svg': 'application/image/svg+xml',
 };
-
 
 // Based roughly on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Node_server_without_framework
 export class DevServer {
-
   constructor(private directory: string, private port = 8081) {
     this.listen();
   }
@@ -59,5 +57,4 @@ export class DevServer {
   stopListening() {
     this.server.close();
   }
-
 }

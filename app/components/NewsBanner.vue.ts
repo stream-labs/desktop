@@ -13,7 +13,6 @@ export default class NewsBanner extends Vue {
 
   processingClose = false;
 
-
   get currentBanner() {
     return this.announcementsService.state;
   }

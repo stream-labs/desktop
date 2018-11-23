@@ -24,17 +24,15 @@ export interface ISceneItemInfo {
 
   sceneNodeType?: TSceneNodeType;
   parentId?: string;
-
 }
 
-export type TSceneNodeInfo =  ISceneItemInfo | ISceneItemFolder;
+export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolder;
 
 interface IContext {
   scene: Scene;
 }
 
 export class SceneItemsNode extends Node<ISchema, {}> {
-
   schemaVersion = 1;
 
   @Inject('SourcesService')
@@ -44,7 +42,10 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   scenesService: ScenesService;
 
   getItems(context: IContext) {
-    return context.scene.getNodes().slice().reverse();
+    return context.scene
+      .getNodes()
+      .slice()
+      .reverse();
   }
 
   save(context: IContext): Promise<void> {
@@ -66,13 +67,12 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               crop: transform.crop,
               locked: sceneItem.locked,
               hotkeys,
-              rotation: transform.rotation
+              rotation: transform.rotation,
             });
           });
         } else {
           resolve(sceneItem.getModel());
         }
-
       });
     });
 
@@ -116,5 +116,4 @@ export class SceneItemsNode extends Node<ISchema, {}> {
       Promise.all(promises).then(() => resolve());
     });
   }
-
 }

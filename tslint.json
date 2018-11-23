@@ -1,9 +1,10 @@
 {
-  "extends": "tslint-config-prettier",
+  "extends": ["tslint-config-prettier", "tslint-plugin-prettier"],
   "rules": {
     "max-line-length": {
       "options": [120]
     },
+    "prettier": true,
     "quotemark": [true, "single", "avoid-escape", "avoid-template"],
     "curly": [true, "ignore-same-line"],
     "no-consecutive-blank-lines": [true, 2]
@@ -11,3 +12,4 @@
   "jsRules": {
   }
 }
+

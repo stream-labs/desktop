@@ -5,17 +5,15 @@ import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { IQueuePreferencesGeneralSettings } from 'services/chatbot';
 
-import {
-  EInputType
-} from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 
 @Component({})
 export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
   generalSettings: IQueuePreferencesGeneralSettings = {
     maximum: 0,
     messages: {
-      picked: ''
-    }
+      picked: '',
+    },
   };
 
   // metadata
@@ -24,15 +22,15 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
       maximum: metadataHelper.number({
         required: true,
         type: EInputType.number,
-        placeholder: $t('Maximum Queue Size')
+        placeholder: $t('Maximum Queue Size'),
       }),
       messages: {
         picked: metadataHelper.text({
           required: true,
           type: EInputType.textArea,
-          placeholder: $t('Message when user is picked.')
-        })
-      }
+          placeholder: $t('Message when user is picked.'),
+        }),
+      },
     };
   }
 

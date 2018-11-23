@@ -20,7 +20,7 @@ import {
   ITextMetadata,
   INumberMetadata,
   ISliderMetadata,
-  IInputMetadata
+  IInputMetadata,
 } from 'components/shared/inputs/index';
 
 interface IChatbotPunishmentMetadata {
@@ -57,7 +57,7 @@ interface ICapsProtectionMetadata {
 interface ISymbolProtectionMetadata {
   general: IProtectionGeneralMetadata;
   advanced: IProtectionAdvancedMetadata;
-};
+}
 
 interface ILinkProtectionCommandsMetadata {
   permit: {
@@ -66,11 +66,11 @@ interface ILinkProtectionCommandsMetadata {
     response: ITextMetadata;
     response_type: IListMetadata<string>;
     new_alias: ITextMetadata;
-  }
+  };
 }
 
 interface ILinkProtectionMetadata {
-  commands: ILinkProtectionCommandsMetadata,
+  commands: ILinkProtectionCommandsMetadata;
   general: IProtectionGeneralMetadata;
   new_whitelist_item: ITextMetadata;
   new_blacklist_item: ITextMetadata;
@@ -129,7 +129,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       message: {
         caps: $t('The phrase that will appear after a viewer enters too many capitalized letters'),
         symbol: $t('The phrase that will appear after a viewer enters too many symbols'),
-        links: $t('The phrase that will appear after a viewer enters blacklisted links')
+        links: $t('The phrase that will appear after a viewer enters blacklisted links'),
       },
       minimum: {
         caps: $t('Set the number of capitalized letters before the system starts to detect'),
@@ -153,35 +153,35 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         type: {
           type: EInputType.list,
           required: true,
-          options: this.chatbotPunishments
+          options: this.chatbotPunishments,
         },
         duration: {
           required: true,
           type: EInputType.number,
           placeholder: $t('Punishment Duration (Value in Seconds)'),
-          min: 0
-        }
+          min: 0,
+        },
       },
       permit: {
         duration: {
           required: true,
           type: EInputType.number,
           placeholder: $t('Permission Duration (Value in Seconds)'),
-        }
+        },
       },
       excluded: {
         level: {
           required: true,
           options: this.chatbotAutopermitOptions,
           type: EInputType.list,
-          tooltip: $t('Set a user group that will not be punished')
-        }
+          tooltip: $t('Set a user group that will not be punished'),
+        },
       },
       message: {
         required: true,
         type: EInputType.textArea,
-        placeholder: this.placeholder(protectionType, 'message')
-      }
+        placeholder: this.placeholder(protectionType, 'message'),
+      },
     };
 
     return generalMetadata;
@@ -195,7 +195,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: this.placeholder(protectionType, 'minimum'),
         min: 0,
         max: 500,
-        tooltip: this.placeholder(protectionType, 'minimum')
+        tooltip: this.placeholder(protectionType, 'minimum'),
       },
       maximum: {
         required: true,
@@ -203,15 +203,15 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: this.placeholder(protectionType, 'maximum'),
         min: 0,
         max: 500,
-        tooltip: this.placeholder(protectionType, 'maximum')
+        tooltip: this.placeholder(protectionType, 'maximum'),
       },
       percent: {
         required: true,
         type: EInputType.slider,
         min: 0,
         max: 100,
-        tooltip: this.placeholder(protectionType, 'percent')
-      }
+        tooltip: this.placeholder(protectionType, 'percent'),
+      },
     };
     return advancedMetadata;
   }
@@ -222,27 +222,27 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         command: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Command phrase'
+          placeholder: 'Command phrase',
         },
         description: {
           required: true,
           type: EInputType.textArea,
-          placeholder: 'Command description'
+          placeholder: 'Command description',
         },
         response: {
           required: true,
           type: EInputType.textArea,
-          placeholder: 'Message in chat'
+          placeholder: 'Message in chat',
         },
         response_type: {
-          options: this.chatbotResponseTypes
+          options: this.chatbotResponseTypes,
         },
         new_alias: {
           required: false,
           type: EInputType.text,
-          placeholder: 'New Command Alias'
-        }
-      }
+          placeholder: 'New Command Alias',
+        },
+      },
     };
     return linkCommandsMetadata;
   }
@@ -252,7 +252,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       text: {
         required: true,
         type: EInputType.text,
-        placeholder: 'word to protect'
+        placeholder: 'word to protect',
       },
       is_regex: {
         required: true,
@@ -262,15 +262,15 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         type: {
           required: true,
           type: EInputType.list,
-          options: this.chatbotPunishments
+          options: this.chatbotPunishments,
         },
         duration: {
           required: true,
           type: EInputType.number,
           placeholder: 'Punishment Duration (Value in Seconds)',
-          min: 0
-        }
-      }
+          min: 0,
+        },
+      },
     };
     return wordBlacklistItemMetadata;
   }
@@ -279,11 +279,11 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const metadata: IProtectionMetadata = {
       caps: {
         general: this.generalMetadata('caps'),
-        advanced: this.advancedMetadata('caps')
+        advanced: this.advancedMetadata('caps'),
       },
       symbol: {
         general: this.generalMetadata('symbol'),
-        advanced: this.advancedMetadata('symbol')
+        advanced: this.advancedMetadata('symbol'),
       },
       link: {
         commands: this.linkCommandsMetadata,
@@ -291,48 +291,52 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         new_whitelist_item: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Link to whitelist'
+          placeholder: 'Link to whitelist',
         },
         new_blacklist_item: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Link to blacklist'
-        }
+          placeholder: 'Link to blacklist',
+        },
       },
       word: {
         general: this.generalMetadata('words'),
-        new_blacklist_item: this.wordBlacklistItemMetadata
-      }
+        new_blacklist_item: this.wordBlacklistItemMetadata,
+      },
     };
     return metadata;
   }
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
-      this.chatbotApiService.resetSettings(slug)
-        .then((response: (
-          ICapsProtectionResponse |
-          ISymbolProtectionResponse |
-          ILinkProtectionResponse |
-          IWordProtectionResponse
-        )) => {
-          switch (slug) {
-            case 'caps-protection':
-              this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
-              break;
-            case 'symbol-protection':
-              this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
-              break;
-            case 'link-protection':
-              this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
-              break;
-            case 'words-protection':
-              this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
-              break;
-            default:
-              break;
-          }
-        })
+      this.chatbotApiService
+        .resetSettings(slug)
+        .then(
+          (
+            response:
+              | ICapsProtectionResponse
+              | ISymbolProtectionResponse
+              | ILinkProtectionResponse
+              | IWordProtectionResponse,
+          ) => {
+            switch (slug) {
+              case 'caps-protection':
+                this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
+                break;
+              case 'symbol-protection':
+                this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
+                break;
+              case 'link-protection':
+                this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
+                break;
+              case 'words-protection':
+                this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
+                break;
+              default:
+                break;
+            }
+          },
+        );
     }
   }
 }

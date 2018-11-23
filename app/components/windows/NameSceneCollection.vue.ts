@@ -12,7 +12,7 @@ interface INameSceneCollectionOptions {
 }
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class NameSceneCollection extends Vue {
   name = '';
@@ -24,8 +24,7 @@ export default class NameSceneCollection extends Vue {
   options: INameSceneCollectionOptions = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
-    const suggestedName =
-      this.options.sceneCollectionToDuplicate || 'New Scene Collection';
+    const suggestedName = this.options.sceneCollectionToDuplicate || 'New Scene Collection';
     this.name = this.sceneCollectionsService.suggestName(suggestedName);
   }
 

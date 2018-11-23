@@ -37,25 +37,25 @@ export interface ICreditsData extends IWidgetData {
 
 @InheritMutations()
 export class CreditsService extends WidgetSettingsService<ICreditsData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.Credits,
-      url: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
+      url: `https://${this.getHost()}/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,
       settingsUpdateEvent: 'endCreditsSettingsUpdate',
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
-
   testRollCredits() {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(`https://${this.getHost()}/api/v5/slobs/widget/test/endcredits`, { headers });
+    const request = new Request(`https://${this.getHost()}/api/v5/slobs/widget/test/endcredits`, {
+      headers,
+    });
     return fetch(request);
   }
 }

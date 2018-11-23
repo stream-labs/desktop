@@ -3,7 +3,6 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component({})
 export default class AddSourceInfo extends Vue {
-
   @Prop()
   name: string;
 
@@ -12,5 +11,4 @@ export default class AddSourceInfo extends Vue {
 
   @Prop({ default: true })
   showSupport: boolean;
-
 }

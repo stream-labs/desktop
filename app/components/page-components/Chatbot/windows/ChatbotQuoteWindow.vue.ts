@@ -5,16 +5,12 @@ import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IQuote,
-  IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+import { IQuote, IChatbotErrorResponse } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -30,17 +26,17 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     return {
       message: metadataHelper.textArea({
         required: true,
-        placeholder: 'Quote'
+        placeholder: 'Quote',
       }),
       game: metadataHelper.text({
         required: true,
-        placeholder: 'Game'
+        placeholder: 'Game',
       }),
       added_by: metadataHelper.text({
         required: true,
-        placeholder: 'Added by'
-      })
-    }
+        placeholder: 'Added by',
+      }),
+    };
   }
 
   mounted() {
@@ -66,9 +62,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
         .catch(this.onErrorHandler);
       return;
     }
-    this.chatbotApiService
-      .createQuote(this.newQuote)
-      .catch(this.onErrorHandler);
+    this.chatbotApiService.createQuote(this.newQuote).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

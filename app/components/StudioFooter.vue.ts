@@ -20,8 +20,8 @@ import { $t } from 'services/i18n';
     TestWidgets,
     PerformanceMetrics,
     NotificationsArea,
-    GlobalSyncStatus
-  }
+    GlobalSyncStatus,
+  },
 })
 export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
@@ -62,9 +62,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal(
-      'https://youtube.com/live_dashboard_splash'
-    );
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
   confirmYoutubeEnabled() {
