@@ -108,7 +108,7 @@
     "css-element-queries": "^1.0.2",
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
-    "electron": "2.0.8",
+    "electron": "2.0.14",
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
     "emojione": "3.1.7",
