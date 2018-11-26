@@ -16,7 +16,7 @@ const cp = require('child_process');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs';
+const s3Bucket = 'slobs-cdn.streamlabs.com';
 const sentryOrg = 'streamlabs-obs';
 const sentryProject = 'streamlabs-obs';
 
