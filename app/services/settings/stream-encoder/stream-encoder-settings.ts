@@ -30,7 +30,7 @@ export const QUALITY_ORDER =  [
   'hp', 'fast', 'bd', 'llhp', 'default', 'll', 'llhq', 'hq', 'medium', 'slow', 'losslesshp', 'lossless',
 
   // QSV
-  1, 2, 3, 4, 5, 6, 7
+  'speed', 'balanced', 'quality'
 ];
 
 
@@ -58,7 +58,7 @@ const simpleEncoderToAndancedEncoderMap = {
 export const encoderFieldsMap = {
   x264: { preset: 'preset', encoderOptions: 'x264opts' },
   nvenc: { preset: 'preset' },
-  qsv: { preset: 'QSVPreset' }
+  qsv: { preset: 'target_usage' }
 };
 
 
