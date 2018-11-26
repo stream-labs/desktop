@@ -24,9 +24,9 @@ export class CustomizationService
     studioControlsOpened: true,
     optimizeForNiconico: true,
     showOptimizationDialogForNiconico: true,
+    pollingPerformanceStatistics: true,
     experimental: {
       // put experimental features here
-      pollingPerformanceStatistics: true
     }
   };
 
@@ -70,11 +70,11 @@ export class CustomizationService
   }
 
   get pollingPerformanceStatistics() {
-    return this.state.experimental.pollingPerformanceStatistics;
+    return this.state.pollingPerformanceStatistics;
   }
 
   setPollingPerformanceStatistics(activate: boolean) {
-    this.setSettings({ experimental: { pollingPerformanceStatistics: activate } });
+    this.setSettings({ pollingPerformanceStatistics: activate });
   }
 
   getSettingsFormData(): TFormData {
