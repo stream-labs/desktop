@@ -49,6 +49,7 @@
     <BoolInput
       :value="pollingPerformanceStatisticsModel"
       @input="setPollingPerformanceStatistics" />
+    <p>{{ $t('settings.pollingPerformanceStatisticsDescription') }}</p>
   </div>
 </div>
 </template>
