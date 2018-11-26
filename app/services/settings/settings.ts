@@ -164,21 +164,21 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     // We hide the encoder preset and settings if the optimized ones are in used
-    if (
-      categoryName === 'Output' &&
-      this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
-    ) {
-      const encoder = obsEncoderToEncoder(
-        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
-        this.findSettingValue(settings, 'Streaming', 'StreamEncoder')
-      );
-      // Setting preset visibility
-      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
-      // Setting encoder settings visibility
-      if (encoder == 'x264') {
-        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, { visible: false });
-      }
-    }
+    // if (
+    //   categoryName === 'Output' &&
+    //   this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
+    // ) {
+    //   const encoder = obsEncoderToEncoder(
+    //     this.findSettingValue(settings, 'Streaming', 'Encoder') ||
+    //     this.findSettingValue(settings, 'Streaming', 'StreamEncoder')
+    //   );
+    //   // Setting preset visibility
+    //   settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
+    //   // Setting encoder settings visibility
+    //   if (encoder == 'x264') {
+    //     settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, { visible: false });
+    //   }
+    // }
 
     console.log('get settings', settings);
 
