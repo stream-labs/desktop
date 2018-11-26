@@ -25,12 +25,14 @@
         <div v-if="isSubscription">
           <div>
             <VFormGroup
+              v-if="isTwitch"
               :title="$t('Subscription Tier')"
               v-model="newAlert.sub.newMessage.tier"
               :metadata="metadata.sub.newMessage.tier"
             />
             <VFormGroup
               :title="$t('Subscription Months')"
+              v-if="!isYoutube"
               v-model="newAlert.sub.newMessage.amount"
               :metadata="metadata.sub.newMessage.amount"
             />
@@ -40,6 +42,7 @@
               :metadata="metadata.sub.newMessage.message"
             />
             <VFormGroup
+              v-if="isTwitch"
               :title="$t('Is Gifted')"
               v-model="newAlert.sub.newMessage.is_gifted"
               :metadata="metadata.sub.newMessage.is_gifted"
@@ -118,6 +121,34 @@
               :title="$t('Subscription Message')"
               v-model="newAlert.sub_mystery_gift.newMessage.message"
               :metadata="metadata.sub_mystery_gift.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isSponsor">
+          <div>
+            <VFormGroup
+              :title="$t('Member Months')"
+              v-model="newAlert.sponsor.newMessage.amount"
+              :metadata="metadata.sponsor.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Member Message')"
+              v-model="newAlert.sponsor.newMessage.message"
+              :metadata="metadata.sponsor.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isSuperChat">
+          <div>
+            <VFormGroup
+              :title="$t('Super Chat Amount')"
+              v-model="newAlert.superchat.newMessage.amount"
+              :metadata="metadata.superchat.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Super Chat Message')"
+              v-model="newAlert.superchat.newMessage.message"
+              :metadata="metadata.superchat.newMessage.message"
             />
           </div>
         </div>

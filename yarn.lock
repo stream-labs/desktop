@@ -4007,10 +4007,10 @@ electron-window-state@^4.1.1:
     jsonfile "^2.2.3"
     mkdirp "^0.5.1"
 
-electron@2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.8.tgz#6ec7113b356e09cc9899797e0d41ebff8163e962"
-  integrity sha512-pbeGFbwijb5V3Xy/KMcwIp59eA9igg2br+7EHbbwQoa3HRDF5JjTrciX7OiscCA52+ze2n4q38S4lXPqRitgIA==
+electron@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.14.tgz#fad6766645e7c0cd10b4ae822d3167959735a870"
+  integrity sha512-8HLVZuscZxVhoMUL6RlF5kMcwGUAMWw5HNwrEmRgzZyBIBbdCO4aMo9z0qknnPTUDROz8xXZFNhFvBXDu61g5Q==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -7768,9 +7768,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.58-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.59-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.58-iojs-v2.0.8.tar.gz#2179f83388692088a6666b23aba41c188d2b6eb5"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.59-iojs-v2.0.8.tar.gz#8d1a0af4f0c3cb0722e5e7bd4fd93ef82d1ca423"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
