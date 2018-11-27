@@ -264,15 +264,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // resolve the device id by the device name here
       if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
 
-      // dshow_input uses "deviceName :" as id
-      if (type == 'dshow_input' && propName == 'audio_device_id') {
-        resolvedSettings[propName] = settings[propName] + ':';
-        return;
-      }
+      const device = type === 'dshow_input' ?
+        this.hardwareService.getDshowDeviceByName(settings[propName]) :
+        this.hardwareService.getDeviceByName(settings[propName]);
 
-      const device = this.hardwareService.getDeviceByName(settings[propName]);
-      const deviceId = device ? device.id : settings[propName];
-      resolvedSettings[propName] = deviceId
+      if (!device) return;
+      resolvedSettings[propName] = device.id;
     });
     return resolvedSettings;
   }

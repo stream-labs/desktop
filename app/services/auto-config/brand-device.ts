@@ -134,9 +134,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
         newSceneCollectionCreated = true;
       }
 
-      // force SLOBS to reload config files
-      obs.NodeObs.OBS_service_resetVideoContext();
-      obs.NodeObs.OBS_service_resetAudioContext();
+      this.reloadConfig();
 
       // some prefabs can be added in next step
       // to not to make duplicates just remove existing for now
@@ -171,6 +169,12 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     const res = await fetch(`https://${ this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`);
     if (!res.ok) return null;
     return res.json();
+  }
+
+  private reloadConfig() {
+    // force SLOBS to reload config files
+    obs.NodeObs.OBS_service_resetVideoContext();
+    obs.NodeObs.OBS_service_resetAudioContext();
   }
 
   @mutation()

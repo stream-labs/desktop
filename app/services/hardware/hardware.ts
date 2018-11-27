@@ -16,12 +16,14 @@ export interface IDevice {
 
 export interface IHardwareServiceState {
   devices: IDevice[];
+  dshowDevices: IDevice[];
 }
 
 export class HardwareService extends StatefulService<IHardwareServiceState> {
 
   static initialState: IHardwareServiceState = {
-    devices: []
+    devices: [],
+    dshowDevices: []
   };
 
   init() {
@@ -29,19 +31,24 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
   }
 
   getDevices() {
-    return this.state.devices;
+    return this.state.devices.concat(this.state.dshowDevices);
   }
 
   getDevice(id: string) {
-    return this.state.devices.find(device => device.id == id);
+    return this.getDevices().find(device => device.id == id);
   }
 
   getDeviceByName(name: string) {
     return this.state.devices.find(device => device.description == name);
   }
 
-  private fetchDevices(): IDevice[] {
+  getDshowDeviceByName(name: string) {
+    return this.state.dshowDevices.find(device => device.description == name);
+  }
+
+  private fetchDevices(): IHardwareServiceState {
     const devices: IDevice[] = [];
+    const dshowDevices: IDevice[] = [];
     const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid());
     const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid());
     const obsVideoInput = obs.InputFactory.create('dshow_input', uuid());
@@ -66,21 +73,32 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
 
     (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
-        devices.push({
+        dshowDevices.push({
           id: item.value,
           description: item.name,
           type: EDeviceType.videoInput
         });
       });
 
+
+    (obsVideoInput.properties.get('audio_device_id') as obs.IListProperty).details.items
+      .forEach((item: { name: string, value: string}) => {
+        dshowDevices.push({
+          id: item.value,
+          description: item.name,
+          type: EDeviceType.audioInput
+        });
+      });
+
     obsAudioInput.release();
     obsAudioOutput.release();
     obsVideoInput.release();
-    return devices;
+    return { devices, dshowDevices};
   }
 
   @mutation()
-  private SET_DEVICES(devices: IDevice[]) {
-    this.state.devices = devices;
+  private SET_DEVICES(devices: IHardwareServiceState) {
+    this.state.devices = devices.devices;
+    this.state.dshowDevices = devices.dshowDevices;
   }
 }
