@@ -7,7 +7,7 @@ import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { debounce } from 'lodash';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { NavigationService } from 'services/navigation';
@@ -97,14 +97,23 @@ export default class EditStreamInfo extends Vue {
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
 
-  created() {
+  async created() {
     this.debouncedGameSearch = debounce(
       (search: string) => this.onGameSearchChange(search),
       500
     );
 
     if (this.streamInfoService.state.channelInfo) {
-      this.populateModels();
+      this.populatingModels = true;
+      if (this.isFacebook) {
+        const service = getPlatformService('facebook');
+        await service.prepopulateInfo()
+          .then((info: IChannelInfo) => this.streamInfoService.setStreamInfo(info.title, info.description, info.game))
+          .then(() => this.populateModels());
+      } else {
+        await this.populateModels();
+      }
+      this.populatingModels = false;
     } else {
       // If the stream info pre-fetch failed, we should try again now
       this.refreshStreamInfo();
@@ -112,10 +121,10 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateModels() {
-    this.populatingModels = true;
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
+    this.streamDescriptionModel.value = this.streamInfoService.state.channelInfo.description;
     this.gameModel.options = [
       {
         description: this.streamInfoService.state.channelInfo.game,
@@ -131,7 +140,6 @@ export default class EditStreamInfo extends Vue {
       this.hasPages = !!this.facebookPages.pages.length;
     }
     this.loadAvailableProfiles();
-    this.populatingModels = false;
   }
 
   onGameSearchChange(searchString: string) {

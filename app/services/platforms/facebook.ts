@@ -27,7 +27,7 @@ interface IFacebookServiceState {
   pages: IFacebookPage[];
   activePage: IFacebookPage;
   liveVideoId: number;
-  streamProperties: Dictionary<string>;
+  streamProperties: IChannelInfo;
 }
 
 export class FacebookService extends StatefulService<IFacebookServiceState> implements IPlatformService {
@@ -44,7 +44,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     pages: [],
     activePage: null,
     liveVideoId: null,
-    streamProperties: { title: 'Streamlabs OBS', description: 'Generic description for a live stream', game: null }
+    streamProperties: { title: null, description: null, game: null }
   };
 
   @mutation()
@@ -120,13 +120,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchUserPagePreference() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+    return this.userService.getFacebookPages()
       .then(json => {
         const pageId = json.page_type === 'page' && json.page_id ? json.page_id : '0';
         this.userService.updatePlatformChannelId(pageId);
@@ -139,6 +133,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchChannelInfo(): Promise<IChannelInfo> {
+    if (this.state.streamProperties.title) { return Promise.resolve(this.state.streamProperties); }
     return this.fetchRawChannelInfo().then(json => {
       const gameTitle = json.type && json.type.name ? json.type.name : '';
       return { title: json.name, game: gameTitle };
@@ -169,26 +164,20 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       });
   }
 
+  prepopulateInfo() {
+    return this.fetchPages()
+      .then(() => this.fetchPrefillData());
+  }
+
   fetchPrefillData() {
-    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
+    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos?fields=title,description,game_spec`;
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const request = new Request(url, { method: 'GET', headers });
     return fetch(request)
     .then(handleErrors)
     .then(response => response.json())
     .then(json => { console.log(json); return json; })
-    .then(json => json.data.length ? json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED').id : '')
-    .then(id => this.fetchBroadcastDetails(id));
-  }
-
-  fetchBroadcastDetails(id: string) {
-    const url =  `${this.apiBase}/${id}?fields=title,description,game_spec`
-    const headers = this.getHeaders(true, this.state.activePage.access_token);
-    const request = new Request(url, { method: 'GET', headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => console.log(json))
+    .then(json => json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0])
   }
 
   fetchViewerCount(): Promise<number> {
