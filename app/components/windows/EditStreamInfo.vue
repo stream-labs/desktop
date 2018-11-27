@@ -28,7 +28,7 @@
       <div class="warning" v-if="isFacebook && !hasPages">
         {{ $t('It looks like you don\'t have any Pages. Head to ') }}
         <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
-        {{ $t(' to create a page, and then trying again.') }}
+        {{ $t(' to create a page, and then try again.') }}
       </div>
       <ObsListInput
         v-if="isFacebook && hasPages && !midStreamMode"
