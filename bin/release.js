@@ -16,7 +16,7 @@ const cp = require('child_process');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs';
+const s3Buckets = [ 'streamlabs-obs', 'slobs-cdn.streamlabs.com' ];
 const sentryOrg = 'streamlabs-obs';
 const sentryProject = 'streamlabs-obs';
 
@@ -79,11 +79,11 @@ async function callSubmodule(moduleName, args) {
 
 /* We can change the release script to export a function instead.
  * I already made this into a separate script so I think this is fine */
-async function uploadUpdateFiles(version, appDir) {
+async function actualUploadUpdateFiles(bucket, version, appDir) {
   return callSubmodule(
     'bin/release-uploader.js',
     [
-      '--s3-bucket', s3Bucket,
+      '--s3-bucket', bucket,
       '--access-key', process.env['AWS_ACCESS_KEY_ID'],
       '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
       '--version', version,
@@ -92,11 +92,11 @@ async function uploadUpdateFiles(version, appDir) {
   );
 }
 
-async function setLatestVersion(version, fileName) {
+async function actualSetLatestVersion(bucket, version, fileName) {
   return callSubmodule(
     'bin/set-latest.js',
     [
-      '--s3-bucket', s3Bucket,
+      '--s3-bucket', bucket,
       '--access-key', process.env['AWS_ACCESS_KEY_ID'],
       '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
       '--version', version,
@@ -105,11 +105,11 @@ async function setLatestVersion(version, fileName) {
   );
 }
 
-async function setChance(version, chance) {
+async function actualSetChance(bucket, version, chance) {
   return callSubmodule(
     'bin/set-chance.js',
     [
-      '--s3-bucket', s3Bucket,
+      '--s3-bucket', bucket,
       '--access-key', process.env['AWS_ACCESS_KEY_ID'],
       '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
       '--version', version,
@@ -118,13 +118,13 @@ async function setChance(version, chance) {
   );
 }
 
-async function uploadS3File(name, filePath) {
+async function actualUploadS3File(bucket, name, filepath) {
   info(`Starting upload of ${name}...`);
 
   const stream = fs.createReadStream(filePath);
   const upload = new AWS.S3.ManagedUpload({
     params: {
-      Bucket: s3Bucket,
+      Bucket: bucket,
       Key: name,
       ACL: 'public-read',
       Body: stream
@@ -147,6 +147,32 @@ async function uploadS3File(name, filePath) {
     error(`Upload of ${name} failed`);
     sh.echo(err);
     sh.exit(1);
+  }
+}
+
+/* Wrapper functions to upload to multiple s3 buckets */
+
+async function uploadUpdateFiles(version, appDir) {
+  for (const bucket of s3buckets) {
+    await actualUploadUpdateFiles(bucket, version, appDir);
+  }
+}
+
+async function setLatestVersion(version, fileName) {
+  for (const bucket of s3buckets) {
+    await actualSetLatestVersion(bucket, version, fileName);
+  }
+}
+
+async function setChance(version, chance) {
+  for (const bucket of s3buckets) {
+    await actualSetChance(bucket, version, chance);
+  }
+}
+
+async function uploadS3File(name, filePath) {
+  for (const bucket of s3buckets) {
+    await actualUploadS3File(bucket, name, filepath);
   }
 }
 
@@ -357,22 +383,24 @@ async function runScript() {
 
     /* Use the separate release-uploader script to upload our
    * win-unpacked content. */
+
   await uploadUpdateFiles(newVersion, path.resolve('dist', 'win-unpacked'));
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  info('Finalizing release with sentry...');
-  sentryCli(`finalize "${newVersion}`);
+  console.log('Setting latest version...');
+  await setLatestVersion(newVersion, channel);
+
+  console.log('Setting chance...');
+  await setChance(newVersion, chance);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`);
   executeCmd(`git merge ${targetBranch}`);
   executeCmd('git push origin HEAD');
 
-  info(`Setting latest version...`);
-
-  await setLatestVersion(newVersion, channel);
-  await setChance(newVersion, chance);
+  info('Finalizing release with sentry...');
+  sentryCli(`finalize "${newVersion}`);
 
   info(`Version ${newVersion} released successfully!`);
 }
