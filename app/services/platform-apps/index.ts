@@ -555,9 +555,19 @@ export class PlatformAppsService extends
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
           ];
 
+          const scriptDomainWhitelist = [
+            'widget.intercom.io',
+            'js.intercomcdn.com'
+          ];
+
           const parsed = url.parse(details.url);
 
           if (scriptWhitelist.includes(details.url)) {
+            cb({});
+            return;
+          }
+
+          if (scriptDomainWhitelist.includes(parsed.hostname)) {
             cb({});
             return;
           }
@@ -577,9 +587,8 @@ export class PlatformAppsService extends
             cb({});
             return;
           }
+
           // Cancel all other script requests.
-          // TODO: Handle production apps
-          console.log('canceling', details);
           cb({ cancel: true });
           return;
         }
