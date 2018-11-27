@@ -108,7 +108,10 @@ export default class EditStreamInfo extends Vue {
       if (this.isFacebook) {
         const service = getPlatformService('facebook');
         await service.prepopulateInfo()
-          .then((info: IChannelInfo) => this.streamInfoService.setStreamInfo(info.title, info.description, info.game))
+          .then((info: IChannelInfo) => {
+            if (!info) return;
+            this.streamInfoService.setStreamInfo(info.title, info.description, info.game)
+          })
           .then(() => this.populateModels());
       } else {
         await this.populateModels();
