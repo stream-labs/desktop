@@ -6,6 +6,7 @@ import { StreamingService } from '../services/streaming';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';
 import { MixerService } from 'services/platforms/mixer';
+import { FacebookService } from 'services/platforms/facebook';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs/Subject';
@@ -93,17 +94,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
-    let promise: Promise<boolean>;
 
-    if (platform instanceof TwitchService || MixerService) {
-      promise = platform.putChannelInfo(title, game);
-    }
-
-    if (platform instanceof YoutubeService) {
-      promise = platform.putChannelInfo(title, description);
-    }
-
-    return promise.then(success => {
+    return platform.putChannelInfo({ title, game, description }).then(success => {
       this.refreshStreamInfo();
       this.createGameAssociation(game);
       return success;

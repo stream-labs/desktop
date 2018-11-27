@@ -28,9 +28,23 @@ import uuid from 'uuid/v4';
     [requestId: string]: IRequest;
   } = {};
 
-  let ready: Function;
+  const mainWindowContents = electron.remote.webContents.fromId(
+    electron.ipcRenderer.sendSync('getMainWindowWebContentsId')
+  );
+  const webContentsId = electron.remote.getCurrentWebContents().id;
+
+  const requestBuffer: IGuestApiRequest[] = [];
+
+  let ready = false;
+  let readyFunc: Function;
   const readyPromise = new Promise<boolean>(resolve => {
-    ready = resolve;
+    readyFunc = () => {
+      requestBuffer.forEach(req => {
+        mainWindowContents.send('guestApiRequest', req);
+      });
+      ready = true;
+      resolve();
+    }
   });
 
   electron.ipcRenderer.on(
@@ -63,13 +77,8 @@ import uuid from 'uuid/v4';
 
   electron.ipcRenderer.on(
     'guestApiReady',
-    () => ready()
+    () => readyFunc()
   );
-
-  const mainWindowContents = electron.remote.webContents.fromId(
-    electron.ipcRenderer.sendSync('getMainWindowWebContentsId')
-  );
-  const webContentsId = electron.remote.getCurrentWebContents().id;
 
   /**
    * Returns a proxy rooted at the given path
@@ -120,7 +129,11 @@ import uuid from 'uuid/v4';
             args: mappedArgs
           };
 
-          mainWindowContents.send('guestApiRequest', apiRequest);
+          if (ready) {
+            mainWindowContents.send('guestApiRequest', apiRequest);
+          } else {
+            requestBuffer.push(apiRequest);
+          }
 
           return promise;
         }

@@ -47,7 +47,8 @@ export default class StartStreamingButton extends Vue {
         this.userService.isLoggedIn() &&
         this.customizationService.state.updateStreamInfoOnLive &&
         (this.userService.platform.type === 'twitch' ||
-        this.userService.platform.type === 'mixer')
+        this.userService.platform.type === 'mixer' ||
+        this.userService.platform.type === 'facebook')
       ) {
         this.streamingService.showEditStreamInfo();
       } else {

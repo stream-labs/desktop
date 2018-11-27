@@ -23,6 +23,11 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
     availableFeatures: []
   }
 
+  init() {
+    this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
+    this.userService.userLogout.subscribe(() => this.resetAvailableFeatures());
+  }
+
   @mutation()
   private SET_AVAILABLE_FEATURES(features: string[]) {
     this.state.availableFeatures = features;
@@ -52,6 +57,10 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
           this.SET_AVAILABLE_FEATURES(response.features);
         });
     }
+  }
+
+  resetAvailableFeatures() {
+    this.SET_AVAILABLE_FEATURES([]);
   }
 
 }

@@ -149,12 +149,12 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   @requiresToken()
-  putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
+  putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
     const headers = this.getHeaders(true);
-    const data = { name: streamTitle };
+    const data = { name: title };
 
-    if (this.state.typeIdMap[streamGame]) {
-      data['typeId'] = this.state.typeIdMap[streamGame];
+    if (this.state.typeIdMap[game]) {
+      data['typeId'] = this.state.typeIdMap[game];
     }
 
     const request = new Request(`${this.apiBase}channels/${this.channelId}`, {
@@ -191,5 +191,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
           resolve(`https://mixer.com/embed/chat/${json.id}`);
         });
     });
+  }
+
+  beforeGoLive() {
+    return Promise.resolve();
   }
 }

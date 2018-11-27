@@ -16,6 +16,8 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
+import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from 'services/platforms';
+import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
@@ -47,6 +49,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
+  @Inject() userService: UserService;
   @Inject() private announcementsService: AnnouncementsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -98,29 +101,28 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
+  finishStartStreaming() {
+    const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+    const confirmText = 'Are you sure you want to start streaming?';
+    if (shouldConfirm && !confirm(confirmText)) return;
+    this.powerSaveId = electron.remote.powerSaveBlocker.start(
+      'prevent-display-sleep'
+    );
+    obs.NodeObs.OBS_service_startStreaming();
+    const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+    if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
+      this.toggleRecording();
+    }
+  }
+
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      const shouldConfirm = this.settingsService.state.General
-        .WarnBeforeStartingStream;
-      const confirmText = 'Are you sure you want to start streaming?';
-
-      if (shouldConfirm && !confirm(confirmText)) return;
-
-      this.powerSaveId = electron.remote.powerSaveBlocker.start(
-        'prevent-display-sleep'
-      );
-      obs.NodeObs.OBS_service_startStreaming();
-
-      const recordWhenStreaming = this.settingsService.state.General
-        .RecordWhenStreaming;
-
-      if (
-        recordWhenStreaming &&
-        this.state.recordingStatus === ERecordingState.Offline
-      ) {
-        this.toggleRecording();
+      if (this.userService.isLoggedIn && this.userService.platform) {
+        const service = getPlatformService(this.userService.platform.type);
+        service.beforeGoLive().then(() => this.finishStartStreaming());
+        return;
       }
-
+      this.finishStartStreaming();
       return;
     }
 
@@ -226,7 +228,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * its current state.
    */
   get formattedDurationInCurrentStreamingState() {
-    return this.formattedDurationSince(this.streamingStateChangeTime);
+    const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
+    if (formattedTime === '03:50:00' && this.userService.platform.type ===  'facebook') {
+      const msg = $t('You are 10 minutes away from the 4 hour stream limit');
+      const existingTimeupNotif = this.notificationsService.getUnread()
+        .filter((notice: INotification) => notice.message === msg);
+      if (existingTimeupNotif.length !== 0) return formattedTime;
+      this.notificationsService.push({
+        type: ENotificationType.INFO,
+        lifeTime: 600000,
+        showTime: true,
+        message: msg
+      });
+    }
+    return formattedTime;
   }
 
   get streamingStateChangeTime() {
@@ -242,7 +257,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       type: ENotificationType.WARNING,
       lifeTime: -1,
       showTime: true,
-      message: $t('Stream has disconnected, attempting to reconnect.')
+      message: msg
     });
   }
 
@@ -265,6 +280,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
+
     if (info.type === EOBSOutputType.Streaming) {
       const time = new Date().toISOString();
 

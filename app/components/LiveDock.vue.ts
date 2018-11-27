@@ -157,6 +157,10 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'youtube';
   }
 
+  get isFacebook() {
+    return this.userService.platform.type === 'facebook';
+  }
+
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
   }

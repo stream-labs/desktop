@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Inject } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
   IChatAlertsResponse,
@@ -19,17 +19,49 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   get alertTypes() {
-    const { streamlabs, twitch } = this.chatAlerts.settings;
-    let alertTypes = {
-      ...streamlabs,
-      ...twitch
-    };
+    const { streamlabs, twitch, mixer, youtube } = this.chatAlerts.settings;
+
+    const platform = this.chatbotApiService.userService.platform.type;
+
+    let alertTypes;
+
+    switch (platform) {
+      case 'twitch': {
+        alertTypes = {
+          ...streamlabs,
+          ...twitch
+        };
+        break;
+      }
+      case 'mixer': {
+        alertTypes = {
+          ...streamlabs,
+          ...mixer
+        };
+        break;
+      }
+      case 'youtube': {
+        alertTypes = {
+          ...streamlabs,
+          ...youtube
+        };
+        break;
+      }
+      default:{
+        alertTypes = {
+          ...streamlabs
+        };
+        break;
+      }
+
+    }
+
     return alertTypes;
   }
 
   platformForAlertType(type: ChatbotAlertType) {
     if (type === 'tip') return 'streamlabs';
-    return 'twitch';
+    return this.chatbotApiService.userService.platform.type;
   }
 
   // preparing data to send to service
@@ -84,4 +116,3 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return this.chatbotApiService.updateChatAlerts(newAlertsObject);
   }
 }
-
