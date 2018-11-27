@@ -67,6 +67,18 @@ export default class ExtraSettings extends Vue {
     this.customizationService.setShowOptimizationDialogForNiconico(model.value);
   }
 
+  get pollingPerformanceStatisticsModel(): IFormInput<boolean> {
+    return {
+      name: 'polling_performance_statistics',
+      description: $t('settings.pollingPerformanceStatistics'),
+      value: this.customizationService.pollingPerformanceStatistics
+    };
+  }
+
+  setPollingPerformanceStatistics(model: IFormInput<boolean>) {
+    this.customizationService.setPollingPerformanceStatistics(model.value);
+  }
+
   showCacheDir() {
     electron.remote.shell.showItemInFolder(
       electron.remote.app.getPath('userData')
