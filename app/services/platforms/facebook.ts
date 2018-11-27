@@ -92,14 +92,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
 
   fetchNewToken(): Promise<void> {
     // FB Doesn't have token refresh, user must login again to update token
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facebook/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+    return new Promise((resolve, reject) => (resolve()))
   }
 
   fetchRawChannelInfo() {
@@ -157,6 +150,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   createLiveVideo() {
+    this.fetchPrefillData();
     const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const data = {
@@ -172,18 +166,36 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
-        return;
       });
+  }
+
+  fetchPrefillData() {
+    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
+    const headers = this.getHeaders(true, this.state.activePage.access_token);
+    const request = new Request(url, { method: 'GET', headers });
+    return fetch(request)
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(json => { console.log(json); return json; })
+    .then(json => json.data.length ? json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED').id : '')
+    .then(id => this.fetchBroadcastDetails(id));
+  }
+
+  fetchBroadcastDetails(id: string) {
+    const url =  `${this.apiBase}/${id}?fields=title,description,game_spec`
+    const headers = this.getHeaders(true, this.state.activePage.access_token);
+    const request = new Request(url, { method: 'GET', headers });
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => console.log(json))
   }
 
   fetchViewerCount(): Promise<number> {
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.live_views);
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.live_views);
   }
 
   fbGoLive() {
@@ -199,9 +211,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       const request = new Request(`${this.apiBase}/${this.state.liveVideoId}`, {
         method: 'POST', headers, body: JSON.stringify(data)
       });
-      return fetch(request)
-        .then(handleErrors)
-        .then(() => true);
+      return fetch(request).then(handleErrors).then(() => true);
     }
     return Promise.resolve(true);
   }
@@ -211,10 +221,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`
     const headers = this.getHeaders(true);
     const request = new Request(url, { method: 'GET', headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(resp => resp.json())
-      .then((json: any) => json.data);
+    return fetch(request).then(handleErrors).then(resp => resp.json()).then((json: any) => json.data);
   }
 
   getChatUrl(): Promise<string> {
