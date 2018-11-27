@@ -27,6 +27,7 @@ interface IFacebookServiceState {
   pages: IFacebookPage[];
   activePage: IFacebookPage;
   liveVideoId: number;
+  streamUrl: string;
   streamProperties: IChannelInfo;
 }
 
@@ -44,6 +45,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     pages: [],
     activePage: null,
     liveVideoId: null,
+    streamUrl: null,
     streamProperties: { title: null, description: null, game: null }
   };
 
@@ -60,6 +62,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   @mutation()
   private SET_LIVE_VIDEO_ID(id: number) {
     this.state.liveVideoId = id;
+  }
+
+  @mutation()
+  private SET_STREAM_URL(url: string) {
+    this.state.streamUrl = url;
   }
 
   @mutation()
@@ -129,7 +136,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchStreamKey(): Promise<string> {
-    return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
+    return Promise.resolve('Key is set automatically when going live');
   }
 
   fetchChannelInfo(): Promise<IChannelInfo> {
@@ -145,7 +152,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   createLiveVideo() {
-    this.fetchPrefillData();
     const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const data = {
@@ -170,14 +176,22 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchPrefillData() {
-    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos?fields=title,description,game_spec`;
+    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
+      'fields=status,stream_url,title,description';
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const request = new Request(url, { method: 'GET', headers });
     return fetch(request)
     .then(handleErrors)
     .then(response => response.json())
     .then(json => { console.log(json); return json; })
-    .then(json => json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0])
+    .then(json => {
+      const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0]
+      if (info.status === 'SCHEDULED_UNPUBLISHED') {
+        this.SET_LIVE_VIDEO_ID(info.id);
+        this.SET_STREAM_URL(info.stream_url);
+      }
+      return info;
+    })
   }
 
   fetchViewerCount(): Promise<number> {
@@ -188,8 +202,16 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fbGoLive() {
-    return new Promise((resolve, reject) => (
-      this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve()));
+    return new Promise((resolve, reject) => {
+      if (this.state.streamUrl) {
+        const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
+        this.setSettingsWithKey(streamKey);
+        this.SET_STREAM_URL(null);
+        resolve();
+      } else {
+        return this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve();
+      }
+    })
   }
 
   putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {
