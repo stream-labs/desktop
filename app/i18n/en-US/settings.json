@@ -564,5 +564,5 @@
   "keyframeInterval": "Keyframe Interval (in seconds)",
   "encoderPreset": "Encoder Preset",
   "pollingPerformanceStatistics": "Activate performance statistics(bitrate, FPS, dropped frames)",
-  "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try to disable this option."
+  "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try disabling this option."
 }
