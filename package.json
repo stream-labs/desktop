@@ -67,7 +67,7 @@
   "dependencies": {
     "aws-sdk": "^2.344.0",
     "backtrace-node": "^0.7.3",
-    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.16/iojs-v2.0.8-crash-handler.tar.gz",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.17/iojs-v2.0.8-crash-handler.tar.gz",
     "electron-log": "^2.2.17",
     "electron-window-state": "^4.1.1",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
