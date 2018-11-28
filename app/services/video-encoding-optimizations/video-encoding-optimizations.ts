@@ -98,7 +98,7 @@ export class VideoEncodingOptimizationService
 
     if (filteredProfiles.length !== 2) {
       console.error(new Error(`${filteredProfiles.length} found for ${game}, 2 profiles expected`));
-      return null;
+      return [];
     }
 
     filteredProfiles = filteredProfiles.sort((profile1, profile2) => {
