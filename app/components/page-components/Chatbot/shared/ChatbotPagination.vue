@@ -1,8 +1,13 @@
 
 <template>
   <div class="chatbot-pagination__container">
-    <i @click="onFirstPageHandler" disabled="currentPage == 1" class="fa fa-angle-double-left chatbot-pagionation__icon"/>
     <i @click="onPrevPageHandler" disabled="currentPage == 1" class="fa fa-angle-left chatbot-pagionation__icon"/>
+    <div :class="{'chatbot-pagination__page--current': 1 === currentPage}"
+      @click="onEmitPageChangeHandler(1)"
+      class="chatbot-pagination__page">
+      1
+    </div>
+    <div class="chatbot-pagination__dots" v-if="currentPage > 6">...</div>
     <div
       v-for="i in customTotalPages"
       :class="{'chatbot-pagination__page--current': i === currentPage}"
@@ -12,8 +17,13 @@
     >
       {{ i }}
     </div>
+    <div class="chatbot-pagination__dots" v-if="currentPage < totalPages - 5">...</div>
+    <div :class="{'chatbot-pagination__page--current': totalPages === currentPage}"
+      @click="onEmitPageChangeHandler(totalPages)"
+      class="chatbot-pagination__page">
+      {{ totalPages }}
+    </div>
     <i @click="onNextPageHandler" disabled="currentPage == totalPages" class="fa fa-angle-right chatbot-pagionation__icon"/>
-    <i @click="onLastPageHandler" :disabled="currentPage == totalPages" class="fa fa-angle-double-right chatbot-pagionation__icon"/>
   </div>
 </template>
 
@@ -32,6 +42,9 @@
       color: @day-title;
       .weight(@bold);
     }
+  }
+  .chatbot-pagination__dots {
+    .padding(1);
   }
 }
 

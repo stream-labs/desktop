@@ -16,16 +16,22 @@ export default class ChatbotQueue extends ChatbotBase {
     await this.chatbotApiService.Base.logInToSocket(['queue']);
     await this.chatbotApiService.Queue.fetchQueueState();
 
+    if (!this.chatbotApiService.Queue.isConnected()) {
+      this.chatbotApiService.Queue.fetchQueueEntries();
+      this.chatbotApiService.Queue.fetchQueuePicked();
+    }
+
     this.chatbotApiService.Queue.connectToQueueSocketChannels();
-    this.chatbotApiService.Queue.fetchQueueEntries();
-    this.chatbotApiService.Queue.fetchQueuePicked();
+
     this.chatbotApiService.Queue.fetchQueuePreferences();
 
     this.queueTitle = this.chatbotApiService.Queue.state.queueStateResponse.title;
   }
 
   get noUsersInList() {
-    return this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0;
+    return (
+      this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0
+    );
   }
 
   onOpenQueuePreferencesHandler() {
@@ -47,6 +53,8 @@ export default class ChatbotQueue extends ChatbotBase {
   }
 
   get queueIsOpen() {
-    return this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open';
+    return (
+      this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open'
+    );
   }
 }

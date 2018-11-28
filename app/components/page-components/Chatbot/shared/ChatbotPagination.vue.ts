@@ -27,12 +27,12 @@ export default class ChatbotPagination extends Vue {
   }
 
   get customTotalPages(){
-    let startIndex = Math.max(1,this.currentPage - 5);
-    const endIndex = Math.min(startIndex+10,this.totalPages);
+    let startIndex = Math.max(2,this.currentPage - 4);
+    const endIndex = Math.min(startIndex+8,this.totalPages-1);
 
     const endOffset = endIndex - startIndex;
-    if(endOffset < 10){
-      startIndex = Math.max(1,startIndex-(10 - endOffset))
+    if(endOffset < 8){
+      startIndex = Math.max(1,startIndex-(8 - endOffset))
     }
 
     let arr = [];

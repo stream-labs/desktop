@@ -5,14 +5,15 @@ import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import io from 'socket.io-client';
 import { ChatbotBaseApiService } from './chatbot-base';
+import * as _ from 'lodash';
 
 import {
   IChatbotAPIPostResponse,
-  IQuotePreferencesResponse,
   IQueuePreferencesResponse,
   IQueueStateResponse,
   IQueueEntriesResponse,
   IQueuePickedResponse,
+  IQueuedUser
 } from './chatbot-interfaces';
 
 // state
@@ -51,112 +52,127 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
         total: 1
       },
       data: []
-    },
+    }
   };
+
+  socket: SocketIOClient.Socket;
 
   //
   // sockets
   //
   connectToQueueSocketChannels() {
-    let socket = io.connect(this.socketUrl, { transports: ['websocket'] });
-    socket.emit('authenticate', { token: this.chatbotBaseApiService.state.socketToken });
+    if (this.socket) {
+      if (this.socket.connected) {
+        return;
+      } else {
+        this.socket.removeAllListeners();
+      }
+    }
 
-    socket.on('queue.open', (response: IQueueStateResponse) => {
+    this.socket = io.connect(this.socketUrl, { transports: ['websocket'] });
+    this.socket.emit('authenticate', {
+      token: this.chatbotBaseApiService.state.socketToken
+    });
+
+    this.socket.on('queue.open', (response: IQueueStateResponse) => {
       // queue open
       this.UPDATE_QUEUE_STATE(response);
     });
-    socket.on('queue.close', (response: IQueueStateResponse) => {
+    this.socket.on('queue.close', (response: IQueueStateResponse) => {
       // queue open
       this.UPDATE_QUEUE_STATE(response);
     });
-    socket.on('queue.join', () => {
+    this.socket.on('queue.join', (response: IQueuedUser) => {
       // someone joins queue, refetch queue entries
-      this.fetchQueueEntries();
+      this.ADD_QUEUE_ENTRY(response);
+
+      //this.fetchQueueEntries();
     });
-    socket.on('queue.pick', () => {
+    this.socket.on('queue.pick', (response: IQueuedUser) => {
       // someone got selected, refetch queue entries and picked entries
-      this.fetchQueueEntries();
-      this.fetchQueuePicked();
+      this.PICK_QUEUE_ENTRY(response);
+     
+      //this.fetchQueueEntries();
+      //this.fetchQueuePicked();
     });
-    socket.on('queue.leave', () => {
+    this.socket.on('queue.leave', (response: IQueuedUser) => {
+      this.LEAVE_QUEUE_ENTRY(response);
       // someone leaves queue, refetch queue entries
-      this.fetchQueueEntries();
+      //this.fetchQueueEntries();
     });
-    socket.on('queue.deleted', () => {
+    this.socket.on('queue.deleted', (response: IQueuedUser) => {
       // queue deleted, refresh both entries
-      this.fetchQueueEntries();
-      this.fetchQueuePicked();
+      this.REMOVE_QUEUE_USER(response);
+      //this.fetchQueueEntries();
+      //this.fetchQueuePicked();
     });
-    socket.on('queue.entries.clear', () => {
+    this.socket.on('queue.entries.clear', () => {
       // Clear entries
-      this.fetchQueueEntries();
+      //this.fetchQueueEntries();
+      this.CLEAR_QUEUE_ENTIES();
     });
-    socket.on('queue.picked.clear', () => {
+    this.socket.on('queue.picked.clear', () => {
       // Clear entries
-      this.fetchQueuePicked();
+      //this.fetchQueuePicked();
+      this.CLEAR_QUEUE_PICKED();
+      
     });
+  }
+
+  isConnected(){
+    return this.socket && this.socket.connected;
   }
 
   //
   // GET requests
   //
-  fetchQuotePreferences() {
-    return this.chatbotBaseApiService.api('GET', 'settings/quotes', {}).then(
-      (response: IQuotePreferencesResponse) => {
-        this.UPDATE_QUOTE_PREFERENCES(response);
-      }
-    );
-  }
-
   fetchQueuePreferences() {
-    return this.chatbotBaseApiService.api('GET', 'settings/queue', {}).then(
-      (response: IQueuePreferencesResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/queue', {})
+      .then((response: IQueuePreferencesResponse) => {
         this.UPDATE_QUEUE_PREFERENCES(response);
-      }
-    );
+      });
   }
 
   fetchQueueState() {
-    return this.chatbotBaseApiService.api('GET', 'queue', {}).then(
-      (response: IQueueStateResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'queue', {})
+      .then((response: IQueueStateResponse) => {
         this.UPDATE_QUEUE_STATE(response);
-      }
-    );
+      });
   }
 
   fetchQueueEntries(
     page = this.state.queueEntriesResponse.pagination.current,
     query = ''
   ) {
-    return this.chatbotBaseApiService.api(
-      'GET',
-      `queue/entries?page=${page}&query=${query}`,
-      {}
-    ).then((response: IQueueEntriesResponse) => {
-      this.UPDATE_QUEUE_ENTRIES(response);
-    });
+    return this.chatbotBaseApiService
+      .api('GET', `queue/entries?page=${page}&query=${query}`, {})
+      .then((response: IQueueEntriesResponse) => {
+        this.UPDATE_QUEUE_ENTRIES(response);
+      });
   }
 
   fetchQueuePicked(page = this.state.queuePickedResponse.pagination.current) {
-    return this.chatbotBaseApiService.api('GET', `queue/picked?page=${page}`, {}).then(
-      (response: IQueuePickedResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', `queue/picked?page=${page}`, {})
+      .then((response: IQueuePickedResponse) => {
         this.UPDATE_QUEUE_PICKED(response);
-      }
-    );
+      });
   }
 
   //
   // Update
   //
   updateQueuePreferences(data: IQueuePreferencesResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/queue', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/queue', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchQueuePreferences();
           this.chatbotCommonService.closeChildWindow();
         }
-      }
-    );
+      });
   }
 
   openQueue(title: string) {
@@ -194,11 +210,6 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   // Mutations
   //
   @mutation()
-  private UPDATE_QUOTE_PREFERENCES(response: IQuotePreferencesResponse) {
-    Vue.set(this.state, 'quotePreferencesResponse', response);
-  }
-
-  @mutation()
   private UPDATE_QUEUE_PREFERENCES(response: IQueuePreferencesResponse) {
     Vue.set(this.state, 'queuePreferencesResponse', response);
   }
@@ -216,5 +227,63 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   @mutation()
   private UPDATE_QUEUE_PICKED(response: IQueuePickedResponse) {
     Vue.set(this.state, 'queuePickedResponse', response);
+  }
+
+  @mutation()
+  private ADD_QUEUE_ENTRY(response: IQueuedUser){
+    let entries = _.cloneDeep(this.state.queueEntriesResponse);
+    entries.data.push(response);
+    Vue.set(this.state, 'queueEntriesResponse', entries);
+  }
+
+  @mutation()
+  private PICK_QUEUE_ENTRY(response: IQueuedUser){
+    let entries = _.cloneDeep(this.state.queueEntriesResponse);
+    _.remove(entries.data,user =>{
+      return user.platform === response.platform && user.viewer_id === response.viewer_id;
+    });
+    Vue.set(this.state, 'queueEntriesResponse', entries);
+
+    let picked = _.cloneDeep(this.state.queuePickedResponse);
+    picked.data.push(response);
+    Vue.set(this.state, 'queuePickedResponse', picked);
+  }
+
+  @mutation()
+  private LEAVE_QUEUE_ENTRY(response:IQueuedUser){
+    let entries = _.cloneDeep(this.state.queueEntriesResponse);
+    _.remove(entries.data,user =>{
+      return user.platform === response.platform && user.viewer_id === response.viewer_id;
+    });
+    Vue.set(this.state, 'queueEntriesResponse', entries);
+  }
+
+  @mutation()
+  private REMOVE_QUEUE_USER(response:IQueuedUser){
+    let entries = _.cloneDeep(this.state.queueEntriesResponse);
+    _.remove(entries.data,user =>{
+      return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
+    });
+    Vue.set(this.state, 'queueEntriesResponse', entries);
+
+    let picked = _.cloneDeep(this.state.queuePickedResponse);
+    _.remove(picked.data,user =>{
+      return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
+    });
+    Vue.set(this.state, 'queuePickedResponse', picked);
+  }
+
+  @mutation()
+  private CLEAR_QUEUE_ENTIES(){
+    let entries = _.cloneDeep(this.state.queueEntriesResponse);
+    entries.data=[];
+    Vue.set(this.state, 'queueEntriesResponse', entries);
+  }
+
+  @mutation()
+  private CLEAR_QUEUE_PICKED(){
+    let picked = _.cloneDeep(this.state.queuePickedResponse);
+    picked.data = [];
+    Vue.set(this.state, 'queuePickedResponse', picked);
   }
 }
