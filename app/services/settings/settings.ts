@@ -185,14 +185,14 @@ export class SettingsService extends StatefulService<ISettingsState>
     return settings;
   }
 
-  findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
-    let settingValue: any;
+  findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
+    let inputModel: any;
 
     settings.find(subCategory => {
       if (subCategory.nameSubCategory === category) {
         subCategory.parameters.find(param => {
           if (param.name === setting) {
-            settingValue = param.value !== void 0 ? param.value : (param as IObsListInput<string>).options[0].value;
+            inputModel = param;
             return true;
           }
         });
@@ -201,7 +201,13 @@ export class SettingsService extends StatefulService<ISettingsState>
       }
     });
 
-    return settingValue;
+    return inputModel;
+  }
+
+  findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    const formModel = this.findSetting(settings, category, setting);
+    if (!formModel) return;
+    return formModel.value !== void 0 ? formModel.value : (formModel as IObsListInput<string>).options[0].value;
   }
 
   private patchSetting(settingsFormData: ISettingsSubCategory[], name: string, patch: Partial<IObsInput<TObsValue>>) {

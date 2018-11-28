@@ -43,6 +43,7 @@ export interface IStreamEncoderSettings {
   preset: string;
   encoderOptions: string;
   rescaleOutput: boolean;
+  resolutions: string[];
 }
 
 const simpleEncoderToAndancedEncoderMap = {
@@ -107,8 +108,12 @@ export class StreamEncoderSettingsService extends Service {
       this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') ||
       this.settingsService.findSettingValue(video, 'Untitled', 'Output');
     const encoderOptions = this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'x264opts')
+      this.settingsService.findSettingValue(output, 'Streaming', 'x264opts');
     const rescaleOutput = this.settingsService.findSettingValue(output, 'Streaming', 'Rescale');
+
+    const resolutions = this.settingsService.findSetting(video, 'Untitled', 'Output')
+      .options
+      .map((option: any) => option.value);
 
     return  {
       mode,
@@ -118,7 +123,8 @@ export class StreamEncoderSettingsService extends Service {
       inputResolution,
       outputResolution,
       encoderOptions,
-      rescaleOutput
+      rescaleOutput,
+      resolutions
     };
   }
 

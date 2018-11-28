@@ -90,14 +90,27 @@ export class VideoEncodingOptimizationService
     let filteredProfiles = profiles.filter(profile => {
       return (
         profile.encoder === settings.encoder &&
-        profile.resolutionIn == settings.outputResolution &&
         profile.bitrateMax >= settings.bitrate &&
-        profile.bitrateMin <= settings.bitrate
+        profile.bitrateMin <= settings.bitrate &&
+        (!settings.preset || settings.preset == profile.presetIn)
       )
     });
 
-    if (filteredProfiles.length !== 2) {
-      console.error(new Error(`${filteredProfiles.length} found for ${game}, 2 profiles expected`));
+    // find 2 profiles with the closest resolution
+    const resInPx = resToPx(settings.outputResolution);
+    const profilesResolutions = filteredProfiles
+      .map((profile, ind) => {
+        return {
+          distance: Math.abs(resToPx(profile.resolutionIn) - resInPx),
+          profile
+        };
+      });
+    const [min1, min2] = profilesResolutions
+      .sort((profile1, profile2) => profile1.distance - profile2.distance);
+    filteredProfiles = [min1.profile, min2.profile];
+
+    if (!filteredProfiles[0] || !filteredProfiles[1]) {
+      console.error(new Error('2 profiles needed, got'), filteredProfiles);
       return [];
     }
 
@@ -145,7 +158,8 @@ export class VideoEncodingOptimizationService
       encoder: encoderProfile.encoder,
       mode: 'Advanced',
       encoderOptions: encoderProfile.options,
-      preset: encoderProfile.presetOut
+      preset: encoderProfile.presetOut,
+      rescaleOutput: false
     };
 
     console.log('Apply encoder settings', newSettings);
@@ -195,4 +209,11 @@ export class VideoEncodingOptimizationService
   private SAVE_LAST_SELECTED_PRESET(preset: number) {
     this.state.lastSelectedPreset = preset;
   }
+}
+
+function resToPx(res: string): number {
+  return res
+    .split('x')
+    .map(px => Number(px))
+    .reduce((prev, current) => prev * current);
 }
