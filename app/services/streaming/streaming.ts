@@ -16,7 +16,7 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
-import { StreamInfoService }from 'services/stream-info';
+import { StreamInfoService } from 'services/stream-info';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
@@ -172,16 +172,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         'prevent-display-sleep'
       );
       this.obsApiService.nodeObs.OBS_service_startStreaming();
-
-      const recordWhenStreaming = this.settingsService.state.General
-        .RecordWhenStreaming;
-
-      if (
-        recordWhenStreaming &&
-        this.state.recordingStatus === ERecordingState.Offline
-      ) {
-        this.toggleRecording();
-      }
 
       return;
     }
@@ -365,6 +355,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
+        }
+
+        const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+        if (
+          recordWhenStreaming &&
+          this.state.recordingStatus === ERecordingState.Offline
+        ) {
+          this.toggleRecording();
         }
 
         this.usageStatisticsService.recordEvent('stream_start', streamEncoderInfo);
