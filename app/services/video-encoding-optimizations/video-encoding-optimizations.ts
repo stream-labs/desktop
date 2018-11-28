@@ -153,14 +153,19 @@ export class VideoEncodingOptimizationService
   applyProfile(encoderProfile: IEncoderProfile, presetType: EPresetType) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
     this.SAVE_LAST_SELECTED_PRESET(presetType);
+    const currentSettings = this.streamEncoderSettingsService.getSettings();
     const newSettings: Partial<IStreamEncoderSettings> = {
-      outputResolution: encoderProfile.resolutionOut,
       encoder: encoderProfile.encoder,
       mode: 'Advanced',
       encoderOptions: encoderProfile.options,
       preset: encoderProfile.presetOut,
-      rescaleOutput: false
+      rescaleOutput: false // prevent using the rescaled resolution from encoder settings
     };
+
+    if (!currentSettings.hasCustomResolution) {
+      // change the resolution only if user didn't set a custom one
+      newSettings.outputResolution = encoderProfile.resolutionOut
+    }
 
     console.log('Apply encoder settings', newSettings);
 

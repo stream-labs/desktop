@@ -43,7 +43,7 @@ export interface IStreamEncoderSettings {
   preset: string;
   encoderOptions: string;
   rescaleOutput: boolean;
-  resolutions: string[];
+  hasCustomResolution: boolean;
 }
 
 const simpleEncoderToAndancedEncoderMap = {
@@ -115,6 +115,8 @@ export class StreamEncoderSettingsService extends Service {
       .options
       .map((option: any) => option.value);
 
+    const hasCustomResolution = !resolutions.includes(outputResolution);
+
     return  {
       mode,
       encoder,
@@ -124,7 +126,7 @@ export class StreamEncoderSettingsService extends Service {
       outputResolution,
       encoderOptions,
       rescaleOutput,
-      resolutions
+      hasCustomResolution
     };
   }
 
