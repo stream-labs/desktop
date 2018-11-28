@@ -84,6 +84,8 @@ function setupStatefulService(state = {}) {
 const createToggleStreamingInjectees = ({
   OBS_service_startStreaming = noop,
   OBS_service_stopStreaming = noop,
+  OBS_service_connectOutputSignals = noop,
+  recordEvent = noop,
   WarnBeforeStartingStream = false,
   WarnBeforeStoppingStream = false,
   RecordWhenStreaming = false,
@@ -96,6 +98,7 @@ const createToggleStreamingInjectees = ({
     nodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
+      OBS_service_connectOutputSignals,
     }
   },
   SettingsService: {
@@ -111,6 +114,9 @@ const createToggleStreamingInjectees = ({
   UserService: {
     isNiconicoLoggedIn() { return isNiconicoLoggedIn; },
     updateStreamSettings,
+  },
+  UsageStatisticsService: {
+    recordEvent,
   },
   CustomizationService: {
     optimizeForNiconico,
@@ -157,6 +163,7 @@ test('toggleStreamingでstreamingStatusがofflineの場合', t => {
   instance.toggleRecording = sinon.stub();
 
   instance.toggleStreaming();
+  instance.handleOBSOutputSignal({type: 'streaming', signal: 'start'});
 
   t.true(instance.toggleRecording.notCalled, '録画状態に触っていない');
   t.true(OBS_service_startStreaming.calledOnce, '配信開始を呼んでいる');
@@ -217,6 +224,7 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
   t.context.confirm.stub.returns(true);
 
   instance.toggleStreaming();
+  instance.handleOBSOutputSignal({type: 'streaming', signal: 'start'});
 
   t.true(t.context.confirm.stub.calledOnce, 'モックしたconfirmを呼んでいる');
   t.true(instance.toggleRecording.notCalled, '録画状態に触っていない');
@@ -234,19 +242,27 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
 
   const OBS_service_startStreaming = sinon.stub();
   const OBS_service_stopStreaming = sinon.stub();
+  const OBS_service_connectOutputSignals = sinon.stub();
 
   const m = getModule(createToggleStreamingInjectees({
     OBS_service_startStreaming,
     OBS_service_stopStreaming,
+    OBS_service_connectOutputSignals,
     RecordWhenStreaming: true,
   }));
 
   const { instance } = m.StreamingService;
 
+  t.is(OBS_service_connectOutputSignals.callCount, 1, '出力状態イベントハンドラを登録している');
+  const handler = OBS_service_connectOutputSignals.getCall(0).args[0];
+
   instance.toggleRecording = sinon.stub();
   instance.toggleStreaming();
+  t.true(typeof(handler) === 'function');
+  handler({type: 'streaming', signal: 'start'});
+  // instance.handleOBSOutputSignal({type: 'streaming', signal: 'start'});
 
-  t.true(instance.toggleRecording.calledOnce, '録画状態を操作している');
+  t.is(instance.toggleRecording.callCount, 1, '録画状態を操作している');
   t.true(OBS_service_startStreaming.calledOnce, '配信開始を呼んでいる');
   t.true(OBS_service_stopStreaming.notCalled, '配信停止を呼んでいない');
 });
