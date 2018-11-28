@@ -276,7 +276,7 @@
     }
   },
   "dshow_input": {
-    "name": "WebCam / Video Input",
+    "name": "Video Capture Device",
     "description": "Select from your build in USB webcam or an external.",
     "activate": {
       "name": "Deactivate"
