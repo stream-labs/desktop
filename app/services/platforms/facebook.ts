@@ -27,7 +27,8 @@ interface IFacebookServiceState {
   pages: IFacebookPage[];
   activePage: IFacebookPage;
   liveVideoId: number;
-  streamProperties: Dictionary<string>;
+  streamUrl: string;
+  streamProperties: IChannelInfo;
 }
 
 export class FacebookService extends StatefulService<IFacebookServiceState> implements IPlatformService {
@@ -44,7 +45,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     pages: [],
     activePage: null,
     liveVideoId: null,
-    streamProperties: { title: 'Streamlabs OBS', description: 'Generic description for a live stream', game: null }
+    streamUrl: null,
+    streamProperties: { title: null, description: null, game: null }
   };
 
   @mutation()
@@ -60,6 +62,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   @mutation()
   private SET_LIVE_VIDEO_ID(id: number) {
     this.state.liveVideoId = id;
+  }
+
+  @mutation()
+  private SET_STREAM_URL(url: string) {
+    this.state.streamUrl = url;
   }
 
   @mutation()
@@ -92,14 +99,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
 
   fetchNewToken(): Promise<void> {
     // FB Doesn't have token refresh, user must login again to update token
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facebook/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+    return new Promise((resolve, reject) => (resolve()))
   }
 
   fetchRawChannelInfo() {
@@ -127,13 +127,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchUserPagePreference() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+    return this.userService.getFacebookPages()
       .then(json => {
         const pageId = json.page_type === 'page' && json.page_id ? json.page_id : '0';
         this.userService.updatePlatformChannelId(pageId);
@@ -142,10 +136,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchStreamKey(): Promise<string> {
-    return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
+    return Promise.resolve('Key is set automatically when going live');
   }
 
   fetchChannelInfo(): Promise<IChannelInfo> {
+    if (this.state.streamProperties.title) { return Promise.resolve(this.state.streamProperties); }
     return this.fetchRawChannelInfo().then(json => {
       const gameTitle = json.type && json.type.name ? json.type.name : '';
       return { title: json.name, game: gameTitle };
@@ -172,23 +167,51 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
-        return;
       });
+  }
+
+  prepopulateInfo() {
+    return this.fetchPages()
+      .then(() => this.fetchPrefillData());
+  }
+
+  fetchPrefillData() {
+    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
+      'fields=status,stream_url,title,description';
+    const headers = this.getHeaders(true, this.state.activePage.access_token);
+    const request = new Request(url, { method: 'GET', headers });
+    return fetch(request)
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(json => { console.log(json); return json; })
+    .then(json => {
+      const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0]
+      if (info.status === 'SCHEDULED_UNPUBLISHED') {
+        this.SET_LIVE_VIDEO_ID(info.id);
+        this.SET_STREAM_URL(info.stream_url);
+      }
+      return info;
+    })
   }
 
   fetchViewerCount(): Promise<number> {
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const headers = this.getHeaders(true, this.state.activePage.access_token);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.live_views);
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.live_views);
   }
 
   fbGoLive() {
-    return new Promise((resolve, reject) => (
-      this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve()));
+    return new Promise((resolve, reject) => {
+      if (this.state.streamUrl) {
+        const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
+        this.setSettingsWithKey(streamKey);
+        this.SET_STREAM_URL(null);
+        resolve();
+      } else {
+        return this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve();
+      }
+    })
   }
 
   putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {
@@ -199,9 +222,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       const request = new Request(`${this.apiBase}/${this.state.liveVideoId}`, {
         method: 'POST', headers, body: JSON.stringify(data)
       });
-      return fetch(request)
-        .then(handleErrors)
-        .then(() => true);
+      return fetch(request).then(handleErrors).then(() => true);
     }
     return Promise.resolve(true);
   }
@@ -211,10 +232,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`
     const headers = this.getHeaders(true);
     const request = new Request(url, { method: 'GET', headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(resp => resp.json())
-      .then((json: any) => json.data);
+    return fetch(request).then(handleErrors).then(resp => resp.json()).then((json: any) => json.data);
   }
 
   getChatUrl(): Promise<string> {
