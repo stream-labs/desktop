@@ -120,7 +120,7 @@ export class StreamEncoderSettingsService extends Service {
     return  {
       mode,
       encoder,
-      preset,
+      preset: preset.trim(), // sometimes it returns \r at the end of string
       bitrate,
       inputResolution,
       outputResolution,
