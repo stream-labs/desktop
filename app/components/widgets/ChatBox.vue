@@ -14,6 +14,7 @@
     <v-form-group title="Extra Emotes">
       <bool-input v-model="wData.settings.show_bttv_emotes" :metadata="metadata.show_bttv_emotes"/>
       <bool-input v-model="wData.settings.show_franker_emotes" :metadata="metadata.show_franker_emotes"/>
+      <bool-input v-model="wData.settings.show_smf_emotes" :metadata="metadata.show_smf_emotes"/>
     </v-form-group>
     <v-form-group v-model="wData.settings.background_color" :metadata="metadata.background_color" />
     <v-form-group title="Hide Message after">

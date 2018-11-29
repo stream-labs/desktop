@@ -65,18 +65,6 @@ interface INewAlertMetadata {
       amount: INumberMetadata;
       message: ITextMetadata;
     }
-  },
-  superchat:{
-    newMessage: {
-      amount: INumberMetadata;
-      message: ITextMetadata;
-    }
-  },
-  sponsor:{
-    newMessage: {
-      amount: INumberMetadata;
-      message: ITextMetadata;
-    }
   }
 }
 
@@ -104,13 +92,7 @@ interface INewAlertData {
   };
   sub_mystery_gift: {
     newMessage: IAlertMessage;
-  };
-  sponsor:{
-    newMessage: IAlertMessage;
-  };
-  superchat:{
-    newMessage: IAlertMessage;
-  };
+  }
 }
 
 @Component({
@@ -141,12 +123,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get title() {
-    if(this.selectedType == 'sponsor'){
-      return `${this.isEdit ? 'Edit' : 'New'} Member Alert`;
-    } else{
-      return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
-    }
-
+    return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
   }
 
   get isDonation() {
@@ -155,14 +132,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   get isSubscription() {
     return this.selectedType === 'sub';
-  }
-
-  get isTwitch() {
-    return this.chatbotApiService.userService.platform.type === 'twitch';
-  }
-
-  get isYoutube() {
-    return this.chatbotApiService.userService.platform.type === 'youtube';
   }
 
   get isFollower() {
@@ -175,14 +144,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   get isRaid() {
     return this.selectedType === 'raid';
-  }
-
-  get isSponsor() {
-    return this.selectedType === 'sponsor';
-  }
-
-  get isSuperChat() {
-    return this.selectedType === 'superchat';
   }
 
   get isBit() {
@@ -326,34 +287,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           },
         }
       },
-      superchat:{
-        newMessage: {
-          amount: {
-            required: true,
-            type: EInputType.number,
-            placeholder: $t('Minimum Amount')
-          },
-          message: {
-            type: EInputType.textArea,
-            required: true,
-            placeholder: $t('Message to Super Chatter')
-          },
-        }
-      },
-      sponsor:{
-        newMessage: {
-          amount: {
-            required: true,
-            type: EInputType.number,
-            placeholder: $t('Minimum Amount')
-          },
-          message: {
-            type: EInputType.textArea,
-            required: true,
-            placeholder: $t('Message to Member')
-          }
-        }
-      }
     };
     return metadata;
   }
@@ -404,18 +337,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           tier: $t('Prime')
         }
       },
-      sponsor: {
-        newMessage: {
-          amount: null,
-          message: null
-        }
-      },
-      superchat: {
-        newMessage: {
-          amount: null,
-          message: null
-        }
-      }
     };
     return initialState;
   }

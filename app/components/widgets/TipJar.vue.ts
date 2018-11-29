@@ -61,7 +61,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   navItems = [
     { value: 'manage-jar', label: $t('Manage Jar') },
     { value: 'font', label: $t('Font Settings') },
-    { value: 'images', label: $t('Images') },
+    { value: 'images', label: $t('Bit Images') },
     { value: 'source', label: $t('Source') }
   ];
 

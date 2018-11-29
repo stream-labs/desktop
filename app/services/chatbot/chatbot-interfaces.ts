@@ -467,9 +467,7 @@ export type ChatbotAlertType =
   | 'raid'
   | 'sub'
   | 'bits'
-  | 'sub_mystery_gift'
-  | 'sponsor'
-  | 'superchat';
+  | 'sub_mystery_gift';
 
 export type ChatbotSocketRoom = 'queue' | 'giveaway';
 
