@@ -34,7 +34,7 @@
         v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
         :is="page"
         :params="params"/>
-      <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
+      <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 
     <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
