@@ -327,7 +327,9 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
-  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    if (
+      !process.argv.includes('--skip-update') &&
+      ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
     const updateInfo = {
       baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
       version: pjson.version,
