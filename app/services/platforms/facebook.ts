@@ -98,7 +98,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
 
   fetchNewToken(): Promise<void> {
     // FB Doesn't have token refresh, user must login again to update token
-    return new Promise((resolve) => (resolve()))
+    return Promise.resolve();
   }
 
   fetchRawChannelInfo() {
