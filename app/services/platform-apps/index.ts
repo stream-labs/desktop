@@ -214,8 +214,6 @@ export class PlatformAppsService extends
 
     const disabledApps = this.getDisabledAppsFromStorage();
 
-    console.log(disabledApps);
-
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
 
