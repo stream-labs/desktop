@@ -890,7 +890,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotCustomCommandWindow',
-      title: 'Chatbot Custom Command Window',
       size: {
         width: 650,
         height: 600
@@ -904,7 +903,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotDefaultCommandWindow',
-      title: 'Chatbot Default Command Window',
       size: {
         width: 650,
         height: 650
@@ -918,7 +916,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotTimerWindow',
-      title: 'Chatbot Timer Window',
       size: {
         width: 650,
         height: 500
@@ -929,7 +926,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openChatbotAlertsWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotAlertsWindow',
-      title: 'Chatbot Alerts Window',
       size: {
         width: 1000,
         height: 700
@@ -940,7 +936,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openCapsProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotCapsProtectionWindow',
-      title: 'Chatbot Caps Protection Window',
       size: {
         width: 650,
         height: 500
@@ -951,7 +946,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSymbolProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSymbolProtectionWindow',
-      title: 'Chatbot Symbol Protection Window',
       size: {
         width: 650,
         height: 500
@@ -962,7 +956,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openLinkProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLinkProtectionWindow',
-      title: 'Chatbot Link Protection Window',
       size: {
         width: 650,
         height: 650
@@ -973,7 +966,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openWordProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotWordProtectionWindow',
-      title: 'Chatbot Word Protection Window',
       size: {
         width: 650,
         height: 500
@@ -987,7 +979,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotQuoteWindow',
-      title: 'Chatbot Quote Window',
       size: {
         width: 650,
         height: 500
@@ -998,7 +989,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQueuePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQueuePreferencesWindow',
-      title: 'Chatbot Queue Preferences Window',
       size: {
         width: 650,
         height: 500
@@ -1009,7 +999,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
-      title: 'Chatbot Quote Preferences Window',
       size: {
         width: 650,
         height: 300
@@ -1032,7 +1021,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestOnboardingWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestOnboardingWindow',
-      title: 'Chat Song Request Onboarding Window',
       size: {
         width: 750,
         height: 550

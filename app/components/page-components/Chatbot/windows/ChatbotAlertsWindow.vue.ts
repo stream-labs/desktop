@@ -20,7 +20,7 @@ import {
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
-  selectedType: ChatbotAlertType = 'tip';
+  selectedType: ChatbotAlertType = 'follow';
 
   get selectedTypeData() {
     return this.alertTypes[this.selectedType];
@@ -44,7 +44,6 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   alertTypeFormattedName(type: ChatbotAlertType) {
     if (type === 'tip') return 'donation';
     if (type === 'sub_mystery_gift') return 'sub mystery gift';
-    if (type === 'sponsor') return 'member';
     return type;
   };
 

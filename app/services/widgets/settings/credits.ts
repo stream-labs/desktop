@@ -2,18 +2,14 @@ import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/wi
 import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
-import { authorizedHeaders } from 'util/requests';
-import { Inject } from 'util/injector';
-import { UserService } from 'services/user';
 
 export interface ICreditsSettings extends IWidgetSettings {
   theme: string;
   credit_title: string;
   credit_subtitle: string;
   background_color: string;
-  font_color: string;
-  font_size: 14;
-  font: string;
+  text_color: string;
+  text_size: 14;
   muted_chatters: string;
   bits: boolean;
   subscribers: boolean;
@@ -53,9 +49,4 @@ export class CreditsService extends WidgetSettingsService<ICreditsData> {
     }
   }
 
-  testRollCredits() {
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(`https://${this.getHost()}/api/v5/slobs/widget/test/endcredits`, { headers });
-    return fetch(request);
-  }
 }

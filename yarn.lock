@@ -3204,9 +3204,9 @@ cosmiconfig@^2.1.0, cosmiconfig@^2.1.1:
     parse-json "^2.2.0"
     require-from-string "^1.1.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.17/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.16/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.17/iojs-v2.0.8-crash-handler.tar.gz#b4cdeeef2b413388588baa23a2263e340ba7d905"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.16/iojs-v2.0.8-crash-handler.tar.gz#ae019aa8e82725f5f90e72cd25e2485b95bcc1cf"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -4002,10 +4002,10 @@ electron-window-state@^4.1.1:
     jsonfile "^2.2.3"
     mkdirp "^0.5.1"
 
-electron@2.0.14:
-  version "2.0.14"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.14.tgz#fad6766645e7c0cd10b4ae822d3167959735a870"
-  integrity sha512-8HLVZuscZxVhoMUL6RlF5kMcwGUAMWw5HNwrEmRgzZyBIBbdCO4aMo9z0qknnPTUDROz8xXZFNhFvBXDu61g5Q==
+electron@2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.8.tgz#6ec7113b356e09cc9899797e0d41ebff8163e962"
+  integrity sha512-pbeGFbwijb5V3Xy/KMcwIp59eA9igg2br+7EHbbwQoa3HRDF5JjTrciX7OiscCA52+ze2n4q38S4lXPqRitgIA==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -7758,9 +7758,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.64-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.59-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.64-iojs-v2.0.8.tar.gz#67934a56a589a32e5f4c5e857f4ed5499de7887d"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.59-iojs-v2.0.8.tar.gz#8d1a0af4f0c3cb0722e5e7bd4fd93ef82d1ca423"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

@@ -1,7 +1,6 @@
 <template>
 <widget-editor :navItems="navItems">
   <validated-form slot="manage-credits-properties" @input="save()" v-if="loaded">
-    <!-- <button class="button button--action" @click="rollCredits">{{ $t('Roll Credits') }}</button> -->
     <v-form-group :title="$t('Credit Title')" type="text" v-model="wData.settings.credit_title" />
     <v-form-group
       :title="$t('Credit Subtitle')"
@@ -26,8 +25,8 @@
   <validated-form slot="visual-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <v-form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
-    <v-form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
-    <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.font_size" :metadata="{ max: 100 }" />
+    <v-form-group :title="$t('Font')" type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
+    <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.font_size"/>
     <v-form-group type="color" :title="$t('Text Color')" v-model="wData.settings.font_color" :metadata="{ tooltip: textColorTooltip }"/>
 
     <v-form-group :title="$t('Loop Option')">

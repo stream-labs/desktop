@@ -516,8 +516,7 @@ export class PlatformAppsService extends
    */
   getAppPartition(appId: string) {
     const app = this.getApp(appId);
-    const userId = this.userService.platformId;
-    const partition = `platformApp-${appId}-${userId}`;
+    const partition = `persist:platformApp-${appId}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
