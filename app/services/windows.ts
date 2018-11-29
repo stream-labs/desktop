@@ -45,6 +45,7 @@ import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
+import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
 import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
@@ -115,6 +116,7 @@ export function getComponents() {
     SubGoal,
     MediaShare,
     AlertBox,
+    SpinWheel,
 
     ChatbotCustomCommandWindow,
     ChatbotDefaultCommandWindow,

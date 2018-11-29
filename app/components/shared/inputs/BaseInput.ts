@@ -13,7 +13,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   @Prop()
   readonly title: string;
 
-  @Prop()
+  @Prop({ default: () => ({}) })
   readonly metadata: TMetadataType;
 
   /**
