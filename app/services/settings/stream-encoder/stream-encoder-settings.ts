@@ -120,7 +120,7 @@ export class StreamEncoderSettingsService extends Service {
     return  {
       mode,
       encoder,
-      preset: preset.trim(), // sometimes it returns \r at the end of string
+      preset: preset.trim(), // in some cases OBS returns \r at the end of the string
       bitrate,
       inputResolution,
       outputResolution,

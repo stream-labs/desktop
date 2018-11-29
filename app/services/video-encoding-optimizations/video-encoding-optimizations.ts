@@ -104,7 +104,7 @@ export class VideoEncodingOptimizationService
     // find 2 profiles with the closest resolution
     const resInPx = resToPx(settings.outputResolution);
     const profilesResolutions = filteredProfiles
-      .map((profile, ind) => {
+      .map(profile => {
         return {
           distance: Math.abs(resToPx(profile.resolutionIn) - resInPx),
           profile
