@@ -96,6 +96,11 @@ export class VideoEncodingOptimizationService
       )
     });
 
+    if (!filteredProfiles.length) {
+      console.error(new Error('No acceptable profiles found'));
+      return [];
+    }
+
     // find 2 profiles with the closest resolution
     const resInPx = resToPx(settings.outputResolution);
     const profilesResolutions = filteredProfiles
