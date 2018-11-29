@@ -115,7 +115,7 @@ export class VideoEncodingOptimizationService
     }
 
     filteredProfiles = filteredProfiles.sort((profile1, profile2) => {
-      return QUALITY_ORDER.indexOf(profile1.presetIn) - QUALITY_ORDER.indexOf(profile2.presetIn);
+      return QUALITY_ORDER.indexOf(profile1.presetOut) - QUALITY_ORDER.indexOf(profile2.presetOut);
     });
 
 
