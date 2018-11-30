@@ -31,24 +31,17 @@
         {{ $t('Checking optimized setting for') }} {{ gameModel.value }}...
       </h-form-group>
 
-      <div v-if="hasAvailablePresets">
+      <div v-if="selectedProfile">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
             <div class="checkbox">
-              <div v-if="!isGenericProfiles">
+              <div>
                 <input
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use {{gameModel.value}} optimized encoder settings</span></label>
-              </div>
-              <div v-else>
-                <input
-                  type="checkbox"
-                  v-model="useOptimizedProfile"
-                />
-                <label><span>{{ $t('Use optimized encoder settings') }}</span>
+                <label><span>{{ selectedProfile.description }}</span>
                   <span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
@@ -58,14 +51,6 @@
                 </label>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="input-container select" v-show="useOptimizedProfile">
-          <div class="input-label">
-            <label>Profile</label>
-          </div>
-          <div class="input-wrapper">
-            <FormInput type="list" v-model="selectedPresetType" :metadata="presetInputMetadata"/>
           </div>
         </div>
       </div>

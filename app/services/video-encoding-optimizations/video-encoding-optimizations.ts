@@ -36,16 +36,12 @@ export * from './definitions';
  We're also doing some resolution switching
  */
 
-export enum EPresetType {
-  HIGH_PRERFORMANCE = 0,
-  HIGH_QUALITY = 1
-}
 
 interface IVideoEncodingOptimizationServiceState {
   useOptimizedProfile: boolean,
   lastLoadedGame: string,
   lastLoadedProfiles: IEncoderProfile[],
-  lastSelectedPreset: EPresetType;
+  lastSelectedProfile: IEncoderProfile
 }
 
 export class VideoEncodingOptimizationService
@@ -55,7 +51,7 @@ export class VideoEncodingOptimizationService
     useOptimizedProfile: false,
     lastLoadedGame: '',
     lastLoadedProfiles: [],
-    lastSelectedPreset: 0
+    lastSelectedProfile: null
   };
 
   private previousSettings: any;
@@ -82,10 +78,9 @@ export class VideoEncodingOptimizationService
   /**
    * returns profiles according to the current encoder settings
    */
-  async fetchProfilesForCurrentSettings(game: string): Promise<IEncoderProfile[]> {
+  async fetchOptimizedProfile(game: string): Promise<IEncoderProfile> {
     const settings = this.streamEncoderSettingsService.getSettings();
     const profiles = await this.fetchAvailableGameProfiles(game);
-    if (!profiles.length) return [];
 
     let filteredProfiles = profiles.filter(profile => {
       return (
@@ -96,35 +91,42 @@ export class VideoEncodingOptimizationService
       )
     });
 
-    if (!filteredProfiles.length) {
-      console.error(new Error('No acceptable profiles found'));
-      return [];
-    }
 
-    // find 2 profiles with the closest resolution
+    // find profiles with the closest resolution to current resolution in current settings
     const resInPx = resToPx(settings.outputResolution);
-    const profilesResolutions = filteredProfiles
-      .map(profile => {
-        return {
-          distance: Math.abs(resToPx(profile.resolutionIn) - resInPx),
-          profile
-        };
-      });
-    const [min1, min2] = profilesResolutions
-      .sort((profile1, profile2) => profile1.distance - profile2.distance);
-    filteredProfiles = [min1.profile, min2.profile];
+    const profile = filteredProfiles.sort((profileA, profileZ) => {
+      return (
+        (resToPx(profileA.resolutionIn) - resInPx) -
+        (resToPx(profileZ.resolutionIn) - resInPx)
+      )
+    })[0];
 
-    if (!filteredProfiles[0] || !filteredProfiles[1]) {
-      console.error(new Error('2 profiles needed, got'), filteredProfiles);
-      return [];
+    if (!profile) return null;
+
+    // set description based on settings for the profile
+    if (profile.game == 'DEFAULT') {
+      switch (settings.encoder) {
+        case 'x264':
+          profile.description = `optimize quality for ${settings.preset}`;
+          break;
+        case 'qsv':
+        case 'nvenc':
+          profile.description = `optimize quality for ${settings.encoder}`;
+          break;
+      }
+
+      const willChangeResolution = (
+        !settings.hasCustomResolution &&
+        settings.outputResolution !== profile.resolutionOut
+      );
+      if (willChangeResolution) {
+        profile.description += ' with resolution change';
+      }
+    } else {
+      profile.description = `optimize quality for ${profile.game}`
     }
 
-    filteredProfiles = filteredProfiles.sort((profile1, profile2) => {
-      return QUALITY_ORDER.indexOf(profile1.presetOut) - QUALITY_ORDER.indexOf(profile2.presetOut);
-    });
-
-
-    return filteredProfiles;
+    return profile
   }
 
   /**
@@ -155,9 +157,9 @@ export class VideoEncodingOptimizationService
     return profiles;
   }
 
-  applyProfile(encoderProfile: IEncoderProfile, presetType: EPresetType) {
+  applyProfile(encoderProfile: IEncoderProfile) {
     this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
-    this.SAVE_LAST_SELECTED_PRESET(presetType);
+    this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
     const currentSettings = this.streamEncoderSettingsService.getSettings();
     const newSettings: Partial<IStreamEncoderSettings> = {
       encoder: encoderProfile.encoder,
@@ -181,15 +183,13 @@ export class VideoEncodingOptimizationService
   canApplyProfileFromCache() {
     return !!(
       this.state.useOptimizedProfile &&
-      this.state.lastSelectedPreset &&
-      this.state.lastLoadedProfiles.length
+      this.state.lastSelectedProfile
     );
   }
 
   async applyProfileFromCache() {
     if (!this.canApplyProfileFromCache()) return;
-    const profiles = await this.fetchProfilesForCurrentSettings(this.state.lastLoadedGame);
-    this.applyProfile(profiles[this.state.lastSelectedPreset], this.state.lastSelectedPreset);
+    this.applyProfile(this.state.lastSelectedProfile);
   }
 
   getIsUsingEncodingOptimizations() {
@@ -216,11 +216,14 @@ export class VideoEncodingOptimizationService
   }
 
   @mutation()
-  private SAVE_LAST_SELECTED_PRESET(preset: number) {
-    this.state.lastSelectedPreset = preset;
+  private SAVE_LAST_SELECTED_PROFILE(profile: IEncoderProfile) {
+    this.state.lastSelectedProfile = profile;
   }
 }
 
+/**
+ * convert resolution like 1024x768 to amount of pixels
+ */
 function resToPx(res: string): number {
   return res
     .split('x')

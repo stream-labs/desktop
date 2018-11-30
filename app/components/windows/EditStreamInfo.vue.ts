@@ -14,7 +14,7 @@ import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
-import { VideoEncodingOptimizationService, IEncoderProfile, EPresetType } from 'services/video-encoding-optimizations';
+import { VideoEncodingOptimizationService, IEncoderProfile } from 'services/video-encoding-optimizations';
 import { IListMetadata } from 'components/shared/inputs';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
@@ -44,7 +44,7 @@ export default class EditStreamInfo extends Vue {
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
-  selectedPresetType = 0;
+  selectedProfile: IEncoderProfile = null;
 
   // Form Models:
 
@@ -81,7 +81,6 @@ export default class EditStreamInfo extends Vue {
     value: false
   };
 
-  encoderPresets: IEncoderProfile[] = [];
 
   facebookPages: IStreamlabsFacebookPages;
 
@@ -96,18 +95,6 @@ export default class EditStreamInfo extends Vue {
 
   set useOptimizedProfile(enabled: boolean) {
     this.videoEncodingOptimizationService.useOptimizedProfile(enabled);
-  }
-
-  get isGenericProfiles() {
-    return this.encoderPresets.length && this.encoderPresets[0].game == 'DEFAULT';
-  }
-
-  get hasAvailablePresets() {
-    return !!this.encoderPresets.length;
-  }
-
-  get selectedPreset() {
-    return this.encoderPresets[this.selectedPresetType];
   }
 
   async created() {
@@ -168,20 +155,8 @@ export default class EditStreamInfo extends Vue {
   async loadAvailableProfiles() {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
-    this.encoderPresets =
-      await this.videoEncodingOptimizationService.fetchProfilesForCurrentSettings(this.gameModel.value);
-    this.selectedPresetType = this.videoEncodingOptimizationService.state.lastSelectedPreset;
+    this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(this.gameModel.value);
     this.searchProfilesPending = false;
-  }
-
-  get presetInputMetadata(): IListMetadata<number> {
-    let options = this.encoderPresets.map((preset, index: EPresetType) => {
-      return {
-        value: index,
-        title: `${ (index === EPresetType.HIGH_PRERFORMANCE ? ' High Performance' : 'High Quality') } ${preset.encoder}`
-      }
-    });
-    return { options };
   }
 
   // For some reason, v-model doesn't work with ListInput
@@ -220,8 +195,8 @@ export default class EditStreamInfo extends Vue {
         }
       });
 
-    if (this.hasAvailablePresets && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(this.selectedPreset, this.selectedPresetType);
+    if (this.selectedProfile && this.useOptimizedProfile) {
+      this.videoEncodingOptimizationService.applyProfile(this.selectedProfile);
     }
   }
 

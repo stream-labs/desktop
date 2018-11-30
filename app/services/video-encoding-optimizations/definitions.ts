@@ -11,6 +11,7 @@ export interface IEncoderProfile {
   resolutionIn: string;
   resolutionOut: string;
   options: string;
+  description?: string;
 }
 
 export type TGameProfileType = 'highPerformance' | 'highQuality';
