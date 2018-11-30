@@ -58,6 +58,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let appIsRunning = false;
   let context: any = null;
   let app: any;
+  let testPassed = false;
 
   async function startApp(t: any) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
@@ -125,11 +126,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   test.beforeEach(async t => {
+    console.log('test start');
+    testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
 
+  test.afterEach(async t => {
+    testPassed = true;
+    console.log('test successfully finished');
+  });
+
   test.afterEach.always(async t => {
+    const testName = t.title.replace('afterEach for ', '');
+    console.log('test finish', t.title);
     const client = await getClient();
     await client.unsubscribeAll();
     if (options.restartAppAfterEachTest) {
