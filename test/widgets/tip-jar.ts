@@ -1,7 +1,6 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron/index';
+import { test, useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
-import { logIn, blankSlate } from '../helpers/spectron/user';
+import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 
 useSpectron({ appArgs: '--nosync' });

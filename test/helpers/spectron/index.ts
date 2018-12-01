@@ -1,6 +1,6 @@
 /// <reference path="../../../app/index.d.ts" />
 import 'rxjs/add/operator/first';
-import test from 'ava';
+import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
@@ -10,6 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
+export const test = avaTest as TestInterface<ITestContext>;;
 
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
@@ -53,6 +54,13 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   restartAppAfterEachTest: true
 };
 
+export interface ITestContext {
+  cacheDir: string,
+  app: Application
+}
+
+export type TExecutionContext = ExecutionContext<ITestContext>;
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
@@ -60,7 +68,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let app: any;
   let testPassed = false;
 
-  async function startApp(t: any) {
+  async function startApp(t: TExecutionContext) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
@@ -125,8 +133,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
   }
 
-  test.beforeEach(async t => {
-    console.log('test start');
+  test.beforeEach(async t  => {
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -134,12 +141,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.afterEach(async t => {
     testPassed = true;
-    console.log('test successfully finished');
   });
 
   test.afterEach.always(async t => {
     const testName = t.title.replace('afterEach for ', '');
-    console.log('test finish', t.title);
     const client = await getClient();
     await client.unsubscribeAll();
     if (options.restartAppAfterEachTest) {

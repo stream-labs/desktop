@@ -50,7 +50,6 @@ test('Place item after non-empty folder', async t => {
       Item3:
       Item4:
     Folder2
-    Item2:
   `);
 
   getNode('Item1').placeAfter(getNodeId('Folder1'));
