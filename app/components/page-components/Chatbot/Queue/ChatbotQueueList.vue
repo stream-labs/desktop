@@ -51,7 +51,7 @@
           />
           <i
             v-if="!isPicked"
-            class="fas fa-arrow-right padding--5"
+            class="fas fa-arrow-right chatbot-arrow"
             @click="onPickEntryHandler(queueUser.id)"
           />
         </td>
@@ -78,6 +78,9 @@
   .padding-vertical--20;
 }
 
+.chatbot-arrow {
+  .padding-h-sides()
+}
 
 h4 {
   line-height: 40px;

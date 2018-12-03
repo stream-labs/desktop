@@ -80,14 +80,14 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     required: true,
     type: EInputType.text,
     placeholder: $t('Enter the text string which will trigger the response'),
-    tooltip: $t('Enter a word used to trigger a response')
+    tooltip: $t('Enter a word used to trigger a response'),
+    max: 25
   };
   responseMetadata: ITextMetadata = {
     required: true,
     type: EInputType.textArea,
-    placeholder: $t(
-      'The phrase that will appear after a user enters the command'
-    )
+    placeholder: $t('The phrase that will appear after a user enters the command'),
+    max: 450
   };
 
   get permissionMetadata() {

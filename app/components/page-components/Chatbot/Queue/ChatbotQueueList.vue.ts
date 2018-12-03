@@ -65,7 +65,9 @@ export default class ChatbotQueueList extends ChatbotBase {
   }
 
   onPickEntryHandler(id: number) {
-    this.chatbotApiService.Queue.pickQueueEntry(id);
+    if(this.pickedList.data.length < 18){
+      this.chatbotApiService.Queue.pickQueueEntry(id);
+    }
   }
 
   onRemoveEntryHandler(id: number) {

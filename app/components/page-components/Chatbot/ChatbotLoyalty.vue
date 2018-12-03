@@ -75,7 +75,15 @@
             :currentPage="currentPage"
             @change="fetchLoyalty"
           />
+          
       </div>
+      <ChatbotGenericModalWindow
+        :name="ADD_LOYALTY_MODAL"
+        :isInputModal="true"
+        @ok="onOkHandler"
+        @cancel="onCancelHandler"
+        :message="$t('Amount')"
+      />
   </div>
 </transition>
 </template>

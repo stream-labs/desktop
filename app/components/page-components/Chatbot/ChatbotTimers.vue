@@ -26,15 +26,16 @@
     <table>
       <thead>
         <tr>
-          <th> {{ $t("timer") }} </th>
+          <th> {{ $t("Timer") }} </th>
+          <th> {{ $t("Response") }} </th>
           <th>
             <div class="flex">
-              {{ $t("interval in minutes") }}
-               <i class="icon-question icon-btn" v-tooltip="$t('interval in minutes')" />
+              {{ $t("Interval ") }}
+               <i class="icon-question icon-btn" v-tooltip="$t('In Minutes')" />
             </div>
           </th>
-          <th> {{ $t("response") }} </th>
-          <th> {{ $t("line minimum") }} </th>
+          <th> {{ $t("Line Minimum") }} </th>
+          <th></th>
           <th></th>
         </tr>
       </thead>
@@ -44,8 +45,8 @@
           :key="timer.name"
         >
           <td> {{ timer.name }} </td>
-          <td> {{ timer.interval }} </td>
           <td> {{ timer.message }} </td>
+          <td> {{ timer.interval }} </td>
           <td> {{ timer.chat_lines }} </td>
           <td>
             <div class="align-items--inline">
@@ -53,14 +54,18 @@
                 :value="timer.enabled"
                 @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
               />
-              <DropdownMenu
-                :placement="'bottom-end'"
-                class="chatbot-timers__timer-actions__container"
-                :icon="'icon-more'"
-              >
-                <button @click="onOpenTimerWindowHandler(timer)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="onDeleteTimerHandler(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
-              </DropdownMenu>
+            </div>
+          </td>
+          <td>
+            <div class="align-items--inline">
+              <i
+                class="icon-trash padding--5 cursor--pointer"
+                @click="onDeleteTimerHandler(timer)"
+              />
+              <i
+                class="fas icon-edit chatbot-edit cursor--pointer"
+                @click="onOpenTimerWindowHandler(timer)"
+              />
             </div>
           </td>
         </tr>
@@ -72,6 +77,13 @@
       :currentPage="currentPage"
       @change="fetchTimers"
     />
+    <ChatbotGenericModalWindow
+        :name="DELETE_COMMAND_MODAL"
+        @yes="onYesHandler"
+        @no="onNoHandler"
+        :header="$t('Are you sure you want to delete %{name} ?',{name: selectedTimer ? selectedTimer.name : ''})"
+        :message="$t('Once deleted it can not be recovered.')"
+      />
   </div>
 </div>
 </template>
@@ -88,16 +100,52 @@
   .padding-vertical--20;
 }
 
-tbody tr {
-  td:first-child {
-    width: 300px;
+table{
+  table-layout:fixed;
+  width: 100%;
+
+  tr {
+    th:first-child,
+    td:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 125px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    td:nth-child(3),
+    th:nth-child(3),
+    td:nth-child(4),
+    th:nth-child(4) {
+      width: 100px;
+    }
+
+    td:nth-child(5),
+    th:nth-child(5) {
+      width: 50px;
+    }
+
+
+    th:last-child:not(.text-align--center),
+    td:last-child:not(.text-align--center) {
+      width: 100px;
+      .align-items--inline;
+      .text-align--right;
+      padding-right: 10px;
+    }
   }
-  td:last-child:not(.text-align--center) {
-    width: 100px;
-    .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
-  }
+}
+
+.chatbot-edit {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .chatbot-timers__timer-actions__container {

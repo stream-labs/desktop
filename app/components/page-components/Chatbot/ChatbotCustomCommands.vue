@@ -44,6 +44,7 @@
             </th>
             <th> {{ $t('Permission') }} </th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -57,20 +58,21 @@
             <td> {{ command.cooldowns.user }} </td>
             <td> {{ command.permission ? $t(chatbotPermissionsEnums[command.permission.level]) : '-' }} </td>
             <td>
-              <div class="align-items--inline">
                 <ToggleInput
                   :value="command.enabled"
                   @input="onToggleEnableCommandHandler(command.id, index, !command.enabled)"
                 />
-                <DropdownMenu
-                  :placement="'bottom-end'"
-                  :icon="'icon-more'"
-                >
-                  <div class="chatbot-custom-commands__command-actions__container">
-                    <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                    <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
-                  </div>
-                </DropdownMenu>
+            </td>
+            <td>
+              <div class="align-items--inline">
+                <i
+                  class="icon-trash padding--5 cursor--pointer"
+                  @click="onDeleteCommandHandler(command)"
+                />
+                <i
+                  class="fas icon-edit chatbot-edit cursor--pointer"
+                  @click="onOpenCommandWindowHandler(command)"
+                />
               </div>
             </td>
           </tr>
@@ -81,6 +83,13 @@
         :totalPages="totalPages"
         :currentPage="currentPage"
         @change="fetchCommands"
+      />
+      <ChatbotGenericModalWindow
+        :name="DELETE_COMMAND_MODAL"
+        @yes="onYesHandler"
+        @no="onNoHandler"
+        :header="$t('Are you sure you want to delete %{name} ?',{name: selectedCommand ? selectedCommand.command : ''})"
+        :message="$t('Once deleted it can not be recovered.')"
       />
     </div>
   </div>
@@ -95,25 +104,60 @@
   .icon-hover();
 }
 
-table tr {
-  .transition;
+table {
+  table-layout:fixed;
+  width: 100%;
 
-  td:first-child {
-    width: 200px;
-  }
+  tr {
+    .transition;
+    
+    th:first-child,
+    td:first-child {
+      white-space: nowrap;      /*keep text on one line */
+      overflow: hidden;         /*prevent text from being shown outside the border */
+      text-overflow: ellipsis;  /*cut off text with an ellipsis*/
+      width: 125px;
+    }
 
-  td:nth-child(5),
-  th:nth-child(5) {
-    width: 200px;
-    .text-align--right;
+    td:nth-child(2) {
+      white-space: nowrap;      /*keep text on one line */
+      overflow: hidden;         /*prevent text from being shown outside the border */
+      text-overflow: ellipsis;  /*cut off text with an ellipsis*/
+    }
+    
+    th:nth-child(3),
+    th:nth-child(4),
+    td:nth-child(3),
+    td:nth-child(4) {
+     width: 50px;
+    }
+    
+    td:nth-child(5),
+    th:nth-child(5) {
+      width: 100px;
+      .text-align--right;
+    }
+    
+    td:nth-child(6),
+    th:nth-child(6) {
+      width: 50px;
+    }
+    
+    th:last-child,
+    td:last-child {
+      width: 100px;
+      .align-items--inline;
+      .text-align--right;
+      padding-right: 10px;
+    }
   }
+}
 
-  td:last-child:not(.text-align--center) {
-    width: 100px;
-    .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
-  }
+
+
+.chatbot-edit {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .chatbot-empty-placeholder__container {

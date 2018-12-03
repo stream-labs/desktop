@@ -1,29 +1,38 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { ICustomCommand } from 'services/chatbot';
+import { ICustomCommand, DELETE_COMMAND_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
-
+import { $t } from 'services/i18n';
+import electron from 'electron';
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
-    ChatbotPagination
+    ChatbotPagination,
+    ChatbotGenericModalWindow
   }
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
+  selectedCommand: ICustomCommand = null;
+
+  get DELETE_COMMAND_MODAL(){
+    return DELETE_COMMAND_MODAL;
+  }
 
   get commands() {
     return this.chatbotApiService.Commands.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination
-      .current;
+    return this.chatbotApiService.Commands.state.customCommandsResponse
+      .pagination.current;
   }
 
   get totalPages() {
-    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.total;
+    return this.chatbotApiService.Commands.state.customCommandsResponse
+      .pagination.total;
   }
 
   mounted() {
@@ -45,7 +54,18 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   onDeleteCommandHandler(command: ICustomCommand) {
-    this.chatbotApiService.Commands.deleteCustomCommand(command.id);
+    this.selectedCommand = command;
+    this.$modal.show(DELETE_COMMAND_MODAL);
+  }
+
+  onYesHandler(){
+    if(this.selectedCommand){
+      this.chatbotApiService.Commands.deleteCustomCommand(this.selectedCommand.id);
+    }
+  }
+
+  onNoHandler(){
+    this.selectedCommand = null;
   }
 
   onToggleEnableCommandHandler(

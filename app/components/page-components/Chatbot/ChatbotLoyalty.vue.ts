@@ -3,10 +3,12 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import { ILoyaltyData } from 'services/chatbot';
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
-    ChatbotPagination
+    ChatbotPagination,
+    ChatbotGenericModalWindow
   }
 })
 export default class ChatbotLoyalty extends ChatbotBase {
@@ -21,12 +23,17 @@ export default class ChatbotLoyalty extends ChatbotBase {
     return this.chatbotApiService.Loyalty.state.loyaltyResponse.data;
   }
 
+  get ADD_LOYALTY_MODAL(){
+    return 'add-loyalty';
+  }
+
   onOpenLoyaltyPreferencesHandler() {
     this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
   }
 
   onOpenLoyaltyAddWllHandler(){
-    this.chatbotApiService.Common.openLoyaltyAddAllWindow();
+    this.$modal.show(this.ADD_LOYALTY_MODAL);
+    //this.chatbotApiService.Common.openLoyaltyAddAllWindow();
   }
 
   onEnableLoyaltyHandler(){
@@ -54,6 +61,13 @@ export default class ChatbotLoyalty extends ChatbotBase {
   fetchLoyalty(page: number = this.currentPage, query?: string) {
     this.chatbotApiService.Loyalty.fetchLoyalty(page, query);
   }
+
+  onOkHandler(value: number){
+    console.log(value);
+    console.log('Add Currency API Call');
+  }
+
+  onCancelHandler(){}
 
   @Watch('searchQuery')
   @Debounce(1000)

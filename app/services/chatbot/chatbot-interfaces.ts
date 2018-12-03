@@ -115,6 +115,10 @@ export interface IQueueStateResponse {
   title?: string;
 }
 
+export interface IQueueTotalResponse {
+  total: number;
+}
+
 export interface IQueueEntriesResponse {
   pagination: IChatbotPagination;
   data: IQueuedUser[];
@@ -539,3 +543,6 @@ export type ChatbotSettingSlug =
 export const NEW_ALERT_MODAL_ID = 'new-alert';
 export const NEW_LINK_PROTECTION_LIST_MODAL_ID = 'new-link-protection-list';
 export const NEW_WORD_PROTECTION_LIST_MODAL_ID = 'new-word-protection-list';
+
+// modals
+export const DELETE_COMMAND_MODAL = 'delete-command';

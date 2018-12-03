@@ -31,7 +31,7 @@ export default class ChatbotPagination extends Vue {
     const endIndex = Math.min(startIndex+8,this.totalPages-1);
 
     const endOffset = endIndex - startIndex;
-    if(endOffset < 8){
+    if(endOffset < 8 && this.totalPages > 8){
       startIndex = Math.max(1,startIndex-(8 - endOffset))
     }
 

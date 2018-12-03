@@ -13,7 +13,8 @@ import {
   IQueueStateResponse,
   IQueueEntriesResponse,
   IQueuePickedResponse,
-  IQueuedUser
+  IQueuedUser,
+  IQueueTotalResponse
 } from './chatbot-interfaces';
 
 // state
@@ -56,7 +57,6 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   };
 
   socket: SocketIOClient.Socket;
-
   //
   // sockets
   //
@@ -75,45 +75,30 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     });
 
     this.socket.on('queue.open', (response: IQueueStateResponse) => {
-      // queue open
       this.UPDATE_QUEUE_STATE(response);
     });
+    this.socket.on('queue.total', (response: IQueueTotalResponse) => {
+      console.log(response);
+    });
     this.socket.on('queue.close', (response: IQueueStateResponse) => {
-      // queue open
       this.UPDATE_QUEUE_STATE(response);
     });
     this.socket.on('queue.join', (response: IQueuedUser) => {
-      // someone joins queue, refetch queue entries
       this.ADD_QUEUE_ENTRY(response);
-
-      //this.fetchQueueEntries();
     });
     this.socket.on('queue.pick', (response: IQueuedUser) => {
-      // someone got selected, refetch queue entries and picked entries
       this.PICK_QUEUE_ENTRY(response);
-     
-      //this.fetchQueueEntries();
-      //this.fetchQueuePicked();
     });
     this.socket.on('queue.leave', (response: IQueuedUser) => {
       this.LEAVE_QUEUE_ENTRY(response);
-      // someone leaves queue, refetch queue entries
-      //this.fetchQueueEntries();
     });
     this.socket.on('queue.deleted', (response: IQueuedUser) => {
-      // queue deleted, refresh both entries
       this.REMOVE_QUEUE_USER(response);
-      //this.fetchQueueEntries();
-      //this.fetchQueuePicked();
     });
     this.socket.on('queue.entries.clear', () => {
-      // Clear entries
-      //this.fetchQueueEntries();
       this.CLEAR_QUEUE_ENTIES();
     });
     this.socket.on('queue.picked.clear', () => {
-      // Clear entries
-      //this.fetchQueuePicked();
       this.CLEAR_QUEUE_PICKED();
       
     });
@@ -231,59 +216,82 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
 
   @mutation()
   private ADD_QUEUE_ENTRY(response: IQueuedUser){
-    let entries = _.cloneDeep(this.state.queueEntriesResponse);
-    entries.data.push(response);
-    Vue.set(this.state, 'queueEntriesResponse', entries);
+      this.state.queueEntriesResponse.data.push(response);
+
+    //this.state.queueEntriesResponse.pagination.total = Math.ceil(response.id / 1);
   }
 
   @mutation()
   private PICK_QUEUE_ENTRY(response: IQueuedUser){
-    let entries = _.cloneDeep(this.state.queueEntriesResponse);
-    _.remove(entries.data,user =>{
+    _.remove(this.state.queueEntriesResponse.data,user =>{
       return user.platform === response.platform && user.viewer_id === response.viewer_id;
     });
-    Vue.set(this.state, 'queueEntriesResponse', entries);
 
-    let picked = _.cloneDeep(this.state.queuePickedResponse);
-    picked.data.push(response);
-    Vue.set(this.state, 'queuePickedResponse', picked);
+    this.state.queuePickedResponse.data.push(response);
+
+    const last = _.last(this.state.queueEntriesResponse.data)
+    if(last){
+      this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
+    }
   }
 
   @mutation()
   private LEAVE_QUEUE_ENTRY(response:IQueuedUser){
-    let entries = _.cloneDeep(this.state.queueEntriesResponse);
-    _.remove(entries.data,user =>{
+    _.remove(this.state.queueEntriesResponse.data,user =>{
       return user.platform === response.platform && user.viewer_id === response.viewer_id;
     });
-    Vue.set(this.state, 'queueEntriesResponse', entries);
+
+    Vue.set(this.state, 'queueEntriesResponse', this.state.queueEntriesResponse);
+
+    const last = _.last(this.state.queueEntriesResponse.data)
+    if(last){
+      this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
+    }
   }
 
   @mutation()
   private REMOVE_QUEUE_USER(response:IQueuedUser){
-    let entries = _.cloneDeep(this.state.queueEntriesResponse);
-    _.remove(entries.data,user =>{
+    //  Attempt to remove from entry list
+    const removedEntry = _.remove(this.state.queueEntriesResponse.data,user =>{
       return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
     });
-    Vue.set(this.state, 'queueEntriesResponse', entries);
 
-    let picked = _.cloneDeep(this.state.queuePickedResponse);
-    _.remove(picked.data,user =>{
+    Vue.set(this.state, 'queueEntriesResponse', this.state.queueEntriesResponse);
+    
+    if(removedEntry.length != 0){
+      const last = _.last(this.state.queueEntriesResponse.data)
+      if(last){
+        this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
+      }
+    }
+
+    //  Attempt to remove from picked list
+    const removedPicked = _.remove(this.state.queuePickedResponse.data,user =>{
       return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
     });
-    Vue.set(this.state, 'queuePickedResponse', picked);
+
+    Vue.set(this.state, 'queuePickedResponse', this.state.queuePickedResponse);
+
+    if(removedPicked.length != 0){
+      const last = _.last(this.state.queuePickedResponse.data)
+      if(last){
+        this.state.queuePickedResponse.pagination.total = Math.ceil(last.id / 1);
+      }
+    }
+
   }
 
   @mutation()
   private CLEAR_QUEUE_ENTIES(){
-    let entries = _.cloneDeep(this.state.queueEntriesResponse);
-    entries.data=[];
-    Vue.set(this.state, 'queueEntriesResponse', entries);
+    this.state.queueEntriesResponse.data = [];
+    this.state.queueEntriesResponse.pagination.total = 1;
+    this.state.queueEntriesResponse.pagination.current = 1;
   }
 
   @mutation()
   private CLEAR_QUEUE_PICKED(){
-    let picked = _.cloneDeep(this.state.queuePickedResponse);
-    picked.data = [];
-    Vue.set(this.state, 'queuePickedResponse', picked);
+    this.state.queuePickedResponse.data = [];
+    this.state.queuePickedResponse.pagination.total = 1;
+    this.state.queuePickedResponse.pagination.current = 1;
   }
 }

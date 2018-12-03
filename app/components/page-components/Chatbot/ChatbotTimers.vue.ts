@@ -1,17 +1,24 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IChatbotTimer } from 'services/chatbot';
+import { IChatbotTimer, DELETE_COMMAND_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 
 @Component({
   components: {
-    ChatbotPagination
+    ChatbotPagination,
+    ChatbotGenericModalWindow
   }
 })
 export default class ChatbotTimers extends ChatbotBase {
   searchQuery = '';
+  selectedTimer: IChatbotTimer = null;
+
+  get DELETE_COMMAND_MODAL(){
+    return DELETE_COMMAND_MODAL;
+  }
 
   get timers() {
     return this.chatbotApiService.Timers.state.timersResponse.data;
@@ -58,6 +65,17 @@ export default class ChatbotTimers extends ChatbotBase {
   }
 
   onDeleteTimerHandler(timer?: IChatbotTimer) {
-    this.chatbotApiService.Timers.deleteTimer(timer.id);
+    this.selectedTimer = timer;
+    this.$modal.show(DELETE_COMMAND_MODAL);
+  }
+
+  onYesHandler(){
+    if(this.selectedTimer){
+      this.chatbotApiService.Timers.deleteTimer(this.selectedTimer.id);
+    }
+  }
+
+  onNoHandler(){
+    this.selectedTimer = null;
   }
 }

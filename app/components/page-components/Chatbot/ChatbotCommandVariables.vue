@@ -33,27 +33,35 @@
 
 <style lang="less" scoped>
 @import "../../../styles/index";
-tbody tr {
+table {
+  table-layout:fixed;
+  width: 100%;
+    
+  tr {
 
-  td {
-    user-select: all;
-  }
+    td {
+      user-select: all;
+    }
 
-  td:first-child {
-    width: 300px;
-  }
-  td:last-child {
-    width: 100px;
-    .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
+    th:first-child,
+    td:first-child {
+      width: 150px;
+    }
+    
+    th:last-child,
+    td:last-child {
+      width: 100px;
+      .align-items--inline;
+      .text-align--right;
+      padding-right: 10px;
 
-    .icon-edit {
-      font-size: 10px;
-      .transition;
+      .icon-edit {
+        font-size: 10px;
+        .transition;
 
-      &:hover {
-        color: @teal;
+        &:hover {
+          color: @teal;
+        }
       }
     }
   }

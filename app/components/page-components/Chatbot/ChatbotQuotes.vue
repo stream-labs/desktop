@@ -34,11 +34,11 @@
     <table>
       <thead>
         <tr>
-          <th> {{ $t("id") }} </th>
-          <th> {{ $t("quote") }} </th>
-          <th> {{ $t("added by") }} </th>
-          <th> {{ $t("game") }} </th>
-          <th> {{ $t("date") }} </th>
+          <th> {{ $t("Id") }} </th>
+          <th> {{ $t("Quote") }} </th>
+          <th> {{ $t("Added By") }} </th>
+          <th> {{ $t("Game") }} </th>
+          <th> {{ $t("Date") }} </th>
           <th></th>
         </tr>
       </thead>

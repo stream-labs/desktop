@@ -24,7 +24,9 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
       maximum: metadataHelper.number({
         required: true,
         type: EInputType.number,
-        placeholder: $t('Maximum Queue Size')
+        placeholder: $t('Maximum Queue Size'),
+        min: 1,
+        max: 1000
       }),
       messages: {
         picked: metadataHelper.text({
