@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';

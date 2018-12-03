@@ -138,7 +138,7 @@
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
-    "spectron": "3.8.0",
+    "spectron": "4.0.0",
     "style-loader": "0.21.0",
     "traverse": "0.6.6",
     "ts-loader": "4.4.2",

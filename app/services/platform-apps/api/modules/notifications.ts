@@ -6,7 +6,7 @@ import {
   IApiContext
 } from './module';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { INotificationsServiceApi } from 'services/notifications';
 
 type TIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED' | 'FRAMES_DROPPED';

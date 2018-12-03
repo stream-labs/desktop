@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';

@@ -3,7 +3,8 @@
 import { TExecutionContext } from './index';
 
 async function getNthLabelId(t: TExecutionContext, label: string, index: number) {
-  return (await (t.context.app.client.$$(`label=${label}`))[index] as any).ELEMENT;
+  const el = await t.context.app.client.$$(`label=${label}`);
+  return (el[index] as any).ELEMENT;
 }
 
 export async function setFormInput(t: TExecutionContext, label: string, value: string, index = 0) {

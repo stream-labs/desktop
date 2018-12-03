@@ -30,7 +30,7 @@ import {
   ISceneCollectionCreateOptions
 } from '.';
 import { SceneCollectionsStateService } from './state';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { $t } from '../i18n';
 

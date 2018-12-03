@@ -1,5 +1,5 @@
 import { IJsonRpcRequest } from '../../app/services/jsonrpc';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 
 const net = require('net');

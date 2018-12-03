@@ -46,9 +46,7 @@ import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
 import { ObserveList } from './util/service-observer';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Subject, Observable, Subscription} from 'rxjs';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
@@ -617,8 +615,10 @@ export class ServicesManager extends Service {
             }
 
             if (result.emitter === 'STREAM') {
-              const subject = new Subject<any>();
-              this.windowSubscriptions[result.resourceId] = subject;
+              let subject = this.windowSubscriptions[result.resourceId];
+              if (!subject) {
+                subject = this.windowSubscriptions[result.resourceId] = new Subject();
+              }
               return subject;
             }
           }

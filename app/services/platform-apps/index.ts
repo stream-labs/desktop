@@ -2,7 +2,7 @@ import { StatefulService } from 'services/stateful-service';
 import { mutation } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { EApiPermissions, IWebviewTransform } from './api/modules/module';
