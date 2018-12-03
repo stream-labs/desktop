@@ -51,14 +51,14 @@ export class WidgetSource implements IWidgetSource {
     const previewSourceSettings = {
       ...source.getSettings(),
       shutdown: false,
-      url: apiSettings.previewUrl,
-      isTemporary: true
+      url: apiSettings.previewUrl
     };
 
     const previewSource = this.sourcesService.createSource(
       source.name,
       source.type,
-      previewSourceSettings
+      previewSourceSettings,
+      { isTemporary: true}
     );
 
     this.SET_PREVIEW_SOURCE_ID(previewSource.sourceId);
@@ -73,6 +73,7 @@ export class WidgetSource implements IWidgetSource {
 
   destroyPreviewSource() {
     this.widgetsService.stopSyncPreviewSource(this.previewSourceId);
+    this.sourcesService.getSource(this.previewSourceId).remove();
     this.SET_PREVIEW_SOURCE_ID('');
   }
 
