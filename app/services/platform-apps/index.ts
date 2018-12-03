@@ -16,7 +16,7 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;

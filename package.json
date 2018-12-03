@@ -79,7 +79,6 @@
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
-    "rxjs-compat": "^6.3.3",
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "uuid": "^3.0.1",
