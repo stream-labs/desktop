@@ -198,8 +198,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
     const req = new Request(url, { method: 'POST', headers, body });
     return fetch(req)
       .then(handleErrors)
-      .then(resp => resp.json())
-      .then(json => console.log(json))
       .catch(resp => resp.json().then((error: any) => Promise.reject(error)));
   }
 
