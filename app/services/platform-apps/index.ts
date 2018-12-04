@@ -563,9 +563,19 @@ export class PlatformAppsService extends
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
           ];
 
+          const scriptDomainWhitelist = [
+            'www.googletagmanager.com',
+            'www.google-analytics.com'
+          ];
+
           const parsed = url.parse(details.url);
 
           if (scriptWhitelist.includes(details.url)) {
+            cb({});
+            return;
+          }
+
+          if (scriptDomainWhitelist.includes(parsed.hostname)) {
             cb({});
             return;
           }
