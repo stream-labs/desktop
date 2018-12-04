@@ -29,12 +29,12 @@ function error(msg) {
   sh.echo(colors.red(`ERROR: ${msg}`));
 }
 
-function executeCmd(cmd) {
+function executeCmd(cmd, exit = true) {
   const result = sh.exec(cmd);
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
-    sh.exit(1);
+    if (exit) sh.exit(1);
   }
 }
 
@@ -395,9 +395,9 @@ async function runScript() {
   await setChance(newVersion, chance);
 
   info(`Merging ${targetBranch} back into staging...`);
-  executeCmd(`git checkout staging`);
-  executeCmd(`git merge ${targetBranch}`);
-  executeCmd('git push origin HEAD');
+  executeCmd(`git checkout staging`, false);
+  executeCmd(`git merge ${targetBranch}`, false);
+  executeCmd('git push origin HEAD', false);
 
   info('Finalizing release with sentry...');
   sentryCli(`finalize "${newVersion}`);
