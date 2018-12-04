@@ -6,7 +6,7 @@ import { Inject } from 'util/injector';
 import Util from 'services/utils';
 import ModalLayout from 'components/ModalLayout.vue';
 import { PlatformAppsService } from 'services/platform-apps';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
   components: { PlatformAppWebview, ModalLayout }

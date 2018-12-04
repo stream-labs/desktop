@@ -21,7 +21,7 @@ import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';

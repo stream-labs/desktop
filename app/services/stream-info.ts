@@ -3,13 +3,9 @@ import { IChannelInfo, getPlatformService } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'util/injector';
 import { StreamingService } from '../services/streaming';
-import { TwitchService } from 'services/platforms/twitch';
-import { YoutubeService } from 'services/platforms/youtube';
-import { MixerService } from 'services/platforms/mixer';
-import { FacebookService } from 'services/platforms/facebook';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 
 interface IStreamInfoServiceState {

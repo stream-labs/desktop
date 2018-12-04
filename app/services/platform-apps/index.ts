@@ -2,7 +2,7 @@ import { StatefulService } from 'services/stateful-service';
 import { mutation } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { EApiPermissions, IWebviewTransform } from './api/modules/module';
@@ -15,8 +15,8 @@ import url from 'url';
 import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
+import { BehaviorSubject } from 'rxjs';
 import { trim, compact, without } from 'lodash';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;

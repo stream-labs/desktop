@@ -12,7 +12,7 @@ import {
   IWidgetSettingsState, TWIdgetLoadingState,
   WidgetsService
 } from 'services/widgets';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { WebsocketService } from 'services/websocket';

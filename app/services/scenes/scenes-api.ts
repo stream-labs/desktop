@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ISourceApi, TSourceType, ISource, ISourceAddOptions } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
 
