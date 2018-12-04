@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import {
@@ -22,6 +22,7 @@ import {
   ISliderMetadata,
   IInputMetadata
 } from 'components/shared/inputs/index';
+import { debounce } from 'lodash-decorators';
 
 interface IChatbotPunishmentMetadata {
   type: IListMetadata<string>;
@@ -124,6 +125,38 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
+  @Watch('linkProtection', { immediate: true, deep: true })
+  @debounce(1)
+  onLinkProtChanged(value: ILinkProtectionData, oldValue: ILinkProtectionData) {
+    if (oldValue) {
+      this.linkProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
+  @Watch('wordProtection', { immediate: true, deep: true })
+  @debounce(1)
+  onWordProtChanged(value: IWordProtectionData, oldValue: IWordProtectionData) {
+    if (oldValue) {
+      this.wordProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
+  @Watch('linkProtection', { immediate: true, deep: true })
+  @debounce(1)
+  onSymbolProtChanged(value: ISymbolProtectionData, oldValue: ISymbolProtectionData) {
+    if (oldValue) {
+      this.symbolProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
+  @Watch('capsProtection', { immediate: true, deep: true })
+  @debounce(1)
+  onCapsProtChanged(value: ICapsProtectionData, oldValue: ICapsProtectionData) {
+    if (oldValue) {
+      this.capsProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
     return {
       message: {
@@ -158,7 +191,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Punishment Duration (Value in Seconds)'),
+          placeholder: $t('Punishment Duration'),
+          tooltip: $t('Value in Seconds'),
           min: 0
         }
       },
@@ -166,7 +200,9 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Permission Duration (Value in Seconds)'),
+          placeholder: $t('Permission Duration'),
+          tooltip: $t('Value in Seconds'),
+          min: 1
         }
       },
       excluded: {
@@ -180,7 +216,9 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       message: {
         required: true,
         type: EInputType.textArea,
-        placeholder: this.placeholder(protectionType, 'message')
+        placeholder: this.placeholder(protectionType, 'message'),
+        uuid: $t('Message'),
+        max: 450
       }
     };
 

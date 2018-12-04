@@ -15,6 +15,7 @@ import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
 import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
+import { Debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -80,8 +81,9 @@ export default class Chatbot extends Vue {
     return this.chatbotApiService.Base.state.globallyEnabled;
   }
 
-  onToggleEnableChatbotHandler() {
-    this.chatbotApiService.Base.toggleEnableChatbot();
+  @Debounce(1000)
+  async onToggleEnableChatbotHandler() {
+    await this.chatbotApiService.Base.toggleEnableChatbot();
   }
 
   mounted() {
@@ -92,5 +94,7 @@ export default class Chatbot extends Vue {
       .catch(err => {
         alert('Error authorizing you into chatbot');
       });
+
+      this.onToggleEnableChatbotHandler = this.onToggleEnableChatbotHandler.bind(this);
   }
 }

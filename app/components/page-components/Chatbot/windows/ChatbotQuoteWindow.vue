@@ -7,7 +7,7 @@
     <validated-form ref="form">
       <div>
         <VFormGroup
-          :title="$t('Quote (Line breaks will be ignored)')"
+          :title="$t('Quote')"
           type="textArea"
           v-model="newQuote.message"
           :metadata="metadata.message"

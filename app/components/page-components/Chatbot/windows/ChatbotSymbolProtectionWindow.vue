@@ -28,12 +28,12 @@
         </div>
         <VFormGroup
           v-if="symbolProtection.general.punishment.type === 'Timeout'"
-          :title="$t('Punishment Duration (Value in Seconds)')"
+          :title="$t('Punishment Duration')"
           v-model="symbolProtection.general.punishment.duration"
           :metadata="metadata.symbol.general.punishment.duration"
         />
         <VFormGroup
-          :title="$t('Punishment Response (Line breaks will be ignored)')"
+          :title="$t('Punishment Response')"
           v-model="symbolProtection.general.message"
           :metadata="metadata.symbol.general.message"
         />

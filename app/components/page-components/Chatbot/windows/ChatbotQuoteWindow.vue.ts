@@ -1,4 +1,4 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
@@ -9,6 +9,7 @@ import {
   IQuote,
   IChatbotErrorResponse
 } from 'services/chatbot';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm }
@@ -20,7 +21,7 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
   };
 
   newQuote: IQuote = {
-    message: null,
+    message: '',
     game: null,
     added_by: null,
   };
@@ -30,7 +31,9 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
     return {
       message: metadataHelper.textArea({
         required: true,
-        placeholder: 'Quote'
+        placeholder: 'Quote',
+        min: 1,
+        max: 450
       }),
       game: metadataHelper.text({
         required: true,
@@ -58,6 +61,14 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
     return this.chatbotApiService.Common.state.quoteToUpdate;
   }
 
+  @Watch('newQuote', { immediate: true, deep: true })
+  @debounce(1)
+  onSymbolProtChanged(value: IQuote, oldValue: IQuote) {
+    if (oldValue) {
+      this.newQuote.message = value.message.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isEdit) {
@@ -75,7 +86,7 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
     if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert($t('This quopte is already taken. Try another one.'));
+      alert($t('This quote is already taken. Try another one.'));
     }
   }
 }

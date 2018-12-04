@@ -17,7 +17,7 @@
             :metadata="commandMetadata"
           />
           <VFormGroup
-            :title="$t('Response (Line breaks will be ignored)')"
+            :title="$t('Response')"
             v-model="newCommand.response"
             :metadata="responseMetadata"
           />
@@ -42,14 +42,14 @@
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
-                :title="$t('Global Command Cooldown (Value in Seconds)')"
+                :title="$t('Global Command Cooldown')"
                 v-model="newCommand.cooldowns.global"
                 :metadata="cooldownsMetadata"
               />
             </div>
             <div class="small-6 columns">
               <VFormGroup
-                :title="$t('User Command Cooldown (Value in Seconds)')"
+                :title="$t('User Command Cooldown')"
                 v-model="newCommand.cooldowns.user"
                 :metadata="cooldownsMetadata"
               />

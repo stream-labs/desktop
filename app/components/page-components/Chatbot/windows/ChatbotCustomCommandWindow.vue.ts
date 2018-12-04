@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Watch, Vue } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { cloneDeep } from 'lodash';
@@ -6,17 +6,15 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { $t } from 'services/i18n';
 
-import {
-  ICustomCommand,
-  IChatbotErrorResponse
-} from 'services/chatbot';
+import { ICustomCommand, IChatbotErrorResponse } from 'services/chatbot';
 
 import {
   EInputType,
   IListMetadata,
   ITextMetadata,
-  INumberMetadata,
+  INumberMetadata
 } from 'components/shared/inputs/index';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -25,14 +23,13 @@ import {
   }
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
 
   newCommand: ICustomCommand = {
-    command: null,
-    response: null,
+    command: '',
+    response: '',
     response_type: 'Chat',
     permission: {
       level: 1,
@@ -75,24 +72,40 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return this.chatbotApiService.Common.state.customCommandToUpdate;
   }
 
+  @Watch('newCommand', { immediate: true, deep: true })
+  @debounce(1)
+  onCommandChanged(value: ICustomCommand, oldValue: ICustomCommand) {
+    if (oldValue) {
+      this.newCommand.command = value.command.replace(/ +/g, '');
+      this.newCommand.response = value.response.replace(/(\r\n|\r|\n)/g, '');
+    }
+  }
+
   // metadata
   commandMetadata: ITextMetadata = {
     required: true,
     type: EInputType.text,
+    title: $t('Command'),
     placeholder: $t('Enter the text string which will trigger the response'),
     tooltip: $t('Enter a word used to trigger a response'),
-    max: 25
+    max: 25,
+    uuid: $t('Command')
   };
   responseMetadata: ITextMetadata = {
     required: true,
+    title: $t('Response'),
     type: EInputType.textArea,
-    placeholder: $t('The phrase that will appear after a user enters the command'),
-    max: 450
+    placeholder: $t(
+      'The phrase that will appear after a user enters the command'
+    ),
+    max: 450,
+    uuid: $t('Response')
   };
 
   get permissionMetadata() {
     let permissionMetadata: IListMetadata<number> = {
       required: true,
+      title: $t('Permission'),
       type: EInputType.list,
       options: this.chatbotPermissions
     };
@@ -102,6 +115,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   get replyTypeMetadata() {
     let replyTypeMetadata: IListMetadata<string> = {
       required: true,
+      title: $t('Reply In'),
       type: EInputType.list,
       options: this.chatbotResponseTypes
     };
@@ -111,7 +125,9 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
       type: EInputType.number,
-      placeholder: $t('Cooldown (Value in Seconds)'),
+      title: $t('Cooldown'),
+      placeholder: $t('Cooldown'),
+      tooltip: $t('Value in seconds'),
       min: 0
     };
     return timerMetadata;
@@ -125,17 +141,16 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.isEdit) {
-      this.chatbotApiService
-        .Commands
-        .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)
-        .catch(this.onErrorHandler);
+      this.chatbotApiService.Commands.updateCustomCommand(
+        this.customCommandToUpdate.id,
+        this.newCommand
+      ).catch(this.onErrorHandler);
       return;
     }
 
-    this.chatbotApiService
-      .Commands
-      .createCustomCommand(this.newCommand)
-      .catch(this.onErrorHandler);
+    this.chatbotApiService.Commands.createCustomCommand(this.newCommand).catch(
+      this.onErrorHandler
+    );
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

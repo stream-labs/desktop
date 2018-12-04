@@ -99,7 +99,6 @@ Vue.use(Toasted);
 Vue.use(VeeValidate); // form validations
 Vue.use(VModal);
 
-
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
