@@ -1,4 +1,5 @@
 /// <reference path="../vendor/toasted.d.ts" />
+/// <reference path="../vendor/urijs.d.ts" />
 
 // all global interfaces here
 

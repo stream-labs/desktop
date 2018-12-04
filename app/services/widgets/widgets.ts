@@ -18,7 +18,7 @@ import { WidgetSource } from './widget-source';
 import { InitAfter } from '../../util/service-observer';
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 @ServiceHelper()
 export class WidgetTester {

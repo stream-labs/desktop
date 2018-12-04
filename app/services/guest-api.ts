@@ -1,7 +1,6 @@
 import { Service } from 'services/service';
 import electron from 'electron';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Subscription, Observable } from 'rxjs';
 
 /**
  * Shared message interchange format

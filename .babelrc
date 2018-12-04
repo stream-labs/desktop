@@ -1,7 +1,7 @@
 {
-  "presets": ["stage-2"],
+  "presets": ["@babel/preset-env"],
   "plugins": [
-    "transform-decorators-legacy",
+    ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": false }],
     "transform-class-properties"
   ]
 }

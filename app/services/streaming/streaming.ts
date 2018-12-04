@@ -5,7 +5,7 @@ import moment from 'moment';
 import { padStart } from 'lodash';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import electron from 'electron';
 import {
   IStreamingServiceApi,

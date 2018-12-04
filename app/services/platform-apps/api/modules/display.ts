@@ -2,7 +2,7 @@ import { Module, apiMethod, EApiPermissions, IApiContext } from './module';
 import { Display } from 'services/video';
 import uuid from 'uuid/v4';
 import electron from 'electron';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 interface IDisplayCreateOptions {
   position: IVec2;

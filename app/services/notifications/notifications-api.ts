@@ -1,6 +1,6 @@
 import { TIssueCode } from 'services/troubleshooter';
 import { IJsonRpcRequest } from 'services/jsonrpc';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export enum ENotificationType {
