@@ -27,6 +27,10 @@ export default class Credits extends WidgetSettings<ICreditsData, CreditsService
     }));
   }
 
+  rollCredits() {
+    this.service.testRollCredits();
+  }
+
   textColorTooltip = $t('A hex code for the base text color.');
   delayTimeTooltip = $t('Wait time before rerunning the credit reel.');
   rollSpeedTooltip = $t('Speed of the rolling credits.');
