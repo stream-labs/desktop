@@ -331,7 +331,7 @@ app.on('ready', () => {
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
     const updateInfo = {
-      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      baseUrl: 'https://slobs-cdn.streamlabs.com',
       version: pjson.version,
       exec: process.argv,
       cwd: process.cwd(),
