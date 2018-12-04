@@ -101,31 +101,6 @@ export class VideoEncodingOptimizationService
       )
     })[0];
 
-    if (!profile) return null;
-
-    // set description based on settings for the profile
-    if (profile.game == 'DEFAULT') {
-      switch (settings.encoder) {
-        case 'x264':
-          profile.description = `optimize quality for ${settings.preset}`;
-          break;
-        case 'qsv':
-        case 'nvenc':
-          profile.description = `optimize quality for ${settings.encoder}`;
-          break;
-      }
-
-      const willChangeResolution = (
-        !settings.hasCustomResolution &&
-        settings.outputResolution !== profile.resolutionOut
-      );
-      if (willChangeResolution) {
-        profile.description += ' with resolution change';
-      }
-    } else {
-      profile.description = `optimize quality for ${profile.game}`
-    }
-
     return profile
   }
 

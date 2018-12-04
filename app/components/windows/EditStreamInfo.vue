@@ -41,7 +41,11 @@
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>{{ selectedProfile.description }}</span>
+                <label>
+                  <span>
+                    {{ $t('Use optimized encoder settings for') }}
+                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.presetIn }}
+                  </span>
                   <span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
