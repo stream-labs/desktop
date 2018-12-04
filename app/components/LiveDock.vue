@@ -125,6 +125,7 @@
   position: relative;
   z-index: 1000;
   width: 28%;
+  box-sizing: border-box;
   border-left: 1px solid @day-border;
   .padding(2);
   .transition();
