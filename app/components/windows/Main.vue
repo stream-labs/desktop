@@ -2,7 +2,7 @@
 <div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
   <div class="main-spacer"></div>
-  <news-banner />
+  <news-banner/>
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
@@ -45,7 +45,7 @@
 <script lang="ts" src="./Main.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .main {
   display: flex;
@@ -54,16 +54,15 @@
 }
 
 .main-contents {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  height: 100%;
 }
 
 .main-middle {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  width: 72%;
 }
 
 .main-spacer {

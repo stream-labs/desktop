@@ -30,8 +30,10 @@ export class CustomizationService
     hideViewerCount: false,
     livedockCollapsed: true,
     previewSize: 300,
-    livedockSize: 0.28,
+    livedockSize: 0,
+    bottomdockSize: 240,
     performanceMode: false,
+    previewEnabled: true,
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
@@ -47,14 +49,7 @@ export class CustomizationService
   init() {
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
-
-    // migrate livedockSize from % to float number
-    const livedockSize = this.state.livedockSize;
-    if (livedockSize > LIVEDOCK_MAX_SIZE) {
-      this.setSettings({
-        livedockSize: CustomizationService.defaultState.livedockSize
-      });
-    }
+    this.setSettings({previewEnabled: true}); // preview is always enabled on app start
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -73,6 +68,10 @@ export class CustomizationService
 
   get nightMode() {
     return this.state.nightMode;
+  }
+
+  get previewEnabled(): boolean {
+    return !this.state.performanceMode && this.state.previewEnabled;
   }
 
   setNightMode(val: boolean) {
@@ -146,19 +145,6 @@ export class CustomizationService
         minVal: 0.25,
         maxVal: 2,
         stepVal: 0.25,
-        visible: true,
-        enabled: true,
-        usePercentages: true,
-      },
-
-      <IObsNumberInputValue> {
-        value: settings.livedockSize,
-        name: 'livedockSize',
-        description: $t('Chat Width'),
-        type: 'OBS_PROPERTY_SLIDER',
-        minVal: LIVEDOCK_MIN_SIZE,
-        maxVal: LIVEDOCK_MAX_SIZE,
-        stepVal: 0.01,
         visible: true,
         enabled: true,
         usePercentages: true,

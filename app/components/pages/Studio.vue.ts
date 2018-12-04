@@ -50,7 +50,11 @@ export default class Studio extends Vue {
   }
 
   get previewEnabled() {
-    return !this.customizationService.state.performanceMode;
+    return this.customizationService.previewEnabled;
+  }
+
+  get performanceMode() {
+    return this.customizationService.state.performanceMode;
   }
 
   get studioMode() {
