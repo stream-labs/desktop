@@ -14,9 +14,11 @@
   width: 64px;
   animation: loading-animation 2s infinite;
 }
+
 svg {
   fill:#70A0AF;
 }
+
 @keyframes loading-animation {
   50% {
     opacity: 0;
