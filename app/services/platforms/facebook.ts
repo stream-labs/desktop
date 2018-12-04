@@ -184,7 +184,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
 
   scheduleStream(scheduledStartTime: string, { title, description, game }: IChannelInfo): Promise<any> {
     const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`
-    const headers = authorizedHeaders(this.oauthToken);
+    const headers = authorizedHeaders(this.activeToken);
     headers.append('Content-Type', 'application/json');
     const body = JSON.stringify({
       planned_start_time: new Date(scheduledStartTime).getTime(),

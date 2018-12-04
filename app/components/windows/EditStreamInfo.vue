@@ -36,8 +36,8 @@
         @input="(pageId) => setFacebookPageId(pageId)"
       />
       <div v-if="isSchedule">
-        <h-form-group type="text" :title="$t('Scheduled Date')" v-model="startTimeModel.date" :metadata="{ dateFormat: 'MM/DD/YYYY', placeholder:'MM/DD/YYYY' }" />
-        <h-form-group type="timer" :title="$t('Scheduled Time')" v-model="startTimeModel.time" :metadata="{ format: 'hm', max: 24 * 3600 }" />
+        <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
+        <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
       </div>
       <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">

@@ -361,15 +361,24 @@ export default class EditStreamInfo extends Vue {
     this.windowsService.closeChildWindow();
   }
 
+  get dateMetadata() {
+    return {
+      title: $t('Scheduled Date'),
+      dateFormat: 'MM/DD/YYYY',
+      placeholder:'MM/DD/YYYY',
+      description: this.isFacebook ? $t('Please schedule no further than 7 days in advance.') : undefined
+    };
+  }
+
+  get timeMetadata() {
+    return { title: $t('Scheduled Time'), format: 'hm', max: 24 * 3600 };
+  }
+
   get profiles() {
     const multiselectArray: IMultiSelectProfiles[] = [];
-    let profiles = this.videoEncodingOptimizationService.getGameProfiles(
-      this.gameModel.value
-    );
+    let profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
     if (profiles.length === 0) {
-      profiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
+      profiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
     }
     profiles.forEach(profile => {
       multiselectArray.push({
