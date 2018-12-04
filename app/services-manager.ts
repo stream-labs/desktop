@@ -615,11 +615,9 @@ export class ServicesManager extends Service {
             }
 
             if (result.emitter === 'STREAM') {
-              let subject = this.windowSubscriptions[result.resourceId];
-              if (!subject) {
-                subject = this.windowSubscriptions[result.resourceId] = new Subject();
-              }
-              return subject;
+              return this.windowSubscriptions[result.resourceId] =
+                this.windowSubscriptions[result.resourceId] ||
+                new Subject();
             }
           }
 

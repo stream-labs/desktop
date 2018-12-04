@@ -15,8 +15,8 @@ import url from 'url';
 import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
-import { trim, compact } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
+import { trim, compact, without } from 'lodash';
 import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;
@@ -145,7 +145,8 @@ export class PlatformAppsService extends
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
-  private localStorageKey = 'PlatformAppsUnpacked';
+  private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
+  private disabledLocalStorageKey = 'PlatformAppsDisabled';
 
   // Lazy initialize the API
   private _apiManager: PlatformAppsApi;
@@ -174,8 +175,8 @@ export class PlatformAppsService extends
     this.installProductionApps();
     this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
 
-    if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
-      const data = JSON.parse(localStorage.getItem(this.localStorageKey));
+    if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
+      const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
       if (data.appPath && data.appToken) {
         this.installUnpackedApp(data.appPath, data.appToken);
       }
@@ -198,6 +199,11 @@ export class PlatformAppsService extends
       .catch(() => []);
   }
 
+  getDisabledAppsFromStorage(): string[] {
+    const disabledAppsStr = localStorage.getItem(this.disabledLocalStorageKey);
+    return disabledAppsStr ? JSON.parse(disabledAppsStr) : [];
+  }
+
   /**
    * Install production apps
    */
@@ -205,6 +211,8 @@ export class PlatformAppsService extends
     if (this.userService.platform.type !== 'twitch') return;
 
     const productionApps = await this.fetchProductionApps();
+
+    const disabledApps = this.getDisabledAppsFromStorage();
 
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
@@ -220,7 +228,7 @@ export class PlatformAppsService extends
         appToken: app.app_token,
         poppedOutSlots: [],
         icon: app.icon,
-        enabled: !unpackedVersionLoaded
+        enabled: !(unpackedVersionLoaded || disabledApps.includes(app.id_hash))
       });
     });
   }
@@ -306,7 +314,7 @@ export class PlatformAppsService extends
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
-      localStorage.setItem(this.localStorageKey, JSON.stringify({
+      localStorage.setItem(this.unpackedLocalStorageKey, JSON.stringify({
         appPath: app.appPath,
         appToken
       }));
@@ -407,7 +415,7 @@ export class PlatformAppsService extends
   unloadApp(app: ILoadedApp) {
     this.REMOVE_APP(app.id);
     if (app.unpacked) {
-      localStorage.removeItem(this.localStorageKey);
+      localStorage.removeItem(this.unpackedLocalStorageKey);
       if (this.devServer) {
         this.devServer.stopListening();
         this.devServer = null;
@@ -729,8 +737,16 @@ export class PlatformAppsService extends
 
     if (enabling) {
       this.appLoad.next(app);
+      localStorage.setItem(
+        this.disabledLocalStorageKey,
+        JSON.stringify(without(this.getDisabledAppsFromStorage(), app.id))
+      );
     } else {
       this.appUnload.next(appId);
+      localStorage.setItem(
+        this.disabledLocalStorageKey,
+        JSON.stringify(this.getDisabledAppsFromStorage().concat([app.id]))
+      );
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
   }

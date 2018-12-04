@@ -39,7 +39,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 {
 
   @Inject() private hostsService: HostsService;
-  @Inject() private userService: UserService;
+  @Inject() protected userService: UserService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() protected websocketService: WebsocketService;
 
