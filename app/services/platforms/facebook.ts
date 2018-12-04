@@ -110,9 +110,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(json => {
-        const activePage = json.data.filter((page: IFacebookPage) => this.userService.platform.channelId === page.id);
-        if (activePage.length) { this.SET_ACTIVE_PAGE(activePage[0]); }
+      .then(async (json) => {
+        let pageId = this.userService.platform.channelId;
+        if (!pageId) {
+          const pages = await this.userService.getFacebookPages();
+          pageId = pages.page_id;
+        }
+        const activePage = json.data.filter((page: IFacebookPage) => pageId === page.id)[0] || json.data[0];
+        this.SET_ACTIVE_PAGE(activePage);
       });
   }
 
@@ -160,6 +165,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   }
 
   fetchPrefillData() {
+    if (!this.state.activePage) return;
     const url = `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
       'fields=status,stream_url,title,description';
     const request = this.formRequest(url, {}, this.activeToken);
