@@ -88,6 +88,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     title: $t('Command'),
     placeholder: $t('Enter the text string which will trigger the response'),
     tooltip: $t('Enter a word used to trigger a response'),
+    min: 2,
     max: 25,
     uuid: $t('Command')
   };

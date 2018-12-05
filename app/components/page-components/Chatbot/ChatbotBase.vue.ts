@@ -14,10 +14,10 @@ import {
   ChatbotPermissionsEnums,
   ChatbotAutopermitEnums,
   ChatbotResponseTypes,
-  ChatbotPunishments,
+  ChatbotPunishments
 } from 'services/chatbot';
 
-import { IListOption } from 'components/shared/inputs'
+import { IListOption } from 'components/shared/inputs';
 
 @Component({
   components: {
@@ -30,14 +30,6 @@ import { IListOption } from 'components/shared/inputs'
 export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
   @Inject() customizationService: CustomizationService;
-
-  mounted() {
-
-    // pre-load them to switch between multiple windows
-    /*this.chatbotApiService.Commands.fetchDefaultCommands();
-    this.chatbotApiService.ModTools.fetchLinkProtection();
-    this.chatbotApiService.Quotes.fetchQuotePreferences();*/
-  }
 
   get nightMode() {
     return this.customizationService.nightMode;

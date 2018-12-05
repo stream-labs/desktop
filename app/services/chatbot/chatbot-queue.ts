@@ -14,7 +14,8 @@ import {
   IQueueEntriesResponse,
   IQueuePickedResponse,
   IQueuedUser,
-  IQueueTotalResponse
+  IQueueTotalResponse,
+  IQueueLeaveData
 } from './chatbot-interfaces';
 
 // state
@@ -100,11 +101,10 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     });
     this.socket.on('queue.picked.clear', () => {
       this.CLEAR_QUEUE_PICKED();
-      
     });
   }
 
-  isConnected(){
+  isConnected() {
     return this.socket && this.socket.connected;
   }
 
@@ -215,81 +215,70 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   }
 
   @mutation()
-  private ADD_QUEUE_ENTRY(response: IQueuedUser){
-      this.state.queueEntriesResponse.data.push(response);
-
-    //this.state.queueEntriesResponse.pagination.total = Math.ceil(response.id / 1);
+  private ADD_QUEUE_ENTRY(response: IQueuedUser) {
+    this.state.queueEntriesResponse.data.push(response);
   }
 
   @mutation()
-  private PICK_QUEUE_ENTRY(response: IQueuedUser){
-    _.remove(this.state.queueEntriesResponse.data,user =>{
-      return user.platform === response.platform && user.viewer_id === response.viewer_id;
+  private PICK_QUEUE_ENTRY(response: IQueuedUser) {
+    const index = _.findIndex(this.state.queueEntriesResponse.data, x => {
+      return x.id === response.id;
     });
+
+    if(index != -1){
+      this.state.queueEntriesResponse.data.splice(index,1);
+    }
 
     this.state.queuePickedResponse.data.push(response);
+  }
 
-    const last = _.last(this.state.queueEntriesResponse.data)
-    if(last){
-      this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
+  @mutation()
+  private LEAVE_QUEUE_ENTRY(response: IQueueLeaveData) {
+    const indexEntry = _.findIndex(this.state.queueEntriesResponse.data, x => {
+      return x.id === response.id;
+    });
+
+    if (indexEntry != -1) {
+      this.state.queueEntriesResponse.data.splice(indexEntry,1);
+    }
+
+    const indexPicked = _.findIndex(this.state.queuePickedResponse.data, x => {
+      return x.id === response.id;
+    });
+
+    if (indexPicked != -1) {
+      this.state.queuePickedResponse.data.splice(indexPicked,1);
     }
   }
 
   @mutation()
-  private LEAVE_QUEUE_ENTRY(response:IQueuedUser){
-    _.remove(this.state.queueEntriesResponse.data,user =>{
-      return user.platform === response.platform && user.viewer_id === response.viewer_id;
+  private REMOVE_QUEUE_USER(response: IQueueLeaveData) {
+    const indexEntry = _.findIndex(this.state.queueEntriesResponse.data, x => {
+      return x.id === response.id;
     });
 
-    Vue.set(this.state, 'queueEntriesResponse', this.state.queueEntriesResponse);
+    if (indexEntry != -1) {
+      this.state.queueEntriesResponse.data.splice(indexEntry,1);
+    }
 
-    const last = _.last(this.state.queueEntriesResponse.data)
-    if(last){
-      this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
+    const indexPicked = _.findIndex(this.state.queuePickedResponse.data, x => {
+      return x.id === response.id;
+    });
+
+    if (indexPicked != -1) {
+      this.state.queuePickedResponse.data.splice(indexPicked,1);
     }
   }
 
   @mutation()
-  private REMOVE_QUEUE_USER(response:IQueuedUser){
-    //  Attempt to remove from entry list
-    const removedEntry = _.remove(this.state.queueEntriesResponse.data,user =>{
-      return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
-    });
-
-    Vue.set(this.state, 'queueEntriesResponse', this.state.queueEntriesResponse);
-    
-    if(removedEntry.length != 0){
-      const last = _.last(this.state.queueEntriesResponse.data)
-      if(last){
-        this.state.queueEntriesResponse.pagination.total = Math.ceil(last.id / 1);
-      }
-    }
-
-    //  Attempt to remove from picked list
-    const removedPicked = _.remove(this.state.queuePickedResponse.data,user =>{
-      return user.id === response.id && user.platform === response.platform && user.viewer_id === response.viewer_id;
-    });
-
-    Vue.set(this.state, 'queuePickedResponse', this.state.queuePickedResponse);
-
-    if(removedPicked.length != 0){
-      const last = _.last(this.state.queuePickedResponse.data)
-      if(last){
-        this.state.queuePickedResponse.pagination.total = Math.ceil(last.id / 1);
-      }
-    }
-
-  }
-
-  @mutation()
-  private CLEAR_QUEUE_ENTIES(){
+  private CLEAR_QUEUE_ENTIES() {
     this.state.queueEntriesResponse.data = [];
     this.state.queueEntriesResponse.pagination.total = 1;
     this.state.queueEntriesResponse.pagination.current = 1;
   }
 
   @mutation()
-  private CLEAR_QUEUE_PICKED(){
+  private CLEAR_QUEUE_PICKED() {
     this.state.queuePickedResponse.data = [];
     this.state.queuePickedResponse.pagination.total = 1;
     this.state.queuePickedResponse.pagination.current = 1;

@@ -61,7 +61,7 @@ export default class ChatbotQueueList extends ChatbotBase {
   }
 
   formatDate(dateString: string) {
-    return moment(dateString).format('LLL');
+    return moment(dateString).format('LTS');
   }
 
   onPickEntryHandler(id: number) {

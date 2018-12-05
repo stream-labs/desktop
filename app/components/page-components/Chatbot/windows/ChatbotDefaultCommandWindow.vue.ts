@@ -95,6 +95,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         ),
         tooltip: $t('Enter a word used to trigger a response'),
         max: 450,
+        min: 2,
         uuid: $t('Command')
       }),
       response: metadataHelper.text({
