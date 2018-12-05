@@ -153,25 +153,25 @@ async function actualUploadS3File(bucket, name, filepath) {
 /* Wrapper functions to upload to multiple s3 buckets */
 
 async function uploadUpdateFiles(version, appDir) {
-  for (const bucket of s3buckets) {
+  for (const bucket of s3Buckets) {
     await actualUploadUpdateFiles(bucket, version, appDir);
   }
 }
 
 async function setLatestVersion(version, fileName) {
-  for (const bucket of s3buckets) {
+  for (const bucket of s3Buckets) {
     await actualSetLatestVersion(bucket, version, fileName);
   }
 }
 
 async function setChance(version, chance) {
-  for (const bucket of s3buckets) {
+  for (const bucket of s3Buckets) {
     await actualSetChance(bucket, version, chance);
   }
 }
 
 async function uploadS3File(name, filePath) {
-  for (const bucket of s3buckets) {
+  for (const bucket of s3Buckets) {
     await actualUploadS3File(bucket, name, filepath);
   }
 }
