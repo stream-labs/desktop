@@ -51,6 +51,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   init() {
     this.websocketService.socketEvent.subscribe(event  => {
       const apiSettings = this.getApiSettings();
+      if (event.type == 'alertProfileChanged') this.onWidgetThemeChange();
       if (event.type !== apiSettings.settingsUpdateEvent) return;
       this.onSettingsUpdatedHandler(event as ISocketEvent)
     });
@@ -63,6 +64,12 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     const data = this.handleDataAfterFetch(rawData);
     this.SET_WIDGET_DATA(data, rawData);
     this.dataUpdated.next(this.state.data);
+  }
+
+  private onWidgetThemeChange() {
+    // changing the widget theme updates the widget setting on the backend
+    // clear the current cached settings to require upload fresh data
+    this.RESET_WIDGET_DATA();
   }
 
   async fetchData(): Promise<TWidgetData> {
@@ -178,5 +185,12 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   protected SET_WIDGET_DATA(data: TWidgetData, rawData: any) {
     this.state.data = data;
     this.state.rawData = rawData;
+  }
+
+  @mutation()
+  protected RESET_WIDGET_DATA() {
+    this.state.loadingState = 'none';
+    this.state.data = null;
+    this.state.rawData = null;
   }
 }

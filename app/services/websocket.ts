@@ -12,7 +12,8 @@ export type TSocketEvent =
   IFacemaskDonationSocketEvent |
   IFollowSocketEvent |
   ISubscriptionSocketEvent |
-  IAlertPlayingSocketEvent
+  IAlertPlayingSocketEvent |
+  IAlertProfileChanged
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -60,6 +61,10 @@ interface IAlertPlayingSocketEvent {
     facemask?: string;
     _id: string;
   }
+}
+
+interface IAlertProfileChanged {
+  type: 'alertProfileChanged';
 }
 
 export class WebsocketService extends Service {
