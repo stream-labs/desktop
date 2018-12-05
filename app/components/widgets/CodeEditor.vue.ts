@@ -9,7 +9,6 @@ import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
 
-
 @Component({
   components: {
     CodeInput,
@@ -26,7 +25,7 @@ export default class CodeEditor extends Vue {
   @Prop()
   value: IWidgetData;
 
-  editorInputValue = this.value.settings['custom_' + this.metadata.type];
+  editorInputValue = this.value.settings['custom_' + this.metadata.type] || this.value.settings[this.alertBoxValue];
 
   private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
@@ -37,6 +36,11 @@ export default class CodeEditor extends Vue {
 
   created() {
     this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
+  }
+
+  get alertBoxValue() {
+    const capitalizedType = this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
+    return `custom${capitalizedType}`;
   }
 
   get hasChanges() {
@@ -59,6 +63,7 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
+    newData.settings[this.alertBoxValue] = this.editorInputValue;
     try {
       await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
@@ -76,5 +81,6 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.value.custom_defaults[type];
+    newData.settings[this.alertBoxValue] = this.value.custom_defaults[type];
   }
 }

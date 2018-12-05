@@ -146,7 +146,7 @@ export class GuestApiService extends Service {
   }
 
   private safeSend(contents: Electron.WebContents, channel: string, msg: any) {
-    if (!contents.isDestroyed()) {
+    if (contents && !contents.isDestroyed()) {
       contents.send(channel, msg);
     }
   }

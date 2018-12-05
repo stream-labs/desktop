@@ -2,6 +2,7 @@ import { TPlatform } from '../platforms';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { WidgetType } from './widgets-data';
 import { ISourceApi } from 'services/sources';
+import { IAlertBoxVariation } from './settings/alert-box/alert-box-api';
 
 export interface ISerializableWidget {
   name: string;
@@ -78,6 +79,7 @@ export interface IWidgetSettingsServiceApi {
   getApiSettings(): IWidgetApiSettings;
   fetchData(): Promise<any>;
   saveSettings(settings: IWidgetSettings): Promise<any>;
+  toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation?: IAlertBoxVariation): void;
   state: IWidgetSettingsGenericState;
 }
 

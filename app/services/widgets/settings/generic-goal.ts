@@ -1,5 +1,5 @@
 import { IWidgetData } from 'services/widgets';
-import { metadata } from 'components/shared/inputs/index';
+import { formMetadata, metadata } from 'components/shared/inputs/index';
 import { $t } from 'services/i18n';
 import { BaseGoalService } from './base-goal';
 import { InheritMutations } from 'services/stateful-service';
@@ -46,7 +46,7 @@ export interface IGoalCreateOptions {
 export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoalCreateOptions> {
 
   getMetadata() {
-    return {
+    return formMetadata({
 
       title: metadata.text({
         title: $t('Title'),
@@ -73,17 +73,45 @@ export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoa
       }),
 
       layout: metadata.list({
+        title: $t('Layout'),
         options: [
           { title: 'Standard', value: 'standard' },
           { title: 'Condensed', value: 'condensed' }
         ]
       }),
+
+      background_color: metadata.color({
+        title: $t('Background Color')
+      }),
+
+      bar_color: metadata.color({
+        title: $t('Bar Color')
+      }),
+
+      bar_bg_color: metadata.color({
+        title: $t('Bar Background Color')
+      }),
+
+      text_color: metadata.color({
+        title: $t('Text Color'),
+        tooltip: $t('A hex code for the base text color.')
+      }),
+
+      bar_text_color: metadata.color({
+        title: $t('Bar Text Color')
+      }),
+
       bar_thickness: metadata.slider({
+        title: $t('Bar Thickness'),
         min: 32,
         max: 128,
         interval: 4
+      }),
+
+      font: metadata.fontFamily({
+        title: $t('Font Family')
       })
-    };
+    });
   }
 
   protected patchAfterFetch(data: IGoalData): IGoalData {

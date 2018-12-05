@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="list-input" data-role="input" data-type="list" :data-name="options.name">
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
@@ -10,6 +10,11 @@
     label="description"
     :allow-empty="options.allowEmpty"
     @input="onInputHandler">
+
+    <template slot="option" slot-scope="props">
+      <span :data-option-value="props.option.value">{{ props.option.description }}</span>
+    </template>
+
   </multiselect>
   <div v-if="selectedOption && selectedOption.description" class="description">
     {{ selectedOption.description }}

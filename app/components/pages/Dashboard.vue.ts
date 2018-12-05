@@ -22,7 +22,7 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.$refs.dashboard.addEventListener('dom-ready', () => {
+    this.$refs.dashboard.addEventListener('did-finish-load', () => {
       this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
         testAudio: this.testAudio,
         getStatus: this.getStatus,
@@ -73,7 +73,7 @@ export default class Dashboard extends Vue {
   }
 
   async testAudio(volume: number) {
-    return this.facemasksService.playTestAudio(volume);
+    return;
   }
 
   async navigate(page: TAppPage) {

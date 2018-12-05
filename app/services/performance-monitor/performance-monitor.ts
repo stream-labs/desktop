@@ -90,8 +90,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       const framesEncoded = currentStats.framesEncoded - this.state.framesEncoded;
       const skippedFactor = framesSkipped / framesEncoded;
 
-      if (skippedFactor >= skippedThreshold) {
-
+      if (framesEncoded !== 0 && skippedFactor >= skippedThreshold) {
         this.pushSkippedFramesNotify(skippedFactor);
       }
     }
@@ -101,7 +100,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       const framesRendered = currentStats.framesRendered - this.state.framesRendered;
       const laggedFactor = framesLagged / framesRendered;
 
-      if (laggedFactor >= laggedThreshold) {
+      if (framesRendered !== 0 && laggedFactor >= laggedThreshold) {
         this.pushLaggedFramesNotify(laggedFactor);
       }
     }

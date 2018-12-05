@@ -3,14 +3,16 @@ import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject } from '../util/injector';
 import { authorizedHeaders } from '../util/requests';
+import { TAppPage } from './navigation';
 
 interface IAnnouncementsInfo {
   id: number;
   header: string;
   subHeader: string;
-  link: string;
   linkTitle: string;
   thumbnail: string;
+  link: string;
+  link_target: 'external' | 'slobs';
 }
 
 export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
@@ -23,7 +25,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     subHeader: null,
     link: null,
     linkTitle: null,
-    thumbnail: null
+    thumbnail: null,
+    link_target: null
   };
 
   async updateBanner() {

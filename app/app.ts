@@ -24,6 +24,7 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
+import electronLog from 'electron-log';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -151,3 +152,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   });
 });
+
+// EVENT LOGGING
+
+const consoleError = console.error;
+console.error = function (...args: any[]) {
+  logError(args[0]);
+  consoleError.call(console, ...args);
+};
+
+function logError(error: Error | string) {
+  let message = '';
+  let stack = '';
+
+  if (error instanceof Error) {
+    message = error.message;
+    stack = error.stack;
+  } else if (typeof(error) == 'string') {
+    message = error;
+  }
+
+  // send error to the main process via IPC
+  electronLog.error(`Error from ${Utils.getWindowId()} window:
+    ${message}
+    ${stack}
+  `);
+}
