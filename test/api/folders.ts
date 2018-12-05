@@ -38,6 +38,7 @@ test('Place after and place before', async t => {
     Item2:
   `));
 
+  t.true(Math.random() > 0.5);
 });
 
 
