@@ -172,7 +172,7 @@ async function setChance(version, chance) {
 
 async function uploadS3File(name, filePath) {
   for (const bucket of s3Buckets) {
-    await actualUploadS3File(bucket, name, filepath);
+    await actualUploadS3File(bucket, name, filePath);
   }
 }
 
