@@ -1,7 +1,7 @@
 <template>
 <div
   class="live-dock"
-  :class="{ collapsed, 'live-dock--left': onLeft }"
+  :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
   :style="{ width: (liveDockSize) + 'px' }">
   <div
     class="live-dock-chevron icon-button"
@@ -128,7 +128,10 @@
   box-sizing: border-box;
   border-left: 1px solid @day-border;
   .padding(2);
-  .transition();
+
+  &.can-animate {
+    .transition();
+  }
 
   &.live-dock--left {
     border-right: 1px solid @day-border;
