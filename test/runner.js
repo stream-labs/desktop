@@ -1,7 +1,7 @@
 /**
  * Tests runner script:
  * - run tests
- * - if same tests failed retry anly these tests
+ * - if some tests failed retry anly these tests
  */
 // TODO: collect statistics about flaky tests
 
