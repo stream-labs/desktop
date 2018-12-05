@@ -3,13 +3,16 @@ import { shell } from 'electron';
 import emojione from 'emojione';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
+import { Component } from 'vue-property-decorator';
 import { NavigationService, TAppPage } from 'services/navigation';
 
+@Component({})
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
   @Inject() navigationService: NavigationService;
 
   proceessingClose = false;
+
 
   get currentBanner() {
     return this.announcementsService.state;

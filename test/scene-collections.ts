@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from './helpers/spectron';
+import { test, useSpectron } from './helpers/spectron';
 
 const fs = require('fs');
 const path = require('path');

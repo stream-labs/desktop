@@ -3,7 +3,7 @@
   :show-controls="false"
   :customControls="true">
   <div slot="content">
-    <div v-if="infoLoading">
+    <div v-if="infoLoading || populatingModels">
       <i class="fa fa-spinner fa-pulse" />
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
@@ -13,7 +13,7 @@
       <a @click="goLive">{{ $t('just go live.') }}</a>
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
-    <div v-if="!infoLoading && !infoError">
+    <div v-if="!infoLoading && !infoError && !populatingModels">
       <ObsTextInput v-model="streamTitleModel" />
       <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
       <ObsListInput
@@ -25,7 +25,16 @@
         :loading="searchingGames"
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
-      <ObsListInput v-if="isFacebook" :value="pageModel" @input="(pageId) => setFacebookPageId(pageId)" />
+      <div class="warning" v-if="isFacebook && !hasPages">
+        {{ $t('It looks like you don\'t have any Pages. Head to ') }}
+        <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        {{ $t(' to create a page, and then try again.') }}
+      </div>
+      <ObsListInput
+        v-if="isFacebook && hasPages && !midStreamMode"
+        :value="pageModel"
+        @input="(pageId) => setFacebookPageId(pageId)"
+      />
       <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
@@ -75,7 +84,7 @@
           </div>
         </div>
       </div>
-      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
+      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode && !isFacebook"/>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -96,7 +105,7 @@
     </button>
     <button
       class="button button--action"
-      :disabled="updatingInfo"
+      :disabled="updatingInfo || (isFacebook && !hasPages)"
       @click="updateAndGoLive">
       <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" />
       {{ submitText }}

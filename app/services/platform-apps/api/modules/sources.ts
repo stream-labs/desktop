@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
 import { AudioService } from 'services/audio';

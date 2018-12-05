@@ -17,6 +17,7 @@ export enum EWInput {
   animation = 'animation',
   frequency = 'frequency',
   sectionedMultiselect = 'sectionedMultiselect',
+  numberList = 'numberList'
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
@@ -33,5 +34,6 @@ export const metadata = {
       ...options
     } as IListMetadata<{ label: string, options: { value: string, label: string }[] }>
   ),
+  numberList: (options: IListMetadata<number>) => ({ type: EWInput.numberList, ...options } as IListMetadata<number>)
 };
 

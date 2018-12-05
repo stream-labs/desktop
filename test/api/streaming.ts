@@ -1,5 +1,5 @@
 import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { TExecutionContext, useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import {
   IStreamingServiceApi,
@@ -53,7 +53,7 @@ test('Streaming to Twitch via API', async t => {
   t.is(streamingStatus, EStreamingState.Offline);
 });
 
-test('Recording via API', async t => {
+test('Recording via API', async (t: TExecutionContext) => {
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');

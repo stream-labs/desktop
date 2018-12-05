@@ -46,9 +46,7 @@ import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
 import { ObserveList } from './util/service-observer';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Subject, Observable, Subscription} from 'rxjs';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
@@ -82,6 +80,8 @@ import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import { HardwareService } from 'services/hardware';
+import { PrefabsService, Prefab } from 'services/prefabs';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -97,7 +97,8 @@ import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 import { SubGoalService } from 'services/widgets/settings/sub-goal';
 import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
-import { AlertBoxService }from 'services/widgets/settings/alert-box';
+import { AlertBoxService } from 'services/widgets/settings/alert-box';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 
 const { ipcRenderer } = electron;
 
@@ -189,6 +190,7 @@ export class ServicesManager extends Service {
     CreditsService,
     EventListService,
     TipJarService,
+    SpinWheelService,
     SponsorBannerService,
     SubGoalService,
     MediaGalleryService,
@@ -198,7 +200,10 @@ export class ServicesManager extends Service {
     AlertBoxService,
     ChatbotWidgetService,
     BrandDeviceService,
-    ObsUserPluginsService
+    ObsUserPluginsService,
+    HardwareService,
+    PrefabsService,
+    Prefab
   };
 
   private instances: Dictionary<Service> = {};
@@ -465,22 +470,39 @@ export class ServicesManager extends Service {
    *
    * @example
    * source = getResource('Source[12]')
+   *
+   * @example
+   * source = getResource('ScenesService.activeScene')
    */
   getResource(resourceId: string) {
-    if (resourceId === 'ServicesManager') {
-      return this;
-    }
+    if ( typeof(resourceId) !== 'string') return null;
+    if (resourceId === 'ServicesManager') return this;
+    const callChain = resourceId.split('.');
+    if (callChain.length > 1) resourceId = callChain[0];
+    let resource: any;
 
+    // resource is a service
     if (this.services[resourceId]) {
-      return this.getInstance(resourceId) || this.initService(resourceId);
+      resource = this.getInstance(resourceId) || this.initService(resourceId);
+    } else {
+      // resource is a service helper
+      const helperName = resourceId.split('[')[0];
+      const constructorArgsStr = resourceId.substr(helperName.length);
+      const constructorArgs = constructorArgsStr
+        ? JSON.parse(constructorArgsStr)
+        : void 0;
+      resource = this.getHelper(helperName, constructorArgs);
     }
 
-    const helperName = resourceId.split('[')[0];
-    const constructorArgsStr = resourceId.substr(helperName.length);
-    const constructorArgs = constructorArgsStr
-      ? JSON.parse(constructorArgsStr)
-      : void 0;
-    return this.getHelper(helperName, constructorArgs);
+    if (callChain.length == 1) return resource;
+
+    // resolve long chains like `ScenesService.activeScene.name`
+    for (let i = 1; i < callChain.length; i++) {
+      resource = resource[callChain[i]];
+      if (!resource) return void 0;
+    }
+
+    return resource;
   }
 
   /**
@@ -593,9 +615,9 @@ export class ServicesManager extends Service {
             }
 
             if (result.emitter === 'STREAM') {
-              const subject = new Subject<any>();
-              this.windowSubscriptions[result.resourceId] = subject;
-              return subject;
+              return this.windowSubscriptions[result.resourceId] =
+                this.windowSubscriptions[result.resourceId] ||
+                new Subject();
             }
           }
 

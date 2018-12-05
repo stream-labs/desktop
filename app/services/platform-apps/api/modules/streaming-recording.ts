@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
 import { StreamingService, EStreamingState, ERecordingState } from 'services/streaming';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { StreamInfoService } from 'services/stream-info';
 
 interface IOutputState {

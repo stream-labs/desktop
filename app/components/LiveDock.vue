@@ -2,7 +2,7 @@
 <div
   class="live-dock"
   :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize * 100) + '%' }">
+  :style="{ width: (liveDockSize) + 'px' }">
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
@@ -12,6 +12,13 @@
       'icon-down icon-right': onLeft
     }" />
   </div>
+
+  <resize-bar
+    v-if="!collapsed"
+    :position="onLeft ? 'right' : 'left'"
+    @onresizestart="onResizeStartHandler"
+    @onresizestop="onResizeStopHandler"
+  />
 
   <transition name="slide-fade">
     <div
@@ -118,6 +125,7 @@
   position: relative;
   z-index: 1000;
   width: 28%;
+  box-sizing: border-box;
   border-left: 1px solid @day-border;
   .padding(2);
   .transition();

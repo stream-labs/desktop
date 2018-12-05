@@ -11,7 +11,7 @@ import WidgetProperties from 'components/custom-source-properties/WidgetProperti
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
 import PlatformAppProperties from 'components/custom-source-properties/PlatformAppProperties.vue';
 import { $t } from 'services/i18n';
-import { Subscription } from 'rxjs/subscription';
+import { Subscription } from 'rxjs';
 import electron from 'electron';
 
 @Component({

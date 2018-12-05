@@ -13,7 +13,7 @@ import { NotificationsModule } from './modules/notifications';
 import { HotkeysModule } from './modules/hotkeys';
 import { ObsPluginsModule } from './modules/obs-plugins';
 import { DisplayModule } from './modules/display';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export class PlatformAppsApi {
 

@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
 import { ScenesService, Scene, TSceneNode } from 'services/scenes';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 enum ESceneNodeType {
   Folder = 'folder',

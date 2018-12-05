@@ -1,9 +1,9 @@
-import { GenericTestContext } from 'ava';
 import { getClient } from './api-client';
 import { WebsocketService } from '../../app/services/websocket';
 import { sleep } from './sleep';
+import { TExecutionContext } from './spectron';
 
-export async function waitForWidgetSettingsSync(t: GenericTestContext<any>) {
+export async function waitForWidgetSettingsSync(t: TExecutionContext) {
   const apiClient = await getClient();
   const websocketService = apiClient.getResource<WebsocketService>('WebsocketService');
 

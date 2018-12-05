@@ -15,7 +15,7 @@ export default class VFormGroup extends BaseFormGroup {
   @Prop()
   value: undefined;
 
-  @Prop()
+  @Prop({ default: () => ({}) })
   metadata: IInputMetadata;
 
   @Prop()
