@@ -11,7 +11,7 @@ export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
   @Inject() navigationService: NavigationService;
 
-  proceessingClose = false;
+  processingClose = false;
 
 
   get currentBanner() {
@@ -27,9 +27,9 @@ export default class NewsBanner extends Vue {
   }
 
   async closeBanner() {
-    this.proceessingClose = true;
+    this.processingClose = true;
     await this.announcementsService.closeBanner();
-    this.proceessingClose = false;
+    this.processingClose = false;
   }
 
   followLink() {
