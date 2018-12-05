@@ -121,7 +121,7 @@ async function actualSetChance(bucket, version, chance) {
 async function actualUploadS3File(bucket, name, filepath) {
   info(`Starting upload of ${name}...`);
 
-  const stream = fs.createReadStream(filePath);
+  const stream = fs.createReadStream(filepath);
   const upload = new AWS.S3.ManagedUpload({
     params: {
       Bucket: bucket,
@@ -172,7 +172,7 @@ async function setChance(version, chance) {
 
 async function uploadS3File(name, filePath) {
   for (const bucket of s3Buckets) {
-    await actualUploadS3File(bucket, name, filepath);
+    await actualUploadS3File(bucket, name, filePath);
   }
 }
 
