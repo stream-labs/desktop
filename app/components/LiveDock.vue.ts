@@ -297,7 +297,6 @@ export default class LiveDock extends Vue {
   }
 
   updateWidth() {
-    console.log('Update width');
     const width = this.customizationService.state.livedockSize;
     if (width !== this.validateWidth(width)) this.setWidth(width);
   }
