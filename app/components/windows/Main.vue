@@ -3,7 +3,7 @@
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>
-  <div class="main-contents">
+  <div class="main-contents" :class="{ 'main-contents--right': mainContentsRight }">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="main_middle">
@@ -67,6 +67,10 @@
   display: grid;
   grid-template-columns: 1fr auto;
   height: 100%;
+}
+
+.main-contents--right {
+  grid-template-columns: auto 1fr;
 }
 
 .main-middle {

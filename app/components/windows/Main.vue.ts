@@ -95,7 +95,14 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  mainContentsRight = false;
+
   get leftDock() {
+    if (this.customizationService.state.leftDock === true) {
+      this.mainContentsRight = true;
+    } else {
+      this.mainContentsRight = false;
+    }
     return this.customizationService.state.leftDock;
   }
 
