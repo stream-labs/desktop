@@ -63,10 +63,7 @@ export default class Main extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
 
-  isMounted = false;
-
   mounted() {
-    this.isMounted = true;
     electron.remote.getCurrentWindow().show();
     this.mainMiddle = this.$refs.main_middle;
   }
@@ -163,9 +160,7 @@ export default class Main extends Vue {
   compactView = false;
 
   handleResize() {
-    if (!this.isMounted) return false;
-
-    if (this.mainMiddle.clientWidth < 1000) {
+    if (this.mainMiddle.clientWidth < 1200) {
       this.compactView = true;
     } else {
       this.compactView = false;
@@ -177,7 +172,6 @@ export default class Main extends Vue {
 
     if (this.compactView) {
       classes.push('main-middle--compact');
-      console.log(classes);
     }
 
     return classes.join(' ');

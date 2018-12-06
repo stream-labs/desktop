@@ -38,15 +38,11 @@ export default class AppsNav extends Vue {
   scrollLeft() {
     this.appTabsContainer.scrollLeft =
       this.appTabsContainer.scrollLeft - this.scrollIncrement;
-
-    console.log(this.appTabsContainer.scrollLeft + 'scroll left val');
   }
 
   scrollRight() {
     this.appTabsContainer.scrollLeft =
       this.appTabsContainer.scrollLeft + this.scrollIncrement;
-
-    console.log(this.appTabsContainer.scrollLeft + 'scroll right val');
   }
 
   handleResize() {
@@ -60,8 +56,6 @@ export default class AppsNav extends Vue {
       (this.appTabsContainer.scrollLeft + this.appTabsContainer.clientWidth);
 
     this.hasNext = scrollRight > 0;
-    console.log(this.appTabsContainer.scrollWidth);
-    console.log(this.appTabsContainer.clientWidth);
   }
 
   isSelectedApp(appId: string) {

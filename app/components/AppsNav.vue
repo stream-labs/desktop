@@ -1,7 +1,6 @@
 <template>
 <div class="apps-nav-wrapper">
   <div class="apps-nav">
-    <resize-observer @notify="handleResize"></resize-observer>
     <div
       v-if="hasPrev"
       @click="scrollLeft"
@@ -17,7 +16,7 @@
         'has-prev': hasPrev
       }"
     >
-    <resize-observer @notify="handleResize"></resize-observer>
+      <resize-observer @notify="handleResize"></resize-observer>
       <span
         v-for="(app, index) in topNavApps"
         :key="index"
