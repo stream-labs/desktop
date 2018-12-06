@@ -220,9 +220,8 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
 
   private register(sourceId: string) {
     const source = this.sourcesService.getSource(sourceId);
+    if (source.getPropertiesManagerType() !== 'widget') return;
     const widgetType = source.getPropertiesManagerSettings().widgetType;
-    const isWidget = typeof widgetType === 'number';
-    if (!isWidget) return;
 
     this.ADD_WIDGET_SOURCE({
       sourceId: source.sourceId,
