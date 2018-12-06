@@ -5,6 +5,8 @@ import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -61,8 +63,12 @@ export default class Main extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
 
+  isMounted = false;
+
   mounted() {
+    this.isMounted = true;
     electron.remote.getCurrentWindow().show();
+    this.mainMiddle = this.$refs.main_middle;
   }
 
   get title() {
@@ -102,11 +108,16 @@ export default class Main extends Vue {
   }
 
   isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
+    return this.platformAppsService.isAppSlotPersistent(
+      appId,
+      EAppPageSlot.TopNav
+    );
   }
 
   isAppPoppedOut(appId: string) {
-    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
+    return this.platformAppsService
+      .getApp(appId)
+      .poppedOutSlots.includes(EAppPageSlot.TopNav);
   }
 
   isAppVisible(appId: string) {
@@ -135,5 +146,33 @@ export default class Main extends Vue {
       const file = files.item(fi);
       this.scenesService.activeScene.addFile(file.path);
     }
+  }
+
+  $refs!: {
+    main_middle: HTMLDivElement;
+  };
+
+  mainMiddle: HTMLDivElement;
+  compactView = false;
+
+  handleResize() {
+    if (!this.isMounted) return false;
+
+    if (this.mainMiddle.clientWidth < 1000) {
+      this.compactView = true;
+    } else {
+      this.compactView = false;
+    }
+  }
+
+  get mainResponsiveClasses() {
+    let classes = [];
+
+    if (this.compactView) {
+      classes.push('main-middle--compact');
+      console.log(classes);
+    }
+
+    return classes.join(' ');
   }
 }

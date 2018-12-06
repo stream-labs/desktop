@@ -78,7 +78,8 @@
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vue-resize": "^0.4.4"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",

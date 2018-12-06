@@ -6,7 +6,9 @@
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
-    <div class="main-middle">
+    <div class="main-middle" :class="mainResponsiveClasses" ref="main_middle">
+      <resize-observer @notify="handleResize"></resize-observer>
+
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
@@ -44,6 +46,14 @@
 
 <script lang="ts" src="./Main.vue.ts"></script>
 
+<style lang="less">
+.main-middle--compact {
+  .performance-metric__label {
+    display: none;
+  }
+}
+</style>
+
 <style lang="less" scoped>
 @import '../../styles/index';
 
@@ -63,6 +73,8 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-spacer {

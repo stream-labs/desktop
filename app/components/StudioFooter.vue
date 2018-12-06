@@ -37,7 +37,7 @@
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .footer {
   display: flex;
@@ -59,11 +59,6 @@
 
 .nav-item {
   .margin-left(2);
-
-  @media(max-width: 1200px) {
-    font-size: 12px;
-    margin-left: 12px;
-  }
 }
 
 .error-wrapper {
@@ -73,7 +68,7 @@
 }
 
 .platform-error {
-  background: rgba(251,72,76,.28);
+  background: rgba(251, 72, 76, 0.28);
   padding: 5px;
   .radius();
 
@@ -91,7 +86,7 @@
   .alert-button {
     height: 18px;
     line-height: 12px;
-    background: rgba(251,72,76,.36);
+    background: rgba(251, 72, 76, 0.36);
     margin: 0 5px;
     padding: 0 8px;
     font-size: 10px;
@@ -110,7 +105,7 @@
   .transition();
   .weight(@bold);
   box-sizing: content-box;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
 
   span {
     font-size: 10px;

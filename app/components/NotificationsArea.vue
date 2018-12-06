@@ -42,7 +42,7 @@
 <script lang="ts" src="./NotificationsArea.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .notifications-area {
   overflow: hidden;
@@ -70,10 +70,9 @@
   position: absolute;
   animation: notify-appears 0.3s;
 
-
   &.info {
     background-color: fade(@grey, 15%);
-    color: @grey;
+    color: @icon;
   }
 
   &.warning {
@@ -103,7 +102,7 @@
   &:before {
     content: '|';
     padding-right: 12px;
-    opacity: .5;
+    opacity: 0.5;
     color: @grey;
   }
 
@@ -121,13 +120,23 @@
 }
 
 @keyframes notify-appears {
-  from {opacity: 0; top: 50px}
-  to {opacity: 1; top: 0 }
+  from {
+    opacity: 0;
+    top: 50px;
+  }
+  to {
+    opacity: 1;
+    top: 0;
+  }
 }
 
 @keyframes notify-disappears {
-  from {opacity: 1}
-  to {opacity: 0; display: none}
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    display: none;
+  }
 }
-
 </style>
