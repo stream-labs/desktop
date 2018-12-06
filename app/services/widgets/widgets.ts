@@ -56,23 +56,21 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
     // sync widgetSources with sources
 
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
-      const source = this.sourcesService.getSource(sourceModel.sourceId);
-      const widgetType = source.getPropertiesManagerSettings().widgetType;
-      const isWidget = typeof widgetType === 'number';
-      if (!isWidget) return;
+      this.register(sourceModel.sourceId);
+    });
 
-      this.ADD_WIDGET_SOURCE({
-        sourceId: source.sourceId,
-        type: widgetType,
-        previewSourceId: ''
-      });
+    this.sourcesService.sourceUpdated.subscribe(sourceModel => {
+      // sync widgets when propertiesManagerType has been changed
+      if (sourceModel.propertiesManagerType === 'widget' && !this.state.widgetSources[sourceModel.sourceId]) {
+        this.register(sourceModel.sourceId);
+      } else if (sourceModel.propertiesManagerType !== 'widget' && this.state.widgetSources[sourceModel.sourceId]) {
+        this.unregister(sourceModel.sourceId);
+      }
     });
 
     this.sourcesService.sourceRemoved.subscribe(sourceModel => {
       if (!this.state.widgetSources[sourceModel.sourceId]) return;
-      const widgetSource = this.getWidgetSource(sourceModel.sourceId);
-      if (widgetSource.previewSourceId) widgetSource.destroyPreviewSource();
-      this.REMOVE_WIDGET_SOURCE(sourceModel.sourceId);
+      this.unregister(sourceModel.sourceId);
     });
   }
 
@@ -218,6 +216,26 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
         }
       });
     });
+  }
+
+  private register(sourceId: string) {
+    const source = this.sourcesService.getSource(sourceId);
+    const widgetType = source.getPropertiesManagerSettings().widgetType;
+    const isWidget = typeof widgetType === 'number';
+    if (!isWidget) return;
+
+    this.ADD_WIDGET_SOURCE({
+      sourceId: source.sourceId,
+      type: widgetType,
+      previewSourceId: ''
+    });
+  }
+
+  private unregister(sourceId: string) {
+    if (!this.state.widgetSources[sourceId]) return;
+    const widgetSource = this.getWidgetSource(sourceId);
+    if (widgetSource.previewSourceId) widgetSource.destroyPreviewSource();
+    this.REMOVE_WIDGET_SOURCE(sourceId);
   }
 
   /**

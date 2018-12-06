@@ -15,6 +15,7 @@ export interface ISource extends IResource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
+  propertiesManagerType: TPropertiesManager;
   channel?: number;
 }
 
@@ -51,7 +52,7 @@ export interface ISourcesServiceApi {
     name: string,
     type: TSourceType,
     settings?: Dictionary<any>,
-    options?: ISourceCreateOptions
+    options?: ISourceAddOptions
   ): ISourceApi;
   removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
@@ -75,11 +76,11 @@ export interface ISourcesServiceApi {
 }
 
 
-export interface ISourceCreateOptions {
+export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>> {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
-  propertiesManagerSettings?: Dictionary<any>;
+  propertiesManagerSettings?: TPropertiesManagerSettings;
   audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
 }
@@ -128,9 +129,4 @@ export interface ISourceDisplayData {
   description: string;
   demoFilename?: string;
   supportList?: string[];
-}
-
-export interface ISourceAddOptions {
-  propertiesManager: TPropertiesManager;
-  propertiesManagerSettings: Dictionary<any>;
 }
