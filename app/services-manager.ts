@@ -470,39 +470,22 @@ export class ServicesManager extends Service {
    *
    * @example
    * source = getResource('Source[12]')
-   *
-   * @example
-   * source = getResource('ScenesService.activeScene')
    */
   getResource(resourceId: string) {
-    if ( typeof(resourceId) !== 'string') return null;
-    if (resourceId === 'ServicesManager') return this;
-    const callChain = resourceId.split('.');
-    if (callChain.length > 1) resourceId = callChain[0];
-    let resource: any;
+    if (resourceId === 'ServicesManager') {
+      return this;
+    }
 
-    // resource is a service
     if (this.services[resourceId]) {
-      resource = this.getInstance(resourceId) || this.initService(resourceId);
-    } else {
-      // resource is a service helper
-      const helperName = resourceId.split('[')[0];
-      const constructorArgsStr = resourceId.substr(helperName.length);
-      const constructorArgs = constructorArgsStr
-        ? JSON.parse(constructorArgsStr)
-        : void 0;
-      resource = this.getHelper(helperName, constructorArgs);
+      return this.getInstance(resourceId) || this.initService(resourceId);
     }
 
-    if (callChain.length == 1) return resource;
-
-    // resolve long chains like `ScenesService.activeScene.name`
-    for (let i = 1; i < callChain.length; i++) {
-      resource = resource[callChain[i]];
-      if (!resource) return void 0;
-    }
-
-    return resource;
+    const helperName = resourceId.split('[')[0];
+    const constructorArgsStr = resourceId.substr(helperName.length);
+    const constructorArgs = constructorArgsStr
+      ? JSON.parse(constructorArgsStr)
+      : void 0;
+    return this.getHelper(helperName, constructorArgs);
   }
 
   /**

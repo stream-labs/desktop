@@ -17,11 +17,10 @@ import { StreamlabelsManager } from './properties-managers/streamlabels-manager'
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
 import {
-  IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
+  IActivePropertyManager, ISource, ISourceAddOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager,
-  ISourceAddOptions
+  TPropertiesManager
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
@@ -33,9 +32,6 @@ import { AudioService } from '../audio';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
-
-const { ipcRenderer } = electron;
-
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
@@ -92,11 +88,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number, isTemporary?: boolean) {
+  private ADD_SOURCE(addOptions: {
+    id: string, name: string,
+    type: TSourceType,
+    channel?: number,
+    isTemporary?: boolean,
+    propertiesManagerType?: TPropertiesManager
+  }) {
+    const id = addOptions.id;
     const sourceModel: ISource = {
       sourceId: id,
-      name,
-      type,
+      name: addOptions.name,
+      type: addOptions.type,
+      propertiesManagerType: addOptions.propertiesManagerType || 'default',
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -111,10 +115,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel
+      channel: addOptions.channel
     };
 
-    if (isTemporary) {
+    if (addOptions.isTemporary) {
       Vue.set(this.state.temporarySources, id, sourceModel);
     } else {
       Vue.set(this.state.sources, id, sourceModel);
@@ -144,7 +148,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     name: string,
     type: TSourceType,
     settings: Dictionary<any> = {},
-    options: ISourceCreateOptions = {}
+    options: ISourceAddOptions = {}
   ): Source {
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
@@ -156,22 +160,29 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
+  addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, name, type, options.channel, options.isTemporary);
+    const managerType = options.propertiesManager || 'default';
+    this.ADD_SOURCE({
+      id,
+      name,
+      type,
+      channel: options.channel,
+      isTemporary: options.isTemporary,
+      propertiesManagerType: managerType
+    });
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
 
-    const managerType = options.propertiesManager || 'default';
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
-      manager: new managerKlass(obsInput, options.propertiesManagerSettings),
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
       type: managerType
     };
 

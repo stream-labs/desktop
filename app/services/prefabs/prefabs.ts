@@ -1,7 +1,7 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import {
   ISource,
-  ISourceCreateOptions,
+  ISourceAddOptions,
   Source,
   SourcesService,
   TPropertiesManager,
@@ -20,7 +20,7 @@ interface IPrefabSourceCreateOptions {
   description?: string,
   type: TSourceType,
   settings: Dictionary<TObsValue>,
-  createOptions: ISourceCreateOptions,
+  createOptions: ISourceAddOptions,
 }
 
 interface IPrefabSource extends IPrefabSourceCreateOptions {
