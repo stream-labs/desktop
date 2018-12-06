@@ -152,7 +152,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   ): Source {
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
-    const obsInputSettings = this.getObsSourceSettings(type, settings);
+    const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
@@ -263,19 +263,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.removeSource(source.sourceId);
   }
 
-
   getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
     const resolvedSettings = cloneDeep(settings);
-
-    // setup default settings
-    if (type === 'browser_source') {
-      if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
-      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
-    }
-
-    if (type === 'text_gdiplus') {
-      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
-    }
 
     Object.keys(resolvedSettings).forEach(propName => {
       // device_id is unique for each PC
@@ -290,6 +279,21 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       if (!device) return;
       resolvedSettings[propName] = device.id;
     });
+    return resolvedSettings;
+  }
+
+  private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
+    const resolvedSettings = this.getObsSourceSettings(type, settings);
+
+    // setup default settings
+    if (type === 'browser_source') {
+      if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
+      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
+    }
+
+    if (type === 'text_gdiplus') {
+      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    }
     return resolvedSettings;
   }
 
