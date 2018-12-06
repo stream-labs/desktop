@@ -187,7 +187,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const headers = authorizedHeaders(this.activeToken);
     headers.append('Content-Type', 'application/json');
     const body = JSON.stringify({
-      planned_start_time: new Date(scheduledStartTime).getTime(),
+      planned_start_time: new Date(scheduledStartTime).getTime() / 1000,
       game_specs: { name: game },
       status: 'SCHEDULED_UNPUBLISHED',
       title,
