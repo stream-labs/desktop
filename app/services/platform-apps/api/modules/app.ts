@@ -10,7 +10,8 @@ enum EPage {
   Editor = 'Editor',
   Live = 'Live',
   Dashboard = 'Dashboard',
-  Themes = 'Themes'
+  Themes = 'Themes',
+  AppDetailsPage = 'AppDetailsPage'
 }
 
 type TNavigationCallback = (nav: INavigation) => void;
@@ -54,6 +55,8 @@ export class AppModule extends Module {
       this.navigationService.navigate('Live');
     } else if (page === EPage.Themes) {
       this.navigationService.navigate('BrowseOverlays');
+    } else if (page === EPage.AppDetailsPage) {
+      this.navigationService.navigate('PlatformAppStore', { appId: ctx.app.id });
     }
   }
 
