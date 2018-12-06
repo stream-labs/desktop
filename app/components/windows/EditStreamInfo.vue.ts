@@ -397,7 +397,7 @@ export default class EditStreamInfo extends Vue {
       hours = hours < 10 ? `0${hours}` : hours;
       let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
       minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[1]}-${dateArray[0]}T${hours}:${minutes}:00.0${moment().format('Z')}`;
+      return `${dateArray[2]}-${dateArray[0]}-${dateArray[1]}T${hours}:${minutes}:00.0${moment().format('Z')}`;
     } catch {
       this.$toasted.show(
         $t('Please enter a valid date'),
