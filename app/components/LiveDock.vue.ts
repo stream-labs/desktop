@@ -42,6 +42,7 @@ export default class LiveDock extends Vue {
 
   elapsedStreamTime = '';
   elapsedInterval: number;
+  canAnimate = false;
 
   $refs: {
     chat: Chat;
@@ -102,11 +103,15 @@ export default class LiveDock extends Vue {
   }
 
   collapse() {
+    this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(true);
+    setTimeout(() => this.canAnimate = false, 300);
   }
 
   expand() {
+    this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(false);
+    setTimeout(() => this.canAnimate = false, 300);
   }
 
   get isStreaming() {
@@ -283,8 +288,9 @@ export default class LiveDock extends Vue {
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
+    const minEditorWidth = 860;
     const minWidth = 290;
-    const maxWidth = appRect.width / 2;
+    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
     width = Math.max(minWidth, width);
     width = Math.min(maxWidth, width);
     return width;
