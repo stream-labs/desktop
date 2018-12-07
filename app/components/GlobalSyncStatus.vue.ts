@@ -13,16 +13,20 @@ export default class GlobalSyncStatus extends Vue {
 
     return {
       'icon-cloud-backup-2': status === EGlobalSyncStatus.Synced,
-      'fa-refresh': status === EGlobalSyncStatus.Syncing,
+      'fa-sync-alt': status === EGlobalSyncStatus.Syncing,
       'fa-spin': status === EGlobalSyncStatus.Syncing
     };
   }
 
   get syncStatusTooltip() {
     if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Synced) {
-      return $t('Cloud Backup: All media and sources are backed up in the cloud');
+      return $t(
+        'Cloud Backup: All media and sources are backed up in the cloud'
+      );
     }
 
-    return $t('Cloud Backup: Your media and sources are being synced with the cloud');
+    return $t(
+      'Cloud Backup: Your media and sources are being synced with the cloud'
+    );
   }
 }

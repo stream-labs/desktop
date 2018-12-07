@@ -2,7 +2,7 @@
 <div
   class="global-sync-status"
   v-tooltip="syncStatusTooltip">
-  <i class="fa" :class="syncIcon" />
+  <i class="fas" :class="syncIcon" />
 </div>
 </template>
 

@@ -1,5 +1,5 @@
 import { ILoadedApp } from '../..';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',

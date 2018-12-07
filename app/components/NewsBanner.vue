@@ -21,9 +21,9 @@
 <script lang="ts" src="./NewsBanner.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
-.banner{
+.banner {
   width: 100%;
   min-height: 0;
   max-height: 0;
@@ -37,10 +37,10 @@
 }
 
 .banner.show {
-  min-height: 100px;
+  min-height: 92px;
   max-height: 140px;
-  padding: 20px;
-  transition: all 0.5s ease-in-out;
+  .padding(2);
+  .transition();
 }
 
 .bg-image {

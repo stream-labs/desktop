@@ -1,5 +1,4 @@
-import test, { GenericTestContext } from 'ava';
-import { useSpectron } from '../helpers/spectron/index';
+import { TExecutionContext, test, useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
 import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -8,7 +7,7 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 useSpectron({ appArgs: '--nosync' });
 
 
-async function testGoal(t: GenericTestContext<any>, goalType: string) {
+async function testGoal(t: TExecutionContext, goalType: string) {
 
   const client = t.context.app.client;
   if (!await logIn(t)) return;

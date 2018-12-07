@@ -1,7 +1,7 @@
 import { Module, apiMethod, apiEvent, EApiPermissions } from './module';
 import { Inject } from 'util/injector';
 import { CustomizationService } from 'services/customization';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 enum ETheme {
   Day = 'day',

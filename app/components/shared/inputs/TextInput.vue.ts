@@ -8,7 +8,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
   @Prop()
   readonly value: string;
 
-  @Prop({ default: {} })
+  @Prop({ default: () => ({}) })
   readonly metadata: ITextMetadata;
 
   getValidations() {

@@ -1,8 +1,8 @@
-import { GenericTestContext } from 'ava';
 import { IInputMetadata } from '../../app/components/shared/inputs';
 import { SpectronClient } from 'spectron';
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
+import { TExecutionContext } from './spectron';
 
 interface IFormMonkeyFillOptions {
   metadata?: Dictionary<IInputMetadata>
@@ -22,7 +22,7 @@ export class FormMonkey {
 
   private client: SpectronClient;
 
-  constructor(private t: GenericTestContext<any>, private showLogs = false) {
+  constructor(private t: TExecutionContext, private showLogs = false) {
     this.client = t.context.app.client;
   }
 

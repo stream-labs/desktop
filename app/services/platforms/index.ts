@@ -40,6 +40,8 @@ export interface IPlatformService {
   getChatUrl: (mode: string) => Promise<string>;
 
   beforeGoLive: () => Promise<any>;
+
+  prepopulateInfo?: () => Promise<any>;
 }
 
 export interface IPlatformAuth {

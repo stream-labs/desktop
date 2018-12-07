@@ -4,7 +4,7 @@ import { Inject } from '../../util/injector';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { JsonrpcService } from '../jsonrpc/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';

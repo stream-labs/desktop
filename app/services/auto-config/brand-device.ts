@@ -1,4 +1,5 @@
 import electron from 'electron';
+import * as fs from 'fs';
 import * as obs from '../../../obs-api';
 import { execSync } from 'child_process';
 import { mutation, StatefulService } from '../stateful-service';
@@ -8,13 +9,10 @@ import { InitAfter } from '../../util/service-observer';
 import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { TSourceType } from '../sources';
 import { ScenesService } from '../scenes';
-import { cloneDeep } from 'lodash';
-import { IObsListInput } from '../../components/obs/inputs/ObsInput';
 import {IpcServerService} from '../ipc-server';
-import {AudioService, IAudioSource} from '../audio';
-import * as fs from 'fs';
+import {AudioService} from '../audio';
+import { PrefabsService } from 'services/prefabs';
 
 interface IBrandDeviceUrls {
   system_sku: string;
@@ -41,6 +39,8 @@ interface IBrandDeviceState extends IMsSystemInfo {
 @InitAfter('OnboardingService')
 export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
 
+  static version = 2;
+
   static initialState: IBrandDeviceState = {
     SystemSKU: '',
     SystemManufacturer: '',
@@ -55,6 +55,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private audioService: AudioService;
   @Inject() private ipcServerService: IpcServerService;
+  @Inject() private prefabsService: PrefabsService;
 
 
   serviceEnabled() {
@@ -133,10 +134,11 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
         newSceneCollectionCreated = true;
       }
 
-      // force SLOBS to reload config files
-      obs.NodeObs.OBS_service_resetVideoContext();
-      obs.NodeObs.OBS_service_resetAudioContext();
+      this.reloadConfig();
 
+      // some prefabs can be added in next step
+      // to not to make duplicates just remove existing for now
+      this.prefabsService.removePrefabs();
 
       // process API additional commands, some sources can be setup here
       if (deviceUrls.onboarding_cmds_url) {
@@ -152,56 +154,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     }
   }
 
-  /**
-   * This method is calling by autoconfiguration commands from onboarding_cmds.json
-   * @Example
-   * addSceneItem(
-   *  'camera',
-   *  'dshow_input',
-   *  {
-   *   sourceSetting: {use_custom_audio_device: true}
-   *   fuzzySourceSettings: { audio_device_id: 'Microphone (Realtek(R) Audio)' }} // use description instead of id here
-   * )
-   */
-  addSceneItem(
-    name: string,
-    type: TSourceType,
-    options: {
-      sourceSettings?: Dictionary<any>,
-      sourceFuzzySettings?: Dictionary<any>,
-      audioSettings: Partial<IAudioSource>
-    })
-  {
-    const sceneItem = this.scenesService.activeScene.createAndAddSource(name, type);
-    const source = sceneItem.getSource();
-
-    if (!options.sourceSettings) return;
-    const settings = cloneDeep(options.sourceSettings);
-    const propsFormData = source.getPropertiesFormData();
-
-    for (const prop of propsFormData) {
-      // handle only LIST props for now
-      if (prop.type !== 'OBS_PROPERTY_LIST') continue;
-      if (!(prop.name in options.sourceFuzzySettings)) continue;
-
-      const searchPattern = options.sourceFuzzySettings[prop.name];
-
-      const option = (prop as IObsListInput<string>).options.find(option => {
-        return (option.value.includes(searchPattern) || option.description.includes(searchPattern))
-      });
-
-      if (!option) continue;
-      settings[prop.name] = option.value;
-    }
-
-    source.updateSettings(settings);
-
-    if (!options.audioSettings) return;
-    const audioSource = this.audioService.getSource(source.sourceId);
-    if (!audioSource) return;
-    audioSource.setSettings(options.audioSettings);
-  }
-
   private async fetchDeviceUrls(): Promise<IBrandDeviceUrls> {
 
     // this combination of system params must be unique for each device type
@@ -210,12 +162,19 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       this.state.SystemManufacturer,
       this.state.SystemProductName,
       this.state.SystemSKU,
-      this.state.SystemVersion
+      this.state.SystemVersion,
+      BrandDeviceService.version
     ].join(' ');
 
     const res = await fetch(`https://${ this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`);
     if (!res.ok) return null;
     return res.json();
+  }
+
+  private reloadConfig() {
+    // force SLOBS to reload config files
+    obs.NodeObs.OBS_service_resetVideoContext();
+    obs.NodeObs.OBS_service_resetAudioContext();
   }
 
   @mutation()

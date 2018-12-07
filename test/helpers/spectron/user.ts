@@ -1,14 +1,13 @@
-import { focusMain } from './index';
-import { GenericTestContext } from 'ava';
-import { getPlatformService } from 'services/platforms';
+import { focusMain, TExecutionContext } from './index';
 import { testSourceExists, selectTestSource, clickRemoveSource } from './sources';
 
-export async function logOut(t: GenericTestContext<any>) {
+
+export async function logOut(t: TExecutionContext) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
 }
 
-export async function logIn(t: GenericTestContext<any>): Promise<boolean> {
+export async function logIn(t: TExecutionContext): Promise<boolean> {
   const app = t.context.app;
   const env = process.env;
 
@@ -54,7 +53,7 @@ export async function logIn(t: GenericTestContext<any>): Promise<boolean> {
   return true;
 }
 
-export const blankSlate = async (t: GenericTestContext<any>) => {
+export const blankSlate = async (t: TExecutionContext) => {
   await focusMain(t);
   while (await testSourceExists(t)) {
     await selectTestSource(t);

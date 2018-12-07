@@ -66,14 +66,14 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
-    platforms: ['twitch', 'youtube', 'mixer']
+    platforms: ['twitch', 'youtube', 'mixer', 'facebook']
   },
   {
     name: 'Mask',
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/facemaskdonation`;
     },
-    platforms: ['twitch', 'youtube', 'mixer']
+    platforms: ['twitch', 'youtube', 'mixer', 'facebook']
   },
   {
     name: 'Bits',

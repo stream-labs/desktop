@@ -1,6 +1,6 @@
 import { IJsonRpcRequest } from '../../app/services/jsonrpc';
-import { Subject } from 'rxjs/Subject';
-
+import { Subject } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
@@ -299,7 +299,7 @@ export class ApiClient {
 
   fetchNextEvent(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.eventReceived.first().subscribe(event => resolve(event));
+      this.eventReceived.pipe(first()).subscribe(event => resolve(event));
       setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
     });
   }

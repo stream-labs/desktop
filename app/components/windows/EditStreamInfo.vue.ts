@@ -7,7 +7,7 @@ import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { debounce } from 'lodash';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { NavigationService } from 'services/navigation';
@@ -19,6 +19,7 @@ import {
   IEncoderPreset
 } from 'services/video-encoding-optimizations';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { shell } from 'electron';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -51,6 +52,8 @@ export default class EditStreamInfo extends Vue {
   areAvailableProfiles = false;
   useOptimizedProfile = false;
   isGenericProfiles = false;
+  hasPages = false;
+  populatingModels = false;
 
   // Form Models:
 
@@ -101,28 +104,43 @@ export default class EditStreamInfo extends Vue {
     );
 
     if (this.streamInfoService.state.channelInfo) {
-      this.facebookPages = await this.fetchFacebookPages();
-      this.populateModels();
+      this.populatingModels = true;
+      if (this.isFacebook) {
+        const service = getPlatformService('facebook');
+        await service.prepopulateInfo()
+          .then((info: IChannelInfo) => {
+            if (!info) return;
+            this.streamInfoService.setStreamInfo(info.title, info.description, info.game)
+          })
+          .then(() => this.populateModels());
+      } else {
+        await this.populateModels();
+      }
+      this.populatingModels = false;
     } else {
       // If the stream info pre-fetch failed, we should try again now
       this.refreshStreamInfo();
     }
   }
 
-  populateModels() {
+  async populateModels() {
+    this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game;
+    this.streamDescriptionModel.value = this.streamInfoService.state.channelInfo.description;
     this.gameModel.options = [
       {
         description: this.streamInfoService.state.channelInfo.game,
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
+
     if (this.facebookPages) {
       this.pageModel.value = this.facebookPages.page_id;
       this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
         { value: page.id, description: `${page.name} | ${page.category}` }
       ));
+      this.hasPages = !!this.facebookPages.pages.length;
     }
     this.loadAvailableProfiles();
   }
@@ -213,6 +231,18 @@ export default class EditStreamInfo extends Vue {
           this.updateError = true;
           this.updatingInfo = false;
         }
+      })
+      .catch((e) => {
+        this.$toasted.show(
+          e,
+          {
+            position: 'bottom-center',
+            className: 'toast-alert',
+            duration: 1000,
+            singleton: true
+          }
+        );
+        this.updatingInfo = false;
       });
 
     if (this.areAvailableProfiles && this.useOptimizedProfile) {
@@ -279,6 +309,11 @@ export default class EditStreamInfo extends Vue {
 
   setFacebookPageId(model: IObsListInput<string>) {
     this.userService.postFacebookPage(model.value);
+  }
+
+  openFBPageCreateLink() {
+    shell.openExternal('https://www.facebook.com/pages/creation/');
+    this.windowsService.closeChildWindow();
   }
 
   get profiles() {

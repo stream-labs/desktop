@@ -14,7 +14,7 @@ import { $t } from 'services/i18n';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
 import { CenteringAxis } from 'util/ScalableRectangle';
@@ -97,7 +97,11 @@ export class SelectionService
 
   @shortcut('Delete')
   remove() {
-    const name = this.getLastSelected().name;
+    const lastSelected = this.getLastSelected();
+
+    if (!lastSelected) return;
+
+    const name = lastSelected.name;
     electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {

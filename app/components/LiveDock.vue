@@ -1,8 +1,8 @@
 <template>
 <div
   class="live-dock"
-  :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize * 100) + '%' }">
+  :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
+  :style="{ width: (liveDockSize) + 'px' }">
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
@@ -12,6 +12,13 @@
       'icon-down icon-right': onLeft
     }" />
   </div>
+
+  <resize-bar
+    v-if="!collapsed"
+    :position="onLeft ? 'right' : 'left'"
+    @onresizestart="onResizeStartHandler"
+    @onresizestop="onResizeStopHandler"
+  />
 
   <transition name="slide-fade">
     <div
@@ -118,9 +125,13 @@
   position: relative;
   z-index: 1000;
   width: 28%;
+  box-sizing: border-box;
   border-left: 1px solid @day-border;
   .padding(2);
-  .transition();
+
+  &.can-animate {
+    .transition();
+  }
 
   &.live-dock--left {
     border-right: 1px solid @day-border;
@@ -165,13 +176,9 @@
 .live-dock-header {
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
+  .margin-bottom();
   align-items: center;
   justify-content: space-between;
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
-  }
 }
 
 .live-dock-text {
@@ -188,16 +195,12 @@
 .live-dock-info {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  .margin-bottom();
 
   .live-dock-platform-tools {
     a {
       padding: 0 8px;
     }
-  }
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
   }
 }
 
