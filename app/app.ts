@@ -62,6 +62,7 @@ if ((isProduction || process.env.SLOBS_REPORT_TO_SENTRY) && !electron.remote.pro
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
+    sampleRate: 0.5,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
