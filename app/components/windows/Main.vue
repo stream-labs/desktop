@@ -3,7 +3,11 @@
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>
-  <div class="main-contents" :class="{ 'main-contents--right': isLoggedIn && leftDock && !isOnboarding, 'main-contents--left': isLoggedIn && !leftDock && !isOnboarding }">
+  <div
+    class="main-contents"
+    :class="{
+      'main-contents--right': isLoggedIn && leftDock && !isOnboarding && hasLiveDock,
+      'main-contents--left': isLoggedIn && !leftDock && !isOnboarding && hasLiveDock }">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="main_middle">
@@ -48,8 +52,12 @@
 
 <style lang="less">
 .main-middle--compact {
-  .performance-metric__label {
-    display: none;
+  .performance-metric-icon {
+    height: 12px;
+  }
+
+  .performance-metric {
+    font-size: 12px;
   }
 }
 </style>

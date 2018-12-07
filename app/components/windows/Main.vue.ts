@@ -66,6 +66,7 @@ export default class Main extends Vue {
   mounted() {
     electron.remote.getCurrentWindow().show();
     this.mainMiddle = this.$refs.main_middle;
+    this.handleResize();
   }
 
   get title() {
@@ -158,14 +159,7 @@ export default class Main extends Vue {
 
   mainMiddle: HTMLDivElement;
   compactView = false;
-
-  handleResize() {
-    if (this.mainMiddle.clientWidth < 1200) {
-      this.compactView = true;
-    } else {
-      this.compactView = false;
-    }
-  }
+  mainMiddleWidth: Number;
 
   get mainResponsiveClasses() {
     let classes = [];
@@ -175,5 +169,37 @@ export default class Main extends Vue {
     }
 
     return classes.join(' ');
+  }
+
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  windowWidth: Number;
+
+  hasLiveDock = true;
+
+  windowSizeHandler() {
+    this.windowWidth = window.innerWidth;
+
+    if (this.windowWidth < 1100) {
+      this.hasLiveDock = false;
+    } else {
+      this.hasLiveDock = true;
+    }
+  }
+
+  handleResize() {
+    let mainMiddleWidth = this.mainMiddle.clientWidth;
+
+    if (this.mainMiddleWidth < 1200) {
+      this.compactView = true;
+    } else {
+      this.compactView = false;
+    }
   }
 }
