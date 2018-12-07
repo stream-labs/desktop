@@ -20,6 +20,7 @@ import {
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { AppService } from 'services/app';
 
 @Component({
   components: {
@@ -36,6 +37,7 @@ export default class LiveDock extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() appService: AppService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -77,6 +79,10 @@ export default class LiveDock extends Vue {
       }
       this.updateWidth();
     }, 100);
+  }
+
+  get applicationLoading() {
+    return this.appService.state.loading;
   }
 
   beforeDestroy() {
