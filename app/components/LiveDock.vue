@@ -95,6 +95,7 @@
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+        <!-- v-if is required because left-side chat will not properly load on application startup -->
         <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
         <PlatformAppWebview
           v-for="app in chatApps"
