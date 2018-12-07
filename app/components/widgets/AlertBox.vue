@@ -21,9 +21,7 @@
       </div>
     </div>
     <div class="left-accordion__button" :class="{ active: selectedAlert === 'general' }" @click="selectAlertType('general')">
-      <span style="text-transform: uppercase;">
-        {{ $t('Global Settings') }}
-      </span>
+      {{ $t('Global Settings') }}
     </div>
     <div v-for="alert in alertTypes" v-if="wData && wData.settings[alert]" :key="alert" style="position: relative;" >
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
@@ -139,13 +137,14 @@
 .left-accordion__button {
   display: flex;
   border-bottom: 1px solid @day-border;
-  padding: 12px;
-  font-size: 12px;
+  .padding();
+  .weight(@medium);
   position: relative;
   align-items: center;
 
   i {
-    font-size: 11px;
+    font-size: 12px;
+    .margin-right();
   }
 
   &:hover {
@@ -163,8 +162,6 @@
 
 .add-alert-button {
   width: 100%;
-  text-transform: uppercase;
-  font-size: 12px;
 }
 
 .add-alert-dropdown {
@@ -174,11 +171,11 @@
   background-color: @white;
   z-index: 1;
   box-shadow: 0 2px @day-shadow;
-  padding: 8px;
+  .padding();
+
   .button {
     display: block;
     width: 100%;
-    font-size: 12px;
     line-height: 12px;
     margin-bottom: 4px;
   }
@@ -189,14 +186,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: uppercase;
   margin-left: 4px;
 }
 
 .left-accordion__input {
   position: absolute;
-  top: 14px;
-  right: 16px;
+  top: 10px;
+  right: 8px;
 }
 
 .leftbar {
@@ -212,7 +208,7 @@
   border: 1px solid @day-border;
   height: 100px;
   position: relative;
-  padding: 6px;
+  .padding();
 
   img {
     height: 60px;
@@ -250,7 +246,8 @@
   padding: 4px;
   background-color: @day-shadow;
 
-  input, input:disabled {
+  input,
+  input:disabled {
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -271,18 +268,22 @@
   .left-accordion__button {
     border-color: @night-border;
   }
+
   .left-accordion__button.active {
     background-color: @night-secondary;
   }
+
   .add-alert-dropdown {
     background-color: @night-secondary;
     box-shadow: 0 2px @night-shadow;
   }
+
   .variation-tile {
     background-color: @night-section-alt;
     box-shadow: 0 2px @night-shadow;
     border-color: @night-border;
   }
+
   .variation-tile.active {
     border: 1px solid @teal;
 
@@ -290,9 +291,11 @@
       border: 1px solid @teal-light-opac;
     }
   }
+
   .variation-tile__image-box {
     background-color: @night-secondary;
   }
+
   .variation-tile__name {
     background-color: @night-shadow;
   }

@@ -176,13 +176,9 @@
 .live-dock-header {
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
+  .margin-bottom();
   align-items: center;
   justify-content: space-between;
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
-  }
 }
 
 .live-dock-text {
@@ -199,16 +195,12 @@
 .live-dock-info {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  .margin-bottom();
 
   .live-dock-platform-tools {
     a {
       padding: 0 8px;
     }
-  }
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
   }
 }
 
