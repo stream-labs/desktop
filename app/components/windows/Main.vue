@@ -3,10 +3,12 @@
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>
-  <div class="main-contents">
+  <div class="main-contents" :class="{ 'main-contents--right': mainContentsRight }">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
-    <div class="main-middle">
+    <div class="main-middle" :class="mainResponsiveClasses" ref="main_middle">
+      <resize-observer @notify="handleResize"></resize-observer>
+
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
@@ -44,6 +46,14 @@
 
 <script lang="ts" src="./Main.vue.ts"></script>
 
+<style lang="less">
+.main-middle--compact {
+  .performance-metric__label {
+    display: none;
+  }
+}
+</style>
+
 <style lang="less" scoped>
 @import '../../styles/index';
 
@@ -59,10 +69,16 @@
   height: 100%;
 }
 
+.main-contents--right {
+  grid-template-columns: auto 1fr;
+}
+
 .main-middle {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-spacer {

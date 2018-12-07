@@ -11,8 +11,13 @@ import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import {
+  IncrementalRolloutService,
+  EAvailableFeatures
+} from 'services/incremental-rollout';
 import { AppService } from '../services/app';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 @Component({
   components: {
@@ -33,6 +38,10 @@ export default class TopNav extends Vue {
   slideOpen = false;
 
   studioModeTooltip = 'Studio Mode';
+
+  mounted() {
+    this.topNav = this.$refs.top_nav;
+  }
 
   get availableFeatures() {
     return EAvailableFeatures;
@@ -122,13 +131,30 @@ export default class TopNav extends Vue {
   }
 
   get appStoreVisible() {
-    return (this.platformAppsService.state.storeVisible
-      || this.featureIsEnabled(this.availableFeatures.platform))
-      && this.userService.isLoggedIn()
-      && this.userService.platform.type === 'twitch';
+    return (
+      (this.platformAppsService.state.storeVisible ||
+        this.featureIsEnabled(this.availableFeatures.platform)) &&
+      this.userService.isLoggedIn() &&
+      this.userService.platform.type === 'twitch'
+    );
   }
 
   get loading() {
     return this.appService.state.loading;
+  }
+
+  $refs: {
+    top_nav: HTMLDivElement;
+  };
+
+  topNav: HTMLDivElement;
+  responsiveClass = false;
+
+  handleResize() {
+    if (this.topNav.clientWidth < 1200) {
+      this.responsiveClass = true;
+    } else {
+      this.responsiveClass = false;
+    }
   }
 }
