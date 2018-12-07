@@ -63,7 +63,6 @@ if ((isProduction || process.env.SLOBS_REPORT_TO_SENTRY) && !electron.remote.pro
     dsn: sentryDsn,
     release: slobsVersion,
     beforeSend: event => {
-      console.log(event);
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
       // the filename.  Unfortunately sentry's electron support
