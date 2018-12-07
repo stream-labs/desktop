@@ -70,7 +70,10 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   },
 
   OptimizeBrandDevice: {
-    isEligible: () => true,
+    isEligible: service => {
+      if (service.options.isLogin) return false;
+      return true;
+    },
     next: 'OptimizeA',
   },
 
