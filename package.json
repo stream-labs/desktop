@@ -17,7 +17,7 @@
     "package:ipc": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava -v",
-    "test-flaky": "node ./test/runner.js test-dist/test/api/folders.js test-dist/test/api/selection.js",
+    "test-flaky": "node ./test/runner.js",
     "clear": "shx rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
