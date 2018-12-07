@@ -65,6 +65,7 @@
     "serial": true
   },
   "dependencies": {
+    "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "backtrace-node": "^0.7.3",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz",
@@ -96,7 +97,6 @@
     "@types/uuid": "3.4.3",
     "@types/webdriverio": "^4.13.0",
     "@xkeshi/vue-qrcode": "0.3.0",
-    "archiver": "2.1.1",
     "ava": "v1.0.0-rc.2",
     "babel-eslint": "8.2.6",
     "babel-loader": "^8.0.4",
