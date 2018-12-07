@@ -59,7 +59,7 @@
                 :key="data.id"
               >
                 <td> {{ $t(data.viewer.name) }} </td>
-                <td> {{ $t(data.points) }} </td>
+                <td> {{ data.points }} </td>
                 <td> {{ (data.time / 60).toFixed(2) }} </td>
                 <td>
                   <div class="align-items--inline">
