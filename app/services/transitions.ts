@@ -45,7 +45,7 @@ interface ITransitionConnection {
   transitionId: string;
 }
 
-interface ITransitionCreateOptions {
+export interface ITransitionCreateOptions {
   id?: string;
   settings?: Dictionary<TObsValue>;
   propertiesManagerSettings?: Dictionary<any>;

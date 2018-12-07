@@ -18,8 +18,8 @@ Vue.use(VModal);
     ModalLayout,
     TransitionSettings,
     Tabs,
-    ConnectionSettings
-  }
+    ConnectionSettings,
+  },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
@@ -32,21 +32,45 @@ export default class SceneTransitions extends Vue {
   tabs: ITab[] = [
     {
       name: 'Transitions',
-      value: 'transitions'
+      value: 'transitions',
     },
     {
       name: 'Connections',
-      value: 'connections'
-    }
+      value: 'connections',
+    },
   ];
 
   selectedTab = 'transitions';
 
-  redundantConnectionTooltip =
-    $t('This connection is redundant because another connection already connects these scenes.');
+  redundantConnectionTooltip = $t(
+    'This connection is redundant because another connection already connects these scenes.',
+  );
 
   get transitionsEnabled() {
     return this.scenesService.scenes.length > 1;
+  }
+
+  /**
+   * Scene transitions created from apps should not be editable
+   * if the app developer specified `shouldLock` as part of their
+   * scene transition creation options.
+   *
+   * @param id ID of the scene transition
+   */
+  isEditable(id: string) {
+    return this.transitionsService.getPropertiesManagerSettings(id).locked !== true;
+  }
+
+  getEditableMessage(id: string) {
+    if (this.isEditable(id)) {
+      return null;
+    }
+
+    return $t('This scene transition is managed by an App and cannot be edited.');
+  }
+
+  getClassNames(id: string) {
+    return this.isEditable(id) ? 'icon-edit' : 'disabled icon-lock';
   }
 
   // TRANSITIONS
@@ -62,12 +86,15 @@ export default class SceneTransitions extends Vue {
   addTransition() {
     const transition = this.transitionsService.createTransition(
       ETransitionType.Cut,
-      'New Transition'
+      'New Transition',
     );
     this.editTransition(transition.id);
   }
 
   editTransition(id: string) {
+    if (!this.isEditable(id)) {
+      return;
+    }
     this.inspectedTransition = id;
     this.$modal.show('transition-settings');
   }
@@ -95,7 +122,7 @@ export default class SceneTransitions extends Vue {
     const connection = this.transitionsService.addConnection(
       this.scenesService.scenes[0].id,
       this.scenesService.scenes[1].id,
-      this.transitions[0].id
+      this.transitions[0].id,
     );
     this.editConnection(connection.id);
   }
