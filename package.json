@@ -74,7 +74,7 @@
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
     "recursive-readdir": "^2.2.2",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.75-iojs-v2.0.8.tar.gz",
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.76-iojs-v2.0.8.tar.gz",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
