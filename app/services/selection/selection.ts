@@ -97,7 +97,11 @@ export class SelectionService
 
   @shortcut('Delete')
   remove() {
-    const name = this.getLastSelected().name;
+    const lastSelected = this.getLastSelected();
+
+    if (!lastSelected) return;
+
+    const name = lastSelected.name;
     electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {
