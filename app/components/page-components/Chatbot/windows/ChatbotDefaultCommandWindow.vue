@@ -1,5 +1,5 @@
 <template>
-  <ModalLayout :showControls="false" :customControls="true">
+  <ModalLayout :showControls="false" :customControls="true" :containsTabs="true">
     <div slot="fixed">
       <div class="row">
         <div class="small-6 columns position--relative window-tab">

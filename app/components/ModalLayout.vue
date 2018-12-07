@@ -6,7 +6,7 @@
     <slot name="fixed"/>
   </div>
   <div
-    class="modal-layout-content"
+    :class="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
     :style="contentStyle">
     <slot name="content" v-if="!loading"/>
     <div class="spinner-container" v-else>
@@ -45,6 +45,8 @@
   background-color: @white;
 }
 
+
+
 .modal-layout--w-side-menu {
   .modal-layout-content {
     overflow-y: hidden;
@@ -63,6 +65,19 @@
   position: relative;
   overflow-x: hidden;
   .padding(2);
+
+  & > * {
+    width: 100%;
+  }
+}
+
+.modal-layout-tab-content {
+    flex-grow: 1;
+  height: 100%;
+  display: flex;
+  position: relative;
+  overflow-x: hidden;
+  margin-top: 45px;
 
   & > * {
     width: 100%;

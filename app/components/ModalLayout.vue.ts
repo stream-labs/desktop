@@ -24,6 +24,10 @@ export default class ModalLayout extends Vue {
   // cancel button.
   @Prop({ default: true }) showCancel: boolean;
 
+  // If controls are shown, whether or not to show the
+  // cancel button.
+  @Prop({ default: false }) containsTabs: boolean;
+
   // Will be called when "done" is clicked if controls
   // are enabled
   @Prop() doneHandler: Function;
