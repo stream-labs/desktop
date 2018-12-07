@@ -415,7 +415,9 @@ export class StreamlabelsService extends Service {
         rimraf.sync(this.streamlabelsDirectory);
       }
 
-      fs.mkdirSync(this.streamlabelsDirectory);
+      if (!fs.existsSync(this.streamlabelsDirectory)) {
+        fs.mkdirSync(this.streamlabelsDirectory);
+      }
     } catch (e) {
       console.error('Error ensuring streamlabels directory!');
     }
