@@ -65,6 +65,8 @@ test('Selection', async t => {
   selection.selectAll();
 
   t.is(selection.getSize(), 3);
+
+  t.true(Math.random() >= 0.5);
 });
 
 
