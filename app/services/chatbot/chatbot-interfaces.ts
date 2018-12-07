@@ -118,12 +118,12 @@ export interface IQueueTotalResponse {
 }
 
 export interface IQueueEntriesResponse {
-  pagination: IChatbotPagination;
+  cursor: IChatbotCursor;
   data: IQueuedUser[];
 }
 
 export interface IQueuePickedResponse {
-  pagination: IChatbotPagination;
+  cursor: IChatbotCursor;
   data: IQueuedUser[];
 }
 
@@ -157,8 +157,17 @@ export interface IChatbotCooldown {
   user: number;
 }
 
+export interface IChatbotCost {
+  base: number;
+}
+
 export interface IChatbotAliases {
   [id: number]: string;
+}
+
+export interface IChatbotCursor {
+  before: number;
+  after: number;
 }
 
 export interface IChatbotPagination {
@@ -228,6 +237,7 @@ export interface ICustomCommand {
   permission: IChatbotPermission;
   response: string;
   response_type?: string;
+  cost: IChatbotCost;
   cooldowns: IChatbotCooldown;
   aliases: IChatbotAliases;
   platforms: number;
@@ -556,3 +566,5 @@ export const NEW_WORD_PROTECTION_LIST_MODAL_ID = 'new-word-protection-list';
 
 // modals
 export const DELETE_COMMAND_MODAL = 'delete-command';
+export const DELETE_MODAL = 'delete-generic';
+export const DELETE_ALL_MODAL = 'delete-generic-all';

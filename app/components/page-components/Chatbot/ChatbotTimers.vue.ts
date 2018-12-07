@@ -66,6 +66,7 @@ export default class ChatbotTimers extends ChatbotBase {
 
   onDeleteTimerHandler(timer?: IChatbotTimer) {
     this.selectedTimer = timer;
+    this.chatbotApiService.Common.closeChatbotChildWindow();
     this.$modal.show(DELETE_COMMAND_MODAL);
   }
 

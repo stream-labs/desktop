@@ -39,7 +39,7 @@
   <!-- Lists -->
   <div class="list-container row width--100 max-width--100 margin--none">
     <div class="col-sm-12 col-md-7 padding--10">
-      <ChatbotQueueList type="entry"/>
+      <ChatbotQueueList ref="entrylist" type="entry"/>
     </div>
     <div class="col-sm-12 col-md-5 padding--10">
       <ChatbotQueueList type="picked"/>

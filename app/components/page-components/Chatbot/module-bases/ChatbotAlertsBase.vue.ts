@@ -21,7 +21,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   get alertTypes() {
     const { streamlabs, twitch, mixer, youtube } = this.chatAlerts.settings;
 
-    const platform = this.chatbotApiService.userService.platform.type;
+    const platform = this.chatbotApiService.Base.userService.platform.type;
 
     let alertTypes;
 
@@ -47,13 +47,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         };
         break;
       }
-      default:{
+      default: {
         alertTypes = {
           ...streamlabs
         };
         break;
       }
-
     }
 
     return alertTypes;
@@ -61,7 +60,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   platformForAlertType(type: ChatbotAlertType) {
     if (type === 'tip') return 'streamlabs';
-    return this.chatbotApiService.userService.platform.type;
+    return this.chatbotApiService.Base.userService.platform.type;
   }
 
   // preparing data to send to service

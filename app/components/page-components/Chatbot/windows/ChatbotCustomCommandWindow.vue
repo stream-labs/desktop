@@ -55,6 +55,15 @@
               />
             </div>
           </div>
+          <div class="row">
+            <div class="small-6 columns">
+              <VFormGroup
+                :title="$t('Cost')"
+                v-model="newCommand.cost.base"
+                :metadata="costMetaData"
+              />
+            </div>
+          </div>
           <ChatbotAliases v-model="newCommand.aliases" />
         </div>
       </validated-form>

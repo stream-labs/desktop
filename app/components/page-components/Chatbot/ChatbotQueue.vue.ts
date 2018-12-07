@@ -12,6 +12,10 @@ import ChatbotQueueList from 'components/page-components/Chatbot/Queue/ChatbotQu
 export default class ChatbotQueue extends ChatbotBase {
   queueTitle = 'The Current Game';
 
+  $refs: {
+    entrylist: ChatbotQueueList;
+  };
+
   async mounted() {
     await this.chatbotApiService.Base.logInToSocket(['queue']);
     await this.chatbotApiService.Queue.fetchQueueState();
@@ -49,7 +53,9 @@ export default class ChatbotQueue extends ChatbotBase {
   }
 
   onPickRandomEntryHandler() {
-    this.chatbotApiService.Queue.pickQueueEntryRandom();
+    this.chatbotApiService.Queue.pickQueueEntryRandom().then(() =>{
+      this.$refs.entrylist.loadNewEntries();
+    });;
   }
 
   get queueIsOpen() {

@@ -35,6 +35,9 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       level: 1,
       info: {}
     },
+    cost:{
+      base: 0
+    },
     cooldowns: {
       global: 0,
       user: 0
@@ -130,6 +133,17 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       placeholder: $t('Cooldown'),
       tooltip: $t('Value in seconds'),
       min: 0
+    };
+    return timerMetadata;
+  }
+
+  get costMetaData() {
+    let timerMetadata: INumberMetadata = {
+      type: EInputType.number,
+      title: $t('Cost'),
+      placeholder: $t('Cost'),
+      min: 0,
+      max: 1000000
     };
     return timerMetadata;
   }

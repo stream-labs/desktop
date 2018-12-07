@@ -40,6 +40,15 @@ export class ChatbotCommonService extends PersistentStatefulService<
     this.windowsService.closeChildWindow();
   }
 
+  closeChatbotChildWindow() {
+    const options = this.windowsService.getChildWindowOptions();
+    const name = options ? options.componentName : '';
+    
+    if(name.includes('Chatbot')){
+      this.windowsService.closeChildWindow();
+    }
+  }
+
   openCustomCommandWindow(command?: ICustomCommand) {
     if (command) {
       this.SET_CUSTOM_COMAND_TO_UPDATE(command);

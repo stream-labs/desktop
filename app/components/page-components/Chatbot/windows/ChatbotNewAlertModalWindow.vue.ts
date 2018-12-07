@@ -158,11 +158,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get isTwitch() {
-    return this.chatbotApiService.userService.platform.type === 'twitch';
+    return this.chatbotApiService.Base.userService.platform.type === 'twitch';
   }
 
   get isYoutube() {
-    return this.chatbotApiService.userService.platform.type === 'youtube';
+    return this.chatbotApiService.Base.userService.platform.type === 'youtube';
   }
 
   get isFollower() {

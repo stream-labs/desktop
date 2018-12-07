@@ -54,8 +54,8 @@
           <td> {{ formatDate(quote.created_at) || '-' }} </td>
           <td>
             <div class="align-items--inline">
-              <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5"/>
-              <i @click="onDeleteQuoteHandler(quote)" class="icon-trash padding--5"/>
+              <i @click="onDeleteQuoteHandler(quote)" class="icon-trash padding--5 cursor--pointer"/>
+              <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5 cursor--pointer"/>
             </div>
           </td>
         </tr>
@@ -68,6 +68,14 @@
       @change="fetchQuotes"
     />
   </div>
+  <!-- Modals -->
+  <ChatbotGenericModalWindow
+    :name="DELETE_MODAL"
+    @yes="onYesHandler"
+    @no="onNoHandler"
+    :header="$t('Are you sure you want to delete Quote %{number}?',{number: selectedQuote ? selectedQuote.custom_id : ''})"
+    :message="$t('Once deleted it can not be recovered.')"
+  />
 </div>
 </template>
 

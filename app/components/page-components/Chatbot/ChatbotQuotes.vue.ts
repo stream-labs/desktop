@@ -1,29 +1,36 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IQuote } from 'services/chatbot';
+import { IQuote, DELETE_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import moment from 'moment';
-
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
-    ChatbotPagination
+    ChatbotPagination,
+    ChatbotGenericModalWindow
   }
 })
 export default class ChatbotQuotes extends ChatbotBase {
-  searchQuery = '';
+  searchQuery: string = '';
+  selectedQuote: IQuote = null;
 
   get quotes() {
     return this.chatbotApiService.Quotes.state.quotesResponse.data;
   }
 
   get currentPage(): number {
-    return this.chatbotApiService.Quotes.state.quotesResponse.pagination.current;
+    return this.chatbotApiService.Quotes.state.quotesResponse.pagination
+      .current;
   }
 
   get totalPages(): number {
     return this.chatbotApiService.Quotes.state.quotesResponse.pagination.total;
+  }
+
+  get DELETE_MODAL(){
+    return `${DELETE_MODAL}-quote`;
   }
 
   mounted() {
@@ -47,7 +54,9 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   formatDate(dateString: string) {
-    return moment(dateString).format(this.quotePreferences.settings.general.date_format);
+    return moment(dateString).format(
+      this.quotePreferences.settings.general.date_format
+    );
   }
 
   onOpenQuoteWindowHandler(quote?: IQuote) {
@@ -59,6 +68,18 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   onDeleteQuoteHandler(quote?: IQuote) {
-    this.chatbotApiService.Quotes.deleteQuote(quote.id);
+    this.selectedQuote = quote;
+    this.chatbotApiService.Common.closeChatbotChildWindow();
+    this.$modal.show(this.DELETE_MODAL);
+  }
+
+  onYesHandler() {
+    if (this.selectedQuote) {
+      this.chatbotApiService.Quotes.deleteQuote(this.selectedQuote.id);;
+    }
+  }
+
+  onNoHandler() {
+    this.selectedQuote = null;
   }
 }

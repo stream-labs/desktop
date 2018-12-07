@@ -55,6 +55,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
 
   onDeleteCommandHandler(command: ICustomCommand) {
     this.selectedCommand = command;
+    this.chatbotApiService.Common.closeChatbotChildWindow();
     this.$modal.show(DELETE_COMMAND_MODAL);
   }
 
