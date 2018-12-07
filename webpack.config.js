@@ -48,7 +48,8 @@ module.exports = {
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")',
-    'request': 'require("request")'
+    'request': 'require("request")',
+    'archiver': 'require("archiver")'
   },
 
   module: {
