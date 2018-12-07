@@ -5,11 +5,13 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { sleep } from '../sleep';
 
+export const test = avaTest as TestInterface<ITestContext>;
+
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
-export const test = avaTest as TestInterface<ITestContext>;;
+
 
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
@@ -66,6 +68,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let context: any = null;
   let app: any;
   let testPassed = false;
+  const failedTests: string[] = [];
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
@@ -143,7 +146,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    const testName = t.title.replace('afterEach for ', '');
+    const testName = t.title.replace('afterEach.always hook for ', '');
+    if (!testPassed) failedTests.push(testName);
+
     const client = await getClient();
     await client.unsubscribeAll();
     if (options.restartAppAfterEachTest) {
@@ -153,9 +158,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.restartAppAfterEachTest) {
       await stopApp();
     }
+
   });
 
   test.after.always(async t => {
     if (appIsRunning) await stopApp();
+    if (failedTests) saveFailedTestsToFile(failedTests);
   });
+}
+
+function saveFailedTestsToFile(failedTests: string[]) {
+  const filePath = 'test-dist/failed-tests.json';
+  if (fs.existsSync(filePath)) {
+    failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
+  }
+  fs.writeFileSync(filePath, JSON.stringify(failedTests));
 }
