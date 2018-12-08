@@ -159,7 +159,7 @@ export default class Main extends Vue {
 
   mainMiddle: HTMLDivElement;
   compactView = false;
-  mainMiddleWidth: Number;
+  mainMiddleWidth: number;
 
   get mainResponsiveClasses() {
     let classes = [];
@@ -179,7 +179,7 @@ export default class Main extends Vue {
     window.removeEventListener('resize', this.windowSizeHandler);
   }
 
-  windowWidth: Number;
+  windowWidth: number;
 
   hasLiveDock = true;
 
