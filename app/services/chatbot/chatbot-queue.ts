@@ -255,7 +255,9 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     const lastItem = _.last(this.state.queueEntriesResponse.data);
 
     if (!lastItem || lastItem.custom_id + 1 == response.custom_id) {
-      this.state.queueEntriesResponse.data.push(response);
+      let clone = _.cloneDeep(this.state.queueEntriesResponse.data);
+      clone.push(response);
+      this.state.queueEntriesResponse.data = clone;
     }
   }
 

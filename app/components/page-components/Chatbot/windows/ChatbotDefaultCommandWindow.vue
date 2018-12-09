@@ -27,6 +27,10 @@
               <span>{{ $t('Loyalty Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
+            <div @click="onToggleHeistPreferencesWindowHandler" v-if="isHeistCommand">
+              <span>{{ $t('Heist Preferences') }}</span>
+              <i class="fas fa-chevron-right window-toggle__icon"></i>
+            </div>
           </div>
         </div>
       </div>

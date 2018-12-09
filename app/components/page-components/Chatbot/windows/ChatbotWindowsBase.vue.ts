@@ -63,6 +63,27 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
+  onToggleHeistPreferencesWindowHandler() {
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
+        break;
+      case 'ChatbotHeistPreferencesWindow':
+        const loyaltyPointsCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['heist'].enter;
+
+        this.chatbotApiService.Common.openDefaultCommandWindow({
+          ...loyaltyPointsCommand,
+          slugName: 'heist',
+          commandName: 'enter'
+        });
+        break;
+    }
+  }
+
   onToggleQuoteWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;

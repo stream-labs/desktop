@@ -12,7 +12,8 @@ import {
   ChatbotSongRequestApiService,
   ChatbotBaseApiService,
   ChatbotCommonService,
-  ChatbotLoyaltyApiService
+  ChatbotLoyaltyApiService,
+  ChatbotHeistApiService
 } from './index';
 
 export class ChatbotApiService extends Service {
@@ -26,4 +27,5 @@ export class ChatbotApiService extends Service {
   @Inject('ChatbotQuotesApiService') Quotes: ChatbotQuotesApiService;
   @Inject('ChatbotSongRequestApiService') SongRequest: ChatbotSongRequestApiService;
   @Inject('ChatbotLoyaltyApiService') Loyalty: ChatbotLoyaltyApiService;
+  @Inject('ChatbotHeistApiService') Heist: ChatbotHeistApiService;
 }

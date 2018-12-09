@@ -80,6 +80,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     );
   }
 
+  get isHeistCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'heist' &&
+      this.defaultCommandToUpdate.commandName === 'enter'
+    );
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }

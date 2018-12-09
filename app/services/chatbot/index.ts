@@ -10,3 +10,4 @@ export * from './chatbot-quotes';
 export * from './chatbot-songrequest';
 export * from './chatbot-loyalty';
 export * from './chatbot';
+export * from './chatbot-heist';

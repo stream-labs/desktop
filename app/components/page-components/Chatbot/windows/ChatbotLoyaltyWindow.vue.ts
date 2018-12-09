@@ -1,16 +1,14 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 
 import {
-  IChatbotTimer,
   IChatbotErrorResponse,
   IChatbotLoyalty
 } from 'services/chatbot';
 
 import {
-  ITextMetadata,
   INumberMetadata,
   EInputType
 } from 'components/shared/inputs/index';

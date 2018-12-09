@@ -17,6 +17,7 @@ export default class ChatbotModules extends ChatbotBase {
   mounted() {
     this.chatbotApiService.Alerts.fetchChatAlerts();
     this.chatbotApiService.SongRequest.fetchSongRequest();
+    this.chatbotApiService.Heist.fetchHeistPreferences();
   }
 
   get modules() {
@@ -61,6 +62,21 @@ export default class ChatbotModules extends ChatbotBase {
         },
       },
       {
+        title: $t('Heist'),
+        description: $t('Allow your viewers to work together and go on an adventure to earn extra loyalty points.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: this.heistCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotApiService.Common.openHeistPreferencesWindow();
+         },
+        onToggleEnabled: () => {
+          this.chatbotApiService.Heist.updateHeistPreferences({
+            ...this.heist,
+            enabled: !this.heistCurrentlyEnabled
+          });
+         }
+      },
+      {
         title: $t('Mini Games'),
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
@@ -87,7 +103,7 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get chatAlertCurrentlyEnabled() {
-    return this.chatbotApiService.Alerts.state.chatAlertsResponse.enabled == true;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse.enabled;
   }
 
   get songRequest() {
@@ -95,6 +111,14 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get songRequestCurrentlyEnabled() {
-    return this.chatbotApiService.SongRequest.state.songRequestResponse.enabled === true;
+    return this.chatbotApiService.SongRequest.state.songRequestResponse.enabled;
+  }
+
+  get heist(){
+    return this.chatbotApiService.Heist.state.heistPreferencesResponse;
+  }
+
+  get heistCurrentlyEnabled(){
+    return this.chatbotApiService.Heist.state.heistPreferencesResponse.enabled;
   }
 }

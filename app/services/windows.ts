@@ -64,6 +64,7 @@ import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatb
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
 import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
+import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
 import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
 
 const { ipcRenderer, remote } = electron;
@@ -129,7 +130,8 @@ export function getComponents() {
     ChatbotSongRequestOnboardingWindow,
     ChatbotLoyaltyWindow,
     ChatbotLoyaltyAddAllWindow,
-    ChatbotLoyaltyPreferencesWindow
+    ChatbotLoyaltyPreferencesWindow,
+    ChatbotHeistPreferencesWindow
   };
 }
 

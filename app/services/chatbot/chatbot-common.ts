@@ -177,7 +177,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openLoyaltyAddAllWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLoyaltyAddAllWindow',
-      title: $t('Chatbot Loyalty Add Window'),
+      title: $t('Chatbot Add Loyalty'),
       size: {
         width: 475,
         height: 192
@@ -199,7 +199,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQueuePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQueuePreferencesWindow',
-      title: $t('Chatbot Queue Preferences Window'),
+      title: $t('Chatbot Queue Preferences'),
       size: {
         width: 650,
         height: 500
@@ -210,7 +210,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
-      title: $t('Chatbot Quote Preferences Window'),
+      title: $t('Chatbot Quote Preferences'),
       size: {
         width: 650,
         height: 300
@@ -221,10 +221,21 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
-      title: $t('Chatbot Song Request Preferences Window'),
+      title: $t('Chatbot Song Request Preferences'),
       size: {
         width: 650,
         height: 500
+      }
+    });
+  }
+
+  openHeistPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotHeistPreferencesWindow',
+      title: $t('Chatbot Heist Preferences'),
+      size: {
+        width: 650,
+        height: 600
       }
     });
   }

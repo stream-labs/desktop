@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
@@ -20,6 +20,7 @@ import {
   NEW_ALERT_MODAL_ID,
   ChatbotAlertType,
 } from 'services/chatbot';
+import { debounce } from 'lodash-decorators';
 
 interface INewAlertMetadata {
   follow: {
@@ -227,12 +228,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Number of months subscribed')
+            placeholder: $t('Number of months subscribed'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to subscriber')
+            placeholder: $t('Message to subscriber'),
+            max: 450
           },
           is_gifted: {
             required: true,
@@ -250,12 +253,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.number,
             min: 0,
             required: true,
-            placeholder: $t('Minimum amount')
+            placeholder: $t('Minimum amount'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to donator')
+            placeholder: $t('Message to donator'),
+            max: 450
           }
         }
       },
@@ -265,12 +270,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             min: 0,
-            placeholder: $t('Minimum viewer count')
+            placeholder: $t('Minimum viewer count'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to hosts')
+            placeholder: $t('Message to hosts'),
+            max: 450
           }
         }
       },
@@ -280,12 +287,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             min: 0,
             type: EInputType.number,
             required: true,
-            placeholder: $t('Minimum amount')
+            placeholder: $t('Minimum amount'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             required: true,
             type: EInputType.textArea,
-            placeholder: $t('Message to raider')
+            placeholder: $t('Message to raider'),
+            max: 450
           }
         }
       },
@@ -295,12 +304,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             min: 0,
-            placeholder: $t('Minimum bit count')
+            placeholder: $t('Minimum bit count'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             required: true,
             type: EInputType.textArea,
-            placeholder: $t('Message to Bit donators')
+            placeholder: $t('Message to Bit donators'),
+            max: 450
           }
         }
       },
@@ -317,12 +328,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Number of months subscribed')
+            placeholder: $t('Number of months subscribed'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to subscriber')
+            placeholder: $t('Message to subscriber'),
+            max: 450
           },
         }
       },
@@ -331,12 +344,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Minimum Amount')
+            placeholder: $t('Minimum Amount'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to Super Chatter')
+            placeholder: $t('Message to Super Chatter'),
+            max: 450
           },
         }
       },
@@ -345,12 +360,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Minimum Amount')
+            placeholder: $t('Minimum Amount'),
+            max: Number.MAX_SAFE_INTEGER
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to Member')
+            placeholder: $t('Message to Member'),
+            max: 450
           }
         }
       }
@@ -434,6 +451,12 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   onCancelHandler() {
     this.$modal.hide(NEW_ALERT_MODAL_ID);
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSubmit() {

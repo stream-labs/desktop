@@ -108,6 +108,11 @@ export interface ILoyaltyPreferencesResponse {
   enabled: boolean;
 }
 
+export interface IHeistPreferencesResponse {
+  settings: IHeistPreferencesData;
+  enabled: boolean;
+}
+
 export interface IQueueStateResponse {
   status: 'Open' | 'Closed';
   title?: string;
@@ -439,6 +444,60 @@ export interface ISongRequestGeneral {
   music_only: boolean;
 }
 
+//  heist
+export interface IHeistCommands {
+  [id: string]: IHeistCommand;
+}
+
+export interface IHeistCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IChatbotAliases;
+  permission: IChatbotPermission;
+}
+
+export interface IHeistPreferencesGeneralSettings {
+  min_entries: number;
+  max_amount: number;
+  start_delay: number;
+  probability: {
+    viewers: number;
+    subscribers: number;
+    moderators: number;
+  };
+  payout: {
+    viewers: number;
+    subscribers: number;
+    moderators: number;
+  };
+}
+
+export interface IHeistPreferencesMessagesSettings {
+  start: {
+    first: string;
+    success: string;
+    fail: string;
+  };
+  solo: {
+    win: string;
+    loss: string;
+  };
+  group: {
+    win: string;
+    partial: string;
+    loss: string;
+  };
+  results: string;
+}
+
+export interface IHeistPreferencesData {
+  commands: IHeistCommands;
+  general: IHeistPreferencesGeneralSettings;
+  messages: IHeistPreferencesMessagesSettings;
+}
+
 // loyalty
 export interface ILoyaltyData {
   [id: number]: IChatbotLoyalty;
@@ -557,7 +616,8 @@ export type ChatbotSettingSlug =
   | 'caps-protection'
   | 'symbol-protection'
   | 'link-protection'
-  | 'words-protection';
+  | 'words-protection'
+  | 'heist';
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
