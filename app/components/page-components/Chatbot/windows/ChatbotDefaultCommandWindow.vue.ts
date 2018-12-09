@@ -244,6 +244,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     }
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
+  }
+
+
   // methods
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;

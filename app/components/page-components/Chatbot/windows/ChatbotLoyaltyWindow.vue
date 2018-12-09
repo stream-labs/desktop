@@ -37,6 +37,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0"
     >
       {{ $t('Save') }}
     </button>

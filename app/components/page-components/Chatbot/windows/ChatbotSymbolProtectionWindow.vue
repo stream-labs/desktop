@@ -8,8 +8,7 @@
     </Tabs>
   </div>
   <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
-    <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general' && symbolProtection">
+      <div v-show="selectedTab === 'general' && symbolProtection">
         <div class="row">
           <div class="small-6 columns">
             <VFormGroup
@@ -38,7 +37,7 @@
           :metadata="metadata.symbol.general.message"
         />
       </div>
-      <div v-if="selectedTab === 'advanced'">
+      <div v-show="selectedTab === 'advanced'">
         <VFormGroup
           :title="$t('Minimum Amount of Symbols')"
           v-model="symbolProtection.advanced.minimum"
@@ -55,7 +54,6 @@
           :metadata="metadata.symbol.advanced.percent"
         />
       </div>
-    </transition>
   </validated-form>
   <div slot="controls" class="flex flex--space-between">
     <button

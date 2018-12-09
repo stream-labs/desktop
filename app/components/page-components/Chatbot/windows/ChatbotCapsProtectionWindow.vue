@@ -1,16 +1,11 @@
 <template>
-<ModalLayout
-  :showControls="false"
-  :customControls="true"
->
-  <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
-    </Tabs>
-  </div>
-  <div slot="content" class="chatbot-caps-protection__container">
-    <transition name='fade' mode="out-in" appear>
+  <ModalLayout :showControls="false" :customControls="true">
+    <div slot="fixed">
+      <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
+    </div>
+    <div slot="content" class="chatbot-caps-protection__container">
       <validated-form ref="form">
-        <div v-if="selectedTab === 'general' && capsProtection">
+        <div v-show="selectedTab === 'general' && capsProtection">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
@@ -39,7 +34,7 @@
             :metadata="metadata.caps.general.message"
           />
         </div>
-        <div v-if="selectedTab === 'advanced'">
+        <div v-show="selectedTab === 'advanced'">
           <VFormGroup
             :title="$t('Minimum Amount of Caps')"
             v-model="capsProtection.advanced.minimum"
@@ -57,29 +52,19 @@
           />
         </div>
       </validated-form>
-    </transition>
-  </div>
-  <div slot="controls" class="flex flex--space-between">
-    <button
-      class="button button--default"
-      @click="onResetHandler">
-      {{ $t('Reset') }}
-    </button>
-    <div>
-      <button
-        class="button button--default"
-        @click="onCancelHandler">
-        {{ $t('Cancel') }}
-      </button>
-      <button
-        class="button button--action"
-        @click="onSaveHandler"
-      >
-        {{ $t("Save") }}
-      </button>
     </div>
-  </div>
-</ModalLayout>
+    <div slot="controls" class="flex flex--space-between">
+      <button class="button button--default" @click="onResetHandler">{{ $t('Reset') }}</button>
+      <div>
+        <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
+        <button
+          class="button button--action"
+          @click="onSaveHandler"
+          :disabled="errors.items.length > 0"
+        >{{ $t("Save") }}</button>
+      </div>
+    </div>
+  </ModalLayout>
 </template>
 
 <script lang="ts" src="./ChatbotCapsProtectionWindow.vue.ts"></script>

@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
@@ -11,6 +11,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
   ISongRequestData
 } from 'services/chatbot';
+import { debounce } from 'lodash-decorators';
 
 
 // general tab is all from chatbot api directly
@@ -101,6 +102,12 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
 
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
   }
 
   async onSaveHandler() {

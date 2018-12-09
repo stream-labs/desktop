@@ -36,9 +36,9 @@
       </div>
     </div>
     <div v-if="editedCommand" slot="content" class="chatbot-add-command__container">
-      <transition name="fade" mode="out-in" appear>
+
         <validated-form ref="form">
-          <div v-if="selectedTab === 'general'">
+          <div v-show="selectedTab === 'general'">
             <VFormGroup
               :title="$t('Command')"
               v-model="editedCommand.command"
@@ -123,11 +123,10 @@
               :metadata="metadata.response_type"
             />
           </div>
-          <div v-if="selectedTab === 'advanced'">
+          <div v-show="selectedTab === 'advanced'">
             <ChatbotAliases v-model="editedCommand.aliases"/>
           </div>
         </validated-form>
-      </transition>
     </div>
     <div slot="controls" class="flex flex--space-between">
       <button
@@ -136,7 +135,7 @@
       >{{ $t('Reset Command') }}</button>
       <div>
         <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
-        <button class="button button--action" @click="onSaveHandler">{{ $t("Save") }}</button>
+        <button class="button button--action" @click="onSaveHandler"       :disabled="errors.items.length > 0">{{ $t("Save") }}</button>
       </div>
     </div>
   </ModalLayout>

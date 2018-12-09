@@ -152,6 +152,12 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     this.selectedTab = tab;
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 

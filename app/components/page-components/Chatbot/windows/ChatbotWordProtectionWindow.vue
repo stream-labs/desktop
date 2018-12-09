@@ -8,8 +8,7 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-word-protection__container">
-    <transition name='fade' mode="out-in" appear>
-      <validated-form ref="form" v-if="selectedTab === 'general' && wordProtection">
+      <validated-form ref="form" v-show="selectedTab === 'general' && wordProtection">
         <VFormGroup
           :title="$t('Auto Permit')"
           v-model="wordProtection.general.excluded.level"
@@ -21,12 +20,11 @@
           :metadata="metadata.word.general.message"
         />
       </validated-form>
-      <div v-if="selectedTab === 'blacklist'">
+      <div v-show="selectedTab === 'blacklist'">
         <ChatbotWordProtectionList
           v-model="wordProtection.blacklist"
         />
       </div>
-    </transition>
   </div>
   <div slot="controls" class="flex flex--space-between">
     <button
@@ -43,6 +41,7 @@
       <button
         class="button button--action"
         @click="onSaveHandler"
+        :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
       </button>

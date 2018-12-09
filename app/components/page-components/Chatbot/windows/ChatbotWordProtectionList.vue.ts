@@ -1,4 +1,4 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue'
 
 import {
@@ -15,6 +15,7 @@ import {
 } from 'services/chatbot';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm }
@@ -101,6 +102,12 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     let newListItemArray = this.value.slice(0);
     newListItemArray.splice(index, 1);
     this.$emit('input', newListItemArray);
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
   }
 
   async onAddNewItemHandler() {

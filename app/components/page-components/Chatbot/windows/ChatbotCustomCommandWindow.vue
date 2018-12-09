@@ -8,9 +8,9 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-add-command__container">
-    <transition name='fade' mode="out-in" appear>
+
       <validated-form ref="form">
-        <div v-if="selectedTab === 'general'">
+        <div v-show="selectedTab === 'general'">
           <VFormGroup
             :title="$t('Command')"
             v-model="newCommand.command"
@@ -38,7 +38,7 @@
             </div>
           </div>
         </div>
-        <div v-if="selectedTab === 'advanced'">
+        <div v-show="selectedTab === 'advanced'">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
@@ -67,7 +67,6 @@
           <ChatbotAliases v-model="newCommand.aliases" />
         </div>
       </validated-form>
-    </transition>
   </div>
   <div slot="controls">
     <button
@@ -78,6 +77,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0"
     >
       {{ $t("Save") }}
     </button>

@@ -14,6 +14,7 @@ import {
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { cloneDeep } from 'lodash';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm }
@@ -208,8 +209,13 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     ' minutes.';
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
+  }
+
   async onSaveHandler() {
-    console.log(this.$refs.form.validateAndGetErrorsCount());
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService

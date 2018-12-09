@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
@@ -13,6 +13,7 @@ import {
   EInputType
 } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm }
@@ -71,6 +72,12 @@ export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
         .updateLoyalty(this.newLoyalty.id, this.newLoyalty)
         .catch(this.onErrorHandler);
       return;
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

@@ -94,6 +94,13 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     }
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
+  }
+
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 

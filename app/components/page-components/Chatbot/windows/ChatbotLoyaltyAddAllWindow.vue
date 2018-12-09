@@ -23,6 +23,7 @@
       <button
         class="button button--action"
         @click="onOkHandler"
+        :disabled="errors.items.length > 0"
       >
         {{ $t("Ok") }}
       </button>

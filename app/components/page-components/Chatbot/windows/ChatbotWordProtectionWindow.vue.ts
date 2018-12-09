@@ -1,9 +1,10 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import ChatbotWordProtectionList from 'components/page-components/Chatbot/windows/ChatbotWordProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -40,6 +41,12 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
 
   onResetHandler() {
     this.onResetSlugHandler('words-protection');
+  }
+  
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
   }
 
   async onSaveHandler() {

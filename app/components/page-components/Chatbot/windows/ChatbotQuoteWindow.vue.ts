@@ -69,6 +69,12 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
     }
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged(){
+    await this.$refs.form.validateAndGetErrorsCount()
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isEdit) {
