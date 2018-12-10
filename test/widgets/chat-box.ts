@@ -27,7 +27,6 @@ test('Chatbox Visual Settings', async t => {
     show_coin_icons: false,
     show_bttv_emotes: false,
     show_franker_emotes: false,
-    show_smf_emotes: false,
     background_color: '#FFFFFF',
     message_hide_delay: 10
   };
@@ -46,7 +45,6 @@ test('Chatbox Visual Settings', async t => {
     show_coin_icons: true,
     show_bttv_emotes: true,
     show_franker_emotes: true,
-    show_smf_emotes: true,
     background_color: '#000000',
     message_hide_delay: 60
   };
