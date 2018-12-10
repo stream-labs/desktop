@@ -8,7 +8,7 @@ import {
   ILoadedApp
 } from 'services/platform-apps';
 import VueResize from 'vue-resize';
-import HScroll from './shared/HScroll.vue';
+import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
 
 @Component({
@@ -20,12 +20,11 @@ export default class AppsNav extends Vue {
   @Inject()
   navigationService: NavigationService;
 
-  isMounted = false;
-  canScroll = false;
-
-  mounted() {
-    this.isMounted = true;
-  }
+  scrollModel: IHScrollModel = {
+    canScroll: false,
+    canScrollLeft: false,
+    canScrollRight: false
+  };
 
 
   isSelectedApp(appId: string) {

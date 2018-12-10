@@ -1,9 +1,12 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
+import { isEqual } from 'lodash';
 
 export interface IHScrollModel {
   canScroll: boolean;
+  canScrollLeft: boolean;
+  canScrollRight: boolean;
 }
 
 /**
@@ -20,25 +23,36 @@ export default class HScroll extends Vue {
 
   mounted() {
     new ResizeSensor(this.$el, () => {
-      this.onResizeHandler();
+      this.onInvalidateHandler();
     });
-    this.onResizeHandler();
+    this.onInvalidateHandler();
   }
 
   onWheelHandler(e: WheelEvent) {
+    // transform a vertical scrolling to the horizontal scrolling
     e.preventDefault();
     this.$el.scrollBy(e.deltaY, 0);
+    this.onInvalidateHandler();
   }
 
-  private onResizeHandler() {
+  /**
+   * recalculate scrolling restrictions
+   */
+  private onInvalidateHandler() {
     const wrapperWidth = this.$el.clientWidth;
     const trackWidth = this.$refs.track.scrollWidth;
-    const model = {
-      canScroll: trackWidth > wrapperWidth
+    const scrollLeft = this.$el.scrollLeft;
+    const canScroll = trackWidth > wrapperWidth;
+    const canScrollLeft = canScroll && scrollLeft > 0;
+    const canScrollRight = canScroll && (trackWidth - wrapperWidth) > scrollLeft;
+    const model: IHScrollModel = {
+      canScroll,
+      canScrollLeft,
+      canScrollRight
     };
 
-    const modelIsChanged = !this.model || this.model.canScroll !== model.canScroll;
-    if (!modelIsChanged) return;
+    // don't fire the 'change' event if nothing has been changed
+    if (isEqual(model, this.model)) return;
 
     this.model = model;
     this.$emit('change', model);

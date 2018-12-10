@@ -4,7 +4,7 @@
   <div class="apps-nav">
 
     <h-scroll
-      @change="(model) => canScroll = model.canScroll"
+      @change="(model) => scrollModel = model"
       class="apps-tab__container"
     >
       <span
@@ -28,12 +28,12 @@
     </h-scroll>
 
 
-    <div class="left">
-      <i v-if="canScroll" class="icon-down icon-left"></i>
+    <div class="left" v-if="scrollModel.canScrollLeft" >
+      <i class="icon-down icon-left"></i>
     </div>
 
-    <div class="right">
-      <i v-if="canScroll" class="icon-down icon-right"></i>
+    <div class="right" v-if="scrollModel.canScrollRight">
+      <i class="icon-down icon-right"></i>
     </div>
 
   </div>
@@ -71,7 +71,8 @@
   left: 0;
 
   &:hover {
-    .left, .right { display: block}
+    // show arrows
+    .left, .right { opacity: 1}
   }
 }
 
@@ -109,22 +110,24 @@
 }
 
 .left {
+  transition: opacity @transition-time;
   .absolute(0, auto, 0, 0);
   padding-top: 8px;
   width: 20px;
   background-image: linear-gradient(to right, @day-primary 80% , transparent);
   z-index: 1;
-  display: none;
+  opacity: 0;
 }
 
 .right {
+  transition: opacity @transition-time;
   .absolute(0, 0, 0, auto);
   padding-top: 8px;
   width: 20px;
   background-image: linear-gradient(to left, @day-primary 80%, transparent);
   z-index: 1;
-  display: none;
   text-align: right;
+  opacity: 0;
 }
 
 .night-theme {
