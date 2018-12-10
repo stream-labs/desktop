@@ -173,6 +173,7 @@
     "recursive-readdir": "^2.2.2",
     "reflect-metadata": "0.1.12",
     "rxjs": "6.3.3",
+    "serve-handler": "^5.0.7",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
