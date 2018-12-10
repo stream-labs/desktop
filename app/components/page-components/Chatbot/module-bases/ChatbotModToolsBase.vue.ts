@@ -193,7 +193,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           type: EInputType.number,
           placeholder: $t('Punishment Duration'),
           tooltip: $t('Value in Seconds'),
-          min: 0
+          min: 0,
+          max: 86400
         }
       },
       permit: {
@@ -202,7 +203,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           type: EInputType.number,
           placeholder: $t('Permission Duration'),
           tooltip: $t('Value in Seconds'),
-          min: 1
+          min: 1,
+          max: 86400
         }
       },
       excluded: {

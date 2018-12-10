@@ -39,7 +39,8 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
           required: true,
           type: EInputType.textArea,
           placeholder: $t('Message when user is picked.')
-        })
+        }),
+        max: 450
       }
     };
   }

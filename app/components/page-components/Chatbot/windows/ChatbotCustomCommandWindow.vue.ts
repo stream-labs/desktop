@@ -132,7 +132,8 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       title: $t('Cooldown'),
       placeholder: $t('Cooldown'),
       tooltip: $t('Value in seconds'),
-      min: 0
+      min: 0,
+      max: 86400
     };
     return timerMetadata;
   }

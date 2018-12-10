@@ -51,14 +51,16 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
       text: {
         required: true,
         type: EInputType.text,
-        placeholder: 'Add a link to add to list'
+        placeholder: 'Add a link to add to list',
+        max: 450
       },
       punishment: {
         duration: {
           type: EInputType.number,
           required: true,
           placeholder: 'Punishment Duration (Value in Seconds)',
-          min: 0
+          min: 0,
+          max: 86400
         },
         type: {
           required: true,
