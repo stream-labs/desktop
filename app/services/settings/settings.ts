@@ -146,12 +146,9 @@ export class SettingsService extends StatefulService<ISettingsState>
       'LowLatencyEnable',
       'BindIP',
       'FilenameFormatting',
-      'MaxRetries',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
       'RecRBPrefix',
-      'Reconnect',
-      'RetryDelay'
     ];
 
     for (const group of settings) {
