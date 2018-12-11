@@ -15,7 +15,6 @@ const debug = process.env.NODE_ENV !== 'production';
 
 const mutations = {
   BULK_LOAD_STATE(state: any, data: any) {
-    console.log('run BULK_LOAD_STATE_MUTATION');
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
