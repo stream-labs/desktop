@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron/index';
+import { test, useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
 import { logIn, blankSlate } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -78,7 +77,7 @@ test('Stream Boss Manage Visual Settings', async t => {
 
   await client.click('li=Visual Settings');
 
-  const formMonkey = new FormMonkey(t, true);
+  const formMonkey = new FormMonkey(t);
 
   const testSet1 = {
     text_color: '#FF0000',

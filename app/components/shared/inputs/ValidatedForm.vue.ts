@@ -4,7 +4,7 @@ import uuid from 'uuid';
 import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 /**
  * VeeValidate doesn't support slots https://github.com/baianat/vee-validate/issues/325

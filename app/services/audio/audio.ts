@@ -1,6 +1,5 @@
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject, Subscription } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -13,12 +12,12 @@ import {
   IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
 } from 'components/obs/inputs/ObsInput';
 import {
-  IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
+  IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
 } from './audio-api';
-import { Observable } from 'rxjs/Observable';
+import { EDeviceType, HardwareService, IDevice } from 'services/hardware';
+import { Observable } from 'rxjs';
 import { $t } from 'services/i18n';
-import uuid from 'uuid/v4';
 import { omit } from 'lodash';
 
 export enum E_AUDIO_CHANNELS {
@@ -50,6 +49,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private hardwareService: HardwareService;
 
 
   protected init() {
@@ -157,32 +157,10 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 
 
-  getDevices(): IAudioDevice[] {
-    const devices: IAudioDevice[] = [];
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid());
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid());
-
-    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
-        devices.push({
-          id: item.value,
-          description: item.name,
-          type: 'input'
-        });
-      });
-
-    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
-        devices.push({
-          id: item.value,
-          description: item.name,
-          type: 'output'
-        });
-      });
-
-    obsAudioInput.release();
-    obsAudioOutput.release();
-    return devices;
+  getDevices(): IDevice[] {
+    return this.hardwareService
+      .getDevices()
+      .filter(device => [EDeviceType.audioOutput, EDeviceType.audioInput].includes(device.type))
   }
 
   showAdvancedSettings() {

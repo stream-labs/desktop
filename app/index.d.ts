@@ -1,4 +1,5 @@
 /// <reference path="../vendor/toasted.d.ts" />
+/// <reference path="../vendor/urijs.d.ts" />
 
 // all global interfaces here
 
@@ -64,6 +65,7 @@ declare module 'recursive-readdir';
 declare module 'vue-toasted';
 declare module 'hyperform';
 declare module 'emojione';
+declare module 'vue-resize';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

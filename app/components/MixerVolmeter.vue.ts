@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { Subscription } from 'rxjs/subscription';
+import { Subscription } from 'rxjs';
 import { AudioSource } from 'services/audio';
 import { Inject } from 'util/injector';
 import { CustomizationService } from 'services/customization';

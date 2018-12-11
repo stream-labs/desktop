@@ -1,6 +1,6 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin');
 
 const plugins = [];
 
@@ -48,7 +48,8 @@ module.exports = {
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")',
-    'request': 'require("request")'
+    'request': 'require("request")',
+    'archiver': 'require("archiver")'
   },
 
   module: {
@@ -117,7 +118,10 @@ module.exports = {
   },
 
   optimization: {
-    minimizer: [new UglifyJsPlugin({ sourceMap: true, uglifyOptions: { mangle: false } })]
+    minimizer: [new TerserPlugin({
+      sourceMap: true,
+      terserOptions: { mangle: false }
+    })]
   },
 
   plugins

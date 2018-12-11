@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs/Observable';
-import { ISourceApi, TSourceType, ISource } from 'services/sources';
+import { Observable } from 'rxjs';
+import { ISourceApi, TSourceType, ISource, ISourceAddOptions } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
 
 /**
@@ -92,6 +92,7 @@ export interface ISceneApi extends IScene {
 
 export interface ISceneNodeAddOptions {
   id?: string; // A new ID will be assigned if one is not provided
+  sourceAddOptions?: ISourceAddOptions;
 }
 
 

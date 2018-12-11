@@ -4,7 +4,7 @@ import { Inject } from '../../util/injector';
 import { WindowsService } from 'services/windows';
 import { IWidgetsServiceApi } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';

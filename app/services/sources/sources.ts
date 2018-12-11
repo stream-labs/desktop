@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
+import { cloneDeep } from 'lodash';
 import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
@@ -16,23 +17,21 @@ import { StreamlabelsManager } from './properties-managers/streamlabels-manager'
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
 import {
-  IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
+  IActivePropertyManager, ISource, ISourceAddOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager,
-  ISourceAddOptions
+  TPropertiesManager
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
+import { HardwareService } from 'services/hardware';
+import { AudioService } from '../audio';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
-
-const { ipcRenderer } = electron;
-
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
@@ -62,6 +61,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private userService: UserService;
   @Inject() private navigationService: NavigationService;
   @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private hardwareService: HardwareService;
+  @Inject() private audioService: AudioService;
 
   /**
    * Maps a source id to a property manager
@@ -87,11 +88,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number, isTemporary?: boolean) {
+  private ADD_SOURCE(addOptions: {
+    id: string, name: string,
+    type: TSourceType,
+    channel?: number,
+    isTemporary?: boolean,
+    propertiesManagerType?: TPropertiesManager
+  }) {
+    const id = addOptions.id;
     const sourceModel: ISource = {
       sourceId: id,
-      name,
-      type,
+      name: addOptions.name,
+      type: addOptions.type,
+      propertiesManagerType: addOptions.propertiesManagerType || 'default',
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -106,10 +115,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel
+      channel: addOptions.channel
     };
 
-    if (isTemporary) {
+    if (addOptions.isTemporary) {
       Vue.set(this.state.temporarySources, id, sourceModel);
     } else {
       Vue.set(this.state.sources, id, sourceModel);
@@ -139,48 +148,48 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     name: string,
     type: TSourceType,
     settings: Dictionary<any> = {},
-    options: ISourceCreateOptions = {}
+    options: ISourceAddOptions = {}
   ): Source {
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
-
-    if (type === 'browser_source') {
-      if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
-    }
-
-    if (type === 'text_gdiplus') {
-      if (settings.text === void 0) settings.text = name;
-    }
-
-    const obsInput = obs.InputFactory.create(type, id, settings);
+    const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
+    const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
 
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
+  addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, name, type, options.channel, options.isTemporary);
+    const managerType = options.propertiesManager || 'default';
+    this.ADD_SOURCE({
+      id,
+      name,
+      type,
+      channel: options.channel,
+      isTemporary: options.isTemporary,
+      propertiesManagerType: managerType
+    });
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
 
-    const managerType = options.propertiesManager || 'default';
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
-      manager: new managerKlass(obsInput, options.propertiesManagerSettings),
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
       type: managerType
     };
 
     if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
+
+    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
   }
 
   removeSource(id: string) {
@@ -254,6 +263,39 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.removeSource(source.sourceId);
   }
 
+  getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
+    const resolvedSettings = cloneDeep(settings);
+
+    Object.keys(resolvedSettings).forEach(propName => {
+      // device_id is unique for each PC
+      // so we allow to provide a device name instead device id
+      // resolve the device id by the device name here
+      if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
+
+      const device = type === 'dshow_input' ?
+        this.hardwareService.getDshowDeviceByName(settings[propName]) :
+        this.hardwareService.getDeviceByName(settings[propName]);
+
+      if (!device) return;
+      resolvedSettings[propName] = device.id;
+    });
+    return resolvedSettings;
+  }
+
+  private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
+    const resolvedSettings = this.getObsSourceSettings(type, settings);
+
+    // setup default settings
+    if (type === 'browser_source') {
+      if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
+      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
+    }
+
+    if (type === 'text_gdiplus') {
+      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    }
+    return resolvedSettings;
+  }
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();

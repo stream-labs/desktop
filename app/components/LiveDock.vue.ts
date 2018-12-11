@@ -19,13 +19,16 @@ import {
 } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
+import ResizeBar from 'components/shared/ResizeBar.vue';
+import { AppService } from 'services/app';
 
 @Component({
   components: {
     Chat,
     Slider,
     ListInput,
-    PlatformAppWebview
+    PlatformAppWebview,
+    ResizeBar
   }
 })
 export default class LiveDock extends Vue {
@@ -34,12 +37,14 @@ export default class LiveDock extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() appService: AppService;
 
   @Prop({ default: false })
   onLeft: boolean;
 
   elapsedStreamTime = '';
   elapsedInterval: number;
+  canAnimate = false;
 
   $refs: {
     chat: Chat;
@@ -61,13 +66,23 @@ export default class LiveDock extends Vue {
   }
 
   mounted() {
+    const width = this.customizationService.state.livedockSize;
+    if (width < 1) {
+      // migrate from old percentage value to the pixel value
+      this.resetWidth();
+    }
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
       }
+      this.updateWidth();
     }, 100);
+  }
+
+  get applicationLoading() {
+    return this.appService.state.loading;
   }
 
   beforeDestroy() {
@@ -94,11 +109,15 @@ export default class LiveDock extends Vue {
   }
 
   collapse() {
+    this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(true);
+    setTimeout(() => this.canAnimate = false, 300);
   }
 
   expand() {
+    this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(false);
+    setTimeout(() => this.canAnimate = false, 300);
   }
 
   get isStreaming() {
@@ -252,4 +271,46 @@ export default class LiveDock extends Vue {
       };
     }
   }
+
+  onResizeStartHandler() {
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  onResizeStopHandler(offset: number) {
+    offset = this.onLeft ? offset : -offset;
+    this.setWidth(this.customizationService.state.livedockSize + offset);
+    setTimeout(() => {
+      this.customizationService.setSettings({
+        previewEnabled: true
+      });
+    }, 500);
+  }
+
+  setWidth(width: number) {
+    this.customizationService.setSettings({
+      livedockSize: this.validateWidth(width)
+    });
+  }
+
+  validateWidth(width: number): number {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const minEditorWidth = 860;
+    const minWidth = 290;
+    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    width = Math.max(minWidth, width);
+    width = Math.min(maxWidth, width);
+    return width;
+  }
+
+  updateWidth() {
+    const width = this.customizationService.state.livedockSize;
+    if (width !== this.validateWidth(width)) this.setWidth(width);
+  }
+
+  resetWidth() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const defaultWidth = appRect.width * 0.28;
+    this.setWidth(defaultWidth);
+  }
+
 }

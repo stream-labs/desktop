@@ -31,6 +31,7 @@ export class Source implements ISourceApi {
   doNotDuplicate: boolean;
   channel?: number;
   resourceId: string;
+  propertiesManagerType: TPropertiesManager;
 
   sourceState: ISource;
 
@@ -46,7 +47,8 @@ export class Source implements ISourceApi {
   }
 
   updateSettings(settings: Dictionary<any>) {
-    this.getObsInput().update(settings);
+    const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
+    this.getObsInput().update(obsInputSettings);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
@@ -89,7 +91,7 @@ export class Source implements ISourceApi {
 
 
   getPropertiesManagerType(): TPropertiesManager {
-    return this.sourcesService.propertiesManagers[this.sourceId].type;
+    return this.propertiesManagerType;
   }
 
 
@@ -115,6 +117,8 @@ export class Source implements ISourceApi {
     this.sourcesService.propertiesManagers[this.sourceId].manager =
       new managerKlass(this.getObsInput(), settings);
     this.sourcesService.propertiesManagers[this.sourceId].type = type;
+    this.SET_PROPERTIES_MANAGER_TYPE(type);
+    this.sourcesService.sourceUpdated.next(this.getModel());
   }
 
 
@@ -194,5 +198,10 @@ export class Source implements ISourceApi {
   @mutation()
   private SET_NAME(newName: string) {
     this.sourceState.name = newName;
+  }
+
+  @mutation()
+  private SET_PROPERTIES_MANAGER_TYPE(type: TPropertiesManager) {
+    this.sourceState.propertiesManagerType = type;
   }
 }

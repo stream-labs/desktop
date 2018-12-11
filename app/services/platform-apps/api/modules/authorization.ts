@@ -64,6 +64,10 @@ export class AuthorizationModule extends Module {
       }
     });
 
+    if (ctx.app.unpacked) {
+      win.webContents.openDevTools({ mode: 'detach' });
+    }
+
     win.webContents.session.protocol.registerFileProtocol('slobs-oauth', (req) => {
       eventHandler({ type: EAuthWindowEventType.AuthRedirect, url: req.url });
       win.close();

@@ -22,7 +22,7 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
   @Prop()
   readonly value: undefined;
 
-  @Prop()
+  @Prop({ default: () => ({}) })
   readonly metadata: IInputMetadata;
 
   @Prop()

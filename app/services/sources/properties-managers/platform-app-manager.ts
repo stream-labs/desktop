@@ -1,7 +1,7 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
 import { PlatformAppsService } from 'services/platform-apps';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import * as obs from '../../../../obs-api';
 
 export interface IPlatformAppManagerSettings {
