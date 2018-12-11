@@ -14,27 +14,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 
-const eventsByPlatform = (platform: string) => ({
-  twitch: [
-    { key: 'show_follows', title: $t('Follows') },
-    { key: 'show_subscriptions', title: $t('Subscriptions') },
-    { key: 'show_resubs', title: $t('Show Resubs') },
-    { key: 'show_sub_tiers', title: $t('Show Sub Tiers') },
-    { key: 'show_hosts', title: $t('Hosts') },
-    { key: 'show_bits', title: $t('Bits') },
-    { key: 'show_raids', title: $t('Raids') }
-  ],
-  facebook: [],
-  youtube: [
-    { key: 'show_subscriptions', title: $t('Subscriptions') },
-    { key: 'show_sponsors', title: $t('Members') },
-    { key: 'show_fanfundings', title: $t('Super Chats') }
-  ],
-  mixer: [
-    { key: 'show_resubs', title: $t('Show Resubs') },
-  ]
-}[platform]);
-
 @Component({
   components: {
     WidgetEditor,
@@ -56,7 +35,7 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
 
   get eventsForPlatform() {
     const baseEvents = [{ key: 'show_donations', title: $t('Donations') }, { key: 'show_merch', title: $t('Merch') }];
-    return eventsByPlatform(this.userService.platform.type).concat(baseEvents);
+    return this.service.eventsByPlatform().concat(baseEvents);
   }
 
   get isTwitch() {
