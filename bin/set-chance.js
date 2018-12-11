@@ -16,8 +16,8 @@ function validateArgs(args) {
     }
   };
 
-  argRequired('access-key');
-  argRequired('secret-access-key');
+  if (!process.env['AWS_ACCESS_KEY_ID']) argRequired('access-key');
+  if (!process.env['AWS_SECRET_ACCESS_KEY']) argRequired('secret-access-key');
   argRequired('version');
 
   argRequired('chance', (value) => {
@@ -41,10 +41,14 @@ async function main() {
   const version = args['version'];
   const chance = args['chance'];
 
-  const awsCredentials =
-      new aws.Credentials(args['access-key'], args['secret-access-key']);
+  let s3Options;
 
-  const s3Options = {credentials : awsCredentials};
+  if (args['access-key'] && args['secret-access-key']) {
+    const awsCredentials =
+        new aws.Credentials(args['access-key'], args['secret-access-key']);
+
+    s3Options = { credentials: awsCredentials };
+  }
 
   const s3Client = new aws.S3(s3Options);
 
