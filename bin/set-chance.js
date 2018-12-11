@@ -16,6 +16,7 @@ function validateArgs(args) {
     }
   };
 
+  argRequired('s3-bucket');
   argRequired('access-key');
   argRequired('secret-access-key');
   argRequired('version');
