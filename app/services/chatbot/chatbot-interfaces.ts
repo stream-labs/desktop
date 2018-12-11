@@ -570,6 +570,43 @@ export interface ILoyaltyDonations {
   superchat: number;
 }
 
+//  poll
+export interface IPollProfile {
+  id: string;
+  title: string;
+  timer: {
+    enabled: boolean;
+    duration: number;
+    job_id?: string;
+    started_at?: number;
+    time_remaining?: number;
+  };
+  options: IPollOption[];
+}
+
+export interface IPollOption {
+  name: string;
+  parameter: string;
+}
+export interface IChatbotPollSettings {
+  commands: IPollCommands;
+  profiles: IPollProfile[];
+}
+
+export interface IPollCommands {
+  [id: string]: IPollCommand;
+}
+
+export interface IPollCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IChatbotAliases;
+  permission: IChatbotPermission;
+}
+
+
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,

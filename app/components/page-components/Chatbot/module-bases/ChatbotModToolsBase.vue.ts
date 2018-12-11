@@ -128,7 +128,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @Watch('linkProtection', { immediate: true, deep: true })
   @debounce(1)
   onLinkProtChanged(value: ILinkProtectionData, oldValue: ILinkProtectionData) {
-    if (oldValue) {
+    if (oldValue && this.linkProtection != null) {
       this.linkProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
     }
   }
@@ -136,7 +136,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @Watch('wordProtection', { immediate: true, deep: true })
   @debounce(1)
   onWordProtChanged(value: IWordProtectionData, oldValue: IWordProtectionData) {
-    if (oldValue) {
+    if (oldValue && this.wordProtection != null) {
       this.wordProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
     }
   }
@@ -144,7 +144,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @Watch('linkProtection', { immediate: true, deep: true })
   @debounce(1)
   onSymbolProtChanged(value: ISymbolProtectionData, oldValue: ISymbolProtectionData) {
-    if (oldValue) {
+    if (oldValue && this.symbolProtection != null) {
       this.symbolProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
     }
   }
@@ -152,7 +152,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @Watch('capsProtection', { immediate: true, deep: true })
   @debounce(1)
   onCapsProtChanged(value: ICapsProtectionData, oldValue: ICapsProtectionData) {
-    if (oldValue) {
+    if (oldValue && this.capsProtection != null) {
       this.capsProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
     }
   }

@@ -16,6 +16,7 @@ import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
 import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
 import { Debounce } from 'lodash-decorators';
+import ChatbotPoll from 'components/page-components/Chatbot/ChatbotPoll.vue';
 
 @Component({
   components: {
@@ -31,7 +32,8 @@ import { Debounce } from 'lodash-decorators';
     ChatbotQueue,
     ToggleInput,
     ChatbotBanner,
-    ChatbotLoyalty
+    ChatbotLoyalty,
+    ChatbotPoll
   }
 })
 export default class Chatbot extends Vue {
@@ -53,7 +55,7 @@ export default class Chatbot extends Vue {
     { title: 'Quotes', enabled: true },
     { title: 'Queue', enabled: true },
     { title: 'Loyalty', enabled: true },
-    { title: 'Poll', enabled: false },
+    { title: 'Poll', enabled: true },
     { title: 'Betting', enabled: false }
   ];
 
