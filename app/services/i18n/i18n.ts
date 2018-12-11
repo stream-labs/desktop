@@ -27,7 +27,7 @@ export function $t(...args: any[]): string {
 }
 
 /**
- * Crowding and Electron use different standards for local name
+ * Crowding and Electron use different standards for locale name
  * Do some mapping in LANG_CODE_MAP based on docs:
  * @see https://electronjs.org/docs/api/locales
  */
