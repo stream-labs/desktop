@@ -11,7 +11,7 @@ import {
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
-  ChatbotSettingSlug,
+  ChatbotSettingSlug
 } from 'services/chatbot';
 
 import {
@@ -58,7 +58,7 @@ interface ICapsProtectionMetadata {
 interface ISymbolProtectionMetadata {
   general: IProtectionGeneralMetadata;
   advanced: IProtectionAdvancedMetadata;
-};
+}
 
 interface ILinkProtectionCommandsMetadata {
   permit: {
@@ -67,11 +67,11 @@ interface ILinkProtectionCommandsMetadata {
     response: ITextMetadata;
     response_type: IListMetadata<string>;
     new_alias: ITextMetadata;
-  }
+  };
 }
 
 interface ILinkProtectionMetadata {
-  commands: ILinkProtectionCommandsMetadata,
+  commands: ILinkProtectionCommandsMetadata;
   general: IProtectionGeneralMetadata;
   new_whitelist_item: ITextMetadata;
   new_blacklist_item: ITextMetadata;
@@ -97,10 +97,84 @@ interface IProtectionMetadata {
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
-  capsProtection: ICapsProtectionData = null;
-  symbolProtection: ISymbolProtectionData = null;
-  linkProtection: ILinkProtectionData = null;
-  wordProtection: IWordProtectionData = null;
+  capsProtection: ICapsProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0
+      },
+      message: '',
+      permit: {
+        duration: 120
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge'
+      }
+    }
+  };
+  symbolProtection: ISymbolProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0
+      },
+      message: '',
+      permit: {
+        duration: 120
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge'
+      }
+    }
+  };
+  linkProtection: ILinkProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0
+      },
+      message: '',
+      permit: {
+        duration: 120
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge'
+      }
+    },
+    blacklist: [],
+    commands: {},
+    whitelist: []
+  };
+  wordProtection: IWordProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0
+      },
+      message: '',
+      permit: {
+        duration: 120
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge'
+      }
+    },
+    blacklist: []
+  };
 
   mounted() {
     this.capsProtection = cloneDeep(this.capsProtectionResponse.settings);
@@ -129,7 +203,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @debounce(1)
   onLinkProtChanged(value: ILinkProtectionData, oldValue: ILinkProtectionData) {
     if (oldValue && this.linkProtection != null) {
-      this.linkProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+      this.linkProtection.general.message = value.general.message.replace(
+        /(\r\n|\r|\n)/g,
+        ''
+      );
     }
   }
 
@@ -137,15 +214,24 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @debounce(1)
   onWordProtChanged(value: IWordProtectionData, oldValue: IWordProtectionData) {
     if (oldValue && this.wordProtection != null) {
-      this.wordProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+      this.wordProtection.general.message = value.general.message.replace(
+        /(\r\n|\r|\n)/g,
+        ''
+      );
     }
   }
 
   @Watch('linkProtection', { immediate: true, deep: true })
   @debounce(1)
-  onSymbolProtChanged(value: ISymbolProtectionData, oldValue: ISymbolProtectionData) {
+  onSymbolProtChanged(
+    value: ISymbolProtectionData,
+    oldValue: ISymbolProtectionData
+  ) {
     if (oldValue && this.symbolProtection != null) {
-      this.symbolProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+      this.symbolProtection.general.message = value.general.message.replace(
+        /(\r\n|\r|\n)/g,
+        ''
+      );
     }
   }
 
@@ -153,29 +239,47 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   @debounce(1)
   onCapsProtChanged(value: ICapsProtectionData, oldValue: ICapsProtectionData) {
     if (oldValue && this.capsProtection != null) {
-      this.capsProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
+      this.capsProtection.general.message = value.general.message.replace(
+        /(\r\n|\r|\n)/g,
+        ''
+      );
     }
   }
 
-  placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
+  placeholder(
+    protectionType: string,
+    fieldType: 'message' | 'minimum' | 'maximum' | 'percent'
+  ) {
     return {
       message: {
-        caps: $t('The phrase that will appear after a viewer enters too many capitalized letters'),
-        symbol: $t('The phrase that will appear after a viewer enters too many symbols'),
-        links: $t('The phrase that will appear after a viewer enters blacklisted links')
+        caps: $t(
+          'The phrase that will appear after a viewer enters too many capitalized letters'
+        ),
+        symbol: $t(
+          'The phrase that will appear after a viewer enters too many symbols'
+        ),
+        links: $t(
+          'The phrase that will appear after a viewer enters blacklisted links'
+        )
       },
       minimum: {
-        caps: $t('Set the number of capitalized letters before the system starts to detect'),
-        symbol: $t('Set the number of symbols before the system starts to detect'),
+        caps: $t(
+          'Set the number of capitalized letters before the system starts to detect'
+        ),
+        symbol: $t(
+          'Set the number of symbols before the system starts to detect'
+        )
       },
       maximum: {
         caps: $t('Set the maximum number of capitalized letters permitted'),
-        symbol: $t('Set the maximum number of symbols permitted'),
+        symbol: $t('Set the maximum number of symbols permitted')
       },
       percent: {
-        caps: $t('Set the maximum percent of capitalized letters within a message'),
-        symbol: $t('Set the maximum percent of symbols within a message'),
-      },
+        caps: $t(
+          'Set the maximum percent of capitalized letters within a message'
+        ),
+        symbol: $t('Set the maximum percent of symbols within a message')
+      }
     }[fieldType][protectionType];
   }
 
@@ -296,7 +400,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       },
       is_regex: {
         required: true,
-        type: EInputType.bool,
+        type: EInputType.bool
       },
       punishment: {
         type: {
@@ -348,31 +452,43 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {
-    if (confirm($t('Are you sure you want to reset this protection preference?'))) {
-      this.chatbotApiService.ModTools.resetSettings(slug)
-        .then((response: (
-          ICapsProtectionResponse |
-          ISymbolProtectionResponse |
-          ILinkProtectionResponse |
-          IWordProtectionResponse
-        )) => {
+    if (
+      confirm($t('Are you sure you want to reset this protection preference?'))
+    ) {
+      this.chatbotApiService.ModTools.resetSettings(slug).then(
+        (
+          response:
+            | ICapsProtectionResponse
+            | ISymbolProtectionResponse
+            | ILinkProtectionResponse
+            | IWordProtectionResponse
+        ) => {
           switch (slug) {
             case 'caps-protection':
-              this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
+              this.capsProtection = cloneDeep(
+                response.settings as ICapsProtectionData
+              );
               break;
             case 'symbol-protection':
-              this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
+              this.symbolProtection = cloneDeep(
+                response.settings as ISymbolProtectionData
+              );
               break;
             case 'link-protection':
-              this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
+              this.linkProtection = cloneDeep(
+                response.settings as ILinkProtectionData
+              );
               break;
             case 'words-protection':
-              this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
+              this.wordProtection = cloneDeep(
+                response.settings as IWordProtectionData
+              );
               break;
             default:
               break;
           }
-        })
+        }
+      );
     }
   }
 }
