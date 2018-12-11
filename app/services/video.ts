@@ -64,7 +64,7 @@ export class Display {
     });
 
     // 映像部分以外の色
-    nodeObs.OBS_content_setPaddingColor(name, 5, 14, 24);
+    nodeObs.OBS_content_setPaddingColor(name, 31, 34, 45);
 
     // ソースの枠線の色
     nodeObs.OBS_content_setOutlineColor(name, 255, 105, 82);

@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
   color: @text-primary;
-  background-color: @padding-color;
+  background-color: @bg-secondary;
 
   &.stacked {
     flex-direction: column;
