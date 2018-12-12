@@ -12,7 +12,9 @@ interface IAnnouncementsInfo {
   linkTitle: string;
   thumbnail: string;
   link: string;
-  link_target: 'external' | 'slobs';
+  linkTarget: 'external' | 'slobs';
+  params?: { [key: string]: string };
+  closeOnLink?: boolean;
 }
 
 export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
@@ -26,7 +28,9 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     link: null,
     linkTitle: null,
     thumbnail: null,
-    link_target: null
+    linkTarget: null,
+    params: null,
+    closeOnLink: false
   };
 
   async updateBanner() {
@@ -47,6 +51,13 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const req = this.formRequest(endpoint);
     try {
       const newState = await fetch(req).then((rawResp) => rawResp.json());
+      const queryString = newState.link.split('?')[1];
+      if (newState.linkTarget === 'slobs' && queryString) {
+        queryString.split(',').forEach((query: string) => {
+          const [ key, value ] = query.split('=');
+          newState.params[key] = value;
+        })
+      }
       return newState.id ? newState : this.state;
     } catch (e) {
       return this.state;
