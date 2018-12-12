@@ -35,6 +35,10 @@
         :value="pageModel"
         @input="(pageId) => setFacebookPageId(pageId)"
       />
+      <div v-if="isSchedule">
+        <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
+        <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
+      </div>
       <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
@@ -106,7 +110,7 @@
     <button
       class="button button--action"
       :disabled="updatingInfo || (isFacebook && !hasPages)"
-      @click="updateAndGoLive">
+      @click="handleSubmit">
       <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" />
       {{ submitText }}
     </button>
