@@ -1,6 +1,7 @@
 import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { IWidgetApiSettings } from 'services/widgets';
 import { InheritMutations } from 'services/stateful-service';
+import { handleErrors } from 'util/requests';
 
 
 interface IBaseGoalData extends IWidgetData {
@@ -44,7 +45,10 @@ export abstract class BaseGoalService<TGoalData extends IBaseGoalData, TGoalCrea
       url: apiSettings.goalUrl,
       method: 'POST',
       body: options
-    });
+    })
+    .then(handleErrors)
+    .catch(err => err.json())
+    .then(json => Promise.reject(json));
   }
 
   async resetGoal() {

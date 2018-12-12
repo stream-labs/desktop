@@ -143,10 +143,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       'SaveProjectors',
       'SysTrayWhenStarted',
       'RecRBSuffix',
-      'LowLatencyEnable',
-      'BindIP',
       'FilenameFormatting',
-      'NewSocketLoopEnable',
       'OverwriteIfExists',
       'RecRBPrefix',
     ];

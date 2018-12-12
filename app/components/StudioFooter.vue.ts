@@ -12,6 +12,7 @@ import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
+import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -27,6 +28,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() windowsService: WindowsService;
 
   @Prop() locked: boolean;
 
@@ -50,6 +52,10 @@ export default class StudioFooterComponent extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  get canSchedule() {
+    return this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type);
+  }
+
   get youtubeEnabled() {
     if (this.userService.platform) {
       const platform = this.userService.platform.type;
@@ -65,6 +71,15 @@ export default class StudioFooterComponent extends Vue {
     electron.remote.shell.openExternal(
       'https://youtube.com/live_dashboard_splash'
     );
+  }
+
+  openScheduleStream() {
+    this.windowsService.showWindow({
+      componentName: 'EditStreamInfo',
+      title: $t('Schedule Stream'),
+      queryParams: { isSchedule: true },
+      size: { width: 500, height: 650 }
+    });
   }
 
   confirmYoutubeEnabled() {
