@@ -144,11 +144,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       'SysTrayWhenStarted',
       'RecRBSuffix',
       'FilenameFormatting',
-      'MaxRetries',
       'OverwriteIfExists',
       'RecRBPrefix',
-      'Reconnect',
-      'RetryDelay'
     ];
 
     for (const group of settings) {
