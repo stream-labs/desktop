@@ -59,6 +59,7 @@
   padding: 16px;
   overflow: auto;
   background-color: @bg-tertiary;
+  border-top: 1px solid @bg-tertiary;
 
   &.bareContent {
     padding: 0;
