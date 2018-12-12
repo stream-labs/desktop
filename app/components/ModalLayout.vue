@@ -58,7 +58,7 @@
   height: 100%;
   padding: 16px;
   overflow: auto;
-  background-color: @padding-color;
+  background-color: @bg-tertiary;
 
   &.bareContent {
     padding: 0;

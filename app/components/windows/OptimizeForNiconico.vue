@@ -59,7 +59,7 @@
 }
 .optimize-setting-list {
   list-style: none;
-  background: @padding-color;
+  background: @bg-tertiary;
   .radius;
   margin: 0;
   padding: 8px;

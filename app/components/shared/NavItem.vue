@@ -27,7 +27,7 @@
   &.active {
     opacity: 1;
     color: @text-primary;
-    background: @padding-color;
+    background: @bg-tertiary;
     .semibold;
 
     i {
@@ -36,7 +36,7 @@
   }
 
   &:not(.active):hover {
-    background: @padding-color;
+    background: @bg-tertiary;
   }
 
   &.disabled {

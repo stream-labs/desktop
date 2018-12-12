@@ -21,7 +21,7 @@
   height: 0;
   width: 100%;
   padding: 16px 8px 0 8px;
-  border-top: 1px solid @padding-color;
+  border-top: 1px solid @bg-tertiary;
 
   svg {
     width: 140px;
@@ -103,7 +103,7 @@
 }
 
 .studio-controls-selector {
-  background: @padding-color;
+  background: @bg-tertiary;
   .radius;
   flex-grow: 1;
   overflow-y: auto;

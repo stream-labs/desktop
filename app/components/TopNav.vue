@@ -62,7 +62,7 @@
   position: relative;
   flex: 0 0 38px;
   min-width: 100%;
-  background-color: @padding-color;
+  background-color: @bg-tertiary;
   i {
     font-size: 14px;
     margin-right: 4px;
