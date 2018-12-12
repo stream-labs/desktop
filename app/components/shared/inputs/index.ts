@@ -55,6 +55,7 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
 export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
+  min?: number;
   dateFormat?: string;
   alphaNum?: boolean;
 }

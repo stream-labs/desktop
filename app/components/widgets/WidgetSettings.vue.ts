@@ -84,16 +84,17 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
     } catch (e) {
+      const errorMessage = e && e.message ? e.message : $t('Save failed, something went wrong.');
       this.onDataUpdatedHandler(this.lastSuccessfullySavedWData);
       this.requestState = 'fail';
-      this.onFailHandler();
+      this.onFailHandler(errorMessage);
     }
     this.pendingRequests--;
   }
 
-  onFailHandler() {
+  onFailHandler(msg: string) {
     this.$toasted.show(
-      $t('Save failed, something went wrong.'),
+      msg,
       {
         position: 'bottom-center',
         className: 'toast-alert',
