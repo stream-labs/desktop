@@ -27,6 +27,9 @@
         <span>REC</span>
       </button>
     </div>
+    <div class="nav-item" v-if="canSchedule">
+      <button class="button button--default" @click="openScheduleStream" >{{ $t('Schedule Stream')}}</button>
+    </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
     </div>
