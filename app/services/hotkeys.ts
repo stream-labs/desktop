@@ -80,7 +80,7 @@ interface IHotkeyAction {
 }
 
 type HotkeyGroup = {
-  [x: string]: IHotkeyAction;
+  [actionName: string]: IHotkeyAction;
 };
 
 const GENERAL_ACTIONS: HotkeyGroup = {
