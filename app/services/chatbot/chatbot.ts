@@ -410,6 +410,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         switch (slug) {
           case 'chat-notifications':
             this.UPDATE_CHAT_ALERTS(response as IChatAlertsResponse);
+            break;
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(response as ICapsProtectionResponse);
             break;
