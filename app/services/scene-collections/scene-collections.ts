@@ -476,6 +476,13 @@ export class SceneCollectionsService extends Service
 
         await this.loadDataIntoApplicationState(data);
       } catch (e) {
+        /*
+         * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
+         *  which can cause partial state from the call above to still
+         *  be present and result in duplicate items (for instance, scenes)
+         *  and methods being invoked (like `updateRegisteredHotkeys`) as
+         *  part of the loading process.
+         */
         console.error('Error while loading collection, restoring backup', e);
         // Check for a backup and load it
         const exists = await this.stateService.collectionFileExists(id, true);
