@@ -230,3 +230,5 @@ caches/build_file_checksums.ser
 
 # Sonarlint plugin
 sonarlint
+
+watcherTasks.xml
