@@ -153,18 +153,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
+    try {
+      const client = await getClient();
+      await client.unsubscribeAll();
+      if (options.restartAppAfterEachTest) client.disconnect();
+      if (options.restartAppAfterEachTest) await stopApp();
+    } catch (e) {
+      // TODO: find the reason why some tests are failing here
+      // look like something is going wrong in the stopApp() call
+      testPassed = false;
+    }
+
     const testName = t.title.replace('afterEach.always hook for ', '');
     if (!testPassed) failedTests.push(testName);
-
-    const client = await getClient();
-    await client.unsubscribeAll();
-    if (options.restartAppAfterEachTest) {
-      client.disconnect();
-    }
-
-    if (options.restartAppAfterEachTest) {
-      await stopApp();
-    }
 
   });
 
