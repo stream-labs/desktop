@@ -27,9 +27,11 @@ export function $t(...args: any[]): string {
 }
 
 /**
+ * Crowding and Electron use different standards for locale name
+ * Do some mapping in LANG_CODE_MAP based on docs:
  * @see https://electronjs.org/docs/api/locales
  */
-const LANG_CODE_MAP = {
+const LANG_CODE_MAP: Dictionary<{lang: string, locale: string}> = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
   'en-US':	{ lang: 'English', locale: 'en-US' },
@@ -45,7 +47,7 @@ const LANG_CODE_MAP = {
   sk: { lang: 'Slovak', locale: 'sk-SK' },
   th:	{ lang: 'Thai', locale: 'th-TH' },
   tr:	{ lang: 'Turkish', locale: 'tr-TR' },
-  'zh-CN': { lang: 'Chinese (Simplified)' }
+  'zh-CN': { lang: 'Chinese (Simplified)', locale: 'zh-CN' }
 };
 
 
