@@ -104,7 +104,7 @@
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.77-iojs-v2.0.8.tar.gz",
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.78-iojs-v2.0.8.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
