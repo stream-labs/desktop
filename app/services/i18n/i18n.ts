@@ -48,6 +48,12 @@ const LANG_CODE_MAP = {
   'zh-CN': { lang: 'Chinese (Simplified)' }
 };
 
+const WHITE_LIST = [
+  'en-US',
+  'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
+  'hu-HU', 'it-IT', 'ja-JP', 'Ko-KR', 'pl-PL',
+  'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
+];
 
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
 
@@ -87,13 +93,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   async load() {
 
-    const WHITE_LIST = [
-      'en-US',
-      'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
-      'hu-HU', 'it-IT', 'ja-JP', 'Ko-KR', 'pl-PL',
-      'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
-    ];
-
     if (this.isLoaded) return;
     const i18nPath = this.getI18nPath();
 
@@ -101,7 +100,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     const localeFiles = fs.readdirSync(i18nPath);
 
     for (const locale of localeFiles) {
-      if (!WHITE_LIST.includes(locale)) continue;
+      if (!this.localeIsSupported(locale)) continue;
       this.availableLocales[locale] = this.fileManagerService.read(`${i18nPath}/${locale}/langname.txt`);
     }
 
@@ -113,13 +112,16 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       locale = langDescription ? langDescription.locale : 'en-US';
     }
 
+    // if electron has unsupported locale, don't allow to use it
+    const fallbackLocale = this.getFallbackLocale();
+    if (!this.localeIsSupported(locale)) locale = fallbackLocale;
+
     // load dictionary if not loaded
     if (!this.loadedDictionaries[locale]) {
       await this.loadDictionary(locale);
     }
 
     // load fallback dictionary
-    const fallbackLocale = this.getFallbackLocale();
     if (!this.loadedDictionaries[fallbackLocale]) {
       await this.loadDictionary(fallbackLocale);
     }
@@ -185,6 +187,10 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     }
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
+  }
+
+  private localeIsSupported(locale: string) {
+    return WHITE_LIST.includes(locale) && fs.existsSync(`${this.getI18nPath()}/${locale}`)
   }
 
   @mutation()
