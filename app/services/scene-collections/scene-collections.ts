@@ -476,6 +476,7 @@ export class SceneCollectionsService extends Service
 
         await this.loadDataIntoApplicationState(data);
       } catch (e) {
+        console.error('Error while loading collection, restoring backup', e);
         // Check for a backup and load it
         const exists = await this.stateService.collectionFileExists(id, true);
 

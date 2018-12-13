@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import { uniqBy } from 'lodash';
+import { Subject } from 'rxjs';
 import { without } from 'lodash';
 import { StatefulService, mutation } from 'services/stateful-service';
 import { TransitionsService } from 'services/transitions';
@@ -13,7 +15,6 @@ import {
   IScenesServiceApi
 } from './index';
 import { SourcesService, ISource } from 'services/sources';
-import { Subject } from 'rxjs';
 import { Inject } from 'util/injector';
 import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
@@ -160,17 +161,15 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   // Utility functions / getters
 
-
-  getModel(): IScenesState  {
+  getModel(): IScenesState {
     return this.state;
   }
 
-  getScene(id: string) {
+  getScene(id: string): Scene | null {
     return !this.state.scenes[id] ? null : new Scene(id);
   }
 
-
-  getSceneItem(sceneItemId: string) {
+  getSceneItem(sceneItemId: string): SceneItem | null {
     for (const scene of this.scenes) {
       const sceneItem = scene.getItem(sceneItemId);
       if (sceneItem) return sceneItem;
@@ -189,9 +188,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
   get scenes(): Scene[] {
-    return this.state.displayOrder.map(id => {
-      return this.getScene(id);
-    });
+    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
   }
 
 
