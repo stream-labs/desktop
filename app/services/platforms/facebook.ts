@@ -179,7 +179,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
           this.SET_STREAM_URL(info.stream_url);
         }
         return info;
-      });
+      })
+      .catch(() => null);
   }
 
   scheduleStream(scheduledStartTime: string, { title, description, game }: IChannelInfo): Promise<any> {
