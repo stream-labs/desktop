@@ -162,10 +162,6 @@ export default class TopNav extends Vue {
   responsiveClass = false;
 
   handleResize() {
-    if (this.topNav.clientWidth < 1200) {
-      this.responsiveClass = true;
-    } else {
-      this.responsiveClass = false;
-    }
+    this.responsiveClass = this.topNav.clientWidth < 1200;
   }
 }

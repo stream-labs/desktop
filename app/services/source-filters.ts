@@ -121,11 +121,7 @@ export class SourceFiltersService extends Service {
       }
 
       /* Video filters can be applied to video sources. */
-      if (source.video && filterType.video) {
-        return true;
-      }
-
-      return false;
+      return source.video && filterType.video;
     });
   }
 
