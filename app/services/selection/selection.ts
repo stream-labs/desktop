@@ -17,7 +17,9 @@ import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from '.
 import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
-import { CenteringAxis } from 'util/ScalableRectangle';
+import { AnchorPoint, AnchorPositions, CenteringAxis, ScalableRectangle } from 'util/ScalableRectangle';
+import { vec2 } from '../../util/vec2';
+import { Rect } from '../../util/rect';
 
 
 /**
@@ -59,7 +61,7 @@ export class SelectionService
   getIds: () => string[];
   getInvertedIds: () => string[];
   getInverted: () => TSceneNode[];
-  getBoundingRect: () => IRectangle;
+  getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
   getSize: () => number;
@@ -80,6 +82,8 @@ export class SelectionService
   setVisibility: (isVisible: boolean) => void;
   setTransform: (transform: IPartialTransform) => void;
   resetTransform: () => void;
+  scale: (scale: IVec2, origin?: IVec2) => void;
+  scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -334,7 +338,7 @@ export class Selection implements ISelection {
     return this.state.selectedIds.length;
   }
 
-  getBoundingRect(): IRectangle {
+  getBoundingRect(): Rect {
     const items = this.getVisualItems();
     if (!items.length) return null;
 
@@ -344,20 +348,19 @@ export class Selection implements ISelection {
     let maxBottom = -Infinity;
 
     items.forEach(item => {
-      const rect = item.getRectangle();
-      rect.normalize();
+      const rect = item.getBoundingRect();
       minTop = Math.min(minTop, rect.y);
       minLeft = Math.min(minLeft, rect.x);
       maxRight = Math.max(maxRight, rect.x + rect.width);
       maxBottom = Math.max(maxBottom, rect.y + rect.height);
     });
 
-    return {
+    return new Rect({
       x: minLeft,
       y: minTop,
       width: maxRight - minLeft,
       height: maxBottom - minTop
-    };
+    });
   }
 
   getInverted(): TSceneNode[] {
@@ -546,6 +549,15 @@ export class Selection implements ISelection {
 
   resetTransform() {
     this.getItems().forEach(item => item.resetTransform());
+  }
+
+  scale(scale: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
+    const originPos = this.getBoundingRect().getOffsetFromOrigin(origin);
+    this.getItems().forEach(item => item.scaleWithOffset(scale, originPos));
+  }
+
+  scaleWithOffset(scale: IVec2, offset: IVec2) {
+    this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
   }
 
   flipY() {

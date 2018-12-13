@@ -1,4 +1,6 @@
 import { get, set, invert } from 'lodash';
+import { vec2 } from './vec2';
+import { Rect } from './rect';
 
 // This class is used for simplifying math that deals
 // with rectangles that can be scaled, including
@@ -23,7 +25,7 @@ export enum CenteringAxis {
 }
 
 // Positions on a positive unit grid
-const AnchorPositions = {
+export const AnchorPositions = {
   [AnchorPoint.North]: { x: 0.5, y: 0 },
   [AnchorPoint.NorthEast]: { x: 1, y: 0 },
   [AnchorPoint.East]: { x: 1, y: 0.5 },
@@ -36,25 +38,19 @@ const AnchorPositions = {
 };
 
 
-export class ScalableRectangle implements IScalableRectangle {
+export class ScalableRectangle extends Rect implements IScalableRectangle {
 
-  x: number;
-  y: number;
+
   scaleX: number;
   scaleY: number;
-  width: number;
-  height: number;
   crop: ICrop;
   rotation: number;
 
-  private anchor: AnchorPoint;
+  private origin: IVec2;
 
 
   constructor(options: IScalableRectangle) {
-    this.x = options.x;
-    this.y = options.y;
-    this.width = options.width;
-    this.height = options.height;
+    super(options);
     this.scaleX = options.scaleX || 1.0;
     this.scaleY = options.scaleY || 1.0;
 
@@ -68,7 +64,8 @@ export class ScalableRectangle implements IScalableRectangle {
 
     this.rotation = options.rotation || 0;
 
-    this.anchor = AnchorPoint.NorthWest;
+    // this.anchor = AnchorPoint.NorthWest;
+    this.origin = AnchorPositions[AnchorPoint.NorthWest];
   }
 
 
@@ -104,31 +101,35 @@ export class ScalableRectangle implements IScalableRectangle {
 
   setAnchor(anchor: AnchorPoint) {
     // We need to calculate the distance to the new anchor point
-    const currentPosition = AnchorPositions[this.anchor];
-    const newPosition = AnchorPositions[anchor];
+    this.setOrigin(AnchorPositions[anchor]);
+  }
 
-    const deltaX = newPosition.x - currentPosition.x;
-    const deltaY = newPosition.y - currentPosition.y;
+  setOrigin(newOrigin: IVec2) {
+    // We need to calculate the distance to the new origin point
+    const currentPosition = this.origin;
+
+    const deltaX = newOrigin.x - currentPosition.x;
+    const deltaY = newOrigin.y - currentPosition.y;
 
     this.x += deltaX * this.scaledWidth;
     this.y += deltaY * this.scaledHeight;
 
-    this.anchor = anchor;
+    this.origin = newOrigin;
   }
 
   /**
    * Adjust width, height, position, and crop to make this appear
-  * like an unrotated object to the rest of the code.
-  * Note that this only works on 90 degree increments of rotation.
-  * @returns a function to undo the operation.
-  */
+   * like an unrotated object to the rest of the code.
+   * Note that this only works on 90 degree increments of rotation.
+   * @returns a function to undo the operation.
+   */
   private zeroRotation() {
     // A set a fields to map values
     const mapFields: Dictionary<string> = {};
 
     // This is where the anchor point would actually be if this
     // were a zero rotated object
-    let anchor = AnchorPoint.NorthWest;
+    let origin = AnchorPositions[AnchorPoint.NorthWest];
 
     if (this.rotation === 90) {
       mapFields['width'] = 'height';
@@ -139,13 +140,13 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.top';
       mapFields['crop.bottom'] = 'crop.right';
       mapFields['crop.left'] = 'crop.bottom';
-      anchor = AnchorPoint.NorthEast;
+      origin = AnchorPositions[AnchorPoint.NorthEast];
     } else if (this.rotation === 180) {
       mapFields['crop.top'] = 'crop.bottom';
       mapFields['crop.right'] = 'crop.left';
       mapFields['crop.bottom'] = 'crop.top';
       mapFields['crop.left'] = 'crop.right';
-      anchor = AnchorPoint.SouthEast;
+      origin = AnchorPositions[AnchorPoint.SouthEast];
     } else if (this.rotation === 270) {
       mapFields['width'] = 'height';
       mapFields['height'] = 'width';
@@ -155,12 +156,12 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.bottom';
       mapFields['crop.bottom'] = 'crop.left';
       mapFields['crop.left'] = 'crop.top';
-      anchor = AnchorPoint.SouthWest;
+      origin = AnchorPositions[AnchorPoint.SouthWest];
     }
 
     this.mapFields(mapFields);
 
-    this.anchor = anchor;
+    this.origin = origin;
 
     // Return the anchor to the NW, since the editor code assumes
     // that all rectangles are anchored from the NW
@@ -172,7 +173,7 @@ export class ScalableRectangle implements IScalableRectangle {
     // Return a function to undo these operations in the reverse order
     return () => {
       this.rotation = rotation;
-      this.setAnchor(anchor);
+      this.setOrigin(origin);
       this.mapFields(invert(mapFields));
     };
   }
@@ -196,14 +197,23 @@ export class ScalableRectangle implements IScalableRectangle {
    * which it is returned to its original anchor point.
    */
   withAnchor(anchor: AnchorPoint, fun: Function) {
-    const oldAnchor = this.anchor;
-    this.setAnchor(anchor);
+    this.withOrigin(AnchorPositions[anchor], fun);
+  }
+
+  /**
+   * Executes the function with a specific origin point, after
+   * which it is returned to its original origin point.
+   * Origin {x: 0, y: 0} is top-left corner
+   * Origin {x: 1, y: 1} is bottom-right corner
+   */
+  withOrigin(origin: IVec2, fun: Function) {
+    const oldOrigin = this.origin;
+    this.setOrigin(origin);
 
     fun();
 
-    this.setAnchor(oldAnchor);
+    this.setOrigin(oldOrigin);
   }
-
 
   /**
    * Normalizes this rectangle into a rectangle that does not
@@ -322,4 +332,37 @@ export class ScalableRectangle implements IScalableRectangle {
     }));
   }
 
+
+  //
+  // /**
+  //  * returns the relative distance from rect to point
+  //  */
+  // getOriginFromOffset(offset: IVec2): IVec2 {
+  //   let origin: IVec2;
+  //   this.normalized(() => {
+  //     origin = vec2(
+  //       // vec2().setX(offset.x).distanceTo(vec2().setX(this.x)) / this.croppedWidth,
+  //       // vec2().setY(offset.y).distanceTo(vec2().setY(this.y)) / this.croppedHeight
+  //
+  //       (offset.x - this.x) / this.scaledWidth,
+  //       (offset.y - this.y) / this.scaledHeight
+  //     );
+  //   });
+  //   return origin;
+  // }
+  //
+  // /**
+  //  * opposite for `getOriginFromOffset()`
+  //  * returns the absolute point offset based on the relative origin param
+  //  */
+  // getOffsetFromOrigin(origin: IVec2): IVec2 {
+  //   let offset: IVec2;
+  //   this.normalized(() => {
+  //     offset = vec2(
+  //       this.x + this.scaledWidth * origin.x,
+  //       this.y + this.scaledHeight * origin.y
+  //     )
+  //   });
+  //   return offset;
+  // }
 }
