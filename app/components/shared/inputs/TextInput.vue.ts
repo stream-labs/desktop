@@ -16,6 +16,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
       ...super.getValidations(),
       date_format:  this.options.dateFormat,
       max: this.options.max,
+      min: this.options.min,
       alpha_num: this.options.alphaNum
     };
   }

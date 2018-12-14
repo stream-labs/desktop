@@ -25,7 +25,10 @@ const alertNameMap = () => ({
   treat: $t('TreatStream'),
   follows: $t('Follows'),
   hosts: $t('Hosts'),
-  raids: $t('Raids')
+  raids: $t('Raids'),
+  stars: $t('Stars'),
+  support: $t('Support'),
+  likes: $t('Likes')
 });
 
 const triggerAmountMap = {

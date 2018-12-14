@@ -68,6 +68,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let context: any = null;
   let app: any;
   let testPassed = false;
+  let testName = '';
   const failedTests: string[] = [];
 
   async function startApp(t: TExecutionContext) {
@@ -135,14 +136,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   async function stopApp() {
-    await context.app.stop();
-    await new Promise((resolve) => {
-      rimraf(context.cacheDir, resolve);
-    });
+    try {
+      await context.app.stop();
+      await new Promise((resolve) => {
+        rimraf(context.cacheDir, resolve);
+      });
+    } catch (e) {
+      // TODO: find the reason why some tests are failing here
+      testPassed = false;
+    }
     appIsRunning = false;
   }
 
   test.beforeEach(async t  => {
+    testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -153,24 +160,23 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    const testName = t.title.replace('afterEach.always hook for ', '');
+      const client = await getClient();
+      await client.unsubscribeAll();
+      if (options.restartAppAfterEachTest) {
+        client.disconnect();
+        await stopApp();
+      }
     if (!testPassed) failedTests.push(testName);
-
-    const client = await getClient();
-    await client.unsubscribeAll();
-    if (options.restartAppAfterEachTest) {
-      client.disconnect();
-    }
-
-    if (options.restartAppAfterEachTest) {
-      await stopApp();
-    }
-
   });
 
   test.after.always(async t => {
-    if (appIsRunning) await stopApp();
-    if (failedTests) saveFailedTestsToFile(failedTests);
+
+    if (appIsRunning) {
+      await stopApp();
+      if (!testPassed) failedTests.push(testName);
+    }
+
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 }
 

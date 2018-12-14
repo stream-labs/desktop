@@ -143,15 +143,9 @@ export class SettingsService extends StatefulService<ISettingsState>
       'SaveProjectors',
       'SysTrayWhenStarted',
       'RecRBSuffix',
-      'LowLatencyEnable',
-      'BindIP',
       'FilenameFormatting',
-      'MaxRetries',
-      'NewSocketLoopEnable',
       'OverwriteIfExists',
       'RecRBPrefix',
-      'Reconnect',
-      'RetryDelay'
     ];
 
     for (const group of settings) {
