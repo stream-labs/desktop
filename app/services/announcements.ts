@@ -57,6 +57,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
       const queryString = newState.link.split('?')[1];
       if (newState.linkTarget === 'slobs' && queryString) {
+        newState.link = newState.link.split('?')[0];
+        newState.params = {};
         queryString.split(',').forEach((query: string) => {
           const [ key, value ] = query.split('=');
           newState.params[key] = value;
