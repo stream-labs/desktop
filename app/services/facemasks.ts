@@ -114,16 +114,24 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   startup() {
-    this.fetchFacemaskSettings().then(response => {
-      this.checkFacemaskSettings(response);
-    }).catch(err => {
-      this.SET_ACTIVE(false);
-    });
+    if (this.checkForPlugin()) {
+      this.fetchFacemaskSettings().then(response => {
+        this.checkFacemaskSettings(response);
+      }).catch(err => {
+        this.SET_ACTIVE(false);
+      });
+    } else {
+      this.notifyPluginMissing();
+    }
   }
 
   activate() {
     this.SET_ACTIVE(true);
     this.initSocketConnection();
+  }
+
+  checkForPlugin() {
+    return obs.ModuleFactory.modules().includes('facemask-plugin.dll');
   }
 
   notifyFailure() {
@@ -140,6 +148,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         if (btnIndex === 0) {
           this.startup();
         }
+      }
+    );
+  }
+
+  notifyPluginMissing() {
+    this.SET_ACTIVE(false);
+    const ok = electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: 'Unable to find face mask plugin. You will not be able to use Face Masks',
+        buttons: ['OK']
       }
     );
   }
