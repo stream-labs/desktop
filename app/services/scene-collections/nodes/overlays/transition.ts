@@ -1,5 +1,5 @@
 import { Node } from '../node';
-import { TransitionsService, ETransitionType } from 'services/transitions';
+import { ETransitionType, TransitionsService } from 'services/transitions';
 import { Inject } from 'util/injector';
 import { uniqueId } from 'lodash';
 import path from 'path';
@@ -56,8 +56,7 @@ export class TransitionNode extends Node<ISchema, IContext> {
     this.transitionsService.deleteAllTransitions();
 
     if (this.data.type === 'obs_stinger_transition') {
-      const filePath = path.join(context.assetsPath, this.data.settings.path);
-      this.data.settings.path = filePath;
+      this.data.settings.path = path.join(context.assetsPath, this.data.settings.path);
     }
 
     this.transitionsService.createTransition(this.data.type, 'Global Transition', {

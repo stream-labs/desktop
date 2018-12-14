@@ -1,16 +1,16 @@
 import { uniq } from 'lodash';
 import electron from 'electron';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, ServiceHelper, StatefulService } from 'services/stateful-service';
 import {
+  IPartialTransform,
+  ISceneItem,
+  ISceneItemNode,
+  ISceneItemSettings,
   Scene,
   SceneItem,
-  ScenesService,
-  ISceneItem,
-  ISceneItemSettings,
-  IPartialTransform,
-  TSceneNode,
-  ISceneItemNode,
   SceneItemFolder,
+  ScenesService,
+  TSceneNode,
   TSceneNodeModel,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
@@ -512,8 +512,7 @@ export class Selection implements ISelection {
     const selectedNodes = this.getRootNodes();
     const nodesFolders = selectedNodes.map(node => node.parentId || null);
     const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
-    const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
-    return canGroupIntoFolder;
+    return selectedNodes.length > 1 && nodesHaveTheSameParent;
   }
 
   getSources(): Source[] {

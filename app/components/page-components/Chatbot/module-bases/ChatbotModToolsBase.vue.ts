@@ -1,26 +1,26 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import {
-  ICapsProtectionResponse,
-  ISymbolProtectionResponse,
-  ILinkProtectionResponse,
-  IWordProtectionResponse,
-  ICapsProtectionData,
-  ISymbolProtectionData,
-  ILinkProtectionData,
-  IWordProtectionData,
   ChatbotSettingSlug,
+  ICapsProtectionData,
+  ICapsProtectionResponse,
+  ILinkProtectionData,
+  ILinkProtectionResponse,
+  ISymbolProtectionData,
+  ISymbolProtectionResponse,
+  IWordProtectionData,
+  IWordProtectionResponse,
 } from 'services/chatbot';
 
 import {
   EInputType,
+  IInputMetadata,
   IListMetadata,
-  ITextMetadata,
   INumberMetadata,
   ISliderMetadata,
-  IInputMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs';
 
 interface IChatbotPunishmentMetadata {
@@ -147,8 +147,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // metadata
-  generalMetadata(protectionType: string) {
-    const generalMetadata: IProtectionGeneralMetadata = {
+  generalMetadata(protectionType: string): IProtectionGeneralMetadata {
+    return {
       punishment: {
         type: {
           type: EInputType.list,
@@ -183,12 +183,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: this.placeholder(protectionType, 'message'),
       },
     };
-
-    return generalMetadata;
   }
 
-  advancedMetadata(protectionType: string) {
-    const advancedMetadata: IProtectionAdvancedMetadata = {
+  advancedMetadata(protectionType: string): IProtectionAdvancedMetadata {
+    return {
       minimum: {
         required: true,
         type: EInputType.number,
@@ -213,11 +211,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         tooltip: this.placeholder(protectionType, 'percent'),
       },
     };
-    return advancedMetadata;
   }
 
-  get linkCommandsMetadata() {
-    const linkCommandsMetadata: ILinkProtectionCommandsMetadata = {
+  get linkCommandsMetadata(): ILinkProtectionCommandsMetadata {
+    return {
       permit: {
         command: {
           required: true,
@@ -244,11 +241,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
       },
     };
-    return linkCommandsMetadata;
   }
 
-  get wordBlacklistItemMetadata() {
-    const wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
+  get wordBlacklistItemMetadata(): IWordProtectionBlacklistItem {
+    return {
       text: {
         required: true,
         type: EInputType.text,
@@ -272,11 +268,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
       },
     };
-    return wordBlacklistItemMetadata;
   }
 
-  get metadata() {
-    const metadata: IProtectionMetadata = {
+  get metadata(): IProtectionMetadata {
+    return {
       caps: {
         general: this.generalMetadata('caps'),
         advanced: this.advancedMetadata('caps'),
@@ -304,7 +299,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         new_blacklist_item: this.wordBlacklistItemMetadata,
       },
     };
-    return metadata;
   }
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {

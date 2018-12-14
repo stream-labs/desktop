@@ -6,13 +6,13 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { $t } from 'services/i18n';
 
-import { ICustomCommand, IChatbotErrorResponse } from 'services/chatbot';
+import { IChatbotErrorResponse, ICustomCommand } from 'services/chatbot';
 
 import {
   EInputType,
   IListMetadata,
-  ITextMetadata,
   INumberMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs';
 
 @Component({
@@ -84,31 +84,28 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     placeholder: $t('The phrase that will appear after a user enters the command'),
   };
 
-  get permissionMetadata() {
-    const permissionMetadata: IListMetadata<number> = {
+  get permissionMetadata(): IListMetadata<number> {
+    return {
       required: true,
       type: EInputType.list,
       options: this.chatbotPermissions,
     };
-    return permissionMetadata;
   }
 
-  get replyTypeMetadata() {
-    const replyTypeMetadata: IListMetadata<string> = {
+  get replyTypeMetadata(): IListMetadata<string> {
+    return {
       required: true,
       type: EInputType.list,
       options: this.chatbotResponseTypes,
     };
-    return replyTypeMetadata;
   }
 
-  get cooldownsMetadata() {
-    const timerMetadata: INumberMetadata = {
+  get cooldownsMetadata(): INumberMetadata {
+    return {
       type: EInputType.number,
       placeholder: $t('Cooldown (Value in Seconds)'),
       min: 0,
     };
-    return timerMetadata;
   }
 
   onSelectTabHandler(tab: string) {
