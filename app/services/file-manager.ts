@@ -162,7 +162,7 @@ export class FileManagerService extends Service {
 
   /**
    * Checks if a file exists
-   * @param string a path to the file
+   * @param filePath a path to the file
    */
   private fileExists(filePath: string): Promise<boolean> {
     return new Promise(resolve => {

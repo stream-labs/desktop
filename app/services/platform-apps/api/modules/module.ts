@@ -82,6 +82,7 @@ export abstract class Module {
   /**
    * Takes a patch object and validates it against the required keys.
    * @param requiredKeys keys required in the original object
+   * @param patch An object containing the changes to apply
    */
   validatePatch(requiredKeys: string[], patch: Dictionary<any>) {
     requiredKeys.forEach(key => {

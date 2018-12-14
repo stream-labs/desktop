@@ -47,11 +47,14 @@ export const NODE_TYPES = {
   TransitionNode: TransitionsNode, // Alias old name to new node
 };
 
-const DEFAULT_COLLECTION_NAME = 'Scenes';
-
 interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {
+  /** A function that can be used to set up some state.
+   * This should really only be used by the OBS importer.
+   */
   setupFunction?: () => boolean;
 }
+
+const DEFAULT_COLLECTION_NAME = 'Scenes';
 
 /**
  * V2 of the scene collections service:
@@ -183,9 +186,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   /**
    * Creates and switches to a new blank scene collection
-   * @param setupFunction a function that can be used to set
-   * up some state.  This should really only be used by the OBS
-   * importer.
+   *
+   * @param options An optional object containing a setup function
+   * @see {ISceneCollectionCreateOptions}
    */
   @RunInLoadingMode()
   async create(
@@ -274,6 +277,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   /**
    * Duplicates a scene collection.
    * @param name the name of the new scene collection
+   * @param id An optional ID, if omitted the active collection ID is used
    */
   async duplicate(name: string, id?: string) {
     this.disableAutoSave();
