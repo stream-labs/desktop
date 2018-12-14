@@ -3,25 +3,54 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.11.7",
+  "version": "0.11.8-preview.1",
   "main": "main.js",
+  "engines": {
+    "node": ">= 8 < 12",
+    "yarn": ">= 1.5.2"
+  },
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
     "compile:ci": "yarn clear && webpack-cli --mode development",
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
-    "clear-plugins": "shx rm -rf plugins",
-    "package": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
-    "package:preview": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
-    "package:ipc": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
+    "clear-plugins": "rimraf plugins",
+    "package": "rimraf dist && build -w --x64 --config.extraMetadata.env=production",
+    "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
+    "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava -v",
     "test-flaky": "node ./test/helpers/runner.js",
-    "clear": "shx rm -rf bundles/media",
+    "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
-    "screentest": "node test/screentest/runner.js"
+    "screentest": "node test/screentest/runner.js",
+    "commit": "commit"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100,
+    "endOfLine": "lf",
+    "trailingComma": "all"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "node scripts/precommit.js",
+      "commit-msg": "node scripts/commit-msg.js"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "tslint --fix",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/prompt"
+    }
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -75,7 +104,7 @@
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.76-iojs-v2.0.8.tar.gz",
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.78-iojs-v2.0.8.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
@@ -89,6 +118,10 @@
     "@babel/core": "^7.1.6",
     "@babel/plugin-proposal-decorators": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
+    "@commitlint/cli": "^7.2.1",
+    "@commitlint/config-conventional": "^7.1.2",
+    "@commitlint/prompt": "^7.2.1",
+    "@commitlint/prompt-cli": "^7.2.1",
     "@sentry/browser": "^4.4.1",
     "@types/archiver": "2.1.2",
     "@types/lodash": "4.14.115",
@@ -99,11 +132,13 @@
     "@types/webdriverio": "^4.13.0",
     "@xkeshi/vue-qrcode": "0.3.0",
     "ava": "v1.0.0-rc.2",
-    "babel-eslint": "8.2.6",
+    "babel-eslint": "10.0.1",
     "babel-loader": "^8.0.4",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-decorators-legacy": "1.3.5",
     "circular-dependency-plugin": "3.0.0",
+    "commitizen": "^3.0.4",
+    "cross-spawn": "^6.0.5",
     "css-element-queries": "^1.0.2",
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
@@ -111,28 +146,34 @@
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
     "emojione": "3.1.7",
-    "eslint": "3.19.0",
-    "eslint-config-airbnb": "14.1.0",
-    "eslint-plugin-import": "2.13.0",
-    "eslint-plugin-jsx-a11y": "4.0.0",
-    "eslint-plugin-react": "6.10.3",
+    "eslint": "^4.12.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.3.0",
+    "eslint-import-resolver-webpack": "^0.10.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.0",
     "eslint-plugin-vue": "2.1.0",
     "file-loader": "1.1.11",
     "fuse.js": "3.2.1",
+    "husky": "^1.2.0",
     "js-yaml": "3.12.0",
     "less": "2.7.3",
     "less-loader": "4.1.0",
+    "lint-staged": "^8.1.0",
     "lodash": "4.17.10",
     "lodash-decorators": "4.3.1",
     "moment": "2.22.2",
     "node-win32-np": "1.0.6",
     "pixelmatch": "4.0.2",
     "pngjs": "3.3.3",
+    "prettier": "^1.15.2",
     "progress": "2.0.0",
+    "read-pkg-up": "^4.0.0",
     "recursive-readdir": "^2.2.2",
     "reflect-metadata": "0.1.12",
     "rxjs": "6.3.3",
-    "shx": "^0.3.2",
+    "serve-handler": "^5.0.7",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
@@ -145,7 +186,7 @@
     "tslint-config-prettier": "1.14.0",
     "tslint-loader": "3.6.0",
     "typedoc": "0.11.1",
-    "typescript": "3.2.1",
+    "typescript": "^3.2.1",
     "unzip-stream": "0.3.0",
     "urijs": "1.19.1",
     "v-tooltip": "2.0.0-rc.31",
@@ -167,7 +208,8 @@
     "vuex": "3.0.1",
     "webdriverio": "^4.14.1",
     "webpack": "4.26.1",
-    "webpack-cli": "3.1.2"
+    "webpack-cli": "3.1.2",
+    "which": "^1.3.1"
   },
   "resolutions": {
     "uglify-es": "3.3.9"

@@ -9,6 +9,9 @@ import { UserService } from '../user';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
+  liveStreamId: string;
+  scheduledStartTime: string;
+  channelInfo: IChannelInfo;
 }
 
 export class YoutubeService extends StatefulService<IYoutubeServiceState> implements IPlatformService {
@@ -19,6 +22,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
 
   static initialState: IYoutubeServiceState = {
     liveStreamingEnabled: true,
+    liveStreamId: null,
+    scheduledStartTime: null,
+    channelInfo: { title: null, description: null }
   };
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -27,7 +33,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
   };
 
   apiBase = 'https://www.googleapis.com/youtube/v3';
-  liveStreamId = '';
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
@@ -48,19 +53,29 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
     this.state.liveStreamingEnabled = enabled;
   }
 
+  @mutation()
+  private SET_STREAM_ID(id: string) {
+    this.state.liveStreamId = id;
+  }
+
+  @mutation()
+  private SET_SCHEDULED_START_TIME(time: string) {
+    this.state.scheduledStartTime = time;
+  }
+
+  @mutation()
+  private SET_CHANNEL_INFO(info: IChannelInfo) {
+    this.state.channelInfo = info;
+  }
+
   setupStreamSettings(auth: IPlatformAuth) {
     this.fetchStreamKey().then(streamKey => {
       const settings = this.settingsService.getSettingsFormData('Stream');
 
       settings.forEach(subCategory => {
         subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'service') {
-            parameter.value = 'YouTube / YouTube Gaming';
-          }
-
-          if (parameter.name === 'key') {
-            parameter.value = streamKey;
-          }
+          if (parameter.name === 'service') { parameter.value = 'YouTube / YouTube Gaming'; }
+          if (parameter.name === 'key') { parameter.value = streamKey; }
         });
       });
 
@@ -69,27 +84,19 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
   }
 
   fetchDescription(): Promise<string> {
-    return this.userService.getDonationSettings().then(json => {
-      if (json.settings.autopublish) return `Support the stream: ${json.donation_url} \n`;
-      return '';
-    });
+    return this.userService.getDonationSettings().then(json => (
+      json.settings.autopublish ? `Support the stream: ${json.donation_url} \n` : ''
+    ));
   }
 
   ableToStream(): Promise<void> {
-    const endpoint =
-      'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
-    const request = new Request(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
-    );
+    const endpoint = 'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
+    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => {
-        this.SET_ENABLED_STATUS(true);
-      })
-      .catch(err => {
-        this.handleForbidden(err);
-      });
+      .then(() => this.SET_ENABLED_STATUS(true))
+      .catch(err => this.handleForbidden(err));
   }
 
   fetchUserInfo() {
@@ -98,11 +105,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
 
   @requiresToken()
   fetchBoundStreamId(): Promise<string> {
-    const endpoint =
-      'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
-    const request = new Request(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
-    );
+    const endpoint = 'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
+    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
       .then(handleErrors)
@@ -123,9 +127,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
   @requiresToken()
   fetchStreamKeyForId(streamId: string): Promise<string> {
     const endpoint = `liveStreams?part=cdn&id=${streamId}`;
-    const request = new Request(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
-    );
+    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
       .then(handleErrors)
@@ -134,55 +136,69 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
   }
 
   fetchStreamKey(): Promise<string> {
-    return this.fetchBoundStreamId().then(boundStreamId =>
-      this.fetchStreamKeyForId(boundStreamId)
-    );
+    return this.fetchBoundStreamId().then(boundStreamId => this.fetchStreamKeyForId(boundStreamId));
   }
 
-  // TODO
   fetchChannelInfo(): Promise<IChannelInfo> {
-    return Promise.resolve({
-      title: '',
-      game: ''
-    });
+    return Promise.resolve(this.state.channelInfo);
   }
 
   @requiresToken()
   getLiveStreamId(forceGet: boolean): Promise<void> {
-    if (this.liveStreamId && !forceGet) return Promise.resolve();
-
-    const endpoint =
-      'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
-    const request = new Request(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
-    );
+    if (this.state.liveStreamId && !forceGet) return Promise.resolve();
+    const endpoint = 'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
+    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(json => {
-        if (json.items.length) {
-          this.liveStreamId = json.items[0].id;
-        }
-      });
+      .then(json => { if (json.items.length) { this.SET_STREAM_ID(json.items[0].id); } });
   }
 
   @requiresToken()
   fetchViewerCount(): Promise<number> {
     return this.getLiveStreamId(false).then(() => {
       const endpoint = 'videos?part=snippet,liveStreamingDetails';
-      const url = `${this.apiBase}/${endpoint}&id=${
-        this.liveStreamId
-      }&access_token=${this.oauthToken}`;
+      const url = `${this.apiBase}/${endpoint}&id=${this.state.liveStreamId}&access_token=${this.oauthToken}`;
       const request = new Request(url);
 
       return fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then(
-          json => json.items[0].liveStreamingDetails.concurrentViewers || 0
-        );
+        .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
     });
+  }
+
+  prepopulateInfo() {
+    return this.fetchPrefillData();
+  }
+
+  @requiresToken()
+  fetchPrefillData() {
+    const query = `part=snippet,contentDetails,status&broadcastStatus=upcoming&access_token=${this.oauthToken}`;
+    return fetch(`${this.apiBase}/liveBroadcasts?${query}`)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => {
+        if (!json.items.length) return;
+        this.SET_STREAM_ID(json.items[0].id);
+        this.SET_SCHEDULED_START_TIME(json.items[0].snippet.scheduledStartTime);
+        return json.items[0].snippet;
+      });
+  }
+
+  @requiresToken()
+  scheduleStream(scheduledStartTime: string, { title, description }: IChannelInfo): Promise<any> {
+    const url = `${this.apiBase}/liveBroadcasts?part=snippet,status`
+    const headers = authorizedHeaders(this.oauthToken);
+    headers.append('Content-Type', 'application/json');
+    const body = JSON.stringify(
+      { snippet: { scheduledStartTime, title, description }, status: { privacyStatus: 'public' } }
+    );
+    const req = new Request(url, { method: 'POST', headers, body });
+    return fetch(req)
+      .then(handleErrors)
+      .catch(resp => resp.json().then((error: any) => Promise.reject(error)));
   }
 
   fetchNewToken(): Promise<void> {
@@ -194,33 +210,31 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(response =>
-        this.userService.updatePlatformToken(response.access_token)
-      );
+      .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
   @requiresToken()
   putChannelInfo({ title, description }: IChannelInfo): Promise<boolean> {
+    this.SET_CHANNEL_INFO({ title, description });
     return this.fetchDescription().then(autopublishString => {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      const fullDescription = autopublishString.concat(description);
-      const data = { snippet: { title: title, description: fullDescription }, id: this.liveStreamId };
+      const fullDescription = new RegExp(autopublishString).test(description) ?
+        description : autopublishString.concat(description);
+      const body = JSON.stringify(
+        {
+          snippet: { title: title, description: fullDescription, scheduledStartTime: this.state.scheduledStartTime },
+          id: this.state.liveStreamId
+        }
+      );
       const endpoint = 'liveBroadcasts?part=snippet';
 
       const request = new Request(
-        `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
-        {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify(data)
-        }
+        `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`, { method: 'PUT', headers, body }
       );
 
-      return fetch(request)
-        .then(handleErrors)
-        .then(() => true);
+      return fetch(request).then(handleErrors).then(() => true);
     });
   }
 
@@ -241,17 +255,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
       .then(handleErrors)
       .then(response => response.json())
       .then(json => {
-        const youtubeDomain =
-          mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
-        this.liveStreamId = json.items[0].id;
+        const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
+        this.SET_STREAM_ID(json.items[0].id);
         return `${youtubeDomain}/live_chat?v=${json.items[0].id}&is_popout=1`;
       });
   }
 
   verifyAbleToStream(): void {
-    this.fetchNewToken().then(() => {
-      this.ableToStream();
-    });
+    this.fetchNewToken().then(() => this.ableToStream());
   }
 
   beforeGoLive() {

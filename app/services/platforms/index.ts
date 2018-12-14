@@ -42,6 +42,8 @@ export interface IPlatformService {
   beforeGoLive: () => Promise<any>;
 
   prepopulateInfo?: () => Promise<any>;
+
+  scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
 }
 
 export interface IPlatformAuth {
