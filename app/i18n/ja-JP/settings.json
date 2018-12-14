@@ -169,7 +169,7 @@
         "CRF": "CRF"
       },
       "bitrate": {
-        "name": "ビットレート（kbps）"
+        "name": "映像ビットレート（kbps）"
       },
       "use_bufsize": {
         "name": "バッファサイズを指定する"
