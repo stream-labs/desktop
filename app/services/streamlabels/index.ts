@@ -2,7 +2,7 @@ import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import uuid from 'uuid/v4';
 import fs from 'fs';
@@ -231,9 +231,7 @@ export class StreamlabelsService extends Service {
       body: JSON.stringify(this.settings)
     });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(() => true);
+    return fetch(request).then(handleResponse).then(() => true);
   }
 
   restartSession(): Promise<Boolean> {
@@ -243,9 +241,7 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(() => true);
+    return fetch(request).then(handleResponse).then(() => true);
   }
 
 
@@ -266,8 +262,7 @@ export class StreamlabelsService extends Service {
     const request = new Request(url, { headers });
 
     fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => this.updateOutput(json.data));
   }
 
@@ -280,8 +275,7 @@ export class StreamlabelsService extends Service {
     const request = new Request(url, { headers });
 
     fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(settings => this.updateSettings(settings));
   }
 

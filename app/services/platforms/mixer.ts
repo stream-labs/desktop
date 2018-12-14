@@ -4,7 +4,7 @@ import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
+import { handleResponse, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 
@@ -97,11 +97,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(response =>
-        this.userService.updatePlatformToken(response.access_token)
-      );
+      .then(handleResponse)
+      .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
   @requiresToken()
@@ -110,8 +107,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(`${this.apiBase}channels/${this.mixerUsername}/details`, { headers });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => {
         this.userService.updatePlatformChannelId(json.id);
         return json;
@@ -142,10 +138,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const headers = this.getHeaders();
     const request = new Request(`${this.apiBase}channels/${this.mixerUsername}`, { headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.viewersCurrent);
+    return fetch(request).then(handleResponse).then(json => json.viewersCurrent);
   }
 
   @requiresToken()
@@ -164,7 +157,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
 
     return fetch(request)
-      .then(handleErrors)
+      .then(handleResponse)
       .then(() => true);
   }
 
@@ -174,8 +167,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(`${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`, { headers });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(response => {
         response.forEach((game: any) => {
           this.ADD_GAME_MAPPING(game.name, game.id);

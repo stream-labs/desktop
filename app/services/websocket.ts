@@ -2,7 +2,7 @@ import { Service } from './service';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import { Subject } from 'rxjs';
 
@@ -98,8 +98,7 @@ export class WebsocketService extends Service {
     const request = new Request(url, { headers });
 
     fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => json.socket_token)
       .then(token => {
         const url = `${this.hostsService.io}?token=${token}`;

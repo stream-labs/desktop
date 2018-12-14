@@ -1,7 +1,7 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import Util from 'services/utils';
 
@@ -31,9 +31,7 @@ export class SceneCollectionsServerApiService extends Service {
     const url = `${this.baseUrl}/scene-collection`;
     const request = new Request(url, { headers: this.headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   /**
@@ -43,27 +41,21 @@ export class SceneCollectionsServerApiService extends Service {
     const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   fetchActiveCollection() {
     const url = `${this.baseUrl}/active/scene-collection`;
     const request = new Request(url, { headers: this.headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   makeSceneCollectionActive(id: number) {
     const url = `${this.baseUrl}/active/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers, method: 'POST' });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   createSceneCollection(collection: IServerSceneCollection): Promise<IServerSceneCollection> {
@@ -74,9 +66,7 @@ export class SceneCollectionsServerApiService extends Service {
     const body = this.formSerializeCollection(collection);
     const request = new Request(url, { headers, method: 'POST', body });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   updateSceneCollection(collection: IServerSceneCollection) {
@@ -87,18 +77,14 @@ export class SceneCollectionsServerApiService extends Service {
     const body = this.formSerializeCollection(collection);
     const request = new Request(url, { headers, method: 'PUT', body });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   deleteSceneCollection(id: number) {
     const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers, method: 'DELETE' });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json());
+    return fetch(request).then(handleResponse);
   }
 
   private formSerializeCollection(collection: IServerSceneCollection) {

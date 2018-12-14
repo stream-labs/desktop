@@ -1,5 +1,5 @@
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
@@ -51,8 +51,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
       const request = new Request(url, { headers });
 
       return fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
+        .then(handleResponse)
         .then(response => {
           this.SET_AVAILABLE_FEATURES(response.features);
         });

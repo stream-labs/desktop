@@ -13,7 +13,7 @@ import electron from 'electron';
 import { DevServer } from './dev-server';
 import url from 'url';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { BehaviorSubject } from 'rxjs';
 import { trim, compact, without } from 'lodash';
@@ -193,10 +193,7 @@ export class PlatformAppsService extends
       { headers }
     );
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
-      .catch(() => []);
+    return fetch(request).then(handleResponse).catch(() => []);
   }
 
   getDisabledAppsFromStorage(): string[] {
@@ -241,8 +238,7 @@ export class PlatformAppsService extends
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.is_app_store_visible)
       .catch(() => false)
   }
@@ -462,8 +458,7 @@ export class PlatformAppsService extends
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.id_hash)
       .catch(() => null);
   }
@@ -476,8 +471,7 @@ export class PlatformAppsService extends
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.dev_mode)
       .catch(() => false);
   }

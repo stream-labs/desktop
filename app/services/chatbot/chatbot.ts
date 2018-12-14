@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 import {
@@ -162,15 +162,12 @@ export class ChatbotApiService extends PersistentStatefulService<
       });
 
       fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
-        .then((response: IChatbotAuthResponse) => {
-          this.LOGIN(response);
+        .then(handleResponse)
+        .then((json: IChatbotAuthResponse) => {
+          this.LOGIN(json);
           resolve(true);
         })
-        .catch(err => {
-          reject(err);
-        });
+        .catch(err => reject(err));
     });
   }
 
@@ -199,20 +196,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     }
     const request = new Request(url, options);
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => {
-        return response.json();
-      })
-      .catch(error => {
-        // errors contain string response. Need to json()
-        // and return the promised error
-        return error
-          .json()
-          .then((errJson: Promise<IChatbotErrorResponse>) =>
-            Promise.reject(errJson)
-          );
-      });
+    return fetch(request).then(handleResponse);
   }
 
   //

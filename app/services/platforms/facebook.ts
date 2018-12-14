@@ -3,7 +3,7 @@ import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders, requiresToken } from '../../util/requests';
+import { handleResponse, authorizedHeaders, requiresToken } from '../../util/requests';
 import { UserService } from '../user';
 
 interface IFacebookPage{
@@ -108,8 +108,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
   fetchPages() {
     const request = this.formRequest(`${this.apiBase}/me/accounts`);
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(async (json) => {
         let pageId = this.userService.platform.channelId;
         if (!pageId) {
@@ -151,8 +150,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const data = { method: 'POST', body: JSON.stringify({ title, description, game_specs: { name: game } }) };
     const request = this.formRequest(`${this.apiBase}/${this.state.activePage.id}/live_videos`, data, this.activeToken);
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => {
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
@@ -170,8 +168,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       'fields=status,stream_url,title,description';
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => {
         const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0];
         if (info.status === 'SCHEDULED_UNPUBLISHED') {
@@ -194,15 +191,13 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       description
     });
     const req = new Request(url, { method: 'POST', headers, body });
-    return fetch(req)
-      .then(handleErrors)
-      .catch(resp => resp.json().then((error: any) => Promise.reject(error)));
+    return fetch(req).then(handleResponse)
   }
 
   fetchViewerCount(): Promise<number> {
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const request = this.formRequest(url, {}, this.activeToken);
-    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.live_views);
+    return fetch(request).then(handleResponse).then(json => json.live_views);
   }
 
   fbGoLive() {
@@ -226,7 +221,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       const request = new Request(`${this.apiBase}/${this.state.liveVideoId}`, {
         method: 'POST', headers, body: JSON.stringify(data)
       });
-      return fetch(request).then(handleErrors).then(() => true);
+      return fetch(request).then(handleResponse).then(() => true);
     }
     return Promise.resolve(true);
   }
@@ -237,7 +232,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`
     const headers = this.getHeaders();
     const request = new Request(url, { method: 'GET', headers });
-    return fetch(request).then(handleErrors).then(resp => resp.json()).then((json: any) => json.data);
+    return fetch(request).then(handleResponse).then((json: any) => json.data);
   }
 
   getChatUrl(): Promise<string> {
