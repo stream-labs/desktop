@@ -68,6 +68,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let context: any = null;
   let app: any;
   let testPassed = false;
+  let testName = '';
   const failedTests: string[] = [];
 
   async function startApp(t: TExecutionContext) {
@@ -135,14 +136,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   async function stopApp() {
-    await context.app.stop();
-    await new Promise((resolve) => {
-      rimraf(context.cacheDir, resolve);
-    });
+    try {
+      await context.app.stop();
+      await new Promise((resolve) => {
+        rimraf(context.cacheDir, resolve);
+      });
+    } catch (e) {
+      // TODO: find the reason why some tests are failing here
+      testPassed = false;
+    }
     appIsRunning = false;
   }
 
   test.beforeEach(async t  => {
+    testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -153,30 +160,23 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    try {
       const client = await getClient();
       await client.unsubscribeAll();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp();
       }
-    } catch (e) {
-      // TODO: find the reason why some tests are failing here
-      // look like something is going wrong in the stopApp() call
-      testPassed = false;
-    }
-
-    const testName = t.title.replace('afterEach.always hook for ', '');
     if (!testPassed) failedTests.push(testName);
-
   });
 
   test.after.always(async t => {
-    if (failedTests.length) {
-      console.log('save failed test to file', JSON.stringify(failedTests))
-      saveFailedTestsToFile(failedTests);
+
+    if (appIsRunning) {
+      await stopApp();
+      if (!testPassed) failedTests.push(testName);
     }
-    if (appIsRunning) await stopApp();
+
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 }
 
