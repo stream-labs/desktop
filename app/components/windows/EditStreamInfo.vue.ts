@@ -134,7 +134,7 @@ export default class EditStreamInfo extends Vue {
   async populateModels() {
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
-    this.gameModel.value = this.streamInfoService.state.channelInfo.game;
+    this.gameModel.value = this.streamInfoService.state.channelInfo.game || '';
     this.streamDescriptionModel.value = this.streamInfoService.state.channelInfo.description;
     this.gameModel.options = [{
       description: this.streamInfoService.state.channelInfo.game,
@@ -366,7 +366,8 @@ export default class EditStreamInfo extends Vue {
       title: $t('Scheduled Date'),
       dateFormat: 'MM/DD/YYYY',
       placeholder:'MM/DD/YYYY',
-      description: this.isFacebook ? $t('Please schedule no further than 7 days in advance.') : undefined
+      description: this.isFacebook ?
+        $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.') : undefined
     };
   }
 

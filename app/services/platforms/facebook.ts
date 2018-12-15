@@ -174,7 +174,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       .then(response => response.json())
       .then(json => {
         const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0];
-        if (info.status === 'SCHEDULED_UNPUBLISHED') {
+        if (info && info.status === 'SCHEDULED_UNPUBLISHED') {
           this.SET_LIVE_VIDEO_ID(info.id);
           this.SET_STREAM_URL(info.stream_url);
         }

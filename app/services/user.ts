@@ -290,7 +290,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => response.json())
+      .catch(() => null);
   }
 
   postFacebookPage(pageId: string) {
