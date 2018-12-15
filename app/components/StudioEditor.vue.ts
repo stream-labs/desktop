@@ -12,10 +12,6 @@ import { SelectionService } from 'services/selection/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
-import { vec2 } from '../util/vec2';
-import { Point } from '../../vendor/paper/basic.js';
-import { Line } from '../util/line';
-import { LineSegment } from '../util/line-segment';
 
 interface IResizeRegion {
   name: string;
@@ -61,7 +57,6 @@ export default class StudioEditor extends Vue {
   $refs: {
     display: HTMLDivElement;
   };
-
 
   onOutputResize(region: IRectangle) {
     this.renderedWidth = region.width;
@@ -328,75 +323,47 @@ export default class StudioEditor extends Vue {
       ...options
     };
 
-    let newScaleX: number;
-    let newScaleY: number;
     let scaleXDelta: number;
     let scaleYDelta: number;
     const source = this.resizeRegion.item;
+    const rect = new ScalableRectangle(source.getRectangle());
 
-    // const rect = new ScalableRectangle(source.getRectangle());
+    rect.normalized(() => {
+      rect.withAnchor(opts.anchor, () => {
+        const distanceX = Math.abs(x - rect.x);
+        const distanceY = Math.abs(y - rect.y);
 
-    // rect.normalized(() => {
-    //   rect.withAnchor(opts.anchor, () => {
-    //     const distanceX = Math.abs(x - rect.x);
-    //     const distanceY = Math.abs(y - rect.y);
-    //
-    //     let newScaleX = distanceX / rect.croppedWidth;
-    //     let newScaleY = distanceY / rect.croppedHeight;
-    //
-    //     // To preserve aspect ratio, take the bigger of the
-    //     // two new scales.
-    //     if (opts.lockRatio) {
-    //       if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
-    //         newScaleY = newScaleX;
-    //       } else {
-    //         newScaleX = newScaleY;
-    //       }
-    //     }
-    //
-    //     scaleXDelta = newScaleX / rect.scaleX;
-    //     scaleYDelta = newScaleX / rect.scaleY;
-    //
-    //     // Aspect ratio preservation overrides lockX and lockY
-    //     if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
-    //     if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
-    //   });
-    // });
+        let oldScaleX = rect.scaleX;
+        let oldScaleY = rect.scaleY;
+        let newScaleX = distanceX / rect.croppedWidth;
+        let newScaleY = distanceY / rect.croppedHeight;
 
-    const rect = this.selectionService.getBoundingRect();
-    const anchor = AnchorPositions[opts.anchor];
-    const opositAnchorCoords = [anchor.x, anchor.y].map(val => {
-      if (val === 0) return 1;
-      if (val === 1) return 0;
-      return val;
+        // To preserve aspect ratio, take the bigger of the
+        // two new scales.
+        if (opts.lockRatio) {
+          if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
+            newScaleY = newScaleX;
+          } else {
+            newScaleX = newScaleY;
+          }
+        }
+
+        // Aspect ratio preservation overrides lockX and lockY
+        if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
+        if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
+
+        scaleXDelta = rect.scaleX / oldScaleX;
+        scaleYDelta = rect.scaleY / oldScaleY;
+
+      });
     });
-    const opositAnchor = vec2(opositAnchorCoords[0], opositAnchorCoords[1]);
-    const opositAnchorPos = rect.getOffsetFromOrigin(opositAnchor);
-    const delta = vec2(x, y).sub(opositAnchorPos);
-    scaleXDelta = (rect.width + delta.x) / rect.width;
-    scaleYDelta = (rect.height + delta.y) / rect.height
 
-    // const anchorPos = rect.getOffsetFromOrigin(AnchorPositions[opts.anchor]);
-    // const segmentBetweenAnchorAndXY = new LineSegment(anchorPos, {x, y});
-    // const intersections = rect.getIntersections(segmentBetweenAnchorAndXY.getLine());
-    // const segmentBetweenAnchorAndEdge = new LineSegment(...intersections);
-
-
-    // console.log('segmentBetweenAnchorAndXY', segmentBetweenAnchorAndXY, 'intersections', intersections, segmentBetweenAnchorAndEdge);
-
-    //
-    // const newWidth = Math.abs(x - anchorPos.x);
-    // const newHeight = Math.abs(y - anchorPos.y);
-    //
-    // scaleXDelta = newWidth / rect.width;
-    // scaleYDelta = newHeight / rect.height;
-    //
-    //
-    // console.log('scaleDelta', scaleXDelta, scaleYDelta);
-    //
-    // const point = new Point(0, 0);
-
-    this.selectionService.scale({ x: scaleXDelta, y: scaleYDelta}, AnchorPositions[opts.anchor])
+    // scale all selected items
+    this.selectionService.scaleWithOffset(
+      { x: scaleXDelta, y: scaleYDelta},
+      source.getBoundingRect()
+        .getOffsetFromOrigin(AnchorPositions[opts.anchor])
+    )
   }
 
   updateCursor(event: MouseEvent) {

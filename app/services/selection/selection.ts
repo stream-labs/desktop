@@ -18,7 +18,6 @@ import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis, ScalableRectangle } from 'util/ScalableRectangle';
-import { vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 
 

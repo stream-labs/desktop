@@ -1,6 +1,6 @@
 import { get, set, invert } from 'lodash';
-import { vec2 } from './vec2';
 import { Rect } from './rect';
+import { v2, Vec2 } from './vec2';
 
 // This class is used for simplifying math that deals
 // with rectangles that can be scaled, including
@@ -46,7 +46,7 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
   crop: ICrop;
   rotation: number;
 
-  private origin: IVec2;
+  private origin: Vec2;
 
 
   constructor(options: IScalableRectangle) {
@@ -65,7 +65,7 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     this.rotation = options.rotation || 0;
 
     // this.anchor = AnchorPoint.NorthWest;
-    this.origin = AnchorPositions[AnchorPoint.NorthWest];
+    this.origin = v2(AnchorPositions[AnchorPoint.NorthWest]);
   }
 
 
@@ -90,7 +90,7 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
 
 
   get aspectRatio() {
-    return this.width / this.height;
+    return this.getAspectRatio();
   }
 
 
@@ -104,16 +104,15 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     this.setOrigin(AnchorPositions[anchor]);
   }
 
-  setOrigin(newOrigin: IVec2) {
+  setOrigin(newOriginModel: IVec2) {
     // We need to calculate the distance to the new origin point
     const currentPosition = this.origin;
+    const newOrigin = v2(newOriginModel);
+    const delta = newOrigin.sub(currentPosition);
+    const newPosition = this.getPosition()
+      .add(delta.multiply(v2(this.scaledWidth, this.scaledHeight)));
 
-    const deltaX = newOrigin.x - currentPosition.x;
-    const deltaY = newOrigin.y - currentPosition.y;
-
-    this.x += deltaX * this.scaledWidth;
-    this.y += deltaY * this.scaledHeight;
-
+    this.setPosition(newPosition);
     this.origin = newOrigin;
   }
 
@@ -161,7 +160,7 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
 
     this.mapFields(mapFields);
 
-    this.origin = origin;
+    this.origin = v2(origin);
 
     // Return the anchor to the NW, since the editor code assumes
     // that all rectangles are anchored from the NW
@@ -331,38 +330,4 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
       });
     }));
   }
-
-
-  //
-  // /**
-  //  * returns the relative distance from rect to point
-  //  */
-  // getOriginFromOffset(offset: IVec2): IVec2 {
-  //   let origin: IVec2;
-  //   this.normalized(() => {
-  //     origin = vec2(
-  //       // vec2().setX(offset.x).distanceTo(vec2().setX(this.x)) / this.croppedWidth,
-  //       // vec2().setY(offset.y).distanceTo(vec2().setY(this.y)) / this.croppedHeight
-  //
-  //       (offset.x - this.x) / this.scaledWidth,
-  //       (offset.y - this.y) / this.scaledHeight
-  //     );
-  //   });
-  //   return origin;
-  // }
-  //
-  // /**
-  //  * opposite for `getOriginFromOffset()`
-  //  * returns the absolute point offset based on the relative origin param
-  //  */
-  // getOffsetFromOrigin(origin: IVec2): IVec2 {
-  //   let offset: IVec2;
-  //   this.normalized(() => {
-  //     offset = vec2(
-  //       this.x + this.scaledWidth * origin.x,
-  //       this.y + this.scaledHeight * origin.y
-  //     )
-  //   });
-  //   return offset;
-  // }
 }

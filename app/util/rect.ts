@@ -1,11 +1,10 @@
-import { Vec2, vec2 } from './vec2';
-import { Path } from '../../vendor/paper/basic';
-import { Line } from './line';
-import { uniqWith, without, isEqual } from 'lodash';
+import { v2, Vec2 } from './vec2';
+import { ServiceHelper } from '../services/stateful-service';
 
 /**
- * provides math fore rectangles
+ * Class for a simple rectangle
  */
+@ServiceHelper()
 export class Rect implements IRectangle {
 
   x: number;
@@ -20,7 +19,6 @@ export class Rect implements IRectangle {
     this.height = options.height;
   }
 
-
   getModel(): IRectangle {
     return {
       x: this.x,
@@ -30,64 +28,39 @@ export class Rect implements IRectangle {
     }
   }
 
+  getAspectRatio() {
+    return this.width / this.height;
+  }
+
+  getPosition(): Vec2 {
+    return v2(this.x, this.y);
+  }
+
+  setPosition(pos: IVec2) {
+    this.x = pos.x;
+    this.y = pos.y;
+  }
+
   /**
    * returns the relative distance from the rectangle to point
+   * { x: 0, y: 0 } is top-left corner
+   * { x: 1, y: 1 } is bottom-right corner
    */
   getOriginFromOffset(offset: IVec2): Vec2 {
-    return vec2(
+    return v2(
       (offset.x - this.x) / this.width,
       (offset.y - this.y) / this.height
     );
   }
 
   /**
-   * opposite for `getOriginFromOffset()`
+   * opposite for `.getOriginFromOffset()`
    * returns the absolute point offset based on the relative origin param
    */
   getOffsetFromOrigin(origin: IVec2): Vec2 {
-    return vec2(
+    return v2(
       this.x + this.width * origin.x,
       this.y + this.height * origin.y
     )
-  }
-
-  /**
-   * returns intersection points
-   */
-  getIntersections(line: Line): [Vec2?, Vec2?] {
-    const lines = this.getLines();
-    let intersections = [
-      line.getIntersection(lines[0]),
-      line.getIntersection(lines[1]),
-      line.getIntersection(lines[2]),
-      line.getIntersection(lines[3]),
-    ];
-    intersections = uniqWith(intersections, isEqual);
-    return without(intersections, null) as [Vec2?, Vec2?];
-  }
-
-  /**
-   * returns edges lines in CW direction
-   */
-  getLines(): [Line, Line, Line, Line] {
-    const [vx1, vx2, vx3, vx4] = this.getVertices();
-    return [
-      new Line(vx1, vx2),
-      new Line(vx2, vx3),
-      new Line(vx3, vx4),
-      new Line(vx4, vx1),
-    ]
-  }
-
-  /**
-   * returns vertices in CW direction
-   */
-  getVertices(): [Vec2, Vec2, Vec2, Vec2] {
-    return [
-      vec2(this.x, this.y),
-      vec2(this.x + this.width, this.y),
-      vec2(this.x + this.width, this.y + this.height),
-      vec2(this.x,this.y + this.height),
-    ]
   }
 }
