@@ -61,7 +61,7 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   //
   // sockets
   //
-  connectToQueueSocketChannels() {
+  connectSocket() {
     if (this.socket) {
       if (this.socket.connected) {
         return;
@@ -102,6 +102,12 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     this.socket.on('queue.picked.clear', () => {
       this.CLEAR_QUEUE_PICKED();
     });
+  }
+
+  disconnectSocket() {
+    if (this.isConnected()) {
+      this.socket.disconnect();
+    }
   }
 
   isConnected() {
@@ -267,10 +273,14 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
       return x.id === response.id;
     });
 
-    if(index !== -1){
+    if (index !== -1) {
       let tempData = _.cloneDeep(this.state.queueEntriesResponse.data);
 
-      for (let i = index; i < this.state.queueEntriesResponse.data.length; ++i) {
+      for (
+        let i = index;
+        i < this.state.queueEntriesResponse.data.length;
+        ++i
+      ) {
         tempData[i].custom_id--;
       }
 
@@ -278,7 +288,7 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
 
       this.state.queueEntriesResponse.data = tempData;
     }
-  
+
     this.state.queuePickedResponse.data.push(response);
   }
 
@@ -289,10 +299,14 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
       return x.id === response.id;
     });
 
-    if(indexEntry !== -1){
+    if (indexEntry !== -1) {
       let tempData = _.cloneDeep(this.state.queueEntriesResponse.data);
 
-      for (let i = indexEntry; i < this.state.queueEntriesResponse.data.length; ++i) {
+      for (
+        let i = indexEntry;
+        i < this.state.queueEntriesResponse.data.length;
+        ++i
+      ) {
         tempData[i].custom_id--;
       }
 

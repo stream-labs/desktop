@@ -123,6 +123,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
     return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {}).then(
       (response: IChatbotSocketAuthResponse) => {
         this.LOGIN_TO_SOCKET(response);
+        console.log(response);
       }
     );
   }

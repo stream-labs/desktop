@@ -25,11 +25,15 @@ export default class ChatbotQueue extends ChatbotBase {
       this.chatbotApiService.Queue.fetchQueuePicked();
     }
 
-    this.chatbotApiService.Queue.connectToQueueSocketChannels();
+    this.chatbotApiService.Queue.connectSocket();
 
     this.chatbotApiService.Queue.fetchQueuePreferences();
 
     this.queueTitle = this.chatbotApiService.Queue.state.queueStateResponse.title;
+  }
+
+  destroyed() {
+    this.chatbotApiService.Queue.disconnectSocket();
   }
 
   get noUsersInList() {
@@ -53,9 +57,9 @@ export default class ChatbotQueue extends ChatbotBase {
   }
 
   onPickRandomEntryHandler() {
-    this.chatbotApiService.Queue.pickQueueEntryRandom().then(() =>{
+    this.chatbotApiService.Queue.pickQueueEntryRandom().then(() => {
       this.$refs.entrylist.loadNewEntries();
-    });;
+    });
   }
 
   get queueIsOpen() {

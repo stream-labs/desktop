@@ -83,7 +83,7 @@ export default class Chatbot extends Vue {
     return this.chatbotApiService.Base.state.globallyEnabled;
   }
 
-  @Debounce(1000)
+  //@Debounce(1000)
   async onToggleEnableChatbotHandler() {
     await this.chatbotApiService.Base.toggleEnableChatbot();
   }

@@ -11,3 +11,4 @@ export * from './chatbot-songrequest';
 export * from './chatbot-loyalty';
 export * from './chatbot';
 export * from './chatbot-heist';
+export * from './chatbot-poll';

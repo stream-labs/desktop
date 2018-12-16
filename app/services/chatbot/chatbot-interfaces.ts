@@ -8,6 +8,7 @@ export interface IChatbotCommonServiceState {
   quoteToUpdate: IQuote;
   modBannerVisible: boolean;
   loyaltyToUpdate: IChatbotLoyalty;
+  pollProfileToUpdate: IPollProfile;
 }
 
 // responses
@@ -101,6 +102,20 @@ export interface IQuotePreferencesResponse {
 export interface IQueuePreferencesResponse {
   settings: IQueuePreferencesData;
   enabled: boolean;
+}
+
+export interface IPollPreferencesResponse {
+  settings: IPollPreferencesData;
+  enabled: boolean;
+}
+
+export interface IActivePollResponse {
+  id?: number;
+  user_id: number;
+  settings: IPollProfile;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ILoyaltyPreferencesResponse {
@@ -572,7 +587,7 @@ export interface ILoyaltyDonations {
 
 //  poll
 export interface IPollProfile {
-  id: string;
+  id?: string;
   title: string;
   timer: {
     enabled: boolean;
@@ -587,8 +602,9 @@ export interface IPollProfile {
 export interface IPollOption {
   name: string;
   parameter: string;
+  votes?: number;
 }
-export interface IChatbotPollSettings {
+export interface IPollPreferencesData {
   commands: IPollCommands;
   profiles: IPollProfile[];
 }
@@ -605,7 +621,6 @@ export interface IPollCommand {
   aliases: IChatbotAliases;
   permission: IChatbotPermission;
 }
-
 
 // dictionaries
 export enum ChatbotAutopermitEnums {
@@ -644,7 +659,7 @@ export type ChatbotAlertType =
   | 'sponsor'
   | 'superchat';
 
-export type ChatbotSocketRoom = 'queue' | 'giveaway';
+export type ChatbotSocketRoom = 'queue' | 'giveaway' | 'poll';
 
 export const ChatbotClients = ['Twitch', 'Mixer', 'Youtube'];
 
@@ -660,6 +675,7 @@ export type ChatbotSettingSlug =
 export const NEW_ALERT_MODAL_ID = 'new-alert';
 export const NEW_LINK_PROTECTION_LIST_MODAL_ID = 'new-link-protection-list';
 export const NEW_WORD_PROTECTION_LIST_MODAL_ID = 'new-word-protection-list';
+export const NEW_POLL_OPTION_MODAL_ID = 'new-poll-option';
 
 // modals
 export const DELETE_COMMAND_MODAL = 'delete-command';

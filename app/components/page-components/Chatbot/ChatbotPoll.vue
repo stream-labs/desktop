@@ -1,14 +1,25 @@
 <template>
   <div>
-    <!-- batch actions -->
-    <div class="flex flex--space-between padding--10">
-      <button
-        class="button button--action margin--10 button--add-command"
-      >{{ $t('Add Betting Profile') }}</button>
-      <button class="button button--default margin--10">{{ $t('Betting Preferences') }}</button>
+    <ChatbotActivePoll v-if="isPollActive"/>
+    <div class="chatbot-poll__container" v-else>
+      <!-- batch actions -->
+      <div class="flex flex--space-between padding--10">
+        <button
+          class="button button--action margin--10 button--add-command"
+          @click="onOpenProfileHandler"
+        >{{ $t('Add Poll Profile') }}</button>
+        <button class="button button--default margin--10">{{ $t('Poll Preferences') }}</button>
+      </div>
+      <!-- profiles -->
+      <div class="chatbot-profile__container">
+        <ChatbotPollProfile
+          v-if="profiles"
+          v-for="profile in profiles"
+          :key="profile.title"
+          :profile="profile"
+        />
+      </div>
     </div>
-    <!-- profiles -->
-    <ChatbotPollProfile v-for="profile in profiles" :key="profile.title" :profile="profile"/>
   </div>
 </template>
 
@@ -16,4 +27,7 @@
 
 <style lang="less" scoped>
 @import '../../../styles/index';
+.chatbot-profile__container {
+  .margin-horizontal--10;
+}
 </style>

@@ -2,22 +2,25 @@
   <div class="chatbot-profile__container">
     <div class="chatbot-profile__header">
       <h3>{{ $t(profile.title) }}</h3>
-      <DropdownMenu :placement="'bottom-end'" :icon="'icon-more'">
-        <div class="chatbot-profile-actions__container">
-          <button class="button button--action">{{ $t('Edit') }}</button>
-          <button class="button button--soft-warning">{{ $t('Delete') }}</button>
-        </div>
-      </DropdownMenu>
+      <div class="align-items--inline">
+        <i class="icon-trash padding--5 cursor--pointer" @click="onDeleteProfileHandler"/>
+        <i class="fas icon-edit chatbot-edit cursor--pointer" @click="onEditProfileHandler"/>
+      </div>
     </div>
 
     <div class="chatbot-profile__body">
       <div class="chatbot-profile__content">
-        <div>{{ $t('Duration') }}</div>
-        <p>{{ $t(formatTime(profile.timer.duration)) }}</p>
+        <div v-if="profile.timer.enabled">{{ $t('Duration') }}</div>
+        <p v-if="profile.timer.enabled">{{ $t(formatTime(profile.timer.duration)) }}</p>
         <div>{{ $t('Options') }}</div>
-        <p>{{ $t(profile.options[0].name) }}</p>
+        <p
+          :class="profile.timer.enabled ? 'chatbot-options': 'chatbot-options-alt'"
+        >{{ $t(options) }}</p>
       </div>
-      <button class="button button--action chatbot-profile__action">{{ $t('Start Poll') }}</button>
+      <button
+        class="button button--action chatbot-profile__action"
+        @click="onStartPollHandler"
+      >{{ $t('Start Poll') }}</button>
     </div>
   </div>
 </template>
@@ -26,6 +29,10 @@
 
 <style lang="less" scoped>
 @import '../../../../styles/index';
+.chatbot-edit {
+  padding-left: 5px;
+  padding-right: 5px;
+}
 
 .chatbot-profile__container {
   display: inline-block;
@@ -42,6 +49,10 @@
 
     h3 {
       font-size: 16px;
+      max-width: 210px;
+      white-space: nowrap; /*keep text on one line */
+      overflow: hidden; /*prevent text from being shown outside the border */
+      text-overflow: ellipsis; /*cut off text with an ellipsis*/
       .margin--none();
     }
 
@@ -54,6 +65,22 @@
         }
       }
     }
+  }
+
+  .chatbot-options {
+    overflow: hidden; /*prevent text from being shown outside the border */
+    text-overflow: ellipsis; /*cut off text with an ellipsis*/
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .chatbot-options-alt {
+    overflow: hidden; /*prevent text from being shown outside the border */
+    text-overflow: ellipsis; /*cut off text with an ellipsis*/
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
   }
 
   .chatbot-profile__body {

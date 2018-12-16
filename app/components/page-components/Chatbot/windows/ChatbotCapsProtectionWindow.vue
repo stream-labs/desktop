@@ -45,7 +45,8 @@
             v-model="capsProtection.advanced.maximum"
             :metadata="metadata.caps.advanced.maximum"
           />
-          <VFormGroup
+          <VFormGroup 
+            v-if="selectedTab === 'advanced'"
             :title="$t('Maximum Percent')"
             v-model="capsProtection.advanced.percent"
             :metadata="metadata.caps.advanced.percent"

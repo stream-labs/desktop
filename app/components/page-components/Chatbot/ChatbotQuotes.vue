@@ -30,7 +30,7 @@
     />
     <span>{{ $t('Click add quote to get started.') }}</span>
   </div>
-  <div v-else class="padding--10">
+  <div v-else class="padding--10 margin-horizontal--10">
     <table>
       <thead>
         <tr>

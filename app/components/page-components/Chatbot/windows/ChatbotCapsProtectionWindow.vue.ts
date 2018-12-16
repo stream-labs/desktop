@@ -5,12 +5,10 @@ import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 
-
 @Component({
   components: { ValidatedForm }
 })
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -40,21 +38,18 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService
-      .ModTools
-      .updateCapsProtection({
-        enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection
-      })
-      .then(() => {
-        this.chatbotApiService.Common.closeChildWindow();
-      });
+    this.chatbotApiService.ModTools.updateCapsProtection({
+      enabled: this.capsProtectionResponse.enabled,
+      settings: this.capsProtection
+    }).then(() => {
+      this.chatbotApiService.Common.closeChildWindow();
+    });
   }
 }

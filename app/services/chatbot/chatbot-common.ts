@@ -10,7 +10,8 @@ import {
   IDefaultCommand,
   IChatbotTimer,
   IQuote,
-  IChatbotLoyalty
+  IChatbotLoyalty,
+  IPollProfile
 } from './chatbot-interfaces';
 
 export class ChatbotCommonService extends PersistentStatefulService<
@@ -25,7 +26,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
     timerToUpdate: null,
     quoteToUpdate: null,
     modBannerVisible: true,
-    loyaltyToUpdate: null
+    loyaltyToUpdate: null,
+    pollProfileToUpdate: null
   };
 
   hideModBanner() {
@@ -50,6 +52,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   }
 
   openCustomCommandWindow(command?: ICustomCommand) {
+    console.log(command);
     if (command) {
       this.SET_CUSTOM_COMAND_TO_UPDATE(command);
     }
@@ -207,6 +210,21 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
+  openPollProfileWindow(profile?: IPollProfile) {
+    if (profile) {
+      this.SET_POLL_PROFILE_TO_UPDATE(profile);
+    }
+
+    this.windowsService.showWindow({
+      componentName: 'ChatbotPollProfileWindow',
+      title: $t('Chatbot Profile'),
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
   openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
@@ -284,5 +302,10 @@ export class ChatbotCommonService extends PersistentStatefulService<
   @mutation()
   private SET_LOYALTY_TO_UPDATE(loyalty: IChatbotLoyalty) {
     Vue.set(this.state, 'loyaltyToUpdate', loyalty);
+  }
+
+  @mutation()
+  private SET_POLL_PROFILE_TO_UPDATE(profile: IPollProfile) {
+    Vue.set(this.state, 'pollProfileToUpdate', profile);
   }
 }

@@ -49,6 +49,7 @@
           :metadata="metadata.symbol.advanced.maximum"
         />
         <VFormGroup
+          v-if="selectedTab === 'advanced'"
           :title="$t('Maximum Percent')"
           v-model="symbolProtection.advanced.percent"
           :metadata="metadata.symbol.advanced.percent"
