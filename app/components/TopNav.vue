@@ -20,7 +20,7 @@
     <button
       @click="navigateChatBot"
       class="tab-button"
-      v-if="featureIsEnabled(availableFeatures.chatbot)"
+      v-if="featureIsEnabled(availableFeatures.chatbot) && chatbotVisible"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-community"/> <span class="tab-button__text">{{ $t('Chatbot') }}</span>
