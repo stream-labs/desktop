@@ -38,6 +38,11 @@ export default class TopNav extends Vue {
   slideOpen = false;
 
   studioModeTooltip = 'Studio Mode';
+  settingsTooltip = 'Settings';
+  helpTooltip = 'Get Help';
+  logoutTooltip = 'Logout';
+  sunTooltip = 'Day mode';
+  moonTooltip = 'Night mode';
 
   mounted() {
     this.topNav = this.$refs.top_nav;
