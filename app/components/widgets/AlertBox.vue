@@ -11,7 +11,7 @@
       <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
       <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
         <button
-          v-for="type in alertTypes"
+          v-for="type in alertTypes.filter(t => t !== 'facemasks')"
           class="button button--action"
           :key="type"
           @click="addAlert(type)"

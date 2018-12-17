@@ -21,6 +21,7 @@ export const API_NAME_MAP =  {
   superheart: 'superhearts',
   fanfunding: 'fanfunding',
   sponsor: 'sponsors',
+  facemaskdonation: 'facemasks',
   support: 'support',
   like: 'likes',
   star: 'stars'

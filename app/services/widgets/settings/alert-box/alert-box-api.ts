@@ -403,6 +403,12 @@ interface IAlertBoxRaidSettings {
   raid_variations: IAlertBoxVariation[];
 }
 
+// FACEMASKS
+
+interface IAlertBoxFacemaskSettings {
+  facemaskdonation_enabled: boolean;
+}
+
 // ACCOUNT INTEGRATIONS
 interface IAlertBoxDonorDriveSettings {
   donordrivedonation_alert_duration: number;
@@ -618,6 +624,7 @@ IAlertBoxLikeSettings,
 IAlertBoxRaidSettings,
 IAlertBoxMerchSettings,
 IAlertBoxResubSettings,
+IAlertBoxFacemaskSettings,
 IAlertBoxTreatSettings,
 IAlertBoxDonorDriveSettings,
 IAlertBoxExtraLifeSettings,
@@ -642,6 +649,7 @@ export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {
   hosts: IAlertBoxSetting;
   raids: IAlertBoxSetting;
   merch: IAlertBoxSetting;
+  facemasks: IAlertBoxSetting;
   support?: IAlertBoxSetting;
   likes?: IAlertBoxSetting;
   stars?: IAlertBoxSettings;
