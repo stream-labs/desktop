@@ -1,4 +1,3 @@
-import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
@@ -7,6 +6,9 @@ import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleErrors } from 'util/requests';
 import { Throttle } from 'lodash-decorators';
+import { PersistentStatefulService } from './persistent-stateful-service';
+import uuid from 'uuid/v4';
+import { mutation } from './stateful-service';
 
 export type TUsageEvent =
   'stream_start' |
@@ -49,8 +51,15 @@ export function track(event: TUsageEvent) {
   };
 }
 
+interface IUsageStatisticsServiceState {
+  uuid: string;
+}
 
-export class UsageStatisticsService extends Service {
+export class UsageStatisticsService extends PersistentStatefulService<IUsageStatisticsServiceState> {
+  static defaultState: IUsageStatisticsServiceState = {
+    uuid: ''
+  };
+
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
 
@@ -60,6 +69,7 @@ export class UsageStatisticsService extends Service {
   private anaiticsEvents: IAnalyticsEvent[] = [];
 
   init() {
+    if (!this.state.uuid) this.SET_UUID();
     this.loadInstallerId();
   }
 
@@ -136,7 +146,9 @@ export class UsageStatisticsService extends Service {
       product: 'SLOBS',
       version: this.version,
       count: 1,
-      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : void 0
+      uuid: this.userService.state.auth ?
+        this.userService.state.auth.platform.id :
+        this.state.uuid
     });
     this.sendAnalytics();
   }
@@ -155,5 +167,10 @@ export class UsageStatisticsService extends Service {
       body: JSON.stringify(data || {})
     });
     fetch(request).then(handleErrors);
+  }
+
+  @mutation()
+  private SET_UUID() {
+    this.state.uuid = uuid();
   }
 }
