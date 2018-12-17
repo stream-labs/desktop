@@ -17,7 +17,6 @@ import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from 'services/streaming';
-import { resolve } from 'dns';
 
 interface IFacemasksServiceState {
   device: IInputDeviceSelection;
