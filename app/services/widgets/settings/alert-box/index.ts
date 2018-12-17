@@ -3,7 +3,13 @@ import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
-import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVariation } from './alert-box-api';
+import {
+  IAlertBoxSettings,
+  IAlertBoxApiSettings,
+  IAlertBoxSetting,
+  IAlertBoxVariation,
+  IAlertBoxMixerSettings
+} from './alert-box-api';
 import { API_NAME_MAP, REGEX_TESTERS, newVariation, conditions } from './alert-box-data';
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
@@ -107,7 +113,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
 
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
     const { settings, ...rest } = data;
-    const newSettings = this.transformSettings(settings);
+    const newSettings = settings.mixer_account ?
+      this.transformSettings({ ...settings, ...settings.mixer_account }) : this.transformSettings(settings);
     return { ...rest, settings: newSettings };
   }
 
@@ -320,6 +327,12 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     };
   }
 
+  private isMixerKey(prefix: string, key: string) {
+    return this.userService.platform.type === 'mixer' &&
+      (['follow', 'host', 'resub', 'sub'].includes(prefix) ||
+      ['auto_host_enabled', 'recent_events_host_min_viewer_count', 'show_resub_message'].includes(key));
+  }
+
   private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
     const settingsObj = {} as IAlertBoxApiSettings;
     Object.keys(settings).forEach((setting) => {
@@ -332,7 +345,14 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
         const flattenedDefault = prefix === 'sub' ?
           this.unshapeSubs(defaultVariation) :  this.unshapeVariation(defaultVariation, bitsPrefix);
-        Object.keys(flattenedDefault).forEach((key) => settingsObj[key] = flattenedDefault[key]);
+        Object.keys(flattenedDefault).forEach((key) => {
+          if (this.isMixerKey(prefix, key)) {
+            if (!settingsObj.mixer_account) settingsObj.mixer_account = {} as IAlertBoxMixerSettings;
+            settingsObj.mixer_account[key] = flattenedDefault[key];
+          } else {
+            settingsObj[key] = flattenedDefault[key];
+          }
+        });
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
