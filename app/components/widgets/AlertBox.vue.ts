@@ -191,7 +191,8 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     if (this.selectedAlert === 'facemasks') {
       const { duration } = this.selectedVariation;
       const { enabled } = this.wData.settings.facemasks;
-      this.facemasksService.updateFacemaskSettings({ duration, enabled });
+      // TODO: implement a dropdown where user can set their device 
+      this.facemasksService.updateFacemaskSettings({ duration, enabled, device: this.facemasksService.state.device });
     } else {
       this.save();
     }
