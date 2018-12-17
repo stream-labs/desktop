@@ -43,8 +43,7 @@ interface IFacemask {
 
 interface IFacemaskSettings {
   enabled: boolean;
-  facemasks: IFacemask[];
-  audio_volume: number;
+  facemasks?: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
 }
@@ -83,7 +82,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   settings: IFacemaskSettings = {
     enabled: false,
     facemasks: [],
-    audio_volume: 50,
     duration: 10,
     device: {
       name: null,
@@ -314,11 +312,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       .then(response => response.json());
   }
 
-  fetchProfanityFilterSettings() {
+  updateSettings(settings: IFacemaskSettings) {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/widget/settings?widget=donation_page`;
+    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
     const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
+    headers.append('Content-Type', 'text/json');
+
+    const request = new Request(url, { 
+      method: 'POST',
+      headers,
+      body: JSON.stringify(settings)
+     });
 
     return fetch(request)
       .then(handleErrors)
