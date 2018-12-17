@@ -605,6 +605,12 @@ interface IAlertBoxTreatSettings {
   treat_variations: IAlertBoxVariation[];
 }
 
+export interface IAlertBoxMixerSettings
+  extends IAlertBoxFollowSettings,
+    IAlertBoxSubSettings,
+    IAlertBoxResubSettings,
+    IAlertBoxHostSettings {}
+
 export interface IAlertBoxApiSettings
   extends IAlertBoxGeneralSettings,
     IAlertBoxSubSettings,
@@ -624,7 +630,9 @@ export interface IAlertBoxApiSettings
     IAlertBoxGamewsipSettings,
     IAlertBoxJustGivingSettings,
     IAlertBoxPatreonSettings,
-    IAlertBoxTiltifySettings {}
+    IAlertBoxTiltifySettings {
+  mixer_account?: IAlertBoxMixerSettings;
+}
 
 // SLOBS GENERAL SETTINGS
 export interface IAlertBoxSetting {
