@@ -102,7 +102,7 @@ export class UsageStatisticsService extends Service {
   recordEvent(event: TUsageEvent, metadata: object = {}) {
     if (!this.isProduction) return;
 
-    const headers = new Headers();
+    let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
     const bodyData: IUsageApiData = {
@@ -113,7 +113,7 @@ export class UsageStatisticsService extends Service {
     };
 
     if (this.userService.isLoggedIn()) {
-      authorizedHeaders(this.userService.apiToken, headers);
+      headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 
     if (this.installerId) {
@@ -149,9 +149,9 @@ export class UsageStatisticsService extends Service {
 
     this.anaiticsEvents.length = 0;
 
-    const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/analytics/slobs/ping`, {
+    const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
       method: 'post',
-      headers: authorizedHeaders(this.userService.apiToken),
+      headers,
       body: JSON.stringify(data || {})
     });
     fetch(request).then(handleErrors);

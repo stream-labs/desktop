@@ -51,4 +51,7 @@ export class HostsService extends Service {
     return 'platform.streamlabs.com';
   }
 
+  get analitycs() {
+    return 'r2d2.streamlabs.com';
+  }
 }
