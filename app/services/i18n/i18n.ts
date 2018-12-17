@@ -27,9 +27,11 @@ export function $t(...args: any[]): string {
 }
 
 /**
+ * Crowding and Electron use different standards for locale name
+ * Do some mapping in LANG_CODE_MAP based on docs:
  * @see https://electronjs.org/docs/api/locales
  */
-const LANG_CODE_MAP = {
+const LANG_CODE_MAP: Dictionary<{lang: string, locale: string}> = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
   'en-US':	{ lang: 'English', locale: 'en-US' },
@@ -45,7 +47,7 @@ const LANG_CODE_MAP = {
   sk: { lang: 'Slovak', locale: 'sk-SK' },
   th:	{ lang: 'Thai', locale: 'th-TH' },
   tr:	{ lang: 'Turkish', locale: 'tr-TR' },
-  'zh-CN': { lang: 'Chinese (Simplified)' }
+  'zh-CN': { lang: 'Chinese (Simplified)', locale: 'zh-CN' }
 };
 
 
@@ -62,6 +64,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   static setWebviewLocale(webview: Electron.WebviewTag) {
+    if (!webview) return;
+
     // use a static method here because it allows to accept unserializable arguments like webview from other windows
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;

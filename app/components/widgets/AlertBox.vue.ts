@@ -28,6 +28,9 @@ const alertNameMap = () => ({
   hosts: $t('Hosts'),
   raids: $t('Raids'),
   facemasks: $t('Facemask Donations'),
+  stars: $t('Stars'),
+  support: $t('Support'),
+  likes: $t('Likes')
 });
 
 const triggerAmountMap = {

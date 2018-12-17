@@ -1,11 +1,13 @@
 <template>
-<div class="top-nav" :class="{'loading': loading}">
+<div class="top-nav" ref="top_nav" :class="{ 'loading': loading, 'top-nav--compact': responsiveClass }">
   <!--<button
       @click="navigateOnboarding"
       class="button button--action"
       :class="{ active: page === 'Onboarding' }">
       Onboarding
   </button>-->
+
+  <resize-observer @notify="handleResize"></resize-observer>
 
   <div class="tabs">
     <button
@@ -149,6 +151,23 @@
     background-color: black;
     opacity: 0;
   }
+
+  .tab-button {
+    i,
+    .fa {
+      .margin-right(0);
+    }
+
+    span {
+      .margin-left();
+    }
+  }
+}
+
+.top-nav--compact {
+  .tab-button__text {
+    display: none;
+  }
 }
 
 .top-nav-right {
@@ -157,14 +176,6 @@
   text-align: right;
   justify-content: flex-end;
   align-items: center;
-}
-
-.tab-button__text {
-  display: none;
-
-  @media (min-width: 1280px) {
-    display: inline;
-  }
 }
 
 .link {

@@ -95,7 +95,8 @@
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-        <chat :style="defaultChatStyles" ref="chat" />
+        <!-- v-if is required because left-side chat will not properly load on application startup -->
+        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
         <PlatformAppWebview
           v-for="app in chatApps"
           v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
@@ -176,13 +177,9 @@
 .live-dock-header {
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
+  .margin-bottom();
   align-items: center;
   justify-content: space-between;
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
-  }
 }
 
 .live-dock-text {
@@ -199,16 +196,12 @@
 .live-dock-info {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  .margin-bottom();
 
   .live-dock-platform-tools {
     a {
       padding: 0 8px;
     }
-  }
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
   }
 }
 

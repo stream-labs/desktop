@@ -3,6 +3,7 @@ import { WidgetType } from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
+import { $t } from 'services/i18n';
 
 export interface IEventListSettings extends IWidgetSettings {
   animation_speed: number;
@@ -88,4 +89,27 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
     };
   }
 
+  eventsByPlatform(): { key: string, title: string }[] {
+    const platform = this.userService.platform.type;
+    return {
+      twitch: [
+        { key: 'show_follows', title: $t('Follows') },
+        { key: 'show_subscriptions', title: $t('Subscriptions') },
+        { key: 'show_resubs', title: $t('Show Resubs') },
+        { key: 'show_sub_tiers', title: $t('Show Sub Tiers') },
+        { key: 'show_hosts', title: $t('Hosts') },
+        { key: 'show_bits', title: $t('Bits') },
+        { key: 'show_raids', title: $t('Raids') }
+      ],
+      facebook: [],
+      youtube: [
+        { key: 'show_subscriptions', title: $t('Subscriptions') },
+        { key: 'show_sponsors', title: $t('Members') },
+        { key: 'show_fanfundings', title: $t('Super Chats') }
+      ],
+      mixer: [
+        { key: 'show_resubs', title: $t('Show Resubs') },
+      ]
+    }[platform];
+  }
 }

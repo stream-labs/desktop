@@ -17,7 +17,7 @@ import {
   IPlatformService
 } from './platforms';
 import { CustomizationService } from 'services/customization';
-import Raven from 'raven-js';
+import * as Sentry from '@sentry/browser';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -76,7 +76,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
-    this.setRavenContext();
+    this.setSentryContext();
     this.validateLogin();
     this.incrementalRolloutService.fetchAvailableFeatures();
   }
@@ -260,7 +260,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-    this.setRavenContext();
+    this.setSentryContext();
     service.setupStreamSettings(auth);
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
@@ -290,7 +290,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => response.json())
+      .catch(() => null);
   }
 
   postFacebookPage(pageId: string) {
@@ -389,13 +390,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
-   * Registers the current user information with Raven so
-   * we can view more detailed information in sentry.
+   * Registers the current user information with Sentry so
+   * we can view more detailed information.
    */
-  setRavenContext() {
+  setSentryContext() {
     if (!this.isLoggedIn()) return;
-    Raven.setUserContext({ username: this.username });
-    Raven.setExtraContext({ platform: this.platform.type });
+
+    Sentry.configureScope(scope => {
+      scope.setUser({ username: this.username });
+      scope.setExtra('platform', this.platform.type);
+    });
   }
 
   popoutRecentEvents() {

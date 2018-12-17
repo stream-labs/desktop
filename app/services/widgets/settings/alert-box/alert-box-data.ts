@@ -21,7 +21,10 @@ export const API_NAME_MAP =  {
   superheart: 'superhearts',
   fanfunding: 'fanfunding',
   sponsor: 'sponsors',
-  facemaskdonation: 'facemasks'
+  facemaskdonation: 'facemasks',
+  support: 'support',
+  like: 'likes',
+  star: 'stars'
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map((key) => (

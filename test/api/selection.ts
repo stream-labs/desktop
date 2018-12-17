@@ -65,6 +65,7 @@ test('Selection', async t => {
   selection.selectAll();
 
   t.is(selection.getSize(), 3);
+
 });
 
 

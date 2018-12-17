@@ -80,15 +80,18 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
         });
       });
 
-
-    (obsVideoInput.properties.get('audio_device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
-        dshowDevices.push({
-          id: item.value,
-          description: item.name,
-          type: EDeviceType.audioInput
+    const audioDeviceIdProp = (obsVideoInput.properties.get('audio_device_id') as obs.IListProperty);
+    // audioDeviceIdProp can be null if no devices exist
+    if (audioDeviceIdProp) {
+      audioDeviceIdProp.details.items
+        .forEach((item: { name: string, value: string}) => {
+          dshowDevices.push({
+            id: item.value,
+            description: item.name,
+            type: EDeviceType.audioInput
+          });
         });
-      });
+    }
 
     obsAudioInput.release();
     obsAudioOutput.release();

@@ -170,16 +170,33 @@ export class FacebookService extends StatefulService<IFacebookServiceState> impl
       'fields=status,stream_url,title,description';
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
-    .then(handleErrors)
-    .then(response => response.json())
-    .then(json => {
-      const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0]
-      if (info.status === 'SCHEDULED_UNPUBLISHED') {
-        this.SET_LIVE_VIDEO_ID(info.id);
-        this.SET_STREAM_URL(info.stream_url);
-      }
-      return info;
-    })
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => {
+        const info = json.data.find((vid: any)=> vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0];
+        if (info && info.status === 'SCHEDULED_UNPUBLISHED') {
+          this.SET_LIVE_VIDEO_ID(info.id);
+          this.SET_STREAM_URL(info.stream_url);
+        }
+        return info;
+      });
+  }
+
+  scheduleStream(scheduledStartTime: string, { title, description, game }: IChannelInfo): Promise<any> {
+    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`
+    const headers = authorizedHeaders(this.activeToken);
+    headers.append('Content-Type', 'application/json');
+    const body = JSON.stringify({
+      planned_start_time: new Date(scheduledStartTime).getTime() / 1000,
+      game_specs: { name: game },
+      status: 'SCHEDULED_UNPUBLISHED',
+      title,
+      description
+    });
+    const req = new Request(url, { method: 'POST', headers, body });
+    return fetch(req)
+      .then(handleErrors)
+      .catch(resp => resp.json().then((error: any) => Promise.reject(error)));
   }
 
   fetchViewerCount(): Promise<number> {

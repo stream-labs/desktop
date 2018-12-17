@@ -8,9 +8,9 @@
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
       {{ $t('There was an error fetching your channel information.  You can try') }}
-      <a @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
+      <a class="description-link" @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
       {{ $t('or you can') }}
-      <a @click="goLive">{{ $t('just go live.') }}</a>
+      <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
     <div v-if="!infoLoading && !infoError && !populatingModels">
@@ -27,7 +27,7 @@
         @input="onGameInput"/>
       <div class="warning" v-if="isFacebook && !hasPages">
         {{ $t('It looks like you don\'t have any Pages. Head to ') }}
-        <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
         {{ $t(' to create a page, and then try again.') }}
       </div>
       <ObsListInput
@@ -35,6 +35,10 @@
         :value="pageModel"
         @input="(pageId) => setFacebookPageId(pageId)"
       />
+      <div v-if="isSchedule">
+        <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
+        <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
+      </div>
       <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
@@ -106,7 +110,7 @@
     <button
       class="button button--action"
       :disabled="updatingInfo || (isFacebook && !hasPages)"
-      @click="updateAndGoLive">
+      @click="handleSubmit">
       <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" />
       {{ submitText }}
     </button>
@@ -118,6 +122,10 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
+
+.description-link {
+  text-decoration: underline;
+}
 
 .edit-stream-info-option-desc {
   height: 20px;

@@ -5,11 +5,13 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { sleep } from '../sleep';
 
+export const test = avaTest as TestInterface<ITestContext>;
+
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
-export const test = avaTest as TestInterface<ITestContext>;;
+
 
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
@@ -66,6 +68,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let context: any = null;
   let app: any;
   let testPassed = false;
+  let testName = '';
+  const failedTests: string[] = [];
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
@@ -82,6 +86,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       env: {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir
+      },
+      webdriverOptions: {
+        // most of deprecation warning encourage us to use WebdriverIO actions API
+        // however the documentation for this API looks very poor, it provides only one example:
+        // http://webdriver.io/api/protocol/actions.html
+        // disable deprecation warning and waiting for better docs now
+        deprecationWarnings: false
       }
     });
 
@@ -125,14 +136,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   async function stopApp() {
-    await context.app.stop();
-    await new Promise((resolve) => {
-      rimraf(context.cacheDir, resolve);
-    });
+    try {
+      await context.app.stop();
+      await new Promise((resolve) => {
+        rimraf(context.cacheDir, resolve);
+      });
+    } catch (e) {
+      // TODO: find the reason why some tests are failing here
+      testPassed = false;
+    }
     appIsRunning = false;
   }
 
   test.beforeEach(async t  => {
+    testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -143,19 +160,30 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    const testName = t.title.replace('afterEach for ', '');
-    const client = await getClient();
-    await client.unsubscribeAll();
-    if (options.restartAppAfterEachTest) {
-      client.disconnect();
-    }
-
-    if (options.restartAppAfterEachTest) {
-      await stopApp();
-    }
+      const client = await getClient();
+      await client.unsubscribeAll();
+      if (options.restartAppAfterEachTest) {
+        client.disconnect();
+        await stopApp();
+      }
+    if (!testPassed) failedTests.push(testName);
   });
 
   test.after.always(async t => {
-    if (appIsRunning) await stopApp();
+
+    if (appIsRunning) {
+      await stopApp();
+      if (!testPassed) failedTests.push(testName);
+    }
+
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
+}
+
+function saveFailedTestsToFile(failedTests: string[]) {
+  const filePath = 'test-dist/failed-tests.json';
+  if (fs.existsSync(filePath)) {
+    failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
+  }
+  fs.writeFileSync(filePath, JSON.stringify(failedTests));
 }
