@@ -17,6 +17,7 @@ import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from 'services/streaming';
+import { resolve } from 'dns';
 
 interface IFacemasksServiceState {
   device: IInputDeviceSelection;
@@ -302,21 +303,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       .then(response => response.json());
   }
 
-  updateFacemaskSettings(settingsData: Partial<IFacemaskSettings>) {
-    return;
+  updateFacemaskSettings(settingsData: IFacemaskSettings) {
+    return new Promise((resolve, reject) => {
+      this.postFacemaskSettingsUpdate(settingsData).then(response => {
+        this.startup();
+        resolve('success');
+      }).catch(err => {
+        reject('error');
+      })
+    });
   }
 
-  fetchInstallUpdate(uuid:string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
-    const request = new Request(url, {});
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
-  }
-
-  updateSettings(settings: IFacemaskSettings) {
+  postFacemaskSettingsUpdate(settingsData: IFacemaskSettings) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/facemasks/settings`;
     const headers = authorizedHeaders(this.apiToken);
@@ -325,8 +323,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     const request = new Request(url, { 
       method: 'POST',
       headers,
-      body: JSON.stringify(settings)
-     });
+      body: JSON.stringify(settingsData)
+      });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  fetchInstallUpdate(uuid:string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
+    const request = new Request(url, {});
 
     return fetch(request)
       .then(handleErrors)
