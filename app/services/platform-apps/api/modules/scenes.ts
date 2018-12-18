@@ -1,11 +1,18 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
-import { ScenesService, Scene, TSceneNode } from 'services/scenes';
+import {
+  apiEvent,
+  apiMethod,
+  EApiPermissions,
+  IApiContext,
+  Module,
+  NotImplementedError,
+} from './module';
+import { Scene, ScenesService, TSceneNode } from 'services/scenes';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
 
 enum ESceneNodeType {
   Folder = 'folder',
-  SceneItem = 'scene_item'
+  SceneItem = 'scene_item',
 }
 
 interface INode {
@@ -41,7 +48,6 @@ interface IScene {
 }
 
 export class ScenesModule extends Module {
-
   moduleName = 'Scenes';
   permissions = [EApiPermissions.ScenesSources];
 
@@ -49,16 +55,35 @@ export class ScenesModule extends Module {
 
   constructor() {
     super();
+    // TODO: simplify this replay, there's a lot of code duplication
     this.scenesService.sceneAdded.subscribe(sceneData => {
       const scene = this.scenesService.getScene(sceneData.id);
       this.sceneAdded.next(this.serializeScene(scene));
     });
+
     this.scenesService.sceneSwitched.subscribe(sceneData => {
       const scene = this.scenesService.getScene(sceneData.id);
       this.sceneSwitched.next(this.serializeScene(scene));
     });
+
     this.scenesService.sceneRemoved.subscribe(sceneData => {
       this.sceneRemoved.next(sceneData.id);
+    });
+
+    this.scenesService.itemAdded.subscribe(sceneItemData => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemData.sceneItemId);
+
+      this.sceneItemAdded.next(this.serializeNode(sceneItem));
+    });
+
+    this.scenesService.itemUpdated.subscribe(sceneItemData => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemData.sceneItemId);
+
+      this.sceneItemUpdated.next(this.serializeNode(sceneItem));
+    });
+
+    this.scenesService.itemRemoved.subscribe(sceneItemData => {
+      this.sceneItemRemoved.next(sceneItemData.id);
     });
   }
 
@@ -71,7 +96,14 @@ export class ScenesModule extends Module {
   @apiEvent()
   sceneRemoved = new Subject<string>();
 
-  // TODO Events for scene items
+  @apiEvent()
+  sceneItemAdded = new Subject<ISceneItem | ISceneItemFolder>();
+
+  @apiEvent()
+  sceneItemUpdated = new Subject<ISceneItem | ISceneItemFolder>();
+
+  @apiEvent()
+  sceneItemRemoved = new Subject<string>();
 
   @apiMethod()
   getScenes() {
@@ -138,7 +170,7 @@ export class ScenesModule extends Module {
       name: scene.name,
       nodes: scene.getNodes().map(node => {
         return this.serializeNode(node);
-      })
+      }),
     };
   }
 
@@ -148,7 +180,7 @@ export class ScenesModule extends Module {
         id: node.id,
         type: ESceneNodeType.Folder,
         name: node.name,
-        childrenIds: node.childrenIds
+        childrenIds: node.childrenIds,
       };
 
       return folder;
@@ -159,11 +191,10 @@ export class ScenesModule extends Module {
         sourceId: node.sourceId,
         visible: node.visible,
         locked: node.locked,
-        transform: node.transform
+        transform: node.transform,
       };
 
       return item;
     }
   }
-
 }
