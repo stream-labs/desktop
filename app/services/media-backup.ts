@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import electron from 'electron';
+import { isUrl } from '../util/requests';
 
 const uuid = window['require']('uuid/v4');
 
@@ -14,12 +15,12 @@ export enum EMediaFileStatus {
   Checking,
   Synced,
   Uploading,
-  Downloading
+  Downloading,
 }
 
 export enum EGlobalSyncStatus {
   Syncing,
-  Synced
+  Synced,
 }
 
 interface IMediaFile {
@@ -53,7 +54,9 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   /**
    * Gets a string suitable to act as a local file id
    */
-  getLocalFileId() { return uuid(); }
+  getLocalFileId() {
+    return uuid();
+  }
 
   /**
    * Fetches the global sync status.
@@ -73,6 +76,10 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
    */
   async createNewFile(localId: string, filePath: string): Promise<IMediaFile> {
     let name: string;
+
+    if (isUrl(filePath)) {
+      return;
+    }
 
     try {
       name = path.parse(filePath).base;
@@ -112,7 +119,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       name,
       filePath,
       status: EMediaFileStatus.Uploading,
-      syncLock
+      syncLock,
     };
 
     if (!fs.existsSync(filePath)) return null;
@@ -165,7 +172,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       filePath: originalFilePath,
       serverId,
       status: EMediaFileStatus.Checking,
-      syncLock
+      syncLock,
     };
 
     this.INSERT_FILE(file);
@@ -185,10 +192,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
 
     // These are the 2 locations that will be checked for valid media files
-    const filesToCheck = [
-      originalFilePath,
-      this.getMediaFilePath(serverId, data.filename)
-    ];
+    const filesToCheck = [originalFilePath, this.getMediaFilePath(serverId, data.filename)];
 
     for (const fileToCheck of filesToCheck) {
       if (fs.existsSync(fileToCheck)) {
@@ -201,7 +205,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
           console.warn(`[Media Backup] Error calculating checksum: ${e}`);
         }
 
-        if (checksum && (checksum === data.checksum)) {
+        if (checksum && checksum === data.checksum) {
           if (this.validateSyncLock(localId, syncLock)) {
             file.filePath = fileToCheck;
             file.status = EMediaFileStatus.Synced;
@@ -220,7 +224,9 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     let downloadedPath: string;
 
     try {
-      downloadedPath = await this.withRetry(() => this.downloadFile(data.url, serverId, data.filename));
+      downloadedPath = await this.withRetry(() =>
+        this.downloadFile(data.url, serverId, data.filename),
+      );
     } catch (e) {
       console.error(`[Media Backup] Error downloading file: ${e.body}`);
 
@@ -240,7 +246,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
   }
 
-
   private async uploadFile(filePath: string) {
     const checksum = await this.getChecksum(filePath);
     const file = fs.createReadStream(filePath);
@@ -248,22 +253,24 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const formData = {
       modified: new Date().toISOString(),
       checksum,
-      file
+      file,
     };
 
     const data = await new Promise<{ id: number }>((resolve, reject) => {
-      const req = request.post({
-        url: `${this.apiBase}/upload`,
-        headers: this.authedHeaders,
-        formData
-      },
-      (err, res, body) => {
-        if (Math.floor(res.statusCode / 100) === 2) {
-          resolve(JSON.parse(body));
-        } else {
-          reject(res);
-        }
-      });
+      const req = request.post(
+        {
+          url: `${this.apiBase}/upload`,
+          headers: this.authedHeaders,
+          formData,
+        },
+        (err, res, body) => {
+          if (Math.floor(res.statusCode / 100) === 2) {
+            resolve(JSON.parse(body));
+          } else {
+            reject(res);
+          }
+        },
+      );
     });
 
     return data;
@@ -271,17 +278,19 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
   private getFileData(id: number) {
     return new Promise<IMediaFileDataResponse>((resolve, reject) => {
-      request({
-        url: `${this.apiBase}/${id}`,
-        headers: this.authedHeaders
-      },
-      (err, res, body) => {
-        if (Math.floor(res.statusCode / 100) === 2) {
-          resolve(JSON.parse(body));
-        } else {
-          reject(res);
-        }
-      });
+      request(
+        {
+          url: `${this.apiBase}/${id}`,
+          headers: this.authedHeaders,
+        },
+        (err, res, body) => {
+          if (Math.floor(res.statusCode / 100) === 2) {
+            resolve(JSON.parse(body));
+          } else {
+            reject(res);
+          }
+        },
+      );
     });
   }
 
@@ -328,7 +337,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
    */
   private validateSyncLock(id: string, syncLock: string) {
     return !!this.state.files.find(file => {
-      return ((file.id === id) && (file.syncLock === syncLock));
+      return file.id === id && file.syncLock === syncLock;
     });
   }
 
@@ -372,5 +381,4 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       }
     });
   }
-
 }
