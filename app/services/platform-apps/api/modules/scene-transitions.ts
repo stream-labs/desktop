@@ -3,6 +3,7 @@ import { getType } from 'mime';
 import { apiMethod, EApiPermissions, IApiContext, Module } from './module';
 import {
   ETransitionType,
+  ITransition,
   ITransitionCreateOptions,
   TransitionsService,
 } from 'services/transitions';
@@ -59,7 +60,7 @@ const stingerTransitionDefaultOptions: Partial<StingerTransitionOptions> = {
 };
 
 /**
- * This module can be used to create scene transitions.
+ * This module can be used to manage scene transitions.
  * It's useful for apps to provide both editable and uneditable transitions for the streamer.
  */
 export class SceneTransitionsModule extends Module {
@@ -81,9 +82,10 @@ export class SceneTransitionsModule extends Module {
    * @param options A description of transition options
    *
    * @see {TransitionOptions}
+   * @see {ITransition}
    */
   @apiMethod()
-  async createTransition(ctx: IApiContext, options: TransitionOptions) {
+  async createTransition(ctx: IApiContext, options: TransitionOptions): Promise<ITransition> {
     if (options.type === 'stinger') {
       const appId = ctx.app.id;
       const { url } = options;
@@ -107,6 +109,36 @@ export class SceneTransitionsModule extends Module {
     }
 
     throw new Error('Not Implemented');
+  }
+
+  /**
+   * Get a list of transitions
+   *
+   * This includes all transitions the user has setup in SLOBS.
+   * For transitions managed by this App use `getAppTransitions`.
+   *
+   * @see {getAppTransitions}
+   */
+  @apiMethod()
+  async getTransitions(_ctx: IApiContext): Promise<Array<ITransition>> {
+    return this.transitionsService.state.transitions;
+  }
+
+  /**
+   * Get a list of transitions belonging to this App.
+   *
+   * @param ctx API context
+   * @return A list of Transition objects belonging to the current App
+   */
+  @apiMethod()
+  async getAppTransitions(ctx: IApiContext): Promise<Array<ITransition>> {
+    return Object.keys(this.transitionsService.obsTransitions)
+      .filter(obsTransitionId => {
+        const settings = this.transitionsService.getPropertiesManagerSettings(obsTransitionId);
+
+        return settings && settings.appId === ctx.app.id;
+      })
+      .map(id => this.transitionsService.getTransition(id));
   }
 
   private createTransitionOptions(
