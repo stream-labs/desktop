@@ -64,7 +64,7 @@ async function ensureDir(dirPath) {
 
 async function getPreviousRoll(cacheFile, version) {
     return new Promise((resolve, reject) => {
-        fs.readFile(cacheFile, (err, data) => {
+        fs.readFile(cacheFile, 'utf8', (err, data) => {
             if (err) {
                 log.info("Roll cache not found!");
                 resolve(0);
