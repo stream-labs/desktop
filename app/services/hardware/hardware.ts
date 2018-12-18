@@ -42,14 +42,6 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     return this.state.devices.find(device => device.description == name);
   }
 
-  getDshowDevices() {
-    return this.state.dshowDevices;
-  }
-
-  getDshowDevice(id: string) {
-    return this.state.dshowDevices.find(device => device.id == id);
-  }
-
   getDshowDeviceByName(name: string) {
     return this.state.dshowDevices.find(device => device.description == name);
   }
