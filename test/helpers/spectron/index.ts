@@ -136,7 +136,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   async function stopApp() {
     try {
       await context.app.stop();
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         rimraf(context.cacheDir, resolve);
       });
     } catch (e) {
@@ -146,7 +146,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
   }
 
-  test.beforeEach(async t  => {
+  test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
@@ -158,17 +158,16 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-      const client = await getClient();
-      await client.unsubscribeAll();
-      if (options.restartAppAfterEachTest) {
-        client.disconnect();
-        await stopApp();
-      }
+    const client = await getClient();
+    await client.unsubscribeAll();
+    if (options.restartAppAfterEachTest) {
+      client.disconnect();
+      await stopApp();
+    }
     if (!testPassed) failedTests.push(testName);
   });
 
   test.after.always(async t => {
-
     if (appIsRunning) {
       await stopApp();
       if (!testPassed) failedTests.push(testName);
