@@ -36,8 +36,8 @@ export default class TopNav extends Vue {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   slideOpen = false;
-
   studioModeTooltip = 'Studio Mode';
+  availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
   mounted() {
     this.topNav = this.$refs.top_nav;
@@ -47,8 +47,7 @@ export default class TopNav extends Vue {
     return EAvailableFeatures;
   }
 
-  @Prop()
-  locked: boolean;
+  @Prop() locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
@@ -136,6 +135,13 @@ export default class TopNav extends Vue {
         this.featureIsEnabled(this.availableFeatures.platform)) &&
       this.userService.isLoggedIn() &&
       this.userService.platform.type === 'twitch'
+    );
+  }
+
+  get chatbotVisible() {
+    return (
+      this.userService.isLoggedIn() &&
+      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
     );
   }
 
