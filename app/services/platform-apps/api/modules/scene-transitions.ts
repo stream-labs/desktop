@@ -141,6 +141,28 @@ export class SceneTransitionsModule extends Module {
       .map(id => this.transitionsService.getTransition(id));
   }
 
+  /**
+   * Set a transition as the default transition
+   *
+   * @param transitionId ID of the transition to be set as default
+   * @return Whether setting the default succeeded
+   */
+  @apiMethod()
+  async setDefaultTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
+    /*
+     * We return a boolean as this might fail if provided transition ID is
+     * invalid. TransitionsService doesn't have this concern and thus will
+     * assume it'll always work. The best we can do is exception handling at
+     * this point.
+     */
+    try {
+      this.transitionsService.setDefaultTransition(transitionId);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private createTransitionOptions(
     appId: string,
     shouldLock: boolean,
