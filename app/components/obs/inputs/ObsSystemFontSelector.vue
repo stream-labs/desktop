@@ -55,7 +55,7 @@
 @import "../../../styles/index";
 
 .multiselect--font {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .FontProperty-presets {

@@ -35,7 +35,7 @@
 @import "../../../styles/index";
 
 .expand-enter {
-  max-height: 0px;
+  max-height: 0;
   opacity: 0;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .expand-leave-to {
-  max-height: 0px;
+  max-height: 0;
   opacity: 0;
 }
 </style>
