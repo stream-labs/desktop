@@ -32,7 +32,7 @@ function retryTests() {
     return false;
   }
 
-  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile));
+  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf-8'));
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   try {
     execSync('yarn test ' + args.concat(retryingArgs).join(' '), { stdio: [0, 1, 2] });
