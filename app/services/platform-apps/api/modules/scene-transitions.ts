@@ -149,18 +149,7 @@ export class SceneTransitionsModule extends Module {
    */
   @apiMethod()
   async setDefaultTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
-    /*
-     * We return a boolean as this might fail if provided transition ID is
-     * invalid. TransitionsService doesn't have this concern and thus will
-     * assume it'll always work. The best we can do is exception handling at
-     * this point.
-     */
-    try {
-      this.transitionsService.setDefaultTransition(transitionId);
-      return true;
-    } catch {
-      return false;
-    }
+    return tryCatchToBool(() => this.transitionsService.setDefaultTransition(transitionId));
   }
 
   /**
@@ -174,16 +163,7 @@ export class SceneTransitionsModule extends Module {
    */
   @apiMethod()
   async deleteTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
-    try {
-      this.transitionsService.deleteTransition(transitionId);
-      return true;
-    } catch {
-      /*
-       * See comment on `setDefaultTransition` as to why we're exception
-       * handling/swallowing here.
-       */
-      return false;
-    }
+    return tryCatchToBool(() => this.transitionsService.deleteTransition(transitionId));
   }
 
   private createTransitionOptions(
@@ -239,3 +219,18 @@ export class SceneTransitionsModule extends Module {
     return /^video\/.*$/.test(mimeType);
   }
 }
+
+/*
+ * We return a boolean as this might fail if provided data is
+ * invalid. Services don't typically have this concern and thus will
+ * assume it'll always work. The best we can do is exception handling at
+ * this point.
+ */
+const tryCatchToBool = (fn: () => void) => {
+  try {
+    fn();
+    return true;
+  } catch {
+    return false;
+  }
+};
