@@ -114,7 +114,7 @@ export class SceneTransitionsModule extends Module {
   /**
    * Get a list of transitions
    *
-   * This includes all transitions the user has setup in SLOBS.
+   * This includes all transitions the user has set up in SLOBS.
    * For transitions managed by this App use `getAppTransitions`.
    *
    * @see {getAppTransitions}
