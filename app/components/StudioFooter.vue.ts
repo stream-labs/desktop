@@ -78,7 +78,7 @@ export default class StudioFooterComponent extends Vue {
       componentName: 'EditStreamInfo',
       title: $t('Schedule Stream'),
       queryParams: { isSchedule: true },
-      size: { width: 500, height: 650 }
+      size: { width: 500, height: 670 }
     });
   }
 

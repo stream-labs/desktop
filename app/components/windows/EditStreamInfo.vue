@@ -105,7 +105,7 @@
       class="button button--default"
       :disabled="updatingInfo"
       @click="cancel">
-      Cancel
+      {{ isSchedule ? $t('Close') : $t('Cancel') }}
     </button>
     <button
       class="button button--action"

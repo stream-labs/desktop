@@ -270,7 +270,27 @@ export default class EditStreamInfo extends Vue {
     };
     if (scheduledStartTime) {
       await service.scheduleStream(scheduledStartTime, streamInfo)
-        .then(() => this.windowsService.closeChildWindow())
+        .then(() => this.startTimeModel = { time: null, date: null })
+        .then(() => {
+          this.$toasted.show(
+            $t(
+              'Your stream has been scheduled for %{time} from now.' +
+              ' If you\'d like to make another schedule please enter a different time',
+              { time: moment().to(scheduledStartTime, true) }
+            ),
+            {
+              position: 'bottom-center',
+              fullWidth: true,
+              className: 'toast-success toast-success__schedule',
+              duration: 0,
+              action: {
+                text: $t('Close'),
+                class: 'toast-action',
+                onClick: (_e, toastedObject) => toastedObject.goAway()
+              }
+            }
+          );
+        })
         .catch((e) => {
           this.$toasted.show(
             e.error.message,
