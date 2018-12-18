@@ -166,6 +166,25 @@ export class SceneTransitionsModule extends Module {
     return tryCatchToBool(() => this.transitionsService.deleteTransition(transitionId));
   }
 
+  /**
+   * Create a scene transition connection between scenes
+   *
+   * @param _ctx API Context
+   * @param transitionId ID of the transition to connect
+   * @param fromSceneId Originating scene ID
+   * @param toSceneId Target scene ID
+   * @see {ScenesModule.getScenes} for information on how to retrieve scene IDs
+   */
+  @apiMethod()
+  async createConnection(
+    _ctx: IApiContext,
+    transitionId: string,
+    fromSceneId: string,
+    toSceneId: string,
+  ) {
+    return this.transitionsService.addConnection(fromSceneId, toSceneId, transitionId);
+  }
+
   private createTransitionOptions(
     appId: string,
     shouldLock: boolean,
