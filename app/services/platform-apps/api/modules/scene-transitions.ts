@@ -132,24 +132,25 @@ export class SceneTransitionsModule extends Module {
    */
   @apiMethod()
   async getAppTransitions(ctx: IApiContext): Promise<Array<ITransition>> {
-    return Object.keys(this.transitionsService.obsTransitions)
-      .filter(obsTransitionId => {
-        const settings = this.transitionsService.getPropertiesManagerSettings(obsTransitionId);
+    return this.getTransitions(ctx).then(transitions =>
+      transitions.filter(transition => {
+        const settings = this.transitionsService.getPropertiesManagerSettings(transition.id);
 
         return settings && settings.appId === ctx.app.id;
-      })
-      .map(id => this.transitionsService.getTransition(id));
+      }),
+    );
   }
 
   /**
    * Set a transition as the default transition
    *
    * @param transitionId ID of the transition to be set as default
-   * @return Whether setting the default succeeded
+   * @return `true` if setting the default succeeded
    */
   @apiMethod()
   async setDefaultTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
-    return tryCatchToBool(() => this.transitionsService.setDefaultTransition(transitionId));
+    this.transitionsService.setDefaultTransition(transitionId);
+    return true;
   }
 
   /**
@@ -159,11 +160,12 @@ export class SceneTransitionsModule extends Module {
    *
    * @param _ctx API Context
    * @param transitionId ID of the transition to be deleted
-   * @return Whether the transition was successfully deleted
+   * @return `true` if the transition was successfully deleted
    */
   @apiMethod()
   async deleteTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
-    return tryCatchToBool(() => this.transitionsService.deleteTransition(transitionId));
+    this.transitionsService.deleteTransition(transitionId);
+    return true;
   }
 
   /**
@@ -173,7 +175,9 @@ export class SceneTransitionsModule extends Module {
    * @param transitionId ID of the transition to connect
    * @param fromSceneId Originating scene ID
    * @param toSceneId Target scene ID
+   * @return `true` if the connection was successfully created
    * @see {ScenesModule.getScenes} for information on how to retrieve scene IDs
+   *
    */
   @apiMethod()
   async createConnection(
@@ -182,7 +186,7 @@ export class SceneTransitionsModule extends Module {
     fromSceneId: string,
     toSceneId: string,
   ) {
-    return this.transitionsService.addConnection(fromSceneId, toSceneId, transitionId);
+    return !!this.transitionsService.addConnection(fromSceneId, toSceneId, transitionId);
   }
 
   private createTransitionOptions(
@@ -238,18 +242,3 @@ export class SceneTransitionsModule extends Module {
     return /^video\/.*$/.test(mimeType);
   }
 }
-
-/*
- * We return a boolean as this might fail if provided data is
- * invalid. Services don't typically have this concern and thus will
- * assume it'll always work. The best we can do is exception handling at
- * this point.
- */
-const tryCatchToBool = (fn: () => void) => {
-  try {
-    fn();
-    return true;
-  } catch {
-    return false;
-  }
-};
