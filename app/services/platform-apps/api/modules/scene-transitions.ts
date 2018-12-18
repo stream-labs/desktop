@@ -150,6 +150,7 @@ export class SceneTransitionsModule extends Module {
   /**
    * Set a transition as the default transition
    *
+   * @param _ctx API context
    * @param transitionId ID of the transition to be set as default
    * @return `true` if setting the default succeeded
    */
