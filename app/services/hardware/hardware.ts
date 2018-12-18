@@ -16,7 +16,7 @@ export interface IDevice {
 
 export interface IHardwareServiceState {
   devices: IDevice[];
-  dshowDevices: IDevice[]; // dhow_input provide
+  dshowDevices: IDevice[]; // dhow_input operates with the different devices list
 }
 
 export class HardwareService extends StatefulService<IHardwareServiceState> {
