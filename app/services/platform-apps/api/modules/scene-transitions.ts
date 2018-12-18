@@ -3,7 +3,6 @@ import { getType } from 'mime';
 import { apiMethod, EApiPermissions, IApiContext, Module } from './module';
 import {
   ETransitionType,
-  ITransition,
   ITransitionCreateOptions,
   TransitionsService,
 } from 'services/transitions';
@@ -22,6 +21,13 @@ type TransitionPointType = 'time' | 'frame';
 enum ETransitionPointType {
   Time = 0,
   Frame = 1,
+}
+
+interface ITransition {
+  id: string;
+  name: string;
+  type: ETransitionType;
+  duration: number;
 }
 
 interface StingerTransitionOptions {

@@ -28,7 +28,7 @@ interface ITransitionsState {
   studioMode: boolean;
 }
 
-export interface ITransition {
+interface ITransition {
   id: string;
   name: string;
   type: ETransitionType;
