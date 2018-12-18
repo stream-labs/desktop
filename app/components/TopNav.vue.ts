@@ -17,6 +17,7 @@ import {
 } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
 Vue.use(VueResize);
 
 @Component({
@@ -37,12 +38,12 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
-  studioModeTooltip = 'Studio Mode';
-  settingsTooltip = 'Settings';
-  helpTooltip = 'Get Help';
-  logoutTooltip = 'Logout';
-  sunTooltip = 'Day mode';
-  moonTooltip = 'Night mode';
+  studioModeTooltip = $t('Studio Mode');
+  settingsTooltip = $t('Settings');
+  helpTooltip = $t('Get Help');
+  logoutTooltip = $t('Logout');
+  sunTooltip = $t('Day mode');
+  moonTooltip = $t('Night mode');
 
   mounted() {
     this.topNav = this.$refs.top_nav;
