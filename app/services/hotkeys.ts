@@ -353,20 +353,18 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
     obsHotkeys.filter(isSupportedHotkey).forEach(hotkey => {
       const action = getActionFromName(hotkey.HotkeyName);
-      if (!action) {
-        return;
-      }
+      if (action && action.name) {
+        const key = `${action.name}-${hotkey.ObjectName}`;
 
-      const key = `${action.name}-${hotkey.ObjectName}`;
-
-      if (!addedHotkeys.has(key)) {
-        hotkeys.push({
-          [idPropFor(hotkey)]: hotkey.ObjectName,
-          actionName: action.name,
-          bindings: [] as IBinding[],
-          hotkeyId: hotkey.HotkeyId,
-        });
-        addedHotkeys.add(key);
+        if (!addedHotkeys.has(key)) {
+          hotkeys.push({
+            [idPropFor(hotkey)]: hotkey.ObjectName,
+            actionName: action.name,
+            bindings: [] as IBinding[],
+            hotkeyId: hotkey.HotkeyId,
+          });
+          addedHotkeys.add(key);
+        }
       }
     });
 
@@ -636,13 +634,17 @@ const getMigrationMapping = (actionName: string) => {
   }[normalizeActionName(actionName)];
 };
 
-const getActionFromName = (actionName: string) =>
-  ACTIONS[actionName] || ACTIONS[getMigrationMapping(actionName)];
+const getActionFromName = (actionName: string) => ({
+  ...(ACTIONS[actionName] || ACTIONS[getMigrationMapping(actionName)]),
+});
 
-const isSupportedHotkey = (hotkey: OBSHotkey) =>
-  hotkey.ObjectType === obs.EHotkeyObjectType.Source &&
-  getActionFromName(hotkey.HotkeyName) &&
-  idPropFor(hotkey);
+const isSupportedHotkey = (hotkey: OBSHotkey) => {
+  const action = getActionFromName(hotkey.HotkeyName);
+
+  return (
+    hotkey.ObjectType === obs.EHotkeyObjectType.Source && action && action.name && idPropFor(hotkey)
+  );
+};
 
 const isSceneItem = (hotkey: OBSHotkey) => !!getScenesService().getSceneItem(hotkey.ObjectName);
 

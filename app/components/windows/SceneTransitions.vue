@@ -39,7 +39,11 @@
               <td class="table__controls">
                 <i
                   @click="editTransition(transition.id)"
-                  class="icon-edit transition-control" />
+                  class="transition-control"
+                  :class="getClassNames(transition.id)"
+                  :title="getEditableMessage(transition.id)"
+                />
+
                 <i
                   @click="deleteTransition(transition.id)"
                   class="icon-trash transition-control" />
@@ -151,6 +155,9 @@
 
 .transition-control {
   margin-left: 10px;
+}
+
+.transition-control:not(.disabled) {
   cursor: pointer;
   .icon-hover();
 }
@@ -180,6 +187,10 @@
     &:hover {
       color: @white;
     }
+  }
+  .transition-control.disabled:hover {
+    cursor: not-allowed;
+    color: inherit;
   }
 }
 </style>
