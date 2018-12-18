@@ -11,8 +11,16 @@ export class DevServer {
   listen() {
     this.server = http.createServer((request, response) =>
       handler(request, response, {
-        public: this.directory
-      })
+        public: this.directory,
+        cleanUrls: false,
+        headers: {
+          source: '*',
+          headers: {
+            key: 'Cache-Control',
+            value: 'no-cache'
+          }
+        }
+      }),
     );
 
     this.server.listen(this.port);
