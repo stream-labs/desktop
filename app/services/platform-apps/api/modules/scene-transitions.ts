@@ -163,6 +163,29 @@ export class SceneTransitionsModule extends Module {
     }
   }
 
+  /**
+   * Delete a transition
+   *
+   * Deletes a specific transition by ID.
+   *
+   * @param _ctx API Context
+   * @param transitionId ID of the transition to be deleted
+   * @return Whether the transition was successfully deleted
+   */
+  @apiMethod()
+  async deleteTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
+    try {
+      this.transitionsService.deleteTransition(transitionId);
+      return true;
+    } catch {
+      /*
+       * See comment on `setDefaultTransition` as to why we're exception
+       * handling/swallowing here.
+       */
+      return false;
+    }
+  }
+
   private createTransitionOptions(
     appId: string,
     shouldLock: boolean,
