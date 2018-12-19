@@ -20,6 +20,7 @@ const zlib = require('zlib');
 const cp = require('child_process');
 const semver = require('semver');
 const { BrowserWindow } = require('electron');
+const log = require('electron-log');
 const prequest = util.promisify(request);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -63,14 +64,14 @@ async function ensureDir(dirPath) {
 
 async function getPreviousRoll(cacheFile, version) {
     return new Promise((resolve, reject) => {
-        fs.readFile(cacheFile, (err, data) => {
+        fs.readFile(cacheFile, 'utf8', (err, data) => {
             if (err) {
-                console.log("Roll cache not found!");
+                log.info("Roll cache not found!");
                 resolve(0);
                 return;
             }
 
-            let roll = parseInt(data);
+            let roll = parseInt(data, 10);
 
             if (!roll) {
                 roll = 0;
@@ -90,7 +91,7 @@ async function checkChance(info, version) {
     const response = await prequest(reqInfo);
 
     if (response.statusCode !== 200) {
-        console.log(`No chance file found! Assuming 100...`);
+        log.info(`No chance file found! Assuming 100...`);
         return true;
     }
 
@@ -98,7 +99,7 @@ async function checkChance(info, version) {
     const body = JSON.parse(response.body);
     const chance = body.chance;
 
-    console.log(`Chance to update is ${chance}...`);
+    log.info(`Chance to update is ${chance}...`);
 
     /* Check for a cached roll. Caching the roll prevents incorrect
      * chance in the case we change the percentage chance to update. */
@@ -121,7 +122,7 @@ async function checkChance(info, version) {
         await writeFile(rollCache, `${roll}`);
     }
 
-    console.log(`You rolled ${roll}`);
+    log.info(`You rolled ${roll}`);
 
     if (roll <= chance) {
         return true;
@@ -188,7 +189,7 @@ async function getVersion(info) {
     let response = await prequest(reqInfo);
 
     if (response.statusCode != 200) {
-        console.log(
+        log.info(
             `Failed to fetch version information ` +
             `- ${response.statusCode}`
         );
@@ -233,7 +234,7 @@ async function entry(info) {
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
     } catch (error) {
-        console.log('Error when spawning status window!');
+        log.info('Error when spawning status window!');
         if (statusWindow) statusWindow.close();
         statusWindow = null;
     }
@@ -244,28 +245,28 @@ async function entry(info) {
     * to be greater than the current version!
     * If it's different, update to latest. */
     if (!latestVersion) {
-        console.log('Failed to fetch latest version!');
+        log.info('Failed to fetch latest version!');
         return false;
     }
 
     if (semver.eq(info.version, latestVersion)) {
-        console.log('Already latest version!');
+        log.info('Already latest version!');
         return false;
     }
 
     if (semver.gt(info.version, latestVersion)) {
-        console.log('Latest version is less than current version!');
+        log.info('Latest version is less than current version!');
         return false;
     }
 
     if (!await checkChance(info, latestVersion)) {
-        console.log('Failed the chance lottery. Better luck next time!');
+        log.info('Failed the chance lottery. Better luck next time!');
         return false;
     }
 
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
-    ensureDir(info.tempDir);
+    await ensureDir(info.tempDir);
 
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
@@ -294,7 +295,7 @@ async function entry(info) {
         updaterArgs.push(statusWindow.webContents.getOSProcessId());
     }
 
-    console.log(updaterArgs);
+    log.info(updaterArgs);
 
     cp.spawn(`${updaterPath}`, updaterArgs, {
         cwd: info.tempDir,
@@ -311,7 +312,7 @@ module.exports = async (info) => {
         destroyStatusWindow();
         return Promise.resolve(status);
     }).catch((error) => {
-        console.log(error);
+        log.info(error);
         destroyStatusWindow();
         return Promise.resolve(false);
     });
