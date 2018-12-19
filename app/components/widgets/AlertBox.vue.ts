@@ -98,8 +98,14 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   editingName: string = null;
   languages: any[] = [];
 
+  facemaskDevice = this.facemasksService.getEnabledDevice();
+
   get metadata() {
     return this.service.getMetadata(this.selectedAlert, this.languages);
+  }
+
+  get facemaskDeviceOptions() {
+    return this.facemasksService.getInputDevicesList();
   }
 
   get selectedVariation() {
@@ -207,12 +213,15 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     this.editingName = null;
   }
 
+  handleFacemaskDeviceSelect(value: string) {
+    this.facemaskDevice = this.facemaskDeviceOptions.find(device => device.value === value);
+  }
+
   handleFacemaskInput() {
     if (this.selectedAlert === 'facemasks') {
       const { duration } = this.selectedVariation;
       const { enabled } = this.wData.settings.facemasks;
-      // TODO: implement a dropdown where user can set their device 
-      this.facemasksService.updateFacemaskSettings({ duration, enabled, device: this.facemasksService.state.device });
+      this.facemasksService.updateFacemaskSettings({ duration, enabled, device: this.facemaskDevice });
     } else {
       this.save();
     }

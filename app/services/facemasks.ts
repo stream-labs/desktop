@@ -328,14 +328,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   updateFacemaskSettings(settingsData: IFacemaskSettings) {
-    return new Promise((resolve, reject) => {
-      this.postFacemaskSettingsUpdate(settingsData).then(response => {
-        this.startup();
-        resolve('success');
-      }).catch(err => {
-        reject('error');
-      })
-    });
+    return this.postFacemaskSettingsUpdate(settingsData).then(() => this.startup());
   }
 
   fetchProfanityFilterSettings() {
@@ -348,7 +341,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     const headers = authorizedHeaders(this.apiToken);
     headers.append('Content-Type', 'text/json');
 
-    const request = new Request(url, { 
+    const request = new Request(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(settingsData)
