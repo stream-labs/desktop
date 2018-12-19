@@ -167,7 +167,7 @@ export class AppService extends StatefulService<IAppState> {
    * Should be called for any scene-collections loading operations
    * @see RunInLoadingMode decorator
    */
-  async runInLoadingMode(fn: () => Promise<any> | void) {
+  runInLoadingMode(fn: () => Promise<any> | void) {
 
     if (!this.state.loading) {
       this.START_LOADING();
@@ -186,28 +186,36 @@ export class AppService extends StatefulService<IAppState> {
     }
 
     let returningValue = result;
+
+    const tryFinishLoading = (promiseId?: string) => {
+      if (promiseId) delete this.loadingPromises[promiseId];
+      if (Object.keys(this.loadingPromises).length > 0) {
+        // some loading operations are still in progress
+        // don't stop the loading mode
+        if (error) throw error;
+      }
+      this.tcpServerService.startRequestsHandling();
+      this.sceneCollectionsService.enableAutoSave();
+      this.FINISH_LOADING();
+      if (error) throw error;
+      return;
+    };
+
+    // return a promise for async methods
     if (result instanceof Promise) {
       const promiseId = uuid();
       this.loadingPromises[promiseId] = result;
-      try {
-        returningValue = await result;
-      } catch (e) {
+      return result.then(value => {
+        returningValue = value;
+        tryFinishLoading(promiseId);
+      }).catch(e => {
         error = e;
-      }
-      delete this.loadingPromises[promiseId];
+        tryFinishLoading(promiseId);
+      });
     }
 
-    if (Object.keys(this.loadingPromises).length > 0) {
-      // some loading operations are still in progress
-      // don't stop the loading mode
-      if (error) throw error;
-      return returningValue;
-    }
-
-    this.tcpServerService.startRequestsHandling();
-    this.sceneCollectionsService.enableAutoSave();
-    this.FINISH_LOADING();
-    if (error) throw error;
+    // return a simple value for synchronous methods
+    tryFinishLoading();
     return returningValue;
   }
 
