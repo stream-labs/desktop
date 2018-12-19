@@ -304,6 +304,11 @@ async function entry(info) {
         shell: true
     });
 
+    cp.on('error', (error) => {
+        console.log('Error spawning');
+        console.log('Error : ' + error)
+    });
+
     return true;
 }
 
