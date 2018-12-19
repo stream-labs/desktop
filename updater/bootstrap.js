@@ -299,7 +299,6 @@ async function entry(info) {
     cp.spawn(`${updaterPath}`, updaterArgs, {
         cwd: info.tempDir,
         detached: true,
-        stdio: 'ignore',
         shell: true
     });
 
