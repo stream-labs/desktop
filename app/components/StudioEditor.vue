@@ -25,7 +25,7 @@
 .studio-editor-display-container {
   position: relative;
   flex-grow: 1;
-  background-color: @padding-color;
+  background-color: @bg-tertiary;
 }
 
 .studio-editor-display {

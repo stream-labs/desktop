@@ -64,7 +64,7 @@
 .no-preview {
   position: relative;
   flex-grow: 1;
-  background-color: @padding-color;
+  background-color: @bg-tertiary;
   display: flex;
   align-items: center;
   justify-content: center;

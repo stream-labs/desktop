@@ -69,7 +69,7 @@
   flex-grow: 1;
   margin: 0;
   overflow-y: auto;
-  background-color: @padding-color;
+  background-color: @bg-tertiary;
 }
 </style>
 
