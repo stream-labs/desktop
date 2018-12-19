@@ -1,5 +1,6 @@
 import electron from 'electron';
 import uuid from 'uuid/v4';
+import 'reflect-metadata';
 import { Service } from 'services/service';
 import { AutoConfigService } from 'services/auto-config';
 import { ObsImporterService } from 'services/obs-importer';
