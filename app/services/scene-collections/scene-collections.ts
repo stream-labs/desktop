@@ -314,26 +314,6 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Show the window to name a new scene collection
-   * @param options options
-   */
-  showNameConfig(
-    options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
-  ) {
-    this.windowsService.showWindow({
-      componentName: 'NameSceneCollection',
-      queryParams: {
-        sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
-        rename: options.rename ? 'true' : ''
-      },
-      size: {
-        width: 400,
-        height: 250
-      }
-    });
-  }
-
-  /**
    * Show the window to manage scene collections
    */
   showManageWindow() {
