@@ -8,7 +8,6 @@ import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import NameSceneCollection from 'components/windows/NameSceneCollection.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
@@ -86,7 +85,6 @@ export function getComponents() {
     RenameSource,
     AddSource,
     NameScene,
-    NameSceneCollection,
     NameFolder,
     SourceProperties,
     SourceFilters,
