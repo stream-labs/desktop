@@ -200,7 +200,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private varifySetting(setting: any): IAlertBoxSetting {
-    const { show_message, enabled, variations, showResubMessage, ...rest } = setting;
+    const { show_message, enabled, showResubMessage, ...rest } = setting;
+    const variations = setting.variations || [];
     const defaultVariation = this.reshapeVariation(rest);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),

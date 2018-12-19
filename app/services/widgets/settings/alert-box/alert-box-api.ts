@@ -409,7 +409,33 @@ interface IAlertBoxRaidSettings {
 // FACEMASKS
 
 interface IAlertBoxFacemaskSettings {
+  facemaskdonation_alert_duration: number;
+  facemaskdonation_alert_message_min_amount: number;
+  facemaskdonation_custom_css: string;
+  facemaskdonation_custom_html: string;
+  facemaskdonation_custom_html_enabled: boolean;
+  facemaskdonation_custom_js: string;
+  facemaskdonation_custom_json: string;
   facemaskdonation_enabled: boolean;
+  facemaskdonation_font: string;
+  facemaskdonation_font_color: string;
+  facemaskdonation_font_color2: string;
+  facemaskdonation_font_size: string;
+  facemaskdonation_font_weight: string;
+  facemaskdonation_hide_animation: string;
+  facemaskdonation_image_href: string;
+  facemaskdonation_layout: string;
+  facemaskdonation_message_font: string;
+  facemaskdonation_message_font_color: string;
+  facemaskdonation_message_font_size: string;
+  facemaskdonation_message_font_weight: string;
+  facemaskdonation_message_template: string;
+  facemaskdonation_show_animation: string;
+  facemaskdonation_sound_href: string;
+  facemaskdonation_sound_volume: number;
+  facemaskdonation_text_animation: string;
+  facemaskdonation_text_delay: number;
+  facemaskdonation_variations: IAlertBoxVariation[]
 }
 
 // ACCOUNT INTEGRATIONS

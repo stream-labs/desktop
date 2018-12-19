@@ -91,11 +91,11 @@
   <validated-form slot="media-properties" key="media-properties" @input="save()" v-if="selectedVariation">
     <v-form-group
       v-if="selectedAlert === 'facemasks'"
-      :value="facemaskDevice"
+      :value="facemaskDevice.value"
       @input="handleFacemaskDeviceSelect"
       type="list"
       :title="$t('Webcam Source')"
-      :metadata="{ options: facemaskDeviceList }"
+      :metadata="{ options: facemaskDeviceOptions }"
     />
     <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
     <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
