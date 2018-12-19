@@ -266,7 +266,7 @@ async function entry(info) {
 
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
-    ensureDir(info.tempDir);
+    await ensureDir(info.tempDir);
 
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
