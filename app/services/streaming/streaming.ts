@@ -192,6 +192,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  startReplayBuffer() {
+    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
+    obs.NodeObs.OBS_service_startReplayBuffer();
+  }
+
+  stopReplayBuffer() {
+    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
+      obs.NodeObs.OBS_service_stopReplayBuffer(false);
+    } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
+      obs.NodeObs.OBS_service_stopReplayBuffer(true);
+    }
+  }
+
   showEditStreamInfo() {
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
