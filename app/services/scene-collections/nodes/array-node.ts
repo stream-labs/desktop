@@ -5,8 +5,10 @@ interface IArraySchema<TSchema> {
   items: TSchema[];
 }
 
-export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySchema<TSchema>, TContext> {
-
+export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<
+  IArraySchema<TSchema>,
+  TContext
+> {
   abstract saveItem(item: TItem, context: TContext): Promise<TSchema>;
 
   abstract loadItem(item: TSchema, context: TContext): Promise<(() => Promise<void>) | void>;
@@ -14,9 +16,11 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
   abstract getItems(context: TContext): TItem[];
 
   async save(context: TContext): Promise<void> {
-    const values = await Promise.all(this.getItems(context).map(item => {
-      return this.saveItem(item, context);
-    }));
+    const values = await Promise.all(
+      this.getItems(context).map(item => {
+        return this.saveItem(item, context);
+      }),
+    );
 
     this.data = { items: compact(values) };
   }
@@ -51,7 +55,5 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
    * Can be called before loading to do some data munging
    * @param context the context
    */
-  async beforeLoad(context: TContext): Promise<void> {
-  }
-
+  async beforeLoad(context: TContext): Promise<void> {}
 }

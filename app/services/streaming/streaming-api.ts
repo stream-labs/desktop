@@ -5,14 +5,14 @@ export enum EStreamingState {
   Starting = 'starting',
   Live = 'live',
   Ending = 'ending',
-  Reconnecting = 'reconnecting'
+  Reconnecting = 'reconnecting',
 }
 
 export enum ERecordingState {
   Offline = 'offline',
   Starting = 'starting',
   Recording = 'recording',
-  Stopping = 'stopping'
+  Stopping = 'stopping',
 }
 
 export interface IStreamingServiceState {
@@ -23,7 +23,6 @@ export interface IStreamingServiceState {
 }
 
 export interface IStreamingServiceApi {
-
   getModel(): IStreamingServiceState;
 
   /**

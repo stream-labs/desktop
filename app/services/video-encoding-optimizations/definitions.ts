@@ -8,7 +8,7 @@ enum EncoderType {
   amd = 'amd',
   amd_amf_h264 = 'amd_amf_h264',
   qsv = 'qsv',
-  obs_qsv11 = 'obs_qsv11'
+  obs_qsv11 = 'obs_qsv11',
 }
 
 enum GameType {
@@ -27,7 +27,7 @@ enum PresetType {
   fast = 'fast',
   medium = 'medium',
   slow = 'slow',
-  slower = 'slower'
+  slower = 'slower',
 }
 
 export interface IProfile {
@@ -37,22 +37,22 @@ export interface IProfile {
   preset: PresetType;
 }
 
-const CPU_profile: IProfile = {
+const CPU_PROFILE: IProfile = {
   profile: 'CPU',
   description: 'Medium',
   preset: PresetType.veryfast,
   get longDescription() {
     return $t('Optimized profile for average CPUs');
-  }
+  },
 };
 
-const VQ_profile: IProfile = {
+const VQ_PROFILE: IProfile = {
   profile: 'VQ',
   description: 'Low',
   preset: PresetType.ultrafast,
   get longDescription() {
     return $t('Optimized profile for weak CPUs');
-  }
+  },
 };
 
 export interface IEncoderPreset {
@@ -64,34 +64,34 @@ export interface IEncoderPreset {
 
 export const Presets: IEncoderPreset[] = [
   {
-    profile: CPU_profile,
+    profile: CPU_PROFILE,
     game: GameType.PUBG,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 ' +
       'bframes=3 subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 ' +
       'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: VQ_profile,
+    profile: VQ_PROFILE,
     game: GameType.PUBG,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=2 chroma-qp-offset=-2 ' +
       'bframes=0 subme=0 b_adapt=2 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 ' +
       'chroma_me=1 psy=0 8x8dct=0 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: CPU_profile,
+    profile: CPU_PROFILE,
     game: GameType.LeagueOfLegends,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 ' +
       'bframes=3 subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 ' +
       'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: VQ_profile,
+    profile: VQ_PROFILE,
     game: GameType.LeagueOfLegends,
     settings:
       'nal-hrd=cbr weightp=1 me_range=16 threads=6 intra_refresh=0 qcomp=0.60 qpmax=69 ' +
@@ -99,60 +99,60 @@ export const Presets: IEncoderPreset[] = [
       'trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=0 bframes=0 ' +
       'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 ' +
       'psy=0 8x8dct=0 fast_pskip=1 lookahead_threads=6',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: CPU_profile,
+    profile: CPU_PROFILE,
     game: GameType.Fortnite,
     settings:
       'nal-hrd=cbr trellis=0 me=hex force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=3 ' +
       'subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: VQ_profile,
+    profile: VQ_PROFILE,
     game: GameType.Fortnite,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=-2 bframes=0 subme=1 ' +
       'b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: CPU_profile,
+    profile: CPU_PROFILE,
     game: GameType.Destiny2,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=3 subme=1 ' +
       'b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: VQ_profile,
+    profile: VQ_PROFILE,
     game: GameType.Destiny2,
     settings:
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=-2 bframes=0 subme=1 ' +
       'b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: CPU_profile,
+    profile: CPU_PROFILE,
     game: GameType.Generic,
     settings:
       'nal-hrd=cbr deblock=1:0 trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=2 ' +
       'subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 ' +
       'lookahead_threads=6',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
   },
   {
-    profile: VQ_profile,
+    profile: VQ_PROFILE,
     game: GameType.Generic,
     settings:
       'nal-hrd=cbr deblock=1:0 trellis=0 me=tesa force-cfr=1 rc-lookahead=10 ref=0 chroma-qp-offset=-2 bframes=0 ' +
       'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 fast_pskip=1 ' +
       'lookahead_threads=6',
-    encoder: [EncoderType.x264, EncoderType.obs_x264]
-  }
+    encoder: [EncoderType.x264, EncoderType.obs_x264],
+  },
 ];

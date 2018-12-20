@@ -26,5 +26,4 @@ export default class Login extends Vue {
   login() {
     this.userService.showLogin();
   }
-
 }

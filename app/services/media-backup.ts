@@ -115,11 +115,11 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const syncLock = uuid();
 
     const file: IMediaFile = {
-      id: localId,
       name,
       filePath,
-      status: EMediaFileStatus.Uploading,
       syncLock,
+      id: localId,
+      status: EMediaFileStatus.Uploading,
     };
 
     if (!fs.existsSync(filePath)) return null;
@@ -167,12 +167,12 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const syncLock = uuid();
 
     const file: IMediaFile = {
-      id: localId,
       name,
-      filePath: originalFilePath,
       serverId,
-      status: EMediaFileStatus.Checking,
       syncLock,
+      id: localId,
+      filePath: originalFilePath,
+      status: EMediaFileStatus.Checking,
     };
 
     this.INSERT_FILE(file);
@@ -251,7 +251,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const file = fs.createReadStream(filePath);
 
     const formData = {
-      modified: new Date().toISOString(),
       checksum,
       file,
     };
@@ -259,9 +258,9 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const data = await new Promise<{ id: number }>((resolve, reject) => {
       const req = request.post(
         {
+          formData,
           url: `${this.apiBase}/upload`,
           headers: this.authedHeaders,
-          formData,
         },
         (err, res, body) => {
           if (Math.floor(res.statusCode / 100) === 2) {

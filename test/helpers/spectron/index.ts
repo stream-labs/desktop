@@ -12,7 +12,6 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
-
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -23,12 +22,10 @@ async function focusWindow(t: any, regex: RegExp) {
   }
 }
 
-
 // Focuses the main window
 export async function focusMain(t: any) {
   await focusWindow(t, /windowId=main$/);
 }
-
 
 // Focuses the child window
 export async function focusChild(t: any) {
@@ -52,17 +49,18 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true
+  restartAppAfterEachTest: true,
 };
 
 export interface ITestContext {
-  cacheDir: string,
-  app: Application
+  cacheDir: string;
+  app: Application;
 }
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
+  // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
   let context: any = null;
@@ -81,19 +79,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
         options.appArgs ? options.appArgs : '',
-        '.'
+        '.',
       ],
       env: {
         NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir
+        SLOBS_CACHE_DIR: t.context.cacheDir,
       },
       webdriverOptions: {
         // most of deprecation warning encourage us to use WebdriverIO actions API
         // however the documentation for this API looks very poor, it provides only one example:
         // http://webdriver.io/api/protocol/actions.html
         // disable deprecation warning and waiting for better docs now
-        deprecationWarnings: false
-      }
+        deprecationWarnings: false,
+      },
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -183,6 +181,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 function saveFailedTestsToFile(failedTests: string[]) {
   const filePath = 'test-dist/failed-tests.json';
   if (fs.existsSync(filePath)) {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
   }
   fs.writeFileSync(filePath, JSON.stringify(failedTests));

@@ -3,14 +3,12 @@ import { IObsInput, TObsType, ObsInput } from './ObsInput';
 
 @Component
 class ObsTextInput extends ObsInput<IObsInput<string>> {
-
   static obsType: TObsType[];
 
   @Prop()
   value: IObsInput<string>;
 
   textVisible = !this.value.masked;
-
 
   toggleVisible() {
     this.textVisible = !this.textVisible;
@@ -19,7 +17,6 @@ class ObsTextInput extends ObsInput<IObsInput<string>> {
   onInputHandler(event: Event) {
     this.emitInput({ ...this.value, value: event.target['value'] });
   }
-
 }
 
 ObsTextInput.obsType = ['OBS_PROPERTY_EDIT_TEXT', 'OBS_PROPERTY_TEXT'];

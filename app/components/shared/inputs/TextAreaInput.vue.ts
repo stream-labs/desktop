@@ -6,15 +6,11 @@ interface IWTextMetadata extends IInputMetadata {
   placeholder: string;
 }
 
-@Component({
-})
+@Component({})
 export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
-
   @Prop()
   readonly value: string;
 
   @Prop({ default: () => ({}) })
   readonly metadata: IWTextMetadata;
-
-
 }

@@ -52,7 +52,7 @@ const recursive = require('recursive-readdir');
     const missedStringsMap = {};
     missedStrings.forEach(missedString => {
       missedStringsMap[missedString] = missedString;
-    })
+    });
 
     console.log(JSON.stringify(missedStringsMap, null, 4));
   });

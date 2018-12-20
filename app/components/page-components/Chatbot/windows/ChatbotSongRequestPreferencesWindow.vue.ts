@@ -5,13 +5,9 @@ import { ITab } from 'components/Tabs.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { cloneDeep } from 'lodash';
 import { IMediaShareBan } from 'services/widgets/settings/media-share';
-import { EInputType, } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  ISongRequestData
-} from 'services/chatbot';
-
+import { ISongRequestData } from 'services/chatbot';
 
 @Component({})
 export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
@@ -22,21 +18,22 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Blacklist'),
-      value: 'blacklist'
-    }
+      value: 'blacklist',
+    },
   ];
 
   securityDescription = $t(
+    // tslint:disable-next-line:prefer-template
     'This slider helps you filter shared media before it can be submitted.\n' +
       '1: No security\n' +
       '2: 65%+ rating, 5k+ views\n' +
       '3: 75%+ rating, 40k+ views\n' +
       '4: 80%+ rating, 300k+ views\n' +
-      '5: 85%+ rating, 900k+ views'
+      '5: 85%+ rating, 900k+ views',
   );
 
   selectedTab: string = 'general';
@@ -52,11 +49,9 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     await this.chatbotApiService.fetchSongRequestPreferencesData();
     await this.chatbotApiService.fetchSongRequest();
     this.songRequestBannedMedia = cloneDeep(
-      this.chatbotApiService.state.songRequestPreferencesResponse.banned_media
+      this.chatbotApiService.state.songRequestPreferencesResponse.banned_media,
     );
-    this.songRequestData = cloneDeep(
-      this.songRequestResponse.settings
-    );
+    this.songRequestData = cloneDeep(this.songRequestResponse.settings);
   }
 
   get songRequestResponse() {
@@ -69,29 +64,29 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
         max_duration: metadataHelper.number({
           required: true,
           min: 0,
-          placeholder: $t('Max Duration')
+          placeholder: $t('Max Duration'),
         }),
         max_requests_per_user: metadataHelper.number({
           required: true,
           min: 0,
-          placeholder: $t('Max Requests per user')
+          placeholder: $t('Max Requests per user'),
         }),
         skip_votes: metadataHelper.number({
           required: true,
           min: 0,
-          placeholder: $t('Number of votes to skip song')
+          placeholder: $t('Number of votes to skip song'),
         }),
         filter_level: metadataHelper.slider({
           min: 0,
           max: 4,
           interval: 1,
-          description: this.securityDescription
-        })
+          description: this.securityDescription,
+        }),
       },
       new_banned_media: metadataHelper.text({
         required: true,
-        placeholder: $t('New Banned Media')
-      })
+        placeholder: $t('New Banned Media'),
+      }),
     };
   }
 
@@ -104,7 +99,7 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
 
     await this.chatbotApiService.updateSongRequest({
       ...this.songRequestResponse,
-      settings: this.songRequestData
+      settings: this.songRequestData,
     });
     this.chatbotCommonService.closeChildWindow();
   }

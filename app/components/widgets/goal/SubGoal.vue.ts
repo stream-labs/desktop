@@ -4,7 +4,7 @@ import Vue from 'vue';
 
 @Component({
   components: {
-    GenericGoal
-  }
+    GenericGoal,
+  },
 })
 export default class Goal extends Vue {}

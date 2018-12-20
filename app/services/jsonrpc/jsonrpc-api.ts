@@ -1,5 +1,3 @@
-
-
 /**
  * @see http://www.jsonrpc.org/specification
  */
@@ -9,7 +7,7 @@ export enum E_JSON_RPC_ERROR {
   METHOD_NOT_FOUND = -32601,
   INVALID_PARAMS = -32602,
   INTERNAL_JSON_RPC_ERROR = -32603,
-  INTERNAL_SERVER_ERROR = -32000
+  INTERNAL_SERVER_ERROR = -32000,
 }
 
 export interface IJsonRpcRequest {
@@ -17,10 +15,10 @@ export interface IJsonRpcRequest {
   id: string;
   method: string;
   params: {
-    resource: string,
-    args?: any[],
-    fetchMutations?: boolean,
-    compactMode?: boolean
+    resource: string;
+    args?: any[];
+    fetchMutations?: boolean;
+    compactMode?: boolean;
   };
 }
 
@@ -30,35 +28,26 @@ export interface IJsonRpcResponse<TResponse> {
   result?: TResponse;
   error?: {
     code: number;
-    message?: string
+    message?: string;
   };
   mutations?: IMutation[];
 }
 
 declare type TResourceType = 'HELPER' | 'SUBSCRIPTION' | 'EVENT';
 
-
 export interface IJsonRpcEvent {
   _type: 'EVENT';
   resourceId: string;
   emitter: 'PROMISE' | 'STREAM';
   data: any;
-  isRejected?: boolean;  // for PROMISE emitter only
+  isRejected?: boolean; // for PROMISE emitter only
 }
-
 
 export interface IMutation {
   type: string;
   payload: any;
 }
 
-
 export interface IJsonrpcServiceApi {
-
-  createRequest(
-    resourceId: string,
-    method: string,
-    ...args: any[]
-  ): IJsonRpcRequest;
-
+  createRequest(resourceId: string, method: string, ...args: any[]): IJsonRpcRequest;
 }

@@ -70,7 +70,7 @@ export class PlatformAppsApi {
       let authorized = true;
 
       // TODO this is a weird pattern
-      for (let permission of this.modules[moduleName].permissions) {
+      for (const permission of this.modules[moduleName].permissions) {
         authorized = app.manifest.permissions.includes(permission);
         if (!authorized) break;
       }
@@ -80,12 +80,12 @@ export class PlatformAppsApi {
           api[moduleName][methodName] = async (...args: any[]) => {
             if (authorized) {
               return await this.modules[moduleName][methodName](context, ...args);
-            } else {
-              throw new Error(
-                'This app does not have permission to access this API. ' +
-                  `Required permissions: ${this.modules[moduleName].permissions}`,
-              );
             }
+
+            throw new Error(
+              'This app does not have permission to access this API. ' +
+                `Required permissions: ${this.modules[moduleName].permissions}`,
+            );
           };
         },
       );

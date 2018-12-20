@@ -8,10 +8,9 @@ import { UserService } from '../../../services/user';
 import SelectableWidget from './SelectableWidget.vue';
 
 @Component({
-  components: { SelectableWidget }
+  components: { SelectableWidget },
 })
 export default class SelectWidgets extends Vue {
-
   @Inject()
   widgetsService: WidgetsService;
 
@@ -31,15 +30,11 @@ export default class SelectWidgets extends Vue {
 
   selectedWidgets: WidgetType[] = [];
 
-
   created() {
     if (!this.onboardingService.state.completedSteps.includes('ObsImport')) {
-      this.selectedWidgets = [
-        WidgetType.AlertBox
-      ];
+      this.selectedWidgets = [WidgetType.AlertBox];
     }
   }
-
 
   // SelectableWidget components with inspect=true will
   // pop up a full screen modal.  This function can be
@@ -83,5 +78,4 @@ export default class SelectWidgets extends Vue {
   skip() {
     this.onboardingService.skip();
   }
-
 }

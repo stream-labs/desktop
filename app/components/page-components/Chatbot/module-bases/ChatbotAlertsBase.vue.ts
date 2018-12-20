@@ -5,7 +5,7 @@ import {
   IChatAlertsResponse,
   IAlertMessage,
   ChatbotAlertType,
-  NEW_ALERT_MODAL_ID
+  NEW_ALERT_MODAL_ID,
 } from 'services/chatbot';
 
 @Component({})
@@ -29,31 +29,30 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       case 'twitch': {
         alertTypes = {
           ...streamlabs,
-          ...twitch
+          ...twitch,
         };
         break;
       }
       case 'mixer': {
         alertTypes = {
           ...streamlabs,
-          ...mixer
+          ...mixer,
         };
         break;
       }
       case 'youtube': {
         alertTypes = {
           ...streamlabs,
-          ...youtube
+          ...youtube,
         };
         break;
       }
-      default:{
+      default: {
         alertTypes = {
-          ...streamlabs
+          ...streamlabs,
         };
         break;
       }
-
     }
 
     return alertTypes;
@@ -71,18 +70,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     type: ChatbotAlertType,
     index: number,
     updatedAlert: IAlertMessage,
-    tier?: string
+    tier?: string,
   ) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
     newAlertsObject.settings[platform][type].messages.splice(index, 1);
     if (updatedAlert) {
-      newAlertsObject.settings[platform][type].messages.splice(
-        index,
-        0,
-        updatedAlert
-      );
+      newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
     }
 
     this.updateChatAlerts(newAlertsObject);
@@ -94,8 +89,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
-    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
-      .settings[platform][type].enabled;
+    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts.settings[platform][type]
+      .enabled;
 
     this.updateChatAlerts(newAlertsObject);
   }

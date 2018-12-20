@@ -11,18 +11,15 @@ import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-import {
-  IncrementalRolloutService,
-  EAvailableFeatures
-} from 'services/incremental-rollout';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
 @Component({
   components: {
-    Login
-  }
+    Login,
+  },
 })
 export default class TopNav extends Vue {
   @Inject() appService: AppService;
