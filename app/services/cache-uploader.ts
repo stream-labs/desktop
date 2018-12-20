@@ -58,6 +58,7 @@ export class CacheUploaderService extends Service {
       this.addDirIfExists(archive, 'SceneConfigs');
       this.addDirIfExists(archive, 'SceneCollections');
       this.addDirIfExists(archive, 'Streamlabels');
+      this.addFileIfExists(archive, 'log.log');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
       archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
@@ -68,11 +69,19 @@ export class CacheUploaderService extends Service {
     });
   }
 
-  addDirIfExists(archive: archiver.Archiver, name: string) {
+  private addDirIfExists(archive: archiver.Archiver, name: string) {
     const dirPath = path.join(this.cacheDir, name);
 
     if (fs.existsSync(dirPath)) {
       archive.directory(dirPath, name);
+    }
+  }
+
+  private addFileIfExists(archive: archiver.Archiver, name: string) {
+    const dirPath = path.join(this.cacheDir, name);
+
+    if (fs.existsSync(dirPath)) {
+      archive.file(dirPath, { name });
     }
   }
 
