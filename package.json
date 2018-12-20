@@ -22,7 +22,7 @@
     "release": "yarn install --cwd bin && node bin/release.js",
     "lint": "tslint --project tsconfig.json {app,guest-api,obs-api,updater}/**/*.ts",
     "lint:ci": "yarn lint --format json --out tslint-results.json",
-    "test": "tsc -p test && ava -v",
+    "test": "tsc -p test && ava --tap | tap-appveyor",
     "test-flaky": "node ./test/helpers/runner.js",
     "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
