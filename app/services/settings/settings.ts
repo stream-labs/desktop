@@ -210,6 +210,15 @@ export class SettingsService extends StatefulService<ISettingsState>
     return formModel.value !== void 0 ? formModel.value : (formModel as IObsListInput<string>).options[0].value;
   }
 
+
+  findValidListValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    const formModel = this.findSetting(settings, category, setting);
+    if (!formModel) return;
+    const options = (formModel as IObsListInput<string>).options;
+    const option = options.find(option => option.value == option.value);
+    return option ? option.value : options[0].value;
+  }
+
   private patchSetting(settingsFormData: ISettingsSubCategory[], name: string, patch: Partial<IObsInput<TObsValue>>) {
     settingsFormData = cloneDeep(settingsFormData);
     for (let subcategory of settingsFormData) {

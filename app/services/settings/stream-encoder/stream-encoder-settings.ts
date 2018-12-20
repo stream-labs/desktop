@@ -94,7 +94,7 @@ export class StreamEncoderSettingsService extends Service {
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder')
     ) as EEncoder;
-    const preset: string = this.settingsService.findSettingValue(output, 'Streaming', 'preset') ||
+    const preset: string = this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'QSVPreset') ||
