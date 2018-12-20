@@ -12,13 +12,13 @@ import { Subject } from 'rxjs';
  */
 @Component({})
 export default class ValidatedForm extends Vue {
-
   @Prop() name: string;
 
   validated = new Subject<ErrorField[]>();
   validationScopeId = uuid();
 
   getInputs(children?: Vue[]): BaseInput<any, IInputMetadata>[] {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     children = children || this.$children;
     const inputs: BaseInput<any, IInputMetadata>[] = [];
     children.forEach(child => {

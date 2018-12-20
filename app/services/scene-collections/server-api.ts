@@ -64,7 +64,7 @@ export class SceneCollectionsServerApiService extends Service {
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     const body = this.formSerializeCollection(collection);
-    const request = new Request(url, { headers, method: 'POST', body });
+    const request = new Request(url, { headers, body, method: 'POST' });
 
     return fetch(request).then(handleResponse);
   }
@@ -75,7 +75,7 @@ export class SceneCollectionsServerApiService extends Service {
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     const body = this.formSerializeCollection(collection);
-    const request = new Request(url, { headers, method: 'PUT', body });
+    const request = new Request(url, { headers, body, method: 'PUT' });
 
     return fetch(request).then(handleResponse);
   }

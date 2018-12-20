@@ -7,13 +7,13 @@ import io from 'socket.io-client';
 import { Subject } from 'rxjs';
 
 export type TSocketEvent =
-  IStreamlabelsSocketEvent |
-  IDonationSocketEvent |
-  IFacemaskDonationSocketEvent |
-  IFollowSocketEvent |
-  ISubscriptionSocketEvent |
-  IAlertPlayingSocketEvent |
-  IAlertProfileChanged
+  | IStreamlabelsSocketEvent
+  | IDonationSocketEvent
+  | IFacemaskDonationSocketEvent
+  | IFollowSocketEvent
+  | ISubscriptionSocketEvent
+  | IAlertPlayingSocketEvent
+  | IAlertProfileChanged;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -60,7 +60,7 @@ interface IAlertPlayingSocketEvent {
   message: {
     facemask?: string;
     _id: string;
-  }
+  };
 }
 
 interface IAlertProfileChanged {

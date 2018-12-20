@@ -9,8 +9,8 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
@@ -23,13 +23,13 @@ export default class SceneTransitions extends Vue {
       description: $t('Beginning Scene'),
       name: 'from',
       value: this.connection.fromSceneId,
-      options: this.sceneOptions
+      options: this.sceneOptions,
     };
   }
 
   set fromSceneModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
-      fromSceneId: model.value
+      fromSceneId: model.value,
     });
   }
 
@@ -38,13 +38,13 @@ export default class SceneTransitions extends Vue {
       description: $t('Ending Scene'),
       name: 'to',
       value: this.connection.toSceneId,
-      options: this.sceneOptions
+      options: this.sceneOptions,
     };
   }
 
   set toSceneModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
-      toSceneId: model.value
+      toSceneId: model.value,
     });
   }
 
@@ -53,13 +53,13 @@ export default class SceneTransitions extends Vue {
       description: $t('Scene Transition'),
       name: 'transition',
       value: this.connection.transitionId,
-      options: this.transitionOptions
+      options: this.transitionOptions,
     };
   }
 
   set transitionModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
-      transitionId: model.value
+      transitionId: model.value,
     });
   }
 
@@ -71,7 +71,7 @@ export default class SceneTransitions extends Vue {
     return this.scenesService.scenes.map(scene => {
       return {
         description: scene.name,
-        value: scene.id
+        value: scene.id,
       };
     });
   }
@@ -80,9 +80,8 @@ export default class SceneTransitions extends Vue {
     return this.transitionsService.state.transitions.map(transition => {
       return {
         description: transition.name,
-        value: transition.id
+        value: transition.id,
       };
     });
   }
-
 }

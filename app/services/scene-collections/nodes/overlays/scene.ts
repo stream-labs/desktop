@@ -14,7 +14,7 @@ export class SceneSourceNode extends Node<ISceneNodeSchema, IContext> {
   schemaVersion = 1;
 
   async save(context: IContext) {
-    this.data = { sceneId: context.sceneItem.sourceId }
+    this.data = { sceneId: context.sceneItem.sourceId };
   }
 
   async load(context: IContext) {

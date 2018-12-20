@@ -1,5 +1,6 @@
 import electron from 'electron';
 import uuid from 'uuid/v4';
+import 'reflect-metadata';
 import { Service } from 'services/service';
 import { AutoConfigService } from 'services/auto-config';
 import { ObsImporterService } from 'services/obs-importer';
@@ -7,7 +8,7 @@ import { YoutubeService } from 'services/platforms/youtube';
 import { TwitchService } from 'services/platforms/twitch';
 import { MixerService } from 'services/platforms/mixer';
 import { FacebookService } from 'services/platforms/facebook';
-import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
+import { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
 import { CustomizationService } from './services/customization';
@@ -21,11 +22,10 @@ import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
 import { PersistentStatefulService } from './services/persistent-stateful-service';
 import { SettingsService } from './services/settings';
-import { SourcesService, Source } from './services/sources';
+import { Source, SourcesService } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
-import { WidgetsService, WidgetSource } from './services/widgets';
-import { WidgetTester } from './services/widgets';
+import { WidgetSource, WidgetsService, WidgetTester } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
 import { TransitionsService } from 'services/transitions';
@@ -46,25 +46,25 @@ import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
 import { ObserveList } from './util/service-observer';
-import { Subject, Observable, Subscription} from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
-import { SelectionService, Selection } from 'services/selection';
+import { Selection, SelectionService } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
-  IJsonRpcResponse,
+  E_JSON_RPC_ERROR,
   IJsonRpcEvent,
   IJsonRpcRequest,
-  E_JSON_RPC_ERROR,
+  IJsonRpcResponse,
   IMutation,
-  JsonrpcService
+  JsonrpcService,
 } from 'services/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
 import { CrashReporterService } from 'services/crash-reporter';
@@ -81,7 +81,7 @@ import { AnnouncementsService } from 'services/announcements';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { HardwareService } from 'services/hardware';
-import { PrefabsService, Prefab } from 'services/prefabs';
+import { Prefab, PrefabsService } from 'services/prefabs';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -203,7 +203,7 @@ export class ServicesManager extends Service {
     ObsUserPluginsService,
     HardwareService,
     PrefabsService,
-    Prefab
+    Prefab,
   };
 
   private instances: Dictionary<Service> = {};
@@ -233,7 +233,6 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
-
     // this helps to debug services from the console
     if (Utils.isDevMode()) {
       window['sm'] = this;
@@ -248,7 +247,6 @@ export class ServicesManager extends Service {
     }
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
-
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -256,9 +254,7 @@ export class ServicesManager extends Service {
     const items = observeList.observations.filter(item => {
       return item.observableServiceName === observableService.serviceName;
     });
-    return items.map(
-      item => this.getService(item.observerServiceName).instance
-    );
+    return items.map(item => this.getService(item.observerServiceName).instance);
   }
 
   getService(serviceName: string) {
@@ -286,7 +282,6 @@ export class ServicesManager extends Service {
     ipcRenderer.on(
       'services-message',
       (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
-
         if (message.result._type !== 'EVENT') return;
 
         // handle promise reject/resolve
@@ -304,7 +299,7 @@ export class ServicesManager extends Service {
           if (!this.windowSubscriptions[resourceId]) return;
           this.windowSubscriptions[resourceId].next(message.result.data);
         }
-      }
+      },
     );
   }
 
@@ -323,17 +318,20 @@ export class ServicesManager extends Service {
     const handleErrors = (e?: any) => {
       if (!e && this.requestErrors.length === 0) return;
       if (e) {
-
         // re-raise error for Raven
         const isChildWindowRequest = request.params && request.params.fetchMutations;
-        if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
+        if (isChildWindowRequest) {
+          setTimeout(() => {
+            throw e;
+          }, 0);
+        }
 
         if (e.message) this.requestErrors.push(e.stack.toString());
       }
 
-      response = this.jsonrpc.createError(request,{
+      response = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
-        message: this.requestErrors.join(';')
+        message: this.requestErrors.join(';'),
       });
     };
 
@@ -351,17 +349,10 @@ export class ServicesManager extends Service {
     return JsonrpcService;
   }
 
-  private handleServiceRequest(
-    request: IJsonRpcRequest
-  ): IJsonRpcResponse<any> {
+  private handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
     const methodName = request.method;
-    const {
-      resource: resourceId,
-      args,
-      fetchMutations,
-      compactMode
-    } = request.params;
+    const { resource: resourceId, args, fetchMutations, compactMode } = request.params;
 
     if (fetchMutations) this.startBufferingMutations();
 
@@ -369,12 +360,12 @@ export class ServicesManager extends Service {
     if (!resource) {
       response = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-        message: 'resource not found'
+        message: 'resource not found',
       });
     } else if (!resource[methodName]) {
       response = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
-        message: methodName
+        message: methodName,
       });
     }
 
@@ -390,20 +381,18 @@ export class ServicesManager extends Service {
       responsePayload = {
         _type: 'SUBSCRIPTION',
         resourceId: subscriptionId,
-        emitter: 'STREAM'
+        emitter: 'STREAM',
       };
       if (!this.subscriptions[subscriptionId]) {
-        this.subscriptions[subscriptionId] = resource[methodName].subscribe(
-          (data: any) => {
-            this.serviceEvent.next(
-              this.jsonrpc.createEvent({
-                emitter: 'STREAM',
-                resourceId: subscriptionId,
-                data
-              })
-            );
-          }
-        );
+        this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
+          this.serviceEvent.next(
+            this.jsonrpc.createEvent({
+              data,
+              emitter: 'STREAM',
+              resourceId: subscriptionId,
+            }),
+          );
+        });
       }
     } else if (typeof resource[methodName] === 'function') {
       responsePayload = resource[methodName].apply(resource, args);
@@ -418,14 +407,14 @@ export class ServicesManager extends Service {
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
-        data => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
-        data => this.sendPromiseMessage({ isRejected: true, promiseId, data })
+        data => this.sendPromiseMessage({ data, promiseId, isRejected: false }),
+        data => this.sendPromiseMessage({ data, promiseId, isRejected: true }),
       );
 
       response = this.jsonrpc.createResponse(request, {
         _type: 'SUBSCRIPTION',
         resourceId: promiseId,
-        emitter: 'PROMISE'
+        emitter: 'PROMISE',
       });
     } else if (responsePayload && responsePayload.isHelper === true) {
       const helper = responsePayload;
@@ -433,13 +422,13 @@ export class ServicesManager extends Service {
       response = this.jsonrpc.createResponse(request, {
         _type: 'HELPER',
         resourceId: helper._resourceId,
-        ...!compactMode ? this.getHelperModel(helper) : {}
+        ...(!compactMode ? this.getHelperModel(helper) : {}),
       });
     } else if (responsePayload && responsePayload instanceof Service) {
       response = this.jsonrpc.createResponse(request, {
         _type: 'SERVICE',
         resourceId: responsePayload.serviceName,
-        ...!compactMode ? this.getHelperModel(responsePayload) : {}
+        ...(!compactMode ? this.getHelperModel(responsePayload) : {}),
       });
     } else {
       // payload can contain helpers-objects
@@ -450,7 +439,7 @@ export class ServicesManager extends Service {
           return {
             _type: 'HELPER',
             resourceId: helper._resourceId,
-            ...!compactMode ? this.getHelperModel(helper) : {}
+            ...(!compactMode ? this.getHelperModel(helper) : {}),
           };
         }
       });
@@ -482,9 +471,7 @@ export class ServicesManager extends Service {
 
     const helperName = resourceId.split('[')[0];
     const constructorArgsStr = resourceId.substr(helperName.length);
-    const constructorArgs = constructorArgsStr
-      ? JSON.parse(constructorArgsStr)
-      : void 0;
+    const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
     return this.getHelper(helperName, constructorArgs);
   }
 
@@ -511,7 +498,6 @@ export class ServicesManager extends Service {
     keys.forEach(key => {
       resourceScheme[key] = typeof resource[key];
     });
-
 
     return resourceScheme;
   }
@@ -549,7 +535,6 @@ export class ServicesManager extends Service {
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
-
     return new Proxy(service, {
       get: (target, property, receiver) => {
         if (!target[property]) return target[property];
@@ -571,15 +556,14 @@ export class ServicesManager extends Service {
         const isHelper = target['isHelper'];
 
         const handler = (...args: any[]) => {
-
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(
               isHelper ? target['_resourceId'] : serviceName,
               methodName as string,
               { compactMode: true, fetchMutations: true },
-              ...args
-            )
+              ...args,
+            ),
           );
 
           if (response.error) {
@@ -598,9 +582,8 @@ export class ServicesManager extends Service {
             }
 
             if (result.emitter === 'STREAM') {
-              return this.windowSubscriptions[result.resourceId] =
-                this.windowSubscriptions[result.resourceId] ||
-                new Subject();
+              return (this.windowSubscriptions[result.resourceId] =
+                this.windowSubscriptions[result.resourceId] || new Subject());
             }
           }
 
@@ -622,7 +605,7 @@ export class ServicesManager extends Service {
 
         if (typeof target[property] === 'function') return handler;
         if (target[property] instanceof Observable) return handler();
-      }
+      },
     });
   }
 
@@ -644,18 +627,14 @@ export class ServicesManager extends Service {
     return this.instances[serviceName];
   }
 
-  private sendPromiseMessage(info: {
-    isRejected: boolean;
-    promiseId: string;
-    data: any;
-  }) {
+  private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
     this.serviceEvent.next(
       this.jsonrpc.createEvent({
         emitter: 'PROMISE',
         data: info.data,
         resourceId: info.promiseId,
-        isRejected: info.isRejected
-      })
+        isRejected: info.isRejected,
+      }),
     );
   }
 }

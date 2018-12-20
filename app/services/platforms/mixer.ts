@@ -1,5 +1,5 @@
 import { Service } from '../service';
-import { StatefulService, mutation } from './../stateful-service';
+import { StatefulService, mutation } from '../stateful-service';
 import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -13,7 +13,6 @@ interface IMixerServiceState {
 }
 
 export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
-
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
@@ -104,7 +103,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   @requiresToken()
   fetchRawChannelInfo() {
     const headers = this.getHeaders(true);
-    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}/details`, { headers });
+    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}/details`, {
+      headers,
+    });
 
     return fetch(request)
       .then(handleResponse)
@@ -128,7 +129,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
       return {
         title: json.name,
-        game: gameTitle
+        game: gameTitle,
       };
     });
   }
@@ -151,9 +152,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     }
 
     const request = new Request(`${this.apiBase}channels/${this.channelId}`, {
-      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      method: 'PATCH',
+      body: JSON.stringify(data),
     });
 
     return fetch(request)
@@ -164,7 +165,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   @requiresToken()
   searchGames(searchString: string): Promise<IGame[]> {
     const headers = this.getHeaders();
-    const request = new Request(`${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`, { headers });
+    const request = new Request(
+      `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
+      { headers },
+    );
 
     return fetch(request)
       .then(handleResponse)
@@ -177,11 +181,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   getChatUrl(mode: string): Promise<string> {
-    return new Promise((resolve) => {
-      this.fetchRawChannelInfo()
-        .then(json => {
-          resolve(`https://mixer.com/embed/chat/${json.id}`);
-        });
+    return new Promise(resolve => {
+      this.fetchRawChannelInfo().then(json => {
+        resolve(`https://mixer.com/embed/chat/${json.id}`);
+      });
     });
   }
 

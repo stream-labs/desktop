@@ -10,12 +10,7 @@ import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
-import {
-  getPlatformService,
-  IPlatformAuth,
-  TPlatform,
-  IPlatformService
-} from './platforms';
+import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { AppService } from 'services/app';
@@ -89,13 +84,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.
-    electron.ipcRenderer.on(
-      'testing-fakeAuth',
-      async (e: Electron.Event, auth: IPlatformAuth) => {
-        const service = getPlatformService(auth.platform.type);
-        this.login(service, auth);
-      }
-    );
+    electron.ipcRenderer.on('testing-fakeAuth', async (e: Electron.Event, auth: IPlatformAuth) => {
+      const service = getPlatformService(auth.platform.type);
+      this.login(service, auth);
+    });
   }
 
   // Makes sure the user's login is still good
@@ -202,9 +194,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   dashboardUrl(subPage: string) {
-    const host = Util.isPreview()
-      ? this.hostsService.beta3
-      : this.hostsService.streamlabs;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
@@ -225,9 +215,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const host = Util.isPreview()
-      ? this.hostsService.beta3
-      : this.hostsService.streamlabs;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
@@ -293,10 +281,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.apiToken);
     headers.append('Content-Type', 'application/json');
-    const request = new Request(
-      url,
-      { headers, method: 'POST', body: JSON.stringify({ page_id: pageId, page_type: 'page' }) }
-    );
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
+    });
     try {
       fetch(request);
     } catch {
@@ -312,7 +301,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     platform: TPlatform,
     onWindowShow: (...args: any[]) => any,
     onAuthStart: (...args: any[]) => any,
-    onAuthFinish: (...args: any[]) => any
+    onAuthFinish: (...args: any[]) => any,
   ) {
     const service = getPlatformService(platform);
 
@@ -323,8 +312,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       webPreferences: {
         nodeIntegration: false,
         nativeWindowOpen: true,
-        sandbox: true
-      }
+        sandbox: true,
+      },
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
@@ -375,8 +364,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           type: query.platform,
           username: query.platform_username,
           token: query.platform_token,
-          id: query.platform_id
-        }
+          id: query.platform_id,
+        },
       } as IPlatformAuth;
     }
 
@@ -397,14 +386,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   popoutRecentEvents() {
-    this.windowsService.createOneOffWindow({
-      componentName: 'RecentEvents',
-      title: $t('Recent Events'),
-      size: {
-        width: 800,
-        height: 600
-      }
-    }, 'RecentEvents');
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'RecentEvents',
+        title: $t('Recent Events'),
+        size: {
+          width: 800,
+          height: 600,
+        },
+      },
+      'RecentEvents',
+    );
   }
 }
 
@@ -421,7 +413,7 @@ export function requiresLogin() {
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
         if (UserService.instance.isLoggedIn()) return original.apply(target, args);
-      }
+      },
     };
   };
 }

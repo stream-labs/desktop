@@ -4,7 +4,6 @@ import { $t } from 'services/i18n';
 
 @Component({})
 export default class SelectableWidget extends Vue {
-
   @Prop()
   selected: boolean;
 
@@ -20,5 +19,4 @@ export default class SelectableWidget extends Vue {
   buttonTextForWidget() {
     return this.selected ? $t('Remove Widget') : $t('Add Widget');
   }
-
 }

@@ -33,14 +33,14 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     RemoteControlSettings,
     ExperimentalSettings,
     LanguageSettings,
-    InstalledApps
-  }
+    InstalledApps,
+  },
 })
 export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
 
-  $refs: { settingsContainer: HTMLElement }
+  $refs: { settingsContainer: HTMLElement };
 
   categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
@@ -58,7 +58,7 @@ export default class Settings extends Vue {
     Appearance: 'icon-settings-3-1',
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
-    'Installed Apps': 'icon-store'
+    'Installed Apps': 'icon-store',
   };
 
   mounted() {
@@ -91,5 +91,4 @@ export default class Settings extends Vue {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
     this.$refs.settingsContainer.scrollTop = 0;
   }
-
 }

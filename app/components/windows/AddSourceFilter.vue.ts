@@ -8,12 +8,10 @@ import * as inputComponents from 'components/obs/inputs';
 import ModalLayout from '../ModalLayout.vue';
 import { $t } from 'services/i18n';
 
-
 @Component({
-  components: { ModalLayout, ...inputComponents }
+  components: { ModalLayout, ...inputComponents },
 })
 export default class AddSourceFilter extends Vue {
-
   @Inject()
   windowsService: WindowsService;
 
@@ -34,11 +32,7 @@ export default class AddSourceFilter extends Vue {
     this.error = this.validateName(name);
     if (this.error) return;
 
-    this.filtersService.add(
-      this.sourceId,
-      this.form.type.value,
-      name
-    );
+    this.filtersService.add(this.sourceId, this.form.type.value, name);
 
     this.filtersService.showSourceFilters(this.sourceId, name);
   }
@@ -61,5 +55,4 @@ export default class AddSourceFilter extends Vue {
     }).description;
     this.form.name.value = this.filtersService.suggestName(this.sourceId, name);
   }
-
 }

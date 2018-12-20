@@ -6,8 +6,8 @@ import { Debounce } from 'lodash-decorators';
 
 @Component({
   components: {
-    ChatbotPagination
-  }
+    ChatbotPagination,
+  },
 })
 export default class ChatbotQueueList extends ChatbotBase {
   @Prop()
@@ -43,9 +43,9 @@ export default class ChatbotQueueList extends ChatbotBase {
   }
 
   fetchList(page = this.currentPage, query = this.searchQuery) {
-    this.isPicked ?
-      this.chatbotApiService.fetchQueuePicked(page) :
-      this.chatbotApiService.fetchQueueEntries(page, query);
+    this.isPicked
+      ? this.chatbotApiService.fetchQueuePicked(page)
+      : this.chatbotApiService.fetchQueueEntries(page, query);
   }
 
   @Watch('searchQuery')
@@ -55,9 +55,9 @@ export default class ChatbotQueueList extends ChatbotBase {
   }
 
   onClearListHandler() {
-    this.isPicked ?
-      this.chatbotApiService.clearQueuePicked() :
-      this.chatbotApiService.clearQueueEntries();
+    this.isPicked
+      ? this.chatbotApiService.clearQueuePicked()
+      : this.chatbotApiService.clearQueueEntries();
   }
 
   formatDate(dateString: string) {
