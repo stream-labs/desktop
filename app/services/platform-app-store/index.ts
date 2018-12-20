@@ -1,8 +1,7 @@
 import { Service } from 'services/service';
 
 export class PlatformAppStoreService extends Service {
-
-  paypalAuthCallback: Function = () => { }
+  paypalAuthCallback: Function = () => {};
 
   paypalAuthSuccess() {
     this.paypalAuthCallback();
@@ -11,5 +10,4 @@ export class PlatformAppStoreService extends Service {
   bindsPaypalSuccessCallback(callback: Function) {
     this.paypalAuthCallback = callback;
   }
-
 }

@@ -13,8 +13,8 @@ import { UserService } from 'services/user';
 
 @Component({
   components: {
-    ObsListInput
-  }
+    ObsListInput,
+  },
 })
 export default class WidgetProperties extends Vue {
   @Prop() source: ISourceApi;
@@ -36,10 +36,7 @@ export default class WidgetProperties extends Vue {
   }
 
   navigateWidgetSettings() {
-
-    const widgetType = this.source
-      .getPropertiesManagerSettings()
-      .widgetType;
+    const widgetType = this.source.getPropertiesManagerSettings().widgetType;
 
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',
@@ -54,7 +51,7 @@ export default class WidgetProperties extends Vue {
       [WidgetType.ViewerCount]: 'viewercount',
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',
-      [WidgetType.SpinWheel]: 'wheel'
+      [WidgetType.SpinWheel]: 'wheel',
     }[widgetType.toString()];
 
     this.navigationService.navigate('Dashboard', { subPage });

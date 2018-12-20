@@ -1,3 +1,4 @@
+/* tslint:disable:max-line-length */
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 import { cloneDeep } from 'lodash';
@@ -51,23 +52,14 @@ import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/wind
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
-import ChatbotSymbolProtectionWindow
-  from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
-import ChatbotLinkProtectionWindow
-  from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
-import ChatbotWordProtectionWindow
-  from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
+import ChatbotSymbolProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
+import ChatbotLinkProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
+import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
-import ChatbotQuotePreferencesWindow
-  from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
-import ChatbotQueuePreferencesWindow
-  from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotSongRequestPreferencesWindow
-  from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
-import ChatbotSongRequestOnboardingWindow
-  from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
-
-import ExecuteInCurrentWindow from '../util/execute-in-current-window';
+import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
+import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
+import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
+import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -132,7 +124,6 @@ export function getComponents() {
   };
 }
 
-
 export interface IWindowOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
@@ -146,7 +137,7 @@ export interface IWindowOptions {
   center?: boolean;
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
-  prevWindowOptions? : IWindowOptions;
+  prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
 }
 
@@ -157,11 +148,10 @@ interface IWindowsState {
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
-  isShown: true
+  isShown: true,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
-
   /**
    * 'main' and 'child' are special window ids that always exist
    * and have special purposes.  All other windows ids are considered
@@ -172,23 +162,22 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
-      isShown: false
-    }
+      isShown: false,
+    },
   };
 
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
 
-  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
+  windowUpdated = new Subject<{ windowId: string; options: IWindowOptions }>();
   windowDestroyed = new Subject<string>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
-
 
   init() {
     const windows = BrowserWindow.getAllWindows();
@@ -225,14 +214,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
       const options = {
         ...windowOptions.prevWindowOptions,
-        isPreserved: true
+        isPreserved: true,
       };
 
       ipcRenderer.send('window-showChildWindow', options);
       this.updateChildWindowOptions(options);
       return;
     }
-
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
@@ -247,7 +235,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     remote.getCurrentWindow().close();
   }
 
-
   /**
    * Creates a one-off window that will not impact or close
    * any existing windows, and will cease to exist when closed.
@@ -257,6 +244,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * @return the window id of the created window
    */
   createOneOffWindow(options: Partial<IWindowOptions>, windowId?: string): string {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     windowId = windowId || uuid();
 
     if (this.windows[windowId]) {
@@ -267,12 +255,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
-    const newWindow = this.windows[windowId] = new BrowserWindow({
+    const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
-      title: options.title || 'New Window'
-    });
+      title: options.title || 'New Window',
+    }));
 
     newWindow.setMenu(null);
     newWindow.on('closed', () => {
@@ -317,7 +305,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
   }
 
-
   // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
@@ -333,14 +320,15 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
-
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
 
       if (currentOptions.preservePrevWindow) {
-        throw new Error('You can\'t use preservePrevWindow option for more that 1 window in the row');
+        throw new Error(
+          "You can't use preservePrevWindow option for more that 1 window in the row",
+        );
       }
 
       newOptions.prevWindowOptions = currentOptions;
@@ -378,7 +366,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const opts = {
       componentName: 'Blank',
       scaleFactor: 1,
-      ...options
+      ...options,
     };
 
     Vue.set(this.state, windowId, opts);
@@ -387,7 +375,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
     const oldOpts = this.state[windowId];
-    Vue.set(this.state, windowId, { ...oldOpts, ...options })
+    Vue.set(this.state, windowId, { ...oldOpts, ...options });
   }
 
   @mutation()

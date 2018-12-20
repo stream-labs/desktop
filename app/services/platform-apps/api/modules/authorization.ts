@@ -6,7 +6,7 @@ import uuid from 'uuid/v4';
 enum EAuthWindowEventType {
   AuthRedirect = 'auth_redirect',
   Show = 'show',
-  Close = 'close'
+  Close = 'close',
 }
 
 interface IAuthWindowEvent {
@@ -23,9 +23,8 @@ interface IAuthWIndowOptions {
 type TEventHandler = (event: IAuthWindowEvent) => void;
 
 export class AuthorizationModule extends Module {
-
   moduleName = 'Authorization';
-  permissions = [EApiPermissions.Authorization]
+  permissions = [EApiPermissions.Authorization];
 
   windowHandles: Dictionary<BrowserWindow> = {};
 
@@ -34,7 +33,7 @@ export class AuthorizationModule extends Module {
     ctx: IApiContext,
     authUrl: string,
     options: IAuthWIndowOptions,
-    eventHandler: TEventHandler
+    eventHandler: TEventHandler,
   ) {
     if (this.windowHandles[ctx.app.id]) {
       throw new Error('This application already has an open authorization window!');
@@ -44,8 +43,7 @@ export class AuthorizationModule extends Module {
     const parsed = url.parse(authUrl);
     const valid = !!(ctx.app.manifest.authorizationUrls || []).find(whitelistUrl => {
       const whitelistParsed = url.parse(whitelistUrl);
-      return (whitelistParsed.host === parsed.host) &&
-        (whitelistParsed.pathname === parsed.pathname);
+      return whitelistParsed.host === parsed.host && whitelistParsed.pathname === parsed.pathname;
     });
 
     if (!valid) {
@@ -60,15 +58,15 @@ export class AuthorizationModule extends Module {
       webPreferences: {
         nodeIntegration: false,
         sandbox: true,
-        partition: uuid()
-      }
+        partition: uuid(),
+      },
     });
 
     if (ctx.app.unpacked) {
       win.webContents.openDevTools({ mode: 'detach' });
     }
 
-    win.webContents.session.protocol.registerFileProtocol('slobs-oauth', (req) => {
+    win.webContents.session.protocol.registerFileProtocol('slobs-oauth', req => {
       eventHandler({ type: EAuthWindowEventType.AuthRedirect, url: req.url });
       win.close();
     });
@@ -95,5 +93,4 @@ export class AuthorizationModule extends Module {
       this.windowHandles[ctx.app.id].close();
     }
   }
-
 }

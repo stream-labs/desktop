@@ -5,11 +5,10 @@ import { Subject } from 'rxjs';
 
 enum ETheme {
   Day = 'day',
-  Night = 'night'
+  Night = 'night',
 }
 
 export class ThemeModule extends Module {
-
   moduleName = 'Theme';
   permissions: EApiPermissions[] = [];
 
@@ -28,10 +27,8 @@ export class ThemeModule extends Module {
   @apiEvent()
   themeChanged = new Subject<ETheme>();
 
-
   @apiMethod()
   getTheme(): ETheme {
     return this.customizationService.nightMode ? ETheme.Night : ETheme.Day;
   }
-
 }

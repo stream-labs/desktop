@@ -9,7 +9,7 @@ export * from './definitions';
 
 enum OutputMode {
   simple = 'Simple',
-  advanced = 'Advanced'
+  advanced = 'Advanced',
 }
 
 export interface IOutputSettings {
@@ -27,14 +27,14 @@ export class VideoEncodingOptimizationService extends Service {
     outputMode: OutputMode.simple,
     encoderField: 'StreamEncoder',
     presetField: 'Preset',
-    encoderSettingsField: 'x264Settings'
+    encoderSettingsField: 'x264Settings',
   };
 
   private advancedOutputSettings: IOutputSettings = {
     outputMode: OutputMode.advanced,
     encoderField: 'Encoder',
     presetField: 'preset',
-    encoderSettingsField: 'x264opts'
+    encoderSettingsField: 'x264opts',
   };
 
   private currentOutputSettings: IOutputSettings;
@@ -44,10 +44,7 @@ export class VideoEncodingOptimizationService extends Service {
 
   init() {
     this.streamingService.streamingStatusChange.subscribe(status => {
-      if (
-        status === EStreamingState.Offline &&
-        this.isUsingEncodingOptimizations
-      ) {
+      if (status === EStreamingState.Offline && this.isUsingEncodingOptimizations) {
         this.isUsingEncodingOptimizations = false;
         this.restorePreviousValues();
       }
@@ -83,9 +80,12 @@ export class VideoEncodingOptimizationService extends Service {
       });
 
       profiles = Presets.filter(profile => {
-        return profile.game === game && profile.encoder.find(encoder => {
-          return encoder === StreamEncoder.value
-        });
+        return (
+          profile.game === game &&
+          profile.encoder.find(encoder => {
+            return encoder === StreamEncoder.value;
+          })
+        );
       });
     }
 
@@ -98,7 +98,7 @@ export class VideoEncodingOptimizationService extends Service {
     let indexSubCategory = outputSettings.indexOf(
       outputSettings.find(category => {
         return category.nameSubCategory === 'Streaming';
-      })
+      }),
     );
 
     let parameters = outputSettings[indexSubCategory].parameters;
@@ -107,21 +107,18 @@ export class VideoEncodingOptimizationService extends Service {
     const indexStreamEncoder = parameters.indexOf(
       parameters.find(parameter => {
         return parameter.name === this.currentOutputSettings.encoderField;
-      })
+      }),
     );
-    outputSettings[indexSubCategory].parameters[indexStreamEncoder].value =
-      'obs_x264';
+    outputSettings[indexSubCategory].parameters[indexStreamEncoder].value = 'obs_x264';
 
     if (this.currentOutputSettings.outputMode === 'Simple') {
       // Setting use advanced value
       const indexUseAdvanced = parameters.indexOf(
         parameters.find(parameter => {
           return parameter.name === 'UseAdvanced';
-        })
+        }),
       );
-      outputSettings[indexSubCategory].parameters[
-        indexUseAdvanced
-      ].value = true;
+      outputSettings[indexSubCategory].parameters[indexUseAdvanced].value = true;
     }
 
     // Apply these first settings to be able to set the next ones :
@@ -133,7 +130,7 @@ export class VideoEncodingOptimizationService extends Service {
     indexSubCategory = outputSettings.indexOf(
       outputSettings.find(category => {
         return category.nameSubCategory === 'Streaming';
-      })
+      }),
     );
 
     parameters = outputSettings[indexSubCategory].parameters;
@@ -142,21 +139,17 @@ export class VideoEncodingOptimizationService extends Service {
     const indexPreset = parameters.indexOf(
       parameters.find(parameter => {
         return parameter.name === this.currentOutputSettings.presetField;
-      })
+      }),
     );
-    outputSettings[indexSubCategory].parameters[indexPreset].value =
-      encoderPreset.profile.preset;
+    outputSettings[indexSubCategory].parameters[indexPreset].value = encoderPreset.profile.preset;
 
     // Setting encoder settings value
     const indexX264Settings = parameters.indexOf(
       parameters.find(parameter => {
-        return (
-          parameter.name === this.currentOutputSettings.encoderSettingsField
-        );
-      })
+        return parameter.name === this.currentOutputSettings.encoderSettingsField;
+      }),
     );
-    outputSettings[indexSubCategory].parameters[indexX264Settings].value =
-      encoderPreset.settings;
+    outputSettings[indexSubCategory].parameters[indexX264Settings].value = encoderPreset.settings;
 
     this.settingsService.setSettings('Output', outputSettings);
 

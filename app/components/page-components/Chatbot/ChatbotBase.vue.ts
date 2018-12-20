@@ -1,10 +1,14 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 
 import {
   ChatbotApiService,
+  ChatbotAutopermitEnums,
   ChatbotCommonService,
+  ChatbotPermissionsEnums,
+  ChatbotPunishments,
+  ChatbotResponseTypes,
 } from 'services/chatbot';
 
 import { CustomizationService } from 'services/customization';
@@ -13,22 +17,15 @@ import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
-import {
-  ChatbotPermissionsEnums,
-  ChatbotAutopermitEnums,
-  ChatbotResponseTypes,
-  ChatbotPunishments,
-} from 'services/chatbot';
-
-import { IListOption } from 'components/shared/inputs'
+import { IListOption } from 'components/shared/inputs';
 
 @Component({
   components: {
     ...inputComponents,
     VFormGroup,
     Tabs,
-    DropdownMenu
-  }
+    DropdownMenu,
+  },
 })
 export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
@@ -51,33 +48,33 @@ export default class ChatbotBase extends Vue {
   }
 
   get chatbotPermissions() {
-    let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
+    const permissions = Object.keys(ChatbotPermissionsEnums).reduce(
       (a: IListOption<number>[], b: string) => {
         if (typeof ChatbotPermissionsEnums[b] === 'number') {
           a.push({
             title: b.split('_').join(' '),
-            value: ChatbotPermissionsEnums[b]
+            value: ChatbotPermissionsEnums[b],
           });
         }
         return a;
       },
-      []
+      [],
     );
     return permissions;
   }
 
   get chatbotAutopermitOptions() {
-    let permissions = Object.keys(ChatbotAutopermitEnums).reduce(
+    const permissions = Object.keys(ChatbotAutopermitEnums).reduce(
       (a: IListOption<number>[], b: string) => {
         if (typeof ChatbotAutopermitEnums[b] === 'number') {
           a.push({
             title: b.split('_').join(' '),
-            value: ChatbotAutopermitEnums[b]
+            value: ChatbotAutopermitEnums[b],
           });
         }
         return a;
       },
-      []
+      [],
     );
     return permissions;
   }
@@ -86,7 +83,7 @@ export default class ChatbotBase extends Vue {
     return Object.keys(ChatbotResponseTypes).map(responseType => {
       return {
         value: ChatbotResponseTypes[responseType],
-        title: responseType
+        title: responseType,
       };
     });
   }
@@ -95,7 +92,7 @@ export default class ChatbotBase extends Vue {
     return Object.keys(ChatbotPunishments).map(punishmentType => {
       return {
         value: ChatbotPunishments[punishmentType],
-        title: punishmentType
+        title: punishmentType,
       };
     });
   }

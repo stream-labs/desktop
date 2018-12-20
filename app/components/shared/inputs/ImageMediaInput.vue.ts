@@ -4,10 +4,9 @@ import { IMediaGalleryMetadata } from './index';
 import { MediaGalleryInput } from './inputs';
 
 @Component({
-  components: { MediaGalleryInput }
+  components: { MediaGalleryInput },
 })
 export default class ImageMediaInput extends BaseInput<string, IMediaGalleryMetadata> {
-
   @Prop({ default: '' })
   readonly value: string;
 

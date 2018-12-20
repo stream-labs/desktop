@@ -5,7 +5,6 @@ import electron from 'electron';
 
 @Component({})
 export default class FileInput extends BaseInput<string, IFileMetadata> {
-
   @Prop() readonly value: string;
   @Prop() readonly metadata: IFileMetadata;
 
@@ -13,7 +12,7 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
     const options: Electron.OpenDialogOptions = {
       defaultPath: this.value,
       filters: this.metadata.filters,
-      properties: []
+      properties: [],
     };
 
     if (this.metadata.directory) {
@@ -28,5 +27,4 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
       this.emitInput(paths[0]);
     }
   }
-
 }
