@@ -34,6 +34,10 @@ export default class ChatbotPoll extends ChatbotBase {
     this.chatbotApiService.Common.openPollProfileWindow(profile);
   }
 
+  onOpenPollPreferencesHandler(){
+    this.chatbotApiService.Common.openPollPreferencesWindow();
+  }
+
   get isPollActive() {
     return (
       this.chatbotApiService.Poll.state.activePollResponse &&

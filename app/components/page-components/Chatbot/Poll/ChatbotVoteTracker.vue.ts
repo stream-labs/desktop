@@ -8,13 +8,13 @@ export default class ChatbotVoteTracker extends ChatbotBase {
   @Prop() option: IPollOption;
 
   get percentage() {
-    return `${(this.votes / this.total * 100).toFixed(2)}%`;
+    return `${(this.votes / Math.max(this.total,1) * 100).toFixed(2)}%`;
   }
 
   get command() {
     return this.settings.commands['vote'].command + ' ' + this.option.parameter;
   }
-
+  
   get name() {
     return this.option.name;
   }

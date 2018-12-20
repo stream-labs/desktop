@@ -38,7 +38,8 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
       enabled: false,
       duration: 300
     },
-    title: ''
+    title: '',
+    send_notification: false
   };
 
   tabs: ITab[] = [
@@ -60,12 +61,12 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
         max: 100,
         placeholder: $t('Title')
       },
-      timer: {
+      duration: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 86400,
-        placeholder: $t('Timer')
+        placeholder: $t('Duration')
       }
     };
   }
@@ -74,7 +75,10 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     name: null,
     parameter: null
   };
+
   selectedIndex: number = -1;
+
+  selectedTab: string = 'general';
 
   mounted() {
     // if editing existing custom command
@@ -108,13 +112,21 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     await this.$refs.form.validateAndGetErrorsCount();
   }
 
+  onSelectTabHandler(tab: string) {
+    this.selectedTab = tab;
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.newProfile.id) {
-      await this.chatbotApiService.Poll.updatePollProfile(this.newProfile).catch(this.onErrorHandler);
+      await this.chatbotApiService.Poll.updatePollProfile(
+        this.newProfile
+      ).catch(this.onErrorHandler);
     } else {
-      await this.chatbotApiService.Poll.addPollProfile(this.newProfile).catch(this.onErrorHandler);
+      await this.chatbotApiService.Poll.addPollProfile(this.newProfile).catch(
+        this.onErrorHandler
+      );
     }
   }
 
@@ -158,5 +170,4 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   onRemoveOptionHandler(index: number) {
     this.newProfile.options.splice(index, 1);
   }
-  
 }

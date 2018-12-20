@@ -1,25 +1,40 @@
 <template>
   <div class="content__container">
     <div class="flex flex--justify-end padding--10">
-      <button class="button button--default margin--10" @click="complete" v-if="hasAnyVotes">{{ $t('Complete') }}</button>
-      <button class="button button--default margin--10" @click="cancel" v-else>{{ $t('Cancel') }}</button>
-      <button class="button button--action margin--10" @click="close" v-if="isPollOpen">{{ $t('Close Poll') }}</button>
-      <button class="button button--action margin--10" @click="open" v-else>{{ $t('Open Poll') }}</button>
+      <button
+        class="button button--default margin--10"
+        @click="complete"
+        v-if="hasAnyVotes"
+        :disabled="isPollOpen"
+      >{{ $t('Complete') }}</button>
+      <button
+        class="button button--default margin--10"
+        @click="cancel"
+        v-if="!hasAnyVotes"
+      >{{ $t('Cancel') }}</button>
+      <button
+        class="button button--action margin--10"
+        @click="toggleState"
+        v-if="isPollOpen"
+      >{{ $t('Close Poll') }}</button>
+      <button
+        class="button button--action margin--10"
+        @click="toggleState"
+        v-else
+      >{{ $t('Open Poll') }}</button>
     </div>
     <div class="header__container">
-      <h1>Will I wwin the next game?</h1>
+      <h1>{{activePoll.settings.title}}</h1>
       <div class="flex flex--space-between padding--10">
         <div class="margin-horizontal--10">
-          <div class="header__container__title">Loyalty Pot</div>
-          <div class="header__container__text">2000</div>
+          <div class="header__container__text">{{ total }}</div>
+          <div class="header__container__title">{{ $t('Votes') }}</div>
         </div>
         <div class="margin-horizontal--10">
-          <div class="header__container__title">Votes</div>
-          <div class="header__container__text">{{ $t(total) }}</div>
-        </div>
-        <div class="margin-horizontal--10">
-          <div class="header__container__title">Timer</div>
-          <div class="header__container__text">00:45</div>
+          <div class="header__container__text">{{ $t(timeRemaining) }}</div>
+          <div
+            class="header__container__title"
+          >{{ $t(activePoll.settings.timer.enabled ? 'Time Left' : 'Time Elapsed') }}</div>
         </div>
       </div>
     </div>
@@ -30,6 +45,12 @@
         :option="option"
       />
     </div>
+    <ChatbotGenericModalWindow
+      :name="CANCEL_MODAL"
+      @yes="onYesCancelHandler"
+      @no="onNoCancelHandler"
+      :header="$t('Are you sure you want to cancel your poll?')"
+    />
   </div>
 </template>
 
@@ -50,14 +71,16 @@
   }
 
   .header__container__title {
-    font-size: 15px;
+    font-size: 16px;
+    .flex;
+    .flex--center;
   }
 
   .header__container__text {
     color: @dark-2;
     .flex;
     .flex--center;
-    font-size: 15px;
+    font-size: 18px;
   }
 }
 

@@ -84,6 +84,27 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
+  onTogglePollPreferencesWindowHandler() {
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotApiService.Common.openPollPreferencesWindow();
+        break;
+      case 'ChatbotPollPreferencesWindow':
+        const pollVoteCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['poll'].vote;
+
+        this.chatbotApiService.Common.openDefaultCommandWindow({
+          ...pollVoteCommand,
+          slugName: 'poll',
+          commandName: 'vote'
+        });
+        break;
+    }
+  }
+
   onToggleQuoteWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;

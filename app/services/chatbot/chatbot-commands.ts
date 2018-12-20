@@ -50,6 +50,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
   fetchDefaultCommands() {
     return this.chatbotBaseApiService.api('GET', 'commands/default', {}).then(
       (response: IDafaultCommandsResponse) => {
+        console.log(response);
         this.UPDATE_DEFAULT_COMMANDS(response);
       }
     );

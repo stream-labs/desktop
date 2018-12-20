@@ -87,6 +87,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     );
   }
 
+  get isPollCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'poll' &&
+      this.defaultCommandToUpdate.commandName === 'vote'
+    );
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }

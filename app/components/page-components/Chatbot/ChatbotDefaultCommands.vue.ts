@@ -4,7 +4,15 @@ import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 
-type TCommandSlug = 'commands' | 'link-protection' | 'giveaway' | 'loyalty' | 'queue' | 'songrequest' | 'heist';
+type TCommandSlug =
+  | 'commands'
+  | 'link-protection'
+  | 'giveaway'
+  | 'loyalty'
+  | 'queue'
+  | 'songrequest'
+  | 'heist'
+  | 'poll';
 
 @Component({
   components: {
@@ -14,7 +22,16 @@ type TCommandSlug = 'commands' | 'link-protection' | 'giveaway' | 'loyalty' | 'q
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
-  v1CommandSlugs: TCommandSlug[] = ['commands', 'link-protection', 'giveaway','loyalty','queue','songrequest','heist'];
+  v1CommandSlugs: TCommandSlug[] = [
+    'commands',
+    'link-protection',
+    'giveaway',
+    'loyalty',
+    'queue',
+    'songrequest',
+    'heist',
+    'poll'
+  ];
 
   get commandSlugs() {
     return this.chatbotApiService.Commands.state.defaultCommandsResponse;

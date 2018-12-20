@@ -45,8 +45,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
   closeChatbotChildWindow() {
     const options = this.windowsService.getChildWindowOptions();
     const name = options ? options.componentName : '';
-    
-    if(name.includes('Chatbot')){
+
+    if (name.includes('Chatbot')) {
       this.windowsService.closeChildWindow();
     }
   }
@@ -221,6 +221,17 @@ export class ChatbotCommonService extends PersistentStatefulService<
       size: {
         width: 650,
         height: 500
+      }
+    });
+  }
+
+  openPollPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotPollPreferencesWindow',
+      title: $t('Chatbot Poll Preferences'),
+      size: {
+        width: 650,
+        height: 600
       }
     });
   }

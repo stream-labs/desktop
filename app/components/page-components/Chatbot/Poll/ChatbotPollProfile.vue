@@ -22,6 +22,13 @@
         @click="onStartPollHandler"
       >{{ $t('Start Poll') }}</button>
     </div>
+    <ChatbotGenericModalWindow
+      :name="DELETE_MODAL"
+      @yes="onYesHandler"
+      @no="onNoHandler"
+      :header="$t('Are you sure you want to delete %{name} ?',{name: profile ? profile.title : ''})"
+      :message="$t('Once deleted it can not be recovered.')"
+    />
   </div>
 </template>
 

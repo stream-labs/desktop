@@ -8,7 +8,8 @@
           class="button button--action margin--10 button--add-command"
           @click="onOpenProfileHandler"
         >{{ $t('Add Poll Profile') }}</button>
-        <button class="button button--default margin--10">{{ $t('Poll Preferences') }}</button>
+        <button class="button button--default margin--10"
+        @click="onOpenPollPreferencesHandler">{{ $t('Poll Preferences') }}</button>
       </div>
       <!-- profiles -->
       <div class="chatbot-profile__container">

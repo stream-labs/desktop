@@ -1,10 +1,12 @@
 <template>
   <div class="chatbot-vote__container">
-    <span>{{ $t(command) }}</span>
+    <span>{{ $t("{name} ({command})",{name:name, command: command}) }}</span>
     <div class="chatbot-progress__container">
       <span :style="{width:percentage}"></span>
     </div>
-    <div class="text-align--right">{{ $t("{amount} Votes | {percent}",{amount: votes, percent: percentage}) }}</div>
+    <div
+      class="text-align--right"
+    >{{ $t("{amount} Votes | {percent}",{amount: votes, percent: percentage}) }}</div>
   </div>
 </template>
 

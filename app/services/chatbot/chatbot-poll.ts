@@ -39,7 +39,8 @@ export class ChatbotPollApiService extends PersistentStatefulService<
         id: null,
         options: null,
         timer: null,
-        title: null
+        title: null,
+        send_notification: false
       },
       status: null,
       user_id: null
@@ -66,22 +67,35 @@ export class ChatbotPollApiService extends PersistentStatefulService<
     });
 
     this.socket.on('poll.open', () => {
-      //console.log(response);
+      this.UPDATE_POLL_STATE('Open');
     });
 
-    this.socket.on('poll.close', (response: any) => {
-      console.log(response);
+    this.socket.on('poll.close', () => {
+      this.UPDATE_POLL_STATE('Closed');
     });
 
     this.socket.on('poll.cancel', (response: any) => {
-      console.log(response);
+      this.RESET_ACTIVE_POLL();
     });
 
     this.socket.on('poll.complete', (response: any) => {
-      console.log(response);
+      this.RESET_ACTIVE_POLL();
     });
 
-    console.log('xD');
+    this.socket.on('poll.update', (response: any) => {
+      console.log(response);
+      this.UPDATE_POLL_OPTIONS(response);
+    });
+
+    this.socket.on('poll.timer.start', (response: any) => {
+      console.log(response);
+      this.UPDATE_POLL_TIMER(response);
+    });
+
+    this.socket.on('poll.timer.stop', (response: any) => {
+      console.log(response);
+      this.UPDATE_POLL_TIMER(response);
+    });
   }
 
   disconnectSocket() {
@@ -187,6 +201,19 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   }
 
   //
+  // Reset
+  //
+  resetSettings() {
+    return this.chatbotBaseApiService.resetSettings('poll').then(
+      (response: IPollPreferencesResponse) => {
+        console.log(response);
+        this.UPDATE_POLL_PREFERENCES(response);
+        return Promise.resolve(response);
+      }
+    );
+  }
+
+  //
   // Mutations
   //
   @mutation()
@@ -201,7 +228,22 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   }
 
   @mutation()
+  private UPDATE_POLL_OPTIONS(options: any) {
+    this.state.activePollResponse.settings.options = options;
+  }
+
+  @mutation()
   private UPDATE_POLL_STATE(status: string){
-    //this.acti
+    this.state.activePollResponse.status = status;
+  }
+
+  @mutation()
+  private RESET_ACTIVE_POLL(){
+    Vue.set(this.state, 'activePollResponse', ChatbotPollApiService.defaultState.activePollResponse);
+  }
+
+  @mutation()
+  private UPDATE_POLL_TIMER(data: any){
+    this.state.activePollResponse.settings.timer = data;
   }
 }

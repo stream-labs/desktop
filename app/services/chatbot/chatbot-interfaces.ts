@@ -128,6 +128,11 @@ export interface IHeistPreferencesResponse {
   enabled: boolean;
 }
 
+export interface IPollPreferencesResonse {
+  settings: IPollPreferencesData;
+  enabled: boolean;
+}
+
 export interface IQueueStateResponse {
   status: 'Open' | 'Closed';
   title?: string;
@@ -597,6 +602,7 @@ export interface IPollProfile {
     time_remaining?: number;
   };
   options: IPollOption[];
+  send_notification: boolean;
 }
 
 export interface IPollOption {
@@ -604,9 +610,30 @@ export interface IPollOption {
   parameter: string;
   votes?: number;
 }
+
+export interface IPollGeneral {
+  repeat_active: {
+    enabled: boolean;
+    chat_lines: number;
+    message: string;
+  };
+}
+
+export interface IPollMessages {
+  open: string;
+  close: string;
+  cancel: string;
+  results: {
+    tie: string;
+    win: string;
+  };
+}
+
 export interface IPollPreferencesData {
   commands: IPollCommands;
   profiles: IPollProfile[];
+  general: IPollGeneral;
+  messages: IPollMessages;
 }
 
 export interface IPollCommands {
@@ -669,7 +696,8 @@ export type ChatbotSettingSlug =
   | 'symbol-protection'
   | 'link-protection'
   | 'words-protection'
-  | 'heist';
+  | 'heist'
+  | 'poll';
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
