@@ -44,7 +44,7 @@
                 <label>
                   <span>
                     {{ $t('Use optimized encoder settings for') }}
-                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.presetIn }}
+                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.encoder }}
                   </span>
                   <span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
