@@ -96,8 +96,8 @@ export class VideoEncodingOptimizationService
     const resInPx = resToPx(settings.outputResolution);
     const profile = filteredProfiles.sort((profileA, profileZ) => {
       return (
-        (resToPx(profileA.resolutionIn) - resInPx) -
-        (resToPx(profileZ.resolutionIn) - resInPx)
+        Math.abs(resToPx(profileA.resolutionIn) - resInPx) -
+        Math.abs(resToPx(profileZ.resolutionIn) - resInPx)
       )
     })[0];
 
