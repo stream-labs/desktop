@@ -35,6 +35,7 @@ enum EOBSOutputSignal {
   Stop = 'stop',
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
+  Wrote = 'wrote',
 }
 
 interface IOBSOutputSignalInfo {
@@ -56,6 +57,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
+  replayBufferStatusChange = new Subject<EReplayBufferState>();
+  replayBufferFileWrite = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -195,6 +198,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
       obs.NodeObs.OBS_service_stopReplayBuffer(true);
     }
+  }
+
+  captureReplay() {
+    // TODO: Do we need to capture this in the frontend at all?
+    obs.NodeObs.OBS_service_processReplayBufferHotkey();
   }
 
   showEditStreamInfo() {
@@ -354,7 +362,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
       }[info.signal];
 
-      this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+      if (nextState) {
+        this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+        this.replayBufferStatusChange.next(nextState);
+      }
+
+      if (info.signal === EOBSOutputSignal.Wrote) {
+        this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
+      }
     }
 
     if (info.code) {

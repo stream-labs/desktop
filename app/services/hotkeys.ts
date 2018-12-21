@@ -132,6 +132,11 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Transition (Studio Mode)'),
     down: () => getTransitionsService().executeStudioModeTransition(),
   },
+  CAPTURE_REPLAY: {
+    name: 'CAPTURE_REPLAY',
+    description: () => $t('Capture Replay'),
+    down: () => getStreamingService().captureReplay(),
+  },
 };
 
 const SOURCE_ACTIONS: HotkeyGroup = {

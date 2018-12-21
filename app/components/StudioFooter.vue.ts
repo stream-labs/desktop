@@ -102,7 +102,7 @@ export default class StudioFooterComponent extends Vue {
     return {
       [EReplayBufferState.Offline]: $t('Start Replay Buffer'),
       [EReplayBufferState.Running]: $t('Stop Replay Buffer'),
-      [EReplayBufferState.Stopping]: $t('Stopping...')
+      [EReplayBufferState.Stopping]: $t('Stopping...'),
     }[this.streamingService.state.replayBufferStatus];
   }
 
