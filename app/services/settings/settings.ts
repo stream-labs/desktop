@@ -215,7 +215,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     const formModel = this.findSetting(settings, category, setting);
     if (!formModel) return;
     const options = (formModel as IObsListInput<string>).options;
-    const option = options.find(option => option.value == option.value);
+    const option = options.find(option => option.value == formModel.value);
     return option ? option.value : options[0].value;
   }
 
