@@ -54,7 +54,10 @@ export class VideoEncodingOptimizationService
     lastSelectedProfile: null
   };
 
-  private previousSettings: any;
+  private previousSettings: {
+    video: any;
+    output: any;
+  };
   private isUsingEncodingOptimizations = false;
 
   @Inject() private settingsService: SettingsService;
@@ -133,7 +136,10 @@ export class VideoEncodingOptimizationService
   }
 
   applyProfile(encoderProfile: IEncoderProfile) {
-    this.previousSettings = cloneDeep(this.settingsService.getSettingsFormData('Output'));
+    this.previousSettings = {
+      output: cloneDeep(this.settingsService.getSettingsFormData('Output')),
+      video: cloneDeep(this.settingsService.getSettingsFormData('Video'))
+    };
     this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
     const currentSettings = this.streamEncoderSettingsService.getSettings();
     const newSettings: Partial<IStreamEncoderSettings> = {
@@ -176,7 +182,8 @@ export class VideoEncodingOptimizationService
   }
 
   private restorePreviousValues() {
-    this.settingsService.setSettings('Output', this.previousSettings);
+    this.settingsService.setSettings('Output', this.previousSettings.output);
+    this.settingsService.setSettings('Video', this.previousSettings.video);
   }
 
   @mutation()
