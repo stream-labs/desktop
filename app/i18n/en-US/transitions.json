@@ -22,5 +22,6 @@
   "Default": "Default",
   "Deleted": "Deleted",
   "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
-  "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions."
+  "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
+  "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited."
 }

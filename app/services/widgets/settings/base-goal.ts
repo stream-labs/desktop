@@ -1,11 +1,9 @@
-import { IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { IWidgetApiSettings } from 'services/widgets';
+import { IWidgetApiSettings, IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { InheritMutations } from 'services/stateful-service';
 import { handleErrors } from 'util/requests';
 
-
 interface IBaseGoalData extends IWidgetData {
-  goal: Dictionary<any>
+  goal: Dictionary<any>;
 }
 
 interface IGoalWidgetApiSettings extends IWidgetApiSettings {
@@ -16,14 +14,14 @@ interface IGoalWidgetApiSettings extends IWidgetApiSettings {
 }
 
 @InheritMutations()
-export abstract class BaseGoalService<TGoalData extends IBaseGoalData, TGoalCreateOptions>
-  extends WidgetSettingsService<TGoalData>
-{
-
+export abstract class BaseGoalService<
+  TGoalData extends IBaseGoalData,
+  TGoalCreateOptions
+> extends WidgetSettingsService<TGoalData> {
   init() {
     super.init();
 
-    this.websocketService.socketEvent.subscribe(event  => {
+    this.websocketService.socketEvent.subscribe(event => {
       const apiSettings = this.getApiSettings();
       if (event.type === apiSettings.goalCreateEvent || event.type === apiSettings.goalResetEvent) {
         this.refreshData();
@@ -44,11 +42,11 @@ export abstract class BaseGoalService<TGoalData extends IBaseGoalData, TGoalCrea
     return await this.request({
       url: apiSettings.goalUrl,
       method: 'POST',
-      body: options
+      body: options,
     })
-    .then(handleErrors)
-    .catch(err => err.json())
-    .then(json => Promise.reject(json));
+      .then(handleErrors)
+      .catch(err => err.json())
+      .then(json => Promise.reject(json));
   }
 
   async resetGoal() {
@@ -57,14 +55,13 @@ export abstract class BaseGoalService<TGoalData extends IBaseGoalData, TGoalCrea
     if (apiSettings.goalResetUrl) {
       return await this.request({
         url: apiSettings.goalResetUrl,
-        method: 'POST'
+        method: 'POST',
       });
     }
 
     return await this.request({
       url: apiSettings.goalUrl,
-      method: 'DELETE'
+      method: 'DELETE',
     });
   }
-
 }

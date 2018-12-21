@@ -22,8 +22,8 @@ import { SettingsService } from 'services/settings';
     TestWidgets,
     PerformanceMetrics,
     NotificationsArea,
-    GlobalSyncStatus
-  }
+    GlobalSyncStatus,
+  },
 })
 export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
@@ -55,7 +55,9 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get canSchedule() {
-    return this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type);
+    return (
+      this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type)
+    );
   }
 
   get youtubeEnabled() {
@@ -70,9 +72,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal(
-      'https://youtube.com/live_dashboard_splash'
-    );
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
   openScheduleStream() {
@@ -80,7 +80,7 @@ export default class StudioFooterComponent extends Vue {
       componentName: 'EditStreamInfo',
       title: $t('Schedule Stream'),
       queryParams: { isSchedule: true },
-      size: { width: 500, height: 650 }
+      size: { width: 500, height: 670 },
     });
   }
 

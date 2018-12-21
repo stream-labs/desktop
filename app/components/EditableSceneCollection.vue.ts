@@ -56,11 +56,14 @@ export default class EditableSceneCollection extends Vue {
     this.duplicating = true;
 
     setTimeout(() => {
-      this.sceneCollectionsService.duplicate(this.collection.name, this.collection.id).then(() => {
-        this.duplicating = false;
-      }).catch(() => {
-        this.duplicating = false;
-      });
+      this.sceneCollectionsService
+        .duplicate(this.collection.name, this.collection.id)
+        .then(() => {
+          this.duplicating = false;
+        })
+        .catch(() => {
+          this.duplicating = false;
+        });
     }, 500);
   }
 
@@ -80,9 +83,15 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    if (!confirm($t('Are you sure you want to remove %{collectionName}?', { collectionName: this.collection.name })))
+    if (
+      !confirm(
+        $t('Are you sure you want to remove %{collectionName}?', {
+          collectionName: this.collection.name,
+        }),
+      )
+    ) {
       return;
+    }
     this.sceneCollectionsService.delete(this.collectionId);
   }
-
 }

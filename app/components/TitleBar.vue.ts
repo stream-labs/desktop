@@ -39,5 +39,4 @@ export default class TitleBar extends Vue {
   get nightMode() {
     return this.customizationService.nightMode;
   }
-
 }

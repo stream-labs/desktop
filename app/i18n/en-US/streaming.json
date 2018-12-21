@@ -48,5 +48,6 @@
   "Set path in Settings > Output.": "Set path in Settings > Output.",
   "Start Replay Buffer": "Start Replay Buffer",
   "Stop Replay Buffer": "Stop Replay Buffer",
-  "Stopping...": "Stopping..."
+  "Stopping...": "Stopping...",
+  "Your stream has been scheduled for %{time} from now. If you'd like to make another schedule please enter a different time": "Your stream has been scheduled for %{time} from now. If you'd like to make another schedule please enter a different time"
 }

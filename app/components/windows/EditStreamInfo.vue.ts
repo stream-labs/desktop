@@ -2,7 +2,7 @@ import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { ObsTextInput, ObsListInput, ObsBoolInput }from 'components/obs/inputs';
+import { ObsTextInput, ObsListInput, ObsBoolInput } from 'components/obs/inputs';
 import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
@@ -18,7 +18,7 @@ import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
 import {
   VideoEncodingOptimizationService,
-  IEncoderPreset
+  IEncoderPreset,
 } from 'services/video-encoding-optimizations';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import { shell } from 'electron';
@@ -36,8 +36,8 @@ interface IMultiSelectProfiles {
     ObsListInput,
     ObsBoolInput,
     HFormGroup,
-    Multiselect
-  }
+    Multiselect,
+  },
 })
 export default class EditStreamInfo extends Vue {
   @Inject() streamInfoService: StreamInfoService;
@@ -63,40 +63,40 @@ export default class EditStreamInfo extends Vue {
   streamTitleModel: IObsInput<string> = {
     name: 'stream_title',
     description: $t('Title'),
-    value: ''
+    value: '',
   };
 
   streamDescriptionModel: IObsTextInputValue = {
     name: 'stream_description',
     description: 'Description',
     value: '',
-    multiline: true
+    multiline: true,
   };
 
   gameModel: IObsListInput<string> = {
     name: 'stream_game',
     description: $t('Game'),
     value: '',
-    options: []
+    options: [],
   };
 
   pageModel: IObsListInput<string> = {
     name: 'stream_page',
     description: $t('Facebook Page'),
     value: '',
-    options: []
+    options: [],
   };
 
   doNotShowAgainModel: IObsInput<boolean> = {
     name: 'do_not_show_again',
     description: $t('Do not show this message when going live'),
-    value: false
+    value: false,
   };
 
-  startTimeModel: { time: number, date: string } = {
+  startTimeModel: { time: number; date: string } = {
     time: null,
-    date: null
-  }
+    date: null,
+  };
 
   encoderProfile: IMultiSelectProfiles;
 
@@ -106,16 +106,14 @@ export default class EditStreamInfo extends Vue {
   debouncedGameSearch: (search: string) => void;
 
   async created() {
-    this.debouncedGameSearch = debounce(
-      (search: string) => this.onGameSearchChange(search),
-      500
-    );
+    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
 
     if (this.streamInfoService.state.channelInfo) {
       this.populatingModels = true;
       if (this.isFacebook || this.isYoutube) {
         const service = getPlatformService(this.userService.platform.type);
-        await service.prepopulateInfo()
+        await service
+          .prepopulateInfo()
           .then((info: IChannelInfo) => {
             if (!info) return;
             return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
@@ -136,16 +134,19 @@ export default class EditStreamInfo extends Vue {
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game || '';
     this.streamDescriptionModel.value = this.streamInfoService.state.channelInfo.description;
-    this.gameModel.options = [{
-      description: this.streamInfoService.state.channelInfo.game,
-      value: this.streamInfoService.state.channelInfo.game
-    }];
+    this.gameModel.options = [
+      {
+        description: this.streamInfoService.state.channelInfo.game,
+        value: this.streamInfoService.state.channelInfo.game,
+      },
+    ];
 
     if (this.facebookPages) {
       this.pageModel.value = this.facebookPages.page_id;
-      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => (
-        { value: page.id, description: `${page.name} | ${page.category}` }
-      ));
+      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
+        value: page.id,
+        description: `${page.name} | ${page.category}`,
+      }));
       this.hasPages = !!this.facebookPages.pages.length;
     }
     this.loadAvailableProfiles();
@@ -165,7 +166,7 @@ export default class EditStreamInfo extends Vue {
           games.forEach(game => {
             this.gameModel.options.push({
               description: game.name,
-              value: game.name
+              value: game.name,
             });
           });
         }
@@ -176,12 +177,10 @@ export default class EditStreamInfo extends Vue {
   loadAvailableProfiles() {
     if (!this.midStreamMode) {
       const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        this.gameModel.value
+        this.gameModel.value,
       );
 
-      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        'Generic'
-      );
+      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
 
       this.areAvailableProfiles = availableProfiles.length > 0 || genericProfiles.length > 0;
 
@@ -218,14 +217,18 @@ export default class EditStreamInfo extends Vue {
     if (this.doNotShowAgainModel.value) {
       alert(
         $t('You will not be asked again to update your stream info when going live. ') +
-        $t('You can re-enable this from the settings.')
+          $t('You can re-enable this from the settings.'),
       );
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
     this.streamInfoService
-      .setStreamInfo(this.streamTitleModel.value, this.streamDescriptionModel.value, this.gameModel.value)
+      .setStreamInfo(
+        this.streamTitleModel.value,
+        this.streamDescriptionModel.value,
+        this.gameModel.value,
+      )
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -238,23 +241,18 @@ export default class EditStreamInfo extends Vue {
           this.updatingInfo = false;
         }
       })
-      .catch((e) => {
-        this.$toasted.show(
-          e,
-          {
-            position: 'bottom-center',
-            className: 'toast-alert',
-            duration: 1000,
-            singleton: true
-          }
-        );
+      .catch(e => {
+        this.$toasted.show(e, {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 1000,
+          singleton: true,
+        });
         this.updatingInfo = false;
       });
 
     if (this.areAvailableProfiles && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(
-        this.encoderProfile.value
-      );
+      this.videoEncodingOptimizationService.applyProfile(this.encoderProfile.value);
     }
   }
 
@@ -266,21 +264,39 @@ export default class EditStreamInfo extends Vue {
     const streamInfo = {
       title: this.streamTitleModel.value,
       description: this.streamDescriptionModel.value,
-      game: this.gameModel.value
+      game: this.gameModel.value,
     };
     if (scheduledStartTime) {
-      await service.scheduleStream(scheduledStartTime, streamInfo)
-        .then(() => this.windowsService.closeChildWindow())
-        .catch((e) => {
+      await service
+        .scheduleStream(scheduledStartTime, streamInfo)
+        .then(() => (this.startTimeModel = { time: null, date: null }))
+        .then(() => {
           this.$toasted.show(
-            e.error.message,
+            $t(
+              'Your stream has been scheduled for %{time} from now.' +
+                " If you'd like to make another schedule please enter a different time",
+              { time: moment().to(scheduledStartTime, true) },
+            ),
             {
               position: 'bottom-center',
-              className: 'toast-alert',
-              duration: 1000,
-              singleton: true
-            }
+              fullWidth: true,
+              className: 'toast-success toast-success__schedule',
+              duration: 0,
+              action: {
+                text: $t('Close'),
+                class: 'toast-action',
+                onClick: (_e, toastedObject) => toastedObject.goAway(),
+              },
+            },
           );
+        })
+        .catch(e => {
+          this.$toasted.show(e.error.message, {
+            position: 'bottom-center',
+            className: 'toast-alert',
+            duration: 1000,
+            singleton: true,
+          });
         });
     }
 
@@ -365,9 +381,12 @@ export default class EditStreamInfo extends Vue {
     return {
       title: $t('Scheduled Date'),
       dateFormat: 'MM/DD/YYYY',
-      placeholder:'MM/DD/YYYY',
-      description: this.isFacebook ?
-        $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.') : undefined
+      placeholder: 'MM/DD/YYYY',
+      description: this.isFacebook
+        ? $t(
+            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+          )
+        : undefined,
     };
   }
 
@@ -398,17 +417,16 @@ export default class EditStreamInfo extends Vue {
       hours = hours < 10 ? `0${hours}` : hours;
       let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
       minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[0]}-${dateArray[1]}T${hours}:${minutes}:00.0${moment().format('Z')}`;
+      return `${dateArray[2]}-${dateArray[0]}-${
+        dateArray[1]
+      }T${hours}:${minutes}:00.0${moment().format('Z')}`;
     } catch {
-      this.$toasted.show(
-        $t('Please enter a valid date'),
-        {
-          position: 'bottom-center',
-          className: 'toast-alert',
-          duration: 1000,
-          singleton: true
-        }
-      )
+      this.$toasted.show($t('Please enter a valid date'), {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
     }
   }
 }
