@@ -342,16 +342,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Start]: ERecordingState.Recording,
         [EOBSOutputSignal.Starting]: ERecordingState.Starting,
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
-        [EOBSOutputSignal.Stopping]: ERecordingState.Stopping
+        [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       }[info.signal];
 
       this.SET_RECORDING_STATUS(nextState, time);
       this.recordingStatusChange.next(nextState);
-    } else if (info.type === EOBSOutputType.ReplayBuffer){
+    } else if (info.type === EOBSOutputType.ReplayBuffer) {
       const nextState: EReplayBufferState = {
         [EOBSOutputSignal.Start]: EReplayBufferState.Running,
         [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
-        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline
+        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
       }[info.signal];
 
       this.SET_REPLAY_BUFFER_STATUS(nextState, time);

@@ -18,7 +18,7 @@ export enum ERecordingState {
 export enum EReplayBufferState {
   Running = 'running',
   Stopping = 'stopping',
-  Offline = 'offline'
+  Offline = 'offline',
 }
 
 export interface IStreamingServiceState {
