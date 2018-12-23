@@ -17,10 +17,11 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from 'services/platforms';
+import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
+import { throttle } from 'lodash-decorators';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -36,6 +37,7 @@ enum EOBSOutputSignal {
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
+  WriteError = 'writing_error',
 }
 
 interface IOBSOutputSignalInfo {
@@ -200,9 +202,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  captureReplay() {
-    // TODO: Do we need to capture this in the frontend at all?
-    obs.NodeObs.OBS_service_processReplayBufferHotkey();
+  saveReplay() {
+    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
+      this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
+      this.replayBufferStatusChange.next(EReplayBufferState.Saving);
+      obs.NodeObs.OBS_service_processReplayBufferHotkey();
+    }
   }
 
   showEditStreamInfo() {
@@ -360,6 +365,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Start]: EReplayBufferState.Running,
         [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
         [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+        [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+        [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
       }[info.signal];
 
       if (nextState) {
@@ -420,8 +427,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time: string) {
+  private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
     this.state.replayBufferStatus = status;
-    this.state.replayBufferStatusTime = time;
+    if (time) this.state.replayBufferStatusTime = time;
   }
 }

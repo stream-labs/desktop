@@ -65,6 +65,26 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === 'replay'"
+      :name="$t('Instant Replay')"
+      :description="$t('Automatically plays your most recently captured replay in your stream.')"
+      key="28">
+      <!-- TODO, Assets, description -->
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>{{ $t('New Followers') }}</li>
+        <li>{{ $t('New Subscribers') }}</li>
+        <li>{{ $t('New Cheers') }}</li>
+        <li>{{ $t('New Donations') }}</li>
+        <li>{{ $t('All-Time Top Donator') }}</li>
+        <li>{{ $t('Weekly Top Donator') }}</li>
+        <li>{{ $t('Monthly Follows') }}</li>
+        <li>{{ $t('Many more') }}</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
       v-for="appSource in availableAppSources"
       :key="`${appSource.appId}-${appSource.source.id}`"
       v-if="(inspectedSource === 'app_source') && (inspectedAppId === appSource.appId) && (inspectedAppSourceId === appSource.source.id)"
@@ -135,6 +155,13 @@
             @click="inspectSource('streamlabel')"
             @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
             <div>{{ $t('Stream Label') }}</div>
+          </div>
+          <div
+            class="source source--widget"
+            :class="{ 'source--active': inspectedSource === 'replay' }"
+            @click="inspectSource('replay')"
+            @dblclick="selectSource('ffmpeg_source', { propertiesManager: 'replay' })">
+            <div>{{ $t('Instant Replay') }}</div>
           </div>
         </div>
       </div>

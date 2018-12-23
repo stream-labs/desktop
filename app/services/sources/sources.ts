@@ -9,7 +9,6 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
-import electron from 'electron';
 import { Inject } from 'util/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
@@ -37,6 +36,7 @@ import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
+import { ReplayManager } from './properties-managers/replay-manager';
 
 const SOURCES_UPDATE_INTERVAL = 1000;
 const AudioFlag = obs.ESourceOutputFlags.Audio;
@@ -49,6 +49,7 @@ export const PROPERTIES_MANAGER_TYPES = {
   widget: WidgetManager,
   streamlabels: StreamlabelsManager,
   platformApp: PlatformAppManager,
+  replay: ReplayManager,
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
@@ -538,7 +539,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('Add Source'),
       size: {
         width: 1200,
-        height: 650,
+        // TODO: CSS on this window is screwed up.  Window should expand naturally,
+        // We shouldn't have to perfectly size the window to the contents
+        height: 685,
       },
     });
   }

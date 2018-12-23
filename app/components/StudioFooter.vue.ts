@@ -98,12 +98,16 @@ export default class StudioFooterComponent extends Vue {
     return this.settingsService.state.Output.RecRB;
   }
 
-  get replayBufferLabel() {
-    return {
-      [EReplayBufferState.Offline]: $t('Start Replay Buffer'),
-      [EReplayBufferState.Running]: $t('Stop Replay Buffer'),
-      [EReplayBufferState.Stopping]: $t('Stopping...'),
-    }[this.streamingService.state.replayBufferStatus];
+  get replayBufferOffline() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Offline;
+  }
+
+  get replayBufferStopping() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Stopping;
+  }
+
+  get replayBufferSaving() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Saving;
   }
 
   toggleReplayBuffer() {
@@ -112,5 +116,9 @@ export default class StudioFooterComponent extends Vue {
     } else {
       this.streamingService.stopReplayBuffer();
     }
+  }
+
+  saveReplay() {
+    this.streamingService.saveReplay();
   }
 }
