@@ -4,38 +4,37 @@ import { $t } from 'services/i18n';
 import * as _ from 'lodash';
 import {
   IChatbotErrorResponse,
-  IPollOption
+  IBettingProfile,
+  IBettingOption
 } from 'services/chatbot';
-import { IPollProfile } from 'services/chatbot';
-import {
-  ITextMetadata,
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { cloneDeep } from 'lodash';
 import { debounce } from 'lodash-decorators';
-import ChatbotPollOptionModal from '../Poll/ChatbotPollOptionModal.vue';
-import { mutation } from 'services/stateful-service';
+import ChatbotBetOptionModal from '../Bet/ChatbotBetOptionModal.vue';
 
 @Component({
   components: {
     ValidatedForm,
-    ChatbotPollOptionModal
+    ChatbotBetOptionModal
   }
 })
-export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
+export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   $refs: {
     form: ValidatedForm;
   };
 
-  newProfile: IPollProfile = {
+  newProfile: IBettingProfile = {
     id: null,
     options: [],
     timer: {
       enabled: false,
       duration: 300
+    },
+    loyalty: {
+      min: 10,
+      max: 10000
     },
     title: '',
     send_notification: false
@@ -58,19 +57,40 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
         required: true,
         type: EInputType.text,
         max: 100,
-        placeholder: $t('Title')
+        placeholder: $t('Title'),
+        uuid: $t('Title')
       },
       duration: {
         required: true,
         type: EInputType.number,
-        min: 0,
+        min: 1,
         max: 86400,
-        placeholder: $t('Duration')
+        placeholder: $t('Duration'),
+        uuid: $t('Duration')
+      },
+      min: {
+        required: true,
+        type: EInputType.number,
+        min: 10,
+        max: 100000,
+        placeholder: $t('Minimum'),
+        tooltip: $t('Minimum amount of points that is required to be bet'),
+        uuid: $t('Minimum')
+      },
+      max: {
+        required: true,
+        type: EInputType.number,
+        min: 10,
+        max: 100000,
+        placeholder: $t('Maximum'),
+        tooltip: $t('Maximum amount of points that is allowed to be bet'),
+        uuid: $t('Maximum')
+        
       }
     };
   }
 
-  selectedOption: IPollOption = {
+  selectedOption: IBettingOption = {
     name: null,
     parameter: null
   };
@@ -91,18 +111,18 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   }
 
   get profileToUpdate() {
-    return this.chatbotApiService.Common.state.pollProfileToUpdate;
+    return this.chatbotApiService.Common.state.bettingProfileToUpdate;
   }
 
   get baseCommand() {
     return (
-      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings
-        .commands['vote'].command + ' '
+      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings
+        .commands['bet'].command + ' '
     );
   }
 
-  get NEW_POLL_OPTION_MODAL_ID() {
-    return 'new-poll-option';
+  get NEW_BET_OPTION_MODAL_ID() {
+    return 'new-betting-option';
   }
 
   @Watch('errors.items.length')
@@ -119,11 +139,11 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.newProfile.id) {
-      await this.chatbotApiService.Poll.updatePollProfile(
-        this.newProfile
-      ).catch(this.onErrorHandler);
+      await this.chatbotApiService.Betting.updateProfile(this.newProfile).catch(
+        this.onErrorHandler
+      );
     } else {
-      await this.chatbotApiService.Poll.addPollProfile(this.newProfile).catch(
+      await this.chatbotApiService.Betting.addProfile(this.newProfile).catch(
         this.onErrorHandler
       );
     }
@@ -131,11 +151,11 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
     if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert($t('This timer name is already taken. Try another name.'));
+      alert($t('This name is already taken. Try another name.'));
     }
   }
 
-  onAddOptionHandler(option: IPollOption, index: number) {
+  onAddOptionHandler(option: IBettingOption, index: number) {
     if (!option) {
       this.selectedOption = {
         name: null,
@@ -146,10 +166,10 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     }
 
     this.selectedIndex = index;
-    this.$modal.show(this.NEW_POLL_OPTION_MODAL_ID);
+    this.$modal.show(this.NEW_BET_OPTION_MODAL_ID);
   }
 
-  onAddedHandler(option: IPollOption = null, index: number = -1) {
+  onAddedHandler(option: IBettingOption = null, index: number = -1) {
     const dupe = _.find(this.newProfile.options, x => {
       return (
         x.name.toLowerCase() == option.name.toLowerCase() ||

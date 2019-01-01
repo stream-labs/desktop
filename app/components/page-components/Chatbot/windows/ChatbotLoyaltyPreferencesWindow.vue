@@ -133,7 +133,8 @@
             </div>
           </div>
         </div>
-        <div class="loyalty-tabs__import" v-show="selectedTab === 'import'">
+        <div class="loyalty-tabs__import" v-show="selectedTab === 'import' && isTwitch">
+          <ChatbotLoyaltyImporter />
         </div>
       </validated-form>
     </div>

@@ -9,7 +9,7 @@ import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-
+import * as _ from 'lodash';
 import {
   ChatbotPermissionsEnums,
   ChatbotAutopermitEnums,
@@ -40,18 +40,17 @@ export default class ChatbotBase extends Vue {
   }
 
   get chatbotPermissions() {
-    let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
-      (a: IListOption<number>[], b: string) => {
-        if (typeof ChatbotPermissionsEnums[b] === 'number') {
-          a.push({
-            title: b.split('_').join(' '),
-            value: ChatbotPermissionsEnums[b]
-          });
-        }
-        return a;
-      },
-      []
-    );
+    const keys = _.difference(Object.keys(ChatbotPermissionsEnums), ['None']);
+
+    let permissions = keys.reduce((a: IListOption<number>[], b: string) => {
+      if (typeof ChatbotPermissionsEnums[b] === 'number') {
+        a.push({
+          title: b.split('_').join(' '),
+          value: ChatbotPermissionsEnums[b]
+        });
+      }
+      return a;
+    }, []);
     return permissions;
   }
 

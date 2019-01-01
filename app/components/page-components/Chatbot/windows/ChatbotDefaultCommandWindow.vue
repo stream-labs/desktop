@@ -31,12 +31,12 @@
               <span>{{ $t('Heist Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
-            <div @click="onToggleHeistPreferencesWindowHandler" v-if="isHeistCommand">
-              <span>{{ $t('Heist Preferences') }}</span>
-              <i class="fas fa-chevron-right window-toggle__icon"></i>
-            </div>
             <div @click="onTogglePollPreferencesWindowHandler" v-if="isPollCommand">
               <span>{{ $t('Poll Preferences') }}</span>
+              <i class="fas fa-chevron-right window-toggle__icon"></i>
+            </div>
+            <div @click="onToggleBettingPreferencesWindowHandler" v-if="isBetCommand">
+              <span>{{ $t('Betting Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
           </div>
@@ -44,97 +44,102 @@
       </div>
     </div>
     <div v-if="editedCommand" slot="content" class="chatbot-add-command__container">
-
-        <validated-form ref="form">
-          <div v-show="selectedTab === 'general'">
-            <VFormGroup
-              :title="$t('Command')"
-              v-model="editedCommand.command"
-              :metadata="metadata.command"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.response"
-              :title="$t('Response')"
-              v-model="editedCommand.response"
-              :metadata="metadata.response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.success_response"
-              :title="$t('Success Response')"
-              v-model="editedCommand.success_response"
-              :metadata="metadata.success_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.failed_response"
-              :title="$t('Failed Response')"
-              v-model="editedCommand.failed_response"
-              :metadata="metadata.failed_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.enabled_response"
-              :title="$t('Enabled Response')"
-              v-model="editedCommand.enabled_response"
-              :metadata="metadata.enabled_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.disabled_response"
-              :title="$t('Disabled Response')"
-              v-model="editedCommand.disabled_response"
-              :metadata="metadata.disabled_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.duration_response"
-              :title="$t('Duration Response')"
-              v-model="editedCommand.duration_response"
-              :metadata="metadata.duration_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.rating_response"
-              :title="$t('Rating Response')"
-              v-model="editedCommand.rating_response"
-              :metadata="metadata.rating_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.views_response"
-              :title="$t('Views Response')"
-              v-model="editedCommand.views_response"
-              :metadata="metadata.views_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.banned_response"
-              :title="$t('Banned Response')"
-              v-model="editedCommand.banned_response"
-              :metadata="metadata.banned_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.music_response"
-              :title="$t('Banned Response')"
-              v-model="editedCommand.music_response"
-              :metadata="metadata.music_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.max_response"
-              :title="$t('Max Response')"
-              v-model="editedCommand.max_response"
-              :metadata="metadata.max_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.full_response"
-              :title="$t('Full Response')"
-              v-model="editedCommand.full_response"
-              :metadata="metadata.full_response"
-            />
-            <VFormGroup
-              v-if="defaultCommandToUpdate.response_type"
-              :title="$t('Reply in')"
-              v-model="editedCommand.response_type"
-              :metadata="metadata.response_type"
-            />
-          </div>
-          <div v-show="selectedTab === 'advanced'">
-            <ChatbotAliases v-model="editedCommand.aliases"/>
-          </div>
-        </validated-form>
+      <validated-form ref="form">
+        <div v-show="selectedTab === 'general'">
+          <VFormGroup
+            :title="$t('Command')"
+            v-model="editedCommand.command"
+            :metadata="metadata.command"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response"
+            :title="$t('Response')"
+            v-model="editedCommand.response"
+            :metadata="metadata.response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.success_response"
+            :title="$t('Success Response')"
+            v-model="editedCommand.success_response"
+            :metadata="metadata.success_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.failed_response"
+            :title="$t('Failed Response')"
+            v-model="editedCommand.failed_response"
+            :metadata="metadata.failed_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.enabled_response"
+            :title="$t('Enabled Response')"
+            v-model="editedCommand.enabled_response"
+            :metadata="metadata.enabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.disabled_response"
+            :title="$t('Disabled Response')"
+            v-model="editedCommand.disabled_response"
+            :metadata="metadata.disabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.duration_response"
+            :title="$t('Duration Response')"
+            v-model="editedCommand.duration_response"
+            :metadata="metadata.duration_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.rating_response"
+            :title="$t('Rating Response')"
+            v-model="editedCommand.rating_response"
+            :metadata="metadata.rating_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.views_response"
+            :title="$t('Views Response')"
+            v-model="editedCommand.views_response"
+            :metadata="metadata.views_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.banned_response"
+            :title="$t('Banned Response')"
+            v-model="editedCommand.banned_response"
+            :metadata="metadata.banned_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.music_response"
+            :title="$t('Banned Response')"
+            v-model="editedCommand.music_response"
+            :metadata="metadata.music_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.max_response"
+            :title="$t('Max Response')"
+            v-model="editedCommand.max_response"
+            :metadata="metadata.max_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.full_response"
+            :title="$t('Full Response')"
+            v-model="editedCommand.full_response"
+            :metadata="metadata.full_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.permission"
+            :title="$t('Permission')"
+            v-model="defaultCommandToUpdate.permission.level"
+            :metadata="metadata.permission"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response_type"
+            :title="$t('Reply in')"
+            v-model="editedCommand.response_type"
+            :metadata="metadata.response_type"
+          />
+        </div>
+        <div v-show="selectedTab === 'advanced'">
+          <ChatbotAliases v-model="editedCommand.aliases"/>
+        </div>
+      </validated-form>
     </div>
     <div slot="controls" class="flex flex--space-between">
       <button
@@ -143,7 +148,11 @@
       >{{ $t('Reset Command') }}</button>
       <div>
         <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
-        <button class="button button--action" @click="onSaveHandler"       :disabled="errors.items.length > 0">{{ $t("Save") }}</button>
+        <button
+          class="button button--action"
+          @click="onSaveHandler"
+          :disabled="errors.items.length > 0"
+        >{{ $t("Save") }}</button>
       </div>
     </div>
   </ModalLayout>
@@ -165,7 +174,6 @@
     padding-left: 0;
   }
 }
-
 
 .window-toggle__wrapper {
   background-color: @day-primary;

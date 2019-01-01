@@ -3,7 +3,8 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { $t } from 'services/i18n';
 
 import {
-  IChatbotErrorResponse, ILoyaltyPreferencesResponse
+  IChatbotErrorResponse,
+  ILoyaltyPreferencesResponse
 } from 'services/chatbot';
 
 import {
@@ -15,9 +16,10 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { cloneDeep } from 'lodash';
 import { debounce } from 'lodash-decorators';
+import ChatbotLoyaltyImporter from '../Importer/ChatbotLoyaltyImporter.vue';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm, ChatbotLoyaltyImporter }
 })
 export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -25,10 +27,10 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
   };
 
   newLoyaltyPreferences: ILoyaltyPreferencesResponse = {
-    settings:{
-      commands:{},
-      general:{
-        interval:{
+    settings: {
+      commands: {},
+      general: {
+        interval: {
           live: 5
         },
         name: 'points',
@@ -37,7 +39,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
           live: 1
         }
       },
-      advanced:{
+      advanced: {
         donations: {
           extralife: 0,
           streamlabs: 0,
@@ -55,21 +57,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     enabled: false
   };
 
-  tabs: ITab[] = [
-    {
-      name: $t('General'),
-      value: 'general'
-    },
-    {
-      name: $t('Advanced'),
-      value: 'advanced'
-    },
-    {
-      name: $t('Import'),
-      value: 'import'
-    }
-  ];
-
+  tabs: ITab[] = [];
 
   // metadata
   loyaltyNameMetaData: ITextMetadata = {
@@ -132,7 +120,9 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Host Bonus'),
-    tooltip: $t('Amount of currency a viewer will receive when hosting the channel.')
+    tooltip: $t(
+      'Amount of currency a viewer will receive when hosting the channel.'
+    )
   };
 
   onRaidMetaData: INumberMetadata = {
@@ -141,7 +131,9 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Raid Bonus'),
-    tooltip: $t('Amount of currency a viewer will receive when raiding the channel.')
+    tooltip: $t(
+      'Amount of currency a viewer will receive when raiding the channel.'
+    )
   };
 
   onStreamlabsMetaData: INumberMetadata = {
@@ -167,14 +159,31 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     max: 10000,
     placeholder: $t('Super Chat Bonus')
   };
-  
+
   selectedTab: string = 'general';
 
-  mounted(){
-    this.chatbotApiService.Loyalty.fetchLoyaltyPreferences().then(() =>{
-      this.newLoyaltyPreferences = cloneDeep(this.loyaltyPreferences)
+  mounted() {
+    this.tabs = [
+      {
+        name: $t('General'),
+        value: 'general'
+      },
+      {
+        name: $t('Advanced'),
+        value: 'advanced'
+      }
+    ];
+
+    if (this.isTwitch) {
+      this.tabs.push({
+        name: $t('Import'),
+        value: 'import'
+      });
+    }
+
+    this.chatbotApiService.Loyalty.fetchLoyaltyPreferences().then(() => {
+      this.newLoyaltyPreferences = cloneDeep(this.loyaltyPreferences);
     });
-   ;
   }
 
   onSelectTabHandler(tab: string) {
@@ -184,9 +193,13 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
   get minAmount() {
     return (
       this.newLoyaltyPreferences.settings.general.payout.live *
-        60 /
-        this.newLoyaltyPreferences.settings.general.interval.live
+      60 /
+      this.newLoyaltyPreferences.settings.general.interval.live
     ).toFixed(2);
+  }
+
+  get isTwitch() {
+    return this.chatbotApiService.Base.userService.platform.type === 'twitch';
   }
 
   get loyaltyPreferences() {
@@ -197,31 +210,31 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     return (
       (this.newLoyaltyPreferences.settings.general.payout.live +
         this.newLoyaltyPreferences.settings.general.payout.active) *
-        60 /
-        this.newLoyaltyPreferences.settings.general.interval.live
+      60 /
+      this.newLoyaltyPreferences.settings.general.interval.live
     ).toFixed(2);
   }
 
   @Watch('newLoyaltyPreferences.settings.general.interval.live')
   onQueryChangeHandler(value: number) {
-    this.livePayoutMetaData.tooltip = 'Currency that a viewer will earn when you are live every ' +
-    value +
-    ' minutes.';
+    this.livePayoutMetaData.tooltip =
+      'Currency that a viewer will earn when you are live every ' +
+      value +
+      ' minutes.';
   }
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService
-        .Loyalty
-        .updateLoyaltyPreferences(this.newLoyaltyPreferences)
-        .catch(this.onErrorHandler);
+    this.chatbotApiService.Loyalty.updateLoyaltyPreferences(
+      this.newLoyaltyPreferences
+    ).catch(this.onErrorHandler);
     return;
   }
 

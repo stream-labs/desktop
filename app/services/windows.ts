@@ -68,6 +68,8 @@ import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/wi
 import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
 import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
 import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
+import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
+import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -135,7 +137,9 @@ export function getComponents() {
     ChatbotLoyaltyPreferencesWindow,
     ChatbotHeistPreferencesWindow,
     ChatbotPollProfileWindow,
-    ChatbotPollPreferencesWindow
+    ChatbotPollPreferencesWindow,
+    ChatbotBettingProfileWindow,
+    ChatbotBettingPreferencesWindow
   };
 }
 

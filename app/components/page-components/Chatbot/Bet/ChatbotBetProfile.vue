@@ -2,7 +2,7 @@
   <div class="chatbot-profile__container">
     <div class="chatbot-profile__header">
       <h3>{{ $t(profile.title) }}</h3>
-      <div class="align-items--inline" v-if="!isActive">
+      <div class="align-items--inline" v-if="!isActiveBet">
         <i class="icon-trash padding--5 cursor--pointer" @click="onDeleteProfileHandler"/>
         <i class="fas icon-edit chatbot-edit cursor--pointer" @click="onEditProfileHandler"/>
       </div>
@@ -20,7 +20,7 @@
 
     <div class="chatbot-profile__body">
       <div class="chatbot-profile__content">
-        <ul v-if="!isActive">
+        <ul v-if="!isActiveBet">
           <li
             v-for="(item, index) in profile.options"
             :key="item.name"
@@ -32,20 +32,19 @@
           :key="option.parameter"
           :option="option"
           :thinBars="true"
-          :type="type"
         />
       </div>
       <button
-        v-if="!isActive"
+        v-if="!isActiveBet"
         class="button button--action chatbot-profile__action"
-        @click="onStartHandler"
-        :disabled="isOpen"
-      >{{ $t(type === 'poll' ? 'Start Poll' : 'Start Bet') }}</button>
+        @click="onStartBettingHandler"
+        :disabled="isBettingOpen"
+      >{{ $t('Start Betting') }}</button>
       <button
         v-else
         class="button button--action chatbot-profile__action"
         @click="onViewActiveHandler"
-      >{{ $t(type === 'poll' ? 'View Active Poll': 'View Active Bet') }}</button>
+      >{{ $t('View Active Betting') }}</button>
     </div>
     <ChatbotGenericModalWindow
       :name="DELETE_MODAL"
@@ -57,7 +56,7 @@
   </div>
 </template>
 
-<script lang='ts' src="./ChatbotPollProfile.vue.ts"></script>
+<script lang='ts' src="./ChatbotBetProfile.vue.ts"></script>
 
 <style lang="less" scoped>
 @import '../../../../styles/index';

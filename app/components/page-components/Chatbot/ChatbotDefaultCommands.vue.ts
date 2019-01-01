@@ -12,7 +12,8 @@ type TCommandSlug =
   | 'queue'
   | 'songrequest'
   | 'heist'
-  | 'poll';
+  | 'poll'
+  | 'betting';
 
 @Component({
   components: {
@@ -30,7 +31,8 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     'queue',
     'songrequest',
     'heist',
-    'poll'
+    'poll',
+    'betting'
   ];
 
   get commandSlugs() {

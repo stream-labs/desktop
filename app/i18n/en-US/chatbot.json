@@ -4,5 +4,6 @@
   "Are you sure you want to remove %{name}?": "Are you sure you want to remove %{name}?",
   "Are you sure you want to delete Quote %{number}?": "Are you sure you want to delete Quote %{number}?",
   "{amount} Votes | {percent}": "{amount} Votes | {percent}",
-  "{name} ({command})": "{name} ({command})"
+  "{name} ({command})": "{name} ({command})",
+  "{loyalty} Loyalty | {amount} Bets | {percent}": "{loyalty} Loyalty | {amount} Bets | {percent}"
 }

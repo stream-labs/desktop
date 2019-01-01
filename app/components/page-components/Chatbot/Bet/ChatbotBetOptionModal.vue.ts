@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import { cloneDeep } from 'lodash';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
@@ -7,9 +5,9 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { INumberMetadata, EInputType } from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 
-import { IPollOption } from 'services/chatbot';
+import { IBettingOption } from 'services/chatbot';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import ChatbotWindowsBase from '../windows/ChatbotWindowsBase.vue';
 import { debounce } from 'lodash-decorators';
@@ -24,7 +22,7 @@ import { debounce } from 'lodash-decorators';
     ValidatedForm
   }
 })
-export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
+export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   $refs: {
     modalForm: ValidatedForm;
   };
@@ -35,7 +33,7 @@ export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
       parameter: null
     }
   })
-  option: IPollOption;
+  option: IBettingOption;
 
   @Prop() index: number = -1;
 
@@ -62,41 +60,42 @@ export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
     return this.option && this.option.name;
   }
 
-  get NEW_POLL_OPTION_MODAL_ID() {
-    return 'new-poll-option';
+  get NEW_BETTING_OPTION_MODAL_ID() {
+    return 'new-betting-option';
   }
 
   get baseCommand() {
     return (
-      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings
-        .commands['vote'].command + ' '
+      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings
+        .commands['bet'].command + ' '
     );
   }
 
   @Watch('errors.items.length')
   @debounce(200)
   async onErrorsChanged() {
-    if (this.$refs.modalForm) {
+    if(this.$refs.modalForm){
       await this.$refs.modalForm.validateAndGetErrorsCount();
     }
+
   }
 
   @Watch('option', { immediate: true, deep: true })
   @debounce(1)
-  onOptionChanged(value: IPollOption) {
+  onSymbolProtChanged(value: IBettingOption) {
     if (value && value.parameter) {
       this.option.parameter = value.parameter.replace(/ +/g, '');
     }
   }
 
   onCancelNewItemModalHandler() {
-    this.$modal.hide(this.NEW_POLL_OPTION_MODAL_ID);
+    this.$modal.hide(this.NEW_BETTING_OPTION_MODAL_ID);
   }
 
   async onAddNewItemHandler() {
     if (await this.$refs.modalForm.validateAndGetErrorsCount()) return;
     this.$emit('add', this.option, this.index);
 
-    this.$modal.hide(this.NEW_POLL_OPTION_MODAL_ID);
+    this.$modal.hide(this.NEW_BETTING_OPTION_MODAL_ID);
   }
 }

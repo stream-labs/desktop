@@ -3,30 +3,12 @@
     <span
       class="chatbot-vote__container__name"
     >{{ $t("{name} ({command})",{name:name, command: command}) }}</span>
-    <div class="flex flex--center">
-      <div class="flex--grow">
-        <div class="chatbot-progress__container ">
-          <span :style="{width:percentage}"></span>
-        </div>
-        <div
-          v-if="type === 'poll'"
-          class="text-align--right"
-        >{{ $t("{amount} Votes | {percent}",{amount: amount, percent: percentage}) }}</div>
-        <div
-          v-else
-          class="text-align--right"
-        >{{ $t("{loyalty} Loyalty | {amount} Bets | {percent}",{loyalty: loyalty, amount: amount, percent: percentage}) }}</div>
-      </div>
-      <button
-        v-if="type !== 'poll'"
-        class="button button--action button--winner"
-        @click="onPickWinnerHandler"
-        :disabled="isPicked || !isClosed"
-      >
-        <i class="fa fa-trophy trophy-icon"/>
-        {{ $t('Pick Winner') }}
-      </button>
+    <div class="chatbot-progress__container">
+      <span :style="{width:percentage}"></span>
     </div>
+    <div
+      class="text-align--right"
+    >{{ $t("{amount} Votes | {percent}",{amount: votes, percent: percentage}) }}</div>
   </div>
   <div class="chatbot-vote__container" v-else>
     <div class="flex flex--space-between">
@@ -39,7 +21,7 @@
   </div>
 </template>
 
-<script lang='ts' src="./ChatbotVoteTracker.vue.ts"></script>
+<script lang='ts' src="./ChatbotBetTracker.vue.ts"></script>
 
 <style lang="less" scoped>
 @import '../../../../styles/index';
@@ -47,7 +29,7 @@
   .chatbot-progress__container,
   .chatbot-progress__container-alt {
     background-color: @light-3;
-    height: 32px;
+    height: 25px;
     position: relative;
     .radius();
 
@@ -83,31 +65,12 @@
     }
   }
 }
-.button--winner {
-  margin-bottom: 20px;
-  margin-left: 10px;
-  margin-top: 0px;
-  margin-right: 0px;
-}
 .night-theme {
   .chatbot-progress__container {
     background-color: @dark-4;
   }
   .chatbot-progress__container-alt {
     background-color: @dark-5;
-  }
-
-  .trophy-icon {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    transition: none !important;
-    color: inherit;
-    transition-delay: 0s;
-
-    &:hover {
-      color: @white;
-    }
   }
 }
 </style>

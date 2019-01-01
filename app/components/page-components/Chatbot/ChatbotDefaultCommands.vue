@@ -5,15 +5,13 @@
       <button
         @click="onResetDefaultCommandsHandler"
         class="chatbot__button--reset button button--default margin--10"
-      >
-        {{ $t('Reset Commands') }}
-      </button>
+      >{{ $t('Reset Commands') }}</button>
       <input
         v-model="searchQuery"
         type="text"
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
-      />
+      >
     </div>
 
     <!-- slugs -->
@@ -28,9 +26,9 @@
       <table>
         <thead>
           <tr>
-            <th> {{ $t('Command') }} </th>
-            <th> {{ $t('Description') }} </th>
-            <th> {{ $t('Static Permission') }} </th>
+            <th>{{ $t('Command') }}</th>
+            <th>{{ $t('Description') }}</th>
+            <th>{{ $t('Permission') }}</th>
             <th></th>
           </tr>
         </thead>
@@ -40,9 +38,12 @@
             :key="index"
             v-if="matchesQuery(commandName, command)"
           >
-            <td> {{ command.command }} </td>
-            <td> {{ $t(command.description) }} </td>
-            <td> {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) : '-' }} </td>
+            <td>{{ command.command }}</td>
+            <td>{{ $t(command.description) }}</td>
+            <td>
+              {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) :
+              (command.permission ?$t(chatbotPermissionsEnums[command.permission.level]) : '-') }}
+            </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput
@@ -66,17 +67,17 @@
 <script lang='ts' src="./ChatbotDefaultCommands.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
-table{
-  table-layout:fixed;
+@import '../../../styles/index';
+table {
+  table-layout: fixed;
   width: 100%;
 
-  tr {   
+  tr {
     th:first-child,
     td:first-child {
-      white-space: nowrap;      /*keep text on one line */
-      overflow: hidden;         /*prevent text from being shown outside the border */
-      text-overflow: ellipsis;  /*cut off text with an ellipsis*/
+      white-space: nowrap; /*keep text on one line */
+      overflow: hidden; /*prevent text from being shown outside the border */
+      text-overflow: ellipsis; /*cut off text with an ellipsis*/
       width: 150px;
     }
 
@@ -100,13 +101,9 @@ table{
       }
     }
   }
-
 }
 
-
-
 .night-theme {
-
   tbody tr {
     border: 2px solid transparent;
     .transition();

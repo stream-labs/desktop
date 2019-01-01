@@ -11,7 +11,8 @@ import {
   IChatbotTimer,
   IQuote,
   IChatbotLoyalty,
-  IPollProfile
+  IPollProfile,
+  IBettingProfile
 } from './chatbot-interfaces';
 
 export class ChatbotCommonService extends PersistentStatefulService<
@@ -27,7 +28,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
     quoteToUpdate: null,
     modBannerVisible: true,
     loyaltyToUpdate: null,
-    pollProfileToUpdate: null
+    pollProfileToUpdate: null,
+    bettingProfileToUpdate: null
   };
 
   hideModBanner() {
@@ -52,7 +54,6 @@ export class ChatbotCommonService extends PersistentStatefulService<
   }
 
   openCustomCommandWindow(command?: ICustomCommand) {
-    console.log(command);
     if (command) {
       this.SET_CUSTOM_COMAND_TO_UPDATE(command);
     }
@@ -225,10 +226,36 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
+  openBettingProfileWindow(profile?: IBettingProfile) {
+    if (profile) {
+      this.SET_BETTING_PROFILE_TO_UPDATE(profile);
+    }
+
+    this.windowsService.showWindow({
+      componentName: 'ChatbotBettingProfileWindow',
+      title: $t('Chatbot Profile'),
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
   openPollPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotPollPreferencesWindow',
       title: $t('Chatbot Poll Preferences'),
+      size: {
+        width: 650,
+        height: 600
+      }
+    });
+  }
+
+  openBettingPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotBettingPreferencesWindow',
+      title: $t('Chatbot Betting Preferences'),
       size: {
         width: 650,
         height: 600
@@ -318,5 +345,10 @@ export class ChatbotCommonService extends PersistentStatefulService<
   @mutation()
   private SET_POLL_PROFILE_TO_UPDATE(profile: IPollProfile) {
     Vue.set(this.state, 'pollProfileToUpdate', profile);
+  }
+
+  @mutation()
+  private SET_BETTING_PROFILE_TO_UPDATE(profile: IBettingProfile){
+    Vue.set(this.state, 'bettingProfileToUpdate', profile);
   }
 }

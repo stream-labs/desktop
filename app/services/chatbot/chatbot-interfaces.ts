@@ -9,6 +9,7 @@ export interface IChatbotCommonServiceState {
   modBannerVisible: boolean;
   loyaltyToUpdate: IChatbotLoyalty;
   pollProfileToUpdate: IPollProfile;
+  bettingProfileToUpdate: IBettingProfile;
 }
 
 // responses
@@ -109,10 +110,24 @@ export interface IPollPreferencesResponse {
   enabled: boolean;
 }
 
+export interface IBettingPreferencesResponse {
+  settings: IBettingPreferencesData;
+  enabled: boolean;
+}
+
 export interface IActivePollResponse {
   id?: number;
   user_id: number;
   settings: IPollProfile;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface IActiveBettingResponse {
+  id?: number;
+  user_id: number;
+  settings: IBettingProfile;
   status: string;
   created_at?: string;
   updated_at?: string;
@@ -126,6 +141,11 @@ export interface ILoyaltyPreferencesResponse {
 export interface IHeistPreferencesResponse {
   settings: IHeistPreferencesData;
   enabled: boolean;
+}
+
+export interface IImporterStatusResponse{
+  extension: string;
+  streamelements: string;
 }
 
 export interface IPollPreferencesResonse {
@@ -648,6 +668,66 @@ export interface IPollCommand {
   aliases: IChatbotAliases;
   permission: IChatbotPermission;
 }
+//  betting
+export interface IBettingProfile {
+  id?: string;
+  title: string;
+  timer: {
+    enabled: boolean;
+    duration: number;
+    job_id?: string;
+    started_at?: number;
+    time_remaining?: number;
+  };
+  loyalty: {
+    min: number;
+    max: number;
+  };
+  options: IBettingOption[];
+  send_notification: boolean;
+}
+
+export interface IBettingOption {
+  name: string;
+  parameter: string;
+  bets?: number;
+  loyalty?: number;
+}
+
+export interface IBettingGeneral {
+  repeat_active: {
+    enabled: boolean;
+    chat_lines: number;
+    message: string;
+  };
+}
+
+export interface IBettingMessages {
+  open: string;
+  close: string;
+  cancel: string;
+  win: string;
+}
+
+export interface IBettingPreferencesData {
+  commands: IBettingCommands;
+  profiles: IBettingProfile[];
+  general: IBettingGeneral;
+  messages: IBettingMessages;
+}
+
+export interface IBettingCommands {
+  [id: string]: IBettingCommand;
+}
+
+export interface IBettingCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IChatbotAliases;
+  permission: IChatbotPermission;
+}
 
 // dictionaries
 export enum ChatbotAutopermitEnums {
@@ -686,7 +766,7 @@ export type ChatbotAlertType =
   | 'sponsor'
   | 'superchat';
 
-export type ChatbotSocketRoom = 'queue' | 'giveaway' | 'poll';
+export type ChatbotSocketRoom = 'queue' | 'giveaway' | 'poll' | 'betting';
 
 export const ChatbotClients = ['Twitch', 'Mixer', 'Youtube'];
 
@@ -697,13 +777,13 @@ export type ChatbotSettingSlug =
   | 'link-protection'
   | 'words-protection'
   | 'heist'
-  | 'poll';
+  | 'poll'
+  | 'betting';
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
 export const NEW_LINK_PROTECTION_LIST_MODAL_ID = 'new-link-protection-list';
 export const NEW_WORD_PROTECTION_LIST_MODAL_ID = 'new-word-protection-list';
-export const NEW_POLL_OPTION_MODAL_ID = 'new-poll-option';
 
 // modals
 export const DELETE_COMMAND_MODAL = 'delete-command';

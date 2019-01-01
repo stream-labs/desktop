@@ -8,65 +8,59 @@
       <div>
         <button
           class="button button--default margin--10"
-          @click="onCancelHandler"
-          v-if="isCancelable"
-        >{{ $t('Cancel') }}</button>
-        <button
-          class="button button--default margin--10"
           @click="onCompleteHandler"
-          v-else
-          :disabled="isOpen"
+          v-if="hasAnyVotes"
+          :disabled="isBettingOpen"
         >{{ $t('Complete') }}</button>
         <button
-          class="button button--action margin--10"
-          @click="onToggleStateHandler"
-          v-if="isOpen"
-        >{{ $t(type === 'poll' ? 'Close Poll': 'Close Betting') }}</button>
+          class="button button--default margin--10"
+          @click="onCancelHandler"
+          v-if="!hasAnyVotes"
+        >{{ $t('Cancel') }}</button>
         <button
           class="button button--action margin--10"
           @click="onToggleStateHandler"
-          :disabled="isPicked"
+          v-if="isBettingOpen"
+        >{{ $t('Close Betting') }}</button>
+        <button
+          class="button button--action margin--10"
+          @click="onToggleStateHandler"
           v-else
-        >{{ $t(type === 'poll' ? 'Open Poll' : 'Open Betting') }}</button>
+        >{{ $t('Open Betting') }}</button>
       </div>
     </div>
     <div class="header__container">
-      <h1>{{active.settings.title}}</h1>
+      <h1>{{activeBet.settings.title}}</h1>
       <div class="flex flex--space-between padding--10">
-        <div v-if="type !=='poll'" class="margin-horizontal--10">
-          <div class="header__container__text">{{ loyalty }}</div>
-          <div class="header__container__title">{{ $t('Loyalty Pot') }}</div>
-        </div>
         <div class="margin-horizontal--10">
           <div class="header__container__text">{{ total }}</div>
-          <div class="header__container__title">{{ $t(type ==='poll' ? 'Votes' : 'Bets') }}</div>
+          <div class="header__container__title">{{ $t('Votes') }}</div>
         </div>
         <div class="margin-horizontal--10">
           <div class="header__container__text">{{ $t(timeRemaining) }}</div>
           <div
             class="header__container__title"
-          >{{ $t(active.settings.timer.enabled ? 'Time Left' : 'Time Elapsed') }}</div>
+          >{{ $t(activeBet.settings.timer.enabled ? 'Time Left' : 'Time Elapsed') }}</div>
         </div>
       </div>
     </div>
     <div class="options__container">
       <ChatbotVoteTracker
-        v-for="(option) in active.settings.options"
+        v-for="(option) in activeBet.settings.options"
         :key="option.parameter"
         :option="option"
-        :type="type"
       />
     </div>
     <ChatbotGenericModalWindow
       :name="CANCEL_MODAL"
       @yes="onYesCancelHandler"
       @no="onNoCancelHandler"
-      :header="$t('Are you sure you want to cancel your poll?')"
+      :header="$t('Are you sure you want to cancel your bet?')"
     />
   </div>
 </template>
 
-<script lang='ts' src="./ChatbotActivePoll.vue.ts"></script>
+<script lang='ts' src="./ChatbotActiveBet.vue.ts"></script>
 
 <style lang="less" scoped>
 @import '../../../../styles/index';

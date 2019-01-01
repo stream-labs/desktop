@@ -68,7 +68,9 @@ import {
   ChatbotQuotesApiService,
   ChatbotSongRequestApiService,
   ChatbotLoyaltyApiService,
-  ChatbotHeistApiService
+  ChatbotHeistApiService,
+  ChatbotBettingApiService,
+  ChatbotImporterApiService
 } from 'services/chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
@@ -210,6 +212,8 @@ export class ServicesManager extends Service {
     ChatbotLoyaltyApiService,
     ChatbotHeistApiService,
     ChatbotPollApiService,
+    ChatbotBettingApiService,
+    ChatbotImporterApiService,
     StreamBossService,
     DonationTickerService,
     CreditsService,

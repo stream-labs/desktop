@@ -34,14 +34,15 @@ export default class ChatbotPoll extends ChatbotBase {
     this.chatbotApiService.Common.openPollProfileWindow(profile);
   }
 
-  onOpenPollPreferencesHandler(){
+  onOpenPollPreferencesHandler() {
     this.chatbotApiService.Common.openPollPreferencesWindow();
   }
 
   get isPollActive() {
     return (
       this.chatbotApiService.Poll.state.activePollResponse &&
-      this.chatbotApiService.Poll.state.activePollResponse.id
+      this.chatbotApiService.Poll.state.activePollResponse.id &&
+      this.chatbotApiService.Poll.state.activeView === 'active'
     );
   }
 }

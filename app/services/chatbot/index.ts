@@ -12,3 +12,5 @@ export * from './chatbot-loyalty';
 export * from './chatbot';
 export * from './chatbot-heist';
 export * from './chatbot-poll';
+export * from './chatbot-betting';
+export * from './chatbot-importer';

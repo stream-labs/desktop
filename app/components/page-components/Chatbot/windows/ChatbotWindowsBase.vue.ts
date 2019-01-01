@@ -105,6 +105,27 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
+  onToggleBettingPreferencesWindowHandler() {
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotApiService.Common.openBettingPreferencesWindow();
+        break;
+      case 'ChatbotBettingPreferencesWindow':
+        const betCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['betting'].bet;
+
+        this.chatbotApiService.Common.openDefaultCommandWindow({
+          ...betCommand,
+          slugName: 'betting',
+          commandName: 'bet'
+        });
+        break;
+    }
+  }  
+
   onToggleQuoteWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;

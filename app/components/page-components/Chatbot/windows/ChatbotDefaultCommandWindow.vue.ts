@@ -94,6 +94,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     );
   }
 
+  get isBetCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'betting' &&
+      this.defaultCommandToUpdate.commandName === 'bet'
+    );
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }
@@ -120,6 +127,18 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         ),
         max: 450,
         uuid: $t('Response')
+      }),
+      replyType: metadataHelper.list({
+        required: true,
+        title: $t('Reply In'),
+        type: EInputType.list,
+        options: this.chatbotResponseTypes
+      }),
+      permission: metadataHelper.numberList({
+        required: true,
+        title: $t('Permission'),
+        type: EInputType.list,
+        options: this.chatbotPermissions
       }),
       new_alias: metadataHelper.text({
         required: true,
@@ -244,8 +263,11 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
       this.editedCommand.command = value.command.replace(/ +/g, '');
 
       for (const key in this.editedCommand) {
-        if (this.editedCommand.hasOwnProperty(key) && key.includes('response')) {
-          this.editedCommand[key] =  value[key].replace(/(\r\n|\r|\n)/g, '');
+        if (
+          this.editedCommand.hasOwnProperty(key) &&
+          key.includes('response')
+        ) {
+          this.editedCommand[key] = value[key].replace(/(\r\n|\r|\n)/g, '');
         }
       }
     }
@@ -253,10 +275,9 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
-
 
   // methods
   onSelectTabHandler(tab: string) {
