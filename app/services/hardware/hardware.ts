@@ -16,7 +16,7 @@ export interface IDevice {
 
 export interface IHardwareServiceState {
   devices: IDevice[];
-  dshowDevices: IDevice[];
+  dshowDevices: IDevice[]; // dhow_input operates with the different devices list
 }
 
 export class HardwareService extends StatefulService<IHardwareServiceState> {
@@ -30,12 +30,9 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
   }
 
   getDevices() {
-    return this.state.devices.concat(this.state.dshowDevices);
+    return this.state.devices;
   }
 
-  getDevice(id: string) {
-    return this.getDevices().find(device => device.id === id);
-  }
 
   getDeviceByName(name: string) {
     return this.state.devices.find(device => device.description === name);
