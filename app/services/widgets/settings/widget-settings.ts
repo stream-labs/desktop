@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { HostsService } from 'services/hosts';
 import { Inject } from '../../../util/injector';
 import { UserService } from 'services/user';
-import { handleErrors, authorizedHeaders } from '../../../util/requests';
+import { handleResponse, authorizedHeaders } from '../../../util/requests';
 import {
   IWidgetApiSettings,
   IWidgetData,
@@ -156,9 +156,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return fetch(request).then(handleResponse);
   }
 
   protected getHost(): string {

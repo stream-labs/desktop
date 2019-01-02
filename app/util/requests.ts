@@ -9,9 +9,9 @@ import fs from 'fs';
  * this is NOT the default behavior of the fetch API, so we have to
  * handle it explicitly.
  */
-export function handleErrors(response: Response): Promise<Response> {
-  if (response.ok) return Promise.resolve(response);
-  return Promise.reject(response);
+export const handleResponse = (response: Response): Promise<any> => {
+  if (response.ok) return response.json();
+  return response.json().then(json => Promise.reject(json));
 }
 
 export function requiresToken() {
@@ -47,7 +47,7 @@ export function authorizedHeaders(token: string, headers = new Headers()): Heade
 export async function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     return fetch(srcUrl)
-      .then(handleErrors)
+      .then(resp => (resp.ok ? Promise.resolve(resp) : Promise.reject(resp)))
       .then(({ body }: { body: ReadableStream }) => {
         const reader = body.getReader();
         let result = new Uint8Array(0);

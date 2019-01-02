@@ -7,7 +7,7 @@ import { ISource } from 'services/sources/sources-api';
 import { Source } from 'services/sources/source';
 import { SourceFiltersService } from './source-filters';
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
 import * as obs from '../../obs-api';
 import path from 'path';
@@ -304,35 +304,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   fetchFacemaskSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.formRequest('slobs/facemasks/settings');
   }
 
-  fetchInstallUpdate(uuid: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
-    const request = new Request(url, {});
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+  fetchInstallUpdate(uuid:string) {
+    return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
   fetchProfanityFilterSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/widget/settings?widget=donation_page`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.formRequest('slobs/widget/settings?widget=donation_page');
   }
 
   setupFilter() {
@@ -552,5 +532,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   private libraryUrl(uuid: string) {
     return `${this.cdn}${uuid}.json`;
+  }
+
+  private formRequest(endpoint: string) {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/${endpoint}`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request).then(handleResponse);
   }
 }

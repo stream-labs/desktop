@@ -3,7 +3,7 @@ import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
-import { handleErrors, requiresToken, authorizedHeaders } from 'util/requests';
+import { handleResponse, requiresToken, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 
 export class TwitchService extends Service implements IPlatformService {
@@ -76,8 +76,7 @@ export class TwitchService extends Service implements IPlatformService {
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
@@ -86,9 +85,7 @@ export class TwitchService extends Service implements IPlatformService {
     const headers = this.getHeaders(true);
     const request = new Request('https://api.twitch.tv/kraken/channel', { headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return fetch(request).then(handleResponse)
   }
 
   fetchStreamKey(): Promise<string> {
@@ -112,15 +109,8 @@ export class TwitchService extends Service implements IPlatformService {
     });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => {
-        if (json[0] && json[0].login) {
-          return { username: json[0].login as string };
-        }
-
-        return {};
-      });
+      .then(handleResponse)
+      .then(json => (json[0] && json[0].login) ? { username: (json[0].login as string) } : {});
   }
 
   fetchViewerCount(): Promise<number> {
@@ -130,8 +120,7 @@ export class TwitchService extends Service implements IPlatformService {
     });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => (json.stream ? json.stream.viewers : 0));
   }
 
@@ -145,9 +134,7 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(() => true);
+    return fetch(request).then(handleResponse).then(() => true);
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
@@ -156,10 +143,7 @@ export class TwitchService extends Service implements IPlatformService {
       headers,
     });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.games);
+    return fetch(request).then(handleResponse).then(json => json.games);
   }
 
   getChatUrl(mode: string) {
@@ -191,10 +175,7 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => json.results[0].hits);
+    return fetch(request).then(handleResponse).then(json => json.results[0].hits);
   }
 
   beforeGoLive() {

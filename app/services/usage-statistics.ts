@@ -5,7 +5,7 @@ import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
-import { authorizedHeaders, handleErrors } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { Throttle } from 'lodash-decorators';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
@@ -147,9 +147,9 @@ export class UsageStatisticsService extends Service {
       {
         method: 'post',
         headers: authorizedHeaders(this.userService.apiToken),
-        body: JSON.stringify(data || {}),
-      },
+        body: JSON.stringify(data || {})
+      }
     );
-    fetch(request).then(handleErrors);
+    fetch(request).then(handleResponse);
   }
 }
