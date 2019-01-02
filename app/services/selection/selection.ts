@@ -392,6 +392,7 @@ export class Selection implements ISelection {
     let insertedNode: TSceneNode;
 
     const sourcesMap: Dictionary<Source> = {};
+    // TODO: we're updating this, but we don't seem to ever use it
     const notDuplicatedSources: Source[] = [];
     if (duplicateSources) {
       this.getSources().forEach(source => {
@@ -516,6 +517,7 @@ export class Selection implements ISelection {
   }
 
   getSources(): Source[] {
+    // TODO: we're never updating sourceIds, the condition below will always fail
     const sourcesIds: string[] = [];
     const sources: Source[] = [];
     this.getItems().forEach(item => {
