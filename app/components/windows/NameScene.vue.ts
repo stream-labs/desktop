@@ -47,7 +47,6 @@ export default class NameScene extends Vue {
       name = 'New Scene';
     }
     if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
-
   }
 
   submit() {
