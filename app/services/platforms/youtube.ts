@@ -102,7 +102,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(resp => resp.status === 403 ? this.handleForbidden(resp) : handleResponse(resp))
+      .then(resp => (resp.status === 403 ? this.handleForbidden(resp) : handleResponse(resp)))
       .then(() => this.SET_ENABLED_STATUS(true));
   }
 
@@ -121,7 +121,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   handleForbidden(response: Response): void {
-    response.json().then((json:any) => {
+    response.json().then((json: any) => {
       if (
         json.error &&
         json.error.errors &&
@@ -159,7 +159,11 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     return fetch(request)
       .then(handleResponse)
-      .then(json => { if (json.items.length) { this.SET_STREAM_ID(json.items[0].id); } });
+      .then(json => {
+        if (json.items.length) {
+          this.SET_STREAM_ID(json.items[0].id);
+        }
+      });
   }
 
   @requiresToken()
@@ -203,9 +207,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     headers.append('Content-Type', 'application/json');
     const body = JSON.stringify({
       snippet: { scheduledStartTime, title, description },
-      status: { privacyStatus: 'public' }
+      status: { privacyStatus: 'public' },
     });
-    const req = new Request(url, { method: 'POST', headers, body });
+    const req = new Request(url, { headers, body, method: 'POST' });
     return fetch(req).then(handleResponse);
   }
 
@@ -249,8 +253,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
           body,
         });
 
-      return fetch(request).then(handleResponse).then(() => true);
-    });
+        return fetch(request)
+          .then(handleResponse)
+          .then(() => true);
+      });
   }
 
   searchGames(searchString: string) {

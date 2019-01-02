@@ -273,7 +273,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request).then(handleResponse).catch(() => null);
+    return fetch(request)
+      .then(handleResponse)
+      .catch(() => null);
   }
 
   postFacebookPage(pageId: string) {

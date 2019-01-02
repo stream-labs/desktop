@@ -139,7 +139,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const headers = this.getHeaders();
     const request = new Request(`${this.apiBase}channels/${this.mixerUsername}`, { headers });
 
-    return fetch(request).then(handleResponse).then(json => json.viewersCurrent);
+    return fetch(request)
+      .then(handleResponse)
+      .then(json => json.viewersCurrent);
   }
 
   @requiresToken()

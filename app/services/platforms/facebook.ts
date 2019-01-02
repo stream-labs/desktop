@@ -110,7 +110,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     const request = this.formRequest(`${this.apiBase}/me/accounts`);
     return fetch(request)
       .then(handleResponse)
-      .then(async (json) => {
+      .then(async json => {
         let pageId = this.userService.platform.channelId;
         if (!pageId) {
           const pages = await this.userService.getFacebookPages();
@@ -212,7 +212,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   fetchViewerCount(): Promise<number> {
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const request = this.formRequest(url, {}, this.activeToken);
-    return fetch(request).then(handleResponse).then(json => json.live_views);
+    return fetch(request)
+      .then(handleResponse)
+      .then(json => json.live_views);
   }
 
   fbGoLive() {
@@ -238,7 +240,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         method: 'POST',
         body: JSON.stringify(data),
       });
-      return fetch(request).then(handleResponse).then(() => true);
+      return fetch(request)
+        .then(handleResponse)
+        .then(() => true);
     }
     return Promise.resolve(true);
   }
@@ -248,8 +252,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     if (searchString.length < 2) return;
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`;
     const headers = this.getHeaders();
-    const request = new Request(url, { method: 'GET', headers });
-    return fetch(request).then(handleResponse).then((json: any) => json.data);
+    const request = new Request(url, { headers, method: 'GET' });
+    return fetch(request)
+      .then(handleResponse)
+      .then((json: any) => json.data);
   }
 
   getChatUrl(): Promise<string> {
