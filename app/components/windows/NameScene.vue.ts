@@ -41,14 +41,12 @@ export default class NameScene extends Vue {
       this.name = name;
     } else if (this.options.sceneToDuplicate) {
       name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
-      this.name = this.sourcesService.suggestName(name);
     } else if (this.options.itemsToGroup) {
       name = `${this.scenesService.activeScene.name} Group`;
-      this.name = this.sourcesService.suggestName(name);
     } else {
       name = 'New Scene';
-      this.name = this.sourcesService.suggestName(name);
     }
+    if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
 
   }
 
