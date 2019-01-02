@@ -4,11 +4,10 @@ import { ICustomCommand } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
-
 @Component({
   components: {
-    ChatbotPagination
-  }
+    ChatbotPagination,
+  },
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
@@ -18,8 +17,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination
-      .current;
+    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
   }
 
   get totalPages() {
@@ -48,16 +46,12 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService.deleteCustomCommand(command.id);
   }
 
-  onToggleEnableCommandHandler(
-    commandId: string,
-    index: number,
-    isEnabled: boolean
-  ) {
+  onToggleEnableCommandHandler(commandId: string, index: number, isEnabled: boolean) {
     const commandToBeUpdated = this.commands[index];
 
     this.chatbotApiService.updateCustomCommand(commandId, {
       ...commandToBeUpdated,
-      enabled: isEnabled
+      enabled: isEnabled,
     });
   }
 }

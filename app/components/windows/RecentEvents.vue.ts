@@ -6,14 +6,14 @@ import { UserService } from 'services/user';
 import { I18nService } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class RecentEvents extends Vue {
   @Inject() userService: UserService;
   @Inject() i18nService: I18nService;
 
   $refs: {
-    webview: Electron.WebviewTag
+    webview: Electron.WebviewTag;
   };
 
   mounted() {

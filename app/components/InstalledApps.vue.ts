@@ -13,9 +13,7 @@ export default class InstalledApps extends Vue {
   }
 
   get enabledInstalledAppIds(): string[] {
-    return this.installedApps
-      .filter(app => app.enabled)
-      .map(app => app.id);
+    return this.installedApps.filter(app => app.enabled).map(app => app.id);
   }
 
   isEnabled(appId: string) {

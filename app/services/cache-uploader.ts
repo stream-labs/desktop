@@ -10,7 +10,6 @@ import archiver from 'archiver';
 import AWS from 'aws-sdk';
 
 export class CacheUploaderService extends Service {
-
   @Inject()
   userService: UserService;
 
@@ -21,7 +20,7 @@ export class CacheUploaderService extends Service {
   uploadCache(): Promise<string> {
     return new Promise(resolve => {
       const cacheDir = this.cacheDir;
-      const dateStr = (new Date()).toISOString();
+      const dateStr = new Date().toISOString();
       const username = this.userService.username;
       const keyname = `${compact([dateStr, username]).join('-')}.zip`;
       const cacheFile = path.join(os.tmpdir(), 'slobs-cache.zip');
@@ -36,16 +35,15 @@ export class CacheUploaderService extends Service {
         // This is a restricted cache upload account
         AWS.config.credentials = new AWS.Credentials({
           accessKeyId: 'AKIAIAINC32O7I3KUJGQ',
-          secretAccessKey: '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'
+          secretAccessKey: '9DGGUNxN1h4BKZN4hkJQNjGxD+sC8oyoNaSyyQUj',
         });
-
 
         const upload = new AWS.S3.ManagedUpload({
           params: {
             Bucket: 'streamlabs-obs-user-cache',
             Key: keyname,
-            Body: file
-          }
+            Body: file,
+          },
         });
 
         upload.promise().then(() => {
@@ -58,6 +56,7 @@ export class CacheUploaderService extends Service {
       this.addDirIfExists(archive, 'SceneConfigs');
       this.addDirIfExists(archive, 'SceneCollections');
       this.addDirIfExists(archive, 'Streamlabels');
+      this.addFileIfExists(archive, 'log.log');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
       archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
@@ -68,7 +67,7 @@ export class CacheUploaderService extends Service {
     });
   }
 
-  addDirIfExists(archive: archiver.Archiver, name: string) {
+  private addDirIfExists(archive: archiver.Archiver, name: string) {
     const dirPath = path.join(this.cacheDir, name);
 
     if (fs.existsSync(dirPath)) {
@@ -76,4 +75,11 @@ export class CacheUploaderService extends Service {
     }
   }
 
+  private addFileIfExists(archive: archiver.Archiver, name: string) {
+    const dirPath = path.join(this.cacheDir, name);
+
+    if (fs.existsSync(dirPath)) {
+      archive.file(dirPath, { name });
+    }
+  }
 }

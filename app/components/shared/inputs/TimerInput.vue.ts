@@ -4,7 +4,6 @@ import { ITimerMetadata } from './index';
 
 @Component({})
 export default class TimerInput extends BaseInput<number, ITimerMetadata> {
-
   @Prop() value: number;
   @Prop() metadata: ITimerMetadata;
 
@@ -30,16 +29,16 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   get seconds() {
     return this.generateTime(60);
- }
+  }
 
-  hideTimerDropdown(){
+  hideTimerDropdown() {
     this.showTimerDropdown = false;
   }
 
-  generateTime(time: number){
+  generateTime(time: number) {
     const times: string[] = [];
 
-    for(let num = 0; num < time; num++) {
+    for (let num = 0; num < time; num++) {
       const fill = num > 9 ? '' : '0';
       times.push(fill + num);
     }
@@ -49,17 +48,17 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   isActiveHour(hour: number) {
     const currentHour = Math.floor(this.value / 3600);
-    return (hour == currentHour);
+    return hour === currentHour;
   }
 
   isActiveMinute(minute: number) {
     const currentMinute = Math.floor((this.value % 3600) / 60);
-    return (minute == currentMinute);
+    return minute === currentMinute;
   }
 
   isActiveSecond(second: number) {
-    const currentSecond = Math.floor(((this.value % 3600) % 60) /60);
-    return second == currentSecond;
+    const currentSecond = Math.floor(((this.value % 3600) % 60) / 60);
+    return second === currentSecond;
   }
 
   setHour(val: number) {
@@ -76,7 +75,7 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   setSecond(val: number) {
     const currentMinsInSecs = Math.floor((this.value % 3600) / 60) * 60;
-    this.updateValue(currentMinsInSecs + (val * 1));
+    this.updateValue(currentMinsInSecs + val * 1);
   }
 
   updateValue(value: number) {
@@ -99,19 +98,20 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   }
 
   increment(unitInSeconds: number) {
-    let val = this.value + unitInSeconds <= this.max ? this.value + unitInSeconds : this.max;
+    const val = this.value + unitInSeconds <= this.max ? this.value + unitInSeconds : this.max;
     this.updateValue(val);
   }
 
   decrement(unitInSeconds: number) {
     const bot = this.min >= 0 && this.min < this.max ? this.min : 0;
-    let val = this.value - unitInSeconds >= bot ? this.value - unitInSeconds : bot;
+    const val = this.value - unitInSeconds >= bot ? this.value - unitInSeconds : bot;
     this.updateValue(val);
   }
 
   beginHold(callback: Function, param: any) {
     callback(param);
     this.holdTimeout = window.setTimeout(() => {
+      // tslint:disable-next-line:ter-prefer-arrow-callback TODO
       this.holdInterval = window.setInterval(function() {
         callback(param);
       }, 100);
@@ -119,11 +119,11 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   }
 
   releaseHold() {
-    if(this.holdTimeout !== null) {
+    if (this.holdTimeout !== null) {
       clearTimeout(this.holdTimeout);
       this.holdTimeout = null;
     }
-    if(this.holdInterval !== null) {
+    if (this.holdInterval !== null) {
       clearInterval(this.holdInterval);
       this.holdInterval = null;
     }

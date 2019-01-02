@@ -30,7 +30,7 @@ export class TransitionNode extends Node<ISchema, IContext> {
 
     const filePath = settings.path as string;
 
-    if ((type === 'obs_stinger_transition') && filePath) {
+    if (type === 'obs_stinger_transition' && filePath) {
       const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
 
       const destination = path.join(context.assetsPath, newFileName);
@@ -60,13 +60,9 @@ export class TransitionNode extends Node<ISchema, IContext> {
       this.data.settings.path = filePath;
     }
 
-    this.transitionsService.createTransition(
-      this.data.type,
-      'Global Transition',
-      {
-        settings: this.data.settings,
-        duration: this.data.duration
-      }
-    );
+    this.transitionsService.createTransition(this.data.type, 'Global Transition', {
+      settings: this.data.settings,
+      duration: this.data.duration,
+    });
   }
 }

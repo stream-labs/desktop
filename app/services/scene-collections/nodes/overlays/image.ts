@@ -25,7 +25,7 @@ export class ImageNode extends Node<ISchema, IContext> {
     fs.writeFileSync(destination, fs.readFileSync(filePath));
 
     this.data = {
-      filename: newFileName
+      filename: newFileName,
     };
   }
 

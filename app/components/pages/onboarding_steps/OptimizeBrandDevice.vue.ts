@@ -4,10 +4,8 @@ import { Inject } from '../../../util/injector';
 import { OnboardingService } from 'services/onboarding';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 
-
 @Component({})
 export default class OptimizeBrandDevice extends Vue {
-
   @Inject() private onboardingService: OnboardingService;
   @Inject() private brandDeviceService: BrandDeviceService;
 
@@ -54,5 +52,4 @@ export default class OptimizeBrandDevice extends Vue {
   skip() {
     this.onboardingService.skip();
   }
-
 }

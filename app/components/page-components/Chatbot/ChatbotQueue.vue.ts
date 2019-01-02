@@ -6,8 +6,8 @@ import ChatbotQueueList from 'components/page-components/Chatbot/Queue/ChatbotQu
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotQueueList
-  }
+    ChatbotQueueList,
+  },
 })
 export default class ChatbotQueue extends ChatbotBase {
   queueTitle = 'The Current Game';
