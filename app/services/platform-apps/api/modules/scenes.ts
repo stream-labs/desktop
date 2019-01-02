@@ -85,6 +85,20 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
+  getScene(_ctx: IApiContext, id: string): IScene | null {
+    const scene = this.scenesService.getScene(id);
+
+    return scene ? this.serializeScene(scene) : null;
+  }
+
+  @apiMethod()
+  getSceneItem(_ctx: IApiContext, id: string): ISceneItem | ISceneItemFolder | null {
+    const sceneItem = this.scenesService.getSceneItem(id);
+
+    return sceneItem ? this.serializeNode(sceneItem) : null;
+  }
+
+  @apiMethod()
   getActiveScene() {
     return this.serializeScene(this.scenesService.activeScene);
   }
