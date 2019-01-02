@@ -43,8 +43,7 @@ export abstract class BaseGoalService<
       url: apiSettings.goalUrl,
       method: 'POST',
       body: options,
-    })
-    .then(handleResponse);
+    }).then(handleResponse);
   }
 
   async resetGoal() {

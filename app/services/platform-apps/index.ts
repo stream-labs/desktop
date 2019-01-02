@@ -188,7 +188,9 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       headers,
     });
 
-    return fetch(request).then(handleResponse).catch(() => []);
+    return fetch(request)
+      .then(handleResponse)
+      .catch(() => []);
   }
 
   getDisabledAppsFromStorage(): string[] {

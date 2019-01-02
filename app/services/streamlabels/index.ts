@@ -213,7 +213,9 @@ export class StreamlabelsService extends Service {
       body: JSON.stringify(this.settings),
     });
 
-    return fetch(request).then(handleResponse).then(() => true);
+    return fetch(request)
+      .then(handleResponse)
+      .then(() => true);
   }
 
   restartSession(): Promise<Boolean> {
@@ -225,7 +227,9 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request).then(handleResponse).then(() => true);
+    return fetch(request)
+      .then(handleResponse)
+      .then(() => true);
   }
 
   private log(message: string, ...args: any[]) {
