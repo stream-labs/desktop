@@ -12,7 +12,7 @@ import fs from 'fs';
 export const handleResponse = (response: Response): Promise<any> => {
   if (response.ok) return response.json();
   return response.json().then(json => Promise.reject(json));
-}
+};
 
 export function requiresToken() {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {

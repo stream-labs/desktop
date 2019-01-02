@@ -147,8 +147,8 @@ export class UsageStatisticsService extends Service {
       {
         method: 'post',
         headers: authorizedHeaders(this.userService.apiToken),
-        body: JSON.stringify(data || {})
-      }
+        body: JSON.stringify(data || {}),
+      },
     );
     fetch(request).then(handleResponse);
   }

@@ -307,7 +307,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest('slobs/facemasks/settings');
   }
 
-  fetchInstallUpdate(uuid:string) {
+  fetchInstallUpdate(uuid: string) {
     return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
