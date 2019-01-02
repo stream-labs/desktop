@@ -13,11 +13,10 @@ import { Debounce } from 'lodash-decorators';
     SceneSelector,
     SourceSelector,
     ResizeBar,
-    Mixer
-  }
+    Mixer,
+  },
 })
 export default class StudioControls extends Vue {
-
   @Inject() customizationService: CustomizationService;
 
   get height() {
@@ -25,7 +24,7 @@ export default class StudioControls extends Vue {
   }
 
   set height(value) {
-    this.customizationService.setSettings({ bottomdockSize: value})
+    this.customizationService.setSettings({ bottomdockSize: value });
   }
 
   get maxHeight() {

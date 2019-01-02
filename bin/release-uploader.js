@@ -76,7 +76,7 @@ async function s3UploadFiles(client, Bucket, s3Dir, baseDir, fileList) {
     const params = {Bucket, Key, ACL : 'public-read', Body : stream};
 
     const streamPromise = new Promise((resolve, reject) => {
-      stream.on('close', () => { resolve(); })
+      stream.on('close', () => { resolve(); });
       stream.on('error', (error) => { reject(error); });
     });
 

@@ -4,7 +4,6 @@ import { IListOption } from './index';
 
 @Component({})
 export default class ImagePickerInput extends BaseInput<string, IListOption<string>> {
-
   @Prop({ default: '' })
   readonly value: string;
 

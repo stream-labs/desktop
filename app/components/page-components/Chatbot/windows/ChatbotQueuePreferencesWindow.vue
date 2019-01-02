@@ -1,52 +1,44 @@
 <template>
-<ModalLayout
-  :showControls="false"
-  :customControls="true"
-  :title="$t('Queue Settings')"
- >
-  <div slot="fixed">
-   <div class="window-toggle__wrapper">
-    <div @click="onToggleQueueWindowHandler">
-      <span> {{ $t('Edit Primary Command') }} </span>
-      <i class="fas fa-chevron-right window-toggle__icon"></i>
+  <ModalLayout :showControls="false" :customControls="true" :title="$t('Queue Settings')">
+    <div slot="fixed">
+      <div class="window-toggle__wrapper">
+        <div @click="onToggleQueueWindowHandler">
+          <span> {{ $t('Edit Primary Command') }} </span>
+          <i class="fas fa-chevron-right window-toggle__icon"></i>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-  <div slot="content" class="chatbot-quote-preferences__container">
-    <div>
-      <VFormGroup
-        :title="$t('Maximum Queue Size')"
-        v-model="generalSettings.maximum"
-        :metadata="metadata.maximum"
-      />
-      <VFormGroup
-        :title="$t('Pick User Message')"
-        v-model="generalSettings.messages.picked"
-        :metadata="metadata.messages.picked"
-      />
+    <div slot="content" class="chatbot-quote-preferences__container">
+      <div>
+        <VFormGroup
+          :title="$t('Maximum Queue Size')"
+          v-model="generalSettings.maximum"
+          :metadata="metadata.maximum"
+        />
+        <VFormGroup
+          :title="$t('Pick User Message')"
+          v-model="generalSettings.messages.picked"
+          :metadata="metadata.messages.picked"
+        />
+      </div>
     </div>
-  </div>
-  <div slot="controls">
-    <button
-      class="button button--default"
-      @click="onCancelHandler">
-      {{ $t('Cancel') }}
-    </button>
-    <button
-      class="button button--action"
-      @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !generalSettings.messages.picked"
-    >
-      {{ $t('Save') }}
-    </button>
-  </div>
-</ModalLayout>
+    <div slot="controls">
+      <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
+      <button
+        class="button button--action"
+        @click="onSaveHandler"
+        :disabled="errors.items.length > 0 || !generalSettings.messages.picked"
+      >
+        {{ $t('Save') }}
+      </button>
+    </div>
+  </ModalLayout>
 </template>
 
 <script lang="ts" src="./ChatbotQueuePreferencesWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
-@import "../../../../styles/index";
+<style lang="less" scoped>
+@import '../../../../styles/index';
 
 .window-toggle__wrapper {
   background-color: @day-primary;

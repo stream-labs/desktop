@@ -3,10 +3,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { IObsInput, TObsValue } from './ObsInput';
 import { propertyComponentForType } from './Components';
 
-
 @Component({})
 export default class GenericForm extends Vue {
-
   @Prop()
   value: IObsInput<TObsValue>[];
 
@@ -17,5 +15,4 @@ export default class GenericForm extends Vue {
     newValue.splice(index, 1, value);
     this.$emit('input', newValue, index);
   }
-
-};
+}

@@ -23,26 +23,32 @@ interface IFilterNodeData {
     NavItem,
     GenericForm,
     Display,
-    SlVueTree
-  }
+    SlVueTree,
+  },
 })
 export default class SourceFilters extends Vue {
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() windowsService: WindowsService;
 
-  windowOptions = this.windowsService.getChildWindowQueryParams() as { sourceId: string, selectedFilterName: string };
+  windowOptions = this.windowsService.getChildWindowQueryParams() as {
+    sourceId: string;
+    selectedFilterName: string;
+  };
   sourceId = this.windowOptions.sourceId;
   filters = this.sourceFiltersService.getFilters(this.sourceId);
-  selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
+  selectedFilterName =
+    this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
   properties = this.sourceFiltersService.getPropertiesFormData(
-    this.sourceId, this.selectedFilterName
+    this.sourceId,
+    this.selectedFilterName,
   );
 
   @Watch('selectedFilterName')
   updateProperties() {
     this.properties = this.sourceFiltersService.getPropertiesFormData(
-      this.sourceId, this.selectedFilterName
+      this.sourceId,
+      this.selectedFilterName,
     );
   }
 
@@ -50,7 +56,7 @@ export default class SourceFilters extends Vue {
     this.sourceFiltersService.setPropertiesFormData(
       this.sourceId,
       this.selectedFilterName,
-      this.properties
+      this.properties,
     );
     this.updateProperties();
   }
@@ -74,8 +80,8 @@ export default class SourceFilters extends Vue {
         isSelected: filter.name === this.selectedFilterName,
         isLeaf: true,
         data: {
-          visible: filter.visible
-        }
+          visible: filter.visible,
+        },
       };
     });
   }
@@ -88,7 +94,11 @@ export default class SourceFilters extends Vue {
 
   toggleVisibility(filterName: string) {
     const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.sourceFiltersService.setVisibility(this.sourceId, sourceFilter.name, !sourceFilter.visible);
+    this.sourceFiltersService.setVisibility(
+      this.sourceId,
+      sourceFilter.name,
+      !sourceFilter.visible,
+    );
     this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 
@@ -96,7 +106,10 @@ export default class SourceFilters extends Vue {
     this.selectedFilterName = filterDescr[0].title;
   }
 
-  handleSort(nodes: ISlTreeNodeModel<IFilterNodeData>[], position: ICursorPosition<IFilterNodeData>) {
+  handleSort(
+    nodes: ISlTreeNodeModel<IFilterNodeData>[],
+    position: ICursorPosition<IFilterNodeData>,
+  ) {
     const sourceNode = nodes[0];
     const sourceInd = this.filters.findIndex(filter => filter.name === sourceNode.title);
     let targetInd = this.filters.findIndex(filter => filter.name === position.node.title);
@@ -106,7 +119,11 @@ export default class SourceFilters extends Vue {
     } else if (sourceInd > targetInd) {
       targetInd = position.placement === 'before' ? targetInd : targetInd + 1;
     }
-    this.sourceFiltersService.setOrder(this.sourceId, this.selectedFilterName, targetInd - sourceInd);
+    this.sourceFiltersService.setOrder(
+      this.sourceId,
+      this.selectedFilterName,
+      targetInd - sourceInd,
+    );
     this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 }

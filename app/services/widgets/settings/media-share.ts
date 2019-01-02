@@ -6,17 +6,17 @@ import { InheritMutations } from '../../stateful-service';
 
 export interface IMediaShareSettings extends IWidgetSettings {
   advanced_settings: {
-    auto_play: boolean,
-    auto_show: boolean,
-    buffer_time: number,
-    enabled: boolean,
-    max_duration: number,
-    min_amount_to_share: number,
-    moderation_queue: boolean,
-    price_per_second: number,
-    requests_enabled: boolean,
-    security: number,
-    volume: number,
+    auto_play: boolean;
+    auto_show: boolean;
+    buffer_time: number;
+    enabled: boolean;
+    max_duration: number;
+    min_amount_to_share: number;
+    moderation_queue: boolean;
+    price_per_second: number;
+    requests_enabled: boolean;
+    security: number;
+    volume: number;
   };
   allowed_types: string[];
   auto_show_video: boolean;
@@ -46,21 +46,20 @@ export interface IMediaShareBan {
 
 @InheritMutations()
 export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
-
   getApiSettings() {
     return {
       type: WidgetType.MediaShare,
       url: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/media-share?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'mediaShareSettingsUpdate',
       goalCreateEvent: 'newmediaShare',
       goalResetEvent: 'mediaShareEnd',
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
       testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
 
   async unbanMedia(media: IMediaShareBan) {
@@ -69,8 +68,8 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
       url,
       method: 'POST',
       body: {
-        media: media.media
-      }
+        media: media.media,
+      },
     });
     return this.fetchData();
   }
@@ -82,9 +81,9 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
       ...response,
       settings: {
         ...response.settings,
-        ...response.settings.advanced_settings
-      }
-    }
+        ...response.settings.advanced_settings,
+      },
+    };
   }
 
   protected patchBeforeSend(settings: IMediaShareSettings): any {

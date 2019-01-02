@@ -1,4 +1,4 @@
-import { Inject } from '../../util/injector';
+import { Inject } from '../injector';
 import { Menu } from './Menu';
 import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
@@ -33,7 +33,8 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
 
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
-  private source: Source;
+
+  private readonly source: Source;
 
   constructor(private options: IEditMenuOptions) {
     super();
@@ -53,39 +54,36 @@ export class EditMenu extends Menu {
         label: $t('Paste (Reference)'),
         enabled: this.clipboardService.hasData(),
         accelerator: 'CommandOrControl+V',
-        click: () => this.clipboardService.paste()
+        click: () => this.clipboardService.paste(),
       });
 
       this.append({
         label: $t('Paste (Duplicate)'),
         enabled: this.clipboardService.hasItems(),
-        click: () => this.clipboardService.paste(true)
+        click: () => this.clipboardService.paste(true),
       });
     }
 
     const isMultipleSelection = this.selectionService.getSize() > 1;
 
     if (this.options.showSceneItemMenu) {
-
       const selectedItem = this.selectionService.getLastSelected();
 
       this.append({
         label: $t('Copy'),
         accelerator: 'CommandOrControl+C',
-        click: () => this.clipboardService.copy()
+        click: () => this.clipboardService.copy(),
       });
-
 
       this.append({
         label: $t('Select All'),
         accelerator: 'CommandOrControl+A',
-        click: () => this.selectionService.selectAll()
+        click: () => this.selectionService.selectAll(),
       });
       this.append({
         label: $t('Invert Selection'),
-        click: () => this.selectionService.invert()
+        click: () => this.selectionService.invert(),
       });
-
 
       this.append({ type: 'separator' });
 
@@ -94,17 +92,17 @@ export class EditMenu extends Menu {
         accelerator: 'Delete',
         click: () => {
           this.selectionService.remove();
-        }
+        },
       });
 
       this.append({
         label: $t('Transform'),
-        submenu: this.transformSubmenu().menu
+        submenu: this.transformSubmenu().menu,
       });
 
       this.append({
         label: 'Group',
-        submenu: this.groupSubmenu().menu
+        submenu: this.groupSubmenu().menu,
       });
 
       if (selectedItem) {
@@ -115,43 +113,42 @@ export class EditMenu extends Menu {
             label: visibilityLabel,
             click: () => {
               selectedItem.setVisibility(!selectedItem.visible);
-            }
+            },
           });
           this.append({
             label: $t('Create Source Projector'),
             click: () => {
               this.projectorService.createProjector(selectedItem.sourceId);
-            }
+            },
           });
         } else {
           this.append({
             label: $t('Show'),
             click: () => {
               this.selectionService.setVisibility(true);
-            }
+            },
           });
           this.append({
             label: $t('Hide'),
             click: () => {
               this.selectionService.setVisibility(false);
-            }
+            },
           });
         }
       }
-
 
       if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
           label: $t('Export Widget'),
           click: () => {
             const chosenPath = electron.remote.dialog.showSaveDialog({
-              filters: [{ name: 'Widget File', extensions: ['widget'] }]
+              filters: [{ name: 'Widget File', extensions: ['widget'] }],
             });
 
             if (!chosenPath) return;
 
             this.widgetsService.saveWidgetFile(chosenPath, selectedItem.sceneItemId);
-          }
+          },
         });
       }
     }
@@ -161,18 +158,15 @@ export class EditMenu extends Menu {
         label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
-            renameId:  this.selectionService.getFolders()[0].id
-          })
+            renameId: this.selectionService.getFolders()[0].id,
+          }),
       });
     }
 
-
     if (this.source && !isMultipleSelection) {
-
       this.append({
         label: $t('Rename'),
-        click: () =>
-          this.sourcesService.showRenameSource(this.source.sourceId)
+        click: () => this.sourcesService.showRenameSource(this.source.sourceId),
       });
 
       this.append({ type: 'separator' });
@@ -183,18 +177,18 @@ export class EditMenu extends Menu {
         label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
         click: () => {
           this.showFilters();
-        }
+        },
       });
 
       this.append({
         label: $t('Copy Filters'),
-        click: () => this.clipboardService.copyFilters()
+        click: () => this.clipboardService.copyFilters(),
       });
 
       this.append({
         label: $t('Paste Filters'),
         click: () => this.clipboardService.pasteFilters(),
-        enabled: this.clipboardService.hasFilters()
+        enabled: this.clipboardService.hasFilters(),
       });
 
       this.append({ type: 'separator' });
@@ -204,7 +198,7 @@ export class EditMenu extends Menu {
         click: () => {
           this.showProperties();
         },
-        enabled: this.source.hasProps()
+        enabled: this.source.hasProps(),
       });
     }
 
@@ -213,21 +207,22 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Lock Sources'),
-        click: () => this.scenesService.setLockOnAllScenes(true)
+        click: () => this.scenesService.setLockOnAllScenes(true),
       });
 
       this.append({
         label: $t('Unlock Sources'),
-        click: () => this.scenesService.setLockOnAllScenes(false)
+        click: () => this.scenesService.setLockOnAllScenes(false),
       });
 
       this.append({
         label: $t('Performance Mode'),
         type: 'checkbox',
         checked: this.customizationService.state.performanceMode,
-        click: () => this.customizationService.setSettings({
-          performanceMode: !this.customizationService.state.performanceMode
-        })
+        click: () =>
+          this.customizationService.setSettings({
+            performanceMode: !this.customizationService.state.performanceMode,
+          }),
       });
     }
 
@@ -235,7 +230,7 @@ export class EditMenu extends Menu {
 
     this.append({
       label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector()
+      click: () => this.projectorService.createProjector(),
     });
 
     if (this.options.showAudioMixerMenu) {
@@ -245,15 +240,14 @@ export class EditMenu extends Menu {
         label: 'Hide',
         click: () => {
           this.audioService.getSource(this.source.sourceId).setHidden(true);
-        }
+        },
       });
 
       this.append({
         label: 'Unhide All',
-        click: () => this.audioService.unhideAllSourcesForCurrentScene()
+        click: () => this.audioService.unhideAllSourcesForCurrentScene(),
       });
     }
-
   }
 
   private showFilters() {

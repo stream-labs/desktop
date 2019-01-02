@@ -10,9 +10,9 @@ export interface ISceneCollectionSchema {
     id: string;
     name: string;
     sceneItems: {
-      sceneItemId: string,
-      sourceId: string
-    }[]
+      sceneItemId: string;
+      sourceId: string;
+    }[];
   }[];
 
   sources: {
@@ -24,7 +24,6 @@ export interface ISceneCollectionSchema {
 }
 
 export class SceneCollectionsModule extends Module {
-
   moduleName = 'SceneCollections';
   permissions = [EApiPermissions.SceneCollections];
 
@@ -34,5 +33,4 @@ export class SceneCollectionsModule extends Module {
   getSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     return this.sceneCollectionsService.fetchSceneCollectionsSchema();
   }
-
 }

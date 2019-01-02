@@ -7,7 +7,7 @@ import { ISource } from 'services/sources/sources-api';
 import { Source } from 'services/sources/source';
 import { SourceFiltersService } from './source-filters';
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
 import * as obs from '../../obs-api';
 import path from 'path';
@@ -87,8 +87,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     duration: 10,
     device: {
       name: null,
-      value: null
-    }
+      value: null,
+    },
   };
 
   downloadProgress: IDownloadProgress[] = [];
@@ -108,17 +108,19 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.userService.userLogin.subscribe(() => {
       this.startup();
     });
-    this.streamingService.streamingStatusChange.subscribe((status) => {
+    this.streamingService.streamingStatusChange.subscribe(status => {
       if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
     });
   }
 
   startup() {
-    this.fetchFacemaskSettings().then(response => {
-      this.checkFacemaskSettings(response);
-    }).catch(err => {
-      this.SET_ACTIVE(false);
-    });
+    this.fetchFacemaskSettings()
+      .then(response => {
+        this.checkFacemaskSettings(response);
+      })
+      .catch(err => {
+        this.SET_ACTIVE(false);
+      });
   }
 
   activate() {
@@ -134,13 +136,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         type: 'warning',
         message: 'We encountered an issue setting up your Face Mask Library',
         detail: 'Click Retry to try again',
-        buttons: ['Retry', 'OK']
+        buttons: ['Retry', 'OK'],
       },
       btnIndex => {
         if (btnIndex === 0) {
           this.startup();
         }
-      }
+      },
     );
   }
 
@@ -172,7 +174,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   onSocketEvent(event: TSocketEvent) {
     if (event.type === 'facemaskdonation') {
-      this.registerDonationEvent({ facemask: event.message[0].facemask, eventId: event.message[0]._id });
+      this.registerDonationEvent({
+        facemask: event.message[0].facemask,
+        eventId: event.message[0]._id,
+      });
     }
     if (event.type === 'alertPlaying' && event.message.facemask) {
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
@@ -188,7 +193,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   trigger(mask: string) {
     this.updateFilter({
       Mask: `${mask}.json`,
-      alertActivate: true
+      alertActivate: true,
     });
     setTimeout(() => {
       this.facemaskFilter.update({ alertActivate: false });
@@ -216,7 +221,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
     if (enabled) {
       devices.forEach(device => {
-        if (enabled === device.value as string) {
+        if (enabled === (device.value as string)) {
           device.selected = true;
         }
       });
@@ -228,13 +233,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   getDeviceStatus() {
     const availableDevices = this.getInputDevicesList();
     const enabledDeviceId = this.state.device ? this.state.device.value : null;
-    const availableDeviceSelected = enabledDeviceId ? availableDevices.some(device => {
-      return enabledDeviceId  === device.value as string;
-    }) : false;
+    const availableDeviceSelected = enabledDeviceId
+      ? availableDevices.some(device => {
+          return enabledDeviceId === (device.value as string);
+        })
+      : false;
     return this.settings.enabled && availableDeviceSelected;
   }
 
-  checkFacemaskSettings(settings:IFacemaskSettings) {
+  checkFacemaskSettings(settings: IFacemaskSettings) {
     this.settings = settings;
     if (settings.enabled) {
       const uuids = settings.facemasks.map((mask: IFacemask) => {
@@ -249,17 +256,20 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       }
 
       const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
-      const downloads = missingMasks.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, false));
+      const downloads = missingMasks.map(mask =>
+        this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
+      );
 
       this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
 
-      Promise.all(downloads).then((responses) => {
-        this.ensureModtimes(settings.facemasks);
-      }).catch(err => {
-        console.log(err);
-        this.notifyFailure();
-      });
-
+      Promise.all(downloads)
+        .then(responses => {
+          this.ensureModtimes(settings.facemasks);
+        })
+        .catch(err => {
+          console.log(err);
+          this.notifyFailure();
+        });
     } else {
       this.SET_ACTIVE(false);
     }
@@ -294,35 +304,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   fetchFacemaskSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.formRequest('slobs/facemasks/settings');
   }
 
-  fetchInstallUpdate(uuid:string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
-    const request = new Request(url, {});
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+  fetchInstallUpdate(uuid: string) {
+    return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
   fetchProfanityFilterSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/widget/settings?widget=donation_page`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.formRequest('slobs/widget/settings?widget=donation_page');
   }
 
   setupFilter() {
@@ -344,7 +334,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       if (matches.length === 1) {
         const slobsSource = matches[0];
         const target = slobsSource.getObsInput();
-        let fmFilter = target.findFilter('Face Mask Plugin');
+        const fmFilter = target.findFilter('Face Mask Plugin');
 
         if (!fmFilter) {
           this.facemaskFilter = this.sourceFiltersService.add(
@@ -356,8 +346,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
               alertDuration: this.settings.duration,
               alertDoIntro: false,
               alertDoOutro: false,
-              alertActivate: false
-            });
+              alertActivate: false,
+            },
+          );
         } else {
           this.facemaskFilter = fmFilter;
           this.updateFilter({
@@ -365,7 +356,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
             alertDuration: this.settings.duration,
             alertDoIntro: false,
             alertDoOutro: false,
-            alertActivate: false
+            alertActivate: false,
           });
         }
       }
@@ -383,34 +374,40 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
-  getMissingModtimes(missing:string[]) {
+  getMissingModtimes(missing: string[]) {
     return new Promise((resolve, reject) => {
       const asyncReads = missing.map(uuid => this.readFile(uuid));
-      Promise.all(asyncReads).then(results => {
-        resolve();
-      }).catch(err => {
-        this.notifyFailure();
-        reject();
-      });
+      Promise.all(asyncReads)
+        .then(results => {
+          resolve();
+        })
+        .catch(err => {
+          this.notifyFailure();
+          reject();
+        });
     });
   }
 
   updateMasks(data: IFacemask[]) {
     const needsUpdate = data.reduce((result, mask) => {
-      if (this.state.modtimeMap[mask.uuid].modtime < (mask.modtime - 3600)) {
+      if (this.state.modtimeMap[mask.uuid].modtime < mask.modtime - 3600) {
         result.push({ uuid: mask.uuid, intro: mask.is_intro });
       }
       return result;
     }, []);
 
-    const downloads = needsUpdate.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, true));
+    const downloads = needsUpdate.map(mask =>
+      this.downloadAndSaveModtime(mask.uuid, mask.intro, true),
+    );
 
-    Promise.all(downloads).then(responses => {
-      this.activate();
-    }).catch(err => {
-      console.log(err);
-      this.notifyFailure();
-    });
+    Promise.all(downloads)
+      .then(responses => {
+        this.activate();
+      })
+      .catch(err => {
+        console.log(err);
+        this.notifyFailure();
+      });
   }
 
   readFile(uuid: string) {
@@ -435,7 +432,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return !fs.existsSync(maskPath);
   }
 
-  enableMask(uuid:string) {
+  enableMask(uuid: string) {
     this.downloadMask(uuid).then(modtime => {
       this.ADD_MODTIME(uuid, modtime, false);
       this.fetchInstallUpdate(uuid);
@@ -445,15 +442,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   // Try to download a mask, resolve whether operation was successful or not
   downloadAndSaveModtime(uuid: string, intro: boolean, update = false): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.downloadMask(uuid, update).then(modtime => {
-        if (modtime) {
-          this.ADD_MODTIME(uuid, modtime, intro);
-          this.fetchInstallUpdate(uuid);
-        }
-        resolve();
-      }).catch(err => {
-        reject(err);
-      });
+      this.downloadMask(uuid, update)
+        .then(modtime => {
+          if (modtime) {
+            this.ADD_MODTIME(uuid, modtime, intro);
+            this.fetchInstallUpdate(uuid);
+          }
+          resolve();
+        })
+        .catch(err => {
+          reject(err);
+        });
     });
   }
 
@@ -474,12 +473,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       https.get(this.libraryUrl(uuid), response => {
         const writeStream = fs.createWriteStream(maskPath);
 
-        let length = parseInt(response.headers['content-length'], 10);
+        const length = parseInt(response.headers['content-length'], 10);
         let current = 0;
 
         response.on('data', chunk => {
           current += chunk.length;
-          this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] = current / length;
+          this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] =
+            current / length;
           fileContent += chunk;
         });
 
@@ -532,5 +532,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   private libraryUrl(uuid: string) {
     return `${this.cdn}${uuid}.json`;
+  }
+
+  private formRequest(endpoint: string) {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/${endpoint}`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request).then(handleResponse);
   }
 }

@@ -12,11 +12,7 @@ import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { $t } from 'services/i18n';
 import PlatformAppWebview from 'components/PlatformAppWebview.vue';
-import {
-  PlatformAppsService,
-  EAppPageSlot,
-  ILoadedApp
-} from 'services/platform-apps';
+import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -28,8 +24,8 @@ import { AppService } from 'services/app';
     Slider,
     ListInput,
     PlatformAppWebview,
-    ResizeBar
-  }
+    ResizeBar,
+  },
 })
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
@@ -61,7 +57,7 @@ export default class LiveDock extends Vue {
   get liveDockStyles() {
     return {
       position: this.collapsed ? 'absolute' : 'static',
-      left: this.collapsed ? '10000px' : 'auto'
+      left: this.collapsed ? '10000px' : 'auto',
     };
   }
 
@@ -111,13 +107,13 @@ export default class LiveDock extends Vue {
   collapse() {
     this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(true);
-    setTimeout(() => this.canAnimate = false, 300);
+    setTimeout(() => (this.canAnimate = false), 300);
   }
 
   expand() {
     this.canAnimate = true;
     this.customizationService.setLiveDockCollapsed(false);
-    setTimeout(() => this.canAnimate = false, 300);
+    setTimeout(() => (this.canAnimate = false), 300);
   }
 
   get isStreaming() {
@@ -149,9 +145,7 @@ export default class LiveDock extends Vue {
     const service = getPlatformService(platform);
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
     const youtubeDomain =
-      nightMode === 'day'
-        ? 'https://youtube.com'
-        : 'https://gaming.youtube.com';
+      nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     if (service instanceof YoutubeService) {
       const url = `${youtubeDomain}/channel/${service.youtubeId}/live`;
       electron.remote.shell.openExternal(url);
@@ -159,9 +153,7 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal(
-      'https://www.youtube.com/live_dashboard'
-    );
+    electron.remote.shell.openExternal('https://www.youtube.com/live_dashboard');
   }
 
   get isTwitch() {
@@ -190,7 +182,7 @@ export default class LiveDock extends Vue {
 
   toggleViewerCount() {
     this.customizationService.setHiddenViewerCount(
-      !this.customizationService.state.hideViewerCount
+      !this.customizationService.state.hideViewerCount,
     );
   }
 
@@ -219,21 +211,21 @@ export default class LiveDock extends Vue {
   }
 
   get chatAppsListMetadata() {
-    let options = [
+    const options = [
       {
         title: this.userService.platform.type as string,
-        value: 'default'
-      }
+        value: 'default',
+      },
     ];
     this.chatApps
       .filter(app => !app.poppedOutSlots.includes(this.slot))
       .forEach(chatApp => {
         options.push({
           title: chatApp.manifest.name,
-          value: chatApp.id
-        })
+          value: chatApp.id,
+        });
       });
-    return metadataHelper.list({ options })
+    return metadataHelper.list({ options });
   }
 
   get isPopOutAllowed() {
@@ -264,12 +256,12 @@ export default class LiveDock extends Vue {
   get defaultChatStyles() {
     if (this.selectedChat === 'default') {
       return {};
-    } else {
-      return {
-        position: 'absolute',
-        top: '-10000px'
-      };
     }
+
+    return {
+      position: 'absolute',
+      top: '-10000px',
+    };
   }
 
   onResizeStartHandler() {
@@ -277,18 +269,19 @@ export default class LiveDock extends Vue {
   }
 
   onResizeStopHandler(offset: number) {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     offset = this.onLeft ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
     setTimeout(() => {
       this.customizationService.setSettings({
-        previewEnabled: true
+        previewEnabled: true,
       });
     }, 500);
   }
 
   setWidth(width: number) {
     this.customizationService.setSettings({
-      livedockSize: this.validateWidth(width)
+      livedockSize: this.validateWidth(width),
     });
   }
 
@@ -297,7 +290,9 @@ export default class LiveDock extends Vue {
     const minEditorWidth = 860;
     const minWidth = 290;
     const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     width = Math.max(minWidth, width);
+    // tslint:disable-next-line:no-parameter-reassignment
     width = Math.min(maxWidth, width);
     return width;
   }
@@ -312,5 +307,4 @@ export default class LiveDock extends Vue {
     const defaultWidth = appRect.width * 0.28;
     this.setWidth(defaultWidth);
   }
-
 }

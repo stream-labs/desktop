@@ -4,12 +4,18 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { TSceneNodeType } from './scenes-api';
 import { Inject } from '../../util/injector';
-import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';
+import {
+  ScenesService,
+  Scene,
+  ISceneItemNode,
+  SceneItemFolder,
+  SceneItem,
+  TSceneNode,
+} from './index';
 import { SelectionService } from 'services/selection';
 
 @ServiceHelper()
 export abstract class SceneItemNode implements ISceneItemNode {
-
   id: string;
   parentId: string;
   childrenIds: string[];
@@ -48,7 +54,9 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getNodeIndex(): number {
-    return this.getScene().getNodesIds().indexOf(this.id);
+    return this.getScene()
+      .getNodesIds()
+      .indexOf(this.id);
   }
 
   placeAfter(nodeId: string) {
@@ -70,19 +78,18 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getPrevSiblingNode(): TSceneNode {
-    const siblingsIds = this.parentId ?
-      this.getParent().getNestedNodesIds() :
-      this.getScene().getRootNodesIds();
+    const siblingsIds = this.parentId
+      ? this.getParent().getNestedNodesIds()
+      : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
   }
 
-
   getNextSiblingNode(): TSceneNode {
-    const siblingsIds = this.parentId ?
-      this.getParent().getNestedNodesIds() :
-      this.getScene().getRootNodesIds();
+    const siblingsIds = this.parentId
+      ? this.getParent().getNestedNodesIds()
+      : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd + 1]);
@@ -145,7 +152,6 @@ export abstract class SceneItemNode implements ISceneItemNode {
   protected abstract get state(): ISceneItemNode;
   protected abstract remove(): void;
 
-
   @mutation()
   protected SET_PARENT(parentId?: string) {
     const nodeState = this.state;
@@ -161,5 +167,4 @@ export abstract class SceneItemNode implements ISceneItemNode {
     const newParent = sceneState.nodes.find(node => node.id === parentId);
     newParent.childrenIds.unshift(this.id);
   }
-
 }

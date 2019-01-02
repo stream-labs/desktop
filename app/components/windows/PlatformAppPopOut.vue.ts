@@ -9,10 +9,9 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { Subscription } from 'rxjs';
 
 @Component({
-  components: { PlatformAppWebview, ModalLayout }
+  components: { PlatformAppWebview, ModalLayout },
 })
 export default class PlatformAppPopOut extends Vue {
-
   @Inject() windowsService: WindowsService;
   @Inject() platformAppsService: PlatformAppsService;
   unloadSub: Subscription;
@@ -49,5 +48,4 @@ export default class PlatformAppPopOut extends Vue {
   destroyed() {
     this.unloadSub.unsubscribe();
   }
-
 }

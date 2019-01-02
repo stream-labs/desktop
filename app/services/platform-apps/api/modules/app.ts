@@ -11,13 +11,12 @@ enum EPage {
   Live = 'Live',
   Dashboard = 'Dashboard',
   Themes = 'Themes',
-  AppDetailsPage = 'AppDetailsPage'
+  AppDetailsPage = 'AppDetailsPage',
 }
 
 type TNavigationCallback = (nav: INavigation) => void;
 
 export class AppModule extends Module {
-
   readonly moduleName = 'App';
   readonly permissions: EApiPermissions[] = [];
 
@@ -59,5 +58,4 @@ export class AppModule extends Module {
       this.navigationService.navigate('PlatformAppStore', { appId: ctx.app.id });
     }
   }
-
 }

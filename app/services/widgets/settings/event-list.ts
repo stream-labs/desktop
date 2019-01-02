@@ -1,5 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
-import { WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
@@ -54,21 +53,20 @@ export interface IEventListData extends IWidgetData {
 
 @InheritMutations()
 export class EventListService extends WidgetSettingsService<IEventListData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.EventList,
       url: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
+      previewUrl: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,
       settingsUpdateEvent: 'eventListSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
-    }
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+    };
   }
 
   getMetadata() {
@@ -79,17 +77,17 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
           { title: 'Boxed', value: 'boxed' },
           { title: 'Twitch', value: 'twitch' },
           { title: 'Old School', value: 'oldschool' },
-          { title: 'Chunky', value: 'chunky' }
-        ]
+          { title: 'Chunky', value: 'chunky' },
+        ],
       }),
       message_hide_delay: metadata.slider({
         min: 0,
-        max: 200
-      })
+        max: 200,
+      }),
     };
   }
 
-  eventsByPlatform(): { key: string, title: string }[] {
+  eventsByPlatform(): { key: string; title: string }[] {
     const platform = this.userService.platform.type;
     return {
       twitch: [
@@ -99,17 +97,15 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
         { key: 'show_sub_tiers', title: $t('Show Sub Tiers') },
         { key: 'show_hosts', title: $t('Hosts') },
         { key: 'show_bits', title: $t('Bits') },
-        { key: 'show_raids', title: $t('Raids') }
+        { key: 'show_raids', title: $t('Raids') },
       ],
       facebook: [],
       youtube: [
         { key: 'show_subscriptions', title: $t('Subscriptions') },
         { key: 'show_sponsors', title: $t('Members') },
-        { key: 'show_fanfundings', title: $t('Super Chats') }
+        { key: 'show_fanfundings', title: $t('Super Chats') },
       ],
-      mixer: [
-        { key: 'show_resubs', title: $t('Show Resubs') },
-      ]
+      mixer: [{ key: 'show_resubs', title: $t('Show Resubs') }],
     }[platform];
   }
 }

@@ -1,1 +1,1 @@
-export * from 'obs-studio-node/module'
+export * from 'obs-studio-node/module';
