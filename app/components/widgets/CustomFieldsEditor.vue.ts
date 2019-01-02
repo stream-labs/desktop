@@ -182,7 +182,7 @@ export default class CustomFieldsEditor extends Vue {
     this.editorInputValue = JSON.stringify(this.customFields, null, 2);
   }
 
-  closeJsonEditor(needSave: boolean) {
+  closeJsonEditor(needSave: boolean = false) {
     if (!needSave) {
       this.isEditMode = false;
       return;
