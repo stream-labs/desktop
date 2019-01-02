@@ -25,7 +25,7 @@
       v-show="showExtendedNotifications"
       @click="onNotificationClickHandler(notify.id)"
       :class="{
-        'info': notify.type == 'INFO',
+        'info': notify.type === 'INFO',
         'warning': notify.type == 'WARNING',
         'has-action': notify.action && !notify.outdated,
         'outdated': notify.outdated,

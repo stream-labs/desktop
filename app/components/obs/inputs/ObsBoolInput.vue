@@ -1,5 +1,5 @@
 <template>
-<div class="input-container" :class="{disabled: value.enabled == false}">
+<div class="input-container" :class="{disabled: value.enabled === false}">
   <div class="input-label">
   </div>
   <div class="input-wrapper">

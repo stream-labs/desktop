@@ -11,7 +11,7 @@
 
   <div slot="content">
 
-    <div v-if="issue.code == 'FRAMES_DROPPED'">
+    <div v-if="issue.code === 'FRAMES_DROPPED'">
       <h4>
         <span class="fa fa-warning"></span>
         {{ issue.message }}
@@ -43,7 +43,7 @@
     </div>
 
 
-    <div v-if="issue.code == 'FRAMES_SKIPPED'">
+    <div v-if="issue.code === 'FRAMES_SKIPPED'">
       <h4>
         <span class="fa fa-warning"></span>
         {{ issue.message }}
@@ -70,7 +70,7 @@
     </div>
 
 
-    <div v-if="issue.code == 'FRAMES_LAGGED'">
+    <div v-if="issue.code === 'FRAMES_LAGGED'">
       <h4>
         <span class="fa fa-warning"></span>
         {{ issue.message }}
