@@ -25,6 +25,7 @@ export const API_NAME_MAP = {
   raid: 'raids',
   superheart: 'superhearts',
   fanfunding: 'fanfunding',
+  subscriber: 'subscribers', // YouTube
   sponsor: 'sponsors',
   support: 'support',
   like: 'likes',
