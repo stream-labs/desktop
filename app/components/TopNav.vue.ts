@@ -14,6 +14,7 @@ import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
 Vue.use(VueResize);
 
 @Component({
@@ -33,7 +34,14 @@ export default class TopNav extends Vue {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   slideOpen = false;
-  studioModeTooltip = 'Studio Mode';
+
+  studioModeTooltip = $t('Studio Mode');
+  settingsTooltip = $t('Settings');
+  helpTooltip = $t('Get Help');
+  logoutTooltip = $t('Logout');
+  sunTooltip = $t('Day mode');
+  moonTooltip = $t('Night mode');
+
   availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
   mounted() {
