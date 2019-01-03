@@ -7,7 +7,7 @@ import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAli
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { IListMetadata, ITextMetadata, EInputType } from 'components/shared/inputs';
+import { EInputType, IListMetadata } from 'components/shared/inputs';
 
 @Component({
   components: {
@@ -151,12 +151,11 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     };
   }
 
-  get responseTypeMetadata() {
-    const responseTypeMetadata: IListMetadata<string> = {
+  get responseTypeMetadata(): IListMetadata<string> {
+    return {
       type: EInputType.list,
       options: this.chatbotResponseTypes,
     };
-    return responseTypeMetadata;
   }
 
   // methods

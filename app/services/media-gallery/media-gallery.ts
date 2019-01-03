@@ -173,14 +173,13 @@ export class MediaGalleryService extends Service {
   private async fetchFileLimits(): Promise<IMediaGalleryLimits> {
     const req = this.formRequest('api/v5/slobs/user/filelimits');
     try {
-      const fileSize = await fetch(req).then((rawRes: any) => {
+      return await fetch(req).then((rawRes: any) => {
         const resp = rawRes.json();
         return {
           maxUsage: resp.body.max_allowed_upload_usage,
           maxFileSize: resp.body.max_allowed_upload_fize_size,
         };
       });
-      return fileSize;
     } catch (e) {
       return {
         maxUsage: DEFAULT_MAX_USAGE,

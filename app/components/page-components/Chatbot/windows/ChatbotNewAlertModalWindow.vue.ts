@@ -194,8 +194,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return amount === null || !message;
   }
 
-  get metadata() {
-    const metadata: INewAlertMetadata = {
+  get metadata(): INewAlertMetadata {
+    return {
       follow: {
         newMessage: {
           message: {
@@ -346,11 +346,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         },
       },
     };
-    return metadata;
   }
 
-  get initialNewAlertState() {
-    const initialState: INewAlertData = {
+  get initialNewAlertState(): INewAlertData {
+    return {
       follow: {
         newMessage: {
           message: null,
@@ -408,7 +407,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         },
       },
     };
-    return initialState;
   }
 
   bindOnSubmitAndCheckIfEdited(event: any) {

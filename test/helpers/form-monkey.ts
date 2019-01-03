@@ -207,11 +207,10 @@ export class FormMonkey {
     await sleep(500); // slider has an initialization delay
 
     const dotSelector = `${sliderInputSelector} .vue-slider-dot`;
-    const sliderWidth = await this.client.getElementSize(
+    let moveOffset = await this.client.getElementSize(
       `${sliderInputSelector} .vue-slider-wrap`,
       'width',
     );
-    let moveOffset = sliderWidth;
 
     // reset slider to 0 position
     await this.client.moveToObject(dotSelector);

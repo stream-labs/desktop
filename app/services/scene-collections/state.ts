@@ -1,14 +1,9 @@
-import { StatefulService, mutation } from 'services/stateful-service';
-import {
-  ISceneCollectionsManifestEntry,
-  ISceneCollectionSchema,
-  ISceneCollectionsServiceApi,
-} from '.';
+import { mutation, StatefulService } from 'services/stateful-service';
+import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
-import { ISceneCollectionsResponse } from './server-api';
 import { FileManagerService } from 'services/file-manager';
 import { Inject } from 'util/injector';
 
@@ -75,7 +70,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     if (!Array.isArray(obj.collections)) return;
 
     // Filter out collections we can't recover, and fix ones we can
-    const filtered = obj.collections.filter(coll => {
+    obj.collections = obj.collections.filter(coll => {
       // If there is no id, this is unrecoverable
       if (coll.id == null) return false;
 
@@ -86,7 +81,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       return true;
     });
 
-    obj.collections = filtered;
     return obj;
   }
 

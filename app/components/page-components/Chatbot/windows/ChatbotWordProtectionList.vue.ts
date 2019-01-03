@@ -2,11 +2,11 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
 import {
+  EInputType,
   IInputMetadata,
-  ITextMetadata,
   IListMetadata,
   INumberMetadata,
-  EInputType,
+  ITextMetadata,
 } from '../../../shared/inputs';
 
 import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
@@ -35,14 +35,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   editIndex: number = -1;
 
   get metadata() {
-    const metadata: {
-      text: ITextMetadata;
-      punishment: {
-        duration: INumberMetadata;
-        type: IListMetadata<string>;
-      };
-      is_regex: IInputMetadata;
-    } = {
+    return {
       text: {
         required: true,
         type: EInputType.text,
@@ -67,7 +60,6 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
         title: 'This word / phrase contains a regular expression.',
       },
     };
-    return metadata;
   }
 
   get NEW_WORD_PROTECTION_LIST_MODAL_ID() {

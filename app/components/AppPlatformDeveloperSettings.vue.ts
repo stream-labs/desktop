@@ -52,11 +52,10 @@ export default class AppPlatformDeveloperSettings extends Vue {
     this.loading = true;
 
     try {
-      const error = await this.platformAppsService.installUnpackedApp(
+      this.error = await this.platformAppsService.installUnpackedApp(
         this.appPathValue,
         this.appTokenValue,
       );
-      this.error = error;
     } catch (e) {
       this.error =
         'There was an error loading this app, please try again ' +
@@ -71,8 +70,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
     this.error = '';
 
     try {
-      const error = await this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
-      this.error = error;
+      this.error = await this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
     } catch (e) {
       this.error =
         'There was an error loading this app, please try again ' +

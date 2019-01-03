@@ -16,12 +16,12 @@ export default class ChatbotModules extends ChatbotBase {
     this.chatbotApiService.fetchSongRequest();
   }
 
-  get modules() {
+  get modules(): IChatbotModule[] {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     const comingSoonText = $t(
       'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.',
     );
-    const modules: IChatbotModule[] = [
+    return [
       {
         title: $t('Chat Alerts'),
         description: $t(
@@ -67,7 +67,6 @@ export default class ChatbotModules extends ChatbotBase {
         comingSoon: true,
       },
     ];
-    return modules;
   }
 
   get chatAlerts() {

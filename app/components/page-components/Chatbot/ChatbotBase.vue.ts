@@ -47,36 +47,28 @@ export default class ChatbotBase extends Vue {
     return ChatbotPermissionsEnums;
   }
 
-  get chatbotPermissions() {
-    const permissions = Object.keys(ChatbotPermissionsEnums).reduce(
-      (a: IListOption<number>[], b: string) => {
-        if (typeof ChatbotPermissionsEnums[b] === 'number') {
-          a.push({
-            title: b.split('_').join(' '),
-            value: ChatbotPermissionsEnums[b],
-          });
-        }
-        return a;
-      },
-      [],
-    );
-    return permissions;
+  get chatbotPermissions(): IListOption<number>[] {
+    return Object.keys(ChatbotPermissionsEnums).reduce((a: IListOption<number>[], b: string) => {
+      if (typeof ChatbotPermissionsEnums[b] === 'number') {
+        a.push({
+          title: b.split('_').join(' '),
+          value: ChatbotPermissionsEnums[b],
+        });
+      }
+      return a;
+    }, []);
   }
 
-  get chatbotAutopermitOptions() {
-    const permissions = Object.keys(ChatbotAutopermitEnums).reduce(
-      (a: IListOption<number>[], b: string) => {
-        if (typeof ChatbotAutopermitEnums[b] === 'number') {
-          a.push({
-            title: b.split('_').join(' '),
-            value: ChatbotAutopermitEnums[b],
-          });
-        }
-        return a;
-      },
-      [],
-    );
-    return permissions;
+  get chatbotAutopermitOptions(): IListOption<number>[] {
+    return Object.keys(ChatbotAutopermitEnums).reduce((a: IListOption<number>[], b: string) => {
+      if (typeof ChatbotAutopermitEnums[b] === 'number') {
+        a.push({
+          title: b.split('_').join(' '),
+          value: ChatbotAutopermitEnums[b],
+        });
+      }
+      return a;
+    }, []);
   }
 
   get chatbotResponseTypes() {

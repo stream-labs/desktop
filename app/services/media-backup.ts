@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import request from 'request';
@@ -142,8 +142,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
 
     if (this.validateSyncLock(localId, syncLock)) {
-      const serverId = data.id;
-      file.serverId = serverId;
+      file.serverId = data.id;
       file.status = EMediaFileStatus.Synced;
       this.UPDATE_FILE(localId, file);
       return file;
@@ -255,7 +254,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       file,
     };
 
-    const data = await new Promise<{ id: number }>((resolve, reject) => {
+    return await new Promise<{ id: number }>((resolve, reject) => {
       const req = request.post(
         {
           formData,
@@ -271,8 +270,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         },
       );
     });
-
-    return data;
   }
 
   private getFileData(id: number) {
