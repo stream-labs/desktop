@@ -38,6 +38,7 @@ export default class NameScene extends Vue {
 
     if (this.options.rename) {
       name = this.scenesService.getScene(this.options.rename).name;
+      this.name = name;
     } else if (this.options.sceneToDuplicate) {
       name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
     } else if (this.options.itemsToGroup) {
@@ -47,8 +48,7 @@ export default class NameScene extends Vue {
     } else {
       name = $t('scenes.newSceneName');
     }
-
-    this.name = this.sourcesService.suggestName(name);
+    if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
   }
 
   submit() {
