@@ -10,6 +10,7 @@
       :options="value.options"
       track-by="value"
       :close-on-select="true"
+      :allow-empty="allowEmpty"
       :placeholder="placeholder"
       :allow-custom="getCustomResolution"
       label="description"

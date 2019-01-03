@@ -7,21 +7,18 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ITroubleshooterServiceApi, ITroubleshooterSettings } from 'services/troubleshooter';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class NotificationsSettings extends Vue {
-
   @Inject() notificationsService: INotificationsServiceApi;
   @Inject() troubleshooterService: ITroubleshooterServiceApi;
 
   settingsFormData: TObsFormData = null;
   troubleshooterFormData: TObsFormData = null;
 
-
   created() {
     this.updateForms();
   }
-
 
   saveNotificationsSettings(formData: TObsFormData) {
     const settings: Partial<INotificationsSettings> = {};
@@ -32,7 +29,6 @@ export default class NotificationsSettings extends Vue {
     this.settingsFormData = this.notificationsService.getSettingsFormData();
   }
 
-
   saveTroubleshooterSettings(formData: TObsFormData) {
     const settings: Partial<ITroubleshooterSettings> = {};
     formData.forEach(formInput => {
@@ -42,13 +38,11 @@ export default class NotificationsSettings extends Vue {
     this.troubleshooterFormData = this.troubleshooterService.getSettingsFormData();
   }
 
-
   restoreDefaults() {
     this.notificationsService.restoreDefaultSettings();
     this.troubleshooterService.restoreDefaultSettings();
     this.updateForms();
   }
-
 
   showNotifications() {
     this.notificationsService.showNotifications();

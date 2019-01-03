@@ -8,12 +8,10 @@ interface ISelectorItem {
   value: string;
 }
 
-
 @Component({
-  components: { draggable }
+  components: { draggable },
 })
 export default class Selector extends Vue {
-
   @Prop()
   items: ISelectorItem[];
 
@@ -32,7 +30,7 @@ export default class Selector extends Vue {
 
     this.$emit('sort', {
       change,
-      order
+      order,
     });
   }
 
@@ -63,15 +61,14 @@ export default class Selector extends Vue {
    */
   get normalizedItems(): ISelectorItem[] {
     return _.map(this.items, item => {
-      if (typeof(item) === 'string') {
+      if (typeof item === 'string') {
         return {
           name: item,
-          value: item
+          value: item,
         };
-      } else {
-        return item;
       }
+
+      return item;
     });
   }
-
 }

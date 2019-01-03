@@ -2,7 +2,7 @@ import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import uuid from 'uuid/v4';
 import fs from 'fs';
@@ -16,7 +16,6 @@ interface IStreamlabelActiveSubscriptions {
   subscribers: string[];
 }
 
-
 /**
  * Returned to streamlabels subscribers.  Contains
  * information about the subscription, and must be
@@ -27,7 +26,6 @@ export interface IStreamlabelSubscription {
   statname: string;
   path: string;
 }
-
 
 export interface IStreamlabelSettings {
   format: string;
@@ -41,7 +39,6 @@ export interface IStreamlabelSettings {
   include_resubs?: boolean;
 }
 
-
 interface ITrainInfo {
   mostRecentEventAt: number;
   mostRecentName: string;
@@ -49,13 +46,11 @@ interface ITrainInfo {
   setting: string;
 }
 
-
 interface IDonationTrainInfo extends ITrainInfo {
   mostRecentAmount: number;
   totalAmount: number;
   donationTrain: boolean;
 }
-
 
 interface ITrains {
   donation: IDonationTrainInfo;
@@ -63,21 +58,16 @@ interface ITrains {
   follow: ITrainInfo;
 }
 
-
 type TTrainType = 'donation' | 'follow' | 'subscription';
-
 
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
   return (train as IDonationTrainInfo).donationTrain;
 }
 
-
 export class StreamlabelsService extends Service {
-
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() websocketService: WebsocketService;
-
 
   /**
    * Represents the raw strings that should be
@@ -95,11 +85,9 @@ export class StreamlabelsService extends Service {
    */
   subscriptions: Dictionary<IStreamlabelActiveSubscriptions> = {};
 
-
   trainInterval: number;
 
   socket: SocketIOClient.Socket;
-
 
   /**
    * Holds data about the currently running trains.
@@ -114,22 +102,21 @@ export class StreamlabelsService extends Service {
       mostRecentAmount: null,
       totalAmount: 0,
       donationTrain: true,
-      setting: 'train_tips'
+      setting: 'train_tips',
     },
     subscription: {
       mostRecentEventAt: null,
       mostRecentName: null,
       counter: 0,
-      setting: 'train_twitch_subscriptions'
+      setting: 'train_twitch_subscriptions',
     },
     follow: {
       mostRecentEventAt: null,
       mostRecentName: null,
       counter: 0,
-      setting: 'train_twitch_follows'
-    }
+      setting: 'train_twitch_follows',
+    },
   };
-
 
   init() {
     this.ensureDirectory();
@@ -143,12 +130,10 @@ export class StreamlabelsService extends Service {
     });
   }
 
-
   onUserLogin() {
     this.fetchInitialData();
     this.fetchSettings();
   }
-
 
   /**
    * Subscribe to a particular streamlabels stat
@@ -162,21 +147,20 @@ export class StreamlabelsService extends Service {
     } else {
       this.subscriptions[statname] = {
         filename: uuid(),
-        subscribers: [subscriptionId]
+        subscribers: [subscriptionId],
       };
 
       this.writeFileForStat(statname);
     }
 
     const subscription: IStreamlabelSubscription = {
+      statname,
       id: subscriptionId,
       path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
-      statname
     };
 
     return subscription;
   }
-
 
   /**
    * End a streamlabel subscription
@@ -194,7 +178,6 @@ export class StreamlabelsService extends Service {
     }
   }
 
-
   getSettingsForStat(statname: string) {
     const settings = { ...this.settings[statname] };
 
@@ -205,7 +188,6 @@ export class StreamlabelsService extends Service {
     return settings;
   }
 
-
   setSettingsForStat(statname: string, settings: IStreamlabelSettings): Promise<boolean> {
     if (settings.item_separator) {
       settings.item_separator = settings.item_separator.replace(/\\n/gi, '\n');
@@ -213,7 +195,7 @@ export class StreamlabelsService extends Service {
 
     this.settings[statname] = {
       ...this.settings[statname],
-      ...settings
+      ...settings,
     };
 
     // Because trains are client-side, we can force a fast update
@@ -226,33 +208,33 @@ export class StreamlabelsService extends Service {
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const request = new Request(url, {
-      method: 'POST',
       headers,
-      body: JSON.stringify(this.settings)
+      method: 'POST',
+      body: JSON.stringify(this.settings),
     });
 
     return fetch(request)
-      .then(handleErrors)
+      .then(handleResponse)
       .then(() => true);
   }
 
   restartSession(): Promise<Boolean> {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
+    const url = `https://${
+      this.hostsService.streamlabs
+    }/api/v5/slobs/stream-labels/restart-session`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handleErrors)
+      .then(handleResponse)
       .then(() => true);
   }
-
 
   private log(message: string, ...args: any[]) {
     console.debug(`Streamlabels: ${message}`, ...args);
   }
-
 
   /**
    * Attempt to load initial data via HTTP instead of waiting
@@ -266,11 +248,9 @@ export class StreamlabelsService extends Service {
     const request = new Request(url, { headers });
 
     fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(json => this.updateOutput(json.data));
   }
-
 
   private fetchSettings(): void {
     if (!this.userService.isLoggedIn()) return;
@@ -280,16 +260,13 @@ export class StreamlabelsService extends Service {
     const request = new Request(url, { headers });
 
     fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .then(settings => this.updateSettings(settings));
   }
-
 
   private initSocketConnection(): void {
     this.websocketService.socketEvent.subscribe(e => this.onSocketEvent(e));
   }
-
 
   private initTrainClockInterval() {
     this.trainInterval = window.setInterval(() => {
@@ -311,17 +288,16 @@ export class StreamlabelsService extends Service {
           this.outputTrainInfo(trainType);
         } else {
           const minutes = Math.floor(msRemaining / (60 * 1000));
-          const seconds = Math.floor(msRemaining % (60 * 1000) / 1000);
+          const seconds = Math.floor((msRemaining % (60 * 1000)) / 1000);
           const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
           this.updateOutput({
-            [statname]: formatted
+            [statname]: formatted,
           });
         }
       });
     }, 1000);
   }
-
 
   private clearTrain(trainType: TTrainType) {
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
@@ -336,11 +312,9 @@ export class StreamlabelsService extends Service {
     train.mostRecentName = null;
   }
 
-
   private outputAllTrains() {
     Object.keys(this.trains).forEach((train: TTrainType) => this.outputTrainInfo(train));
   }
-
 
   /**
    * Outputs all files on a train, except for the clock while the
@@ -351,14 +325,12 @@ export class StreamlabelsService extends Service {
     const settings = this.getSettingsForStat(train.setting);
     const output = {
       [`${trainType}_train_counter`]: settings.show_count ? train.counter.toString() : '',
-      [`${trainType}_train_latest_name`]: settings.show_latest ? train.mostRecentName || '' : ''
+      [`${trainType}_train_latest_name`]: settings.show_latest ? train.mostRecentName || '' : '',
     };
 
     if (isDonationTrain(train)) {
-      const latestAmount = train.mostRecentAmount ?
-        train.mostRecentAmount.toFixed(2) : '';
-      const totalAmount = train.totalAmount ?
-        train.totalAmount.toFixed(2) : '';
+      const latestAmount = train.mostRecentAmount ? train.mostRecentAmount.toFixed(2) : '';
+      const totalAmount = train.totalAmount ? train.totalAmount.toFixed(2) : '';
 
       output[`${trainType}_train_latest_amount`] = latestAmount;
       output[`${trainType}_train_total_amount`] = totalAmount;
@@ -370,7 +342,6 @@ export class StreamlabelsService extends Service {
 
     this.updateOutput(output);
   }
-
 
   private onSocketEvent(event: TSocketEvent) {
     this.log('Socket Event', event);
@@ -408,7 +379,6 @@ export class StreamlabelsService extends Service {
     }
   }
 
-
   private ensureDirectory() {
     try {
       if (fs.existsSync(this.streamlabelsDirectory)) {
@@ -421,11 +391,9 @@ export class StreamlabelsService extends Service {
     }
   }
 
-
   private get streamlabelsDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'Streamlabels');
   }
-
 
   private getStreamlabelsPath(filename: string) {
     return path.join(this.streamlabelsDirectory, `${filename}.txt`);
@@ -438,11 +406,10 @@ export class StreamlabelsService extends Service {
   private updateSettings(settingsPatch: Dictionary<IStreamlabelSettings>) {
     this.settings = {
       ...this.settings,
-      ...settingsPatch
+      ...settingsPatch,
     };
     this.outputAllTrains();
   }
-
 
   /**
    * Applies a patch to the output object and writes files for
@@ -452,12 +419,11 @@ export class StreamlabelsService extends Service {
   private updateOutput(outputPatch: Dictionary<string>) {
     this.output = {
       ...this.output,
-      ...outputPatch
+      ...outputPatch,
     };
 
     Object.keys(outputPatch).forEach(stat => this.writeFileForStat(stat));
   }
-
 
   /**
    * Writes data for a particular stat.  Will not do anything
@@ -470,7 +436,7 @@ export class StreamlabelsService extends Service {
 
     electron.ipcRenderer.send('streamlabels-writeFile', {
       path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
-      data: this.output[statname]
+      data: this.output[statname],
     });
   }
 }

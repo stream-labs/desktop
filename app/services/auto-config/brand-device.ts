@@ -10,8 +10,8 @@ import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { ScenesService } from '../scenes';
-import {IpcServerService} from '../ipc-server';
-import {AudioService} from '../audio';
+import { IpcServerService } from '../ipc-server';
+import { AudioService } from '../audio';
 import { PrefabsService } from 'services/prefabs';
 
 interface IBrandDeviceUrls {
@@ -38,7 +38,6 @@ interface IBrandDeviceState extends IMsSystemInfo {
 
 @InitAfter('OnboardingService')
 export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
-
   static version = 2;
 
   static initialState: IBrandDeviceState = {
@@ -46,7 +45,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     SystemManufacturer: '',
     SystemProductName: '',
     SystemVersion: '',
-    urls: null
+    urls: null,
   };
 
   @Inject() private hostsService: HostsService;
@@ -57,11 +56,9 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private prefabsService: PrefabsService;
 
-
   serviceEnabled() {
     return true;
   }
-
 
   /**
    * fetch SystemInformation and download configuration links if we have ones
@@ -71,7 +68,9 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
 
     try {
       // fetch system info via PowerShell
-      const msSystemInformation = execSync('Powershell gwmi -namespace root\\wmi -class MS_SystemInformation')
+      const msSystemInformation = execSync(
+        'Powershell gwmi -namespace root\\wmi -class MS_SystemInformation',
+      )
         .toString()
         .split('\n');
 
@@ -87,22 +86,18 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       return false;
     }
 
-
     // uncomment the code below to test brand device steps
     // this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
     // this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
     // this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
     // this.SET_SYSTEM_PARAM('SystemVersion', '1');
 
-
     this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
     return true;
   }
 
   async startAutoConfig(): Promise<boolean> {
-
     try {
-
       const deviceUrls = await this.fetchDeviceUrls();
       const deviceName = deviceUrls.name;
       const cacheDir = electron.remote.app.getPath('userData');
@@ -144,8 +139,10 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       if (deviceUrls.onboarding_cmds_url) {
         const cmdsPath = `${tempDir}/onboarding_cmds.json`;
         await downloadFile(deviceUrls.onboarding_cmds_url, cmdsPath);
-        const cmds =  JSON.parse(fs.readFileSync(cmdsPath, 'utf8'));
-        if (!newSceneCollectionCreated) await this.sceneCollectionsService.create({ name: deviceName });
+        const cmds = JSON.parse(fs.readFileSync(cmdsPath, 'utf8'));
+        if (!newSceneCollectionCreated) {
+          await this.sceneCollectionsService.create({ name: deviceName });
+        }
         for (const cmd of cmds) this.ipcServerService.exec(cmd);
       }
       return true;
@@ -155,7 +152,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   }
 
   private async fetchDeviceUrls(): Promise<IBrandDeviceUrls> {
-
     // this combination of system params must be unique for each device type
     // so use it as ID
     const id = [
@@ -163,10 +159,12 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       this.state.SystemProductName,
       this.state.SystemSKU,
       this.state.SystemVersion,
-      BrandDeviceService.version
+      BrandDeviceService.version,
     ].join(' ');
 
-    const res = await fetch(`https://${ this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`);
+    const res = await fetch(
+      `https://${this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`,
+    );
     if (!res.ok) return null;
     return res.json();
   }

@@ -8,9 +8,9 @@
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
       {{ $t('There was an error fetching your channel information.  You can try') }}
-      <a @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
+      <a class="description-link" @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
       {{ $t('or you can') }}
-      <a @click="goLive">{{ $t('just go live.') }}</a>
+      <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
     <div v-if="!infoLoading && !infoError && !populatingModels">
@@ -27,7 +27,7 @@
         @input="onGameInput"/>
       <div class="warning" v-if="isFacebook && !hasPages">
         {{ $t('It looks like you don\'t have any Pages. Head to ') }}
-        <a @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
         {{ $t(' to create a page, and then try again.') }}
       </div>
       <ObsListInput
@@ -105,7 +105,7 @@
       class="button button--default"
       :disabled="updatingInfo"
       @click="cancel">
-      Cancel
+      {{ isSchedule ? $t('Close') : $t('Cancel') }}
     </button>
     <button
       class="button button--action"
@@ -122,6 +122,10 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
+
+.description-link {
+  text-decoration: underline;
+}
 
 .edit-stream-info-option-desc {
   height: 20px;

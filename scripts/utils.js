@@ -2,7 +2,7 @@
 const fs = require('fs');
 const which = require('which');
 const path = require('path');
-const readPkgUp = require('read-pkg-up')
+const readPkgUp = require('read-pkg-up');
 
 function resolveBin(modName, { executable = modName, cwd = process.cwd() } = {}) {
   let pathFromWhich;

@@ -9,7 +9,6 @@ export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
 }
 
 export class StreamlabelsManager extends DefaultManager {
-
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() userService: UserService;
 
@@ -66,7 +65,7 @@ export class StreamlabelsManager extends DefaultManager {
       // Default to All-Time Top Donator
       statname: 'all_time_top_donator',
       ...this.settings,
-      ...settings
+      ...settings,
     };
 
     this.normalizeSettings();
@@ -74,13 +73,11 @@ export class StreamlabelsManager extends DefaultManager {
     this.refreshSubscription();
   }
 
-
   private unsubscribe() {
     if (this.subscription) {
       this.streamlabelsService.unsubscribe(this.subscription);
     }
   }
-
 
   private refreshSubscription() {
     this.unsubscribe();
@@ -90,8 +87,7 @@ export class StreamlabelsManager extends DefaultManager {
     this.obsSource.update({
       ...this.obsSource.settings,
       read_from_file: true,
-      file: this.subscription.path
+      file: this.subscription.path,
     });
   }
-
 }

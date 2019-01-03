@@ -1,6 +1,7 @@
+import { Observable } from 'rxjs';
 import { Module, TApiModule, IApiContext, IWebviewTransform } from './modules/module';
 import { SourcesModule } from './modules/sources';
-import { ScenesModule} from './modules/scenes';
+import { ScenesModule } from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
 import { StreamingRecordingModule } from './modules/streaming-recording';
 import { AuthorizationModule } from './modules/authorization';
@@ -13,10 +14,9 @@ import { NotificationsModule } from './modules/notifications';
 import { HotkeysModule } from './modules/hotkeys';
 import { ObsPluginsModule } from './modules/obs-plugins';
 import { DisplayModule } from './modules/display';
-import { Observable } from 'rxjs';
+import { SceneTransitionsModule } from './modules/scene-transitions';
 
 export class PlatformAppsApi {
-
   modules: Dictionary<Module> = {};
 
   constructor() {
@@ -34,6 +34,7 @@ export class PlatformAppsApi {
     this.registerModule(new HotkeysModule());
     this.registerModule(new ObsPluginsModule());
     this.registerModule(new DisplayModule());
+    this.registerModule(new SceneTransitionsModule());
   }
 
   private registerModule(module: Module) {
@@ -51,7 +52,7 @@ export class PlatformAppsApi {
     webContentsId: number,
     electronWindowId: number,
     slobsWindowId: string,
-    webviewTransform: Observable<IWebviewTransform>
+    webviewTransform: Observable<IWebviewTransform>,
   ) {
     const api: Dictionary<TApiModule> = {};
 
@@ -60,7 +61,7 @@ export class PlatformAppsApi {
       webContentsId,
       electronWindowId,
       slobsWindowId,
-      webviewTransform
+      webviewTransform,
     };
 
     Object.keys(this.modules).forEach(moduleName => {
@@ -69,35 +70,42 @@ export class PlatformAppsApi {
       let authorized = true;
 
       // TODO this is a weird pattern
-      for (let permission of this.modules[moduleName].permissions) {
+      for (const permission of this.modules[moduleName].permissions) {
         authorized = app.manifest.permissions.includes(permission);
         if (!authorized) break;
       }
 
-      ((this.modules[moduleName].constructor as typeof Module).apiMethods || []).forEach(methodName => {
-        api[moduleName][methodName] = async (...args: any[]) => {
-          if (authorized) {
-            return await this.modules[moduleName][methodName](context, ...args);
-          } else {
-            throw new Error('This app does not have permission to access this API. ' +
-              `Required permissions: ${this.modules[moduleName].permissions}`);
-          }
-        };
-      });
+      ((this.modules[moduleName].constructor as typeof Module).apiMethods || []).forEach(
+        methodName => {
+          api[moduleName][methodName] = async (...args: any[]) => {
+            if (authorized) {
+              return await this.modules[moduleName][methodName](context, ...args);
+            }
 
-      ((this.modules[moduleName].constructor as typeof Module).apiEvents || []).forEach(eventName => {
-        if (authorized) {
-          api[moduleName][eventName] = this.modules[moduleName][eventName];
-        } else {
-          api[moduleName][eventName] = async () => {
-            throw new Error('This app does not have permission to access this API. ' +
-              `Required permissions: ${this.modules[moduleName].permissions}`);
+            throw new Error(
+              'This app does not have permission to access this API. ' +
+                `Required permissions: ${this.modules[moduleName].permissions}`,
+            );
+          };
+        },
+      );
+
+      ((this.modules[moduleName].constructor as typeof Module).apiEvents || []).forEach(
+        eventName => {
+          if (authorized) {
+            api[moduleName][eventName] = this.modules[moduleName][eventName];
+          } else {
+            api[moduleName][eventName] = async () => {
+              throw new Error(
+                'This app does not have permission to access this API. ' +
+                  `Required permissions: ${this.modules[moduleName].permissions}`,
+              );
+            };
           }
-        }
-      });
+        },
+      );
     });
 
     return api;
   }
-
 }

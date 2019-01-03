@@ -8,22 +8,19 @@ import { ICustomizationServiceApi, ICustomizationSettings } from 'services/custo
 import { WindowsService } from 'services/windows';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class AppearanceSettings extends Vue {
-
   @Inject() private customizationService: ICustomizationServiceApi;
   @Inject() private windowsService: WindowsService;
 
   settingsFormData: TObsFormData = null;
   enableFFZEmotes = false;
 
-
   created() {
     this.settingsFormData = this.customizationService.getSettingsFormData();
     this.enableFFZEmotes = this.customizationService.getSettings().enableFFZEmotes;
   }
-
 
   saveSettings(formData: TObsFormData) {
     const settings: Partial<ICustomizationSettings> = {};
@@ -36,14 +33,17 @@ export default class AppearanceSettings extends Vue {
   }
 
   openFFZSettings() {
-    this.windowsService.createOneOffWindow({
-      componentName: 'FFZSettings',
-      title: $t('FrankerFaceZ Settings'),
-      queryParams: {},
-      size: {
-        width: 800,
-        height: 800
-      }
-    }, 'ffz-settings');
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'FFZSettings',
+        title: $t('FrankerFaceZ Settings'),
+        queryParams: {},
+        size: {
+          width: 800,
+          height: 800,
+        },
+      },
+      'ffz-settings',
+    );
   }
 }

@@ -10,24 +10,24 @@ import electron from 'electron';
 const { webFrame, screen } = electron;
 
 /*
-  * An edge looks like:
-  * ________________________________
-  * |                ^
-  * |                |
-  * |      offset -> |
-  * |                |
-  * |                v
-  * |     depth      /\ ^
-  * |<-------------->|| |
-  * |                || |
-  * |        edge -> || | <- length
-  * |                || |
-  * |                || |
-  * |                \/ v
-  *
-  * An edge can be horizontal or vertical, but only alike
-  * types make sense to compare to each other.
-  */
+ * An edge looks like:
+ * ________________________________
+ * |                ^
+ * |                |
+ * |      offset -> |
+ * |                |
+ * |                v
+ * |     depth      /\ ^
+ * |<-------------->|| |
+ * |                || |
+ * |        edge -> || | <- length
+ * |                || |
+ * |                || |
+ * |                \/ v
+ *
+ * An edge can be horizontal or vertical, but only alike
+ * types make sense to compare to each other.
+ */
 interface IEdge {
   depth: number;
   offset: number;
@@ -104,8 +104,8 @@ export class DragHandler {
     this.displaySize = options.displaySize;
     this.displayOffset = options.displayOffset;
     this.scaleFactor = this.windowsService.state.main.scaleFactor;
-    this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
-      this.displaySize.x;
+    this.snapDistance =
+      (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) / this.displaySize.x;
 
     // Load some attributes about sources
     this.draggedSource = this.selectionService.getLastSelected();
@@ -143,21 +143,12 @@ export class DragHandler {
     if (this.snapEnabled && !event.ctrlKey) {
       const sourceEdges = this.generateSourceEdges(rect);
 
-      const leftDistance = this.getNearestEdgeDistance(
-        sourceEdges.left,
-        this.targetEdges.left
-      );
-      const rightDistance = this.getNearestEdgeDistance(
-        sourceEdges.right,
-        this.targetEdges.right
-      );
-      const topDistance = this.getNearestEdgeDistance(
-        sourceEdges.top,
-        this.targetEdges.top
-      );
+      const leftDistance = this.getNearestEdgeDistance(sourceEdges.left, this.targetEdges.left);
+      const rightDistance = this.getNearestEdgeDistance(sourceEdges.right, this.targetEdges.right);
+      const topDistance = this.getNearestEdgeDistance(sourceEdges.top, this.targetEdges.top);
       const bottomDistance = this.getNearestEdgeDistance(
         sourceEdges.bottom,
-        this.targetEdges.bottom
+        this.targetEdges.bottom,
       );
 
       let snapDistanceX = 0;
@@ -195,14 +186,14 @@ export class DragHandler {
   private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {
     return this.pageSpaceToCanvasSpace({
       x: event.pageX - this.displayOffset.x,
-      y: event.pageY - this.displayOffset.y
+      y: event.pageY - this.displayOffset.y,
     });
   }
 
   private pageSpaceToCanvasSpace(vec: IVec2) {
     return {
       x: (vec.x * this.scaleFactor * this.baseWidth) / this.displaySize.x,
-      y: (vec.y * this.scaleFactor * this.baseHeight) / this.displaySize.y
+      y: (vec.y * this.scaleFactor * this.baseHeight) / this.displaySize.y,
     };
   }
 
@@ -249,7 +240,7 @@ export class DragHandler {
       left: [],
       top: [],
       right: [],
-      bottom: []
+      bottom: [],
     };
 
     // Screen edge snapping:
@@ -258,28 +249,28 @@ export class DragHandler {
       targetEdges.left.push({
         depth: 0,
         offset: 0,
-        length: this.baseHeight
+        length: this.baseHeight,
       });
 
       // Screen top
       targetEdges.top.push({
         depth: 0,
         offset: 0,
-        length: this.baseWidth
+        length: this.baseWidth,
       });
 
       // Screen right
       targetEdges.right.push({
         depth: this.baseWidth,
         offset: 0,
-        length: this.baseHeight
+        length: this.baseHeight,
       });
 
       // Screen bottom
       targetEdges.bottom.push({
         depth: this.baseHeight,
         offset: 0,
-        length: this.baseWidth
+        length: this.baseWidth,
       });
     }
 
@@ -314,7 +305,7 @@ export class DragHandler {
       scaleX: source.scaleX,
       scaleY: source.scaleY,
       crop: source.crop,
-      rotation: source.rotation
+      rotation: source.rotation,
     });
 
     rect.normalize();
@@ -323,27 +314,26 @@ export class DragHandler {
       left: {
         depth: rect.x,
         offset: rect.y,
-        length: rect.scaledHeight
+        length: rect.scaledHeight,
       },
 
       top: {
         depth: rect.y,
         offset: rect.x,
-        length: rect.scaledWidth
+        length: rect.scaledWidth,
       },
 
       right: {
         depth: rect.x + rect.scaledWidth,
         offset: rect.y,
-        length: rect.scaledHeight
+        length: rect.scaledHeight,
       },
 
       bottom: {
         depth: rect.y + rect.scaledHeight,
         offset: rect.x,
-        length: rect.scaledWidth
-      }
+        length: rect.scaledWidth,
+      },
     };
   }
-
 }

@@ -10,8 +10,8 @@ import Fuse from 'fuse.js';
 @Component({
   components: {
     ModalLayout,
-    EditableSceneCollection
-  }
+    EditableSceneCollection,
+  },
 })
 export default class ManageSceneCollections extends Vue {
   @Inject() windowsService: WindowsService;
@@ -34,7 +34,7 @@ export default class ManageSceneCollections extends Vue {
     if (this.searchQuery) {
       const fuse = new Fuse(list, {
         shouldSort: true,
-        keys: ['name']
+        keys: ['name'],
       });
 
       return fuse.search(this.searchQuery);
@@ -42,5 +42,4 @@ export default class ManageSceneCollections extends Vue {
 
     return list;
   }
-
 }

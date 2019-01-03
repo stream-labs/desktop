@@ -17,11 +17,10 @@ enum EAppState {
   Idle = 'idle',
   Streaming = 'streaming',
   Closing = 'closing',
-  CleanExit = 'clean_exit'
+  CleanExit = 'clean_exit',
 }
 
 export class CrashReporterService extends Service {
-
   appState = EAppState.CleanExit;
 
   @Inject() streamingService: StreamingService;
@@ -49,7 +48,7 @@ export class CrashReporterService extends Service {
     // Report any crash that happened last time
     if (this.appState !== EAppState.CleanExit) {
       this.usageStatisticsService.recordEvent('crash', {
-        crashType: this.appState
+        crashType: this.appState,
       });
     }
 
@@ -91,5 +90,4 @@ export class CrashReporterService extends Service {
   private get appStateFile() {
     return path.join(electron.remote.app.getPath('userData'), 'appState');
   }
-
 }

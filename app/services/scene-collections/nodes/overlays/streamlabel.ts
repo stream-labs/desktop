@@ -30,7 +30,7 @@ export class StreamlabelNode extends Node<ISchema, IContext> {
     await this.data.textSource.load(context);
 
     context.sceneItem.source.replacePropertiesManager('streamlabels', {
-      statname: this.data.labelType
+      statname: this.data.labelType,
     });
   }
 }

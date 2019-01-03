@@ -12,10 +12,9 @@ interface IKeyedBinding {
 }
 
 @Component({
-  props: ['hotkey']
+  props: ['hotkey'],
 })
 export default class HotkeyComponent extends Vue {
-
   @Prop()
   hotkey: Hotkey;
 
@@ -41,7 +40,7 @@ export default class HotkeyComponent extends Vue {
 
     binding.binding = {
       key: event.code,
-      modifiers: this.getModifiers(event)
+      modifiers: this.getModifiers(event),
     };
 
     this.setBindings();
@@ -52,15 +51,17 @@ export default class HotkeyComponent extends Vue {
       alt: event.altKey,
       ctrl: event.ctrlKey,
       shift: event.shiftKey,
-      meta: event.metaKey
+      meta: event.metaKey,
     };
   }
 
   isModifierPress(event: KeyboardEvent) {
-    return (event.key === 'Control') ||
-      (event.key === 'Alt') ||
-      (event.key === 'Meta') ||
-      (event.key === 'Shift');
+    return (
+      event.key === 'Control' ||
+      event.key === 'Alt' ||
+      event.key === 'Meta' ||
+      event.key === 'Shift'
+    );
   }
 
   /**
@@ -70,7 +71,6 @@ export default class HotkeyComponent extends Vue {
     this.bindings.splice(index + 1, 0, this.createBindingWithKey(this.getBlankBinding()));
   }
 
-
   getBlankBinding() {
     return {
       key: '',
@@ -78,11 +78,10 @@ export default class HotkeyComponent extends Vue {
         alt: false,
         ctrl: false,
         shift: false,
-        meta: false
-      }
+        meta: false,
+      },
     };
   }
-
 
   removeBinding(index: number) {
     // If this is the last binding, replace it with an
@@ -102,7 +101,9 @@ export default class HotkeyComponent extends Vue {
   createBindingWithKey(binding: IBinding): IKeyedBinding {
     return {
       binding,
-      key: Math.random().toString(36).substring(2, 15)
+      key: Math.random()
+        .toString(36)
+        .substring(2, 15),
     };
   }
 
@@ -118,7 +119,6 @@ export default class HotkeyComponent extends Vue {
 
     this.hotkey.bindings = bindings;
   }
-
 
   /**
    * Turns a binding into a string representation
@@ -143,5 +143,4 @@ export default class HotkeyComponent extends Vue {
 
     return keys.join('+');
   }
-
 }

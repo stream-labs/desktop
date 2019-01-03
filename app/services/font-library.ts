@@ -20,33 +20,31 @@ export interface IFontFamily {
   styles: IFontStyle[];
 }
 
-
 export interface IFontManifest {
   families: IFontFamily[];
 }
 
-
 export class FontLibraryService extends Service {
-
-
   private manifest: IFontManifest;
 
   // Used to prevent downloading the same font multiple times
   fontDownloadPromises: Dictionary<Promise<string>> = {};
 
-
   getManifest(): Promise<IFontManifest> {
     if (!this.manifest) {
       const req = new Request(this.libraryUrl('manifest.json'));
 
-      return fetch(req).then(response => {
-        return response.json();
-      }).then(json => {
-        this.manifest = json;
-        return json;
-      }).catch(() => {
-        return { families: [] };
-      });
+      return fetch(req)
+        .then(response => {
+          return response.json();
+        })
+        .then(json => {
+          this.manifest = json;
+          return json;
+        })
+        .catch(() => {
+          return { families: [] };
+        });
     }
 
     return Promise.resolve(this.manifest);
@@ -58,16 +56,14 @@ export class FontLibraryService extends Service {
     });
   }
 
-
   findStyle(family: string, style: string): Promise<IFontStyle> {
     return this.findFamily(family).then(fam => {
       return fam.styles.find(sty => sty.name === style);
     });
   }
 
-
   // Finds family and style info about a given font path
-  lookupFontInfo(fontPath: string): Promise<{ family: string, style: string }> {
+  lookupFontInfo(fontPath: string): Promise<{ family: string; style: string }> {
     return this.getManifest().then(manifest => {
       let family: string;
       let style: string;
@@ -88,7 +84,6 @@ export class FontLibraryService extends Service {
       return { family, style };
     });
   }
-
 
   // Returns a promise that resolves with a path to the downloaded font
   downloadFont(file: string): Promise<string> {
@@ -116,28 +111,23 @@ export class FontLibraryService extends Service {
     return this.fontDownloadPromises[file];
   }
 
-
   private ensureFontsDirectory() {
     if (!fs.existsSync(this.fontsDirectory)) {
       fs.mkdirSync(this.fontsDirectory);
     }
   }
 
-
   private get fontsDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'Fonts');
   }
-
 
   // Create a local font library path from a filename
   private libraryPath(file: string) {
     return path.join(this.fontsDirectory, file);
   }
 
-
   // Create an s3 font library url from a filename
   private libraryUrl(file: string) {
     return `https://d1g6eog1uhe0xm.cloudfront.net/fonts/${file}`;
   }
-
 }
