@@ -23,6 +23,20 @@ enum ETransitionPointType {
   Frame = 1,
 }
 
+interface ITransition {
+  id: string;
+  name: string;
+  type: ETransitionType;
+  duration: number;
+}
+
+interface ITransitionConnection {
+  id: string;
+  fromSceneId: string;
+  toSceneId: string;
+  transitionId: string;
+}
+
 interface StingerTransitionOptions {
   /** Transition type **/
   type: 'stinger';
@@ -59,7 +73,7 @@ const stingerTransitionDefaultOptions: Partial<StingerTransitionOptions> = {
 };
 
 /**
- * This module can be used to create scene transitions.
+ * This module can be used to manage scene transitions.
  * It's useful for apps to provide both editable and uneditable transitions for the streamer.
  */
 export class SceneTransitionsModule extends Module {
@@ -81,9 +95,10 @@ export class SceneTransitionsModule extends Module {
    * @param options A description of transition options
    *
    * @see {TransitionOptions}
+   * @see {ITransition}
    */
   @apiMethod()
-  async createTransition(ctx: IApiContext, options: TransitionOptions) {
+  async createTransition(ctx: IApiContext, options: TransitionOptions): Promise<ITransition> {
     if (options.type === 'stinger') {
       const appId = ctx.app.id;
       const { url } = options;
@@ -107,6 +122,99 @@ export class SceneTransitionsModule extends Module {
     }
 
     throw new Error('Not Implemented');
+  }
+
+  /**
+   * Get a list of transitions
+   *
+   * This includes all transitions the user has set up in SLOBS.
+   * For transitions managed by this App use `getAppTransitions`.
+   *
+   * @see {getAppTransitions}
+   */
+  @apiMethod()
+  async getTransitions(_ctx: IApiContext): Promise<ITransition[]> {
+    return this.transitionsService.state.transitions;
+  }
+
+  /**
+   * Get a list of transitions belonging to this App.
+   *
+   * @param ctx API context
+   * @return A list of Transition objects belonging to the current App
+   */
+  @apiMethod()
+  async getAppTransitions(ctx: IApiContext): Promise<ITransition[]> {
+    return this.getTransitions(ctx).then(transitions =>
+      transitions.filter(transition => {
+        const settings = this.transitionsService.getPropertiesManagerSettings(transition.id);
+
+        return settings && settings.appId === ctx.app.id;
+      }),
+    );
+  }
+
+  /**
+   * Set a transition as the default transition
+   *
+   * @param _ctx API context
+   * @param transitionId ID of the transition to be set as default
+   * @return `true` if setting the default succeeded
+   */
+  @apiMethod()
+  async setDefaultTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
+    this.transitionsService.setDefaultTransition(transitionId);
+    return true;
+  }
+
+  /**
+   * Delete a transition
+   *
+   * Deletes a specific transition by ID.
+   *
+   * @param _ctx API Context
+   * @param transitionId ID of the transition to be deleted
+   * @return `true` if the transition was successfully deleted
+   */
+  @apiMethod()
+  async deleteTransition(_ctx: IApiContext, transitionId: string): Promise<boolean> {
+    this.transitionsService.deleteTransition(transitionId);
+    return true;
+  }
+
+  /**
+   * Create a scene transition connection between scenes
+   *
+   * @param _ctx API Context
+   * @param transitionId ID of the transition to connect
+   * @param fromSceneId Originating scene ID
+   * @param toSceneId Target scene ID
+   * @return An object describing the connection properties
+   *
+   * @see {ITransitionConnection}
+   * @see {ScenesModule.getScenes} for information on how to retrieve scene IDs
+   *
+   */
+  @apiMethod()
+  async createConnection(
+    _ctx: IApiContext,
+    transitionId: string,
+    fromSceneId: string,
+    toSceneId: string,
+  ): Promise<ITransitionConnection> {
+    return this.transitionsService.addConnection(fromSceneId, toSceneId, transitionId);
+  }
+
+  /**
+   * Delete a scene transition connection
+   *
+   * @param _ctx API Context
+   * @param connectionId ID of the connection to be deleted
+   * @return `true` if the connection was successfully deleted
+   */
+  async deleteConnection(_ctx: IApiContext, connectionId: string): Promise<boolean> {
+    this.transitionsService.deleteConnection(connectionId);
+    return true;
   }
 
   private createTransitionOptions(

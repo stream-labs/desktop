@@ -14,6 +14,9 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop({ default: 'Select Option or Type New Value' })
   placeholder: string;
 
+  @Prop({ default: false })
+  allowEmpty: boolean;
+
   onInputHandler(option: IObsListOption<string>) {
     this.emitInput({ ...this.value, value: option.value });
   }

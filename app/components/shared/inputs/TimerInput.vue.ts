@@ -75,7 +75,7 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   setSecond(val: number) {
     const currentMinsInSecs = Math.floor((this.value % 3600) / 60) * 60;
-    this.updateValue(currentMinsInSecs + val * 1);
+    this.updateValue(currentMinsInSecs + val);
   }
 
   updateValue(value: number) {

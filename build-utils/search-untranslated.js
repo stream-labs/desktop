@@ -33,7 +33,7 @@ const recursive = require('recursive-readdir');
 
     const fileContent = fs.readFileSync(filePath).toString();
     let match;
-    while (match = searchExp.exec(fileContent)) {
+    while ((match = searchExp.exec(fileContent))) {
       let string = match[1];
       string = string.replace('\\', '');
       if (!foundStrings.includes(string)) foundStrings.push(string);

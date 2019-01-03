@@ -98,13 +98,12 @@ export default class MediaGallery extends Vue {
     return this.formatBytes(this.maxUsage, 2);
   }
 
-  formatBytes(bytes: number, argPlaces: number) {
+  formatBytes(bytes: number, argPlaces: number = 1) {
     if (!bytes) {
       return '0KB';
     }
 
-    const places = argPlaces || 1;
-    const divisor = Math.pow(10, places);
+    const divisor = Math.pow(10, argPlaces);
     const base = Math.log(bytes) / Math.log(1024);
     const suffix = ['', 'KB', 'MB', 'GB', 'TB'][Math.floor(base)];
     return Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor + suffix;
@@ -146,7 +145,7 @@ export default class MediaGallery extends Vue {
     this.category = 'stock';
   }
 
-  selectFile(file: IMediaGalleryFile, select: boolean) {
+  selectFile(file: IMediaGalleryFile, shouldSelect: boolean = false) {
     if (this.filter && file.type !== this.filter) {
       return this.$toasted.show($t('Not a supported file type'), {
         duration: 1000,
@@ -161,7 +160,7 @@ export default class MediaGallery extends Vue {
       audio.play();
     }
 
-    if (select) this.handleSelect();
+    if (shouldSelect) this.handleSelect();
   }
 
   handleSelect() {

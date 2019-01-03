@@ -3,7 +3,7 @@ import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
@@ -236,9 +236,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return fetch(request).then(handleResponse);
   }
 
   async showLogin() {
@@ -275,10 +273,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-
     return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
+      .then(handleResponse)
       .catch(() => null);
   }
 

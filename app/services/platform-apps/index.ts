@@ -12,7 +12,7 @@ import electron from 'electron';
 import { DevServer } from './dev-server';
 import url from 'url';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, handleErrors } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
 import { compact, trim, without } from 'lodash';
 import uuid from 'uuid/v4';
@@ -189,8 +189,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .catch(() => []);
   }
 
@@ -238,8 +237,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.is_app_store_visible)
       .catch(() => false);
   }
@@ -466,8 +464,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.id_hash)
       .catch(() => null);
   }
@@ -479,8 +476,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.dev_mode)
       .catch(() => false);
   }

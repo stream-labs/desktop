@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
@@ -9,12 +8,12 @@ import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
-  IListMetadata,
-  ITextMetadata,
-  INumberMetadata,
   EInputType,
+  IListMetadata,
+  INumberMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs';
-import { IAlertMessage, NEW_ALERT_MODAL_ID, ChatbotAlertType } from 'services/chatbot';
+import { ChatbotAlertType, IAlertMessage, NEW_ALERT_MODAL_ID } from 'services/chatbot';
 
 interface INewAlertMetadata {
   follow: {

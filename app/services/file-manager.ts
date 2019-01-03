@@ -144,6 +144,7 @@ export class FileManagerService extends Service {
       await this.writeFile(filePath, file.data);
 
       if (version !== file.version) {
+        // TODO: throw here seems to be used as control flow
         throw new Error('Wrote out of date file!  Will retry...');
       }
 
@@ -162,7 +163,7 @@ export class FileManagerService extends Service {
 
   /**
    * Checks if a file exists
-   * @param string a path to the file
+   * @param filePath a path to the file
    */
   private fileExists(filePath: string): Promise<boolean> {
     return new Promise(resolve => {
