@@ -47,7 +47,6 @@ export default class TopNav extends Vue {
 
   availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
-
   mounted() {
     this.topNav = this.$refs.top_nav;
   }
