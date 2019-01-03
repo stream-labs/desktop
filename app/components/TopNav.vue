@@ -209,7 +209,7 @@
 .theme-toggle__bg {
   height: 14px;
   width: 30px;
-  padding: 0px 16px;
+  padding: 0 16px;
   background: #e3e8eb;
   position: relative;
   border-radius: 10px;

@@ -135,7 +135,7 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 2px 0px rgba(252, 62, 63, 0.6);
+    box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
   }
   70% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0.6);
