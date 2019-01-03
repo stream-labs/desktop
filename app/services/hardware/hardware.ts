@@ -33,7 +33,6 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     return this.state.devices;
   }
 
-
   getDeviceByName(name: string) {
     return this.state.devices.find(device => device.description === name);
   }

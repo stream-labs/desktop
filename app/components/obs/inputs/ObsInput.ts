@@ -473,7 +473,6 @@ export function setupConfigurableDefaults(
     /* If setting isn't set at all, set to first element. */
     if (settings[obsProp.name] === void 0) {
       defaultSettings[obsProp.name] = items[0].value;
-      continue;
     }
   } while ((obsProp = obsProp.next()));
   const needUpdate = Object.keys(defaultSettings).length > 0;
