@@ -112,14 +112,17 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    this.facemasksService;
+    // Eager load services
+    const _ = [
+      this.facemasksService,
 
-    this.incrementalRolloutService;
-    this.shortcutsService;
-    this.streamlabelsService;
+      this.incrementalRolloutService,
+      this.shortcutsService,
+      this.streamlabelsService,
 
-    // Pre-fetch stream info
-    this.streamInfoService;
+      // Pre-fetch stream info
+      this.streamInfoService,
+    ];
 
     this.performanceMonitorService.start();
 
@@ -128,7 +131,8 @@ export class AppService extends StatefulService<IAppState> {
 
     this.patchNotesService.showPatchNotesIfRequired(onboarded);
     this.announcementsService.updateBanner();
-    this.outageNotificationsService;
+
+    const _outageService = this.outageNotificationsService;
 
     this.crashReporterService.endStartup();
 
