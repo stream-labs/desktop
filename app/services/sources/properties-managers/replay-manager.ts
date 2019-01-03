@@ -5,8 +5,9 @@ import { StreamingService } from 'services/streaming';
 export class ReplayManager extends PropertiesManager {
   @Inject() streamingService: StreamingService;
 
+  blacklist: string[] = [];
+
   init() {
-    console.log('init replay');
     console.log(this.obsSource.settings);
 
     this.streamingService.replayBufferFileWrite.subscribe(filePath => {
