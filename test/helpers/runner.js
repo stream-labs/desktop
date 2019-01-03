@@ -30,7 +30,7 @@ function retryTests() {
     return false;
   }
 
-  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile));
+  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf-8'));
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {

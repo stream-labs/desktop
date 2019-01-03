@@ -2,7 +2,7 @@ const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+const CONFIG = require('./config.json');
 
 const branches = [
   'current',
