@@ -361,14 +361,17 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return (
       this.userService.platform.type === 'mixer' &&
       (['follow', 'host', 'resub', 'sub'].includes(prefix) ||
-        ['auto_host_enabled', 'recent_events_host_min_viewer_count', 'show_resub_message'].includes(
-          key,
-        ))
+        [
+          'auto_host_enabled',
+          'recent_events_host_min_viewer_count',
+          'show_resub_message',
+          'background_color',
+        ].includes(key))
     );
   }
 
   private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
-    const settingsObj = {} as IAlertBoxApiSettings;
+    const settingsObj = { mixer_account: {} } as IAlertBoxApiSettings;
     Object.keys(settings).forEach(setting => {
       const prefix = Object.keys(API_NAME_MAP).find(key => API_NAME_MAP[key] === setting);
       if (prefix && prefix !== 'resub') {
@@ -383,9 +386,6 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
             : this.unshapeVariation(defaultVariation, bitsPrefix);
         Object.keys(flattenedDefault).forEach(key => {
           if (this.isMixerKey(prefix, key)) {
-            if (!settingsObj.mixer_account) {
-              settingsObj.mixer_account = {} as IAlertBoxMixerSettings;
-            }
             settingsObj.mixer_account[key] = flattenedDefault[key];
           } else {
             settingsObj[key] = flattenedDefault[key];
