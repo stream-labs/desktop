@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
@@ -42,9 +42,8 @@ export default class Chat extends Vue {
         });
       });
     } else {
-      service.getChatUrl(nightMode).then(chatUrl => this.chatUrl = chatUrl);
+      service.getChatUrl(nightMode).then(chatUrl => (this.chatUrl = chatUrl));
     }
-
 
     webview.addEventListener('new-window', e => {
       const parsedUrl = url.parse(e.url);
@@ -57,15 +56,18 @@ export default class Chat extends Vue {
           (parsedUrl.host === 'twitch.tv' || parsedUrl.host.endsWith('.twitch.tv')) &&
           parsedUrl.query.includes('ffz-settings')
         ) {
-          this.windowsService.createOneOffWindow({
-            componentName: 'FFZSettings',
-            title: $t('FrankerFaceZ Settings'),
-            queryParams: {},
-            size: {
-              width: 800,
-              height: 800
-            }
-          }, 'ffz-settings');
+          this.windowsService.createOneOffWindow(
+            {
+              componentName: 'FFZSettings',
+              title: $t('FrankerFaceZ Settings'),
+              queryParams: {},
+              size: {
+                width: 800,
+                height: 800,
+              },
+            },
+            'ffz-settings',
+          );
         } else {
           electron.remote.shell.openExternal(e.url);
         }
@@ -76,9 +78,10 @@ export default class Chat extends Vue {
       webview.setZoomFactor(settings.chatZoomFactor);
 
       if (settings.enableBTTVEmotes && this.isTwitch) {
-        webview.executeJavaScript(`
+        webview.executeJavaScript(
+          `
           localStorage.setItem('bttv_clickTwitchEmotes', true);
-          localStorage.setItem('bttv_darkenedMode', ${ settings.nightMode ? 'true' : 'false' });
+          localStorage.setItem('bttv_darkenedMode', ${settings.nightMode ? 'true' : 'false'});
 
           var bttvscript = document.createElement('script');
           bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
@@ -96,20 +99,24 @@ export default class Chat extends Vue {
           }
 
           loadLazyEmotes();
-        `, true);
+        `,
+          true,
+        );
       }
       if (settings.enableFFZEmotes && this.isTwitch) {
-        webview.executeJavaScript(`
+        webview.executeJavaScript(
+          `
           var ffzscript1 = document.createElement('script');
           ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
           document.head.appendChild(ffzscript1);
-        `, true);
+        `,
+          true,
+        );
       }
     });
 
-
-    this.settingsSubscr = this.customizationService.settingsChanged.subscribe(
-      (changedSettings) => this.onSettingsChangedHandler(changedSettings)
+    this.settingsSubscr = this.customizationService.settingsChanged.subscribe(changedSettings =>
+      this.onSettingsChangedHandler(changedSettings),
     );
   }
 
@@ -137,5 +144,4 @@ export default class Chat extends Vue {
       this.refresh();
     }
   }
-
 }

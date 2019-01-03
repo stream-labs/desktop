@@ -2,12 +2,7 @@ import { Service } from '../service';
 import * as obs from '../../../obs-api';
 import { continentMap } from './continent-map';
 
-export type TConfigEvent =
-  'starting_step' |
-  'progress' |
-  'stopping_step' |
-  'error' |
-  'done';
+export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
 export interface IConfigStep {
   startMethod: string;
@@ -24,7 +19,6 @@ export interface IConfigProgress {
 type TConfigProgressCallback = (progress: IConfigProgress) => void;
 
 export class AutoConfigService extends Service {
-
   start(cb: TConfigProgressCallback) {
     this.fetchLocation(cb).then(continent => {
       obs.NodeObs.InitializeAutoConfig(
@@ -33,9 +27,9 @@ export class AutoConfigService extends Service {
           cb(progress);
         },
         {
+          continent,
           service_name: 'Twitch',
-          continent
-        }
+        },
       );
 
       obs.NodeObs.StartBandwidthTest();
@@ -76,35 +70,36 @@ export class AutoConfigService extends Service {
     cb({
       event: 'starting_step',
       description: 'detecting_location',
-      percentage: 0
+      percentage: 0,
     });
 
-    return fetch(request).then(response => {
-      cb({
-        event: 'stopping_step',
-        description: 'detecting_location',
-        percentage: 100
+    return fetch(request)
+      .then(response => {
+        cb({
+          event: 'stopping_step',
+          description: 'detecting_location',
+          percentage: 100,
+        });
+
+        return response.json();
+      })
+      .then(json => {
+        const continent = this.countryCodeToContinent(json.country_code);
+
+        cb({
+          continent,
+          event: 'stopping_step',
+          description: 'location_found',
+        });
+
+        return continent;
+      })
+      .catch(() => {
+        return 'Other';
       });
-
-      return response.json();
-    }).then(json => {
-      const continent = this.countryCodeToContinent(json.country_code);
-
-      cb({
-        event: 'stopping_step',
-        description: 'location_found',
-        continent
-      });
-
-      return continent;
-    }).catch(() => {
-      return 'Other';
-    });
   }
 
   countryCodeToContinent(code: string) {
     return continentMap[code];
   }
-
-
 }

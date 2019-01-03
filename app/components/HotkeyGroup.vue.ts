@@ -5,12 +5,10 @@ import Hotkey from './shared/Hotkey.vue';
 @Component({
   props: {
     title: String,
-    hotkeys: Array
+    hotkeys: Array,
   },
-  components: { Hotkey }
+  components: { Hotkey },
 })
 export default class HotkeyGroup extends Vue {
-
   collapsed = false;
-
 }

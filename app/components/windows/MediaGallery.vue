@@ -48,7 +48,7 @@
             <ul v-if="files.length" class="uploads-manager__list">
               <li v-for="file in files" :key="file.href" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                 <div>
-                  <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
+                  <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
                     <video loop :src="file.href" style="height: 100%; width: 100%"></video>
                   </div>
                   <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)" class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>

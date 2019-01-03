@@ -1,11 +1,11 @@
-import { GenericTestContext } from 'ava';
 import { IInputMetadata } from '../../app/components/shared/inputs';
 import { SpectronClient } from 'spectron';
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
+import { TExecutionContext } from './spectron';
 
 interface IFormMonkeyFillOptions {
-  metadata?: Dictionary<IInputMetadata>
+  metadata?: Dictionary<IInputMetadata>;
 }
 
 interface IUIInput {
@@ -19,17 +19,16 @@ interface IUIInput {
  * helper for simulating user input into SLOBS forms
  */
 export class FormMonkey {
-
   private client: SpectronClient;
 
-  constructor(private t: GenericTestContext<any>, private showLogs = false) {
+  constructor(private t: TExecutionContext, private showLogs = false) {
     this.client = t.context.app.client;
   }
 
   async getInputs(formName: string): Promise<IUIInput[]> {
     const formSelector = `form[name=${formName}]`;
 
-    if (!await this.client.isExisting(formSelector)) {
+    if (!(await this.client.isExisting(formSelector))) {
       throw new Error(`form not found: ${formName}`);
     }
 
@@ -42,7 +41,7 @@ export class FormMonkey {
       const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
       const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
       const selector = `form[name=${formName}] [data-name="${name}"]`;
-      result.push({ id, name, type, selector})
+      result.push({ id, name, type, selector });
     }
     return result;
   }
@@ -53,6 +52,7 @@ export class FormMonkey {
   async fill(formName: string, formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
     const inputs = await this.getInputs(formName);
 
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     formData = cloneDeep(formData);
 
     for (const input of inputs) {
@@ -95,7 +95,6 @@ export class FormMonkey {
     if (notFoundFields.length) {
       throw new Error(`Fields not found: ${JSON.stringify(notFoundFields)}`);
     }
-
   }
 
   /**
@@ -106,8 +105,6 @@ export class FormMonkey {
     const formData = {};
 
     for (const input of inputs) {
-
-
       let value;
       this.log(`get the value for the ${input.type} field: ${input.name}`);
 
@@ -153,7 +150,7 @@ export class FormMonkey {
   }
 
   async setTextValue(selector: string, value: string) {
-    const inputSelector = selector + ' input';
+    const inputSelector = `${selector} input`;
     // await this.client.click(inputSelector);
     await this.client.clearElement(inputSelector);
     await this.client.setValue(inputSelector, value);
@@ -174,6 +171,7 @@ export class FormMonkey {
 
   async setColorValue(selector: string, value: string) {
     await this.client.click(`${selector} .colorpicker__input`); // open colorpicker
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     value = value.substr(1); // get rid of # character in value
     const inputSelector = `${selector} .vc-input__input`;
     await this.setInputValue(inputSelector, value);
@@ -185,9 +183,9 @@ export class FormMonkey {
   }
 
   async getListValue(selector: string): Promise<string> {
-    const id = (await this.client.$(`${selector} .multiselect .multiselect__option--selected span`) as any)
-      .value
-      .ELEMENT;
+    const id = ((await this.client.$(
+      `${selector} .multiselect .multiselect__option--selected span`,
+    )) as any).value.ELEMENT;
     return (await this.client.elementIdAttribute(id, 'data-option-value')).value;
   }
 
@@ -195,7 +193,7 @@ export class FormMonkey {
     const checkboxSelector = `${selector} input`;
     await this.client.click(checkboxSelector);
 
-    if (!value && await this.client.isSelected(checkboxSelector)) {
+    if (!value && (await this.client.isSelected(checkboxSelector))) {
       await this.client.click(checkboxSelector);
     }
   }
@@ -206,11 +204,13 @@ export class FormMonkey {
   }
 
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
-
     await sleep(500); // slider has an initialization delay
 
     const dotSelector = `${sliderInputSelector} .vue-slider-dot`;
-    const sliderWidth = await this.client.getElementSize(`${sliderInputSelector} .vue-slider-wrap`, 'width');
+    const sliderWidth = await this.client.getElementSize(
+      `${sliderInputSelector} .vue-slider-wrap`,
+      'width',
+    );
     let moveOffset = sliderWidth;
 
     // reset slider to 0 position
@@ -223,7 +223,7 @@ export class FormMonkey {
 
     // use a bisection method to find the correct slider position
     while (true) {
-      let currentValue = await this.getSliderValue(sliderInputSelector);
+      const currentValue = await this.getSliderValue(sliderInputSelector);
 
       if (currentValue === goalValue) {
         // we've found it
@@ -249,9 +249,9 @@ export class FormMonkey {
 
   async setInputValue(selector: string, value: string) {
     await this.client.click(selector);
-    await (this.client.keys(['Control', 'a']) as any as Promise<any>); // clear
-    await (this.client.keys('Control') as any as Promise<any>); // release ctrl key
-    await (this.client.keys(value) as any as Promise<any>); // type text
+    await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
+    await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
+    await ((this.client.keys(value) as any) as Promise<any>); // type text
   }
 
   private log(...args: any[]) {

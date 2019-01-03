@@ -4,7 +4,7 @@ import uuid from 'uuid';
 import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 /**
  * VeeValidate doesn't support slots https://github.com/baianat/vee-validate/issues/325
@@ -12,13 +12,13 @@ import { Subject } from 'rxjs/Subject';
  */
 @Component({})
 export default class ValidatedForm extends Vue {
-
   @Prop() name: string;
 
   validated = new Subject<ErrorField[]>();
   validationScopeId = uuid();
 
   getInputs(children?: Vue[]): BaseInput<any, IInputMetadata>[] {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     children = children || this.$children;
     const inputs: BaseInput<any, IInputMetadata>[] = [];
     children.forEach(child => {

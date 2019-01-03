@@ -1,16 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.11.2',
-  title: 'Bug Fixes 🔧',
+  version: '0.11.7',
+  title: 'Facebook Live Support',
   showChest: false,
   notes: [
-    'Fixed an issue that would sometimes result in a "Failed to load scene collection" message',
-    'Fixed visual flickering in volmeters',
-    'Fixed a source of crashes on Windows 7',
-    'Fixed various input bugs in widget settings',
-    'Added hotkey support for media hotkeys',
-    'Fixed an issue that sometimes caused projectors to pop up as a white screen',
-    'Fixed a bug that would cause sources to move while they are being cropped'
-  ]
+    'You can now log in and stream to Facebook Live',
+    'Allow drag resizing of editor preview size and chat size',
+    'Fixed some issues when editing widget settings',
+    'Fixed a source of errors on shutdown',
+    'Fixed infinite loading when opening Widget Editor in some cases',
+    'Fixed an invalid server error in some cases',
+  ],
 };

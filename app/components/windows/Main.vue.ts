@@ -5,6 +5,8 @@ import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -49,8 +51,8 @@ import electron from 'electron';
     DesignSystem,
     PlatformAppWebview,
     PlatformAppStore,
-    Help
-  }
+    Help,
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -63,6 +65,8 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
+    this.mainMiddle = this.$refs.main_middle;
+    this.handleResize();
   }
 
   get title() {
@@ -89,7 +93,14 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  mainContentsRight = false;
+
   get leftDock() {
+    if (this.customizationService.state.leftDock) {
+      this.mainContentsRight = true;
+    } else {
+      this.mainContentsRight = false;
+    }
     return this.customizationService.state.leftDock;
   }
 
@@ -134,6 +145,56 @@ export default class Main extends Vue {
     while (fi--) {
       const file = files.item(fi);
       this.scenesService.activeScene.addFile(file.path);
+    }
+  }
+
+  $refs!: {
+    main_middle: HTMLDivElement;
+  };
+
+  mainMiddle: HTMLDivElement;
+  compactView = false;
+  mainMiddleWidth: number;
+
+  get mainResponsiveClasses() {
+    const classes = [];
+
+    if (this.compactView) {
+      classes.push('main-middle--compact');
+    }
+
+    return classes.join(' ');
+  }
+
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  windowWidth: number;
+
+  hasLiveDock = true;
+
+  windowSizeHandler() {
+    this.windowWidth = window.innerWidth;
+
+    if (this.windowWidth < 1100) {
+      this.hasLiveDock = false;
+    } else {
+      this.hasLiveDock = true;
+    }
+  }
+
+  handleResize() {
+    const mainMiddleWidth = this.mainMiddle.clientWidth;
+
+    if (this.mainMiddleWidth < 1200) {
+      this.compactView = true;
+    } else {
+      this.compactView = false;
     }
   }
 }

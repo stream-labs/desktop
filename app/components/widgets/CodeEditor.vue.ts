@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
-import { CodeInput, BoolInput } from 'components/shared/inputs/inputs';
-import { IWidgetData, WidgetSettingsService } from 'services/widgets';
+import { BoolInput, CodeInput } from 'components/shared/inputs/inputs';
+import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
-import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
@@ -12,11 +11,10 @@ import { debounce } from 'lodash-decorators';
 @Component({
   components: {
     CodeInput,
-    BoolInput
-  }
+    BoolInput,
+  },
 })
 export default class CodeEditor extends Vue {
-
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
@@ -25,7 +23,8 @@ export default class CodeEditor extends Vue {
   @Prop()
   value: IWidgetData;
 
-  editorInputValue = this.value.settings['custom_' + this.metadata.type] || this.value.settings[this.alertBoxValue];
+  editorInputValue =
+    this.value.settings[`custom_${this.metadata.type}`] || this.value.settings[this.alertBoxValue];
 
   private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
@@ -39,12 +38,13 @@ export default class CodeEditor extends Vue {
   }
 
   get alertBoxValue() {
-    const capitalizedType = this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
+    const capitalizedType =
+      this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
     return `custom${capitalizedType}`;
   }
 
   get hasChanges() {
-    return (this.serverInputValue !== this.editorInputValue);
+    return this.serverInputValue !== this.editorInputValue;
   }
 
   get canSave() {
@@ -62,7 +62,7 @@ export default class CodeEditor extends Vue {
 
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
-    newData.settings['custom_' + type] = this.editorInputValue;
+    newData.settings[`custom_${type}`] = this.editorInputValue;
     newData.settings[this.alertBoxValue] = this.editorInputValue;
     try {
       await this.settingsService.saveSettings(newData.settings);
@@ -80,7 +80,7 @@ export default class CodeEditor extends Vue {
     if (!this.hasDefaults) return;
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
-    newData.settings['custom_' + type] = this.value.custom_defaults[type];
+    newData.settings[`custom_${type}`] = this.value.custom_defaults[type];
     newData.settings[this.alertBoxValue] = this.value.custom_defaults[type];
   }
 }

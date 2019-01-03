@@ -7,7 +7,7 @@
     <textarea
       rows="4"
       :value="value.value"
-      :disabled="value.enabled == false"
+      :disabled="value.enabled === false"
       @change="onInputHandler"/>
   </div>
   <div class="input-wrapper" v-else>

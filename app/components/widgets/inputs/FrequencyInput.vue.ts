@@ -5,11 +5,9 @@ import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ListInput }
+  components: { ListInput },
 })
-
 export default class FrequencyInput extends BaseInput<string, {}> {
-
   @Prop()
   readonly value: string;
 
@@ -24,15 +22,13 @@ export default class FrequencyInput extends BaseInput<string, {}> {
     { title: $t('Rarely'), value: '2' },
     { title: $t('As Default'), value: '3' },
     { title: $t('Frequently'), value: '4' },
-    { title: $t('Very Frequently'), value: '5' }
+    { title: $t('Very Frequently'), value: '5' },
   ];
-
 
   get listInputMetadata() {
     return {
       ...this.options,
-      options: this.listOptions
-    }
+      options: this.listOptions,
+    };
   }
-
 }

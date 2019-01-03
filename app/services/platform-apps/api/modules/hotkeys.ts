@@ -4,7 +4,7 @@ import { KeyListenerService, IKeyBinding } from 'services/key-listener';
 
 enum EKeyListenerType {
   Up = 'up',
-  Down = 'down'
+  Down = 'down',
 }
 
 interface IKeyReference {
@@ -15,11 +15,10 @@ interface IKeyReference {
     ctrl?: boolean;
     shift?: boolean;
     meta?: boolean;
-  }
+  };
 }
 
 export class HotkeysModule extends Module {
-
   moduleName = 'Hotkeys';
   permissions = [EApiPermissions.Hotkeys];
 
@@ -29,7 +28,7 @@ export class HotkeysModule extends Module {
   registerKey(ctx: IApiContext, reference: IKeyReference, callback: () => void) {
     return this.keyListenerService.register(
       { ...this.referenceToBinding(reference), callback },
-      this.getNamespace(ctx.app.id)
+      this.getNamespace(ctx.app.id),
     );
   }
 
@@ -37,8 +36,8 @@ export class HotkeysModule extends Module {
   unregisterKey(ctx: IApiContext, reference: IKeyReference) {
     this.keyListenerService.unregister(
       this.referenceToBinding(reference),
-      this.getNamespace(ctx.app.id)
-    )
+      this.getNamespace(ctx.app.id),
+    );
   }
 
   @apiMethod()
@@ -54,13 +53,12 @@ export class HotkeysModule extends Module {
         alt: !!ref.modifiers.alt,
         ctrl: !!ref.modifiers.ctrl,
         shift: !!ref.modifiers.shift,
-        meta: !!ref.modifiers.meta
-      }
+        meta: !!ref.modifiers.meta,
+      },
     };
   }
 
   private getNamespace(appId: string) {
     return `PlatformApp-${appId}`;
   }
-
 }

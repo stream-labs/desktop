@@ -1,5 +1,4 @@
 .DS_Store
-.idea
 node_modules/
 build/
 npm-debug.log
@@ -17,3 +16,5 @@ electron.VC.db
 .vs/
 plugins/
 yarn-error.log
+.opt-in
+

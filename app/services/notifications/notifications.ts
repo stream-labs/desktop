@@ -1,7 +1,7 @@
 import { Inject } from '../../util/injector';
 import { mutation } from '../stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
 import { IObsInput, TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -10,7 +10,7 @@ import {
   INotification,
   INotificationOptions,
   INotificationsServiceApi,
-  INotificationsSettings
+  INotificationsSettings,
 } from './notifications-api';
 import { $t } from 'services/i18n';
 
@@ -19,15 +19,14 @@ interface INotificationsState {
   notifications: INotification[];
 }
 
-export class NotificationsService extends PersistentStatefulService<
-  INotificationsState
-> implements INotificationsServiceApi {
+export class NotificationsService extends PersistentStatefulService<INotificationsState>
+  implements INotificationsServiceApi {
   static defaultState: INotificationsState = {
     notifications: [],
     settings: {
       enabled: true,
-      playSound: false
-    }
+      playSound: false,
+    },
   };
 
   @Inject() private windowsService: WindowsService;
@@ -52,7 +51,7 @@ export class NotificationsService extends PersistentStatefulService<
       playSound: true,
       lifeTime: 8000,
       showTime: false,
-      ...notifyInfo
+      ...notifyInfo,
     };
     this.PUSH(notify);
     this.notificationPushed.next(notify);
@@ -111,7 +110,7 @@ export class NotificationsService extends PersistentStatefulService<
         description: $t('Enable notifications'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
-        enabled: true
+        enabled: true,
       },
 
       <IObsInput<boolean>>{
@@ -120,8 +119,8 @@ export class NotificationsService extends PersistentStatefulService<
         description: $t('Enable sound'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
-        enabled: settings.enabled
-      }
+        enabled: settings.enabled,
+      },
     ];
   }
 
@@ -139,11 +138,10 @@ export class NotificationsService extends PersistentStatefulService<
       title: $t('Notifications'),
       size: {
         width: 600,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
-
 
   @mutation()
   private SET_SETTINGS(patch: Partial<INotificationsSettings>) {
@@ -167,8 +165,6 @@ export class NotificationsService extends PersistentStatefulService<
 
   @mutation()
   private MARK_AS_READ(id: number) {
-    this.state.notifications
-      .find(notify => (notify.id === id))
-      .unread = false;
+    this.state.notifications.find(notify => notify.id === id).unread = false;
   }
 }

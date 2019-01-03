@@ -5,13 +5,13 @@ import moment from 'moment';
 import { padStart } from 'lodash';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import electron from 'electron';
 import {
   IStreamingServiceApi,
   IStreamingServiceState,
   EStreamingState,
-  ERecordingState
+  ERecordingState,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
@@ -23,7 +23,7 @@ import { NotificationsService, ENotificationType, INotification } from 'services
 
 enum EOBSOutputType {
   Streaming = 'streaming',
-  Recording = 'recording'
+  Recording = 'recording',
 }
 
 enum EOBSOutputSignal {
@@ -32,7 +32,7 @@ enum EOBSOutputSignal {
   Stopping = 'stopping',
   Stop = 'stop',
   Reconnect = 'reconnect',
-  ReconnectSuccess = 'reconnect_success'
+  ReconnectSuccess = 'reconnect_success',
 }
 
 interface IOBSOutputSignalInfo {
@@ -64,15 +64,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
-    recordingStatusTime: new Date().toISOString()
+    recordingStatusTime: new Date().toISOString(),
   };
 
   init() {
-    obs.NodeObs.OBS_service_connectOutputSignals(
-      (info: IOBSOutputSignalInfo) => {
-        this.handleOBSOutputSignal(info);
-      }
-    );
+    obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
+      this.handleOBSOutputSignal(info);
+    });
   }
 
   getModel() {
@@ -105,9 +103,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
     const confirmText = 'Are you sure you want to start streaming?';
     if (shouldConfirm && !confirm(confirmText)) return;
-    this.powerSaveId = electron.remote.powerSaveBlocker.start(
-      'prevent-display-sleep'
-    );
+    this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
     obs.NodeObs.OBS_service_startStreaming();
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
@@ -130,8 +126,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Starting ||
       this.state.streamingStatus === EStreamingState.Live
     ) {
-      const shouldConfirm = this.settingsService.state.General
-        .WarnBeforeStoppingStream;
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
 
       if (shouldConfirm && !confirm(confirmText)) return;
@@ -142,12 +137,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       obs.NodeObs.OBS_service_stopStreaming(false);
 
-      const keepRecording = this.settingsService.state.General
-        .KeepRecordingWhenStreamStops;
-      if (
-        !keepRecording &&
-        this.state.recordingStatus === ERecordingState.Recording
-      ) {
+      const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
+      if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
         this.toggleRecording();
       }
 
@@ -195,8 +186,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       queryParams: {},
       size: {
         width: 500,
-        height: 400
-      }
+        height: 400,
+      },
     });
   }
 
@@ -215,8 +206,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Starting ||
       this.state.streamingStatus === EStreamingState.Ending
     ) {
-      const elapsedTime =
-        moment().unix() - this.streamingStateChangeTime.unix();
+      const elapsedTime = moment().unix() - this.streamingStateChangeTime.unix();
       return Math.max(this.delaySeconds - elapsedTime, 0);
     }
 
@@ -229,16 +219,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    */
   get formattedDurationInCurrentStreamingState() {
     const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
-    if (formattedTime === '03:50:00' && this.userService.platform.type ===  'facebook') {
+    if (formattedTime === '03:50:00' && this.userService.platform.type === 'facebook') {
       const msg = $t('You are 10 minutes away from the 4 hour stream limit');
-      const existingTimeupNotif = this.notificationsService.getUnread()
+      const existingTimeupNotif = this.notificationsService
+        .getUnread()
         .filter((notice: INotification) => notice.message === msg);
       if (existingTimeupNotif.length !== 0) return formattedTime;
       this.notificationsService.push({
         type: ENotificationType.INFO,
         lifeTime: 600000,
         showTime: true,
-        message: msg
+        message: msg,
       });
     }
     return formattedTime;
@@ -250,20 +241,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private sendReconnectingNotification() {
     const msg = $t('Stream has disconnected, attempting to reconnect.');
-    const existingReconnectNotif = this.notificationsService.getUnread()
+    const existingReconnectNotif = this.notificationsService
+      .getUnread()
       .filter((notice: INotification) => notice.message === msg);
     if (existingReconnectNotif.length !== 0) return;
     this.notificationsService.push({
       type: ENotificationType.WARNING,
       lifeTime: -1,
       showTime: true,
-      message: msg
+      message: msg,
     });
   }
 
   private clearReconnectingNotification() {
-    const notice = this.notificationsService.getAll()
-      .find((notice: INotification) => notice.message === $t('Stream has disconnected, attempting to reconnect.'));
+    const notice = this.notificationsService
+      .getAll()
+      .find(
+        (notice: INotification) =>
+          notice.message === $t('Stream has disconnected, attempting to reconnect.'),
+      );
     if (!notice) return;
     this.notificationsService.markAsRead(notice.id);
   }
@@ -302,7 +298,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         this.usageStatisticsService.recordEvent('stream_start', {
           ...streamEncoderInfo,
-          game
+          game,
         });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
@@ -345,24 +341,29 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       let errorText = '';
 
       if (info.code === obs.EOutputCode.BadPath) {
-        errorText =
-          $t('Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.');
+        errorText = $t(
+          'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
+        );
       } else if (info.code === obs.EOutputCode.ConnectFailed) {
-        errorText =
-          $t('Failed to connect to the streaming server.  Please check your internet connection.');
+        errorText = $t(
+          'Failed to connect to the streaming server.  Please check your internet connection.',
+        );
       } else if (info.code === obs.EOutputCode.Disconnected) {
-        errorText =
-          $t('Disconnected from the streaming server.  Please check your internet connection.');
+        errorText = $t(
+          'Disconnected from the streaming server.  Please check your internet connection.',
+        );
       } else if (info.code === obs.EOutputCode.InvalidStream) {
         errorText =
-          $t('Could not access the specified channel or stream key, please double-check your stream key.  ') +
-          $t('If it is correct, there may be a problem connecting to the server.');
+          $t(
+            'Could not access the specified channel or stream key, please double-check your stream key.  ',
+          ) + $t('If it is correct, there may be a problem connecting to the server.');
       } else if (info.code === obs.EOutputCode.NoSpace) {
         errorText = $t('There is not sufficient disk space to continue recording.');
       } else if (info.code === obs.EOutputCode.Unsupported) {
         errorText =
-          $t('The output format is either unsupported or does not support more than one audio track.  ') +
-          $t('Please check your settings and try again.');
+          $t(
+            'The output format is either unsupported or does not support more than one audio track.  ',
+          ) + $t('Please check your settings and try again.');
       } else if (info.code === obs.EOutputCode.Error) {
         errorText = $t('An unexpected error occurred:') + info.error;
       }

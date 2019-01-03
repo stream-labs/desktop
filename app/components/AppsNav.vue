@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="apps-nav-wrapper">
   <div class="apps-nav">
     <div
       v-if="hasPrev"
@@ -10,13 +10,13 @@
     </div>
     <div
       ref="app_tabs"
-      @scroll="calculateScrolls"
       class="apps-tab__container"
       :class="{
         'has-next': hasNext,
         'has-prev': hasPrev
       }"
     >
+      <resize-observer @notify="handleResize"></resize-observer>
       <span
         v-for="(app, index) in topNavApps"
         :key="index"
@@ -50,7 +50,12 @@
 <script lang="ts" src="./AppsNav.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
+
+.apps-nav-wrapper {
+  position: relative;
+  height: 35px;
+}
 
 .apps-nav {
   display: flex;
@@ -58,12 +63,17 @@
   align-items: center;
   .padding-h-sides();
   position: relative;
-  max-width:  none;
+  max-width: none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 35px;
   height: 35px;
   z-index: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
 
 .apps-tab__container {
@@ -71,30 +81,32 @@
   overflow-x: auto;
   white-space: nowrap;
   overflow-y: hidden;
-  // margin-bottom: -4px;
 
   &.has-prev {
-    margin-left: 15px;
-  }
-  &.has-next {
-    margin-right: 15px;
+    .margin-left();
   }
 
+  &.has-next {
+    .margin-right();
+  }
 }
 
 .apps-nav-control {
   cursor: pointer;
+  position: relative;
 
   &.has-prev {
-    margin-left: 8px;
-     i {
-      margin-right: 5px;
+    .margin-left();
+
+    i {
+      .margin-right();
     }
   }
   &.has-next {
-    margin-right: 8px;
-     i {
-      margin-left: 5px;
+    .margin-right();
+
+    i {
+      .margin-left();
     }
   }
 }
@@ -104,7 +116,6 @@
   width: 0;
   height: 0;
 }
-
 
 .app-tab {
   .padding();
@@ -129,9 +140,9 @@
   .app-tab {
     color: @night-paragraph;
 
-      &.is-active {
-        color: @night-title;
-      }
+    &.is-active {
+      color: @night-title;
+    }
   }
 }
 </style>

@@ -4,11 +4,10 @@ import { IChatbotTimer } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
-
 @Component({
   components: {
-    ChatbotPagination
-  }
+    ChatbotPagination,
+  },
 })
 export default class ChatbotTimers extends ChatbotBase {
   searchQuery = '';
@@ -44,16 +43,12 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotCommonService.openTimerWindow(timer);
   }
 
-  onToggleEnableTimerHandler(
-    timerId: string,
-    index: number,
-    isEnabled: boolean
-  ) {
+  onToggleEnableTimerHandler(timerId: string, index: number, isEnabled: boolean) {
     const timerToBeUpdated = this.timers[index];
 
     this.chatbotApiService.updateTimer(timerId, {
       ...timerToBeUpdated,
-      enabled: isEnabled
+      enabled: isEnabled,
     });
   }
 

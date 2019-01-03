@@ -2,7 +2,6 @@ import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import { compact } from 'lodash';
 
-
 /**
  * This is the interface that the rest of the app uses
  * to interact with property managers in a generic way.
@@ -16,7 +15,6 @@ export interface IPropertyManager {
   customUIComponent: string;
 }
 
-
 /**
  * A property manager is a class that manages the source
  * properties for a particular source.  It shares the same
@@ -27,7 +25,6 @@ export interface IPropertyManager {
  * be exposed.
  */
 export abstract class PropertiesManager implements IPropertyManager {
-
   /**
    * Create a new properties manager
    * @param obsSource The source this class manages
@@ -38,7 +35,6 @@ export abstract class PropertiesManager implements IPropertyManager {
     this.applySettings(settings);
     this.init();
   }
-
 
   /**
    * These are settings for the properties manager
@@ -52,14 +48,11 @@ export abstract class PropertiesManager implements IPropertyManager {
    */
   protected destroyed = false;
 
-
   /**
    * Can be used to attach custom startup behavior to this
    * properties manager.
    */
-  init() {
-  }
-
+  init() {}
 
   /**
    * Can be used to attach custom teardown behavior to this
@@ -69,13 +62,11 @@ export abstract class PropertiesManager implements IPropertyManager {
     this.destroyed = true;
   }
 
-
   /**
    * The blacklist is a list of OBS property names that
    * should not be displayed to the user.
    */
   blacklist: string[] = [];
-
 
   /**
    * displayOrder will be used as a list of property
@@ -85,13 +76,11 @@ export abstract class PropertiesManager implements IPropertyManager {
    */
   displayOrder: string[] = [];
 
-
   /**
    * The name of a custom component that will be shown in the
    * source properties window.
    */
   customUIComponent: string;
-
 
   /**
    * Called to apply new settings on the properties manager.
@@ -102,10 +91,9 @@ export abstract class PropertiesManager implements IPropertyManager {
   applySettings(settings: Dictionary<any>) {
     this.settings = {
       ...this.settings,
-      ...settings
+      ...settings,
     };
   }
-
 
   getPropertiesFormData(): input.TObsFormData {
     const obsProperties = input.getPropertiesFormData(this.obsSource);
@@ -127,7 +115,6 @@ export abstract class PropertiesManager implements IPropertyManager {
     return propsArray;
   }
 
-
   /**
    * By default, simply delegates to the normal
    * setPropertiesFormData function in Input.ts.
@@ -138,5 +125,4 @@ export abstract class PropertiesManager implements IPropertyManager {
   setPropertiesFormData(properties: input.TObsFormData) {
     input.setPropertiesFormData(this.obsSource, properties);
   }
-
 }

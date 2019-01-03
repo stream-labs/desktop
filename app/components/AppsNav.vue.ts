@@ -3,6 +3,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 @Component({})
 export default class AppsNav extends Vue {
@@ -24,36 +26,25 @@ export default class AppsNav extends Vue {
 
   private scrollIncrement = 100;
 
-  created() {
-    window.addEventListener('resize', this.calculateScrolls);
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.calculateScrolls);
-  }
-
   mounted() {
     this.isMounted = true;
     this.appTabsContainer = this.$refs.app_tabs;
-    this.calculateScrolls();
   }
 
   scrollLeft() {
-    this.appTabsContainer.scrollLeft =
-      this.appTabsContainer.scrollLeft - this.scrollIncrement;
+    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft - this.scrollIncrement;
   }
 
   scrollRight() {
-    this.appTabsContainer.scrollLeft =
-      this.appTabsContainer.scrollLeft + this.scrollIncrement;
+    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft + this.scrollIncrement;
   }
 
-  calculateScrolls() {
+  handleResize() {
     if (!this.isMounted) return false;
-    this.canScroll =
-      this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
+
+    this.canScroll = this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
     this.hasPrev = this.appTabsContainer.scrollLeft > 0;
-    let scrollRight =
+    const scrollRight =
       this.appTabsContainer.scrollWidth -
       (this.appTabsContainer.scrollLeft + this.appTabsContainer.clientWidth);
 
@@ -61,7 +52,9 @@ export default class AppsNav extends Vue {
   }
 
   isSelectedApp(appId: string) {
-    return this.page === 'PlatformAppContainer' && this.navigationService.state.params.appId === appId;
+    return (
+      this.page === 'PlatformAppContainer' && this.navigationService.state.params.appId === appId
+    );
   }
 
   get topNavApps() {

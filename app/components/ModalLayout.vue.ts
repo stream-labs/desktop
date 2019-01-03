@@ -8,7 +8,6 @@ import electron from 'electron';
 
 @Component({})
 export default class ModalLayout extends Vue {
-
   contentStyle: Object = {};
   fixedStyle: Object = {};
 
@@ -45,17 +44,16 @@ export default class ModalLayout extends Vue {
   @Prop({ default: false })
   customControls: boolean;
 
-
   created() {
     const contentStyle = {
       padding: '16px',
-      overflowY: 'auto'
+      overflowY: 'auto',
     };
 
     Object.assign(contentStyle, this.contentStyles);
 
     const fixedStyle = {
-      height: (this.fixedSectionHeight || 0).toString() + 'px'
+      height: `${this.fixedSectionHeight || 0}px`,
     };
 
     this.contentStyle = contentStyle;
@@ -85,5 +83,4 @@ export default class ModalLayout extends Vue {
   get loading() {
     return this.appService.state.loading;
   }
-
 }

@@ -6,9 +6,7 @@ interface SchemaAnnotation {
 }
 
 export abstract class Node<TSchema, TContext> {
-
   abstract schemaVersion: number;
-
 
   /**
    * The save method is responsible for taking the current
@@ -18,7 +16,6 @@ export abstract class Node<TSchema, TContext> {
    */
   abstract save(context: TContext): Promise<void>;
 
-
   /**
    * The load method is responsible for taking the data saved
    * in the data propertly and loading it into the application
@@ -26,7 +23,6 @@ export abstract class Node<TSchema, TContext> {
    * nodes in the desired load order.
    */
   abstract load(context: TContext): Promise<void>;
-
 
   /**
    * Nodes that have evolved from schema version 1 should
@@ -38,17 +34,17 @@ export abstract class Node<TSchema, TContext> {
     // By default, do nothing.
   }
 
-
   data: TSchema;
 
-
   toJSON(): SchemaAnnotation & TSchema {
-    return Object.assign({
-      schemaVersion: this.schemaVersion,
-      nodeType: this.constructor.name
-    }, this.data);
+    return Object.assign(
+      {
+        schemaVersion: this.schemaVersion,
+        nodeType: this.constructor.name,
+      },
+      this.data,
+    );
   }
-
 
   fromJSON(obj: SchemaAnnotation & TSchema) {
     // TODO: Handle schema version migration here
@@ -63,5 +59,4 @@ export abstract class Node<TSchema, TContext> {
 
     this.migrate(version);
   }
-
 }

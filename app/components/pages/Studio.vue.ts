@@ -14,8 +14,8 @@ import { ScenesService } from 'services/scenes';
     StudioEditor,
     StudioControls,
     Display,
-    StudioModeControls
-  }
+    StudioModeControls,
+  },
 })
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
@@ -35,7 +35,7 @@ export default class Studio extends Vue {
       if (this.studioMode) {
         const rect = this.$refs.studioModeContainer.getBoundingClientRect();
 
-        if ((rect.width / rect.height) > (16 / 9)) {
+        if (rect.width / rect.height > 16 / 9) {
           this.stacked = false;
         } else {
           this.stacked = true;
@@ -44,13 +44,16 @@ export default class Studio extends Vue {
     }, 1000);
   }
 
-
   destroyed() {
     clearInterval(this.sizeCheckInterval);
   }
 
   get previewEnabled() {
-    return !this.customizationService.state.performanceMode;
+    return this.customizationService.previewEnabled;
+  }
+
+  get performanceMode() {
+    return this.customizationService.state.performanceMode;
   }
 
   get studioMode() {

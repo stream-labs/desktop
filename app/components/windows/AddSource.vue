@@ -5,7 +5,7 @@
 
   <div slot="content">
 
-    <div v-if="sourceType != 'scene'">
+    <div v-if="sourceType !== 'scene'">
       <div class="row">
         <div class="column small-12">
           <h4>{{ $t('Add New Source') }}</h4>

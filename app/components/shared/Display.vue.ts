@@ -18,7 +18,7 @@ export default class Display extends Vue {
   @Prop() clickHandler: boolean;
 
   $refs: {
-    display: HTMLElement
+    display: HTMLElement;
   };
 
   display: OBSDisplay;
@@ -35,7 +35,7 @@ export default class Display extends Vue {
     const displayId = this.videoService.getRandomDisplayId();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
-      paddingSize: this.paddingSize
+      paddingSize: this.paddingSize,
     });
     this.display.setShoulddrawUI(this.drawUI);
 
@@ -59,5 +59,4 @@ export default class Display extends Vue {
   beforeDestroy() {
     this.destroyDisplay();
   }
-
 }

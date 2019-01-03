@@ -3,13 +3,13 @@
     <div
       class="section"
       v-for="(formGroup, groupIndex) in value"
-      :key="formGroup.nameSubCategory"
+      :key="formGroup.nameSubCategory + groupIndex"
       v-if="hasAnyVisibleSettings(formGroup)"
       ref="container">
 
       <h2
         class="section-title section-title--dropdown"
-        v-if="formGroup.nameSubCategory != 'Untitled'"
+        v-if="formGroup.nameSubCategory !== 'Untitled'"
         @click="toggleGroup(groupIndex)">
         <i class="fa fa-plus section-title__icon"  v-show="collapsedGroups[groupIndex]"></i>
         <i class="fa fa-minus section-title__icon" v-show="!collapsedGroups[groupIndex]"></i>

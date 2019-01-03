@@ -35,7 +35,7 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
 export interface IAlertBoxVariation {
   condition: string;
   conditionData: any;
-  conditions: { type: string, description: string }[];
+  conditions: { type: string; description: string }[];
   name: string;
   id: string;
   deleteable?: boolean;
@@ -50,17 +50,17 @@ export interface IAlertBoxVariation {
     image: { href: string };
     layout: string;
     showAnimation: string;
-    sound: { href: string, volume: number };
+    sound: { href: string; volume: number };
     text: {
-      animation: string,
-      color: string,
-      color2: string,
-      font: string,
-      format: string,
-      resubFormat?: string,
-      tierUpgradeFormat?: string,
-      size: number,
-      thickness: number
+      animation: string;
+      color: string;
+      color2: string;
+      font: string;
+      format: string;
+      resubFormat?: string;
+      tierUpgradeFormat?: string;
+      size: number;
+      thickness: number;
     };
     textDelay: number;
     type: string;
@@ -89,8 +89,8 @@ export interface IAlertBoxVariation {
       libraryEnabled: boolean;
       minAmount: number;
       duration: number;
-    }
-  }
+    };
+  };
 }
 
 // SUBS
@@ -116,7 +116,7 @@ interface IAlertBoxSubSettings {
   sub_sound_volume: number;
   sub_text_animation: string;
   sub_text_delay: number;
-  sub_variations: IAlertBoxVariation[]
+  sub_variations: IAlertBoxVariation[];
 }
 
 // RESUBS
@@ -240,6 +240,84 @@ interface IAlertBoxFollowSettings {
   follow_variations: IAlertBoxVariation[];
 }
 
+// STARS
+interface IAlertBoxStarSettings {
+  star_alert_duration: number;
+  star_custom_css: string;
+  star_custom_html: string;
+  star_custom_html_enabled: boolean;
+  star_custom_js: string;
+  star_custom_json: string;
+  star_enabled: boolean;
+  star_font: string;
+  star_font_color: string;
+  star_font_color2: string;
+  star_font_size: string;
+  star_font_weight: number;
+  star_hide_animation: string;
+  star_image_href: string;
+  star_layout: string;
+  star_message_template: string;
+  star_show_animation: string;
+  star_sound_href: string;
+  star_sound_volume: number;
+  star_text_animation: string;
+  star_text_delay: number;
+  star_variations: IAlertBoxVariation[];
+}
+
+// LIKES
+interface IAlertBoxLikeSettings {
+  like_alert_duration: number;
+  like_custom_css: string;
+  like_custom_html: string;
+  like_custom_html_enabled: boolean;
+  like_custom_js: string;
+  like_custom_json: string;
+  like_enabled: boolean;
+  like_font: string;
+  like_font_color: string;
+  like_font_color2: string;
+  like_font_size: string;
+  like_font_weight: number;
+  like_hide_animation: string;
+  like_image_href: string;
+  like_layout: string;
+  like_message_template: string;
+  like_show_animation: string;
+  like_sound_href: string;
+  like_sound_volume: number;
+  like_text_animation: string;
+  like_text_delay: number;
+  like_variations: IAlertBoxVariation[];
+}
+
+// SUPPORT
+interface IAlertBoxSupportSettings {
+  support_alert_duration: number;
+  support_custom_css: string;
+  support_custom_html: string;
+  support_custom_html_enabled: boolean;
+  support_custom_js: string;
+  support_custom_json: string;
+  support_enabled: boolean;
+  support_font: string;
+  support_font_color: string;
+  support_font_color2: string;
+  support_font_size: string;
+  support_font_weight: number;
+  support_hide_animation: string;
+  support_image_href: string;
+  support_layout: string;
+  support_message_template: string;
+  support_show_animation: string;
+  support_sound_href: string;
+  support_sound_volume: number;
+  support_text_animation: string;
+  support_text_delay: number;
+  support_variations: IAlertBoxVariation[];
+}
+
 // HOSTS
 interface IAlertBoxHostSettings {
   host_alert_duration: number;
@@ -263,7 +341,7 @@ interface IAlertBoxHostSettings {
   host_sound_volume: number;
   host_text_animation: string;
   host_text_delay: number;
-  host_variations: IAlertBoxVariation[]
+  host_variations: IAlertBoxVariation[];
 }
 
 // MERCH
@@ -353,7 +431,7 @@ interface IAlertBoxDonorDriveSettings {
   donordrivedonation_sound_volume: number;
   donordrivedonation_text_animation: string;
   donordrivedonation_text_delay: number;
-  donordrivedonation_variations: IAlertBoxVariation[]
+  donordrivedonation_variations: IAlertBoxVariation[];
 }
 
 interface IAlertBoxExtraLifeSettings {
@@ -527,30 +605,33 @@ interface IAlertBoxTreatSettings {
   treat_variations: IAlertBoxVariation[];
 }
 
-export interface IAlertBoxApiSettings extends
-IAlertBoxGeneralSettings,
-IAlertBoxSubSettings,
-IAlertBoxBitsSettings,
-IAlertBoxDonationSettings,
-IAlertBoxFollowSettings,
-IAlertBoxHostSettings,
-IAlertBoxRaidSettings,
-IAlertBoxMerchSettings,
-IAlertBoxResubSettings,
-IAlertBoxTreatSettings,
-IAlertBoxDonorDriveSettings,
-IAlertBoxExtraLifeSettings,
-IAlertBoxGamewsipSettings,
-IAlertBoxJustGivingSettings,
-IAlertBoxPatreonSettings,
-IAlertBoxTiltifySettings {}
+export interface IAlertBoxApiSettings
+  extends IAlertBoxGeneralSettings,
+    IAlertBoxSubSettings,
+    IAlertBoxBitsSettings,
+    IAlertBoxDonationSettings,
+    IAlertBoxFollowSettings,
+    IAlertBoxHostSettings,
+    IAlertBoxStarSettings,
+    IAlertBoxSupportSettings,
+    IAlertBoxLikeSettings,
+    IAlertBoxRaidSettings,
+    IAlertBoxMerchSettings,
+    IAlertBoxResubSettings,
+    IAlertBoxTreatSettings,
+    IAlertBoxDonorDriveSettings,
+    IAlertBoxExtraLifeSettings,
+    IAlertBoxGamewsipSettings,
+    IAlertBoxJustGivingSettings,
+    IAlertBoxPatreonSettings,
+    IAlertBoxTiltifySettings {}
 
 // SLOBS GENERAL SETTINGS
 export interface IAlertBoxSetting {
   enabled: boolean;
   showMessage: boolean;
   showResubMessage?: boolean;
-  variations: IAlertBoxVariation[]
+  variations: IAlertBoxVariation[];
 }
 
 export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {
@@ -561,6 +642,9 @@ export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {
   hosts: IAlertBoxSetting;
   raids: IAlertBoxSetting;
   merch: IAlertBoxSetting;
+  support?: IAlertBoxSetting;
+  likes?: IAlertBoxSetting;
+  stars?: IAlertBoxSettings;
   treat?: IAlertBoxSetting;
   donorDrive?: IAlertBoxSetting;
   extraLife?: IAlertBoxSetting;

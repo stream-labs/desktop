@@ -25,34 +25,6 @@ Installation instructions can be found here:
 
 https://yarnpkg.com/en/docs/install
 
-### Visual C++ Compiler
-
-Yarn will install and compile a number of native extensions from
-source.  For yarn to do this, it needs a Visual C++ compiler.  The
-most reliable way to get this is to install:
-
-Visual Studio Community 2015 with Update 3
-
-Make sure you do a custom installation and select Visual C++ from
-the languages section.
-
-### CMake
-
-Some of our native addons require CMake for compilation.  You can
-download it here:
-
-https://cmake.org/download/
-
-Make sure to add CMake to your path. You may have to restart your
-machine before CMake is available.
-
-### Python 2.7
-
-Node-gyp requires python 2.7 available in your path to install some
-native addons.  You can download it here:
-
-https://www.python.org/
-
 ## Installation
 
 Install all node modules via yarn:
@@ -94,17 +66,6 @@ this would only run in production.
 ## Packaging / Distributing
 
 Currently only Windows x64 packaging is supported.
-
-### Prerequesites
-
-The packager will use whatever version of node-obs you have
-checked out in the slobs directory (at `./node-obs`).  You
-should make sure that node-obs is compiled correctly with 32-bit
-and 64-bit plugins, and works properly with the currently checked
-out version of `streamlabs-obs`.  If you're releasing, that should
-probably be the `master` branch.  You should probably try running
-the app from your dev environment to make sure everything is
-working before you start the release process.
 
 ### Packaging
 
