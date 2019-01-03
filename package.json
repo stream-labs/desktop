@@ -36,12 +36,6 @@
     "endOfLine": "lf",
     "trailingComma": "all"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "node scripts/precommit.js",
-      "commit-msg": "node scripts/commit-msg.js"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "prettier --write",
