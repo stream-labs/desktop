@@ -186,9 +186,7 @@ export default class Main extends Vue {
   }
 
   handleResize() {
-    const mainMiddleWidth = this.$refs.mainMiddle.clientWidth;
-
-    if (mainMiddleWidth < 1200) {
+    if (this.$refs.mainMiddle.clientWidth < 1200) {
       this.compactView = true;
     } else {
       this.compactView = false;
