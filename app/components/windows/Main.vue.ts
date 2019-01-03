@@ -65,7 +65,6 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
-    this.mainMiddle = this.$refs.main_middle;
     this.handleResize();
   }
 
@@ -148,13 +147,11 @@ export default class Main extends Vue {
     }
   }
 
-  $refs!: {
-    main_middle: HTMLDivElement;
+  $refs: {
+    mainMiddle: HTMLDivElement;
   };
 
-  mainMiddle: HTMLDivElement;
   compactView = false;
-  mainMiddleWidth: number;
 
   get mainResponsiveClasses() {
     const classes = [];
@@ -189,9 +186,9 @@ export default class Main extends Vue {
   }
 
   handleResize() {
-    const mainMiddleWidth = this.mainMiddle.clientWidth;
+    const mainMiddleWidth = this.$refs.mainMiddle.clientWidth;
 
-    if (this.mainMiddleWidth < 1200) {
+    if (mainMiddleWidth < 1200) {
       this.compactView = true;
     } else {
       this.compactView = false;
