@@ -84,6 +84,10 @@ export default class ExtraSettings extends Vue {
     return this.userService.isLoggedIn() && this.userService.platform.type === 'twitch';
   }
 
+  get isFacebook() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+  }
+
   get isRecordingOrStreaming() {
     return this.streamingService.isStreaming || this.streamingService.isRecording;
   }
