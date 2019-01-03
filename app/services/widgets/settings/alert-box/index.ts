@@ -4,6 +4,7 @@ import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import {
   IAlertBoxApiSettings,
+  IAlertBoxMixerSettings,
   IAlertBoxSetting,
   IAlertBoxSettings,
   IAlertBoxVariation,
@@ -134,7 +135,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     type: WidgetType;
   }): IAlertBoxData {
     const { settings, ...rest } = data;
-    const newSettings = this.transformSettings(settings);
+    const newSettings = settings.mixer_account
+      ? this.transformSettings({ ...settings, ...settings.mixer_account })
+      : this.transformSettings(settings);
     return { ...rest, settings: newSettings };
   }
 
@@ -368,7 +371,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           prefix === 'sub'
             ? this.unshapeSubs(defaultVariation)
             : this.unshapeVariation(defaultVariation, bitsPrefix);
-        Object.keys(flattenedDefault).forEach(key => (settingsObj[key] = flattenedDefault[key]));
+        Object.keys(flattenedDefault).forEach(key => {
+          settingsObj[key] = flattenedDefault[key];
+        });
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
