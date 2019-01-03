@@ -69,6 +69,7 @@ import {
   ChatbotSongRequestApiService,
   ChatbotLoyaltyApiService,
   ChatbotHeistApiService,
+  ChatbotGambleApiService,
   ChatbotBettingApiService,
   ChatbotImporterApiService
 } from 'services/chatbot';
@@ -211,6 +212,7 @@ export class ServicesManager extends Service {
     ChatbotSongRequestApiService,
     ChatbotLoyaltyApiService,
     ChatbotHeistApiService,
+    ChatbotGambleApiService,
     ChatbotPollApiService,
     ChatbotBettingApiService,
     ChatbotImporterApiService,

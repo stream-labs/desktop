@@ -3,9 +3,7 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotModule.vue';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotModule,
-} from 'services/chatbot';
+import { IChatbotModule } from 'services/chatbot';
 
 @Component({
   components: {
@@ -13,7 +11,6 @@ import {
   }
 })
 export default class ChatbotModules extends ChatbotBase {
-
   mounted() {
     this.chatbotApiService.Alerts.fetchChatAlerts();
     this.chatbotApiService.SongRequest.fetchSongRequest();
@@ -28,7 +25,9 @@ export default class ChatbotModules extends ChatbotBase {
     let modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),
-        description: $t('Get notified in chat whenever an activity happens like Donations and Subscribers.'),
+        description: $t(
+          'Get notified in chat whenever an activity happens like Donations and Subscribers.'
+        ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.chatAlertCurrentlyEnabled,
         onExpand: () => {
@@ -43,7 +42,9 @@ export default class ChatbotModules extends ChatbotBase {
       },
       {
         title: $t('Song Request'),
-        description: $t('Allow your viewers to to request songs from Youtube and play the songs on stream.'),
+        description: $t(
+          'Allow your viewers to to request songs from Youtube and play the songs on stream.'
+        ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.songRequestCurrentlyEnabled,
         onExpand: () => {
@@ -59,30 +60,49 @@ export default class ChatbotModules extends ChatbotBase {
             ...this.songRequest,
             enabled: !this.songRequestCurrentlyEnabled
           });
-        },
+        }
       },
       {
         title: $t('Heist'),
-        description: $t('Allow your viewers to work together and go on an adventure to earn extra loyalty points.'),
+        description: $t(
+          'Allow your viewers to work together and go on an adventure to earn extra loyalty points.'
+        ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: this.heistCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openHeistPreferencesWindow();
-         },
+        },
         onToggleEnabled: () => {
           this.chatbotApiService.Heist.updateHeistPreferences({
             ...this.heist,
             enabled: !this.heistCurrentlyEnabled
           });
-         }
+        }
+      },
+      {
+        title: $t('Gamble'),
+        description: $t(
+          'Allow your viewers to gamble with their loyalty points by rolling a 100 sided die.'
+        ),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: this.gambleCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotApiService.Common.openGamblePreferencesWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.Gamble.updateGamblePreferences({
+            ...this.gamble,
+            enabled: !this.gambleCurrentlyEnabled
+          });
+        }
       },
       {
         title: $t('Mini Games'),
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => { },
-        onToggleEnabled: () => { },
+        onExpand: () => {},
+        onToggleEnabled: () => {},
         comingSoon: true
       },
       {
@@ -90,8 +110,8 @@ export default class ChatbotModules extends ChatbotBase {
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => { },
-        onToggleEnabled: () => { },
+        onExpand: () => {},
+        onToggleEnabled: () => {},
         comingSoon: true
       }
     ];
@@ -114,11 +134,20 @@ export default class ChatbotModules extends ChatbotBase {
     return this.chatbotApiService.SongRequest.state.songRequestResponse.enabled;
   }
 
-  get heist(){
+  get heist() {
     return this.chatbotApiService.Heist.state.heistPreferencesResponse;
   }
 
-  get heistCurrentlyEnabled(){
+  get gamble() {
+    return this.chatbotApiService.Gamble.state.gamblePreferencesResponse;
+  }
+
+  get heistCurrentlyEnabled() {
     return this.chatbotApiService.Heist.state.heistPreferencesResponse.enabled;
+  }
+
+  get gambleCurrentlyEnabled() {
+    return this.chatbotApiService.Gamble.state.gamblePreferencesResponse
+      .enabled;
   }
 }

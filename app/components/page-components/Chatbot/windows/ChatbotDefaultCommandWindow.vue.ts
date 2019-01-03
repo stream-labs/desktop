@@ -101,6 +101,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     );
   }
 
+  get isGambleCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'gamble' &&
+      this.defaultCommandToUpdate.commandName === 'gamble'
+    );
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }
@@ -146,6 +153,24 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('Add a new command alias'),
         max: 450,
         uuid: $t('Alias')
+      }),
+      win_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear after the viewer wins'
+        ),
+        max: 450,
+        uuid: $t('Win Response')
+      }),
+      lose_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear after the viewer loses'
+        ),
+        max: 450,
+        uuid: $t('Lose Response')
       }),
       success_response: metadataHelper.text({
         required: true,

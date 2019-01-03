@@ -39,6 +39,10 @@
               <span>{{ $t('Betting Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
+            <div @click="onToggleGamblePreferencesWindowHandler" v-if="isGambleCommand">
+              <span>{{ $t('Gamble Preferences') }}</span>
+              <i class="fas fa-chevron-right window-toggle__icon"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -122,6 +126,18 @@
             :title="$t('Full Response')"
             v-model="editedCommand.full_response"
             :metadata="metadata.full_response"
+          />
+                    <VFormGroup
+            v-if="defaultCommandToUpdate.win_response"
+            :title="$t('Win Response')"
+            v-model="editedCommand.win_response"
+            :metadata="metadata.win_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.lose_response"
+            :title="$t('Lose Response')"
+            v-model="editedCommand.lose_response"
+            :metadata="metadata.lose_response"
           />
           <VFormGroup
             v-if="defaultCommandToUpdate.permission"

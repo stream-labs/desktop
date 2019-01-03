@@ -3,7 +3,6 @@ import { Component, Inject } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ModalLayout from 'components/ModalLayout.vue';
 
-
 import VModal from 'vue-js-modal';
 
 Vue.use(VModal);
@@ -30,8 +29,8 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openLinkProtectionWindow();
         break;
       case 'ChatbotLinkProtectionWindow':
-        const linkProtectionPermitCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['link-protection'].permit;
+        const linkProtectionPermitCommand = this.chatbotApiService.Commands
+          .state.defaultCommandsResponse['link-protection'].permit;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...linkProtectionPermitCommand,
@@ -124,7 +123,28 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         });
         break;
     }
-  }  
+  }
+
+  onToggleGamblePreferencesWindowHandler() {
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotApiService.Common.openGamblePreferencesWindow();
+        break;
+      case 'ChatbotGamblePreferencesWindow':
+        const gambleCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['gamble'].gamble;
+
+        this.chatbotApiService.Common.openDefaultCommandWindow({
+          ...gambleCommand,
+          slugName: 'gamble',
+          commandName: 'gamble'
+        });
+        break;
+    }
+  }
 
   onToggleQuoteWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()

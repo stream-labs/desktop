@@ -143,7 +143,12 @@ export interface IHeistPreferencesResponse {
   enabled: boolean;
 }
 
-export interface IImporterStatusResponse{
+export interface IGamblePreferencesResponse {
+  settings: IGamblePreferencesData;
+  enabled: boolean;
+}
+
+export interface IImporterStatusResponse {
   extension: string;
   streamelements: string;
 }
@@ -536,6 +541,37 @@ export interface IHeistPreferencesData {
   commands: IHeistCommands;
   general: IHeistPreferencesGeneralSettings;
   messages: IHeistPreferencesMessagesSettings;
+}
+
+//  gamble
+export interface IGambleCommands {
+  [id: string]: IGambleCommand;
+}
+
+export interface IGambleCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IChatbotAliases;
+  permission: IChatbotPermission;
+}
+
+export interface IGamblePreferencesGeneralSettings {
+  min: number;
+  max: number;
+  range: {
+    '1-25': number;
+    '26-50': number;
+    '51-75': number;
+    '76-98': number;
+    '99-100': number;
+  };
+}
+
+export interface IGamblePreferencesData {
+  commands: IGambleCommands;
+  general: IGamblePreferencesGeneralSettings;
 }
 
 // loyalty

@@ -14,3 +14,4 @@ export * from './chatbot-heist';
 export * from './chatbot-poll';
 export * from './chatbot-betting';
 export * from './chatbot-importer';
+export * from './chatbot-gamble';

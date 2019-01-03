@@ -296,6 +296,17 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
+  openGamblePreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotGamblePreferencesWindow',
+      title: $t('Chatbot Gamble Preferences'),
+      size: {
+        width: 650,
+        height: 575
+      }
+    });
+  }
+
   openSongRequestOnboardingWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestOnboardingWindow',
