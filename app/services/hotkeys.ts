@@ -31,10 +31,10 @@ const isAudio = (sourceId: string) => {
   return source ? source.audio : false;
 };
 
-const isGameCapture = (sceneItemId: string) => {
-  const sceneItem = getScenesService().getSceneItem(sceneItemId);
+const isGameCapture = (sourceId: string) => {
+  const source = getSourcesService().getSource(sourceId);
 
-  return sceneItem ? sceneItem.type === 'game_capture' : false;
+  return source ? source.type === 'game_capture' : false;
 };
 
 /**
@@ -163,6 +163,20 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     up: sourceId => getSourcesService().setMuted(sourceId, true),
     shouldApply: isAudio,
   },
+  HOTKEY_START: {
+    name: 'HOTKEY_START',
+    description: () => $t('Capture Foreground Window'),
+    up: processObsHotkey(false),
+    down: processObsHotkey(true),
+    shouldApply: isGameCapture,
+  },
+  HOTKEY_STOP: {
+    name: 'HOTKEY_STOP',
+    description: () => $t('Deactivate Capture'),
+    up: processObsHotkey(false),
+    down: processObsHotkey(true),
+    shouldApply: isGameCapture,
+  },
 };
 
 const SCENE_ACTIONS: HotkeyGroup = {
@@ -199,20 +213,6 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       getScenesService()
         .getSceneItem(sceneItemId)
         .setVisibility(false),
-  },
-  HOTKEY_START: {
-    name: 'HOTKEY_START',
-    description: () => $t('Capture Foreground Window'),
-    up: processObsHotkey(false),
-    down: processObsHotkey(true),
-    shouldApply: isGameCapture,
-  },
-  HOTKEY_STOP: {
-    name: 'HOTKEY_STOP',
-    description: () => $t('Deactivate Capture'),
-    up: processObsHotkey(false),
-    down: processObsHotkey(true),
-    shouldApply: isGameCapture,
   },
 };
 
@@ -344,18 +344,21 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
     obsHotkeys.filter(isSupportedHotkey).forEach(hotkey => {
       const action = getActionFromName(hotkey.HotkeyName);
-      if (action && action.name) {
-        const key = `${action.name}-${hotkey.ObjectName}`;
 
-        if (!addedHotkeys.has(key)) {
-          hotkeys.push({
-            [idPropFor(hotkey)]: hotkey.ObjectName,
-            actionName: action.name,
-            bindings: [] as IBinding[],
-            hotkeyId: hotkey.HotkeyId,
-          });
-          addedHotkeys.add(key);
-        }
+      if (!action.name) {
+        return;
+      }
+
+      const key = `${action.name}-${hotkey.ObjectName}`;
+
+      if (!addedHotkeys.has(key)) {
+        hotkeys.push({
+          sourceId: hotkey.ObjectName,
+          actionName: action.name,
+          bindings: [] as IBinding[],
+          hotkeyId: hotkey.HotkeyId,
+        });
+        addedHotkeys.add(key);
       }
     });
 
