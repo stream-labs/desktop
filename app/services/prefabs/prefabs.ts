@@ -2,12 +2,13 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { ISourceAddOptions, SourcesService, TSourceType, Source } from 'services/sources';
 import { ScenesService, TSceneNode, TSceneNodeType } from 'services/scenes';
 import { Inject } from '../../util/injector';
-import { mutation, ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper } from 'services/stateful-service';
 import uuid from 'uuid/v4';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import Utils from '../utils';
 import Vue from 'vue';
-import { HardwareService } from '../hardware';
+import { HardwareService } from 'services/hardware';
+
 interface IPrefabSourceCreateOptions {
   name: string;
   description?: string;
