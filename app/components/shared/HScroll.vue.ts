@@ -14,7 +14,6 @@ export interface IHScrollModel {
  */
 @Component({})
 export default class HScroll extends Vue {
-
   model: IHScrollModel = null;
 
   $refs: {
@@ -44,11 +43,11 @@ export default class HScroll extends Vue {
     const scrollLeft = this.$el.scrollLeft;
     const canScroll = trackWidth > wrapperWidth;
     const canScrollLeft = canScroll && scrollLeft > 0;
-    const canScrollRight = canScroll && (trackWidth - wrapperWidth) > scrollLeft;
+    const canScrollRight = canScroll && trackWidth - wrapperWidth > scrollLeft;
     const model: IHScrollModel = {
       canScroll,
       canScrollLeft,
-      canScrollRight
+      canScrollRight,
     };
 
     // don't fire the 'change' event if nothing has been changed

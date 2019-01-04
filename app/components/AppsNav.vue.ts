@@ -8,7 +8,7 @@ import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
 
 @Component({
-  components: { HScroll }
+  components: { HScroll },
 })
 export default class AppsNav extends Vue {
   @Inject()
@@ -19,7 +19,7 @@ export default class AppsNav extends Vue {
   scrollModel: IHScrollModel = {
     canScroll: false,
     canScrollLeft: false,
-    canScrollRight: false
+    canScrollRight: false,
   };
 
   isSelectedApp(appId: string) {
