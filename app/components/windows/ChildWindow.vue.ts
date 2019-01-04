@@ -9,14 +9,14 @@ import TitleBar from '../TitleBar.vue';
 @Component({
   components: {
     TitleBar,
-    ...getComponents()
-  }
+    ...getComponents(),
+  },
 })
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private customizationService: CustomizationService;
 
-  components: { name: string; isShown: boolean; title: string; }[] = [];
+  components: { name: string; isShown: boolean; title: string }[] = [];
   private refreshingTimeout = 0;
 
   mounted() {

@@ -30,7 +30,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     thumbnail: null,
     linkTarget: null,
     params: null,
-    closeOnLink: false
+    closeOnLink: false,
   };
 
   async updateBanner() {
@@ -47,12 +47,14 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   private async fetchBanner() {
-    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
-      const newState = await fetch(req).then((rawResp) => rawResp.json());
+      const newState = await fetch(req).then(rawResp => rawResp.json());
       // TODO: remove for next release after BE switches over
-      if (newState.link_target) { newState.linkTarget = newState.link_target; }
+      if (newState.link_target) {
+        newState.linkTarget = newState.link_target;
+      }
 
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
       const queryString = newState.link.split('?')[1];
@@ -60,10 +62,11 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
         newState.link = newState.link.split('?')[0];
         newState.params = {};
         queryString.split(',').forEach((query: string) => {
-          const [ key, value ] = query.split('=');
+          const [key, value] = query.split('=');
           newState.params[key] = value;
-        })
+        });
       }
+
       return newState.id ? newState : this.state;
     } catch (e) {
       return this.state;
@@ -74,16 +77,17 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const endpoint = 'api/v5/slobs/announcement/close';
     const postData = {
       method: 'POST',
-      body: JSON.stringify({ clientId: this.userService.getLocalUserId(), announcementId: this.state.id }),
-      headers: new Headers({ 'Content-Type': 'application/json' })
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: this.state.id,
+      }),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
     };
     const req = this.formRequest(endpoint, postData);
     try {
       await fetch(req);
       this.CLEAR_BANNER();
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   private formRequest(endpoint: string, options: any = {}) {

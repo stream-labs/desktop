@@ -14,11 +14,7 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (
-  host: string,
-  token: string,
-  platform: TPlatform
-) => string;
+type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
 
 export interface IWidgetTester {
   name: string;
@@ -72,7 +68,7 @@ export interface IWidgetApi extends IWidgetSource {
 }
 
 export interface IWidgetsServiceApi {
-  getWidgetSource(sourceId: string): IWidgetApi
+  getWidgetSource(sourceId: string): IWidgetApi;
 }
 
 export interface IWidgetSettingsServiceApi {
@@ -83,7 +79,6 @@ export interface IWidgetSettingsServiceApi {
   state: IWidgetSettingsGenericState;
 }
 
-
 export interface IWidgetSettings {
   custom_enabled: boolean;
   custom_html: string;
@@ -92,7 +87,6 @@ export interface IWidgetSettings {
 }
 
 export interface IWidgetData {
-
   type: WidgetType;
 
   settings: IWidgetSettings;
@@ -112,6 +106,7 @@ export interface IWidgetSettingsGenericState {
   rawData: Dictionary<any>; // widget data before patching
 }
 
-export interface IWidgetSettingsState<TWidgetData extends IWidgetData> extends IWidgetSettingsGenericState {
+export interface IWidgetSettingsState<TWidgetData extends IWidgetData>
+  extends IWidgetSettingsGenericState {
   data: TWidgetData;
 }

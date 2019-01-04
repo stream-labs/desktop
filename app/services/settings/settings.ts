@@ -4,7 +4,7 @@ import {
   IObsListInput,
   obsValuesToInputValues,
   TObsFormData,
-  TObsValue
+  TObsValue,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -34,6 +34,7 @@ export interface ISettingsState {
   Stream: {
     key: string;
     streamType: string;
+    service: string;
   };
   Output: Dictionary<TObsValue>;
   Video: {
@@ -48,14 +49,11 @@ export interface ISettingsState {
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
-
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi {
   static initialState = {};
 
-  static convertFormDataToState(
-    settingsFormData: TSettingsFormData
-  ): ISettingsState {
+  static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
     const settingsState: Partial<ISettingsState> = {};
     for (const groupName in settingsFormData) {
       settingsFormData[groupName].forEach(subGroup => {
@@ -98,21 +96,23 @@ export class SettingsService extends StatefulService<ISettingsState>
       queryParams: { categoryName },
       size: {
         width: 800,
-        height: 800
-      }
+        height: 800,
+      },
     });
   }
 
   advancedSettingEnabled(): boolean {
-    return (
-      Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings')
-    );
+    return Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings');
   }
 
   getCategories(): string[] {
     let categories = obs.NodeObs.OBS_settings_getListCategories();
-    categories = categories
-      .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
+    categories = categories.concat([
+      'Scene Collections',
+      'Notifications',
+      'Appearance',
+      'Remote Control',
+    ]);
 
     if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
@@ -151,7 +151,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     for (const group of settings) {
       group.parameters = obsValuesToInputValues(group.parameters, {
         disabledFields: BLACK_LIST_NAMES,
-        transformListOptions: true
+        transformListOptions: true,
       });
     }
 
@@ -165,7 +165,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       const indexSubCategory = settings.indexOf(
         settings.find((category: any) => {
           return category.nameSubCategory === 'Streaming';
-        })
+        }),
       );
 
       const parameters = settings[indexSubCategory].parameters;
@@ -174,7 +174,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       const indexPreset = parameters.indexOf(
         parameters.find((parameter: any) => {
           return parameter.name === outputSettings.presetField;
-        })
+        }),
       );
       settings[indexSubCategory].parameters[indexPreset].visible = false;
 
@@ -182,7 +182,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       const indexX264Settings = parameters.indexOf(
         parameters.find((parameter: any) => {
           return parameter.name === outputSettings.encoderSettingsField;
-        })
+        }),
       );
       settings[indexSubCategory].parameters[indexX264Settings].visible = false;
     }
@@ -200,26 +200,29 @@ export class SettingsService extends StatefulService<ISettingsState>
     const output = this.getSettingsFormData('Output');
     const video = this.getSettingsFormData('Video');
 
-    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
+    const encoder =
+      this.findSettingValue(output, 'Streaming', 'Encoder') ||
       this.findSettingValue(output, 'Streaming', 'StreamEncoder');
-    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
+    const preset =
+      this.findSettingValue(output, 'Streaming', 'preset') ||
       this.findSettingValue(output, 'Streaming', 'Preset') ||
       this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
       this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
       this.findSettingValue(output, 'Streaming', 'target_usage') ||
       this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
       this.findSettingValue(output, 'Streaming', 'AMDPreset');
-    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
+    const bitrate =
+      this.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.findSettingValue(output, 'Streaming', 'VBitrate');
     const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
     const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
 
-    return  {
+    return {
       encoder,
       preset,
       bitrate,
       baseResolution,
-      outputResolution
+      outputResolution,
     };
   }
 
@@ -251,14 +254,8 @@ export class SettingsService extends StatefulService<ISettingsState>
     const parameters: TObsFormData = [];
 
     // collect output channels info
-    for (
-      let channel = E_AUDIO_CHANNELS.OUTPUT_1;
-      channel <= E_AUDIO_CHANNELS.OUTPUT_2;
-      channel++
-    ) {
-      const source = sourcesInChannels.find(
-        source => source.channel === channel
-      );
+    for (let channel = E_AUDIO_CHANNELS.OUTPUT_1; channel <= E_AUDIO_CHANNELS.OUTPUT_2; channel++) {
+      const source = sourcesInChannels.find(source => source.channel === channel);
       const deviceInd = channel;
 
       parameters.push({
@@ -273,20 +270,14 @@ export class SettingsService extends StatefulService<ISettingsState>
             .filter(device => device.type === EDeviceType.audioOutput)
             .map(device => {
               return { description: device.description, value: device.id };
-            })
-        )
+            }),
+        ),
       });
     }
 
     // collect input channels info
-    for (
-      let channel = E_AUDIO_CHANNELS.INPUT_1;
-      channel <= E_AUDIO_CHANNELS.INPUT_3;
-      channel++
-    ) {
-      const source = sourcesInChannels.find(
-        source => source.channel === channel
-      );
+    for (let channel = E_AUDIO_CHANNELS.INPUT_1; channel <= E_AUDIO_CHANNELS.INPUT_3; channel++) {
+      const source = sourcesInChannels.find(source => source.channel === channel);
       const deviceInd = channel - 2;
 
       parameters.push({
@@ -297,18 +288,20 @@ export class SettingsService extends StatefulService<ISettingsState>
         enabled: true,
         visible: true,
         options: [{ description: 'Disabled', value: null }].concat(
-          audioDevices.filter(device => device.type === EDeviceType.audioInput).map(device => {
-            return { description: device.description, value: device.id };
-          })
-        )
+          audioDevices
+            .filter(device => device.type === EDeviceType.audioInput)
+            .map(device => {
+              return { description: device.description, value: device.id };
+            }),
+        ),
       });
     }
 
     return [
       {
+        parameters,
         nameSubCategory: 'Untitled',
-        parameters
-      }
+      },
     ];
   }
 
@@ -321,8 +314,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       dataToSave.push({
         ...subGroup,
         parameters: inputValuesToObsValues(subGroup.parameters, {
-          valueToCurrentValue: true
-        })
+          valueToCurrentValue: true,
+        }),
       });
     }
 
@@ -335,14 +328,8 @@ export class SettingsService extends StatefulService<ISettingsState>
 
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
-      const isOutput = [
-        E_AUDIO_CHANNELS.OUTPUT_1,
-        E_AUDIO_CHANNELS.OUTPUT_2
-      ].includes(channel);
-      const source = this.sourcesService
-        .getSources()
-        .find(source => source.channel === channel);
-
+      const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
+      const source = this.sourcesService.getSources().find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {
@@ -350,7 +337,6 @@ export class SettingsService extends StatefulService<ISettingsState>
           return;
         }
       } else if (deviceForm.value !== null) {
-
         const device = audioDevices.find(device => device.id === deviceForm.value);
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
@@ -359,13 +345,12 @@ export class SettingsService extends StatefulService<ISettingsState>
             displayName,
             isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
             {},
-            { channel }
+            { channel },
           );
         } else {
           source.updateSettings({ device_id: deviceForm.value, name: displayName });
         }
       }
-
     });
   }
 

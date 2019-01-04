@@ -5,7 +5,6 @@ import Util from 'services/utils';
 // we should allow overriding this value. But for now we
 // are just keeping the value in one place.
 export class HostsService extends Service {
-
   get streamlabs() {
     if (Util.useLocalHost()) {
       return 'streamlabs.site';
@@ -54,4 +53,5 @@ export class HostsService extends Service {
   get analitycs() {
     return 'r2d2.streamlabs.com';
   }
+
 }

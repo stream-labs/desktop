@@ -1,4 +1,3 @@
-
 export interface IClipboardServiceApi {
   copy(): void;
   paste(duplicateSources?: boolean): void;

@@ -20,7 +20,7 @@ export class SubGoalService extends GenericGoalService {
       goalResetEvent: 'subGoalEnd',
       hasTestButtons: true,
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
 }

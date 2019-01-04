@@ -10,8 +10,7 @@ import { getClient } from './api-client';
 // prevents logs from other parts of code to be sent in stdout
 console.log = () => {};
 
-!(async function () {
-
+!(async function() {
   const resource = process.argv[2];
   const method = process.argv[3];
   const args = process.argv.slice(4);
@@ -26,24 +25,21 @@ console.log = () => {};
   });
 
   const client = await getClient();
-  client.request(resource, method, ...args).then(response => {
-    let responseStr = '';
-    if (response === void 0) {
-      responseStr = 'true';
-    } else {
-      responseStr = JSON.stringify(response);
-    }
-    process.stdout.write(responseStr);
-  }).catch(error => {
-    process.stderr.write(JSON.stringify(error));
-  }).then(() => {
-    client.disconnect();
-  });
-
-
-
+  client
+    .request(resource, method, ...args)
+    .then(response => {
+      let responseStr = '';
+      if (response === void 0) {
+        responseStr = 'true';
+      } else {
+        responseStr = JSON.stringify(response);
+      }
+      process.stdout.write(responseStr);
+    })
+    .catch(error => {
+      process.stderr.write(JSON.stringify(error));
+    })
+    .then(() => {
+      client.disconnect();
+    });
 })();
-
-
-
-

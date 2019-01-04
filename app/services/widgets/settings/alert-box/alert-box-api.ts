@@ -9,6 +9,9 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   prime_sub_enabled: boolean;
   moderation_delay: number;
   unlimited_media_moderation_delay: boolean;
+  automatically_reset_session: boolean;
+  censor_streamer_recent_events: boolean;
+  display_mtg_codes: boolean;
 
   // SHOW MESSAGES
   show_bits_message: boolean;
@@ -35,7 +38,7 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
 export interface IAlertBoxVariation {
   condition: string;
   conditionData: any;
-  conditions: { type: string, description: string }[];
+  conditions: { type: string; description: string }[];
   name: string;
   id: string;
   deleteable?: boolean;
@@ -50,17 +53,17 @@ export interface IAlertBoxVariation {
     image: { href: string };
     layout: string;
     showAnimation: string;
-    sound: { href: string, volume: number };
+    sound: { href: string; volume: number };
     text: {
-      animation: string,
-      color: string,
-      color2: string,
-      font: string,
-      format: string,
-      resubFormat?: string,
-      tierUpgradeFormat?: string,
-      size: number,
-      thickness: number
+      animation: string;
+      color: string;
+      color2: string;
+      font: string;
+      format: string;
+      resubFormat?: string;
+      tierUpgradeFormat?: string;
+      size: number;
+      thickness: number;
     };
     textDelay: number;
     type: string;
@@ -89,8 +92,8 @@ export interface IAlertBoxVariation {
       libraryEnabled: boolean;
       minAmount: number;
       duration: number;
-    }
-  }
+    };
+  };
 }
 
 // SUBS
@@ -116,7 +119,7 @@ interface IAlertBoxSubSettings {
   sub_sound_volume: number;
   sub_text_animation: string;
   sub_text_delay: number;
-  sub_variations: IAlertBoxVariation[]
+  sub_variations: IAlertBoxVariation[];
 }
 
 // RESUBS
@@ -341,7 +344,7 @@ interface IAlertBoxHostSettings {
   host_sound_volume: number;
   host_text_animation: string;
   host_text_delay: number;
-  host_variations: IAlertBoxVariation[]
+  host_variations: IAlertBoxVariation[];
 }
 
 // MERCH
@@ -431,7 +434,7 @@ interface IAlertBoxDonorDriveSettings {
   donordrivedonation_sound_volume: number;
   donordrivedonation_text_animation: string;
   donordrivedonation_text_delay: number;
-  donordrivedonation_variations: IAlertBoxVariation[]
+  donordrivedonation_variations: IAlertBoxVariation[];
 }
 
 interface IAlertBoxExtraLifeSettings {
@@ -605,33 +608,41 @@ interface IAlertBoxTreatSettings {
   treat_variations: IAlertBoxVariation[];
 }
 
-export interface IAlertBoxApiSettings extends
-IAlertBoxGeneralSettings,
-IAlertBoxSubSettings,
-IAlertBoxBitsSettings,
-IAlertBoxDonationSettings,
-IAlertBoxFollowSettings,
-IAlertBoxHostSettings,
-IAlertBoxStarSettings,
-IAlertBoxSupportSettings,
-IAlertBoxLikeSettings,
-IAlertBoxRaidSettings,
-IAlertBoxMerchSettings,
-IAlertBoxResubSettings,
-IAlertBoxTreatSettings,
-IAlertBoxDonorDriveSettings,
-IAlertBoxExtraLifeSettings,
-IAlertBoxGamewsipSettings,
-IAlertBoxJustGivingSettings,
-IAlertBoxPatreonSettings,
-IAlertBoxTiltifySettings {}
+export interface IAlertBoxMixerSettings
+  extends IAlertBoxFollowSettings,
+    IAlertBoxSubSettings,
+    IAlertBoxResubSettings,
+    IAlertBoxHostSettings {}
+
+export interface IAlertBoxApiSettings
+  extends IAlertBoxGeneralSettings,
+    IAlertBoxSubSettings,
+    IAlertBoxBitsSettings,
+    IAlertBoxDonationSettings,
+    IAlertBoxFollowSettings,
+    IAlertBoxHostSettings,
+    IAlertBoxStarSettings,
+    IAlertBoxSupportSettings,
+    IAlertBoxLikeSettings,
+    IAlertBoxRaidSettings,
+    IAlertBoxMerchSettings,
+    IAlertBoxResubSettings,
+    IAlertBoxTreatSettings,
+    IAlertBoxDonorDriveSettings,
+    IAlertBoxExtraLifeSettings,
+    IAlertBoxGamewsipSettings,
+    IAlertBoxJustGivingSettings,
+    IAlertBoxPatreonSettings,
+    IAlertBoxTiltifySettings {
+  mixer_account?: IAlertBoxMixerSettings;
+}
 
 // SLOBS GENERAL SETTINGS
 export interface IAlertBoxSetting {
   enabled: boolean;
   showMessage: boolean;
   showResubMessage?: boolean;
-  variations: IAlertBoxVariation[]
+  variations: IAlertBoxVariation[];
 }
 
 export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {

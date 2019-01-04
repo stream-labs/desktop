@@ -4,18 +4,13 @@ import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
-import { authorizedHeaders, handleErrors } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { Throttle } from 'lodash-decorators';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import uuid from 'uuid/v4';
 import { mutation } from './stateful-service';
 
-export type TUsageEvent =
-  'stream_start' |
-  'stream_end' |
-  'app_start' |
-  'app_close' |
-  'crash';
+export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
 interface IUsageApiData {
   installer_id?: string;
@@ -40,16 +35,16 @@ interface IAnalyticsEvent {
 
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
-
     return {
       ...descriptor,
       value(...args: any[]): any {
         UsageStatisticsService.instance.recordEvent(event);
         descriptor.value.apply(this, args);
-      }
+      },
     };
   };
 }
+
 
 interface IUsageStatisticsServiceState {
   uuid: string;
@@ -116,10 +111,10 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
     headers.append('Content-Type', 'application/json');
 
     const bodyData: IUsageApiData = {
+      event,
       slobs_user_id: this.userService.getLocalUserId(),
       version: this.version,
-      event,
-      data: JSON.stringify(metadata)
+      data: JSON.stringify(metadata),
     };
 
     if (this.userService.isLoggedIn()) {
@@ -131,9 +126,9 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
     }
 
     const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {
-      method: 'POST',
       headers,
-      body: JSON.stringify(bodyData)
+      method: 'POST',
+      body: JSON.stringify(bodyData),
     });
 
     return fetch(request);
@@ -155,7 +150,7 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
 
   @Throttle(2 * 60 * 1000)
   private sendAnalytics() {
-    const data = { analyticsTokens: [ ...this.anaiticsEvents ] };
+    const data = { analyticsTokens: [...this.anaiticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
@@ -167,6 +162,7 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
       body: JSON.stringify(data || {})
     });
     fetch(request).then(handleErrors);
+
   }
 
   @mutation()

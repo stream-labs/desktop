@@ -8,8 +8,8 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 @Component({
   components: {
     ChatbotWordProtectionList,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
   $refs: {
@@ -19,12 +19,12 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Blacklist'),
-      value: 'blacklist'
-    }
+      value: 'blacklist',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -43,13 +43,12 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
   }
 
   async onSaveHandler() {
-
-    if (this.$refs.form && await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.$refs.form && (await this.$refs.form.validateAndGetErrorsCount())) return;
 
     this.chatbotApiService
       .updateWordProtection({
         enabled: this.wordProtectionResponse.enabled,
-        settings: this.wordProtection
+        settings: this.wordProtection,
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

@@ -74,7 +74,7 @@ export interface ISceneCollectionSchema {
   scenes: {
     id: string;
     name: string;
-    sceneItems: { sceneItemId: string, sourceId: string }[]
+    sceneItems: { sceneItemId: string; sourceId: string }[];
   }[];
 
   sources: {

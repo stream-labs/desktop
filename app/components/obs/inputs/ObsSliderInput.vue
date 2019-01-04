@@ -8,7 +8,7 @@
         <Slider
           @input="value => updateValue(value)"
           :value="localValue"
-          :disabled="value.enabled == false"
+          :disabled="value.enabled === false"
           :max="value.maxVal"
           :min="value.minVal"
           :interval="value.stepVal"

@@ -18,6 +18,6 @@ if (args.includes('--secret-access-key') || args.includes('--access-key')) {
 args.push('--secret-access-key', secretKey);
 args.push('--access-key', accessKey);
 
-console.log(`Wrapping ${process.argv[2]} with arguments ${args}`)
+console.log(`Wrapping ${process.argv[2]} with arguments ${args}`);
 
 cp.fork(process.argv[2], args);
