@@ -3,31 +3,30 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotModule.vue';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotModule,
-} from 'services/chatbot';
+import { IChatbotModule } from 'services/chatbot';
 
 @Component({
   components: {
-    ChatbotModule
-  }
+    ChatbotModule,
+  },
 })
 export default class ChatbotModules extends ChatbotBase {
-
   mounted() {
     this.chatbotApiService.fetchChatAlerts();
     this.chatbotApiService.fetchSongRequest();
   }
 
-  get modules() {
+  get modules(): IChatbotModule[] {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     const comingSoonText = $t(
-      'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.'
+      'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.',
     );
-    let modules: IChatbotModule[] = [
+    return [
       {
         title: $t('Chat Alerts'),
-        description: $t('Get notified in chat whenever an activity happens like Donations and Subscribers.'),
+        description: $t(
+          'Get notified in chat whenever an activity happens like Donations and Subscribers.',
+        ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.chatAlertCurrentlyEnabled,
         onExpand: () => {
@@ -36,39 +35,38 @@ export default class ChatbotModules extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.updateChatAlerts({
             ...this.chatAlerts,
-            enabled: !this.chatAlertCurrentlyEnabled
+            enabled: !this.chatAlertCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Song Request'),
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => { },
-        onToggleEnabled: () => { },
-        comingSoon: true
+        onExpand: () => {},
+        onToggleEnabled: () => {},
+        comingSoon: true,
       },
       {
         title: $t('Mini Games'),
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => { },
-        onToggleEnabled: () => { },
-        comingSoon: true
+        onExpand: () => {},
+        onToggleEnabled: () => {},
+        comingSoon: true,
       },
       {
         title: $t('Counter'),
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => { },
-        onToggleEnabled: () => { },
-        comingSoon: true
-      }
+        onExpand: () => {},
+        onToggleEnabled: () => {},
+        comingSoon: true,
+      },
     ];
-    return modules;
   }
 
   get chatAlerts() {
@@ -76,7 +74,7 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get chatAlertCurrentlyEnabled() {
-    return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
+    return this.chatbotApiService.state.chatAlertsResponse.enabled;
   }
 
   get songRequest() {
@@ -84,6 +82,6 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get songRequestCurrentlyEnabled() {
-    return this.chatbotApiService.state.songRequestResponse.enabled === true;
+    return this.chatbotApiService.state.songRequestResponse.enabled;
   }
 }

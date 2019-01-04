@@ -31,7 +31,7 @@ module.exports = {
   target: 'electron-renderer',
 
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.json'],
     modules: [path.resolve(__dirname, 'app'), 'node_modules']
   },
 

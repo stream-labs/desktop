@@ -51,8 +51,8 @@ import electron from 'electron';
     DesignSystem,
     PlatformAppWebview,
     PlatformAppStore,
-    Help
-  }
+    Help,
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -65,7 +65,6 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
-    this.mainMiddle = this.$refs.main_middle;
     this.handleResize();
   }
 
@@ -96,7 +95,7 @@ export default class Main extends Vue {
   mainContentsRight = false;
 
   get leftDock() {
-    if (this.customizationService.state.leftDock === true) {
+    if (this.customizationService.state.leftDock) {
       this.mainContentsRight = true;
     } else {
       this.mainContentsRight = false;
@@ -113,16 +112,11 @@ export default class Main extends Vue {
   }
 
   isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(
-      appId,
-      EAppPageSlot.TopNav
-    );
+    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
   }
 
   isAppPoppedOut(appId: string) {
-    return this.platformAppsService
-      .getApp(appId)
-      .poppedOutSlots.includes(EAppPageSlot.TopNav);
+    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
   }
 
   isAppVisible(appId: string) {
@@ -153,16 +147,14 @@ export default class Main extends Vue {
     }
   }
 
-  $refs!: {
-    main_middle: HTMLDivElement;
+  $refs: {
+    mainMiddle: HTMLDivElement;
   };
 
-  mainMiddle: HTMLDivElement;
   compactView = false;
-  mainMiddleWidth: number;
 
   get mainResponsiveClasses() {
-    let classes = [];
+    const classes = [];
 
     if (this.compactView) {
       classes.push('main-middle--compact');
@@ -194,9 +186,7 @@ export default class Main extends Vue {
   }
 
   handleResize() {
-    let mainMiddleWidth = this.mainMiddle.clientWidth;
-
-    if (this.mainMiddleWidth < 1200) {
+    if (this.$refs.mainMiddle.clientWidth < 1200) {
       this.compactView = true;
     } else {
       this.compactView = false;

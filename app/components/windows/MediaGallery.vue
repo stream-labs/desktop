@@ -48,11 +48,11 @@
             <ul v-if="files.length" class="uploads-manager__list">
               <li v-for="file in files" :key="file.href" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                 <div>
-                  <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
+                  <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
                     <video loop :src="file.href" style="height: 100%; width: 100%"></video>
                   </div>
                   <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)" class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>
-                  <div v-if="file.type == 'audio'" style="height: 132">
+                  <div v-if="file.type == 'audio'" style="height: 132px;">
                     <i class="icon-music" style="line-height: 132px; fontSize: 28px; textAlign: center; display: block"></i>
                   </div>
                   <button class="copy-button button button--action" @click="handleCopy(file.href)">
@@ -231,15 +231,15 @@
   z-index: 100000;
   box-sizing: border-box;
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   height: 100%;
   width: 100%;
 }
 
 .busy-overlay {
   position: absolute;
-  top: 0px;
+  top: 0;
   left: 0px;
   width: 100%;
   height: 100%;
@@ -251,14 +251,12 @@
 
 .uploads-manager__list {
   padding: 0;
-  margin: 0;
   list-style: none;
   height: 400px;
-  display: inline-block;
   width: 100%;
   overflow-y: scroll;
   display: flex;
-  margin-top: 10px;
+  margin: 10px 0 0;
   flex-wrap: wrap;
 }
 

@@ -28,8 +28,8 @@ import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBann
     ChatbotQuotes,
     ChatbotQueue,
     ToggleInput,
-    ChatbotBanner
-  }
+    ChatbotBanner,
+  },
 })
 export default class Chatbot extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
@@ -42,8 +42,8 @@ export default class Chatbot extends Vue {
       children: [
         { title: 'Custom Commands' },
         { title: 'Default Commands' },
-        { title: 'Variables' }
-      ]
+        { title: 'Variables' },
+      ],
     },
     { title: 'Timers', enabled: true },
     { title: 'Mod Tools', enabled: true },
@@ -51,7 +51,7 @@ export default class Chatbot extends Vue {
     { title: 'Queue', enabled: false },
     { title: 'Currency', enabled: false },
     { title: 'Poll', enabled: false },
-    { title: 'Betting', enabled: false }
+    { title: 'Betting', enabled: false },
   ];
 
   //
@@ -66,7 +66,7 @@ export default class Chatbot extends Vue {
     Queue: 'fas fa-list-ul',
     Currency: 'fas fa-dollar-sign',
     Poll: 'icon-suggestions',
-    Betting: 'fas fa-money-bill-wave'
+    Betting: 'fas fa-money-bill-wave',
   };
 
   selectedTab = 'Modules';
@@ -83,7 +83,6 @@ export default class Chatbot extends Vue {
   }
 
   mounted() {
-
     this.chatbotApiService
       .logIn()
       .then(response => {
@@ -94,4 +93,3 @@ export default class Chatbot extends Vue {
       });
   }
 }
-

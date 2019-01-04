@@ -2,11 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
-import {
-  PlatformAppsService,
-  EAppPageSlot,
-  ILoadedApp
-} from 'services/platform-apps';
+import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
@@ -26,11 +22,9 @@ export default class AppsNav extends Vue {
     canScrollRight: false
   };
 
-
   isSelectedApp(appId: string) {
     return (
-      this.page === 'PlatformAppContainer' &&
-      this.navigationService.state.params.appId === appId
+      this.page === 'PlatformAppContainer' && this.navigationService.state.params.appId === appId
     );
   }
 
@@ -43,9 +37,7 @@ export default class AppsNav extends Vue {
   }
 
   isPopOutAllowed(app: ILoadedApp) {
-    const topNavPage = app.manifest.pages.find(
-      page => page.slot === EAppPageSlot.TopNav
-    );
+    const topNavPage = app.manifest.pages.find(page => page.slot === EAppPageSlot.TopNav);
     if (!topNavPage) return false;
 
     // Default result is true

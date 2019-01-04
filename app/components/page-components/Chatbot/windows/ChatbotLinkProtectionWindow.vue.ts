@@ -8,8 +8,8 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 @Component({
   components: {
     ChatbotLinkProtectionList,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   $refs: {
@@ -19,16 +19,16 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Whitelist'),
-      value: 'whitelist'
+      value: 'whitelist',
     },
     {
       name: $t('Blacklist'),
-      value: 'blacklist'
-    }
+      value: 'blacklist',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -42,12 +42,12 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   }
 
   async onSaveHandler() {
-    if (this.$refs.form && await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.$refs.form && (await this.$refs.form.validateAndGetErrorsCount())) return;
 
     this.chatbotApiService
       .updateLinkProtection({
         enabled: this.linkProtectionResponse.enabled,
-        settings: this.linkProtection
+        settings: this.linkProtection,
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

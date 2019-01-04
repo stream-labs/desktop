@@ -6,10 +6,9 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-
 test('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
-  if (!await logIn(t)) return;
+  if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
 
   await client.click('li=Visual Settings');
@@ -27,9 +26,8 @@ test('Chatbox Visual Settings', async t => {
     show_coin_icons: false,
     show_bttv_emotes: false,
     show_franker_emotes: false,
-    show_smf_emotes: false,
     background_color: '#FFFFFF',
-    message_hide_delay: 10
+    message_hide_delay: 10,
   };
 
   await formMonkey.fill(formName, testSet1);
@@ -46,9 +44,8 @@ test('Chatbox Visual Settings', async t => {
     show_coin_icons: true,
     show_bttv_emotes: true,
     show_franker_emotes: true,
-    show_smf_emotes: true,
     background_color: '#000000',
-    message_hide_delay: 60
+    message_hide_delay: 60,
   };
 
   await formMonkey.fill(formName, testSet2);
@@ -56,10 +53,9 @@ test('Chatbox Visual Settings', async t => {
   t.true(await formMonkey.includes(formName, testSet2));
 });
 
-
 test('Chatbox Font Settings', async t => {
   const client = t.context.app.client;
-  if (!await logIn(t)) return;
+  if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
 
   await client.click('li=Font Settings');
@@ -69,7 +65,7 @@ test('Chatbox Font Settings', async t => {
 
   const testSet1 = {
     text_color: '#FF0000',
-    text_size: 20
+    text_size: 20,
   };
 
   await formMonkey.fill(formName, testSet1);
@@ -78,7 +74,7 @@ test('Chatbox Font Settings', async t => {
 
   const testSet2 = {
     text_color: '#F8E71C',
-    text_size: 15
+    text_size: 15,
   };
 
   await formMonkey.fill(formName, testSet2);

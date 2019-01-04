@@ -10,7 +10,7 @@
       'main-contents--left': isLoggedIn && !leftDock && !isOnboarding && hasLiveDock }">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
-    <div class="main-middle" :class="mainResponsiveClasses" ref="main_middle">
+    <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
 
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>

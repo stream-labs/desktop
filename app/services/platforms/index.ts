@@ -16,7 +16,6 @@ export interface IGame {
 // All platform services should implement
 // this interface.
 export interface IPlatformService {
-
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
   authUrl: string;
@@ -42,6 +41,8 @@ export interface IPlatformService {
   beforeGoLive: () => Promise<any>;
 
   prepopulateInfo?: () => Promise<any>;
+
+  scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
 }
 
 export interface IPlatformAuth {
@@ -67,6 +68,6 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
     mixer: MixerService.instance,
-    facebook: FacebookService.instance
+    facebook: FacebookService.instance,
   }[platform];
 }
