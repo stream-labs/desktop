@@ -2,8 +2,8 @@ import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleResponse, authorizedHeaders } from 'util/requests';
-import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { authorizedHeaders, handleResponse } from 'util/requests';
+import { TSocketEvent, WebsocketService } from 'services/websocket';
 import uuid from 'uuid/v4';
 import fs from 'fs';
 import path from 'path';
@@ -153,13 +153,11 @@ export class StreamlabelsService extends Service {
       this.writeFileForStat(statname);
     }
 
-    const subscription: IStreamlabelSubscription = {
+    return {
       statname,
       id: subscriptionId,
       path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
     };
-
-    return subscription;
   }
 
   /**

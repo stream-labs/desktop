@@ -3,12 +3,12 @@ import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
 import * as obs from '../../../../obs-api';
 import {
-  isListProperty,
   isEditableListProperty,
-  isNumberProperty,
-  isTextProperty,
   isFontProperty,
+  isListProperty,
+  isNumberProperty,
   isPathProperty,
+  isTextProperty,
 } from '../../../util/properties-type-guards';
 import { $t } from 'services/i18n/index';
 
@@ -357,10 +357,9 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     // handle property details
 
     if (isListProperty(obsProp)) {
-      const options: IObsListOption<any>[] = obsProp.details.items.map(option => {
+      (formItem as IObsListInput<TObsValue>).options = obsProp.details.items.map(option => {
         return { value: option.value, description: option.name };
       });
-      (formItem as IObsListInput<TObsValue>).options = options;
     }
 
     if (isNumberProperty(obsProp)) {

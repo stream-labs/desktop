@@ -144,6 +144,7 @@ export class Display {
   }
 
   remoteClose() {
+    this.outputRegionCallbacks = [];
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {

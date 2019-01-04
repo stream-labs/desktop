@@ -1,4 +1,4 @@
-import { Module, apiMethod, EApiPermissions, IApiContext } from './module';
+import { apiMethod, EApiPermissions, IApiContext, Module } from './module';
 import { Display } from 'services/video';
 import uuid from 'uuid/v4';
 import electron from 'electron';
@@ -48,15 +48,13 @@ export class DisplayModule extends Module {
       webviewPosition: { x: 0, y: 0 },
     };
 
-    const sub = ctx.webviewTransform.subscribe(transform => {
+    this.displays[displayId].webviewSubscription = ctx.webviewTransform.subscribe(transform => {
       const displayEntry = this.displays[displayId];
       displayEntry.webviewVisible = transform.visible;
       displayEntry.webviewPosition = transform.pos;
 
       this.updateDisplay(displayEntry);
     });
-
-    this.displays[displayId].webviewSubscription = sub;
 
     electron.remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
       this.destroyDisplay(displayId);

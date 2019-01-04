@@ -26,6 +26,10 @@ const alertNameMap = () => ({
   follows: $t('Follows'),
   hosts: $t('Hosts'),
   raids: $t('Raids'),
+  superhearts: $t('Super Hearts'),
+  fanfunding: $t('Super Chat'),
+  sponsors: $t('Members'),
+  subscribers: $t('Subscribers'), // YouTube
   stars: $t('Stars'),
   support: $t('Support'),
   likes: $t('Likes'),

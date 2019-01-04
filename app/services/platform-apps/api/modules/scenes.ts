@@ -1,12 +1,12 @@
 import {
-  Module,
-  EApiPermissions,
-  apiMethod,
   apiEvent,
-  NotImplementedError,
+  apiMethod,
+  EApiPermissions,
   IApiContext,
+  Module,
+  NotImplementedError,
 } from './module';
-import { ScenesService, Scene, TSceneNode } from 'services/scenes';
+import { Scene, ScenesService, TSceneNode } from 'services/scenes';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
 
@@ -164,26 +164,22 @@ export class ScenesModule extends Module {
 
   private serializeNode(node: TSceneNode) {
     if (node.isFolder()) {
-      const folder: ISceneItemFolder = {
+      return {
         id: node.id,
         type: ESceneNodeType.Folder,
         name: node.name,
         childrenIds: node.childrenIds,
-      };
-
-      return folder;
+      } as ISceneItemFolder;
       // tslint:disable-next-line:no-else-after-return TODO
     } else if (node.isItem()) {
-      const item: ISceneItem = {
+      return {
         id: node.id,
         type: ESceneNodeType.SceneItem,
         sourceId: node.sourceId,
         visible: node.visible,
         locked: node.locked,
         transform: node.transform,
-      };
-
-      return item;
+      } as ISceneItem;
     }
   }
 }

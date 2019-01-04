@@ -71,7 +71,7 @@ async function getPreviousRoll(cacheFile, version) {
                 return;
             }
 
-            let roll = parseInt(data, 10);
+            let roll = parseInt(data.toString(), 10);
 
             if (!roll) {
                 roll = 0;
@@ -124,11 +124,7 @@ async function checkChance(info, version) {
 
     log.info(`You rolled ${roll}`);
 
-    if (roll <= chance) {
-        return true;
-    }
-
-    return false;
+    return (roll <= chance);
 }
 
 /* Note that latest-updater.exe never changes
@@ -292,7 +288,7 @@ async function entry(info) {
 
     if (statusWindow) {
         updaterArgs.push('-p');
-        updaterArgs.push(statusWindow.webContents.getOSProcessId());
+        updaterArgs.push(statusWindow.webContents.getOSProcessId().toString());
     }
 
     log.info(updaterArgs);

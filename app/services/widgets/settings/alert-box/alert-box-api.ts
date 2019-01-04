@@ -9,6 +9,9 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   prime_sub_enabled: boolean;
   moderation_delay: number;
   unlimited_media_moderation_delay: boolean;
+  automatically_reset_session: boolean;
+  censor_streamer_recent_events: boolean;
+  display_mtg_codes: boolean;
 
   // SHOW MESSAGES
   show_bits_message: boolean;
@@ -605,6 +608,12 @@ interface IAlertBoxTreatSettings {
   treat_variations: IAlertBoxVariation[];
 }
 
+export interface IAlertBoxMixerSettings
+  extends IAlertBoxFollowSettings,
+    IAlertBoxSubSettings,
+    IAlertBoxResubSettings,
+    IAlertBoxHostSettings {}
+
 export interface IAlertBoxApiSettings
   extends IAlertBoxGeneralSettings,
     IAlertBoxSubSettings,
@@ -624,7 +633,9 @@ export interface IAlertBoxApiSettings
     IAlertBoxGamewsipSettings,
     IAlertBoxJustGivingSettings,
     IAlertBoxPatreonSettings,
-    IAlertBoxTiltifySettings {}
+    IAlertBoxTiltifySettings {
+  mixer_account?: IAlertBoxMixerSettings;
+}
 
 // SLOBS GENERAL SETTINGS
 export interface IAlertBoxSetting {

@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { Component, Watch, Prop } from 'vue-property-decorator';
-import { IObsInput, ObsInput, IObsFont } from './ObsInput';
+import { Component, Prop, Watch } from 'vue-property-decorator';
+import { IObsFont, IObsInput, ObsInput } from './ObsInput';
 import { Multiselect } from 'vue-multiselect';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 import fontManager from 'font-manager';
@@ -92,12 +92,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   }
 
   getFlagsFromFont(font: IFontDescriptor) {
-    const flags =
+    return (
       (font.italic ? EFontStyle.Italic : 0) |
       (font.oblique ? EFontStyle.Italic : 0) |
-      (font.weight > 400 ? EFontStyle.Bold : 0);
-
-    return flags;
+      (font.weight > 400 ? EFontStyle.Bold : 0)
+    );
   }
 
   setStyle(font: IFontDescriptor) {
