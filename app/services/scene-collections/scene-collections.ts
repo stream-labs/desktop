@@ -141,7 +141,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async deinitialize() {
     this.disableAutoSave();
     await this.save();
-    await this.deloadCurrentApplicationState();
+    await this.deloadCurrentApplicationState(true);
     await this.safeSync();
     await this.stateService.flushManifestFile();
   }
@@ -533,7 +533,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * ready to load a new config file.  This should only ever be
    * performed while the application is already in a "LOADING" state.
    */
-  private async deloadCurrentApplicationState() {
+  private async deloadCurrentApplicationState(isShutdown: boolean = false) {
     if (!this.initialized) return;
 
     this.tcpServerService.stopRequestsHandling();
@@ -564,7 +564,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       console.error(new Error('Error deloading application state'));
     }
 
-    this.hotkeysService.clearAllHotkeys();
+    this.hotkeysService.clearAllHotkeys(isShutdown);
     this.collectionLoaded = false;
   }
 

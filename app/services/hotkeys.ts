@@ -285,6 +285,11 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
    */
   private registeredHotkeys: Hotkey[];
 
+  /**
+   * If we're deloading app state, to prevent querying OBS hotkeys
+   */
+  private isDeloading: boolean = false;
+
   init() {
     this.scenesService.sceneAdded.subscribe(() => this.invalidate());
     this.scenesService.sceneRemoved.subscribe(() => this.invalidate());
@@ -340,27 +345,29 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
     });
 
-    const obsHotkeys: OBSHotkey[] = obs.NodeObs.OBS_API_QueryHotkeys();
+    if (!this.isDeloading) {
+      const obsHotkeys: OBSHotkey[] = obs.NodeObs.OBS_API_QueryHotkeys();
 
-    obsHotkeys
-      .filter(hotkey => this.isSupportedHotkey(hotkey))
-      .forEach(hotkey => {
-        const action = this.getActionForHotkey(hotkey);
+      obsHotkeys
+        .filter(hotkey => this.isSupportedHotkey(hotkey))
+        .forEach(hotkey => {
+          const action = this.getActionForHotkey(hotkey);
 
-        if (action && action.name) {
-          const key = `${action.name}-${hotkey.ObjectName}`;
+          if (action && action.name) {
+            const key = `${action.name}-${hotkey.ObjectName}`;
 
-          if (!addedHotkeys.has(key)) {
-            hotkeys.push({
-              sourceId: hotkey.ObjectName,
-              actionName: action.name,
-              bindings: [] as IBinding[],
-              hotkeyId: hotkey.HotkeyId,
-            });
-            addedHotkeys.add(key);
+            if (!addedHotkeys.has(key)) {
+              hotkeys.push({
+                sourceId: hotkey.ObjectName,
+                actionName: action.name,
+                bindings: [] as IBinding[],
+                hotkeyId: hotkey.HotkeyId,
+              });
+              addedHotkeys.add(key);
+            }
           }
-        }
-      });
+        });
+    }
 
     // Set up bindings from saved hotkeys
     // This is a slow O(n^2) process, and may need to
@@ -405,15 +412,19 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     };
   }
 
-  clearAllHotkeys() {
-    this.applyHotkeySet({
-      general: [],
-      sources: {},
-      scenes: {},
-    });
+  clearAllHotkeys(isDeloading: boolean = false) {
+    this.applyHotkeySet(
+      {
+        general: [],
+        sources: {},
+        scenes: {},
+      },
+      isDeloading,
+    );
   }
 
-  applyHotkeySet(hotkeySet: IHotkeysSet) {
+  applyHotkeySet(hotkeySet: IHotkeysSet, isDeloading: boolean = false) {
+    this.isDeloading = isDeloading;
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
     Object.keys(hotkeySet.scenes).forEach(sceneId => hotkeys.push(...hotkeySet.scenes[sceneId]));
