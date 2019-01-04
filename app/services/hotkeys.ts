@@ -163,15 +163,15 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     up: sourceId => getSourcesService().setMuted(sourceId, true),
     shouldApply: isAudio,
   },
-  HOTKEY_START: {
-    name: 'HOTKEY_START',
+  GAME_CAPTURE_HOTKEY_START: {
+    name: 'GAME_CAPTURE_HOTKEY_START',
     description: () => $t('Capture Foreground Window'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
     shouldApply: isGameCapture,
   },
-  HOTKEY_STOP: {
-    name: 'HOTKEY_STOP',
+  GAME_CAPTURE_HOTKEY_STOP: {
+    name: 'GAME_CAPTURE_HOTKEY_STOP',
     description: () => $t('Deactivate Capture'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
@@ -342,25 +342,25 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
     const obsHotkeys: OBSHotkey[] = obs.NodeObs.OBS_API_QueryHotkeys();
 
-    obsHotkeys.filter(isSupportedHotkey).forEach(hotkey => {
-      const action = getActionFromName(hotkey.HotkeyName);
+    obsHotkeys
+      .filter(hotkey => this.isSupportedHotkey(hotkey))
+      .forEach(hotkey => {
+        const action = this.getActionForHotkey(hotkey);
 
-      if (!action.name) {
-        return;
-      }
+        if (action && action.name) {
+          const key = `${action.name}-${hotkey.ObjectName}`;
 
-      const key = `${action.name}-${hotkey.ObjectName}`;
-
-      if (!addedHotkeys.has(key)) {
-        hotkeys.push({
-          sourceId: hotkey.ObjectName,
-          actionName: action.name,
-          bindings: [] as IBinding[],
-          hotkeyId: hotkey.HotkeyId,
-        });
-        addedHotkeys.add(key);
-      }
-    });
+          if (!addedHotkeys.has(key)) {
+            hotkeys.push({
+              sourceId: hotkey.ObjectName,
+              actionName: action.name,
+              bindings: [] as IBinding[],
+              hotkeyId: hotkey.HotkeyId,
+            });
+            addedHotkeys.add(key);
+          }
+        }
+      });
 
     // Set up bindings from saved hotkeys
     // This is a slow O(n^2) process, and may need to
@@ -515,6 +515,32 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   private CLEAR_HOTKEYS() {
     this.state.hotkeys = [];
   }
+
+  private isSupportedHotkey(hotkey: OBSHotkey) {
+    if (hotkey.ObjectType !== obs.EHotkeyObjectType.Source) {
+      return false;
+    }
+
+    const action = this.getActionForHotkey(hotkey);
+
+    return action && action.name && idPropFor(hotkey);
+  }
+
+  private getActionForHotkey(hotkey: OBSHotkey): IHotkeyAction {
+    const action = getActionFromName(hotkey.HotkeyName);
+
+    // Return the action immediately if there's a 1-1 mapping
+    if (action && action.name) {
+      return action;
+    }
+
+    // Otherwise prefix the hotkey name with its source type
+    const source = this.sourcesService.getSource(hotkey.ObjectName);
+
+    if (source) {
+      return ACTIONS[`${source.type.toUpperCase()}_${hotkey.HotkeyName}`];
+    }
+  }
 }
 
 /**
@@ -612,14 +638,6 @@ const getMigrationMapping = (actionName: string) => {
 const getActionFromName = (actionName: string) => ({
   ...(ACTIONS[actionName] || ACTIONS[getMigrationMapping(actionName)]),
 });
-
-const isSupportedHotkey = (hotkey: OBSHotkey) => {
-  const action = getActionFromName(hotkey.HotkeyName);
-
-  return (
-    hotkey.ObjectType === obs.EHotkeyObjectType.Source && action && action.name && idPropFor(hotkey)
-  );
-};
 
 const isSceneItem = (hotkey: OBSHotkey) => !!getScenesService().getSceneItem(hotkey.ObjectName);
 
