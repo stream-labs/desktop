@@ -4,7 +4,7 @@
 
     <div class="scene-collections-wrapper">
 
-      <!-- <DropdownMenu class="scene-collections__dropdown" :title="activeCollection.name">
+      <DropdownMenu class="scene-collections__dropdown" :title="activeCollection.name">
         <div class="input-wrapper input-wrapper--search">
           <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
         </div>
@@ -22,7 +22,7 @@
         >
           {{ sceneCollection.name }}
         </div>
-      </DropdownMenu> -->
+      </DropdownMenu>
 
     </div>
 
