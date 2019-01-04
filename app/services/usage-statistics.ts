@@ -45,14 +45,15 @@ export function track(event: TUsageEvent) {
   };
 }
 
-
 interface IUsageStatisticsServiceState {
   uuid: string;
 }
 
-export class UsageStatisticsService extends PersistentStatefulService<IUsageStatisticsServiceState> {
+export class UsageStatisticsService extends PersistentStatefulService<
+  IUsageStatisticsServiceState
+> {
   static defaultState: IUsageStatisticsServiceState = {
-    uuid: ''
+    uuid: '',
   };
 
   @Inject() userService: UserService;
@@ -141,9 +142,7 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
       product: 'SLOBS',
       version: this.version,
       count: 1,
-      uuid: this.userService.state.auth ?
-        this.userService.state.auth.platform.id :
-        this.state.uuid
+      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : this.state.uuid,
     });
     this.sendAnalytics();
   }
@@ -157,12 +156,11 @@ export class UsageStatisticsService extends PersistentStatefulService<IUsageStat
     this.anaiticsEvents.length = 0;
 
     const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
-      method: 'post',
       headers,
-      body: JSON.stringify(data || {})
+      method: 'post',
+      body: JSON.stringify(data || {}),
     });
-    fetch(request).then(handleErrors);
-
+    fetch(request).then(handleResponse);
   }
 
   @mutation()

@@ -53,5 +53,4 @@ export class HostsService extends Service {
   get analitycs() {
     return 'r2d2.streamlabs.com';
   }
-
 }
