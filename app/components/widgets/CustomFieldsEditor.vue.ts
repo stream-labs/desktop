@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { codemirror } from 'vue-codemirror';
 import { CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
@@ -9,6 +8,7 @@ import { $t } from 'services/i18n/index';
 import { IInputMetadata, inputComponents, metadata } from 'components/shared/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
+import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 
 const { ToggleInput } = inputComponents;
 
@@ -95,15 +95,14 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
 export default class CustomFieldsEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
-  @Prop()
-  value: IWidgetData;
+  @Prop() value: IWidgetData;
+  @Prop() metadata: IInputMetadata;
 
-  customFields: Dictionary<ICustomField> = this.value.settings['custom_json'];
-  editorInputValue = this.value.settings['custom_json'];
+  customFields: Dictionary<ICustomField> = null;
+  editorInputValue: string = null;
   isEditMode = false;
   isLoading = false;
 
-  private serverInputValue = this.editorInputValue;
   private settingsService: WidgetSettingsService<any>;
 
   @debounce(1000)
@@ -113,7 +112,20 @@ export default class CustomFieldsEditor extends Vue {
   }
 
   created() {
+    this.customFields = this.selectedVariation
+      ? this.selectedVariation.settings.customJson
+      : this.value.settings['custom_json'];
+    this.editorInputValue = this.selectedVariation
+      ? this.selectedVariation.settings.customJson
+      : this.value.settings['custom_json'];
     this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
+  }
+
+  get selectedVariation() {
+    if (!this.metadata.selectedAlert || !this.metadata.selectedId) return;
+    return this.value.settings[this.metadata.selectedAlert].variations.find(
+      (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
+    );
   }
 
   get inputsData(): { value: number | string; metadata: IInputMetadata; fieldName: string }[] {
@@ -163,17 +175,22 @@ export default class CustomFieldsEditor extends Vue {
     this.isLoading = true;
 
     const newData = cloneDeep(this.value);
-    newData.settings['custom_json'] = this.customFields;
-
+    if (this.selectedVariation) {
+      const newVariation = newData.settings[this.metadata.selectedAlert].variations.find(
+        (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
+      );
+      newVariation.settings.customJson = this.customFields;
+    } else {
+      newData.settings['custom_json'] = this.customFields;
+    }
     try {
       await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
-      alert($t('Something went wrong'));
+      this.onFailHandler($t('Save failed, something went wrong.'));
       this.isLoading = false;
       return;
     }
 
-    this.serverInputValue = this.editorInputValue;
     this.isLoading = false;
   }
 
@@ -209,12 +226,17 @@ export default class CustomFieldsEditor extends Vue {
     this.isEditMode = false;
   }
 
-  toggleCustomFields() {
-    !!this.customFields ? this.removeFields() : this.addDefaultFields();
-  }
-
   emitInput(newValue: IWidgetData) {
     this.$emit('input', newValue);
     this.editorInputValue = newValue.settings['custom_json'];
+  }
+
+  onFailHandler(msg: string) {
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 3000,
+      singleton: true,
+    });
   }
 }

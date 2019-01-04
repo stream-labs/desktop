@@ -17,7 +17,6 @@ import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
-import { IAlertBoxData } from 'services/widgets/settings/alert-box';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 
 @Component({
@@ -40,7 +39,8 @@ export default class WidgetEditor extends Vue {
   @Inject() private projectorService: ProjectorService;
 
   @Prop() isAlertBox?: boolean;
-  @Prop() selectedVariation?: IAlertBoxVariation;
+  @Prop() selectedId?: string;
+  @Prop() selectedAlert?: string;
 
   /**
    * Declaration of additional sections in the right panel
@@ -82,6 +82,13 @@ export default class WidgetEditor extends Vue {
   get wData(): IWidgetData {
     if (!this.settingsState.data) return null;
     return cloneDeep(this.settingsState.data) as IWidgetData;
+  }
+
+  get selectedVariation() {
+    if (!this.selectedAlert || !this.selectedId || this.selectedAlert === 'general') return;
+    return this.wData.settings[this.selectedAlert].variations.find(
+      (variation: IAlertBoxVariation) => variation.id === this.selectedId,
+    );
   }
 
   get customCodeIsEnabled() {
@@ -138,7 +145,7 @@ export default class WidgetEditor extends Vue {
 
   get topTabs() {
     const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
-    if (this.selectedVariation && !this.selectedVariation.id) {
+    if (this.selectedAlert === 'general') {
       return firstTab;
     }
     return this.apiSettings.customCodeAllowed
@@ -153,7 +160,7 @@ export default class WidgetEditor extends Vue {
     // Animation takes 600ms to complete before we can re-render the OBS display
     setTimeout(() => {
       this.animating = false;
-      this.canShowEditor = true; // vue-codemirrow has rendering issues if we attempt to animate it just after mount
+      this.canShowEditor = true; // vue-codemirror has rendering issues if we attempt to animate it just after mount
     }, 600);
   }
 
