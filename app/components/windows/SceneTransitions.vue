@@ -8,7 +8,7 @@
     <div v-if="!transitionsEnabled" class="transition-blank">
       {{ $t('You need at least 2 scenes to edit transitions.') }}
     </div>
-    <tabs :tabs="tabs" v-model="selectedTab" v-else>
+    <tabs :tabs="tabs" className="scene-transition__tabs" v-model="selectedTab" v-else>
       <div slot="transitions" class="transition-tab">
         <button class="button button--action" @click="addTransition">
           {{$t('Add Transition')}}
@@ -113,6 +113,12 @@
 </template>
 
 <script lang="ts" src="./SceneTransitions.vue.ts"></script>
+
+<style lang="less">
+.scene-transition__tabs {
+  padding: 0 20px !important;
+}
+</style>
 
 <style lang="less" scoped>
 @import "../../styles/index";
