@@ -1,10 +1,10 @@
 import uuid from 'uuid/v4';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { getResource, Inject } from 'util/injector';
+import { Inject } from 'util/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -22,6 +22,7 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import * as obs from '../../../obs-api';
+import { EVideoCodes } from 'obs-studio-node/module';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
@@ -29,6 +30,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { $t } from '../i18n';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -87,7 +89,20 @@ export class AppService extends StatefulService<IAppState> {
     await this.obsUserPluginsService.initialize();
 
     // Initialize OBS
-    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
+    const apiResult = obs.NodeObs.OBS_API_initAPI(
+      'en-US',
+      electron.remote.process.env.SLOBS_IPC_USERDATA,
+    );
+
+    if (apiResult !== EVideoCodes.Success) {
+      const message = apiInitErrorResultToMessage(apiResult);
+      showDialog(message);
+
+      crashHandler.unregisterProcess(this.pid);
+      electron.ipcRenderer.send('shutdownComplete');
+
+      return;
+    }
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -228,3 +243,21 @@ export class AppService extends StatefulService<IAppState> {
     this.state.argv = argv;
   }
 }
+
+export const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
+  switch (resultCode) {
+    case EVideoCodes.NotSupported: {
+      return $t('OBSInit.NotSupportedError');
+    }
+    case EVideoCodes.ModuleNotFound: {
+      return $t('OBSInit.ModuleNotFoundError');
+    }
+    default: {
+      return $t('OBSInit.UnknownError');
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+};
