@@ -9,6 +9,11 @@ import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
 
+interface ICodeEditorMetadata extends IInputMetadata {
+  selectedId?: string;
+  selectedAlert?: string;
+}
+
 @Component({
   components: {
     CodeInput,
@@ -19,7 +24,7 @@ export default class CodeEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
-  metadata: IInputMetadata;
+  metadata: ICodeEditorMetadata;
 
   @Prop()
   value: IWidgetData;
@@ -59,13 +64,8 @@ export default class CodeEditor extends Vue {
     );
   }
 
-  @debounce(2000)
-  async save() {
-    if (!this.canSave) return;
-    this.isLoading = true;
-
+  setCustomCode(newData: IWidgetData) {
     const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
     if (this.selectedVariation) {
       const newVariation = newData.settings[this.metadata.selectedAlert].variations.find(
         (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
@@ -74,6 +74,17 @@ export default class CodeEditor extends Vue {
     } else {
       newData.settings[`custom_${type}`] = this.editorInputValue;
     }
+
+    return newData;
+  }
+
+  @debounce(2000)
+  async save() {
+    if (!this.canSave) return;
+    this.isLoading = true;
+
+    let newData = cloneDeep(this.value);
+    newData = this.setCustomCode(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
@@ -88,8 +99,8 @@ export default class CodeEditor extends Vue {
 
   restoreDefaults() {
     const type = this.metadata.type;
-    if (!!this.value.custom_defaults || !!this.value.custom) {
-      this.editorInputValue = this.value.custom_defaults[type] || this.value.custom[type];
+    if (!!this.value.custom_defaults) {
+      this.editorInputValue = this.value.custom_defaults[type];
     } else {
       this.onFailHandler($t('This widget does not have defaults.'));
     }

@@ -96,12 +96,6 @@ export interface IWidgetData {
     css: string;
     js: string;
   };
-
-  custom?: {
-    html: string;
-    css: string;
-    js: string;
-  };
 }
 
 export type TWIdgetLoadingState = 'none' | 'pending' | 'success' | 'fail';

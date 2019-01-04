@@ -21,6 +21,11 @@ type TCustomFieldType =
   | 'image-input'
   | 'sound-input';
 
+interface ICustomFieldMetadata {
+  selectedId?: string;
+  selectedAlert?: string;
+}
+
 export interface ICustomField {
   label: string;
   type: TCustomFieldType;
@@ -96,7 +101,7 @@ export default class CustomFieldsEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
   @Prop() value: IWidgetData;
-  @Prop() metadata: IInputMetadata;
+  @Prop() metadata: ICustomFieldMetadata;
 
   customFields: Dictionary<ICustomField> = null;
   editorInputValue: string = null;
@@ -171,10 +176,7 @@ export default class CustomFieldsEditor extends Vue {
     });
   }
 
-  async save() {
-    this.isLoading = true;
-
-    const newData = cloneDeep(this.value);
+  setCustomJson(newData: IWidgetData) {
     if (this.selectedVariation) {
       const newVariation = newData.settings[this.metadata.selectedAlert].variations.find(
         (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
@@ -183,6 +185,14 @@ export default class CustomFieldsEditor extends Vue {
     } else {
       newData.settings['custom_json'] = this.customFields;
     }
+    return newData;
+  }
+
+  async save() {
+    this.isLoading = true;
+
+    let newData = cloneDeep(this.value);
+    newData = this.setCustomJson(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
