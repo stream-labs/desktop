@@ -49,9 +49,20 @@ const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
 
 const WHITE_LIST = [
   'en-US',
-  'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
-  'hu-HU', 'it-IT', 'ja-JP', 'Ko-KR', 'pl-PL',
-  'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
+  'ru-RU',
+  'zh-TW',
+  'da-DK',
+  'de-DE',
+  'hu-HU',
+  'it-IT',
+  'ja-JP',
+  'Ko-KR',
+  'pl-PL',
+  'pt-PT',
+  'pt-BR',
+  'es-ES',
+  'fr-FR',
+  'tr-TR',
 ];
 
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
@@ -89,7 +100,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   @Inject() fileManagerService: FileManagerService;
 
   async load() {
-
     if (this.isLoaded) return;
     const i18nPath = this.getI18nPath();
 
@@ -98,7 +108,9 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     for (const locale of localeFiles) {
       if (!this.localeIsSupported(locale)) continue;
-      this.availableLocales[locale] = this.fileManagerService.read(`${i18nPath}/${locale}/langname.txt`);
+      this.availableLocales[locale] = this.fileManagerService.read(
+        `${i18nPath}/${locale}/langname.txt`,
+      );
     }
 
     // if locale is not set than use electron's one
@@ -190,7 +202,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   private localeIsSupported(locale: string) {
-    return WHITE_LIST.includes(locale) && fs.existsSync(`${this.getI18nPath()}/${locale}`)
+    return WHITE_LIST.includes(locale) && fs.existsSync(`${this.getI18nPath()}/${locale}`);
   }
 
   @mutation()
