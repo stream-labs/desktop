@@ -2,6 +2,7 @@ const zlib = require('zlib');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
+// TODO: we're getting these through dev deps, maybe we should be explicit about these
 const pmap = require('p-map');
 const pump = require('pump');
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { Component, Watch, Prop } from 'vue-property-decorator';
-import { IObsInput, ObsInput, IObsFont } from './ObsInput';
+import { Component, Prop, Watch } from 'vue-property-decorator';
+import { IObsFont, IObsInput, ObsInput } from './ObsInput';
 import { Multiselect } from 'vue-multiselect';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 import fontManager from 'font-manager';
@@ -26,20 +26,19 @@ interface IFontSelect extends HTMLElement {
 }
 
 @Component({
-  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector }
+  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector },
 })
-export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>{
-
+export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>> {
   @Prop()
   value: IObsInput<IObsFont>;
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 
   $refs: {
-    family: HTMLInputElement,
-    font: IFontSelect,
-    size: HTMLInputElement,
-  }
+    family: HTMLInputElement;
+    font: IFontSelect;
+    size: HTMLInputElement;
+  };
 
   // CSS styles for a particular font
   styleForFont(font: IFontDescriptor) {
@@ -50,9 +49,9 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     }
 
     return {
+      fontStyle,
       fontFamily: font.family,
       fontWeight: font.weight,
-      fontStyle
     };
   }
 
@@ -61,44 +60,43 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   fontsToFamily(fonts: IFontDescriptor[]) {
     if (fonts) {
       return {
+        fonts,
         family: fonts[0].family,
-        fonts
       };
     }
 
     return { family: '', fonts: [] };
   }
 
-  setFamily(family: {family: string, fonts: IFontDescriptor[]}) {
+  setFamily(family: { family: string; fonts: IFontDescriptor[] }) {
     // When a new family is selected, we have to select a
     // default style.  This will be "Regular" if it exists.
     // Otherwise, it will be the first family on the list.
 
-    let selected_font: IFontDescriptor;
+    let selectedFont: IFontDescriptor;
 
-    let regular = _.find(family.fonts, font => {
+    const regular = _.find(family.fonts, font => {
       return font.style === 'Regular';
     });
 
     if (regular) {
-      selected_font = regular;
+      selectedFont = regular;
     } else {
-      selected_font = family.fonts[0];
+      selectedFont = family.fonts[0];
     }
 
     this.setFont({
       face: family.family,
-      flags: this.getFlagsFromFont(selected_font)
+      flags: this.getFlagsFromFont(selectedFont),
     });
   }
 
   getFlagsFromFont(font: IFontDescriptor) {
-    const flags = 
-      (font.italic  ? EFontStyle.Italic : 0) |
+    return (
+      (font.italic ? EFontStyle.Italic : 0) |
       (font.oblique ? EFontStyle.Italic : 0) |
-      (font.weight > 400 ? EFontStyle.Bold : 0);
-
-    return flags;
+      (font.weight > 400 ? EFontStyle.Bold : 0)
+    );
   }
 
   setStyle(font: IFontDescriptor) {
@@ -136,7 +134,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   restyleSelect(select: any) {
     if (!this.selectedFont) return;
 
-    let input = select.$refs.search;
+    const input = select.$refs.search;
     input.style['font-family'] = this.selectedFont.family;
 
     if (this.selectedFont.italic) {
@@ -176,10 +174,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   }
 
   get fontFamilies() {
-    return _.sortBy(_.map(this.fontsByFamily, fonts => {
-      return this.fontsToFamily(fonts);
-    }), 'family');
+    return _.sortBy(
+      _.map(this.fontsByFamily, fonts => {
+        return this.fontsToFamily(fonts);
+      }),
+      'family',
+    );
   }
-
-
 }

@@ -62,7 +62,6 @@
   flex-direction: row;
   align-items: center;
   .padding-h-sides();
-  position: relative;
   max-width: none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;

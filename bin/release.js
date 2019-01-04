@@ -277,7 +277,7 @@ async function runScript() {
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
-  const pjson = JSON.parse(fs.readFileSync('package.json'));
+  const pjson = require('./package.json');
   const currentVersion = pjson.version;
 
   info(`The current application version is ${currentVersion}`);

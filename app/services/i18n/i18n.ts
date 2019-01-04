@@ -20,32 +20,31 @@ export function $t(...args: any[]): string {
   // some tests try to call this function before dictionaries have been loaded
   if (!vueI18nInstance) return args[0];
 
-  return vueI18nInstance.t.call(
-    I18nService.vueI18nInstance,
-    ...args
-  );
+  return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args);
 }
 
 /**
+ * Crowding and Electron use different standards for locale name
+ * Do some mapping in LANG_CODE_MAP based on docs:
  * @see https://electronjs.org/docs/api/locales
  */
-const LANG_CODE_MAP = {
+const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
-  'en-US':	{ lang: 'English', locale: 'en-US' },
+  'en-US': { lang: 'English', locale: 'en-US' },
   es: { lang: 'Spanish', locale: 'es-ES' },
   fr: { lang: 'French', locale: 'fr-FR' },
-  it:	{ lang: 'Italian', locale: 'it-IT' },
+  it: { lang: 'Italian', locale: 'it-IT' },
   ja: { lang: 'Japanese', locale: 'ja-JP' },
-  ko:	{ lang: 'Korean', locale: 'ko-KR' },
-  pl: { lang:	'Polish', locale: 'pl-PL' },
+  ko: { lang: 'Korean', locale: 'ko-KR' },
+  pl: { lang: 'Polish', locale: 'pl-PL' },
   pt: { lang: 'Portuguese', locale: 'pt-PT' },
   'pt-BR': { lang: 'Portuguese (Brazil)', locale: 'pt-BR' },
   ru: { lang: 'Russian', locale: 'ru-RU' },
   sk: { lang: 'Slovak', locale: 'sk-SK' },
-  th:	{ lang: 'Thai', locale: 'th-TH' },
-  tr:	{ lang: 'Turkish', locale: 'tr-TR' },
-  'zh-CN': { lang: 'Chinese (Simplified)' }
+  th: { lang: 'Thai', locale: 'th-TH' },
+  tr: { lang: 'Turkish', locale: 'tr-TR' },
+  'zh-CN': { lang: 'Chinese (Simplified)', locale: 'zh-CN' },
 };
 
 const WHITE_LIST = [
@@ -56,9 +55,8 @@ const WHITE_LIST = [
 ];
 
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
-
   static defaultState: II18nState = {
-    locale: ''
+    locale: '',
   };
 
   static vueI18nInstance: VueI18n;
@@ -89,7 +87,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   private isLoaded = false;
 
   @Inject() fileManagerService: FileManagerService;
-
 
   async load() {
 
@@ -149,41 +146,44 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   getLocaleFormData(): TObsFormData {
-    const options = Object.keys(this.availableLocales)
-      .map(locale => {
-        return {
-          value: locale,
-          description: this.availableLocales[locale]
-        };
-      });
+    const options = Object.keys(this.availableLocales).map(locale => {
+      return {
+        value: locale,
+        description: this.availableLocales[locale],
+      };
+    });
 
     return [
       <IObsListInput<string>>{
+        options,
         type: 'OBS_PROPERTY_LIST',
         name: 'locale',
         description: $t('Language'),
         value: this.state.locale,
         enabled: true,
         visible: true,
-        options
-      }
+      },
     ];
   }
 
   private getI18nPath() {
-    return path.join(electron.remote.app.getAppPath(),'app/i18n');
+    return path.join(electron.remote.app.getAppPath(), 'app/i18n');
   }
 
   private async loadDictionary(locale: string): Promise<Dictionary<string>> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
     const i18nPath = this.getI18nPath();
-    const dictionaryFiles = fs.readdirSync(`${i18nPath}/${locale}`)
+    const dictionaryFiles = fs
+      .readdirSync(`${i18nPath}/${locale}`)
       .filter(fileName => fileName.split('.')[1] === 'json');
 
     const dictionary: Dictionary<string> = {};
     for (const fileName of dictionaryFiles) {
-      Object.assign(dictionary, JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)));
+      Object.assign(
+        dictionary,
+        JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)),
+      );
     }
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
@@ -197,5 +197,4 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   private SET_LOCALE(locale: string) {
     this.state.locale = locale;
   }
-
 }

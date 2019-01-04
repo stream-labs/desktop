@@ -8,7 +8,7 @@ import MixerVolmeter from './MixerVolmeter.vue';
 import { Inject } from '../util/injector';
 
 @Component({
-  components: { Slider, MixerVolmeter }
+  components: { Slider, MixerVolmeter },
 })
 export default class MixerItem extends Vue {
   @Prop() audioSource: AudioSource;
@@ -30,7 +30,7 @@ export default class MixerItem extends Vue {
   showSourceMenu(sourceId: string) {
     const menu = new EditMenu({
       selectedSourceId: sourceId,
-      showAudioMixerMenu: true
+      showAudioMixerMenu: true,
     });
     menu.popup();
   }

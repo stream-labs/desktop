@@ -111,6 +111,12 @@
   display: none !important;
 }
 
+.popper {
+  border: 0 !important;
+  padding: 8px !important;
+  color: inherit !important;
+}
+
 .popper[x-placement^="top"] {
   margin-bottom: 5px;
 }

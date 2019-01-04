@@ -8,7 +8,6 @@ import Utils from 'services/utils';
 
 @Component({})
 export default class PlatformAppWebview extends Vue {
-
   @Inject() platformAppsService: PlatformAppsService;
   @Prop() appId: string;
   @Prop() pageSlot: EAppPageSlot;
@@ -18,7 +17,7 @@ export default class PlatformAppWebview extends Vue {
   $refs: {
     appView: Electron.WebviewTag;
     resizeContainer: HTMLDivElement;
-  }
+  };
 
   reloadSub: Subscription;
 
@@ -32,7 +31,7 @@ export default class PlatformAppWebview extends Vue {
     this.transformSubjectId = this.platformAppsService.createTransformSubject({
       pos: { x: 0, y: 0 },
       size: { x: 0, y: 0 },
-      visible: this.visible
+      visible: this.visible,
     });
 
     this.checkResize();
@@ -43,7 +42,7 @@ export default class PlatformAppWebview extends Vue {
 
     this.attachWebviewListeners();
 
-    this.reloadSub = this.platformAppsService.appReload.subscribe((appId) => {
+    this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
       if (this.appId === appId) {
         this.renderWebview = false;
 
@@ -51,7 +50,7 @@ export default class PlatformAppWebview extends Vue {
         // Ideally we would have a better way to destroy and
         // recreate the webcontents
         this.$nextTick(() => {
-          this.renderWebview = true
+          this.renderWebview = true;
 
           this.$nextTick(() => {
             this.attachWebviewListeners();
@@ -86,7 +85,7 @@ export default class PlatformAppWebview extends Vue {
         webContents.id,
         electron.remote.getCurrentWindow().id,
         Utils.getCurrentUrlParams().windowId,
-        this.transformSubjectId
+        this.transformSubjectId,
       );
 
       /**
@@ -98,7 +97,7 @@ export default class PlatformAppWebview extends Vue {
       // We allow opening dev tools for beta apps only
       if (app.beta) {
         webContents.on('before-input-event', (e, input) => {
-          if ((input.type === 'keyDown') && (input.code === 'KeyI') && input.control && input.shift) {
+          if (input.type === 'keyDown' && input.code === 'KeyI' && input.control && input.shift) {
             this.$refs.appView.openDevTools();
           }
         });
@@ -113,10 +112,7 @@ export default class PlatformAppWebview extends Vue {
   }
 
   get appUrl() {
-    return this.platformAppsService.getPageUrlForSlot(
-      this.appId,
-      this.pageSlot
-    );
+    return this.platformAppsService.getPageUrlForSlot(this.appId, this.pageSlot);
   }
 
   get appPartition() {
@@ -126,12 +122,12 @@ export default class PlatformAppWebview extends Vue {
   get webviewStyles() {
     if (this.visible) {
       return {};
-    } else {
-      return {
-        position: 'absolute',
-        top: '-10000px'
-      };
     }
+
+    return {
+      position: 'absolute',
+      top: '-10000px',
+    };
   }
 
   currentPosition: IVec2;
@@ -139,10 +135,11 @@ export default class PlatformAppWebview extends Vue {
   checkResize() {
     const rect = this.$refs.resizeContainer.getBoundingClientRect();
 
-    if (this.currentPosition == null ||
+    if (
+      this.currentPosition == null ||
       rect.left !== this.currentPosition.x ||
-      rect.top !== this.currentPosition.y) {
-
+      rect.top !== this.currentPosition.y
+    ) {
       this.emitTransform();
     }
   }
@@ -152,14 +149,13 @@ export default class PlatformAppWebview extends Vue {
     const rect = this.$refs.resizeContainer.getBoundingClientRect();
     this.currentPosition = {
       x: rect.left,
-      y: rect.top
+      y: rect.top,
     };
 
     this.platformAppsService.nextTransformSubject(this.transformSubjectId, {
       pos: { x: rect.left, y: rect.top },
       size: { x: rect.width, y: rect.height },
-      visible: this.visible
+      visible: this.visible,
     });
   }
-
 }

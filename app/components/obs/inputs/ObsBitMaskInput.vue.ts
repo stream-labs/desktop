@@ -4,7 +4,6 @@ import { EBit, default as Utils } from '../../../services/utils';
 
 @Component
 class ObsBitMaskInput extends ObsInput<IObsBitmaskInput> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -26,7 +25,6 @@ class ObsBitMaskInput extends ObsInput<IObsBitmaskInput> {
     const value = Utils.binnaryArrayToNumber(this.flags.reverse());
     this.emitInput({ ...this.value, value });
   }
-
 }
 
 ObsBitMaskInput.obsType = 'OBS_PROPERTY_BITMASK';

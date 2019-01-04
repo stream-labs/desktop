@@ -5,7 +5,7 @@ import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   $refs: {
@@ -15,12 +15,12 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -39,7 +39,7 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
     this.chatbotApiService
       .updateSymbolProtection({
         enabled: this.symbolProtectionResponse.enabled,
-        settings: this.symbolProtection
+        settings: this.symbolProtection,
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

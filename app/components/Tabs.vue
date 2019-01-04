@@ -34,7 +34,6 @@
   height: 48px;
   border: 0;
   border-bottom: 1px solid @day-border;
-  background: transparent;
   padding: 0;
 }
 

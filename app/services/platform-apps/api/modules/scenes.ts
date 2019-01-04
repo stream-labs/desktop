@@ -1,11 +1,18 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
-import { ScenesService, Scene, TSceneNode } from 'services/scenes';
+import {
+  apiEvent,
+  apiMethod,
+  EApiPermissions,
+  IApiContext,
+  Module,
+  NotImplementedError,
+} from './module';
+import { Scene, ScenesService, TSceneNode } from 'services/scenes';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
 
 enum ESceneNodeType {
   Folder = 'folder',
-  SceneItem = 'scene_item'
+  SceneItem = 'scene_item',
 }
 
 interface INode {
@@ -41,7 +48,6 @@ interface IScene {
 }
 
 export class ScenesModule extends Module {
-
   moduleName = 'Scenes';
   permissions = [EApiPermissions.ScenesSources];
 
@@ -76,6 +82,20 @@ export class ScenesModule extends Module {
   @apiMethod()
   getScenes() {
     return this.scenesService.getScenes().map(scene => this.serializeScene(scene));
+  }
+
+  @apiMethod()
+  getScene(_ctx: IApiContext, id: string): IScene | null {
+    const scene = this.scenesService.getScene(id);
+
+    return scene ? this.serializeScene(scene) : null;
+  }
+
+  @apiMethod()
+  getSceneItem(_ctx: IApiContext, id: string): ISceneItem | ISceneItemFolder | null {
+    const sceneItem = this.scenesService.getSceneItem(id);
+
+    return sceneItem ? this.serializeNode(sceneItem) : null;
   }
 
   @apiMethod()
@@ -138,32 +158,28 @@ export class ScenesModule extends Module {
       name: scene.name,
       nodes: scene.getNodes().map(node => {
         return this.serializeNode(node);
-      })
+      }),
     };
   }
 
   private serializeNode(node: TSceneNode) {
     if (node.isFolder()) {
-      const folder: ISceneItemFolder = {
+      return {
         id: node.id,
         type: ESceneNodeType.Folder,
         name: node.name,
-        childrenIds: node.childrenIds
-      };
-
-      return folder;
+        childrenIds: node.childrenIds,
+      } as ISceneItemFolder;
+      // tslint:disable-next-line:no-else-after-return TODO
     } else if (node.isItem()) {
-      const item: ISceneItem = {
+      return {
         id: node.id,
         type: ESceneNodeType.SceneItem,
         sourceId: node.sourceId,
         visible: node.visible,
         locked: node.locked,
-        transform: node.transform
-      };
-
-      return item;
+        transform: node.transform,
+      } as ISceneItem;
     }
   }
-
 }

@@ -1,8 +1,7 @@
 import { Node } from './node';
-import { Scene } from '../../scenes/scene';
+import { ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
-import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';
 import { Inject } from '../../../util/injector';
 
 interface ISchema {
@@ -24,17 +23,15 @@ export interface ISceneItemInfo {
 
   sceneNodeType?: TSceneNodeType;
   parentId?: string;
-
 }
 
-export type TSceneNodeInfo =  ISceneItemInfo | ISceneItemFolder;
+export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolder;
 
 interface IContext {
   scene: Scene;
 }
 
 export class SceneItemsNode extends Node<ISchema, {}> {
-
   schemaVersion = 1;
 
   @Inject('SourcesService')
@@ -44,7 +41,10 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   scenesService: ScenesService;
 
   getItems(context: IContext) {
-    return context.scene.getNodes().slice().reverse();
+    return context.scene
+      .getNodes()
+      .slice()
+      .reverse();
   }
 
   save(context: IContext): Promise<void> {
@@ -56,6 +56,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
             resolve({
+              hotkeys,
               id: sceneItem.sceneItemId,
               sourceId: sceneItem.sourceId,
               x: transform.position.x,
@@ -65,14 +66,12 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               visible: sceneItem.visible,
               crop: transform.crop,
               locked: sceneItem.locked,
-              hotkeys,
-              rotation: transform.rotation
+              rotation: transform.rotation,
             });
           });
         } else {
           resolve(sceneItem.getModel());
         }
-
       });
     });
 
@@ -116,5 +115,4 @@ export class SceneItemsNode extends Node<ISchema, {}> {
       Promise.all(promises).then(() => resolve());
     });
   }
-
 }

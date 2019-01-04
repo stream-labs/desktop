@@ -5,7 +5,6 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 
 @Component({})
 export default class HelpTip extends Vue {
-
   @Inject() dismissablesService: DismissablesService;
   @Prop() dismissableKey: EDismissable;
 

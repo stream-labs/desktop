@@ -7,12 +7,10 @@ import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/keymap/sublime';
 import { IInputMetadata } from './index';
 
-
 @Component({
-  components: { codemirror }
+  components: { codemirror },
 })
 export default class CodeInput extends BaseInput<string, IInputMetadata> {
-
   @Prop({ default: '' })
   readonly value: string;
 
@@ -34,8 +32,8 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       autoCloseTags: true,
       extraKeys: {
         Tab: 'emmetExpandAbbreviation',
-        Enter: 'emmetInsertLineBreak'
-      }
+        Enter: 'emmetInsertLineBreak',
+      },
     },
 
     css: {
@@ -51,8 +49,8 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       autoCloseTags: true,
       extraKeys: {
         Tab: 'emmetExpandAbbreviation',
-        Enter: 'emmetInsertLineBreak'
-      }
+        Enter: 'emmetInsertLineBreak',
+      },
     },
 
     js: {
@@ -67,8 +65,6 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       autoCloseBrackets: true,
       matchBrackets: true,
       autoCloseTags: true,
-    }
-
+    },
   };
-
 }

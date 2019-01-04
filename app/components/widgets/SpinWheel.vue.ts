@@ -1,8 +1,5 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import {
-  SpinWheelService,
-  ISpinWheelData
-} from 'services/widgets/settings/spin-wheel';
+import { SpinWheelService, ISpinWheelData } from 'services/widgets/settings/spin-wheel';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -18,11 +15,10 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
     WidgetEditor,
     VFormGroup,
     ValidatedForm,
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelService> {
-
   get metadata() {
     return this.service.getMetadata(this.sectionOptions);
   }
@@ -35,7 +31,7 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
     { value: 'border', label: $t('Border') },
     { value: 'ticker', label: $t('Ticker') },
     { value: 'image', label: $t('Center Image') },
-    { value: 'source', label: $t('Source') }
+    { value: 'source', label: $t('Source') },
   ];
 
   clearCategories() {
@@ -49,7 +45,9 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   }
 
   removeCategory(prize: string) {
-    this.wData.settings.categories = this.wData.settings.categories.filter((cat) => cat.prize !== prize);
+    this.wData.settings.categories = this.wData.settings.categories.filter(
+      cat => cat.prize !== prize,
+    );
     this.save();
   }
 
@@ -58,13 +56,13 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   }
 
   removeSection(key: string) {
-    this.wData.settings.sections = this.wData.settings.sections.filter((sect) => sect.key !== key);
+    this.wData.settings.sections = this.wData.settings.sections.filter(sect => sect.key !== key);
     this.save();
   }
 
   moveSection(key: string, idxMod: number) {
     const sections = this.wData.settings.sections;
-    const idx = sections.findIndex((sect) => sect.key === key);
+    const idx = sections.findIndex(sect => sect.key === key);
     [sections[idx], sections[idx + idxMod]] = [sections[idx + idxMod], sections[idx]];
     this.save();
   }

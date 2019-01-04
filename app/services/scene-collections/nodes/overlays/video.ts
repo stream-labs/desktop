@@ -41,7 +41,7 @@ export class VideoNode extends Node<ISchema, IContext> {
 
     this.data = {
       settings,
-      filename: newFileName
+      filename: newFileName,
     };
   }
 

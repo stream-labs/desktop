@@ -2,7 +2,20 @@ import { ISourceDisplayData } from './index';
 import { $t } from 'services/i18n';
 
 const imageSupport = ['png', 'jpg', 'jpeg', 'gif', 'tga', 'bmp'];
-const mediaSupport = ['mp4', 'ts', 'mov', 'flv', 'mkv', 'avi', 'mp3', 'ogg', 'aac', 'wav', 'gif', 'webm'];
+const mediaSupport = [
+  'mp4',
+  'ts',
+  'mov',
+  'flv',
+  'mkv',
+  'avi',
+  'mp3',
+  'ogg',
+  'aac',
+  'wav',
+  'gif',
+  'webm',
+];
 const colorSupport = ['Hex', 'RGBA', 'HSV'];
 
 export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
@@ -10,55 +23,57 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('Image'),
     description: $t('Add images to your scene.'),
     demoFilename: 'image.png',
-    supportList: imageSupport
+    supportList: imageSupport,
   },
   color_source: {
     name: $t('Color Source'),
     description: $t('Add a color to the background of your whole scene or just a part.'),
     demoFilename: 'color-source.png',
-    supportList: colorSupport
+    supportList: colorSupport,
   },
   browser_source: {
     name: $t('Browser Source'),
-    description: $t('Allows you to add web-based content as a source, such as web pages and Flash SWFs.'),
+    description: $t(
+      'Allows you to add web-based content as a source, such as web pages and Flash SWFs.',
+    ),
     demoFilename: 'browser-source.png',
-    supportList: [$t('Websites'), $t('Third party widgets'), 'HTML']
+    supportList: [$t('Websites'), $t('Third party widgets'), 'HTML'],
   },
   ffmpeg_source: {
     name: $t('Media Source'),
     description: $t('Add videos or sound clips to your scene.'),
     demoFilename: 'media.png',
-    supportList: mediaSupport
+    supportList: mediaSupport,
   },
   slideshow: {
     name: $t('Image Slide Show'),
     description: $t('Add a slideshow of images to your scene.'),
     demoFilename: 'image-slide-show.png',
-    supportList: imageSupport
+    supportList: imageSupport,
   },
   text_gdiplus: {
     name: $t('Text (GDI+)'),
     description: $t('Add text to your scene and adjust its style.'),
     demoFilename: 'text.png',
-    supportList: [...colorSupport, $t('System Fonts'), $t('System Sizes')]
+    supportList: [...colorSupport, $t('System Fonts'), $t('System Sizes')],
   },
   monitor_capture: {
     name: $t('Display Capture'),
     description: $t('Capture your entire computer monitor.'),
     demoFilename: 'display-capture.png',
-    supportList: [$t('Primary monitor'), $t('Secondary monitor')]
+    supportList: [$t('Primary monitor'), $t('Secondary monitor')],
   },
   window_capture: {
     name: $t('Window Capture'),
-    description: $t('Capture a specific window that\'s open on your computer.'),
+    description: $t("Capture a specific window that's open on your computer."),
     demoFilename: 'window-capture.png',
-    supportList: [$t('Compatible with most modern browsers and programs')]
+    supportList: [$t('Compatible with most modern browsers and programs')],
   },
   game_capture: {
     name: $t('Game Capture'),
-    description: $t('Capture a game you\'re playing on your computer.'),
+    description: $t("Capture a game you're playing on your computer."),
     demoFilename: 'game-capture.png',
-    supportList: [$t('Built in works with most modern computer games')]
+    supportList: [$t('Built in works with most modern computer games')],
   },
   dshow_input: {
     name: $t('Video Capture Device'),
@@ -67,63 +82,61 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: [
       $t('Built in webcam'),
       $t('Logitech webcam'),
-      $t('Capture cards (Elgato, Avermedia, BlackMagic)')
-    ]
+      $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
+    ],
   },
   ndi_source: {
     name: $t('NDI source'),
-    description: $t('Allow you to capture NDI output streams.')
+    description: $t('Allow you to capture NDI output streams.'),
   },
   'decklink-input': {
     name: $t('Blackmagic Device'),
     description: $t('Capture the feed your decklink device is capturing.'),
     demoFilename: 'sources.png',
-    supportList: [$t('Works with most of the recent Blackmagic cards.')]
+    supportList: [$t('Works with most of the recent Blackmagic cards.')],
   },
   openvr_capture: {
     name: $t('OpenVR Capture'),
     description: $t('Directly capture the OpenVR monitoring video buffer of your HMD.'),
     demoFilename: 'vr-capture.png',
-    supportList: ['OpenVR', 'SteamVR']
+    supportList: ['OpenVR', 'SteamVR'],
   },
   liv_capture: {
     name: $t('LIV Client Capture'),
     description: $t(
-      'Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.'
+      'Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.',
     ),
     demoFilename: 'vr-capture.png',
-    supportList: ['LIV']
+    supportList: ['LIV'],
   },
   wasapi_input_capture: {
     name: $t('Audio Input Capture'),
     description: $t(
-      'Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.'
+      'Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.',
     ),
     demoFilename: 'audio-input.png',
-    supportList: [
-      $t('Built in microphones'),
-      $t('USB microphones'),
-      $t('Other USB devices')
-    ]
+    supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
   },
   wasapi_output_capture: {
     name: $t('Audio Output Capture'),
-    description: $t('Captures your desktop audio for the purpose of playing sound, such as music or speech.'),
+    description: $t(
+      'Captures your desktop audio for the purpose of playing sound, such as music or speech.',
+    ),
     demoFilename: 'audio-output.png',
-    supportList: [$t('Desktop audio')]
+    supportList: [$t('Desktop audio')],
   },
   scene: {
     name: $t('Scene'),
     description: $t('Allows you to add existing scene as a source'),
-    demoFilename: 'scene.png'
+    demoFilename: 'scene.png',
   },
   // vvv Not sure if this is still supported, there is no showcase data for it vvv
   text_ft2_source: {
     name: $t('Text (FreeType 2)'),
-    description: ''
+    description: '',
   },
   ovrstream_dc_source: {
     name: 'OvrStream',
-    description: ''
-  }
+    description: '',
+  },
 });
