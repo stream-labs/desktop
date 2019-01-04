@@ -1,12 +1,5 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import {
-  ISource,
-  ISourceAddOptions,
-  Source,
-  SourcesService,
-  TPropertiesManager,
-  TSourceType,
-} from 'services/sources';
+import { ISourceAddOptions, SourcesService, TSourceType, Source } from 'services/sources';
 import { ScenesService, TSceneNode, TSceneNodeType } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { mutation, ServiceHelper } from '../stateful-service';
@@ -14,7 +7,7 @@ import uuid from 'uuid/v4';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import Utils from '../utils';
 import Vue from 'vue';
-
+import { HardwareService } from '../hardware';
 interface IPrefabSourceCreateOptions {
   name: string;
   description?: string;
@@ -144,6 +137,7 @@ export class Prefab implements IPrefab {
   @Inject() private prefabsService: PrefabsService;
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
+  @Inject() private hardwareService: HardwareService;
 
   constructor(prefabId: string) {
     Utils.applyProxy(this, this.prefabsService.state.prefabs[prefabId]);
@@ -156,6 +150,10 @@ export class Prefab implements IPrefab {
 
   addToScene(sceneId: string, options: IPrefabAddToSceneOptions = {}): TSceneNode {
     const scene = this.scenesService.getScene(sceneId);
+    const existingSource = this.getExistingSource();
+
+    if (existingSource) return scene.addSource(existingSource.sourceId);
+
     const prefabSourceModel = this.getPrefabSourceModel();
     const source = this.sourcesService.createSource(
       options.name || prefabSourceModel.name,
@@ -168,5 +166,27 @@ export class Prefab implements IPrefab {
 
   remove() {
     this.prefabsService.removePrefab(this.id);
+  }
+
+  /**
+   * dshow_input allows to use only one source of the same device
+   * instead of creating a new source we add an existing for this type of source
+   */
+  private getExistingSource(): Source {
+    const prefabSourceModel = this.getPrefabSourceModel();
+
+    // only dshow_input requires usage of existing source
+    if (!prefabSourceModel || prefabSourceModel.type !== 'dshow_input') return null;
+
+    // find and return already existing dshow_input source with the same device.
+    const deviceId = (prefabSourceModel.settings &&
+      prefabSourceModel.settings.video_device_id) as string;
+    if (!deviceId) return null;
+    const device =
+      this.hardwareService.getDshowDeviceByName(deviceId) ||
+      this.hardwareService.getDshowDevice(deviceId);
+    return this.sourcesService.getSources().find(source => {
+      return source.type === 'dshow_input' && source.getSettings().video_device_id === device.id;
+    });
   }
 }
