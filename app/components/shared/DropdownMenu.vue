@@ -113,7 +113,7 @@
 
 .popper {
   border: 0 !important;
-  padding: 5px !important;
+  padding: 8px !important;
   color: inherit !important;
 }
 
