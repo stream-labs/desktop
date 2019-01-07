@@ -6,9 +6,7 @@ import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { Throttle } from 'lodash-decorators';
-import { PersistentStatefulService } from './persistent-stateful-service';
-import uuid from 'uuid/v4';
-import { mutation } from './stateful-service';
+import { Service } from './service';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -45,17 +43,7 @@ export function track(event: TUsageEvent) {
   };
 }
 
-interface IUsageStatisticsServiceState {
-  uuid: string;
-}
-
-export class UsageStatisticsService extends PersistentStatefulService<
-  IUsageStatisticsServiceState
-> {
-  static defaultState: IUsageStatisticsServiceState = {
-    uuid: '',
-  };
-
+export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
 
@@ -65,7 +53,6 @@ export class UsageStatisticsService extends PersistentStatefulService<
   private anaiticsEvents: IAnalyticsEvent[] = [];
 
   init() {
-    if (!this.state.uuid) this.SET_UUID(uuid());
     this.loadInstallerId();
   }
 
@@ -142,7 +129,7 @@ export class UsageStatisticsService extends PersistentStatefulService<
       product: 'SLOBS',
       version: this.version,
       count: 1,
-      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : this.state.uuid,
+      uuid: this.userService.getLocalUserId(),
     });
     this.sendAnalytics();
   }
@@ -161,11 +148,5 @@ export class UsageStatisticsService extends PersistentStatefulService<
       body: JSON.stringify(data || {}),
     });
     fetch(request).then(handleResponse);
-  }
-
-  @mutation()
-  private SET_UUID(uuid: string) {
-    // we need this for combining analytics events from unauthorized users who don't have slobs_user_id
-    this.state.uuid = uuid;
   }
 }
