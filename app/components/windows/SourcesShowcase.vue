@@ -49,7 +49,7 @@
       v-if="inspectedSource === 'streamlabel'"
       :name="$t('Stream Label')"
       :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
-      key="28">
+      key="streamlabel-source-info">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
@@ -68,20 +68,9 @@
       v-if="inspectedSource === 'replay'"
       :name="$t('Instant Replay')"
       :description="$t('Automatically plays your most recently captured replay in your stream.')"
-      key="28">
-      <!-- TODO, Assets, description -->
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('New Followers') }}</li>
-        <li>{{ $t('New Subscribers') }}</li>
-        <li>{{ $t('New Cheers') }}</li>
-        <li>{{ $t('New Donations') }}</li>
-        <li>{{ $t('All-Time Top Donator') }}</li>
-        <li>{{ $t('Weekly Top Donator') }}</li>
-        <li>{{ $t('Monthly Follows') }}</li>
-        <li>{{ $t('Many more') }}</li>
-      </ul>
+      key="replay-source-info">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/media.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/media.png"/>
     </add-source-info>
 
     <add-source-info

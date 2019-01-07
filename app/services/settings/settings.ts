@@ -30,6 +30,8 @@ export interface ISettingsState {
     ScreenSnapping: boolean;
     SourceSnapping: boolean;
     CenterSnapping: boolean;
+    ReplayBufferWhileStreaming: boolean;
+    KeepReplayBufferStreamStops: boolean;
   };
   Stream: {
     key: string;
@@ -136,18 +138,12 @@ export class SettingsService extends StatefulService<ISettingsState>
     // have not implemented them yet.
     const BLACK_LIST_NAMES = [
       'SysTrayMinimizeToTray',
-      'ReplayBufferWhileStreaming',
-      'KeepReplayBufferStreamStops',
       'SysTrayEnabled',
       'CenterSnapping',
       'HideProjectorCursor',
       'ProjectorAlwaysOnTop',
       'SaveProjectors',
       'SysTrayWhenStarted',
-      'RecRBSuffix',
-      'FilenameFormatting',
-      'OverwriteIfExists',
-      'RecRBPrefix',
     ];
 
     for (const group of settings) {

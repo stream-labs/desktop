@@ -108,15 +108,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  finishStartStreaming() {
+  private finishStartStreaming() {
     const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
     const confirmText = 'Are you sure you want to start streaming?';
     if (shouldConfirm && !confirm(confirmText)) return;
+
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
+
     obs.NodeObs.OBS_service_startStreaming();
+
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
+    }
+
+    const replayWhenStreaming = this.settingsService.state.General.ReplayBufferWhileStreaming;
+
+    if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
+      this.startReplayBuffer();
     }
   }
 
@@ -149,6 +159,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
         this.toggleRecording();
+      }
+
+      const keepReplaying = this.settingsService.state.General.KeepReplayBufferStreamStops;
+      if (!keepRecording && this.state.replayBufferStatus === EReplayBufferState.Running) {
+        this.stopReplayBuffer();
       }
 
       this.announcementsService.updateBanner();

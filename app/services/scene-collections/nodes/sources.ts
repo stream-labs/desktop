@@ -122,6 +122,12 @@ export class SourcesNode extends Node<ISchema, {}> {
             };
           }
 
+          if (data.propertiesManager === 'replay') {
+            // Don't save the last replay, otherwise it will just play an old
+            // replay when this source is loaded back in.
+            delete data.settings['local_file'];
+          }
+
           resolve(data);
         });
       });
