@@ -227,6 +227,26 @@ export class WindowsService extends StatefulService<IWindowsState> {
       options.center = true;
     }
 
+    /*
+     * Override `options.size` when what is passed in is bigger than the current display.
+     * We do not do this on CI since it runs at 1024x768 and it break tests that aren't easy
+     * to workaround.
+     */
+    if (options.size && !remote.process.env.CI) {
+      const { width: screenWidth, height: screenHeight } = electron.screen.getDisplayMatching(
+        this.windows.main.getBounds(),
+      ).workAreaSize;
+
+      const SCREEN_PERCENT = 0.75;
+
+      if (options.size.width > screenWidth || options.size.height > screenHeight) {
+        options.size = {
+          width: screenWidth * SCREEN_PERCENT,
+          height: screenHeight * SCREEN_PERCENT,
+        };
+      }
+    }
+
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
   }
