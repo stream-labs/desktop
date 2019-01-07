@@ -38,15 +38,21 @@ export default class AddSource extends Vue {
   }
 
   sources = this.sourcesService.getSources().filter(source => {
-    return (
-      source.isSameType({
-        type: this.sourceType,
-        propertiesManager: this.sourceAddOptions.propertiesManager,
-        widgetType: this.widgetType,
-        appId: this.sourceAddOptions.propertiesManagerSettings.appId,
-        appSourceId: this.sourceAddOptions.propertiesManagerSettings.appSourceId,
-      }) && source.sourceId !== this.scenesService.activeSceneId
+    const comparison = {
+      type: this.sourceType,
+      propertiesManager: this.sourceAddOptions.propertiesManager,
+      widgetType: this.widgetType,
+      appId: this.sourceAddOptions.propertiesManagerSettings.appId,
+      appSourceId: this.sourceAddOptions.propertiesManagerSettings.appSourceId,
+    };
+
+    const isSameType = source.isSameType(
+      comparison.propertiesManager === 'streamlabels'
+        ? { ...comparison, isStreamlabel: true }
+        : comparison,
     );
+
+    return isSameType && source.sourceId !== this.scenesService.activeSceneId;
   });
 
   existingSources = this.sources.map(source => {
