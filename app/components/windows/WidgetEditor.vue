@@ -73,25 +73,26 @@
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
               key="html"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'html' }"
+              :value="wData"
+              :metadata="{ type: 'html', selectedId, selectedAlert }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
               key="css"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'css' }"
+              :value="wData"
+              :metadata="{ type: 'css', selectedId, selectedAlert }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
               key="js"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'js' }"
+              :value="wData"
+              :metadata="{ type: 'js', selectedId, selectedAlert }"
             />
             <custom-fields-editor
               v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
               key="customFields"
-              :value="selectedVariation || wData"
+              :value="wData"
+              :metadata="{ selectedId, selectedAlert }"
             />
           </div>
           </div>

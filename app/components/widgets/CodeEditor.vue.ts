@@ -3,10 +3,16 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import { BoolInput, CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';
+import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import { Inject } from '../../util/injector';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
+
+interface ICodeEditorMetadata extends IInputMetadata {
+  selectedId?: string;
+  selectedAlert?: string;
+}
 
 @Component({
   components: {
@@ -18,15 +24,15 @@ export default class CodeEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
-  metadata: IInputMetadata;
+  metadata: ICodeEditorMetadata;
 
   @Prop()
   value: IWidgetData;
 
   editorInputValue =
-    this.value.settings[`custom_${this.metadata.type}`] || this.value.settings[this.alertBoxValue];
+    this.value.settings[`custom_${this.metadata.type}`] ||
+    this.selectedVariation.settings[this.alertBoxValue];
 
-  private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
 
   isLoading = false;
@@ -51,8 +57,25 @@ export default class CodeEditor extends Vue {
     return this.hasChanges && !this.isLoading;
   }
 
-  get hasDefaults() {
-    return !!this.value.custom_defaults;
+  get selectedVariation() {
+    if (!this.metadata.selectedAlert || !this.metadata.selectedId) return;
+    return this.value.settings[this.metadata.selectedAlert].variations.find(
+      (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
+    );
+  }
+
+  setCustomCode(newData: IWidgetData) {
+    const type = this.metadata.type;
+    if (this.selectedVariation) {
+      const newVariation = newData.settings[this.metadata.selectedAlert].variations.find(
+        (variation: IAlertBoxVariation) => variation.id === this.metadata.selectedId,
+      );
+      newVariation.settings[this.alertBoxValue] = this.editorInputValue;
+    } else {
+      newData.settings[`custom_${type}`] = this.editorInputValue;
+    }
+
+    return newData;
   }
 
   @debounce(2000)
@@ -60,14 +83,12 @@ export default class CodeEditor extends Vue {
     if (!this.canSave) return;
     this.isLoading = true;
 
-    const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
-    newData.settings[`custom_${type}`] = this.editorInputValue;
-    newData.settings[this.alertBoxValue] = this.editorInputValue;
+    let newData = cloneDeep(this.value);
+    newData = this.setCustomCode(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
-      alert($t('Something went wrong'));
+      this.onFailHandler($t('Save failed, something went wrong.'));
       this.isLoading = false;
       return;
     }
@@ -77,10 +98,20 @@ export default class CodeEditor extends Vue {
   }
 
   restoreDefaults() {
-    if (!this.hasDefaults) return;
     const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
-    newData.settings[`custom_${type}`] = this.value.custom_defaults[type];
-    newData.settings[this.alertBoxValue] = this.value.custom_defaults[type];
+    if (!!this.value.custom_defaults) {
+      this.editorInputValue = this.value.custom_defaults[type];
+    } else {
+      this.onFailHandler($t('This widget does not have defaults.'));
+    }
+  }
+
+  onFailHandler(msg: string) {
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 3000,
+      singleton: true,
+    });
   }
 }

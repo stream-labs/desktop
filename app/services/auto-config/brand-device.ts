@@ -4,15 +4,16 @@ import * as obs from '../../../obs-api';
 import { execSync } from 'child_process';
 import { mutation, StatefulService } from '../stateful-service';
 import { Inject } from '../../util/injector';
-import { HostsService } from '../hosts';
+import { HostsService } from 'services/hosts';
 import { InitAfter } from '../../util/service-observer';
 import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { ScenesService } from '../scenes';
-import { IpcServerService } from '../ipc-server';
-import { AudioService } from '../audio';
+import { ScenesService } from 'services/scenes';
+import { IpcServerService } from 'services/ipc-server';
+import { AudioService } from 'services/audio';
 import { PrefabsService } from 'services/prefabs';
+import { UserService } from 'services/user';
 
 interface IBrandDeviceUrls {
   system_sku: string;
@@ -55,6 +56,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private audioService: AudioService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private prefabsService: PrefabsService;
+  @Inject() private userService: UserService;
 
   serviceEnabled() {
     return true;
@@ -122,7 +124,8 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
         await downloadFile(deviceUrls.record_encoder_url, `${cacheDir}/recordEncoder.json`);
       }
 
-      if (deviceUrls.overlay_url) {
+      // user have to be logged-in for correct widgets setup from the overlay file
+      if (deviceUrls.overlay_url && this.userService.isLoggedIn()) {
         const overlayPath = `${tempDir}/slobs-brand-device.overlay`;
         await downloadFile(deviceUrls.overlay_url, overlayPath);
         await this.sceneCollectionsService.loadOverlay(overlayPath, deviceName);
