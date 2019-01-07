@@ -14,6 +14,16 @@
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
     <div v-if="!infoLoading && !infoError && !populatingModels">
+      <div class="warning" v-if="isFacebook && !hasPages">
+        {{ $t('It looks like you don\'t have any Pages. Head to ') }}
+        <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        {{ $t(' to create a page, and then try again.') }}
+      </div>
+      <ObsListInput
+        v-if="isFacebook && hasPages && !midStreamMode"
+        :value="pageModel"
+        @input="(pageId) => setFacebookPageId(pageId)"
+      />
       <ObsTextInput v-model="streamTitleModel" />
       <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
       <ObsListInput
@@ -25,16 +35,6 @@
         :loading="searchingGames"
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
-      <div class="warning" v-if="isFacebook && !hasPages">
-        {{ $t('It looks like you don\'t have any Pages. Head to ') }}
-        <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
-        {{ $t(' to create a page, and then try again.') }}
-      </div>
-      <ObsListInput
-        v-if="isFacebook && hasPages && !midStreamMode"
-        :value="pageModel"
-        @input="(pageId) => setFacebookPageId(pageId)"
-      />
       <div v-if="isSchedule">
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
