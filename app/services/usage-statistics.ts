@@ -65,7 +65,7 @@ export class UsageStatisticsService extends PersistentStatefulService<
   private anaiticsEvents: IAnalyticsEvent[] = [];
 
   init() {
-    if (!this.state.uuid) this.SET_UUID();
+    if (!this.state.uuid) this.SET_UUID(uuid());
     this.loadInstallerId();
   }
 
@@ -164,7 +164,8 @@ export class UsageStatisticsService extends PersistentStatefulService<
   }
 
   @mutation()
-  private SET_UUID() {
-    this.state.uuid = uuid();
+  private SET_UUID(uuid: string) {
+    // we need this for combining analytics events from unauthorized users who don't have slobs_user_id
+    this.state.uuid = uuid;
   }
 }
