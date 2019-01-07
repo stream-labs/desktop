@@ -16,6 +16,7 @@ import { metadata } from 'components/widgets/inputs';
 
 export interface IAlertBoxData extends IWidgetData {
   settings: IAlertBoxSettings;
+  custom: { js: string; html: string; css: string };
   tts_languages?: any[];
 }
 
@@ -133,12 +134,13 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   protected patchAfterFetch(data: {
     settings: IAlertBoxApiSettings;
     type: WidgetType;
+    custom: { js: string; html: string; css: string };
   }): IAlertBoxData {
     const { settings, ...rest } = data;
     const newSettings = settings.mixer_account
       ? this.transformSettings({ ...settings, ...settings.mixer_account })
       : this.transformSettings(settings);
-    return { ...rest, settings: newSettings };
+    return { ...rest, settings: newSettings, custom_defaults: rest.custom };
   }
 
   protected patchBeforeSend(settings: IAlertBoxSettings): IAlertBoxApiSettings {
