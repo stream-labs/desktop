@@ -4,52 +4,23 @@ import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';
+import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
 
-@Component({})
+@Component({
+  components: { HScroll },
+})
 export default class AppsNav extends Vue {
   @Inject()
   platformAppsService: PlatformAppsService;
   @Inject()
   navigationService: NavigationService;
 
-  $refs: {
-    app_tabs: HTMLDivElement;
+  scrollModel: IHScrollModel = {
+    canScroll: false,
+    canScrollLeft: false,
+    canScrollRight: false,
   };
-
-  isMounted = false;
-
-  appTabsContainer: HTMLDivElement = null;
-  canScroll = false;
-  hasNext = false;
-  hasPrev = false;
-
-  private scrollIncrement = 100;
-
-  mounted() {
-    this.isMounted = true;
-    this.appTabsContainer = this.$refs.app_tabs;
-  }
-
-  scrollLeft() {
-    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft - this.scrollIncrement;
-  }
-
-  scrollRight() {
-    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft + this.scrollIncrement;
-  }
-
-  handleResize() {
-    if (!this.isMounted) return false;
-
-    this.canScroll = this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
-    this.hasPrev = this.appTabsContainer.scrollLeft > 0;
-    const scrollRight =
-      this.appTabsContainer.scrollWidth -
-      (this.appTabsContainer.scrollLeft + this.appTabsContainer.clientWidth);
-
-    this.hasNext = scrollRight > 0;
-  }
 
   isSelectedApp(appId: string) {
     return (
