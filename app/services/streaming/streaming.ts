@@ -162,7 +162,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       const keepReplaying = this.settingsService.state.General.KeepReplayBufferStreamStops;
-      if (!keepRecording && this.state.replayBufferStatus === EReplayBufferState.Running) {
+      if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
         this.stopReplayBuffer();
       }
 
