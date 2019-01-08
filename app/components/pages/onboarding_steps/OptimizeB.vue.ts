@@ -13,7 +13,6 @@ interface IConfigStepPresentation {
 
 @Component({})
 export default class OptimizeB extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
@@ -30,10 +29,11 @@ export default class OptimizeB extends Vue {
 
   mounted() {
     this.autoConfigService.start(progress => {
-      if ((progress.event === 'starting_step')
-        || (progress.event === 'progress')
-        || (progress.event === 'stopping_step')) {
-
+      if (
+        progress.event === 'starting_step' ||
+        progress.event === 'progress' ||
+        progress.event === 'stopping_step'
+      ) {
         const step = this.stepInfo.find(step => {
           return step.description === progress.description;
         });
@@ -44,7 +44,7 @@ export default class OptimizeB extends Vue {
           this.stepInfo.push({
             description: progress.description,
             summary: this.summaryForStep(progress),
-            percentage: progress.percentage
+            percentage: progress.percentage,
           });
         }
       } else if (progress.event === 'done') {
@@ -63,8 +63,7 @@ export default class OptimizeB extends Vue {
       checking_settings: $t('Attempting stream ...'),
       setting_default_settings: $t('Reverting to defaults ...'),
       saving_service: $t('Applying stream settings ...'),
-      saving_settings: $t('Applying general settings ...')
+      saving_settings: $t('Applying general settings ...'),
     }[progress.description];
   }
-
 }

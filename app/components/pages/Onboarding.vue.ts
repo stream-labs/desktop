@@ -22,16 +22,14 @@ import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
     SuccessfullyImported,
     SelectWidgets,
     SceneCollectionsImport,
-    OptimizeBrandDevice
-  }
+    OptimizeBrandDevice,
+  },
 })
 export default class Onboarding extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
   get currentView() {
     return this.onboardingService.currentStep;
   }
-
 }

@@ -4,6 +4,8 @@
   :isAlertBox="true"
   :slots="[{ value: 'layout', label: $t('Layout') }]"
   :selectedVariation="selectedVariation"
+  :selectedAlert="selectedAlert"
+  :selectedId="selectedId"
 >
   <!-- Left Toolbar -->
   <div slot="leftbar">

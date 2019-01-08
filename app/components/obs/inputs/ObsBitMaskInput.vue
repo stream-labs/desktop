@@ -1,5 +1,5 @@
 <template>
-<div class="input-container" :class="{disabled: value.enabled == false}">
+<div class="input-container" :class="{disabled: value.enabled === false}">
   <div class="input-label" v-if="value.showDescription !== false"></div>
   <div class="input-wrapper">
     <div v-for="(flag, index) in flags" class="checkbox">

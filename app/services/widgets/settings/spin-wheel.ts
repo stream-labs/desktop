@@ -1,5 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
-import { WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import { $t } from 'services/i18n';
@@ -13,26 +12,28 @@ export interface ISpinWheelSettings extends IWidgetSettings {
   rotationSpeed: number;
   slowRate: number;
   hideTimeout: number;
-  categories: { color: string, prize: string }[];
-  sections: { category: number, weight: number, key: string }[];
+  categories: { color: string; prize: string }[];
+  sections: { category: number; weight: number; key: string }[];
   font: string;
   fontColor: string;
   fontSize: number;
   fontWeight: number;
-  labelText: { height: number, width: number };
+  labelText: { height: number; width: number };
   innerBorderWidth: number;
   outerBorderWidth: number;
   borderColor: string;
-  ticker: { size: number, tone: string, url: string };
+  ticker: { size: number; tone: string; url: string };
   centerImage: {
-    border: { color: string, enabled: boolean, width: number },
-    default: string,
-    enabled: true,
-    size: number
+    border: { color: string; enabled: boolean; width: number };
+    default: string;
+    enabled: true;
+    size: number;
   };
 }
 
-export interface ISpinWheelData extends IWidgetData { settings: ISpinWheelSettings; }
+export interface ISpinWheelData extends IWidgetData {
+  settings: ISpinWheelSettings;
+}
 
 @InheritMutations()
 export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
@@ -41,13 +42,13 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
   getApiSettings() {
     return {
       type: WidgetType.SpinWheel,
-      url: `https://${ this.getHost() }/widgets/spin-wheel?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/spin-wheel?token=${this.getWidgetToken()}&simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/wheel`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/wheel`,
+      url: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,
       settingsUpdateEvent: 'spinwheelSettingsUpdate',
       customCodeAllowed: true,
-      customFieldsAllowed: true
+      customFieldsAllowed: true,
     };
   }
 
@@ -77,13 +78,20 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
       centerSize: metadata.slider({ title: $t('Center Image Size'), min: 1, max: 10 }),
       centerBorderEnabled: metadata.toggle({ title: $t('Center Image Border Enabled') }),
       centerBorderColor: metadata.color({ title: $t('Center Image Border Color') }),
-      centerBorderWidth: metadata.slider({ title: $t('Center Image Border Width'), min: 1, max: 15 }),
+      centerBorderWidth: metadata.slider({
+        title: $t('Center Image Border Width'),
+        min: 1,
+        max: 15,
+      }),
     });
   }
 
   protected patchAfterFetch(data: any): ISpinWheelData {
     data.settings.categories = JSON.parse(data.settings.categories);
-    data.settings.sections = JSON.parse(data.settings.sections).map((sect: any) => ({ key: uuid(), ...sect }));
+    data.settings.sections = JSON.parse(data.settings.sections).map((sect: any) => ({
+      key: uuid(),
+      ...sect,
+    }));
     return data;
   }
 

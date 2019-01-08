@@ -6,26 +6,22 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { $t } from 'services/i18n';
 
-import {
-  ICustomCommand,
-  IChatbotErrorResponse
-} from 'services/chatbot';
+import { IChatbotErrorResponse, ICustomCommand } from 'services/chatbot';
 
 import {
   EInputType,
   IListMetadata,
-  ITextMetadata,
   INumberMetadata,
-} from 'components/shared/inputs/index';
+  ITextMetadata,
+} from 'components/shared/inputs';
 
 @Component({
   components: {
     ChatbotAliases,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -36,26 +32,26 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     response_type: 'Chat',
     permission: {
       level: 1,
-      info: {}
+      info: {},
     },
     cooldowns: {
       global: 0,
-      user: 0
+      user: 0,
     },
     aliases: [],
     platforms: 7,
-    enabled: true
+    enabled: true,
   };
 
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -80,41 +76,36 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     required: true,
     type: EInputType.text,
     placeholder: $t('Enter the text string which will trigger the response'),
-    tooltip: $t('Enter a word used to trigger a response')
+    tooltip: $t('Enter a word used to trigger a response'),
   };
   responseMetadata: ITextMetadata = {
     required: true,
     type: EInputType.textArea,
-    placeholder: $t(
-      'The phrase that will appear after a user enters the command'
-    )
+    placeholder: $t('The phrase that will appear after a user enters the command'),
   };
 
-  get permissionMetadata() {
-    let permissionMetadata: IListMetadata<number> = {
+  get permissionMetadata(): IListMetadata<number> {
+    return {
       required: true,
       type: EInputType.list,
-      options: this.chatbotPermissions
+      options: this.chatbotPermissions,
     };
-    return permissionMetadata;
   }
 
-  get replyTypeMetadata() {
-    let replyTypeMetadata: IListMetadata<string> = {
+  get replyTypeMetadata(): IListMetadata<string> {
+    return {
       required: true,
       type: EInputType.list,
-      options: this.chatbotResponseTypes
+      options: this.chatbotResponseTypes,
     };
-    return replyTypeMetadata;
   }
 
-  get cooldownsMetadata() {
-    let timerMetadata: INumberMetadata = {
+  get cooldownsMetadata(): INumberMetadata {
+    return {
       type: EInputType.number,
       placeholder: $t('Cooldown (Value in Seconds)'),
-      min: 0
+      min: 0,
     };
-    return timerMetadata;
   }
 
   onSelectTabHandler(tab: string) {
@@ -131,9 +122,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       return;
     }
 
-    this.chatbotApiService
-      .createCustomCommand(this.newCommand)
-      .catch(this.onErrorHandler);
+    this.chatbotApiService.createCustomCommand(this.newCommand).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

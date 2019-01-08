@@ -29,7 +29,7 @@ export default class OverlaySettings extends Vue {
     return {
       name: 'media_backup_opt_out',
       description: $t('Do not back up my media files in the cloud (requires app restart)'),
-      value: this.customizationService.state.mediaBackupOptOut
+      value: this.customizationService.state.mediaBackupOptOut,
     };
   }
 
@@ -39,7 +39,7 @@ export default class OverlaySettings extends Vue {
 
   saveOverlay() {
     const chosenPath = electron.remote.dialog.showSaveDialog({
-      filters: [{ name: 'Overlay File', extensions: ['overlay'] }]
+      filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
     });
 
     if (!chosenPath) return;
@@ -50,13 +50,15 @@ export default class OverlaySettings extends Vue {
     // TODO: Expose progress to the user
     this.overlaysPersistenceService.saveOverlay(chosenPath).then(() => {
       this.busy = false;
-      this.message = $t('Successfully saved %{filename}', { filename: path.parse(chosenPath).base });
+      this.message = $t('Successfully saved %{filename}', {
+        filename: path.parse(chosenPath).base,
+      });
     });
   }
 
   loadOverlay() {
     const chosenPath = electron.remote.dialog.showOpenDialog({
-      filters: [{ name: 'Overlay File', extensions: ['overlay'] }]
+      filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
     });
 
     if (!chosenPath) return;
@@ -75,7 +77,7 @@ export default class OverlaySettings extends Vue {
 
   loadWidget() {
     const chosenPath = electron.remote.dialog.showOpenDialog({
-      filters: [{ name: 'Widget File', extensions: ['widget'] }]
+      filters: [{ name: 'Widget File', extensions: ['widget'] }],
     });
 
     if (!chosenPath) return;

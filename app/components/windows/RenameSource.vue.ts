@@ -9,7 +9,7 @@ import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/wi
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class RenameSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
@@ -18,8 +18,8 @@ export default class RenameSource extends Vue {
   @Inject() windowsService: WindowsService;
 
   options: {
-    sourceId?: string,
-  }  = this.windowsService.getChildWindowQueryParams();
+    sourceId?: string;
+  } = this.windowsService.getChildWindowQueryParams();
 
   name = '';
   error = '';
@@ -37,5 +37,4 @@ export default class RenameSource extends Vue {
       this.windowsService.closeChildWindow();
     }
   }
-
 }

@@ -4,7 +4,6 @@ import electron from 'electron';
 const { remote } = electron;
 
 export class Menu {
-
   menu: Electron.Menu;
 
   constructor() {
@@ -25,5 +24,4 @@ export class Menu {
     });
     (this.menu as any).destroy();
   }
-
 }

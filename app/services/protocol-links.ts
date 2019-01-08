@@ -38,9 +38,8 @@ export class ProtocolLinksService extends Service {
     });
 
     // Other instances started with a protocol link will receive this message
-    electron.ipcRenderer.on(
-      'protocolLink',
-      (event: Electron.Event, link: string) => this.handleLink(link)
+    electron.ipcRenderer.on('protocolLink', (event: Electron.Event, link: string) =>
+      this.handleLink(link),
     );
   }
 
@@ -49,7 +48,7 @@ export class ProtocolLinksService extends Service {
     const info: IProtocolLinkInfo = {
       base: parsed.host,
       path: parsed.pathname,
-      query: parsed.searchParams
+      query: parsed.searchParams,
     };
 
     if (this.handlers[info.base]) {
@@ -69,7 +68,7 @@ export class ProtocolLinksService extends Service {
     if (parts) {
       this.navigationService.navigate('BrowseOverlays', {
         type: parts[1],
-        id: parts[2]
+        id: parts[2],
       });
     }
   }

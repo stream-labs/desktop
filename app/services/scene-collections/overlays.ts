@@ -34,7 +34,7 @@ const NODE_TYPES = {
   StreamlabelNode,
   WidgetNode,
   TransitionNode,
-  SceneSourceNode
+  SceneSourceNode,
 };
 
 export interface IDownloadProgress {
@@ -50,10 +50,7 @@ export class OverlaysPersistenceService extends Service {
   /**
    * Downloads the requested overlay into a temporary directory
    */
-  async downloadOverlay(
-    url: string,
-    progressCallback?: (progress: IDownloadProgress) => void
-  ) {
+  async downloadOverlay(url: string, progressCallback?: (progress: IDownloadProgress) => void) {
     const overlayFilename = `${uuid()}.overlay`;
     const overlayPath = path.join(os.tmpdir(), overlayFilename);
     const fileStream = fs.createWriteStream(overlayPath);
@@ -71,7 +68,7 @@ export class OverlaysPersistenceService extends Service {
             progressCallback({
               totalBytes: totalSize,
               downloadedBytes: downloaded,
-              percent: downloaded / totalSize
+              percent: downloaded / totalSize,
             });
           }
         });

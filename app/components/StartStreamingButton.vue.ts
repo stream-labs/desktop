@@ -30,13 +30,14 @@ export default class StartStreamingButton extends Vue {
             {
               title: $t('Cloud Backup'),
               type: 'warning',
-              message: $t('Your media files are currently being synced with the cloud. ') +
+              message:
+                $t('Your media files are currently being synced with the cloud. ') +
                 $t('It is recommended that you wait until this finishes before going live.'),
-              buttons: [$t('Wait'), $t('Go Live Anyway')]
+              buttons: [$t('Wait'), $t('Go Live Anyway')],
             },
             goLive => {
               resolve(!!goLive);
-            }
+            },
           );
         });
 
@@ -45,7 +46,7 @@ export default class StartStreamingButton extends Vue {
 
       if (
         this.userService.isLoggedIn() &&
-        this.customizationService.state.updateStreamInfoOnLive
+        (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
@@ -97,10 +98,18 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.isStreaming;
   }
 
+  get isFacebook() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+  }
+
   get isDisabled() {
-    return this.disabled ||
-      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
-      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+    return (
+      this.disabled ||
+      (this.streamingStatus === EStreamingState.Starting &&
+        this.streamingService.delaySecondsRemaining === 0) ||
+      (this.streamingStatus === EStreamingState.Ending &&
+        this.streamingService.delaySecondsRemaining === 0)
+    );
   }
 
   @Watch('streamingStatus')

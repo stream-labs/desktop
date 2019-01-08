@@ -18,7 +18,7 @@ import {
   ISceneItem,
   ISceneItemApi,
   ISceneItemInfo,
-  TSceneNodeType
+  TSceneNodeType,
 } from './index';
 import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
@@ -30,7 +30,6 @@ import { Rect } from '../../util/rect';
  */
 @ServiceHelper()
 export class SceneItem extends SceneItemNode implements ISceneItemApi {
-
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -61,7 +60,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
   // A visual source is visible in the editor and not locked
   get isVisualSource() {
-    return (this.video && (this.width > 0) && (this.height > 0)) && !this.locked;
+    return this.video && this.width > 0 && this.height > 0 && !this.locked;
   }
 
   sceneItemState: ISceneItem;
@@ -102,7 +101,9 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   }
 
   getObsSceneItem(): obs.ISceneItem {
-    return this.getScene().getObsScene().findItem(this.obsSceneItemId);
+    return this.getScene()
+      .getObsScene()
+      .findItem(this.obsSceneItemId);
   }
 
   getSettings(): ISceneItemSettings {
@@ -114,7 +115,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   }
 
   setSettings(patch: IPartialSettings) {
-
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
     const changed = Utils.getChangedParams(this.sceneItemState, patch);
@@ -123,7 +123,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     if (changed.transform) {
       const changedTransform = Utils.getChangedParams(
         this.sceneItemState.transform,
-        patch.transform
+        patch.transform,
       );
 
       if (changedTransform.position) {
@@ -134,14 +134,13 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
         obsSceneItem.scale = newSettings.transform.scale;
       }
 
-
       if (changedTransform.crop) {
         const crop = newSettings.transform.crop;
         const cropModel: ICrop = {
           top: Math.round(crop.top),
           right: Math.round(crop.right),
           bottom: Math.round(crop.bottom),
-          left: Math.round(crop.left)
+          left: Math.round(crop.left),
         };
         changed.transform.crop = cropModel;
         obsSceneItem.crop = cropModel;
@@ -155,12 +154,10 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
         this.getObsSceneItem().rotation = effectiveRotation;
         changed.transform.rotation = effectiveRotation;
       }
-
     }
 
-
     if (changed.locked !== void 0) {
-      if (changed.locked && (this.selectionService.isSelected(this.sceneItemId))) {
+      if (changed.locked && this.selectionService.isSelected(this.sceneItemId)) {
         this.selectionService.deselect(this.sceneItemId);
       }
     }
@@ -182,43 +179,37 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.setTransform({ position: { x: this.transform.position.x - 1 } });
   }
 
-
   nudgeRight() {
     this.setTransform({ position: { x: this.transform.position.x + 1 } });
   }
-
 
   nudgeUp() {
     this.setTransform({ position: { y: this.transform.position.y - 1 } });
   }
 
-
   nudgeDown() {
     this.setTransform({ position: { y: this.transform.position.y + 1 } });
   }
-
 
   setVisibility(visible: boolean) {
     this.setSettings({ visible });
   }
 
-
   setLocked(locked: boolean) {
     this.setSettings({ locked });
   }
 
-
   loadAttributes() {
     const { position, scale, visible, crop, rotation } = this.getObsSceneItem();
     this.UPDATE({
+      visible,
       sceneItemId: this.sceneItemId,
       transform: {
         position,
         scale,
         crop,
-        rotation
+        rotation,
       },
-      visible
     });
   }
 
@@ -228,14 +219,14 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     const crop = customSceneItem.crop;
 
     this.UPDATE({
+      visible,
       sceneItemId: this.sceneItemId,
       transform: {
+        position,
+        crop,
         scale: { x: customSceneItem.scaleX, y: customSceneItem.scaleY },
         rotation: customSceneItem.rotation,
-        position,
-        crop
       },
-      visible,
       locked: !!customSceneItem.locked,
     });
   }
@@ -253,8 +244,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
-      }
+        bottom: 0,
+      },
     });
   }
 
@@ -321,13 +312,11 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     });
   }
 
-
   stretchToScreen() {
     const rect = this.getRectangle();
     rect.stretchAcross(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
-
 
   fitToScreen() {
     const rect = this.getRectangle();
@@ -370,34 +359,35 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     const source = this.getSource();
     if (source.type !== 'scene') return;
     const scene = this.scenesService.getScene(source.sourceId);
-    const rect = scene.getSelection().selectAll().getBoundingRect();
+    const rect = scene
+      .getSelection()
+      .selectAll()
+      .getBoundingRect();
     const { width, height } = this.source.getObsInput();
     this.setTransform({
       position: {
         x: rect.x,
-        y: rect.y
+        y: rect.y,
       },
       crop: {
         top: rect.y,
         right: width - (rect.x + rect.width),
         bottom: height - (rect.y + rect.height),
-        left: rect.x
-      }
+        left: rect.x,
+      },
     });
   }
 
   private setRect(rect: IScalableRectangle) {
     this.setTransform({
       position: { x: rect.x, y: rect.y },
-      scale: { x: rect.scaleX, y: rect.scaleY }
+      scale: { x: rect.scaleX, y: rect.scaleY },
     });
   }
-
 
   getSelection() {
     return this.getScene().getSelection(this.id);
   }
-
 
   /**
    * A rectangle representing this sceneItem
@@ -411,7 +401,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       width: this.width,
       height: this.height,
       crop: this.transform.crop,
-      rotation: this.transform.rotation
+      rotation: this.transform.rotation,
     });
   }
 
@@ -452,9 +442,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.setTransform({ position: { x: newRect.x, y: newRect.y } });
   }
 
-
   @mutation()
-  private UPDATE(patch: {sceneItemId: string} & IPartialSettings) {
+  private UPDATE(patch: { sceneItemId: string } & IPartialSettings) {
     merge(this.sceneItemState, patch);
   }
 }

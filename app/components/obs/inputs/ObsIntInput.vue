@@ -1,5 +1,5 @@
 <template>
-<div class="input-container IntInput" :class="{disabled: value.enabled == false}">
+<div class="input-container IntInput" :class="{disabled: value.enabled === false}">
   <div class="input-label">
     <label v-if="value.showDescription !== false">{{ value.description }}</label>
   </div>

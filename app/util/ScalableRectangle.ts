@@ -15,13 +15,13 @@ export enum AnchorPoint {
   SouthWest,
   West,
   NorthWest,
-  Center
+  Center,
 }
 
 export enum CenteringAxis {
   X,
   Y,
-  Both
+  Both,
 }
 
 // Positions on a positive unit grid
@@ -34,12 +34,11 @@ export const AnchorPositions = {
   [AnchorPoint.SouthWest]: { x: 0, y: 1 },
   [AnchorPoint.West]: { x: 0, y: 0.5 },
   [AnchorPoint.NorthWest]: { x: 0, y: 0 },
-  [AnchorPoint.Center]: { x: 0.5, y: 0.5 }
+  [AnchorPoint.Center]: { x: 0.5, y: 0.5 },
 };
 
 
 export class ScalableRectangle extends Rect implements IScalableRectangle {
-
 
   scaleX: number;
   scaleY: number;
@@ -47,7 +46,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
   rotation: number;
 
   private origin: Vec2;
-
 
   constructor(options: IScalableRectangle) {
     super(options);
@@ -59,7 +57,7 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
       bottom: 0,
       left: 0,
       right: 0,
-      ...options.crop
+      ...options.crop,
     };
 
     this.rotation = options.rotation || 0;
@@ -68,36 +66,29 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     this.origin = v2(AnchorPositions[AnchorPoint.NorthWest]);
   }
 
-
   get croppedWidth() {
     return this.width - this.crop.left - this.crop.right;
   }
-
 
   get croppedHeight() {
     return this.height - this.crop.top - this.crop.bottom;
   }
 
-
   get scaledWidth() {
     return this.scaleX * this.croppedWidth;
   }
-
 
   get scaledHeight() {
     return this.scaleY * this.croppedHeight;
   }
 
-
   get aspectRatio() {
     return this.getAspectRatio();
   }
 
-
   get scaledAspectRatio() {
     return this.scaledWidth / this.scaledHeight;
   }
-
 
   setAnchor(anchor: AnchorPoint) {
     // We need to calculate the distance to the new anchor point
@@ -177,7 +168,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     };
   }
 
-
   private mapFields(fields: Dictionary<string>) {
     const currentValues: any = {};
 
@@ -189,7 +179,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
       set(this, key, currentValues[key]);
     });
   }
-
 
   /**
    * Executes the function with a specific anchor point, after
@@ -235,7 +224,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     };
   }
 
-
   /**
    * This is a convenience method that will run the passed
    * function in a normalized environment, and then return
@@ -249,7 +237,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     denormalize();
   }
 
-
   flipX() {
     this.scaleX *= -1;
     this.x -= this.scaledWidth;
@@ -258,7 +245,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     this.crop.left = this.crop.right;
     this.crop.right = leftCrop;
   }
-
 
   flipY() {
     this.scaleY *= -1;
@@ -269,21 +255,21 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     this.crop.bottom = topCrop;
   }
 
-
   /**
    * Stretches this rectangle across the provided
    * rectangle.  Aspect ratio may not be preserved.
    */
   stretchAcross(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      this.x = rect.x;
-      this.y = rect.y;
-      this.scaleX = rect.scaledWidth / this.croppedWidth;
-      this.scaleY = rect.scaledHeight / this.croppedHeight;
-    }));
+    this.normalized(() =>
+      rect.normalized(() => {
+        this.x = rect.x;
+        this.y = rect.y;
+        this.scaleX = rect.scaledWidth / this.croppedWidth;
+        this.scaleY = rect.scaledHeight / this.croppedHeight;
+      }),
+    );
   }
-
 
   /**
    * Fits this rectangle inside the provided rectangle
@@ -291,19 +277,20 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
    */
   fitTo(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      if (this.aspectRatio > rect.scaledAspectRatio) {
-        this.scaleX = rect.scaledWidth / this.croppedWidth;
-        this.scaleY = this.scaleX;
-      } else {
-        this.scaleY = rect.scaledHeight / this.croppedHeight;
-        this.scaleX = this.scaleY;
-      }
+    this.normalized(() =>
+      rect.normalized(() => {
+        if (this.aspectRatio > rect.scaledAspectRatio) {
+          this.scaleX = rect.scaledWidth / this.croppedWidth;
+          this.scaleY = this.scaleX;
+        } else {
+          this.scaleY = rect.scaledHeight / this.croppedHeight;
+          this.scaleX = this.scaleY;
+        }
 
-      this.centerOn(rect);
-    }));
+        this.centerOn(rect);
+      }),
+    );
   }
-
 
   /**
    * Centers this rectangle on the provided rectangle
@@ -311,23 +298,25 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
    */
   centerOn(rect: ScalableRectangle, axis?: CenteringAxis) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      // Anchor both rectangles in the axis center
-      this.withAnchor(AnchorPoint.Center, () => {
-        rect.withAnchor(AnchorPoint.Center, () => {
-          switch (axis) {
-            case CenteringAxis.X:
-              this.x = rect.x;
-              break;
-            case CenteringAxis.Y:
-              this.y = rect.y;
-              break;
-            default:
-              this.x = rect.x;
-              this.y = rect.y;
-          }
+    this.normalized(() =>
+      rect.normalized(() => {
+        // Anchor both rectangles in the axis center
+        this.withAnchor(AnchorPoint.Center, () => {
+          rect.withAnchor(AnchorPoint.Center, () => {
+            switch (axis) {
+              case CenteringAxis.X:
+                this.x = rect.x;
+                break;
+              case CenteringAxis.Y:
+                this.y = rect.y;
+                break;
+              default:
+                this.x = rect.x;
+                this.y = rect.y;
+            }
+          });
         });
-      });
-    }));
+      }),
+    );
   }
 }

@@ -10,8 +10,8 @@ import { $t } from 'services/i18n';
 @Component({
   components: {
     GenericForm,
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
@@ -23,7 +23,7 @@ export default class SceneTransitions extends Vue {
       description: $t('Type'),
       name: 'type',
       value: this.transition.type,
-      options: this.transitionsService.getTypes()
+      options: this.transitionsService.getTypes(),
     };
   }
 
@@ -36,7 +36,7 @@ export default class SceneTransitions extends Vue {
     return {
       description: $t('Duration'),
       name: 'duration',
-      value: this.transition.duration
+      value: this.transition.duration,
     };
   }
 
@@ -48,7 +48,7 @@ export default class SceneTransitions extends Vue {
     return {
       description: $t('Name'),
       name: 'name',
-      value: this.transition.name
+      value: this.transition.name,
     };
   }
 

@@ -2,8 +2,7 @@ import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Inject } from '../../util/injector';
 import { WindowsService } from 'services/windows';
-import { IWidgetsServiceApi } from 'services/widgets';
-import { IWidgetData, WidgetSettingsService } from 'services/widgets';
+import { IWidgetData, IWidgetsServiceApi, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs';
 import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
@@ -15,9 +14,10 @@ export interface IWidgetNavItem {
 }
 
 @Component({})
-export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
-  extends Vue {
-
+export default class WidgetSettings<
+  TData extends IWidgetData,
+  TService extends WidgetSettingsService<TData>
+> extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: IWidgetsServiceApi;
 
@@ -30,7 +30,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
   fontFamilyTooltip = $t(
     'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' +
-      ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
+      ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.',
   );
 
   navItems: IWidgetNavItem[];
@@ -93,18 +93,15 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   onFailHandler(msg: string) {
-    this.$toasted.show(
-      msg,
-      {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 3000,
-        singleton: true
-      }
-    );
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 3000,
+      singleton: true,
+    });
   }
 
   protected afterFetch() {
     // override me if you need
-  };
+  }
 }
