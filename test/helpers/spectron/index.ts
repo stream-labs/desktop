@@ -4,6 +4,7 @@ import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { sleep } from '../sleep';
+import { async } from 'rxjs/internal/scheduler/async';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -68,9 +69,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let testPassed = false;
   let testName = '';
   const failedTests: string[] = [];
+  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   async function startApp(t: TExecutionContext) {
-    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    t.context.cacheDir = cacheDir;
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -146,6 +148,24 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
   }
 
+  /**
+   * test should be considered as failed if it writes exceptions in to the log file
+   */
+  async function checkErrorsInLogFile(t: TExecutionContext) {
+    const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    if (!fs.existsSync(filePath)) return;
+    const logs = fs.readFileSync(filePath).toString();
+    const errors = logs
+      .split('\n')
+      .filter((record: string) => record.match(/\[error\]/));
+    fs.unlinkSync(filePath);
+    if (!errors.length) return;
+    t.fail();
+    testPassed = false;
+    console.log('The log-file has errors');
+    console.log(logs);
+  }
+
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
@@ -160,6 +180,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   test.afterEach.always(async t => {
     const client = await getClient();
     await client.unsubscribeAll();
+    await checkErrorsInLogFile(t);
     if (options.restartAppAfterEachTest) {
       client.disconnect();
       await stopApp();

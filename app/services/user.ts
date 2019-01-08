@@ -244,6 +244,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.onboardingService.start({ isLogin: true });
   }
 
+  @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
     this.setSentryContext();
