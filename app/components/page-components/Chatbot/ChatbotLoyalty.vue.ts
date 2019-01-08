@@ -63,7 +63,6 @@ export default class ChatbotLoyalty extends ChatbotBase {
   }
 
   onOkHandler(value: number) {
-    console.log(value);
     console.log('Add Currency API Call');
   }
 

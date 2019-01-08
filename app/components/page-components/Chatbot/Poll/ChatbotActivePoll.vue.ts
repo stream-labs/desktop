@@ -66,9 +66,6 @@ export default class ChatbotActivePoll extends ChatbotBase {
   }
 
   mounted() {
-    console.log('--TYPE--');
-    console.log(this.type);
-
     this.onToggleStateHandler = _.throttle(this.onToggleStateHandler, 1000);
     this.onCancelHandler = _.throttle(this.onCancelHandler, 1000);
     this.onCompleteHandler = _.throttle(this.onCompleteHandler, 1000);

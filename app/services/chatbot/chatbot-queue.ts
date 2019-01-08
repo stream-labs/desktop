@@ -80,9 +80,6 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     this.socket.on('queue.open', (response: IQueueStateResponse) => {
       this.UPDATE_QUEUE_STATE(response);
     });
-    this.socket.on('queue.total', (response: IQueueTotalResponse) => {
-      console.log(response);
-    });
     this.socket.on('queue.close', (response: IQueueStateResponse) => {
       this.UPDATE_QUEUE_STATE(response);
     });

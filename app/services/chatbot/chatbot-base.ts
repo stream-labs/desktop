@@ -13,7 +13,7 @@ import {
   IChatbotAPIPostResponse,
   ChatbotSettingSlug,
   IChatbotSocketAuthResponse,
-  ChatbotSocketRoom
+  ChatbotSocketRoom,
 } from './chatbot-interfaces';
 
 // state
@@ -23,9 +23,7 @@ interface IChatbotBaseApiServiceState {
   globallyEnabled: boolean;
 }
 
-export class ChatbotBaseApiService extends PersistentStatefulService<
-  IChatbotBaseApiServiceState
-> {
+export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBaseApiServiceState> {
   @Inject() userService: UserService;
 
   apiUrl =
@@ -41,7 +39,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   static defaultState: IChatbotBaseApiServiceState = {
     apiToken: null,
     socketToken: null,
-    globallyEnabled: false
+    globallyEnabled: false,
   };
 
   //
@@ -49,8 +47,6 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
 
   logIn() {
-
-
     return new Promise((resolve, reject) => {
       const url = this.apiEndpoint('login');
       const headers = authorizedHeaders(this.userService.apiToken);
@@ -58,7 +54,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
       const request = new Request(url, {
         headers,
         method: 'POST',
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
 
       fetch(request)
@@ -67,7 +63,8 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
           resolve(true);
-        }).then(this.fetchChatbotGlobalEnabled)
+        })
+        .then(this.fetchChatbotGlobalEnabled)
         .catch(err => {
           reject(err);
         });
@@ -85,13 +82,13 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   api(method: string, endpoint: string, data: any) {
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
-    let options: {
+    const options: {
       headers: any;
       method: string;
       body?: string;
     } = {
       headers,
-      method
+      method,
     };
     if (method.toLowerCase() === 'post' || method.toLowerCase() === 'put') {
       options.headers.append('Content-Type', 'application/json');
@@ -109,9 +106,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
         // and return the promised error
         return error
           .json()
-          .then((errJson: Promise<IChatbotErrorResponse>) =>
-            Promise.reject(errJson)
-          );
+          .then((errJson: Promise<IChatbotErrorResponse>) => Promise.reject(errJson));
       });
   }
 
@@ -123,8 +118,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
     return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {}).then(
       (response: IChatbotSocketAuthResponse) => {
         this.LOGIN_TO_SOCKET(response);
-        console.log(response);
-      }
+      },
     );
   }
 
@@ -133,23 +127,21 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
 
   fetchChatbotGlobalEnabled() {
-    return this.api('GET', 'status', {}).then(
-      (response: IChatbotStatusResponse) => {
-        // check for clients
+    return this.api('GET', 'status', {}).then((response: IChatbotStatusResponse) => {
+      // check for clients
 
-        const clientFound = response.clients.services.some(value => {
-          return value.toLowerCase() == this.userService.platform.type;
-        });
+      const clientFound = response.clients.services.some(value => {
+        return value.toLowerCase() == this.userService.platform.type;
+      });
 
-        // all status online.
-        this.UPDATE_GLOBALLY_ENABLED(
-          response.worker.status === 'Online' &&
-            response.worker.type === 'Full' &&
-            response.clients.status === 'Online' &&
-            clientFound
-        );
-      }
-    );
+      // all status online.
+      this.UPDATE_GLOBALLY_ENABLED(
+        response.worker.status === 'Online' &&
+          response.worker.type === 'Full' &&
+          response.clients.status === 'Online' &&
+          clientFound,
+      );
+    });
   }
 
   //
@@ -162,7 +154,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   toggleEnableChatbot() {
     const platforms = ChatbotClients.map(client => client.toLowerCase());
 
-    let containsPlatform = platforms.some(value => {
+    const containsPlatform = platforms.some(value => {
       return value.toLowerCase() == this.userService.platform.type;
     });
 
@@ -170,7 +162,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
       return Promise.all([
         this.state.globallyEnabled
           ? this.leavePlatformChannel(this.userService.platform.type)
-          : this.joinPlatformChannel(this.userService.platform.type)
+          : this.joinPlatformChannel(this.userService.platform.type),
       ]).then((response: IChatbotAPIPostResponse[]) => {
         this.fetchChatbotGlobalEnabled();
       });
@@ -190,7 +182,6 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
-    console.log(response.api_token);
     Vue.set(this.state, 'apiToken', response.api_token);
   }
 

@@ -25,26 +25,28 @@ interface IChatbotCommandsApiServiceState {
   commandVariablesResponse: ICommandVariablesResponse;
 }
 
-export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbotCommandsApiServiceState> {
+export class ChatbotCommandsApiService extends PersistentStatefulService<
+  IChatbotCommandsApiServiceState
+> {
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   static defaultState: IChatbotCommandsApiServiceState = {
     commandPreferencesResponse: {
       enabled: true,
-      settings: null
+      settings: null,
     },
     defaultCommandsResponse: {
       commands: {},
       'link-protection': {},
-      giveaway: {}
+      giveaway: {},
     },
     customCommandsResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     commandVariablesResponse: [],
   };
@@ -54,89 +56,76 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
   //
 
   fetchDefaultCommands() {
-    return this.chatbotBaseApiService.api('GET', 'commands/default', {}).then(
-      (response: IDafaultCommandsResponse) => {
-        console.log(response);
+    return this.chatbotBaseApiService
+      .api('GET', 'commands/default', {})
+      .then((response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
-      }
-    );
+      });
   }
 
-  fetchCustomCommands(
-    page = this.state.customCommandsResponse.pagination.current,
-    query = ''
-  ) {
-    return this.chatbotBaseApiService.api('GET', `commands?page=${page}&query=${query}`, {}).then(
-      (response: ICustomCommandsResponse) => {
+  fetchCustomCommands(page = this.state.customCommandsResponse.pagination.current, query = '') {
+    return this.chatbotBaseApiService
+      .api('GET', `commands?page=${page}&query=${query}`, {})
+      .then((response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
-      }
-    );
+      });
   }
 
-  fetchCommandPreferences(){
-    return this.chatbotBaseApiService.api('GET', 'settings/commands', {}).then(
-      (response: ICommandPreferencesResponse) => {
-        console.log(response);
+  fetchCommandPreferences() {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/commands', {})
+      .then((response: ICommandPreferencesResponse) => {
         this.UPDATE_COMMAND_PREFERENCES(response);
-      }
-    );
+      });
   }
 
   fetchCommandVariables() {
-    return this.chatbotBaseApiService.api('GET', 'commands/variables', {}).then(
-      (response: ICommandVariablesResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'commands/variables', {})
+      .then((response: ICommandVariablesResponse) => {
         this.UPDATE_COMMAND_VARIABLES(response);
-      }
-    );
+      });
   }
 
   //
   // POST, PUT requests
   //
   resetDefaultCommands() {
-    return this.chatbotBaseApiService.api('POST', 'commands/default/reset', {}).then(
-      (response: IDafaultCommandsResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'commands/default/reset', {})
+      .then((response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
-      }
-    );
+      });
   }
 
   resetDefaultCommand(slugName: string, commandName: string) {
-    return this.chatbotBaseApiService.api(
-      'POST',
-      `settings/${slugName}/commands/${commandName}/reset`,
-      {}
-    ).then((response: IDefaultCommand) => {
-      return Promise.resolve(response);
-    });
+    return this.chatbotBaseApiService
+      .api('POST', `settings/${slugName}/commands/${commandName}/reset`, {})
+      .then((response: IDefaultCommand) => {
+        return Promise.resolve(response);
+      });
   }
 
   // create
   createCustomCommand(data: ICustomCommand) {
-    return this.chatbotBaseApiService.api('POST', 'commands', data).then(
-      (response: ICustomCommand) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'commands', data)
+      .then((response: ICustomCommand) => {
         this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
-      }
-    );
+      });
   }
 
   // Update
-  updateDefaultCommand(
-    slugName: string,
-    commandName: string,
-    data: IDefaultCommand
-  ) {
-    return this.chatbotBaseApiService.api(
-      'POST',
-      `settings/${slugName}/commands/${commandName}`,
-      data
-    ).then((response: IChatbotAPIPostResponse) => {
-      if (response.success === true) {
-        this.fetchDefaultCommands();
-        this.chatbotCommonService.closeChildWindow();
-      }
-    });
+  updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
+    return this.chatbotBaseApiService
+      .api('POST', `settings/${slugName}/commands/${commandName}`, data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchDefaultCommands();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      });
   }
 
   updateCommandPreferences(data: ICommandPreferencesResponse) {
@@ -151,27 +140,27 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
   }
 
   updateCustomCommand(id: string, data: ICustomCommand) {
-    return this.chatbotBaseApiService.api('PUT', `commands/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
+    return this.chatbotBaseApiService
+      .api('PUT', `commands/${id}`, data)
+      .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
           this.chatbotCommonService.closeChildWindow();
         }
-      }
-    );
+      });
   }
 
   //
   // DELETE methods
   //
   deleteCustomCommand(id: string) {
-    return this.chatbotBaseApiService.api('DELETE', `commands/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
+    return this.chatbotBaseApiService
+      .api('DELETE', `commands/${id}`, {})
+      .then((response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
         }
-      }
-    );
+      });
   }
 
   //

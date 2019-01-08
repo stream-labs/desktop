@@ -121,7 +121,6 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
   }
 
   mounted() {
-    console.log(this.pollPreferences);
     this.newPollPreferences = _.cloneDeep(this.pollPreferences);
   }
 

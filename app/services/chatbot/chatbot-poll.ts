@@ -14,7 +14,7 @@ import {
   IPollProfile,
   IChatbotAPIPutResponse,
   IChatbotAPIDeleteResponse,
-  IActivePollResponse
+  IActivePollResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -25,9 +25,7 @@ interface IChatbotPollApiServiceState {
   timeRemaining: string;
 }
 
-export class ChatbotPollApiService extends PersistentStatefulService<
-  IChatbotPollApiServiceState
-> {
+export class ChatbotPollApiService extends PersistentStatefulService<IChatbotPollApiServiceState> {
   @Inject() chatbotCommonService: ChatbotCommonService;
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
   socketUrl = this.chatbotBaseApiService.socketUrl;
@@ -35,7 +33,7 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   static defaultState: IChatbotPollApiServiceState = {
     pollPreferencesResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     activePollResponse: {
       settings: {
@@ -43,16 +41,16 @@ export class ChatbotPollApiService extends PersistentStatefulService<
         options: [],
         timer: {
           enabled: null,
-          duration: null
+          duration: null,
         },
         title: null,
-        send_notification: false
+        send_notification: false,
       },
       status: null,
-      user_id: null
+      user_id: null,
     },
     activeView: 'active',
-    timeRemaining: '00:00:00'
+    timeRemaining: '00:00:00',
   };
 
   socket: SocketIOClient.Socket;
@@ -71,12 +69,15 @@ export class ChatbotPollApiService extends PersistentStatefulService<
     }
 
     this.UPDATE_TIMER();
-    //@ts-ignore - weird stuff going on with NodeJs.Timer & number ...
+    // @ts-ignore - weird stuff going on with NodeJs.Timer & number ...
     this.timer = setInterval(this.UPDATE_TIMER, 1000);
 
-    this.socket = io.connect(this.socketUrl, { transports: ['websocket'] });
+    this.socket = io.connect(
+      this.socketUrl,
+      { transports: ['websocket'] },
+    );
     this.socket.emit('authenticate', {
-      token: this.chatbotBaseApiService.state.socketToken
+      token: this.chatbotBaseApiService.state.socketToken,
     });
 
     this.socket.on('poll.start', () => {
@@ -159,12 +160,10 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   }
 
   addPollProfile(data: IPollProfile) {
-    return this.chatbotBaseApiService
-      .api('POST', 'poll/profile', data)
-      .then(() => {
-        this.fetchPollPreferences();
-        this.chatbotCommonService.closeChildWindow();
-      });
+    return this.chatbotBaseApiService.api('POST', 'poll/profile', data).then(() => {
+      this.fetchPollPreferences();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
   updatePollProfile(data: IPollProfile) {
@@ -179,12 +178,10 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   }
 
   startPoll(data: IPollProfile) {
-    return this.chatbotBaseApiService
-      .api('POST', `poll/start/${data.id}`, {})
-      .then(() => {
-        this.fetchActivePoll();
-        this.chatbotCommonService.closeChildWindow();
-      });
+    return this.chatbotBaseApiService.api('POST', `poll/start/${data.id}`, {}).then(() => {
+      this.fetchActivePoll();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
   openPoll() {
@@ -224,7 +221,6 @@ export class ChatbotPollApiService extends PersistentStatefulService<
     return this.chatbotBaseApiService
       .resetSettings('poll')
       .then((response: IPollPreferencesResponse) => {
-        console.log(response);
         this.UPDATE_POLL_PREFERENCES(response);
         return Promise.resolve(response);
       });
@@ -243,9 +239,10 @@ export class ChatbotPollApiService extends PersistentStatefulService<
   @mutation()
   private UPDATE_TIMER() {
     const activePoll = this.state.activePollResponse;
-    const containsSettings = activePoll.settings !== undefined && activePoll.settings.timer !== undefined;
+    const containsSettings =
+      activePoll.settings !== undefined && activePoll.settings.timer !== undefined;
 
-    if(!containsSettings){
+    if (!containsSettings) {
       return;
     }
 
@@ -253,20 +250,15 @@ export class ChatbotPollApiService extends PersistentStatefulService<
     const startedTimer = activePoll.settings.timer.started_at !== undefined;
 
     if (containsSettings && containsTimer && startedTimer) {
-      console.log('made it here');
       const timeElapsed = Date.now() - activePoll.settings.timer.started_at;
       const timerLength = activePoll.settings.timer.time_remaining * 1000;
 
       const duration = moment.duration(Math.max(0, timerLength - timeElapsed));
-      this.state.timeRemaining = moment
-        .utc(duration.asMilliseconds())
-        .format('HH:mm:ss');
+      this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     } else if (!activePoll.settings.timer.enabled) {
       const timeElapsed = Date.now() - Date.parse(activePoll.created_at);
       const duration = moment.duration(Math.max(0, timeElapsed));
-      this.state.timeRemaining = moment
-        .utc(duration.asMilliseconds())
-        .format('HH:mm:ss');
+      this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     }
   }
 
@@ -298,7 +290,7 @@ export class ChatbotPollApiService extends PersistentStatefulService<
     Vue.set(
       this.state,
       'activePollResponse',
-      ChatbotPollApiService.defaultState.activePollResponse
+      ChatbotPollApiService.defaultState.activePollResponse,
     );
   }
 

@@ -14,7 +14,7 @@ import {
   IChatbotAPIDeleteResponse,
   IBettingProfile,
   IBettingPreferencesResponse,
-  IActiveBettingResponse
+  IActiveBettingResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -35,7 +35,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   static defaultState: IChatbotBettingApiServiceState = {
     bettingPreferencesResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     activeBettingResponse: {
       settings: {
@@ -43,20 +43,20 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
         options: [],
         timer: {
           enabled: null,
-          duration: null
+          duration: null,
         },
         loyalty: {
           min: 1,
-          max: 1000
+          max: 1000,
         },
         title: null,
-        send_notification: false
+        send_notification: false,
       },
       status: null,
-      user_id: null
+      user_id: null,
     },
     activeView: 'active',
-    timeRemaining: '00:00:00'
+    timeRemaining: '00:00:00',
   };
 
   socket: SocketIOClient.Socket;
@@ -75,12 +75,15 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     }
 
     this.UPDATE_TIMER();
-    //@ts-ignore - weird stuff going on with NodeJs.Timer & number ...
+    // @ts-ignore - weird stuff going on with NodeJs.Timer & number ...
     this.timer = setInterval(this.UPDATE_TIMER, 1000);
 
-    this.socket = io.connect(this.socketUrl, { transports: ['websocket'] });
+    this.socket = io.connect(
+      this.socketUrl,
+      { transports: ['websocket'] },
+    );
     this.socket.emit('authenticate', {
-      token: this.chatbotBaseApiService.state.socketToken
+      token: this.chatbotBaseApiService.state.socketToken,
     });
 
     this.socket.on('betting.start', () => {
@@ -167,12 +170,10 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   }
 
   addProfile(data: IBettingProfile) {
-    return this.chatbotBaseApiService
-      .api('POST', 'betting/profile', data)
-      .then(() => {
-        this.fetchPreferences();
-        this.chatbotCommonService.closeChildWindow();
-      });
+    return this.chatbotBaseApiService.api('POST', 'betting/profile', data).then(() => {
+      this.fetchPreferences();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
   updateProfile(data: IBettingProfile) {
@@ -187,12 +188,10 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   }
 
   start(data: IBettingProfile) {
-    return this.chatbotBaseApiService
-      .api('POST', `betting/start/${data.id}`, {})
-      .then(() => {
-        this.fetchActive();
-        this.chatbotCommonService.closeChildWindow();
-      });
+    return this.chatbotBaseApiService.api('POST', `betting/start/${data.id}`, {}).then(() => {
+      this.fetchActive();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
   open() {
@@ -213,7 +212,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
 
   pickWinner(option: string) {
     return this.chatbotBaseApiService.api('POST', 'betting/active/pick', {
-      option: option
+      option,
     });
   }
 
@@ -238,7 +237,6 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     return this.chatbotBaseApiService
       .resetSettings('betting')
       .then((response: IBettingPreferencesResponse) => {
-        console.log(response);
         this.UPDATE_BETTING_PREFERENCES(response);
         return Promise.resolve(response);
       });
@@ -258,8 +256,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   private UPDATE_TIMER() {
     const activePoll = this.state.activeBettingResponse;
     const containsSettings =
-      activePoll.settings !== undefined &&
-      activePoll.settings.timer !== undefined;
+      activePoll.settings !== undefined && activePoll.settings.timer !== undefined;
 
     if (!containsSettings) {
       return;
@@ -269,20 +266,15 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     const startedTimer = activePoll.settings.timer.started_at !== undefined;
 
     if (containsSettings && containsTimer && startedTimer) {
-      console.log('made it here');
       const timeElapsed = Date.now() - activePoll.settings.timer.started_at;
       const timerLength = activePoll.settings.timer.time_remaining * 1000;
 
       const duration = moment.duration(Math.max(0, timerLength - timeElapsed));
-      this.state.timeRemaining = moment
-        .utc(duration.asMilliseconds())
-        .format('HH:mm:ss');
+      this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     } else if (!activePoll.settings.timer.enabled) {
       const timeElapsed = Date.now() - Date.parse(activePoll.created_at);
       const duration = moment.duration(Math.max(0, timeElapsed));
-      this.state.timeRemaining = moment
-        .utc(duration.asMilliseconds())
-        .format('HH:mm:ss');
+      this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     }
   }
 
@@ -314,7 +306,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     Vue.set(
       this.state,
       'activeBettingResponse',
-      ChatbotBettingApiService.defaultState.activeBettingResponse
+      ChatbotBettingApiService.defaultState.activeBettingResponse,
     );
   }
 
