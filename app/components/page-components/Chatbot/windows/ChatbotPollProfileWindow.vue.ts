@@ -1,29 +1,19 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
-import {
-  IChatbotErrorResponse,
-  IPollOption
-} from 'services/chatbot';
-import { IPollProfile } from 'services/chatbot';
-import {
-  ITextMetadata,
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { IChatbotErrorResponse, IPollOption, IPollProfile } from 'services/chatbot';
+import { EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
-import { cloneDeep } from 'lodash';
 import { debounce } from 'lodash-decorators';
 import ChatbotPollOptionModal from '../Poll/ChatbotPollOptionModal.vue';
-import { mutation } from 'services/stateful-service';
 
 @Component({
   components: {
     ValidatedForm,
-    ChatbotPollOptionModal
-  }
+    ChatbotPollOptionModal,
+  },
 })
 export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   $refs: {
@@ -35,21 +25,21 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     options: [],
     timer: {
       enabled: false,
-      duration: 300
+      duration: 300,
     },
     title: '',
-    send_notification: false
+    send_notification: false,
   };
 
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   get metaData() {
@@ -58,21 +48,21 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
         required: true,
         type: EInputType.text,
         max: 100,
-        placeholder: $t('Title')
+        placeholder: $t('Title'),
       },
       duration: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 86400,
-        placeholder: $t('Duration')
-      }
+        placeholder: $t('Duration'),
+      },
     };
   }
 
   selectedOption: IPollOption = {
     name: null,
-    parameter: null
+    parameter: null,
   };
 
   selectedIndex: number = -1;
@@ -82,7 +72,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   mounted() {
     // if editing existing custom command
     if (this.isEdit) {
-      this.newProfile = cloneDeep(this.profileToUpdate);
+      this.newProfile = _.cloneDeep(this.profileToUpdate);
     }
   }
 
@@ -95,10 +85,9 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   }
 
   get baseCommand() {
-    return (
-      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings
-        .commands['vote'].command + ' '
-    );
+    return `${
+      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings.commands['vote'].command
+    } `;
   }
 
   get NEW_POLL_OPTION_MODAL_ID() {
@@ -119,13 +108,11 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.newProfile.id) {
-      await this.chatbotApiService.Poll.updatePollProfile(
-        this.newProfile
-      ).catch(this.onErrorHandler);
-    } else {
-      await this.chatbotApiService.Poll.addPollProfile(this.newProfile).catch(
-        this.onErrorHandler
+      await this.chatbotApiService.Poll.updatePollProfile(this.newProfile).catch(
+        this.onErrorHandler,
       );
+    } else {
+      await this.chatbotApiService.Poll.addPollProfile(this.newProfile).catch(this.onErrorHandler);
     }
   }
 
@@ -139,7 +126,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     if (!option) {
       this.selectedOption = {
         name: null,
-        parameter: null
+        parameter: null,
       };
     } else {
       this.selectedOption = option;
@@ -152,8 +139,8 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   onAddedHandler(option: IPollOption = null, index: number = -1) {
     const dupe = _.find(this.newProfile.options, x => {
       return (
-        x.name.toLowerCase() == option.name.toLowerCase() ||
-        x.parameter.toLowerCase() == option.parameter.toLowerCase()
+        x.name.toLowerCase() === option.name.toLowerCase() ||
+        x.parameter.toLowerCase() === option.parameter.toLowerCase()
       );
     });
 

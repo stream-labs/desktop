@@ -9,8 +9,8 @@ import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue'
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotGenericModalWindow
-  }
+    ChatbotGenericModalWindow,
+  },
 })
 export default class ChatbotQueueList extends ChatbotBase {
   @Prop() type: string;
@@ -54,12 +54,10 @@ export default class ChatbotQueueList extends ChatbotBase {
     const scrollHeight = document
       .getElementsByClassName('queue__table-wrapper')[0]
       .getBoundingClientRect().height;
-    const scrollTop = document.getElementsByClassName('queue__table-wrapper')[0]
-      .scrollTop;
-    const clientHeight = document.getElementsByClassName('queue-table')[0]
-      .clientHeight;
+    const scrollTop = document.getElementsByClassName('queue__table-wrapper')[0].scrollTop;
+    const clientHeight = document.getElementsByClassName('queue-table')[0].clientHeight;
 
-    let bottomOfWindow = scrollHeight + scrollTop >= clientHeight - 100;
+    const bottomOfWindow = scrollHeight + scrollTop >= clientHeight - 100;
 
     if (bottomOfWindow) {
       this.fetchList();
@@ -81,10 +79,7 @@ export default class ChatbotQueueList extends ChatbotBase {
   @Debounce(1000)
   loadNewEntries() {
     if (this.dataList.data.length < 25) {
-      this.chatbotApiService.Queue.fetchQueueEntries(
-        this.currentAfter,
-        this.searchQuery
-      );
+      this.chatbotApiService.Queue.fetchQueueEntries(this.currentAfter, this.searchQuery);
     }
   }
 
@@ -111,11 +106,9 @@ export default class ChatbotQueueList extends ChatbotBase {
 
   onYesSingleHandler() {
     if (this.selectedUser) {
-      this.chatbotApiService.Queue.removeQueueEntry(this.selectedUser.id).then(
-        () => {
-          this.loadNewEntries();
-        }
-      );
+      this.chatbotApiService.Queue.removeQueueEntry(this.selectedUser.id).then(() => {
+        this.loadNewEntries();
+      });
     }
   }
 

@@ -6,15 +6,15 @@ import ChatbotStreamElementsModal from './ChatbotStreamElementsModal.vue';
 @Component({
   components: {
     ChatbotExtensionModal,
-    ChatbotStreamElementsModal
-  }
+    ChatbotStreamElementsModal,
+  },
 })
 export default class ChatbotLoyaltyImporter extends ChatbotBase {
   mounted() {
     this.chatbotApiService.Importer.fetchImporterStatus();
   }
 
-  get statusResponse(){
+  get statusResponse() {
     return this.chatbotApiService.Importer.state.statusResponse;
   }
 

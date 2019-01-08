@@ -8,18 +8,14 @@ import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IListMetadata,
-  ITextMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { IListMetadata, ITextMetadata, EInputType } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
     ChatbotAliases,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   $refs: {
@@ -31,12 +27,12 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -118,165 +114,139 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
       command: metadataHelper.text({
         required: true,
         type: EInputType.text,
-        placeholder: $t(
-          'Enter the text string which will trigger the response'
-        ),
+        placeholder: $t('Enter the text string which will trigger the response'),
         tooltip: $t('Enter a word used to trigger a response'),
         max: 450,
         min: 2,
-        uuid: $t('Command')
+        uuid: $t('Command'),
       }),
       response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after a user enters the command'
-        ),
+        placeholder: $t('The phrase that will appear after a user enters the command'),
         max: 450,
-        uuid: $t('Response')
+        uuid: $t('Response'),
       }),
       replyType: metadataHelper.list({
         required: true,
         title: $t('Reply In'),
         type: EInputType.list,
-        options: this.chatbotResponseTypes
+        options: this.chatbotResponseTypes,
       }),
       permission: metadataHelper.numberList({
         required: true,
         title: $t('Permission'),
         type: EInputType.list,
-        options: this.chatbotPermissions
+        options: this.chatbotPermissions,
       }),
       new_alias: metadataHelper.text({
         required: true,
         type: EInputType.text,
         placeholder: $t('Add a new command alias'),
         max: 450,
-        uuid: $t('Alias')
+        uuid: $t('Alias'),
       }),
       win_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after the viewer wins'
-        ),
+        placeholder: $t('The phrase that will appear after the viewer wins'),
         max: 450,
-        uuid: $t('Win Response')
+        uuid: $t('Win Response'),
       }),
       lose_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after the viewer loses'
-        ),
+        placeholder: $t('The phrase that will appear after the viewer loses'),
         max: 450,
-        uuid: $t('Lose Response')
+        uuid: $t('Lose Response'),
       }),
       success_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after a successful command'
-        ),
+        placeholder: $t('The phrase that will appear after a successful command'),
         max: 450,
-        uuid: $t('Success Response')
+        uuid: $t('Success Response'),
       }),
       failed_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
         placeholder: $t('The phrase that will appear after a failed command'),
         max: 450,
-        uuid: $t('Failed Response')
+        uuid: $t('Failed Response'),
       }),
       enabled_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after a command is enabled'
-        ),
+        placeholder: $t('The phrase that will appear after a command is enabled'),
         max: 450,
-        uuid: $t('Enabled Response')
+        uuid: $t('Enabled Response'),
       }),
       disabled_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear after a command is disabled'
-        ),
+        placeholder: $t('The phrase that will appear after a command is disabled'),
         max: 450,
-        uuid: $t('Disabled Response')
+        uuid: $t('Disabled Response'),
       }),
       duration_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          "The phrase that will appear when a song's duration is too long"
-        ),
+        placeholder: $t("The phrase that will appear when a song's duration is too long"),
         max: 450,
-        uuid: $t('Duration Response')
+        uuid: $t('Duration Response'),
       }),
       rating_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          "The phrase that will appear when a song's rating is too low"
-        ),
+        placeholder: $t("The phrase that will appear when a song's rating is too low"),
         max: 450,
-        uuid: $t('Rating Response')
+        uuid: $t('Rating Response'),
       }),
       views_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          "The phrase that will appear when a song's view count is too low"
-        ),
+        placeholder: $t("The phrase that will appear when a song's view count is too low"),
         max: 450,
-        uuid: $t('Views Response')
+        uuid: $t('Views Response'),
       }),
       banned_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear when the user requested a banned song'
-        ),
+        placeholder: $t('The phrase that will appear when the user requested a banned song'),
         max: 450,
-        uuid: $t('Banned Response')
+        uuid: $t('Banned Response'),
       }),
       music_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear when the song is not in the music category'
-        ),
+        placeholder: $t('The phrase that will appear when the song is not in the music category'),
         max: 450,
-        uuid: $t('Music Response')
+        uuid: $t('Music Response'),
       }),
       max_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
         placeholder: $t(
-          'The phrase that will appear when the user already maxed their request limit'
+          'The phrase that will appear when the user already maxed their request limit',
         ),
         max: 450,
-        uuid: $t('Max Response')
+        uuid: $t('Max Response'),
       }),
       full_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,
-        placeholder: $t(
-          'The phrase that will appear if your song queue is currently full'
-        ),
+        placeholder: $t('The phrase that will appear if your song queue is currently full'),
         max: 450,
-        uuid: $t('Full Response')
+        uuid: $t('Full Response'),
       }),
-      response_type: this.responseTypeMetadata
+      response_type: this.responseTypeMetadata,
     };
   }
 
   get responseTypeMetadata() {
-    let responseTypeMetadata: IListMetadata<string> = {
+    const responseTypeMetadata: IListMetadata<string> = {
       type: EInputType.list,
-      options: this.chatbotResponseTypes
+      options: this.chatbotResponseTypes,
     };
     return responseTypeMetadata;
   }
@@ -288,10 +258,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
       this.editedCommand.command = value.command.replace(/ +/g, '');
 
       for (const key in this.editedCommand) {
-        if (
-          this.editedCommand.hasOwnProperty(key) &&
-          key.includes('response')
-        ) {
+        if (this.editedCommand.hasOwnProperty(key) && key.includes('response')) {
           this.editedCommand[key] = value[key].replace(/(\r\n|\r|\n)/g, '');
         }
       }
@@ -313,12 +280,12 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     const { slugName, commandName } = this.defaultCommandToUpdate;
     const resettedCommand = await this.chatbotApiService.Commands.resetDefaultCommand(
       slugName,
-      commandName
+      commandName,
     );
     this.editedCommand = cloneDeep({
       ...resettedCommand,
       slugName,
-      commandName
+      commandName,
     });
   }
 
@@ -328,7 +295,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     this.chatbotApiService.Commands.updateDefaultCommand(
       this.defaultCommandToUpdate.slugName,
       this.defaultCommandToUpdate.commandName,
-      this.editedCommand
+      this.editedCommand,
     );
   }
 }

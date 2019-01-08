@@ -9,8 +9,8 @@ import ChatbotActivePoll from './Poll/ChatbotActivePoll.vue';
   components: {
     ChatbotPollProfile,
     ChatbotVoteTracker,
-    ChatbotActivePoll
-  }
+    ChatbotActivePoll,
+  },
 })
 export default class ChatbotPoll extends ChatbotBase {
   async mounted() {
@@ -26,8 +26,7 @@ export default class ChatbotPoll extends ChatbotBase {
   }
 
   get profiles() {
-    return this.chatbotApiService.Poll.state.pollPreferencesResponse.settings
-      .profiles;
+    return this.chatbotApiService.Poll.state.pollPreferencesResponse.settings.profiles;
   }
 
   onOpenProfileHandler(profile: IPollProfile) {

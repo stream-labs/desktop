@@ -17,8 +17,8 @@ import electron from 'electron';
     TextAreaInput,
     ListInput,
     NumberInput,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotStreamElementsModal extends ChatbotWindowsBase {
   $refs: {
@@ -36,7 +36,7 @@ export default class ChatbotStreamElementsModal extends ChatbotWindowsBase {
     min: 100,
     max: 600,
     placeholder: $t('JWT Token'),
-    uuid: $t('JWT Token')
+    uuid: $t('JWT Token'),
   };
 
   get MODAL_NAME() {
@@ -50,7 +50,7 @@ export default class ChatbotStreamElementsModal extends ChatbotWindowsBase {
       this.token,
       this.importLoyalty,
       this.importCommands,
-      this.importTimers
+      this.importTimers,
     );
     this.$modal.hide(this.MODAL_NAME);
   }
@@ -60,8 +60,6 @@ export default class ChatbotStreamElementsModal extends ChatbotWindowsBase {
   }
 
   openSEDashboard() {
-    electron.remote.shell.openExternal(
-      'https://streamelements.com/dashboard/account/channels'
-    );
+    electron.remote.shell.openExternal('https://streamelements.com/dashboard/account/channels');
   }
 }

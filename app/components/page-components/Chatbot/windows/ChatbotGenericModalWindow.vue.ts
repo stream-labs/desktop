@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
@@ -7,14 +6,9 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import {
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { INumberMetadata, EInputType } from 'components/shared/inputs/index';
 
-import {
-  NEW_ALERT_MODAL_ID
-} from 'services/chatbot';
+import { NEW_ALERT_MODAL_ID } from 'services/chatbot';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
@@ -24,8 +18,8 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
     TextAreaInput,
     ListInput,
     NumberInput,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotGenericModalWindow extends Vue {
   @Prop()
@@ -51,7 +45,7 @@ export default class ChatbotGenericModalWindow extends Vue {
     required: true,
     type: EInputType.number,
     max: 100000,
-    placeholder: $t(this.message)
+    placeholder: $t(this.message),
   };
 
   value: number = 0;

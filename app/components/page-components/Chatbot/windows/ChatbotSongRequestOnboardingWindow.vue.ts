@@ -10,7 +10,7 @@ interface ChatbotOnboardingData {
     backgroundUrl: string;
     description: string;
     onChooseHandler?: () => void;
-  }
+  };
 }
 
 @Component({})
@@ -23,19 +23,22 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
 
   async mounted() {
     await this.chatbotApiService.SongRequest.fetchSongRequestPreferencesData();
-    this.settings = cloneDeep(this.chatbotApiService.SongRequest.state.songRequestPreferencesResponse.settings);
+    this.settings = cloneDeep(
+      this.chatbotApiService.SongRequest.state.songRequestPreferencesResponse.settings,
+    );
   }
 
   async onToggleNextHandler() {
     if (this.step === 1) {
-      await this.chatbotApiService.SongRequest.updateSongRequestPreferencesData({settings: this.settings});
+      await this.chatbotApiService.SongRequest.updateSongRequestPreferencesData({
+        settings: this.settings,
+      });
       this.step++;
-    }
-    else this.chatbotApiService.Common.closeChildWindow();
+    } else this.chatbotApiService.Common.closeChildWindow();
   }
 
   onTogglePrevHandler() {
-    if (this.step > 1) this.step --;
+    if (this.step > 1) this.step--;
   }
 
   get onboardingData(): ChatbotOnboardingData {
@@ -45,68 +48,49 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
       1: [
         {
           title: $t('Auto Play'),
-          backgroundUrl: require(
-            `../../../../../media/images/chatbot/chatbot-songrequest-autoplay--${
-              isAutoPlay ? 'on' : 'off'
-            }--${
-              backgroundUrlSuffix
-            }.svg`
-          ),
+          backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-autoplay--${
+            isAutoPlay ? 'on' : 'off'
+          }--${backgroundUrlSuffix}.svg`),
           description: $t(
             'Allow your songs and videos to automatically play.' +
-            'Ideal experience if you have moderators, since they will filter out NSFW content.'
+              'Ideal experience if you have moderators, since they will filter out NSFW content.',
           ),
           onChooseHandler: () => {
             this.settings.auto_play = true;
-          }
+          },
         },
         {
           title: $t("Don't Auto Play"),
-          backgroundUrl: require(
-            `../../../../../media/images/chatbot/chatbot-songrequest-noplay--${
+          backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-noplay--${
             isAutoPlay ? 'off' : 'on'
-            }--${
-            backgroundUrlSuffix
-            }.svg`
-          ),
+          }--${backgroundUrlSuffix}.svg`),
           description: $t(
             'To play the next Song or video you will need to hit play each time. ' +
-            'Ideal experience if you have no moderators, ' +
-            'since you will have one last chance catch NSFW content.'
+              'Ideal experience if you have no moderators, ' +
+              'since you will have one last chance catch NSFW content.',
           ),
           onChooseHandler: () => {
             this.settings.auto_play = false;
-          }
-        }
+          },
+        },
       ],
       2: [
         {
           title: $t('Add Song Request Widget'),
           subtitle: $t('step 2'),
-          backgroundUrl: require(
-            `../../../../../media/images/chatbot/chatbot-songrequest-step2--${
-            backgroundUrlSuffix
-            }.png`
-          ),
+          backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-step2--${backgroundUrlSuffix}.png`),
           description: $t(
             'You will need to add the Chatbot widget to your scene to hear audio. ' +
-            'Go to the editor and add the Chatbot widget to your desired scene.'
+              'Go to the editor and add the Chatbot widget to your desired scene.',
           ),
         },
         {
           title: $t('Go To Recent Events'),
           subtitle: $t('step 3'),
-          backgroundUrl: require(
-            `../../../../../media/images/chatbot/chatbot-songrequest-step3--${
-            backgroundUrlSuffix
-            }.png`
-          ),
-          description: $t(
-            'You can manage your queued media from your recent events.'
-          ),
-        }
-      ]
-    }[this.step]
+          backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-step3--${backgroundUrlSuffix}.png`),
+          description: $t('You can manage your queued media from your recent events.'),
+        },
+      ],
+    }[this.step];
   }
-
 }

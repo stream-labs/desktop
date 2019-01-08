@@ -10,7 +10,6 @@ import {
   ITimersResponse,
   IChatbotAPIPutResponse,
   IChatbotAPIDeleteResponse,
-
 } from './chatbot-interfaces';
 
 // state
@@ -28,9 +27,9 @@ export class ChatbotTimerApiService extends PersistentStatefulService<
     timersResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
   };
 
@@ -38,44 +37,46 @@ export class ChatbotTimerApiService extends PersistentStatefulService<
   // GET requests
   //
   fetchTimers(page = this.state.timersResponse.pagination.current, query = '') {
-    return this.chatbotBaseApiService.api('GET', `timers?page=${page}&query=${query}`, {}).then(
-      (response: ITimersResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', `timers?page=${page}&query=${query}`, {})
+      .then((response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
-      }
-    );
+      });
   }
 
   // create
   createTimer(data: IChatbotTimer) {
-    return this.chatbotBaseApiService.api('POST', 'timers', data).then((response: IChatbotTimer) => {
-      this.fetchTimers();
-      this.chatbotCommonService.closeChildWindow();
-    });
+    return this.chatbotBaseApiService
+      .api('POST', 'timers', data)
+      .then((response: IChatbotTimer) => {
+        this.fetchTimers();
+        this.chatbotCommonService.closeChildWindow();
+      });
   }
 
   // Update
   updateTimer(id: string, data: IChatbotTimer) {
-    return this.chatbotBaseApiService.api('PUT', `timers/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
+    return this.chatbotBaseApiService
+      .api('PUT', `timers/${id}`, data)
+      .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchTimers();
           this.chatbotCommonService.closeChildWindow();
         }
-      }
-    );
+      });
   }
 
   //
   // DELETE methods
   //
   deleteTimer(id: string) {
-    return this.chatbotBaseApiService.api('DELETE', `timers/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
+    return this.chatbotBaseApiService
+      .api('DELETE', `timers/${id}`, {})
+      .then((response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchTimers();
         }
-      }
-    );
+      });
   }
 
   //

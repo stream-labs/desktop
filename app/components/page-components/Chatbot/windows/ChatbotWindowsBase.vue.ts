@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Inject } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ModalLayout from 'components/ModalLayout.vue';
 
@@ -9,8 +9,8 @@ Vue.use(VModal);
 
 @Component({
   components: {
-    ModalLayout
-  }
+    ModalLayout,
+  },
 })
 export default class ChatbotWindowsBase extends ChatbotBase {
   onCancelHandler(): void {
@@ -29,13 +29,13 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openLinkProtectionWindow();
         break;
       case 'ChatbotLinkProtectionWindow':
-        const linkProtectionPermitCommand = this.chatbotApiService.Commands
-          .state.defaultCommandsResponse['link-protection'].permit;
+        const linkProtectionPermitCommand = this.chatbotApiService.Commands.state
+          .defaultCommandsResponse['link-protection'].permit;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...linkProtectionPermitCommand,
           slugName: 'link-protection',
-          commandName: 'permit'
+          commandName: 'permit',
         });
         break;
     }
@@ -50,13 +50,14 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
         break;
       case 'ChatbotLoyaltyPreferencesWindow':
-        const loyaltyPointsCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['loyalty'].points;
+        const loyaltyPointsCommand = this.chatbotApiService.Commands.state.defaultCommandsResponse[
+          'loyalty'
+        ].points;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...loyaltyPointsCommand,
           slugName: 'loyalty',
-          commandName: 'points'
+          commandName: 'points',
         });
         break;
     }
@@ -71,13 +72,14 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
         break;
       case 'ChatbotHeistPreferencesWindow':
-        const loyaltyPointsCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['heist'].enter;
+        const loyaltyPointsCommand = this.chatbotApiService.Commands.state.defaultCommandsResponse[
+          'heist'
+        ].enter;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...loyaltyPointsCommand,
           slugName: 'heist',
-          commandName: 'enter'
+          commandName: 'enter',
         });
         break;
     }
@@ -92,13 +94,14 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openPollPreferencesWindow();
         break;
       case 'ChatbotPollPreferencesWindow':
-        const pollVoteCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['poll'].vote;
+        const pollVoteCommand = this.chatbotApiService.Commands.state.defaultCommandsResponse[
+          'poll'
+        ].vote;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...pollVoteCommand,
           slugName: 'poll',
-          commandName: 'vote'
+          commandName: 'vote',
         });
         break;
     }
@@ -113,13 +116,13 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openBettingPreferencesWindow();
         break;
       case 'ChatbotBettingPreferencesWindow':
-        const betCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['betting'].bet;
+        const betCommand = this.chatbotApiService.Commands.state.defaultCommandsResponse['betting']
+          .bet;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...betCommand,
           slugName: 'betting',
-          commandName: 'bet'
+          commandName: 'bet',
         });
         break;
     }
@@ -134,13 +137,14 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openGamblePreferencesWindow();
         break;
       case 'ChatbotGamblePreferencesWindow':
-        const gambleCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['gamble'].gamble;
+        const gambleCommand = this.chatbotApiService.Commands.state.defaultCommandsResponse[
+          'gamble'
+        ].gamble;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...gambleCommand,
           slugName: 'gamble',
-          commandName: 'gamble'
+          commandName: 'gamble',
         });
         break;
     }
@@ -161,7 +165,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...quotePreferencesCommand,
           slugName: 'quotes',
-          commandName: 'get'
+          commandName: 'get',
         });
         break;
     }
@@ -182,7 +186,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...queuePreferencesCommand,
           slugName: 'queue',
-          commandName: 'join'
+          commandName: 'join',
         });
         break;
     }
@@ -203,7 +207,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...queuePreferencesCommand,
           slugName: 'songrequest',
-          commandName: 'songrequest'
+          commandName: 'songrequest',
         });
         break;
     }

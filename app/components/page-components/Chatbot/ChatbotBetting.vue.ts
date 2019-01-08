@@ -1,19 +1,14 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
-import { IPollProfile, IBettingProfile } from 'services/chatbot';
+import { IBettingProfile } from 'services/chatbot';
 import ChatbotPollProfile from './Poll/ChatbotPollProfile.vue';
-import ChatbotVoteTracker from './Poll/ChatbotVoteTracker.vue';
 import ChatbotActivePoll from './Poll/ChatbotActivePoll.vue';
-import ChatbotBetProfile from './Bet/ChatbotBetProfile.vue';
-import ChatbotBetTracker from './Bet/ChatbotBetTracker.vue';
-import ChatbotActiveBet from './Bet/ChatbotActiveBet.vue';
 
 @Component({
   components: {
     ChatbotPollProfile,
-    ChatbotBetTracker,
-    ChatbotActivePoll
-  }
+    ChatbotActivePoll,
+  },
 })
 export default class ChatbotBetting extends ChatbotBase {
   async mounted() {
@@ -29,8 +24,7 @@ export default class ChatbotBetting extends ChatbotBase {
   }
 
   get profiles() {
-    return this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings
-      .profiles;
+    return this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings.profiles;
   }
 
   onOpenProfileHandler(profile: IBettingProfile) {

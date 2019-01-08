@@ -3,21 +3,19 @@ import { Component, Watch } from 'vue-property-decorator';
 import { ICustomCommand, DELETE_COMMAND_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
-import { $t } from 'services/i18n';
-import electron from 'electron';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotGenericModalWindow
-  }
+    ChatbotGenericModalWindow,
+  },
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
   selectedCommand: ICustomCommand = null;
 
-  get DELETE_COMMAND_MODAL(){
+  get DELETE_COMMAND_MODAL() {
     return DELETE_COMMAND_MODAL;
   }
 
@@ -26,13 +24,11 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   get currentPage() {
-    return this.chatbotApiService.Commands.state.customCommandsResponse
-      .pagination.current;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.current;
   }
 
   get totalPages() {
-    return this.chatbotApiService.Commands.state.customCommandsResponse
-      .pagination.total;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.total;
   }
 
   mounted() {
@@ -60,26 +56,22 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.$modal.show(DELETE_COMMAND_MODAL);
   }
 
-  onYesHandler(){
-    if(this.selectedCommand){
+  onYesHandler() {
+    if (this.selectedCommand) {
       this.chatbotApiService.Commands.deleteCustomCommand(this.selectedCommand.id);
     }
   }
 
-  onNoHandler(){
+  onNoHandler() {
     this.selectedCommand = null;
   }
 
-  onToggleEnableCommandHandler(
-    commandId: string,
-    index: number,
-    isEnabled: boolean
-  ) {
+  onToggleEnableCommandHandler(commandId: string, index: number, isEnabled: boolean) {
     const commandToBeUpdated = this.commands[index];
 
     this.chatbotApiService.Commands.updateCustomCommand(commandId, {
       ...commandToBeUpdated,
-      enabled: isEnabled
+      enabled: isEnabled,
     });
   }
 

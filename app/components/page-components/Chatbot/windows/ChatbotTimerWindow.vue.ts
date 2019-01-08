@@ -1,26 +1,18 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotTimer,
-  IChatbotErrorResponse
-} from 'services/chatbot';
+import { IChatbotTimer, IChatbotErrorResponse } from 'services/chatbot';
 
-import {
-  ITextMetadata,
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { ITextMetadata, INumberMetadata, EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -31,7 +23,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     chat_lines: 5,
     message: '',
     platforms: 7,
-    enabled: true
+    enabled: true,
   };
 
   // metadata
@@ -41,14 +33,14 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     placeholder: $t('Name of the timer'),
     alphaNum: true,
     max: 25,
-    uuid: $t('Name')
+    uuid: $t('Name'),
   };
   messageMetadata: ITextMetadata = {
     required: true,
     type: EInputType.textArea,
     placeholder: $t('This phrase will appear after the timer has ended'),
     max: 450,
-    uuid: $t('Message')
+    uuid: $t('Message'),
   };
 
   intervalMetadata: INumberMetadata = {
@@ -56,7 +48,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     type: EInputType.number,
     min: 1,
     max: 1440,
-    placeholder: $t('Interval (Value in Minutes)')
+    placeholder: $t('Interval (Value in Minutes)'),
   };
 
   chatLinesMetadata: INumberMetadata = {
@@ -66,8 +58,8 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     max: 1000,
     placeholder: $t('Minimum chat lines'),
     tooltip: $t(
-      'Set the number of chat lines that need to appear when the timer ends before the response appears.'
-    )
+      'Set the number of chat lines that need to appear when the timer ends before the response appears.',
+    ),
   };
 
   mounted() {
@@ -96,25 +88,20 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
-
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.isEdit) {
-      this.chatbotApiService
-        .Timers
-        .updateTimer(this.timerToUpdate.id, this.newTimer)
-        .catch(this.onErrorHandler);
+      this.chatbotApiService.Timers.updateTimer(this.timerToUpdate.id, this.newTimer).catch(
+        this.onErrorHandler,
+      );
       return;
     }
-    this.chatbotApiService
-      .Timers
-      .createTimer(this.newTimer)
-      .catch(this.onErrorHandler);
+    this.chatbotApiService.Timers.createTimer(this.newTimer).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

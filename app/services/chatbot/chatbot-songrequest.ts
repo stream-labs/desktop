@@ -6,13 +6,13 @@ import { ChatbotBaseApiService } from './chatbot-base';
 import {
   MediaShareService,
   IMediaShareData,
-  IMediaShareBan
+  IMediaShareBan,
 } from 'services/widgets/settings/media-share';
 
 import {
   IChatbotAPIPostResponse,
   ISongRequestPreferencesResponse,
-  ISongRequestResponse
+  ISongRequestResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -21,40 +21,38 @@ interface IChatbotSongRequestApiServiceState {
   songRequestResponse: ISongRequestResponse;
 }
 
-export class ChatbotSongRequestApiService extends PersistentStatefulService<IChatbotSongRequestApiServiceState> {
+export class ChatbotSongRequestApiService extends PersistentStatefulService<
+  IChatbotSongRequestApiServiceState
+> {
   @Inject() mediaShareService: MediaShareService;
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
 
   static defaultState: IChatbotSongRequestApiServiceState = {
     songRequestPreferencesResponse: {
       banned_media: [],
-      settings: null
+      settings: null,
     },
     songRequestResponse: {
       enabled: false,
-      settings: null
-    }
+      settings: null,
+    },
   };
 
   //
   // GET requests
   //
   fetchSongRequestPreferencesData() {
-    return this.mediaShareService
-      .fetchData()
-      .then((response: IMediaShareData) => {
-        this.UPDATE_SONG_REQUEST_PREFERENCES(
-          response as ISongRequestPreferencesResponse
-        );
-      });
+    return this.mediaShareService.fetchData().then((response: IMediaShareData) => {
+      this.UPDATE_SONG_REQUEST_PREFERENCES(response as ISongRequestPreferencesResponse);
+    });
   }
 
   fetchSongRequest() {
-    return this.chatbotBaseApiService.api('GET', 'settings/songrequest', {}).then(
-      (response: ISongRequestResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/songrequest', {})
+      .then((response: ISongRequestResponse) => {
         this.UPDATE_SONG_REQUEST(response);
-      }
-    );
+      });
   }
 
   //
@@ -70,22 +68,20 @@ export class ChatbotSongRequestApiService extends PersistentStatefulService<ICha
   }
 
   updateSongRequest(data: ISongRequestResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/songrequest', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/songrequest', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchSongRequest();
         }
-      }
-    );
+      });
   }
 
   //
   // Mutations
   //
   @mutation()
-  private UPDATE_SONG_REQUEST_PREFERENCES(
-    response: ISongRequestPreferencesResponse
-  ) {
+  private UPDATE_SONG_REQUEST_PREFERENCES(response: ISongRequestPreferencesResponse) {
     Vue.set(this.state, 'songRequestPreferencesResponse', response);
   }
 

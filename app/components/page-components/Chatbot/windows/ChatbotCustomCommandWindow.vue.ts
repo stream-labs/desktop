@@ -12,15 +12,15 @@ import {
   EInputType,
   IListMetadata,
   ITextMetadata,
-  INumberMetadata
+  INumberMetadata,
 } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
     ChatbotAliases,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   $refs: {
@@ -33,29 +33,29 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     response_type: 'Chat',
     permission: {
       level: 1,
-      info: {}
+      info: {},
     },
-    cost:{
-      base: 0
+    cost: {
+      base: 0,
     },
     cooldowns: {
       global: 0,
-      user: 0
+      user: 0,
     },
     aliases: [],
     platforms: 7,
-    enabled: true
+    enabled: true,
   };
 
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -93,58 +93,56 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     tooltip: $t('Enter a word used to trigger a response'),
     min: 2,
     max: 25,
-    uuid: $t('Command')
+    uuid: $t('Command'),
   };
   responseMetadata: ITextMetadata = {
     required: true,
     title: $t('Response'),
     type: EInputType.textArea,
-    placeholder: $t(
-      'The phrase that will appear after a user enters the command'
-    ),
+    placeholder: $t('The phrase that will appear after a user enters the command'),
     max: 450,
-    uuid: $t('Response')
+    uuid: $t('Response'),
   };
 
   get permissionMetadata() {
-    let permissionMetadata: IListMetadata<number> = {
+    const permissionMetadata: IListMetadata<number> = {
       required: true,
       title: $t('Permission'),
       type: EInputType.list,
-      options: this.chatbotPermissions
+      options: this.chatbotPermissions,
     };
     return permissionMetadata;
   }
 
   get replyTypeMetadata() {
-    let replyTypeMetadata: IListMetadata<string> = {
+    const replyTypeMetadata: IListMetadata<string> = {
       required: true,
       title: $t('Reply In'),
       type: EInputType.list,
-      options: this.chatbotResponseTypes
+      options: this.chatbotResponseTypes,
     };
     return replyTypeMetadata;
   }
 
   get cooldownsMetadata() {
-    let timerMetadata: INumberMetadata = {
+    const timerMetadata: INumberMetadata = {
       type: EInputType.number,
       title: $t('Cooldown'),
       placeholder: $t('Cooldown'),
       tooltip: $t('Value in seconds'),
       min: 0,
-      max: 86400
+      max: 86400,
     };
     return timerMetadata;
   }
 
   get costMetaData() {
-    let timerMetadata: INumberMetadata = {
+    const timerMetadata: INumberMetadata = {
       type: EInputType.number,
       title: $t('Cost'),
       placeholder: $t('Cost'),
       min: 0,
-      max: 1000000
+      max: 1000000,
     };
     return timerMetadata;
   }
@@ -155,8 +153,8 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSaveHandler() {
@@ -165,14 +163,12 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     if (this.isEdit) {
       this.chatbotApiService.Commands.updateCustomCommand(
         this.customCommandToUpdate.id,
-        this.newCommand
+        this.newCommand,
       ).catch(this.onErrorHandler);
       return;
     }
 
-    this.chatbotApiService.Commands.createCustomCommand(this.newCommand).catch(
-      this.onErrorHandler
-    );
+    this.chatbotApiService.Commands.createCustomCommand(this.newCommand).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

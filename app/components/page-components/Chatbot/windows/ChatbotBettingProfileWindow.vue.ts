@@ -2,23 +2,18 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
-import {
-  IChatbotErrorResponse,
-  IBettingProfile,
-  IBettingOption
-} from 'services/chatbot';
+import { IChatbotErrorResponse, IBettingProfile, IBettingOption } from 'services/chatbot';
 import { EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
-import { cloneDeep } from 'lodash';
 import { debounce } from 'lodash-decorators';
 import ChatbotBetOptionModal from '../Bet/ChatbotBetOptionModal.vue';
 
 @Component({
   components: {
     ValidatedForm,
-    ChatbotBetOptionModal
-  }
+    ChatbotBetOptionModal,
+  },
 })
 export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   $refs: {
@@ -30,25 +25,25 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     options: [],
     timer: {
       enabled: false,
-      duration: 300
+      duration: 300,
     },
     loyalty: {
       min: 10,
-      max: 10000
+      max: 10000,
     },
     title: '',
-    send_notification: false
+    send_notification: false,
   };
 
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   get metaData() {
@@ -58,7 +53,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
         type: EInputType.text,
         max: 100,
         placeholder: $t('Title'),
-        uuid: $t('Title')
+        uuid: $t('Title'),
       },
       duration: {
         required: true,
@@ -66,7 +61,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
         min: 1,
         max: 86400,
         placeholder: $t('Duration'),
-        uuid: $t('Duration')
+        uuid: $t('Duration'),
       },
       min: {
         required: true,
@@ -75,7 +70,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
         max: 100000,
         placeholder: $t('Minimum'),
         tooltip: $t('Minimum amount of points that is required to be bet'),
-        uuid: $t('Minimum')
+        uuid: $t('Minimum'),
       },
       max: {
         required: true,
@@ -84,15 +79,14 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
         max: 100000,
         placeholder: $t('Maximum'),
         tooltip: $t('Maximum amount of points that is allowed to be bet'),
-        uuid: $t('Maximum')
-        
-      }
+        uuid: $t('Maximum'),
+      },
     };
   }
 
   selectedOption: IBettingOption = {
     name: null,
-    parameter: null
+    parameter: null,
   };
 
   selectedIndex: number = -1;
@@ -102,7 +96,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   mounted() {
     // if editing existing custom command
     if (this.isEdit) {
-      this.newProfile = cloneDeep(this.profileToUpdate);
+      this.newProfile = _.cloneDeep(this.profileToUpdate);
     }
   }
 
@@ -115,10 +109,10 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   }
 
   get baseCommand() {
-    return (
-      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings
-        .commands['bet'].command + ' '
-    );
+    return `${
+      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings.commands['bet']
+        .command
+    } `;
   }
 
   get NEW_BET_OPTION_MODAL_ID() {
@@ -140,12 +134,10 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
 
     if (this.newProfile.id) {
       await this.chatbotApiService.Betting.updateProfile(this.newProfile).catch(
-        this.onErrorHandler
+        this.onErrorHandler,
       );
     } else {
-      await this.chatbotApiService.Betting.addProfile(this.newProfile).catch(
-        this.onErrorHandler
-      );
+      await this.chatbotApiService.Betting.addProfile(this.newProfile).catch(this.onErrorHandler);
     }
   }
 
@@ -159,7 +151,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     if (!option) {
       this.selectedOption = {
         name: null,
-        parameter: null
+        parameter: null,
       };
     } else {
       this.selectedOption = option;
@@ -172,8 +164,8 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   onAddedHandler(option: IBettingOption = null, index: number = -1) {
     const dupe = _.find(this.newProfile.options, x => {
       return (
-        x.name.toLowerCase() == option.name.toLowerCase() ||
-        x.parameter.toLowerCase() == option.parameter.toLowerCase()
+        x.name.toLowerCase() === option.name.toLowerCase() ||
+        x.parameter.toLowerCase() === option.parameter.toLowerCase()
       );
     });
 

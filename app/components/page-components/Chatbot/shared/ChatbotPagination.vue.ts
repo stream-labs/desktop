@@ -10,33 +10,33 @@ export default class ChatbotPagination extends Vue {
     this.$emit('change', page);
   }
 
-  onPrevPageHandler(){
+  onPrevPageHandler() {
     this.$emit('change', this.currentPage - 1);
   }
 
-  onNextPageHandler(){
+  onNextPageHandler() {
     this.$emit('change', this.currentPage + 1);
   }
 
-  onFirstPageHandler(){
+  onFirstPageHandler() {
     this.$emit('change', 1);
   }
 
-  onLastPageHandler(){
+  onLastPageHandler() {
     this.$emit('change', this.totalPages);
   }
 
-  get customTotalPages(){
-    let startIndex = Math.max(2,this.currentPage - 4);
-    const endIndex = Math.min(startIndex+8,this.totalPages-1);
+  get customTotalPages() {
+    let startIndex = Math.max(2, this.currentPage - 4);
+    const endIndex = Math.min(startIndex + 8, this.totalPages - 1);
 
     const endOffset = endIndex - startIndex;
-    if(endOffset < 8 && this.totalPages > 8){
-      startIndex = Math.max(1,startIndex-(8 - endOffset))
+    if (endOffset < 8 && this.totalPages > 8) {
+      startIndex = Math.max(1, startIndex - (8 - endOffset));
     }
 
-    let arr = [];
-    for(let i= startIndex;i <= endIndex;++i){
+    const arr = [];
+    for (let i = startIndex; i <= endIndex; ++i) {
       arr.push(i);
     }
 

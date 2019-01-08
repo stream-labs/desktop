@@ -3,23 +3,16 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotErrorResponse,
-  IChatbotLoyalty
-} from 'services/chatbot';
+import { IChatbotErrorResponse, IChatbotLoyalty } from 'services/chatbot';
 
-import {
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { INumberMetadata, EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -28,8 +21,8 @@ export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
     points: 0,
     time: 0,
     viewer: {
-      name: null
-    }
+      name: null,
+    },
   };
 
   // metadata
@@ -38,7 +31,7 @@ export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
     type: EInputType.number,
     min: 0,
     max: Number.MAX_SAFE_INTEGER,
-    placeholder: $t('Points')
+    placeholder: $t('Points'),
   };
 
   timeMetaData: INumberMetadata = {
@@ -46,7 +39,7 @@ export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
     type: EInputType.number,
     min: 0,
     max: Number.MAX_SAFE_INTEGER,
-    placeholder: $t('Time Watched (Value in Minutes)')
+    placeholder: $t('Time Watched (Value in Minutes)'),
   };
 
   mounted() {
@@ -67,17 +60,16 @@ export default class ChatbotLoyaltyWindow extends ChatbotWindowsBase {
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-      this.chatbotApiService
-        .Loyalty
-        .updateLoyalty(this.newLoyalty.id, this.newLoyalty)
-        .catch(this.onErrorHandler);
-      return;
+    this.chatbotApiService.Loyalty.updateLoyalty(this.newLoyalty.id, this.newLoyalty).catch(
+      this.onErrorHandler,
+    );
+    return;
   }
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

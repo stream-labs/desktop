@@ -10,7 +10,7 @@ import { ICommandMessagesData } from 'services/chatbot';
 import { EInputType } from 'components/shared/inputs/index';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotCommandPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -23,7 +23,7 @@ export default class ChatbotCommandPreferencesWindow extends ChatbotWindowsBase 
     displayCooldown: false,
     displayCost: false,
     displayPermission: false,
-    permissionmessage: null
+    permissionmessage: null,
   };
 
   // metadata
@@ -34,22 +34,22 @@ export default class ChatbotCommandPreferencesWindow extends ChatbotWindowsBase 
         required: true,
         max: 450,
         placeholder: $t('Cost Message'),
-        uuid: $t('Cost Message')
+        uuid: $t('Cost Message'),
       }),
       permission: metadataHelper.text({
         type: EInputType.text,
         required: true,
         max: 450,
         placeholder: $t('Permission Message'),
-        uuid: $t('Permission Message')
+        uuid: $t('Permission Message'),
       }),
       cooldown: metadataHelper.text({
         type: EInputType.text,
         required: true,
         max: 450,
         placeholder: $t('Cooldown Message'),
-        uuid: $t('Cooldown Message')
-      })
+        uuid: $t('Cooldown Message'),
+      }),
     };
   }
 
@@ -58,7 +58,6 @@ export default class ChatbotCommandPreferencesWindow extends ChatbotWindowsBase 
   }
 
   mounted() {
-    console.log('Hi');
     this.settings = cloneDeep(this.commandPreferences.settings.messages);
   }
 

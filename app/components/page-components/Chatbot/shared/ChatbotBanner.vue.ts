@@ -4,8 +4,8 @@ import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotMod
 
 @Component({
   components: {
-    ChatbotModule
-  }
+    ChatbotModule,
+  },
 })
 export default class ChatbotBanner extends ChatbotBase {
   onCloseBannerHandler() {

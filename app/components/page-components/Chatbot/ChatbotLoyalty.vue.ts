@@ -8,8 +8,8 @@ import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotGenericModalWindow
-  }
+    ChatbotGenericModalWindow,
+  },
 })
 export default class ChatbotLoyalty extends ChatbotBase {
   searchQuery = '';
@@ -23,7 +23,7 @@ export default class ChatbotLoyalty extends ChatbotBase {
     return this.chatbotApiService.Loyalty.state.loyaltyResponse.data;
   }
 
-  get ADD_LOYALTY_MODAL(){
+  get ADD_LOYALTY_MODAL() {
     return 'add-loyalty';
   }
 
@@ -31,13 +31,13 @@ export default class ChatbotLoyalty extends ChatbotBase {
     this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
   }
 
-  onOpenLoyaltyAddWllHandler(){
+  onOpenLoyaltyAddWllHandler() {
     this.$modal.show(this.ADD_LOYALTY_MODAL);
-    //this.chatbotApiService.Common.openLoyaltyAddAllWindow();
+    // this.chatbotApiService.Common.openLoyaltyAddAllWindow();
   }
 
-  onEnableLoyaltyHandler(){
-    let newSettings = this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse;
+  onEnableLoyaltyHandler() {
+    const newSettings = this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse;
     newSettings.enabled = true;
     this.chatbotApiService.Loyalty.updateLoyaltyPreferences(newSettings, false);
   }
@@ -50,7 +50,7 @@ export default class ChatbotLoyalty extends ChatbotBase {
     return this.chatbotApiService.Loyalty.state.loyaltyResponse.pagination.total;
   }
 
-  get enabled(){
+  get enabled() {
     return this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse.enabled;
   }
 
@@ -62,12 +62,12 @@ export default class ChatbotLoyalty extends ChatbotBase {
     this.chatbotApiService.Loyalty.fetchLoyalty(page, query);
   }
 
-  onOkHandler(value: number){
+  onOkHandler(value: number) {
     console.log(value);
     console.log('Add Currency API Call');
   }
 
-  onCancelHandler(){}
+  onCancelHandler() {}
 
   @Watch('searchQuery')
   @Debounce(1000)

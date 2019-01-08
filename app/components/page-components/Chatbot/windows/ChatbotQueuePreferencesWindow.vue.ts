@@ -5,9 +5,7 @@ import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { IQueuePreferencesGeneralSettings } from 'services/chatbot';
 
-import {
-  EInputType
-} from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
@@ -20,8 +18,8 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
   generalSettings: IQueuePreferencesGeneralSettings = {
     maximum: 0,
     messages: {
-      picked: ''
-    }
+      picked: '',
+    },
   };
 
   // metadata
@@ -32,16 +30,16 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
         type: EInputType.number,
         placeholder: $t('Maximum Queue Size'),
         min: 1,
-        max: 1000
+        max: 1000,
       }),
       messages: {
         picked: metadataHelper.text({
           required: true,
           type: EInputType.textArea,
-          placeholder: $t('Message when user is picked.')
+          placeholder: $t('Message when user is picked.'),
         }),
-        max: 450
-      }
+        max: 450,
+      },
     };
   }
 
@@ -56,8 +54,8 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   onSaveHandler() {

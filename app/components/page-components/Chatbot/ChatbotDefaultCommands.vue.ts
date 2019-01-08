@@ -19,8 +19,8 @@ type TCommandSlug =
 
 @Component({
   components: {
-    CollapsibleSection
-  }
+    CollapsibleSection,
+  },
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
@@ -36,7 +36,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     'poll',
     'betting',
     'misc',
-    'gamble'
+    'gamble',
   ];
 
   get commandSlugs() {
@@ -46,11 +46,8 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   matchesQuery(name: string, command: IDefaultCommand) {
     return (
       name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) >
-        -1 ||
-      command.description
-        .toLowerCase()
-        .indexOf(this.searchQuery.toLowerCase()) > -1
+      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      command.description.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
     );
   }
 
@@ -64,31 +61,19 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     }
   }
 
-  onToggleEnableCommandHandler(
-    slugName: string,
-    commandName: string,
-    isEnabled: boolean
-  ) {
+  onToggleEnableCommandHandler(slugName: string, commandName: string, isEnabled: boolean) {
     const updatedCommand = {
       ...this.commandSlugs[slugName][commandName],
-      enabled: isEnabled
+      enabled: isEnabled,
     };
-    this.chatbotApiService.Commands.updateDefaultCommand(
-      slugName,
-      commandName,
-      updatedCommand
-    );
+    this.chatbotApiService.Commands.updateDefaultCommand(slugName, commandName, updatedCommand);
   }
 
-  onOpenCommandWindowHandler(
-    slugName: string,
-    commandName: string,
-    command: IDefaultCommand
-  ) {
+  onOpenCommandWindowHandler(slugName: string, commandName: string, command: IDefaultCommand) {
     this.chatbotApiService.Common.openDefaultCommandWindow({
       ...command,
       slugName,
-      commandName
+      commandName,
     });
   }
 }

@@ -16,7 +16,7 @@ import {
   ChatbotHeistApiService,
   ChatbotPollApiService,
   ChatbotBettingApiService,
-  ChatbotImporterApiService
+  ChatbotImporterApiService,
 } from './index';
 import { ChatbotGambleApiService } from './chatbot-gamble';
 

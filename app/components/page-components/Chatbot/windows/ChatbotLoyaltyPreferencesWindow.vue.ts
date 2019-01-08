@@ -1,17 +1,10 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotErrorResponse,
-  ILoyaltyPreferencesResponse
-} from 'services/chatbot';
+import { IChatbotErrorResponse, ILoyaltyPreferencesResponse } from 'services/chatbot';
 
-import {
-  ITextMetadata,
-  INumberMetadata,
-  EInputType
-} from 'components/shared/inputs/index';
+import { ITextMetadata, INumberMetadata, EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { cloneDeep } from 'lodash';
@@ -19,7 +12,7 @@ import { debounce } from 'lodash-decorators';
 import ChatbotLoyaltyImporter from '../Importer/ChatbotLoyaltyImporter.vue';
 
 @Component({
-  components: { ValidatedForm, ChatbotLoyaltyImporter }
+  components: { ValidatedForm, ChatbotLoyaltyImporter },
 })
 export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -31,30 +24,30 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
       commands: {},
       general: {
         interval: {
-          live: 5
+          live: 5,
         },
         name: 'points',
         payout: {
           active: 0,
-          live: 1
-        }
+          live: 1,
+        },
       },
       advanced: {
         donations: {
           extralife: 0,
           streamlabs: 0,
-          superchat: 0
+          superchat: 0,
         },
         event: {
           on_follow: 0,
           on_host: 0,
           on_member: 0,
           on_raid: 0,
-          on_sub: 0
-        }
-      }
+          on_sub: 0,
+        },
+      },
     },
-    enabled: false
+    enabled: false,
   };
 
   tabs: ITab[] = [];
@@ -65,7 +58,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     type: EInputType.text,
     max: 100,
     placeholder: $t('Points'),
-    tooltip: $t('Name of your currency.')
+    tooltip: $t('Name of your currency.'),
   };
 
   livePayoutMetaData: INumberMetadata = {
@@ -73,7 +66,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     type: EInputType.number,
     min: 0,
     max: 100,
-    placeholder: $t('Live Payout Amount')
+    placeholder: $t('Live Payout Amount'),
   };
 
   activePayoutMetaData: INumberMetadata = {
@@ -83,8 +76,8 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     max: 100,
     placeholder: $t('Active Payout Amount'),
     tooltip: $t(
-      'Currency that a viewer will earn on top of the Live amount when they talk in your chat.'
-    )
+      'Currency that a viewer will earn on top of the Live amount when they talk in your chat.',
+    ),
   };
 
   liveIntervalMetaData: INumberMetadata = {
@@ -93,7 +86,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 100,
     placeholder: $t('Live Payout Amount'),
-    tooltip: $t('Amount of time between each payout.')
+    tooltip: $t('Amount of time between each payout.'),
   };
 
   onFollowMetaData: INumberMetadata = {
@@ -102,7 +95,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Follow Bonus'),
-    tooltip: $t('Amount of currency a viewer will receive when following.')
+    tooltip: $t('Amount of currency a viewer will receive when following.'),
   };
 
   onSubMetaData: INumberMetadata = {
@@ -111,7 +104,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Subscriber Bonus'),
-    tooltip: $t('Amount of currency a viewer will receive when subscribing.')
+    tooltip: $t('Amount of currency a viewer will receive when subscribing.'),
   };
 
   onHostMetaData: INumberMetadata = {
@@ -120,9 +113,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Host Bonus'),
-    tooltip: $t(
-      'Amount of currency a viewer will receive when hosting the channel.'
-    )
+    tooltip: $t('Amount of currency a viewer will receive when hosting the channel.'),
   };
 
   onRaidMetaData: INumberMetadata = {
@@ -131,9 +122,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     min: 0,
     max: 10000,
     placeholder: $t('Raid Bonus'),
-    tooltip: $t(
-      'Amount of currency a viewer will receive when raiding the channel.'
-    )
+    tooltip: $t('Amount of currency a viewer will receive when raiding the channel.'),
   };
 
   onStreamlabsMetaData: INumberMetadata = {
@@ -141,7 +130,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     type: EInputType.number,
     min: 0,
     max: 10000,
-    placeholder: $t('Donation Bonus')
+    placeholder: $t('Donation Bonus'),
   };
 
   onExtraLifeMetaData: INumberMetadata = {
@@ -149,7 +138,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     type: EInputType.number,
     min: 0,
     max: 10000,
-    placeholder: $t('Super Chat Bonus')
+    placeholder: $t('Super Chat Bonus'),
   };
 
   onSuperChatMetaData: INumberMetadata = {
@@ -157,7 +146,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     type: EInputType.number,
     min: 0,
     max: 10000,
-    placeholder: $t('Super Chat Bonus')
+    placeholder: $t('Super Chat Bonus'),
   };
 
   selectedTab: string = 'general';
@@ -166,18 +155,18 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     this.tabs = [
       {
         name: $t('General'),
-        value: 'general'
+        value: 'general',
       },
       {
         name: $t('Advanced'),
-        value: 'advanced'
-      }
+        value: 'advanced',
+      },
     ];
 
     if (this.isTwitch) {
       this.tabs.push({
         name: $t('Import'),
-        value: 'import'
+        value: 'import',
       });
     }
 
@@ -192,8 +181,7 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
 
   get minAmount() {
     return (
-      this.newLoyaltyPreferences.settings.general.payout.live *
-      60 /
+      (this.newLoyaltyPreferences.settings.general.payout.live * 60) /
       this.newLoyaltyPreferences.settings.general.interval.live
     ).toFixed(2);
   }
@@ -208,19 +196,16 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
 
   get maxAmount() {
     return (
-      (this.newLoyaltyPreferences.settings.general.payout.live +
+      ((this.newLoyaltyPreferences.settings.general.payout.live +
         this.newLoyaltyPreferences.settings.general.payout.active) *
-      60 /
+        60) /
       this.newLoyaltyPreferences.settings.general.interval.live
     ).toFixed(2);
   }
 
   @Watch('newLoyaltyPreferences.settings.general.interval.live')
   onQueryChangeHandler(value: number) {
-    this.livePayoutMetaData.tooltip =
-      'Currency that a viewer will earn when you are live every ' +
-      value +
-      ' minutes.';
+    this.livePayoutMetaData.tooltip = `Currency that a viewer will earn when you are live every ${value} minutes.`;
   }
 
   @Watch('errors.items.length')
@@ -232,9 +217,9 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService.Loyalty.updateLoyaltyPreferences(
-      this.newLoyaltyPreferences
-    ).catch(this.onErrorHandler);
+    this.chatbotApiService.Loyalty.updateLoyaltyPreferences(this.newLoyaltyPreferences).catch(
+      this.onErrorHandler,
+    );
     return;
   }
 

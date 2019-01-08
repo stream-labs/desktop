@@ -7,8 +7,8 @@ import { IChatbotModule } from 'services/chatbot';
 
 @Component({
   components: {
-    ChatbotModule
-  }
+    ChatbotModule,
+  },
 })
 export default class ChatbotModules extends ChatbotBase {
   mounted() {
@@ -20,13 +20,13 @@ export default class ChatbotModules extends ChatbotBase {
   get modules() {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     const comingSoonText = $t(
-      'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.'
+      'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.',
     );
-    let modules: IChatbotModule[] = [
+    const modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),
         description: $t(
-          'Get notified in chat whenever an activity happens like Donations and Subscribers.'
+          'Get notified in chat whenever an activity happens like Donations and Subscribers.',
         ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.chatAlertCurrentlyEnabled,
@@ -36,14 +36,14 @@ export default class ChatbotModules extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.Alerts.updateChatAlerts({
             ...this.chatAlerts,
-            enabled: !this.chatAlertCurrentlyEnabled
+            enabled: !this.chatAlertCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Song Request'),
         description: $t(
-          'Allow your viewers to to request songs from Youtube and play the songs on stream.'
+          'Allow your viewers to to request songs from Youtube and play the songs on stream.',
         ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.songRequestCurrentlyEnabled,
@@ -58,14 +58,14 @@ export default class ChatbotModules extends ChatbotBase {
 
           this.chatbotApiService.SongRequest.updateSongRequest({
             ...this.songRequest,
-            enabled: !this.songRequestCurrentlyEnabled
+            enabled: !this.songRequestCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Heist'),
         description: $t(
-          'Allow your viewers to work together and go on an adventure to earn extra loyalty points.'
+          'Allow your viewers to work together and go on an adventure to earn extra loyalty points.',
         ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: this.heistCurrentlyEnabled,
@@ -75,14 +75,14 @@ export default class ChatbotModules extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.Heist.updateHeistPreferences({
             ...this.heist,
-            enabled: !this.heistCurrentlyEnabled
+            enabled: !this.heistCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Gamble'),
         description: $t(
-          'Allow your viewers to gamble with their loyalty points by rolling a 100 sided die.'
+          'Allow your viewers to gamble with their loyalty points by rolling a 100 sided die.',
         ),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: this.gambleCurrentlyEnabled,
@@ -92,9 +92,9 @@ export default class ChatbotModules extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.Gamble.updateGamblePreferences({
             ...this.gamble,
-            enabled: !this.gambleCurrentlyEnabled
+            enabled: !this.gambleCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Mini Games'),
@@ -103,7 +103,7 @@ export default class ChatbotModules extends ChatbotBase {
         enabled: false,
         onExpand: () => {},
         onToggleEnabled: () => {},
-        comingSoon: true
+        comingSoon: true,
       },
       {
         title: $t('Counter'),
@@ -112,8 +112,8 @@ export default class ChatbotModules extends ChatbotBase {
         enabled: false,
         onExpand: () => {},
         onToggleEnabled: () => {},
-        comingSoon: true
-      }
+        comingSoon: true,
+      },
     ];
     return modules;
   }
@@ -147,7 +147,6 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get gambleCurrentlyEnabled() {
-    return this.chatbotApiService.Gamble.state.gamblePreferencesResponse
-      .enabled;
+    return this.chatbotApiService.Gamble.state.gamblePreferencesResponse.enabled;
   }
 }

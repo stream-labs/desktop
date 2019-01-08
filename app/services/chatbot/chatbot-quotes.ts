@@ -20,7 +20,9 @@ interface IChatbotQuotesApiServiceState {
   quotePreferencesResponse: IQuotePreferencesResponse;
 }
 
-export class ChatbotQuotesApiService extends PersistentStatefulService<IChatbotQuotesApiServiceState> {
+export class ChatbotQuotesApiService extends PersistentStatefulService<
+  IChatbotQuotesApiServiceState
+> {
   @Inject() chatbotCommonService: ChatbotCommonService;
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
 
@@ -28,13 +30,13 @@ export class ChatbotQuotesApiService extends PersistentStatefulService<IChatbotQ
     quotesResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     quotePreferencesResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
   };
 
@@ -42,19 +44,19 @@ export class ChatbotQuotesApiService extends PersistentStatefulService<IChatbotQ
   // GET requests
   //
   fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
-    return this.chatbotBaseApiService.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
-      (response: IQuotesResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', `quotes?page=${page}&query=${query}`, {})
+      .then((response: IQuotesResponse) => {
         this.UPDATE_QUOTES(response);
-      }
-    );
+      });
   }
 
   fetchQuotePreferences() {
-    return this.chatbotBaseApiService.api('GET', 'settings/quotes', {}).then(
-      (response: IQuotePreferencesResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/quotes', {})
+      .then((response: IQuotePreferencesResponse) => {
         this.UPDATE_QUOTE_PREFERENCES(response);
-      }
-    );
+      });
   }
 
   //
@@ -67,38 +69,38 @@ export class ChatbotQuotesApiService extends PersistentStatefulService<IChatbotQ
     });
   }
   updateQuote(id: number, data: IQuote) {
-    return this.chatbotBaseApiService.api('PUT', `quotes/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
+    return this.chatbotBaseApiService
+      .api('PUT', `quotes/${id}`, data)
+      .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchQuotes();
           this.chatbotCommonService.closeChildWindow();
         }
-      }
-    );
+      });
   }
 
   updateQuotePreferences(data: IQuotePreferencesResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/quotes', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/quotes', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchQuotePreferences();
           this.chatbotCommonService.closeChildWindow();
         }
-      }
-    );
+      });
   }
 
   //
   // DELETE methods
   //
   deleteQuote(id: number) {
-    return this.chatbotBaseApiService.api('DELETE', `quotes/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
+    return this.chatbotBaseApiService
+      .api('DELETE', `quotes/${id}`, {})
+      .then((response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchQuotes();
         }
-      }
-    );
+      });
   }
 
   //

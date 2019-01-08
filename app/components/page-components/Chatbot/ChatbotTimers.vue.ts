@@ -5,18 +5,17 @@ import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
-
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotGenericModalWindow
-  }
+    ChatbotGenericModalWindow,
+  },
 })
 export default class ChatbotTimers extends ChatbotBase {
   searchQuery = '';
   selectedTimer: IChatbotTimer = null;
 
-  get DELETE_COMMAND_MODAL(){
+  get DELETE_COMMAND_MODAL() {
     return DELETE_COMMAND_MODAL;
   }
 
@@ -51,16 +50,12 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService.Common.openTimerWindow(timer);
   }
 
-  onToggleEnableTimerHandler(
-    timerId: string,
-    index: number,
-    isEnabled: boolean
-  ) {
+  onToggleEnableTimerHandler(timerId: string, index: number, isEnabled: boolean) {
     const timerToBeUpdated = this.timers[index];
 
     this.chatbotApiService.Timers.updateTimer(timerId, {
       ...timerToBeUpdated,
-      enabled: isEnabled
+      enabled: isEnabled,
     });
   }
 
@@ -70,13 +65,13 @@ export default class ChatbotTimers extends ChatbotBase {
     this.$modal.show(DELETE_COMMAND_MODAL);
   }
 
-  onYesHandler(){
-    if(this.selectedTimer){
+  onYesHandler() {
+    if (this.selectedTimer) {
       this.chatbotApiService.Timers.deleteTimer(this.selectedTimer.id);
     }
   }
 
-  onNoHandler(){
+  onNoHandler() {
     this.selectedTimer = null;
   }
 }

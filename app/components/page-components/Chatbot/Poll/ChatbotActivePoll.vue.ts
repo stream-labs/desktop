@@ -6,7 +6,7 @@ import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue'
 import { ChatbotSettingSlug } from 'services/chatbot';
 
 @Component({
-  components: { ChatbotVoteTracker, ChatbotGenericModalWindow }
+  components: { ChatbotVoteTracker, ChatbotGenericModalWindow },
 })
 export default class ChatbotActivePoll extends ChatbotBase {
   @Prop({ default: 'poll' })
@@ -14,50 +14,33 @@ export default class ChatbotActivePoll extends ChatbotBase {
 
   get isOpen() {
     if (this.type === 'poll') {
-      return (
-        this.chatbotApiService.Poll.state.activePollResponse.status === 'Open'
-      );
-    } else {
-      return (
-        this.chatbotApiService.Betting.state.activeBettingResponse.status ===
-        'Open'
-      );
+      return this.chatbotApiService.Poll.state.activePollResponse.status === 'Open';
     }
+    return this.chatbotApiService.Betting.state.activeBettingResponse.status === 'Open';
   }
 
   get isCancelable() {
     if (this.type === 'poll') {
       return (
-        _.sumBy(
-          this.chatbotApiService.Poll.state.activePollResponse.settings.options,
-          'votes'
-        ) === 0
-      );
-    } else {
-      return (
-        this.chatbotApiService.Betting.state.activeBettingResponse.status !==
-        'Picked'
+        _.sumBy(this.chatbotApiService.Poll.state.activePollResponse.settings.options, 'votes') ===
+        0
       );
     }
+    return this.chatbotApiService.Betting.state.activeBettingResponse.status !== 'Picked';
   }
 
   get isPicked() {
     if (this.type === 'poll') {
       return false;
-    } else {
-      return (
-        this.chatbotApiService.Betting.state.activeBettingResponse.status ===
-        'Picked'
-      );
     }
+    return this.chatbotApiService.Betting.state.activeBettingResponse.status === 'Picked';
   }
 
   get total() {
     if (this.type === 'poll') {
       return _.sumBy(this.active.settings.options, 'votes');
-    } else {
-      return _.sumBy(this.active.settings.options, 'bets');
     }
+    return _.sumBy(this.active.settings.options, 'bets');
   }
 
   get loyalty() {
@@ -67,9 +50,8 @@ export default class ChatbotActivePoll extends ChatbotBase {
   get active() {
     if (this.type === 'poll') {
       return this.chatbotApiService.Poll.state.activePollResponse;
-    } else {
-      return this.chatbotApiService.Betting.state.activeBettingResponse;
     }
+    return this.chatbotApiService.Betting.state.activeBettingResponse;
   }
 
   get CANCEL_MODAL() {
@@ -79,9 +61,8 @@ export default class ChatbotActivePoll extends ChatbotBase {
   get timeRemaining() {
     if (this.type === 'poll') {
       return this.chatbotApiService.Poll.state.timeRemaining;
-    } else {
-      return this.chatbotApiService.Betting.state.timeRemaining;
     }
+    return this.chatbotApiService.Betting.state.timeRemaining;
   }
 
   mounted() {

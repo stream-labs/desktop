@@ -1,6 +1,5 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -11,7 +10,7 @@ import { EInputType } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -29,11 +28,11 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
           '26-50': 0,
           '51-75': 1.25,
           '76-98': 2,
-          '99-100': 3
-        }
-      }
+          '99-100': 3,
+        },
+      },
     },
-    enabled: false
+    enabled: false,
   };
 
   // metadata
@@ -44,50 +43,50 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
         type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Min Amount')
+        placeholder: $t('Min Amount'),
       },
       max: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Max Amount')
+        placeholder: $t('Max Amount'),
       },
       range1: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('1-25')
+        placeholder: $t('1-25'),
       },
       range2: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('26-50')
+        placeholder: $t('26-50'),
       },
       range3: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('51-75')
+        placeholder: $t('51-75'),
       },
       range4: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('76-98')
+        placeholder: $t('76-98'),
       },
       range5: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('99-100')
-      }
+        placeholder: $t('99-100'),
+      },
     };
   }
 
@@ -96,7 +95,7 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
   }
 
   mounted() {
-    this.newGamblePreferences = cloneDeep(this.gamblePreferences);
+    this.newGamblePreferences = _.cloneDeep(this.gamblePreferences);
   }
 
   @Watch('errors.items.length')
@@ -108,8 +107,6 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService.Gamble.updateGamblePreferences(
-      this.newGamblePreferences
-    );
+    this.chatbotApiService.Gamble.updateGamblePreferences(this.newGamblePreferences);
   }
 }

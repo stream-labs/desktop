@@ -1,11 +1,11 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop, Inject } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
   IChatAlertsResponse,
   IAlertMessage,
   ChatbotAlertType,
-  NEW_ALERT_MODAL_ID
+  NEW_ALERT_MODAL_ID,
 } from 'services/chatbot';
 
 @Component({})
@@ -29,27 +29,27 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       case 'twitch': {
         alertTypes = {
           ...streamlabs,
-          ...twitch
+          ...twitch,
         };
         break;
       }
       case 'mixer': {
         alertTypes = {
           ...streamlabs,
-          ...mixer
+          ...mixer,
         };
         break;
       }
       case 'youtube': {
         alertTypes = {
           ...streamlabs,
-          ...youtube
+          ...youtube,
         };
         break;
       }
       default: {
         alertTypes = {
-          ...streamlabs
+          ...streamlabs,
         };
         break;
       }
@@ -70,18 +70,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     type: ChatbotAlertType,
     index: number,
     updatedAlert: IAlertMessage,
-    tier?: string
+    tier?: string,
   ) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
     newAlertsObject.settings[platform][type].messages.splice(index, 1);
     if (updatedAlert) {
-      newAlertsObject.settings[platform][type].messages.splice(
-        index,
-        0,
-        updatedAlert
-      );
+      newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
     }
 
     this.updateChatAlerts(newAlertsObject);
@@ -93,8 +89,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
-    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
-      .settings[platform][type].enabled;
+    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts.settings[platform][type]
+      .enabled;
 
     this.updateChatAlerts(newAlertsObject);
   }

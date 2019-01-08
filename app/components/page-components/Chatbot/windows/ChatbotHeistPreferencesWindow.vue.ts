@@ -1,20 +1,17 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IHeistPreferencesResponse
-} from 'services/chatbot';
+import { IHeistPreferencesResponse } from 'services/chatbot';
 
 import { EInputType } from 'components/shared/inputs/index';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -24,12 +21,12 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Messages'),
-      value: 'messages'
-    }
+      value: 'messages',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -43,34 +40,34 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
         payout: {
           moderators: 0,
           subscribers: 0,
-          viewers: 0
+          viewers: 0,
         },
         probability: {
           moderators: 0,
           subscribers: 0,
-          viewers: 0
+          viewers: 0,
         },
-        start_delay: 120
+        start_delay: 120,
       },
       messages: {
         group: {
           loss: '',
           partial: '',
-          win: ''
+          win: '',
         },
         results: '',
         solo: {
           loss: '',
-          win: ''
+          win: '',
         },
         start: {
           fail: '',
           first: '',
-          success: ''
-        }
-      }
+          success: '',
+        },
+      },
     },
-    enabled: false
+    enabled: false,
   };
 
   // metadata
@@ -81,136 +78,136 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
         type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Min Entries')
+        placeholder: $t('Min Entries'),
       },
       maxAmount: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Max Amount')
+        placeholder: $t('Max Amount'),
       },
       startDelay: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 3600,
-        placeholder: $t('Start Delay')
+        placeholder: $t('Start Delay'),
       },
       viewersChance: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Viewer Chance')
+        placeholder: $t('Viewer Chance'),
       },
       subscribersChance: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Subscriber Chance')
+        placeholder: $t('Subscriber Chance'),
       },
       moderatorsChance: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Moderator Chance')
+        placeholder: $t('Moderator Chance'),
       },
       viewersPayout: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Viewer Payout')
+        placeholder: $t('Viewer Payout'),
       },
       subscribersPayout: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Subscriber Payout')
+        placeholder: $t('Subscriber Payout'),
       },
       moderatorsPayout: {
         required: true,
         type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Moderator Payout')
+        placeholder: $t('Moderator Payout'),
       },
-      firstEntry :{
+      firstEntry: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On First Entry'),
-        uuid: $t('On First Entry')
+        uuid: $t('On First Entry'),
       },
-      successfulStart :{
+      successfulStart: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Successful Start'),
-        uuid: $t('On Successful Start')
+        uuid: $t('On Successful Start'),
       },
-      failedStart :{
+      failedStart: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Failed Start'),
-        uuid: $t('On Failed Start')
+        uuid: $t('On Failed Start'),
       },
-      results :{
+      results: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('Results'),
-        uuid: $t('Results')
+        uuid: $t('Results'),
       },
-      soloWin :{
+      soloWin: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Win'),
-        uuid: $t('On Win')
+        uuid: $t('On Win'),
       },
-      soloLoss :{
+      soloLoss: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Loss'),
-        uuid: $t('On Loss')
+        uuid: $t('On Loss'),
       },
-      groupWin :{
+      groupWin: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Victory'),
-        uuid: $t('On Victory')
+        uuid: $t('On Victory'),
       },
-      groupPartial :{
+      groupPartial: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Partial Victory'),
-        uuid: $t('On Partial Victory')
+        uuid: $t('On Partial Victory'),
       },
-      groupLoss :{
+      groupLoss: {
         required: true,
         type: EInputType.textArea,
         min: 0,
         max: 450,
         placeholder: $t('On Defeat'),
-        uuid: $t('On Defeat')
-      }
+        uuid: $t('On Defeat'),
+      },
     };
   }
 
@@ -223,27 +220,30 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
   }
 
   mounted() {
-    this.newHeistPreferences = cloneDeep(this.heistPreferences);
+    this.newHeistPreferences = _.cloneDeep(this.heistPreferences);
   }
 
   @Watch('newHeistPreferences', { immediate: true, deep: true })
   @debounce(1)
   onCommandChanged(value: IHeistPreferencesResponse) {
     if (value) {
-      let messages = _.cloneDeep(this.newHeistPreferences.settings.messages);
+      const messages = _.cloneDeep(this.newHeistPreferences.settings.messages);
 
-      for (const group in  messages) {
+      for (const group in messages) {
         if (messages.hasOwnProperty(group)) {
-          if(value[group] != messages[group]){
-            if(typeof messages[group] === 'string' || messages[group] instanceof String){
-              messages[group] = value.settings.messages[group].replace(/(\r\n|\r|\n)/g, ''); 
-            } else{
+          if (value[group] !== messages[group]) {
+            if (typeof messages[group] === 'string' || messages[group] instanceof String) {
+              messages[group] = value.settings.messages[group].replace(/(\r\n|\r|\n)/g, '');
+            } else {
               for (const key in messages[group]) {
                 if (messages[group].hasOwnProperty(key)) {
-                  messages[group][key] = value.settings.messages[group][key].replace(/(\r\n|\r|\n)/g, ''); 
+                  messages[group][key] = value.settings.messages[group][key].replace(
+                    /(\r\n|\r|\n)/g,
+                    '',
+                  );
                 }
-              }   
-            }          
+              }
+            }
           }
         }
       }
@@ -254,13 +254,12 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
-
   async onResetHandler() {
-    await this.chatbotApiService.Heist.resetSettings().then(response =>{
+    await this.chatbotApiService.Heist.resetSettings().then(response => {
       this.newHeistPreferences = response;
     });
 

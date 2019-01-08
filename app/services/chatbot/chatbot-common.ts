@@ -12,12 +12,10 @@ import {
   IQuote,
   IChatbotLoyalty,
   IPollProfile,
-  IBettingProfile
+  IBettingProfile,
 } from './chatbot-interfaces';
 
-export class ChatbotCommonService extends PersistentStatefulService<
-  IChatbotCommonServiceState
-> {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {
@@ -29,7 +27,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     modBannerVisible: true,
     loyaltyToUpdate: null,
     pollProfileToUpdate: null,
-    bettingProfileToUpdate: null
+    bettingProfileToUpdate: null,
   };
 
   hideModBanner() {
@@ -62,8 +60,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Custom Command Window'),
       size: {
         width: 650,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 
@@ -76,8 +74,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Default Commmand Window'),
       size: {
         width: 650,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -90,8 +88,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Timer Window'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -101,8 +99,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Alerts Preferences'),
       size: {
         width: 1000,
-        height: 700
-      }
+        height: 700,
+      },
     });
   }
 
@@ -112,8 +110,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Caps Protection Preferences'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -123,8 +121,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Symbol Protection Preferences'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -134,8 +132,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Link Protection Preferences'),
       size: {
         width: 650,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -145,8 +143,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Word Protection Preferences'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -159,8 +157,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Quote Window'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -173,8 +171,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Loyalty Window'),
       size: {
         width: 475,
-        height: 229
-      }
+        height: 229,
+      },
     });
   }
 
@@ -184,8 +182,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Add Loyalty'),
       size: {
         width: 475,
-        height: 192
-      }
+        height: 192,
+      },
     });
   }
 
@@ -195,8 +193,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Loyalty Preferences'),
       size: {
         width: 650,
-        height: 580
-      }
+        height: 580,
+      },
     });
   }
 
@@ -206,8 +204,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Queue Preferences'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -217,8 +215,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Command Preferences'),
       size: {
         width: 650,
-        height: 410
-      }
+        height: 410,
+      },
     });
   }
 
@@ -232,8 +230,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Profile'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -247,8 +245,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Profile'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -258,8 +256,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Poll Preferences'),
       size: {
         width: 650,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 
@@ -269,8 +267,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Betting Preferences'),
       size: {
         width: 650,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 
@@ -280,8 +278,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Quote Preferences'),
       size: {
         width: 650,
-        height: 300
-      }
+        height: 300,
+      },
     });
   }
 
@@ -291,8 +289,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Song Request Preferences'),
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -302,8 +300,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Heist Preferences'),
       size: {
         width: 650,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 
@@ -313,8 +311,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Chatbot Gamble Preferences'),
       size: {
         width: 650,
-        height: 575
-      }
+        height: 575,
+      },
     });
   }
 
@@ -324,8 +322,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: $t('Enabling Song Request'),
       size: {
         width: 750,
-        height: 550
-      }
+        height: 550,
+      },
     });
   }
 
@@ -370,7 +368,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   }
 
   @mutation()
-  private SET_BETTING_PROFILE_TO_UPDATE(profile: IBettingProfile){
+  private SET_BETTING_PROFILE_TO_UPDATE(profile: IBettingProfile) {
     Vue.set(this.state, 'bettingProfileToUpdate', profile);
   }
 }

@@ -1,5 +1,3 @@
-import Vue from 'vue';
-import { cloneDeep } from 'lodash';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
@@ -7,7 +5,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { INumberMetadata, EInputType } from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 
 import { IPollOption } from 'services/chatbot';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
@@ -21,8 +19,8 @@ import { debounce } from 'lodash-decorators';
     TextAreaInput,
     ListInput,
     NumberInput,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
   $refs: {
@@ -32,8 +30,8 @@ export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
   @Prop({
     default: {
       name: null,
-      parameter: null
-    }
+      parameter: null,
+    },
   })
   option: IPollOption;
 
@@ -46,15 +44,15 @@ export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
         type: EInputType.text,
         max: 75,
         placeholder: $t('Option'),
-        uuid: $t('Option')
+        uuid: $t('Option'),
       },
       parameter: {
         required: true,
         type: EInputType.text,
         max: 20,
         placeholder: $t('Command'),
-        uuid: $t('Option')
-      }
+        uuid: $t('Option'),
+      },
     };
   }
 
@@ -67,10 +65,9 @@ export default class ChatbotPollOptionModal extends ChatbotWindowsBase {
   }
 
   get baseCommand() {
-    return (
-      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings
-        .commands['vote'].command + ' '
-    );
+    return `${
+      this.chatbotApiService.Poll.state.pollPreferencesResponse.settings.commands['vote'].command
+    } `;
   }
 
   @Watch('errors.items.length')

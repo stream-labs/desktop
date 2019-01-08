@@ -6,8 +6,8 @@ import ChatbotQueueList from 'components/page-components/Chatbot/Queue/ChatbotQu
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotQueueList
-  }
+    ChatbotQueueList,
+  },
 })
 export default class ChatbotQueue extends ChatbotBase {
   queueTitle = 'The Current Game';
@@ -37,9 +37,7 @@ export default class ChatbotQueue extends ChatbotBase {
   }
 
   get noUsersInList() {
-    return (
-      this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0
-    );
+    return this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0;
   }
 
   onOpenQueuePreferencesHandler() {
@@ -63,8 +61,6 @@ export default class ChatbotQueue extends ChatbotBase {
   }
 
   get queueIsOpen() {
-    return (
-      this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open'
-    );
+    return this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open';
   }
 }

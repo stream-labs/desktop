@@ -1,21 +1,17 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IHeistPreferencesResponse,
-  IPollPreferencesResonse
-} from 'services/chatbot';
+import { IHeistPreferencesResponse, IPollPreferencesResonse } from 'services/chatbot';
 
 import { EInputType } from 'components/shared/inputs/index';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
@@ -29,8 +25,8 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         repeat_active: {
           chat_lines: 25,
           enabled: false,
-          message: null
-        }
+          message: null,
+        },
       },
       messages: {
         cancel: null,
@@ -38,23 +34,23 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         open: null,
         results: {
           tie: null,
-          win: null
-        }
+          win: null,
+        },
       },
-      profiles: null
+      profiles: null,
     },
-    enabled: false
+    enabled: false,
   };
 
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Messages'),
-      value: 'messages'
-    }
+      value: 'messages',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -76,7 +72,7 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         min: 1,
         max: 450,
         placeholder: $t('Tie Message'),
-        uuid: $t('Tie Message')
+        uuid: $t('Tie Message'),
       },
       win: {
         required: true,
@@ -84,7 +80,7 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         min: 1,
         max: 450,
         placeholder: $t('Win Message'),
-        uuid: $t('Win Message')
+        uuid: $t('Win Message'),
       },
       open: {
         required: true,
@@ -92,7 +88,7 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         min: 1,
         max: 450,
         placeholder: $t('Open Message'),
-        uuid: $t('Open Message')
+        uuid: $t('Open Message'),
       },
       close: {
         required: true,
@@ -100,7 +96,7 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         min: 1,
         max: 450,
         placeholder: $t('Close Message'),
-        uuid: $t('Close Message')
+        uuid: $t('Close Message'),
       },
       cancel: {
         required: true,
@@ -108,15 +104,15 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
         min: 1,
         max: 450,
         placeholder: $t('Cancel Message'),
-        uuid: $t('Cancel Message')
+        uuid: $t('Cancel Message'),
       },
       chatLines: {
         required: true,
         type: EInputType.slider,
         min: 5,
         max: 100,
-        tooltip: $t('Amount of chat lines before the bot repeats the message.')
-      }
+        tooltip: $t('Amount of chat lines before the bot repeats the message.'),
+      },
     };
   }
 
@@ -126,7 +122,7 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
 
   mounted() {
     console.log(this.pollPreferences);
-    this.newPollPreferences = cloneDeep(this.pollPreferences);
+    this.newPollPreferences = _.cloneDeep(this.pollPreferences);
   }
 
   onSelectTabHandler(tab: string) {
@@ -138,14 +134,26 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
   onCommandChanged(value: IPollPreferencesResonse) {
     if (value) {
       const messages = value.settings.messages;
-      this.newPollPreferences.settings.messages.open = messages.open.replace(/(\r\n|\r|\n)/g,'');
-      this.newPollPreferences.settings.messages.close = messages.close.replace(/(\r\n|\r|\n)/g,'');
-      this.newPollPreferences.settings.messages.cancel = messages.cancel.replace(/(\r\n|\r|\n)/g,'');
-      this.newPollPreferences.settings.messages.results.win = messages.results.win.replace(/(\r\n|\r|\n)/g,'');
-      this.newPollPreferences.settings.messages.results.tie = messages.results.tie.replace(/(\r\n|\r|\n)/g,'');
+      this.newPollPreferences.settings.messages.open = messages.open.replace(/(\r\n|\r|\n)/g, '');
+      this.newPollPreferences.settings.messages.close = messages.close.replace(/(\r\n|\r|\n)/g, '');
+      this.newPollPreferences.settings.messages.cancel = messages.cancel.replace(
+        /(\r\n|\r|\n)/g,
+        '',
+      );
+      this.newPollPreferences.settings.messages.results.win = messages.results.win.replace(
+        /(\r\n|\r|\n)/g,
+        '',
+      );
+      this.newPollPreferences.settings.messages.results.tie = messages.results.tie.replace(
+        /(\r\n|\r|\n)/g,
+        '',
+      );
 
       const repeat = value.settings.general.repeat_active;
-      this.newPollPreferences.settings.general.repeat_active.message = repeat.message.replace(/(\r\n|\r|\n)/g,'');
+      this.newPollPreferences.settings.general.repeat_active.message = repeat.message.replace(
+        /(\r\n|\r|\n)/g,
+        '',
+      );
     }
   }
 

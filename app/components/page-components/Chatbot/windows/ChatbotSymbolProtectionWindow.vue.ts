@@ -6,7 +6,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   $refs: {
@@ -16,12 +16,12 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -36,22 +36,18 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
-
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService
-      .ModTools
-      .updateSymbolProtection({
-        enabled: this.symbolProtectionResponse.enabled,
-        settings: this.symbolProtection
-      })
-      .then(() => {
-        this.chatbotApiService.Common.closeChildWindow();
-      });
+    this.chatbotApiService.ModTools.updateSymbolProtection({
+      enabled: this.symbolProtectionResponse.enabled,
+      settings: this.symbolProtection,
+    }).then(() => {
+      this.chatbotApiService.Common.closeChildWindow();
+    });
   }
 }

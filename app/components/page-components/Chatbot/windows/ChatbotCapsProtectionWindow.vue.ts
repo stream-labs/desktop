@@ -6,7 +6,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
   $refs: {
@@ -18,12 +18,12 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
-      value: 'general'
+      value: 'general',
     },
     {
       name: $t('Advanced'),
-      value: 'advanced'
-    }
+      value: 'advanced',
+    },
   ];
 
   selectedTab: string = 'general';
@@ -47,7 +47,7 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
     this.chatbotApiService.ModTools.updateCapsProtection({
       enabled: this.capsProtectionResponse.enabled,
-      settings: this.capsProtection
+      settings: this.capsProtection,
     }).then(() => {
       this.chatbotApiService.Common.closeChildWindow();
     });

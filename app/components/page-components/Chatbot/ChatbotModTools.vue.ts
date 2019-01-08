@@ -3,17 +3,14 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotModule.vue';
 import { $t } from 'services/i18n';
 
-import {
-  IChatbotModule,
-} from 'services/chatbot';
+import { IChatbotModule } from 'services/chatbot';
 
 @Component({
   components: {
-    ChatbotModule
-  }
+    ChatbotModule,
+  },
 })
 export default class ChatbotModTools extends ChatbotBase {
-
   mounted() {
     this.chatbotApiService.ModTools.fetchCapsProtection();
     this.chatbotApiService.ModTools.fetchSymbolProtection();
@@ -23,14 +20,11 @@ export default class ChatbotModTools extends ChatbotBase {
 
   get modules() {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
-    let modules: IChatbotModule[] = [
+    const modules: IChatbotModule[] = [
       {
         title: $t('Caps Protection'),
-        description: $t(
-          'Restrict viewers from spamming all caps messages to chat.'
-        ),
-        backgroundUrl:
-          require(`../../../../media/images/chatbot/chatbot-caps--${backgroundUrlSuffix}.png`),
+        description: $t('Restrict viewers from spamming all caps messages to chat.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-caps--${backgroundUrlSuffix}.png`),
         enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openCapsProtectionWindow();
@@ -38,17 +32,14 @@ export default class ChatbotModTools extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.ModTools.updateCapsProtection({
             ...this.capsProtection,
-            enabled: !this.capsProtectionCurrentlyEnabled
+            enabled: !this.capsProtectionCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Symbol Protection'),
-        description: $t(
-          'Restrict viewers from spamming messages with too many symbols.'
-        ),
-        backgroundUrl:
-          require(`../../../../media/images/chatbot/chatbot-symbol--${backgroundUrlSuffix}.png`),
+        description: $t('Restrict viewers from spamming messages with too many symbols.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-symbol--${backgroundUrlSuffix}.png`),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openSymbolProtectionWindow();
@@ -56,17 +47,16 @@ export default class ChatbotModTools extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.ModTools.updateSymbolProtection({
             ...this.symbolProtection,
-            enabled: !this.symbolProtectionCurrentlyEnabled
+            enabled: !this.symbolProtectionCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Link Protection'),
         description: $t(
-          'Allows a viewer to only send links to chat from websites on the whitelist.'
+          'Allows a viewer to only send links to chat from websites on the whitelist.',
         ),
-        backgroundUrl:
-          require(`../../../../media/images/chatbot/chatbot-link--${backgroundUrlSuffix}.png`),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-link--${backgroundUrlSuffix}.png`),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openLinkProtectionWindow();
@@ -74,17 +64,14 @@ export default class ChatbotModTools extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.ModTools.updateLinkProtection({
             ...this.linkProtection,
-            enabled: !this.linkProtectionCurrentlyEnabled
+            enabled: !this.linkProtectionCurrentlyEnabled,
           });
-        }
+        },
       },
       {
         title: $t('Word Protection'),
-        description: $t(
-          'Restrict words from appearing on chat and add words to your blacklist.'
-        ),
-        backgroundUrl:
-          require(`../../../../media/images/chatbot/chatbot-word--${backgroundUrlSuffix}.png`),
+        description: $t('Restrict words from appearing on chat and add words to your blacklist.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-word--${backgroundUrlSuffix}.png`),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openWordProtectionWindow();
@@ -92,10 +79,10 @@ export default class ChatbotModTools extends ChatbotBase {
         onToggleEnabled: () => {
           this.chatbotApiService.ModTools.updateWordProtection({
             ...this.wordProtection,
-            enabled: !this.wordProtectionCurrentlyEnabled
+            enabled: !this.wordProtectionCurrentlyEnabled,
           });
-        }
-      }
+        },
+      },
     ];
     return modules;
   }
@@ -117,18 +104,18 @@ export default class ChatbotModTools extends ChatbotBase {
   }
 
   get capsProtectionCurrentlyEnabled() {
-    return this.capsProtection.enabled == true;
+    return this.capsProtection.enabled === true;
   }
 
   get symbolProtectionCurrentlyEnabled() {
-    return this.symbolProtection.enabled == true;
+    return this.symbolProtection.enabled === true;
   }
 
   get linkProtectionCurrentlyEnabled() {
-    return this.linkProtection.enabled == true;
+    return this.linkProtection.enabled === true;
   }
 
   get wordProtectionCurrentlyEnabled() {
-    return this.wordProtection.enabled == true;
+    return this.wordProtection.enabled === true;
   }
 }

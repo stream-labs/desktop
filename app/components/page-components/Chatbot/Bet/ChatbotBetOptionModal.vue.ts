@@ -19,8 +19,8 @@ import { debounce } from 'lodash-decorators';
     TextAreaInput,
     ListInput,
     NumberInput,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   $refs: {
@@ -30,8 +30,8 @@ export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   @Prop({
     default: {
       name: null,
-      parameter: null
-    }
+      parameter: null,
+    },
   })
   option: IBettingOption;
 
@@ -44,15 +44,15 @@ export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
         type: EInputType.text,
         max: 75,
         placeholder: $t('Option'),
-        uuid: $t('Option')
+        uuid: $t('Option'),
       },
       parameter: {
         required: true,
         type: EInputType.text,
         max: 20,
         placeholder: $t('Command'),
-        uuid: $t('Option')
-      }
+        uuid: $t('Option'),
+      },
     };
   }
 
@@ -65,19 +65,17 @@ export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   }
 
   get baseCommand() {
-    return (
-      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings
-        .commands['bet'].command + ' '
-    );
+    return `${
+      this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings.commands['bet']
+    } `;
   }
 
   @Watch('errors.items.length')
   @debounce(200)
   async onErrorsChanged() {
-    if(this.$refs.modalForm){
+    if (this.$refs.modalForm) {
       await this.$refs.modalForm.validateAndGetErrorsCount();
     }
-
   }
 
   @Watch('option', { immediate: true, deep: true })

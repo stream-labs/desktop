@@ -9,8 +9,8 @@ import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 @Component({
   components: {
     ChatbotPagination,
-    ChatbotGenericModalWindow
-  }
+    ChatbotGenericModalWindow,
+  },
 })
 export default class ChatbotQuotes extends ChatbotBase {
   searchQuery: string = '';
@@ -21,15 +21,14 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   get currentPage(): number {
-    return this.chatbotApiService.Quotes.state.quotesResponse.pagination
-      .current;
+    return this.chatbotApiService.Quotes.state.quotesResponse.pagination.current;
   }
 
   get totalPages(): number {
     return this.chatbotApiService.Quotes.state.quotesResponse.pagination.total;
   }
 
-  get DELETE_MODAL(){
+  get DELETE_MODAL() {
     return `${DELETE_MODAL}-quote`;
   }
 
@@ -54,9 +53,7 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   formatDate(dateString: string) {
-    return moment(dateString).format(
-      this.quotePreferences.settings.general.date_format
-    );
+    return moment(dateString).format(this.quotePreferences.settings.general.date_format);
   }
 
   onOpenQuoteWindowHandler(quote?: IQuote) {
@@ -75,7 +72,7 @@ export default class ChatbotQuotes extends ChatbotBase {
 
   onYesHandler() {
     if (this.selectedQuote) {
-      this.chatbotApiService.Quotes.deleteQuote(this.selectedQuote.id);;
+      this.chatbotApiService.Quotes.deleteQuote(this.selectedQuote.id);
     }
   }
 

@@ -5,17 +5,13 @@ import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IQuote,
-  IChatbotErrorResponse
-} from 'services/chatbot';
+import { IQuote, IChatbotErrorResponse } from 'services/chatbot';
 import { debounce } from 'lodash-decorators';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -33,17 +29,17 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
         required: true,
         placeholder: 'Quote',
         min: 1,
-        max: 450
+        max: 450,
       }),
       game: metadataHelper.text({
         required: true,
-        placeholder: 'Game'
+        placeholder: 'Game',
       }),
       added_by: metadataHelper.text({
         required: true,
-        placeholder: 'Added by'
-      })
-    }
+        placeholder: 'Added by',
+      }),
+    };
   }
 
   mounted() {
@@ -71,23 +67,19 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
 
   @Watch('errors.items.length')
   @debounce(200)
-  async onErrorsChanged(){
-    await this.$refs.form.validateAndGetErrorsCount()
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isEdit) {
-      this.chatbotApiService
-        .Quotes
-        .updateQuote(this.quoteToUpdate.id, this.newQuote)
-        .catch(this.onErrorHandler);
+      this.chatbotApiService.Quotes.updateQuote(this.quoteToUpdate.id, this.newQuote).catch(
+        this.onErrorHandler,
+      );
       return;
     }
-    this.chatbotApiService
-      .Quotes
-      .createQuote(this.newQuote)
-      .catch(this.onErrorHandler);
+    this.chatbotApiService.Quotes.createQuote(this.newQuote).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
