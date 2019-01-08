@@ -6,12 +6,19 @@
         @click="onOpenCommandWindowHandler"
         class="button button--action margin--10 button--add-command"
       >{{ $t('Add Command') }}</button>
-      <input
-        v-model="searchQuery"
-        type="text"
-        class="chatbot__input--search width--auto margin--10"
-        placeholder="Search"
-      >
+
+      <div class="flex flex--center">
+        <div @click="onOpenCommandPreferencesHandler()" class="command-settings__button">
+          <i class="icon-settings"></i>
+          <span>{{ $t('Command Settings') }}</span>
+        </div>
+        <input
+          v-model="searchQuery"
+          type="text"
+          class="chatbot__input--search width--auto margin--10"
+          placeholder="Search"
+        >
+      </div>
     </div>
 
     <!-- custom commands -->
@@ -97,6 +104,11 @@
 
 .icon-question {
   .icon-hover();
+}
+
+.command-settings__button {
+  .padding-left();
+  .cursor--pointer;
 }
 
 table {

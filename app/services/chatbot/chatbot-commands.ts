@@ -14,10 +14,12 @@ import {
   IChatbotAPIPutResponse,
   IChatbotAPIDeleteResponse,
   ICommandVariablesResponse,
+  ICommandPreferencesResponse,
 } from './chatbot-interfaces';
 
 // state
 interface IChatbotCommandsApiServiceState {
+  commandPreferencesResponse: ICommandPreferencesResponse;
   defaultCommandsResponse: IDafaultCommandsResponse;
   customCommandsResponse: ICustomCommandsResponse;
   commandVariablesResponse: ICommandVariablesResponse;
@@ -28,6 +30,10 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   static defaultState: IChatbotCommandsApiServiceState = {
+    commandPreferencesResponse: {
+      enabled: true,
+      settings: null
+    },
     defaultCommandsResponse: {
       commands: {},
       'link-protection': {},
@@ -63,6 +69,15 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
     return this.chatbotBaseApiService.api('GET', `commands?page=${page}&query=${query}`, {}).then(
       (response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
+      }
+    );
+  }
+
+  fetchCommandPreferences(){
+    return this.chatbotBaseApiService.api('GET', 'settings/commands', {}).then(
+      (response: ICommandPreferencesResponse) => {
+        console.log(response);
+        this.UPDATE_COMMAND_PREFERENCES(response);
       }
     );
   }
@@ -124,6 +139,17 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
     });
   }
 
+  updateCommandPreferences(data: ICommandPreferencesResponse) {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/commands', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchCommandPreferences();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      });
+  }
+
   updateCustomCommand(id: string, data: ICustomCommand) {
     return this.chatbotBaseApiService.api('PUT', `commands/${id}`, data).then(
       (response: IChatbotAPIPutResponse) => {
@@ -164,5 +190,10 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbo
   @mutation()
   private UPDATE_COMMAND_VARIABLES(response: ICommandVariablesResponse) {
     Vue.set(this.state, 'commandVariablesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_COMMAND_PREFERENCES(response: ICommandPreferencesResponse) {
+    Vue.set(this.state, 'commandPreferencesResponse', response);
   }
 }

@@ -211,6 +211,17 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
+  openCommandPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotCommandPreferencesWindow',
+      title: $t('Chatbot Command Preferences'),
+      size: {
+        width: 650,
+        height: 410
+      }
+    });
+  }
+
   openPollProfileWindow(profile?: IPollProfile) {
     if (profile) {
       this.SET_POLL_PROFILE_TO_UPDATE(profile);

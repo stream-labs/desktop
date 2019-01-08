@@ -37,6 +37,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
 
   mounted() {
     this.fetchCommands(1);
+    this.chatbotApiService.Commands.fetchCommandPreferences();
   }
 
   @Watch('searchQuery')
@@ -80,5 +81,9 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       ...commandToBeUpdated,
       enabled: isEnabled
     });
+  }
+
+  onOpenCommandPreferencesHandler() {
+    this.chatbotApiService.Common.openCommandPreferencesWindow();
   }
 }

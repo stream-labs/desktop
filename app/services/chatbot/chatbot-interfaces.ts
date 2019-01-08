@@ -46,6 +46,24 @@ export interface IDafaultCommandsResponse {
   [id: string]: IDafaultCommandsSlug;
 }
 
+export interface ICommandPreferencesResponse {
+  settings: ICommandPreferencesData;
+  enabled: boolean;
+}
+
+export interface ICommandPreferencesData {
+  messages: ICommandMessagesData;
+}
+
+export interface ICommandMessagesData {
+  displayCooldown: boolean;
+  cooldownMessage: string;
+  displayCost: boolean;
+  costMessage: string;
+  displayPermission: boolean;
+  permissionmessage: string;
+}
+
 export interface ICustomCommandsResponse {
   pagination: IChatbotPagination;
   data: ICustomCommandsData;
