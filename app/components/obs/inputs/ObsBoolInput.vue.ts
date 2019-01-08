@@ -1,8 +1,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { ObsInput, IObsInput, TObsType } from './ObsInput';
-import VFormGroup from '../../shared/inputs/VFormGroup.vue';
-import { metadata } from '../../shared/inputs';
-import { BoolInput } from '../../shared/inputs/inputs';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
+import { BoolInput } from 'components/shared/inputs/inputs';
 
 @Component({
   components: { VFormGroup, BoolInput },
@@ -15,8 +15,6 @@ class ObsBoolInput extends ObsInput<IObsInput<boolean>> {
 
   get metadata() {
     return metadata.bool({
-      // Here we need to hide the description only if showDescription is explicitly false
-      // tslint:disable-next-line:no-boolean-literal-compare
       title: this.value.showDescription !== false ? this.value.description : null,
       disabled: !this.value.enabled,
     });
