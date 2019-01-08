@@ -15,6 +15,8 @@ class ObsBoolInput extends ObsInput<IObsInput<boolean>> {
 
   get metadata() {
     return metadata.bool({
+      // Here we need to hide the description only if showDescription is explicitly false
+      // tslint:disable-next-line:no-boolean-literal-compare
       title: this.value.showDescription !== false ? this.value.description : null,
       disabled: !this.value.enabled,
     });
