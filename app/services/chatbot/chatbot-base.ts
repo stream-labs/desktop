@@ -131,7 +131,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBas
       // check for clients
 
       const clientFound = response.clients.services.some(value => {
-        return value.toLowerCase() == this.userService.platform.type;
+        return value.toLowerCase() === this.userService.platform.type;
       });
 
       // all status online.
@@ -155,7 +155,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBas
     const platforms = ChatbotClients.map(client => client.toLowerCase());
 
     const containsPlatform = platforms.some(value => {
-      return value.toLowerCase() == this.userService.platform.type;
+      return value.toLowerCase() === this.userService.platform.type;
     });
 
     if (containsPlatform) {

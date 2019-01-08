@@ -69,9 +69,8 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     if (this.socket) {
       if (this.socket.connected) {
         return;
-      } else {
-        this.socket.removeAllListeners();
       }
+      this.socket.removeAllListeners();
     }
 
     this.UPDATE_TIMER();
