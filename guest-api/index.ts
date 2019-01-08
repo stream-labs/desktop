@@ -6,6 +6,10 @@
 import electron from 'electron';
 import { IGuestApiRequest, IGuestApiResponse, IGuestApiCallback } from '../app/services/guest-api';
 import uuid from 'uuid/v4';
+import fs from 'fs';
+import util from 'util';
+import mime from 'mime';
+import path from 'path';
 
 (() => {
   global.eval = function() {
@@ -126,4 +130,13 @@ import uuid from 'uuid/v4';
   }
 
   global['streamlabsOBS'] = getProxy();
+
+  global['tmpLoadFile'] = (filename: string) => {
+    const readFile = util.promisify(fs.readFile);
+
+    return readFile(filename).then(data => {
+      const parsed = path.parse(filename);
+      return new File([data], parsed.base, { type: mime.getType(parsed.ext) });
+    });
+  };
 })();
