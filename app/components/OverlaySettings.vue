@@ -31,7 +31,11 @@
   </div>
   <div class="section">
     <div class="section-content">
-      <ObsBoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
+      <bool-input
+        v-model="mediaBackupOptOut"
+        :metadata="{ title: $t('Do not back up my media files in the cloud (requires app restart)')}"
+        name="media_backup_opt_out"
+      />
     </div>
   </div>
 </div>
