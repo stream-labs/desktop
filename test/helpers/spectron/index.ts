@@ -3,8 +3,6 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { sleep } from '../sleep';
-import { async } from 'rxjs/internal/scheduler/async';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
