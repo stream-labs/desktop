@@ -346,7 +346,8 @@ export class SettingsService extends StatefulService<ISettingsState>
             { channel },
           );
         } else {
-          source.updateSettings({ device_id: deviceForm.value, name: displayName });
+          source.setName(displayName);
+          source.updateSettings({ device_id: deviceForm.value });
         }
       }
     });

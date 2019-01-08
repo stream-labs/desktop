@@ -1,6 +1,7 @@
 <template>
 <modal-layout :showControls="false" :customControls="true">
   <div slot="controls">
+    <start-streaming-button v-if="issue.code === 'FRAMES_DROPPED'"></start-streaming-button>
     <button
         class="button button--action"
         @click="showSettings"
@@ -34,9 +35,9 @@
       </ul>
 
       <div class="inline-controls">
-        <p v-if="isStreaming">
+        <h4 v-if="isStreaming">
           {{ $t('Stop streaming to access these controls:')}}
-        </p>
+        </h4>
         <GenericFormGroups v-model="streamingSettings" @input="saveStreamingSettings" />
         <GenericFormGroups v-model="outputSettings" @input="saveOutputSettings" />
       </div>
