@@ -20,7 +20,7 @@ import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from '.
 import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
-import { AnchorPoint, AnchorPositions, CenteringAxis, ScalableRectangle } from 'util/ScalableRectangle';
+import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { Rect } from '../../util/rect';
 
 /**
@@ -357,7 +357,7 @@ export class Selection implements ISelection {
       y: minTop,
       width: maxRight - minLeft,
       height: maxBottom - minTop,
-    };
+    });
   }
 
   getInverted(): TSceneNode[] {

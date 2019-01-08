@@ -37,9 +37,7 @@ export const AnchorPositions = {
   [AnchorPoint.Center]: { x: 0.5, y: 0.5 },
 };
 
-
 export class ScalableRectangle extends Rect implements IScalableRectangle {
-
   scaleX: number;
   scaleY: number;
   crop: ICrop;
@@ -100,8 +98,9 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     const currentPosition = this.origin;
     const newOrigin = v2(newOriginModel);
     const delta = newOrigin.sub(currentPosition);
-    const newPosition = this.getPosition()
-      .add(delta.multiply(v2(this.scaledWidth, this.scaledHeight)));
+    const newPosition = this.getPosition().add(
+      delta.multiply(v2(this.scaledWidth, this.scaledHeight)),
+    );
 
     this.setPosition(newPosition);
     this.origin = newOrigin;

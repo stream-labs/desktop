@@ -1,4 +1,4 @@
-import Vue from 'vue';
+ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
 import { DragHandler } from 'util/DragHandler';

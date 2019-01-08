@@ -3,7 +3,12 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
-import { ScalableRectangle, CenteringAxis, AnchorPositions, AnchorPoint } from 'util/ScalableRectangle';
+import {
+  ScalableRectangle,
+  CenteringAxis,
+  AnchorPositions,
+  AnchorPoint,
+} from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
@@ -249,7 +254,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     });
   }
 
-
   /**
    * set scale and adjust the item position according to the origin parameter
    */
@@ -265,13 +269,13 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.setTransform({
       position: {
         x: rect.x,
-        y: rect.y
+        y: rect.y,
       },
       scale: {
         x: rect.scaleX,
-        y: rect.scaleY
-      }
-    })
+        y: rect.scaleY,
+      },
+    });
   }
 
   /**
@@ -415,7 +419,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       x: rect.x,
       y: rect.y,
       width: rect.scaledWidth,
-      height: rect.scaledHeight
+      height: rect.scaledHeight,
     });
   }
 

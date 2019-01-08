@@ -8,17 +8,16 @@ type TVecConstructorArgs = [number, number] | [IVec2] | [];
  * @see https://threejs.org/docs/#api/en/math/Vector2
  */
 export class Vec2 extends Vector2 {
-
-  constructor (...args: TVecConstructorArgs) {
+  constructor(...args: TVecConstructorArgs) {
     // define some syntax sugar to add more flexible ways of constricting of Vector2 object
     if (args.length === 0) {
       super(0, 0);
       return;
     }
-    if (typeof args[0] == 'number') {
-      super(args[0], args[1])
+    if (typeof args[0] === 'number') {
+      super(args[0], args[1]);
     } else {
-      super(args[0].x, args[0].y)
+      super(args[0].x, args[0].y);
     }
 
     // Almost all arithmetic methods of THREE.Vector2 changes the entire object
@@ -27,16 +26,15 @@ export class Vec2 extends Vector2 {
     // Change this here behaviour to always return a new object:
     return new Proxy(this, {
       get: (target, propName) => {
-        if (
-          typeof target[propName] !== 'function' ||
-          !Vector2.prototype[propName]
-        ) return target[propName];
+        if (typeof target[propName] !== 'function' || !Vector2.prototype[propName]) {
+          return target[propName];
+        }
 
         return (...args: any[]) => {
           const result = new Vector2(target.x, target.y)[propName](...args);
           if (result instanceof Vector2) return new Vec2(result);
-        }
-      }
+        };
+      },
     });
   }
 }
@@ -47,7 +45,6 @@ export class Vec2 extends Vector2 {
 export function v2(): Vec2;
 export function v2(x: number, y: number): Vec2;
 export function v2(model: IVec2): Vec2;
-export function v2(...args: [number, number] | [IVec2] | []): Vec2
 export function v2(...args: TVecConstructorArgs) {
   return new Vec2(...args);
 }
