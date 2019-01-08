@@ -169,6 +169,7 @@ sonarlint.idea/**/workspace.xml
 # Sensitive or high-churn files
 **/dataSources/
 **/dataSources.ids
+**/dataSources.xml
 **/dataSources.local.xml
 **/sqlDataSources.xml
 **/dynamic.xml
