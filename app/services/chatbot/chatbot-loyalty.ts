@@ -7,12 +7,11 @@ import { ChatbotBaseApiService } from './chatbot-base';
 
 import {
   IChatbotAPIPutResponse,
-  IChatbotAPIDeleteResponse,
   ILoyaltyResponse,
   IChatbotLoyalty,
   ILoyaltyPreferencesData,
   ILoyaltyPreferencesResponse,
-  IChatbotAPIPostResponse
+  IChatbotAPIPostResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -31,40 +30,40 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
     loyaltyResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
-    loyaltyPreferencesResponse:{
+    loyaltyPreferencesResponse: {
       enabled: false,
-      settings:{
-        commands:{},
-        general:{
+      settings: {
+        commands: {},
+        general: {
           interval: {
-            live: 5
+            live: 5,
           },
           name: 'Points',
           payout: {
             active: 0,
-            live: 1
-          }
+            live: 1,
+          },
         },
-        advanced:{
-          donations:{
+        advanced: {
+          donations: {
             extralife: 0,
             streamlabs: 0,
-            superchat: 0
+            superchat: 0,
           },
-          event:{
+          event: {
             on_follow: 0,
             on_host: 0,
             on_member: 0,
             on_raid: 0,
-            on_sub: 0
-          }
-        }
-      }
-    }
+            on_sub: 0,
+          },
+        },
+      },
+    },
   };
 
   //
@@ -79,11 +78,11 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
   }
 
   fetchLoyaltyPreferences() {
-    return this.chatbotBaseApiService.api('GET', 'settings/loyalty', {}).then(
-      (response: ILoyaltyPreferencesData) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/loyalty', {})
+      .then((response: ILoyaltyPreferencesData) => {
         this.UPDATE_LOYALTY_PREFERENCES(response);
-      }
-    );
+      });
   }
 
   // Update
@@ -99,16 +98,16 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
   }
 
   updateLoyaltyPreferences(data: ILoyaltyPreferencesResponse, closeChild: boolean = true) {
-    return this.chatbotBaseApiService.api('POST','settings/loyalty',data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/loyalty', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchLoyaltyPreferences();
-          if(closeChild){
+          if (closeChild) {
             this.chatbotCommonService.closeChildWindow();
           }
         }
-      }
-    )
+      });
   }
 
   //

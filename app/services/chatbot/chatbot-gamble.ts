@@ -5,10 +5,7 @@ import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import { ChatbotBaseApiService } from './chatbot-base';
 
-import {
-  IChatbotAPIPostResponse,
-  IGamblePreferencesResponse
-} from './chatbot-interfaces';
+import { IChatbotAPIPostResponse, IGamblePreferencesResponse } from './chatbot-interfaces';
 
 // state
 interface IChatbotGambleApiServiceState {
@@ -33,12 +30,12 @@ export class ChatbotGambleApiService extends PersistentStatefulService<
             '26-50': 0,
             '51-75': 0,
             '76-98': 0,
-            '99-100': 0
-          }
-        }
+            '99-100': 0,
+          },
+        },
       },
-      enabled: false
-    }
+      enabled: false,
+    },
   };
 
   //
@@ -53,10 +50,7 @@ export class ChatbotGambleApiService extends PersistentStatefulService<
   }
 
   // Update
-  updateGamblePreferences(
-    data: IGamblePreferencesResponse,
-    closeChild: boolean = true
-  ) {
+  updateGamblePreferences(data: IGamblePreferencesResponse, closeChild: boolean = true) {
     return this.chatbotBaseApiService
       .api('POST', 'settings/gamble', data)
       .then((response: IChatbotAPIPostResponse) => {

@@ -4,24 +4,22 @@ import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotBaseApiService } from './chatbot-base';
 
-import {
-  IChatbotAPIPostResponse,
-  IChatAlertsResponse,
-} from './chatbot-interfaces';
-import { ChatbotApiService } from './chatbot';
+import { IChatbotAPIPostResponse, IChatAlertsResponse } from './chatbot-interfaces';
 
 // state
 interface IChatbotAlertsApiServiceState {
   chatAlertsResponse: IChatAlertsResponse;
 }
 
-export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotAlertsApiServiceState> {
+export class ChatbotAlertsApiService extends PersistentStatefulService<
+  IChatbotAlertsApiServiceState
+> {
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
 
   static defaultState: IChatbotAlertsApiServiceState = {
     chatAlertsResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
   };
 
@@ -29,31 +27,31 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
   // GET requests
   //
   fetchChatAlerts() {
-    return this.chatbotBaseApiService.api('GET', 'settings/chat-notifications', {}).then(
-      (response: IChatAlertsResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/chat-notifications', {})
+      .then((response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
-      }
-    );
+      });
   }
 
   // Update
   updateChatAlerts(data: IChatAlertsResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/chat-notifications', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/chat-notifications', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchChatAlerts();
         }
-      }
-    );
+      });
   }
 
   // reset
   resetSettings() {
-    return this.chatbotBaseApiService.resetSettings('chat-notifications').then(
-      (response: IChatAlertsResponse) => {
+    return this.chatbotBaseApiService
+      .resetSettings('chat-notifications')
+      .then((response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
-      }
-    );
+      });
   }
 
   //
@@ -63,5 +61,4 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
   private UPDATE_CHAT_ALERTS(response: IChatAlertsResponse) {
     Vue.set(this.state, 'chatAlertsResponse', response);
   }
-
 }

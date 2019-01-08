@@ -9,7 +9,7 @@ import {
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
   IWordProtectionResponse,
-  ChatbotSettingSlug
+  ChatbotSettingSlug,
 } from './chatbot-interfaces';
 
 // state
@@ -20,25 +20,27 @@ interface IChatbotModToolsApiServiceState {
   wordProtectionResponse: IWordProtectionResponse;
 }
 
-export class ChatbotModToolsApiService extends PersistentStatefulService<IChatbotModToolsApiServiceState> {
+export class ChatbotModToolsApiService extends PersistentStatefulService<
+  IChatbotModToolsApiServiceState
+> {
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
 
   static defaultState: IChatbotModToolsApiServiceState = {
     capsProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     symbolProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     linkProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     wordProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
   };
 
@@ -46,107 +48,107 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<IChatbo
   // GET requests
   //
   fetchCapsProtection() {
-    return this.chatbotBaseApiService.api('GET', 'settings/caps-protection', {}).then(
-      (response: ICapsProtectionResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/caps-protection', {})
+      .then((response: ICapsProtectionResponse) => {
         this.UPDATE_CAPS_PROTECTION(response);
-      }
-    );
+      });
   }
 
   fetchSymbolProtection() {
-    return this.chatbotBaseApiService.api('GET', 'settings/symbol-protection', {}).then(
-      (response: ISymbolProtectionResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/symbol-protection', {})
+      .then((response: ISymbolProtectionResponse) => {
         this.UPDATE_SYMBOL_PROTECTION(response);
-      }
-    );
+      });
   }
 
   fetchLinkProtection() {
-    return this.chatbotBaseApiService.api('GET', 'settings/link-protection', {}).then(
-      (response: ILinkProtectionResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/link-protection', {})
+      .then((response: ILinkProtectionResponse) => {
         this.UPDATE_LINK_PROTECTION(response);
-      }
-    );
+      });
   }
 
   fetchWordProtection() {
-    return this.chatbotBaseApiService.api('GET', 'settings/words-protection', {}).then(
-      (response: IWordProtectionResponse) => {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/words-protection', {})
+      .then((response: IWordProtectionResponse) => {
         this.UPDATE_WORD_PROTECTION(response);
-      }
-    );
+      });
   }
 
   // reset
   resetSettings(slug: ChatbotSettingSlug) {
-    return this.chatbotBaseApiService.api('POST', `settings/${slug}/reset`, {}).then(
-      (
-        response:
-          | ICapsProtectionResponse
-          | ISymbolProtectionResponse
-          | ILinkProtectionResponse
-          | IWordProtectionResponse
-      ) => {
-        switch (slug) {
-          case 'caps-protection':
-            this.UPDATE_CAPS_PROTECTION(response as ICapsProtectionResponse);
-            break;
-          case 'symbol-protection':
-            this.UPDATE_SYMBOL_PROTECTION(
-              response as ISymbolProtectionResponse
-            );
-            break;
-          case 'link-protection':
-            this.UPDATE_LINK_PROTECTION(response as ILinkProtectionResponse);
-            break;
-          case 'words-protection':
-            this.UPDATE_WORD_PROTECTION(response as IWordProtectionResponse);
-            break;
-        }
-        return Promise.resolve(response);
-      }
-    );
+    return this.chatbotBaseApiService
+      .api('POST', `settings/${slug}/reset`, {})
+      .then(
+        (
+          response:
+            | ICapsProtectionResponse
+            | ISymbolProtectionResponse
+            | ILinkProtectionResponse
+            | IWordProtectionResponse,
+        ) => {
+          switch (slug) {
+            case 'caps-protection':
+              this.UPDATE_CAPS_PROTECTION(response as ICapsProtectionResponse);
+              break;
+            case 'symbol-protection':
+              this.UPDATE_SYMBOL_PROTECTION(response as ISymbolProtectionResponse);
+              break;
+            case 'link-protection':
+              this.UPDATE_LINK_PROTECTION(response as ILinkProtectionResponse);
+              break;
+            case 'words-protection':
+              this.UPDATE_WORD_PROTECTION(response as IWordProtectionResponse);
+              break;
+          }
+          return Promise.resolve(response);
+        },
+      );
   }
 
   // Update
   updateCapsProtection(data: ICapsProtectionResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/caps-protection', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/caps-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchCapsProtection();
         }
-      }
-    );
+      });
   }
 
   updateSymbolProtection(data: ISymbolProtectionResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/symbol-protection', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/symbol-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchSymbolProtection();
         }
-      }
-    );
+      });
   }
 
   updateLinkProtection(data: ILinkProtectionResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/link-protection', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/link-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchLinkProtection();
         }
-      }
-    );
+      });
   }
 
   updateWordProtection(data: IWordProtectionResponse) {
-    return this.chatbotBaseApiService.api('POST', 'settings/words-protection', data).then(
-      (response: IChatbotAPIPostResponse) => {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/words-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchWordProtection();
         }
-      }
-    );
+      });
   }
 
   //

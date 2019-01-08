@@ -13,7 +13,7 @@ import {
   ILoyaltyPreferencesData,
   ILoyaltyPreferencesResponse,
   IChatbotAPIPostResponse,
-  IHeistPreferencesResponse
+  IHeistPreferencesResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -38,34 +38,34 @@ export class ChatbotHeistApiService extends PersistentStatefulService<
           payout: {
             viewers: 50,
             moderators: 50,
-            subscribers: 50
+            subscribers: 50,
           },
           probability: {
             moderators: 50,
             subscribers: 50,
-            viewers: 50
+            viewers: 50,
           },
-          start_delay: 120
+          start_delay: 120,
         },
         messages: {
           group: {
             loss: '',
             partial: '',
-            win: ''
+            win: '',
           },
           results: '',
           solo: {
             loss: '',
-            win: ''
+            win: '',
           },
           start: {
             fail: '',
             first: '',
-            success: ''
-          }
-        }
-      }
-    }
+            success: '',
+          },
+        },
+      },
+    },
   };
 
   //
@@ -80,10 +80,7 @@ export class ChatbotHeistApiService extends PersistentStatefulService<
   }
 
   // Update
-  updateHeistPreferences(
-    data: IHeistPreferencesResponse,
-    closeChild: boolean = true
-  ) {
+  updateHeistPreferences(data: IHeistPreferencesResponse, closeChild: boolean = true) {
     return this.chatbotBaseApiService
       .api('POST', 'settings/heist', data)
       .then((response: IChatbotAPIPostResponse) => {
@@ -97,12 +94,12 @@ export class ChatbotHeistApiService extends PersistentStatefulService<
   }
 
   resetSettings() {
-    return this.chatbotBaseApiService.resetSettings('heist').then(
-      (response: IHeistPreferencesResponse) => {
+    return this.chatbotBaseApiService
+      .resetSettings('heist')
+      .then((response: IHeistPreferencesResponse) => {
         this.UPDATE_HEIST_PREFERENCES(response);
         return Promise.resolve(response);
-      }
-    );
+      });
   }
 
   //
