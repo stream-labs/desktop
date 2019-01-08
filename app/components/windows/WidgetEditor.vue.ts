@@ -17,7 +17,6 @@ import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
-import { IAlertBoxData } from 'services/widgets/settings/alert-box';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 
 @Component({
@@ -31,8 +30,8 @@ import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-bo
     TestWidgets,
     Display,
     CustomFieldsEditor,
-    CodeEditor
-  }
+    CodeEditor,
+  },
 })
 export default class WidgetEditor extends Vue {
   @Inject() private widgetsService: IWidgetsServiceApi;
@@ -40,7 +39,8 @@ export default class WidgetEditor extends Vue {
   @Inject() private projectorService: ProjectorService;
 
   @Prop() isAlertBox?: boolean;
-  @Prop() selectedVariation?: IAlertBoxVariation;
+  @Prop() selectedId?: string;
+  @Prop() selectedAlert?: string;
 
   /**
    * Declaration of additional sections in the right panel
@@ -53,7 +53,7 @@ export default class WidgetEditor extends Vue {
    */
   @Prop() navItems: IWidgetNavItem[];
 
-  $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
+  $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
 
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   widget = this.widgetsService.getWidgetSource(this.sourceId);
@@ -62,7 +62,7 @@ export default class WidgetEditor extends Vue {
   codeTabs = [
     { value: 'HTML', name: $t('HTML') },
     { value: 'CSS', name: $t('CSS') },
-    { value: 'JS', name: $t('JS') }
+    { value: 'JS', name: $t('JS') },
   ];
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
@@ -76,7 +76,7 @@ export default class WidgetEditor extends Vue {
   }
 
   get loadingFailed() {
-    return !this.loaded && this.settingsState.loadingState == 'fail';
+    return !this.loaded && this.settingsState.loadingState === 'fail';
   }
 
   get wData(): IWidgetData {
@@ -84,8 +84,17 @@ export default class WidgetEditor extends Vue {
     return cloneDeep(this.settingsState.data) as IWidgetData;
   }
 
+  get selectedVariation() {
+    if (!this.selectedAlert || !this.selectedId || this.selectedAlert === 'general') return;
+    return this.wData.settings[this.selectedAlert].variations.find(
+      (variation: IAlertBoxVariation) => variation.id === this.selectedId,
+    );
+  }
+
   get customCodeIsEnabled() {
-    if (this.selectedVariation) { return this.selectedVariation.settings.customHtmlEnabled }
+    if (this.selectedVariation) {
+      return this.selectedVariation.settings.customHtmlEnabled;
+    }
     return this.wData && this.wData.settings.custom_enabled;
   }
 
@@ -124,23 +133,24 @@ export default class WidgetEditor extends Vue {
   }
 
   retryDataFetch() {
-    const service = this.widget.getSettingsService()
+    const service = this.widget.getSettingsService();
     service.fetchData();
   }
 
   onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.widget.getSource();
-    source.setPropertiesFormData(
-      [properties[changedIndex]]
-    );
+    source.setPropertiesFormData([properties[changedIndex]]);
     this.properties = this.widget.getSource().getPropertiesFormData();
   }
 
   get topTabs() {
     const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
-    if (this.selectedVariation && !this.selectedVariation.id) { return firstTab; }
-    return this.apiSettings.customCodeAllowed ?
-      firstTab.concat([{ value: 'code', name: $t('HTML CSS') }]) : firstTab;
+    if (this.selectedAlert === 'general') {
+      return firstTab;
+    }
+    return this.apiSettings.customCodeAllowed
+      ? firstTab.concat([{ value: 'code', name: $t('HTML CSS') }])
+      : firstTab;
   }
 
   updateTopTab(value: string) {
@@ -150,9 +160,8 @@ export default class WidgetEditor extends Vue {
     // Animation takes 600ms to complete before we can re-render the OBS display
     setTimeout(() => {
       this.animating = false;
-      this.canShowEditor = true; // vue-codemirrow has rendering issues if we attempt to animate it just after mount
+      this.canShowEditor = true; // vue-codemirror has rendering issues if we attempt to animate it just after mount
     }, 600);
-
   }
 
   updateCodeTab(value: string) {
@@ -164,6 +173,8 @@ export default class WidgetEditor extends Vue {
   }
 
   toggleCustomCode(enabled: boolean) {
-    this.widget.getSettingsService().toggleCustomCode(enabled, this.wData.settings, this.selectedVariation);
+    this.widget
+      .getSettingsService()
+      .toggleCustomCode(enabled, this.wData.settings, this.selectedVariation);
   }
 }

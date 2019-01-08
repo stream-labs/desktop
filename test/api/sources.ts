@@ -4,9 +4,7 @@ import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../app/services/sources/sources-api';
 
-
 useSpectron({ restartAppAfterEachTest: false });
-
 
 test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
@@ -44,7 +42,6 @@ test('Source events', async t => {
   sourcesService.sourceRemoved.subscribe(() => void 0);
   sourcesService.sourceUpdated.subscribe(() => void 0);
 
-
   const source1 = sourcesService.createSource('audio1', 'wasapi_output_capture');
   eventData = await client.fetchNextEvent();
 
@@ -64,5 +61,4 @@ test('Source events', async t => {
   eventData = await client.fetchNextEvent();
 
   t.is(eventData.name, 'audio3');
-
 });

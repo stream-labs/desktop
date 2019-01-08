@@ -13,7 +13,6 @@ export default class NewsBanner extends Vue {
 
   processingClose = false;
 
-
   get currentBanner() {
     return this.announcementsService.state;
   }
@@ -33,10 +32,17 @@ export default class NewsBanner extends Vue {
   }
 
   followLink() {
-    if (this.currentBanner.link_target === 'slobs') {
-      this.navigationService.navigate(this.currentBanner.link as TAppPage);
+    if (!this.currentBanner) return;
+    if (this.currentBanner.linkTarget === 'slobs') {
+      this.navigationService.navigate(
+        this.currentBanner.link as TAppPage,
+        this.currentBanner.params,
+      );
     } else {
       shell.openExternal(this.currentBanner.link);
+    }
+    if (this.currentBanner.closeOnLink) {
+      this.closeBanner();
     }
   }
 }

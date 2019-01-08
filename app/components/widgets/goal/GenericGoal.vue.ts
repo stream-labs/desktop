@@ -5,19 +5,21 @@ import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { GenericGoalService, IGoalCreateOptions, IGoalData } from '../../../services/widgets/settings/generic-goal';
-
+import {
+  GenericGoalService,
+  IGoalCreateOptions,
+  IGoalData,
+} from '../../../services/widgets/settings/generic-goal';
 
 @Component({
   components: {
     WidgetEditor,
     VFormGroup,
     ValidatedForm,
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -26,13 +28,13 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
     title: '',
     goal_amount: 100,
     manual_goal_amount: 0,
-    ends_at: ''
+    ends_at: '',
   };
 
   navItems = [
     { value: 'goal', label: $t('Goal') },
     { value: 'visual', label: $t('Visual Settings') },
-    { value: 'source', label: $t('Source') }
+    { value: 'source', label: $t('Source') },
   ];
 
   get hasGoal() {
@@ -42,12 +44,16 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   async saveGoal() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     this.requestState = 'pending';
-    await this.service.saveGoal(this.goalCreateOptions);
-    this.requestState = 'success';
+    try {
+      await this.service.saveGoal(this.goalCreateOptions);
+      this.requestState = 'success';
+    } catch (e) {
+      this.onFailHandler(e.message);
+      this.requestState = 'fail';
+    }
   }
 
   resetGoal() {
     this.service.resetGoal();
   }
-
 }

@@ -4,7 +4,6 @@ import { INumberMetadata } from './index';
 
 @Component({})
 export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
-
   @Prop()
   readonly value: number | string; // the string type is for empty field
 

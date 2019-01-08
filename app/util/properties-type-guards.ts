@@ -1,8 +1,7 @@
 import * as obs from '../../obs-api';
 
 export function isNumberProperty(property: obs.IProperty): property is obs.INumberProperty {
-  return property.type === obs.EPropertyType.Int ||
-    property.type === obs.EPropertyType.Float;
+  return property.type === obs.EPropertyType.Int || property.type === obs.EPropertyType.Float;
 }
 
 export function isTextProperty(property: obs.IProperty): property is obs.ITextProperty {
@@ -17,7 +16,9 @@ export function isListProperty(property: obs.IProperty): property is obs.IListPr
   return property.type === obs.EPropertyType.List;
 }
 
-export function isEditableListProperty(property: obs.IProperty): property is obs.IEditableListProperty {
+export function isEditableListProperty(
+  property: obs.IProperty,
+): property is obs.IEditableListProperty {
   return property.type === obs.EPropertyType.EditableList;
 }
 

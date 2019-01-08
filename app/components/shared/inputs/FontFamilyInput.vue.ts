@@ -729,12 +729,11 @@ const fonts = [
   'Yellowtail',
   'Yeseva One',
   'Yesteryear',
-  'Zeyada'
+  'Zeyada',
 ];
 
-
 @Component({
-  components: { ListInput }
+  components: { ListInput },
 })
 export default class FontFamilyInput extends BaseInput<string, IInputMetadata> {
   @Prop() readonly value: string;
@@ -744,7 +743,7 @@ export default class FontFamilyInput extends BaseInput<string, IInputMetadata> {
   get listInputMetadata() {
     return {
       ...this.options,
-      options: fonts.map(fontName => ({ title: fontName, value: fontName }))
-    }
+      options: fonts.map(fontName => ({ title: fontName, value: fontName })),
+    };
   }
 }

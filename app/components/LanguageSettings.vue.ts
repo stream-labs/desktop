@@ -7,7 +7,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import electron from 'electron';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class LanguageSettings extends Vue {
   @Inject() private i18nService: I18nServiceApi;
@@ -15,19 +15,16 @@ export default class LanguageSettings extends Vue {
   settings = this.i18nService.getLocaleFormData();
 
   private async save(data: TObsFormData) {
-    const choice = electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
-        type: 'question',
-        buttons: [$t('Yes'), $t('No')],
-        title: $t('Confirm'),
-        message: $t('This action will restart the application. Continue?')
-      });
+    const choice = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      type: 'question',
+      buttons: [$t('Yes'), $t('No')],
+      title: $t('Confirm'),
+      message: $t('This action will restart the application. Continue?'),
+    });
 
     if (choice !== 0) return;
 
     await this.i18nService.setLocale(data[0].value as string);
     this.settings = this.i18nService.getLocaleFormData();
   }
-
 }

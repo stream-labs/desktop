@@ -4,7 +4,6 @@ import { Multiselect } from 'vue-multiselect';
 
 @Component({ components: { Multiselect } })
 export default class ObsFontSizeSelector extends ObsInput<number> {
-
   @Prop()
   value: number;
 
@@ -28,8 +27,7 @@ export default class ObsFontSizeSelector extends ObsInput<number> {
       '72',
       '96',
       '144',
-      '288'
+      '288',
     ];
   }
-
 }

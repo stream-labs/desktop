@@ -13,19 +13,22 @@ var receivedTestData = {
   faceDetectedCount : 0,
   faceNotDetectedCount : 0,
   numFacesDetected : 0,
+  mask		: "",
   lastFaceX : 0,
   lastFaceY : 0,
   lastPixelR : 0,
   lastPixelG : 0,
   lastPixelB : 0,
-  lastPixelA : 0
+  lastPixelA : 0,
+  poseX 	 : 0,
+  poseY 	 : 0,
+  poseZ 	 : 0
 };
 
 
 // ---------------------------------------------------------------------------
 // parseTestData : parses info received from the facemask plugin
 function parseTestData(d) {
-
   // remove filter test
   if (d.includes("stopping threads"))
     receivedTestData.removeFilterTestCount += 1;
@@ -57,6 +60,19 @@ function parseTestData(d) {
     receivedTestData.lastPixelG = parseInt(color[1]);
     receivedTestData.lastPixelB = parseInt(color[2]);
     receivedTestData.lastPixelA = parseInt(color[3]);
+  }
+  if (d.includes("Pose Translations")) {
+    const ts = d.split(' ');
+    var t = ts[ts.length  - 1];
+    var translations = t.split(',');
+    receivedTestData.poseX = parseInt(translations[0]);
+    receivedTestData.poseY = parseInt(translations[1]);
+    receivedTestData.poseZ = parseInt(translations[2]);
+  }
+  if (d.includes("Mask")) {
+    const ts = d.split(' ');
+    var t = ts[ts.length  - 1];
+    receivedTestData.mask = t;
   }
 }
 
@@ -93,11 +109,16 @@ function getFacemaskDataDir() {
   var dirString = path.dirname(fs.realpathSync(__filename));
   dirString = path.dirname(dirString);
   dirString = path.dirname(dirString);
-  dirString += '\\node-obs\\data\\obs-plugins\\obs-facemask-plugin\\test\\';
+  dirString += '\\facemask\\';
 
   return dirString;
 }
 
+// ---------------------------------------------------------------------------
+// getFacemaskMasksDataDir : Gets the path to the obs-facemask-plugin test masks data dir
+function getFacemaskMasksDataDir() {
+  return getFacemaskDataDir() + "masks\\";
+}
 
 // ---------------------------------------------------------------------------
 // addMediaSource : Create a Media Source and set it to play a video
@@ -127,7 +148,7 @@ async function addImageSource(t, sourceName, which = IMAGE_ONEFACE) {
   await addSource(t, 'Image', sourceName, false);
 
   // which image
-  var imageFile = 'kappa.png';
+  var imageFile = 'face.png';
   if (which == IMAGE_MANYFACES)
     imageFile = 'faces.png';
 
@@ -153,72 +174,24 @@ async function addVideoCaptureDevice(t, sourceName) {
 async function addFacemaskFilter(t, sourceName, filterName) {
   // add the facemask filter
   await focusMain(t);
-  await addFilter(t, sourceName, 'Face Mask Filter', filterName);
+  await addFilter(t, sourceName, 'Face Mask Plugin', filterName);
 
   // set some params
   await openFilterProperties(t, sourceName, filterName);
-  await clickFormInput(t, 'Show Advanced Settings');
   await clickFormInput(t, 'Enable Testing Mode');
+  await clickFormInput(t, 'Draw Mask');
   await closeFilterProperties(t);
 }
 
-// ---------------------------------------------------------------------------
-// setDetectionFull : disables face detection/tracking cropping 
-async function setDetectionFull(t, sourceName, filterName) {
-    // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  await setSliderPercent(t, 'Face Detect Crop Width', 1);
-  await setSliderPercent(t, 'Face Detect Crop Height', 1);
-  await setSliderPercent(t, 'Tracking Crop Width', 1);
-  await setSliderPercent(t, 'Tracking Crop Height', 1);
-  await setSliderPercent(t, 'Face Detection Frequency', 0);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
-// setMaskImage
-async function setMaskImage(t, sourceName, filterName, color) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "dot.png";
-  await focusChild(t);
-  await setFormInput(t, 'Face Mask Image', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
 
 // ---------------------------------------------------------------------------
 // setMaskJson
-async function setMaskJson(t, sourceName, filterName, color) {
+async function setMaskJson(t, sourceName, filterName, maskName) {
   // set some params
   await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "sphere.json";
+  var f = getFacemaskMasksDataDir() + maskName;
   await focusChild(t);
-  await setFormInput(t, 'Mask', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
-// setMaskImage
-async function setGlassesImage(t, sourceName, filterName, color) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "dot.png";
-  await focusChild(t);
-  await setFormInput(t, 'Eye Glasses Image', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
-// setDrawMode
-async function setDrawMode(t, sourceName, filterName, drawMode) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  await focusChild(t);
-  await setFormDropdown(t, 'Drawing Mode', drawMode);
+  await setFormInput(t, 'Browse to mask', f);
   await focusChild(t);
   await closeFilterProperties(t);
 }
@@ -239,35 +212,6 @@ async function killFilter(t, sourceName, filterName) {
   await removeFilter(t, sourceName, filterName);
 }
 
-
-// ---------------------------------------------------------------------------
-// setFps60 : go into the settings and set video output to 60 fps
-async function setFps60(t) {
-    const app = t.context.app;
-
-  // open settings
-  await focusMain(t);
-  await app.client.click('.top-nav .fa-cog');
-
-  // video section
-  await focusChild(t);
-  await app.client.click('li=Video');
-
-  // set fps to 60
-  await focusChild(t);
-  setFormDropdown(t, "Common FPS Values", "60");
-
-  // yes, we need this, otherwise we close the window before
-  // the dropdown is finishsed selecting.
-  // 1 second is probably lots, but I'm going with 2
-  await sleep(2000);
-
-  // close settings
-  await focusChild(t);
-  await app.client.click('button=Done');
-}
-
-
 // ---------------------------------------------------------------------------
 // updatePerformanceStats : updates performance statistics from the statsu bar
 //                          includes cpu usage and fps
@@ -277,69 +221,57 @@ async function updatePerformanceStats(t) {
   // get the full status string
   await focusMain(t);
   const texts = await t.context.app.client.getText('div*=FPS');
-
   var text = texts[texts.length - 1];
-
   // parse out cpu usage
   var cputext = text.split('\n')[0];
-  cputext = cputext.split(':')[1];
   cputext = cputext.split('%')[0];
-
   // parse out fps
   var fpstext = text.split('\n')[1];
   fpstext = fpstext.split(' ')[0];
-
   // convert and save
   cpuUsage = parseFloat(cputext);
   fps = parseFloat(fpstext);
 }
 
-
 // ---------------------------------------------------------------------------
-// drawingModeTest : used for all the drawing tests
-async function drawingModeTest(t, drawMode) {
-    const sourceName = 'Example Source';
-  const filterName = 'Example Filter';
-
-  // start the test pipe server
-  startTestPipeServer();
-
-  // media source
-  await addImageSource(t, sourceName);
-
-  // facemask filter
-  await addFacemaskFilter(t, sourceName, filterName);
-
+// TEST : testEachMask : Tests each mask and verifies results
+//
+async function testEachMask(t, sourceName, filterName, maskName) {
+	
   // set draw mode
-  await setDrawMode(t, sourceName, filterName, drawMode);
+  await setMaskJson(t, sourceName, filterName, maskName);
 
-  // tests
-  var testColors = ["red", "green", "blue"];
-  var testValues = [[255,0,0,255], [0,255,0,255], [0,0,255,255]];
-  for(var i = 0; i < testColors.length; i++) {
-    // set to color dot
-    if (drawMode == '2D Face Mask')
-      await setMaskImage(t, sourceName, filterName, testColors[i]);
-    else
-      await setMaskJson(t, sourceName, filterName, testColors[i]);
-    await sleep(100);
-    // check color at detected pixel
-    const startTime = Date.now();
-    while((Date.now() - startTime) < 3000) {
-      if ((receivedTestData.lastPixelR != testValues[i][0]) ||
-        (receivedTestData.lastPixelG != testValues[i][1]) ||
-        (receivedTestData.lastPixelB != testValues[i][2]) ||
-        (receivedTestData.lastPixelA != testValues[i][3])) {
-          t.fail();
-          break;
-        }
-
-      await sleep(10);
-    }
+  //wait for apply
+  await sleep(3000);
+  
+  // check color at detected pixel
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 5000) {
+	  // be a wider lax on the exact position (Since it is moving face)
+	if (receivedTestData.lastFaceX < 350 || (receivedTestData.lastFaceX > 700)
+		|| (receivedTestData.lastFaceY < 250) || (receivedTestData.lastFaceY > 500)) {
+		console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
+		t.fail();
+		break;
+	}
+		
+	if (receivedTestData.poseX < -15 || (receivedTestData.poseX > 5)
+		|| (receivedTestData.poseY < -5) || (receivedTestData.poseY > 5)
+		|| (receivedTestData.poseZ < 35) || (receivedTestData.poseZ > 550)) {
+		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
+		t.fail();
+		break;
+	}
+	
+	//Check if applied mask is correct
+	if(receivedTestData.mask.localeCompare(maskName) != 0){
+		console.log("Invalid Mask, Expected: ", maskName, " Actual:", receivedTestData.mask);
+		t.fail();
+		break;
+	}
+    await sleep(10);
   }
 }
-
-
 
 // ---------------------------------------------------------------------------
 // ---------------------======= TESTS ======----------------------------------
@@ -348,7 +280,6 @@ async function drawingModeTest(t, drawMode) {
 
 // Turn Spectron On
 useSpectron();
-
 
 // ---------------------------------------------------------------------------
 // TEST : Remove Filter
@@ -370,7 +301,7 @@ test('Remove Filter', async t => {
   await killFilter(t, sourceName, filterName);
 
   // wait for data to arrive
-  await sleep(100);
+  await sleep(1000);
 
   // we should have got 3 of these
   if (receivedTestData.removeFilterTestCount == 3)
@@ -398,33 +329,37 @@ test('Face Detection - Basic', async t => {
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
 
+   // wait for data to arrive
+  await sleep(1000);
+
   // run for a second (ish), check the face positions
   const startTime = Date.now();
   while((Date.now() - startTime) < 1000) {
 
     // be a little lax on the exact position
-    if (receivedTestData.lastFaceX < 690)
-      t.fail();
-    if (receivedTestData.lastFaceX > 710)
-      t.fail();
-    if (receivedTestData.lastFaceY < 325)
-      t.fail();
-    if (receivedTestData.lastFaceY > 335)
-      t.fail();
+    if (receivedTestData.lastFaceX < 540 || (receivedTestData.lastFaceX > 650)
+		|| (receivedTestData.lastFaceY < 455) || (receivedTestData.lastFaceY > 465)) {
+			console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
+			t.fail();
+			break;
+		}
+	await sleep(10);
   }
 
   // we should have detected kappa at least once by now
   if (receivedTestData.faceDetectedCount > 0)
     t.pass();
-  else
-    t.fail();
+  else {
+	console.log("Wrong Detected Face Number: : ", receivedTestData.faceDetectedCount );
+	t.fail();
+  }
 });
 
 
 // ---------------------------------------------------------------------------
 // TEST : Face Detection - Advanced
 // ---------------------------------------------------------------------------
-test('Face Detection - Basic', async t => {
+test('Face Detection - Advanced', async t => {
   const sourceName = 'Example Source';
   const filterName = 'Example Filter';
 
@@ -436,7 +371,6 @@ test('Face Detection - Basic', async t => {
 
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
-  await setDetectionFull(t, sourceName, filterName);
 
   // wait for a few seconds
   await sleep(60 * 1000);
@@ -458,6 +392,112 @@ test('Face Detection - Basic', async t => {
     t.fail();
 });
 
+// ---------------------------------------------------------------------------
+// TEST : Tracking
+// ---------------------------------------------------------------------------
+var testTrackingAreas = [
+   // x y status
+	[ 650, 390, false],
+	[ 500, 295, false],
+	[ 560, 345, false],
+	[ 505, 374, false],
+	[ 380, 380, false]
+];
+var testTrackingAreaError = 20;
+
+test('Tracking', async t => {
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+   // wait for data to arrive
+  await sleep(1000);
+
+  var arrayLength = testTrackingAreas.length;
+  // run for 5 second
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 10*1000) {
+	for (var i = 0; i < arrayLength; i++) {
+		var x = testTrackingAreas[i][0];
+		var y = testTrackingAreas[i][1];
+		if(Math.abs(receivedTestData.lastFaceX - x) < testTrackingAreaError &&
+			Math.abs(receivedTestData.lastFaceY - y) < testTrackingAreaError){
+			testTrackingAreas[i][2] = true;
+		}
+	}
+	await sleep(10);
+  }
+
+  // we should have tracked all area
+  for (var i = 0; i < arrayLength; i++) {
+	if(!testTrackingAreas[i][2]) {
+		console.log("Missing area of tracking, X Y :",testTrackingAreas[i][0], testTrackingAreas[i][1]);
+		t.fail();                 
+    }                             
+  }                               
+                                  
+  t.pass();                       
+});                               
+                                
+// ---------------------------------------------------------------------------
+// TEST : Drawing : Mask Basic
+// ---------------------------------------------------------------------------
+test('Drawing : Mask Json Basic', async t => {
+
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+  await testEachMask(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
+
+  t.pass();
+});
+
+
+// ---------------------------------------------------------------------------
+// TEST : Drawing : Mask Advanced
+// ---------------------------------------------------------------------------
+test('Drawing : Mask Json Advanced', async t => {
+
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+  var fs = require('fs');
+  var maskDir = getFacemaskMasksDataDir();
+  var masks = fs.readdirSync(maskDir);
+  for (var maskName of masks)  {
+	console.log("Testing mask: ", maskName);
+	await testEachMask(t, sourceName, filterName, maskName);
+  }
+
+  t.pass();
+});
+
 
 // ---------------------------------------------------------------------------
 // TEST : Performance
@@ -469,17 +509,14 @@ test('Performance', async t => {
   // start the test pipe server
   startTestPipeServer();
 
-  // set fps to 60
-  await setFps60(t);
-
   // media source
   await addMediaSource(t, sourceName);
 
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
 
-  // set draw mode to 2D
-  await setDrawMode(t, sourceName, filterName, "2D Face Mask");
+  // add test mask
+  await setMaskJson(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
 
   // wait for the cpu to settle down. Setting params in the UI
   // lowers the FPS
@@ -489,40 +526,17 @@ test('Performance', async t => {
   const startTime = Date.now();
   while((Date.now() - startTime) < 10000) {
     await updatePerformanceStats(t);
-    if (fps < 60) {
+    if (fps < 25) {
       console.log("FPS DROPPED TO ", fps.toString());
       t.fail();
       break;
     }
+	if(cpuUsage >= 50) {
+	  console.log("CPU exceed the limit: ", cpuUsage.toString());
+      t.fail();
+      break;
+	}
   }
 
   t.pass();
 });
-
-
-// ---------------------------------------------------------------------------
-// TEST : Drawing : 2D Mask
-// ---------------------------------------------------------------------------
-test('Drawing : 2D Mask', async t => {
-
-  // draw mode test
-  await drawingModeTest(t, '2D Face Mask');
-
-  t.pass();
-});
-
-
-// ---------------------------------------------------------------------------
-// TEST : Drawing : JSON Mask
-// ---------------------------------------------------------------------------
-test('Drawing : Mask Json', async t => {
-
-  // draw mode test
-  await drawingModeTest(t, 'Mask Json');
-
-  t.pass();
-});
-
-
-
-

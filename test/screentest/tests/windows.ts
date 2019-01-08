@@ -6,10 +6,8 @@ import { useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
 import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 
-
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest({ window: 'child' });
-
 
 test('Sources showcase window', async t => {
   const client = await getClient();
@@ -33,7 +31,6 @@ test('AddSource window with suggestions', async t => {
   sourcesService.showAddSource('color_source');
   t.pass();
 });
-
 
 test('Settings General', async t => {
   const client = await getClient();

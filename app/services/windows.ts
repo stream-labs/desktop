@@ -1,3 +1,4 @@
+/* tslint:disable:max-line-length */
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 import { cloneDeep } from 'lodash';
@@ -8,7 +9,6 @@ import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import NameSceneCollection from 'components/windows/NameSceneCollection.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
@@ -60,8 +60,6 @@ import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/wi
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
 import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
 import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
-
-import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
 import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
 import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
@@ -89,7 +87,6 @@ export function getComponents() {
     RenameSource,
     AddSource,
     NameScene,
-    NameSceneCollection,
     NameFolder,
     SourceProperties,
     SourceFilters,
@@ -171,7 +168,7 @@ interface IWindowsState {
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
-  isShown: true
+  isShown: true,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -185,13 +182,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
-      isShown: false
-    }
+      isShown: false,
+    },
   };
 
   // This is a list of components that are registered to be
@@ -239,7 +236,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
       const options = {
         ...windowOptions.prevWindowOptions,
-        isPreserved: true
+        isPreserved: true,
       };
 
       ipcRenderer.send('window-showChildWindow', options);
@@ -268,10 +265,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * already exists, this function will focus the existing window instead.
    * @return the window id of the created window
    */
-  createOneOffWindow(
-    options: Partial<IWindowOptions>,
-    windowId?: string
-  ): string {
+  createOneOffWindow(options: Partial<IWindowOptions>, windowId?: string): string {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     windowId = windowId || uuid();
 
     if (this.windows[windowId]) {
@@ -286,7 +281,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       frame: false,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
-      title: options.title || 'New Window'
+      title: options.title || 'New Window',
     }));
 
     newWindow.setMenu(null);
@@ -357,7 +352,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
       if (currentOptions.preservePrevWindow) {
         throw new Error(
-          "You can't use preservePrevWindow option for more that 1 window in the row"
+          "You can't use preservePrevWindow option for more that 1 window in the row",
         );
       }
 
@@ -399,7 +394,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const opts = {
       componentName: 'Blank',
       scaleFactor: 1,
-      ...options
+      ...options,
     };
 
     Vue.set(this.state, windowId, opts);

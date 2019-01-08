@@ -2,7 +2,11 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import { cloneDeep } from 'lodash';
-import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
+import {
+  IObsListOption,
+  setupConfigurableDefaults,
+  TObsValue,
+} from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -21,10 +25,14 @@ import { StreamlabelsManager } from './properties-managers/streamlabels-manager'
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
 import {
-  IActivePropertyManager, ISource, ISourceAddOptions, ISourcesServiceApi, ISourcesState,
+  IActivePropertyManager,
+  ISource,
+  ISourceAddOptions,
+  ISourcesServiceApi,
+  ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager
+  TPropertiesManager,
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
@@ -44,14 +52,13 @@ export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   widget: WidgetManager,
   streamlabels: StreamlabelsManager,
-  platformApp: PlatformAppManager
+  platformApp: PlatformAppManager,
 };
 
-export class SourcesService extends StatefulService<ISourcesState>
-  implements ISourcesServiceApi {
+export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},
-    temporarySources: {} // don't save temporarySources in the config file
+    temporarySources: {}, // don't save temporarySources in the config file
   } as ISourcesState;
 
   sourceAdded = new Subject<ISource>();
@@ -76,12 +83,10 @@ export class SourcesService extends StatefulService<ISourcesState>
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
 
     this.scenesService.itemRemoved.subscribe(sceneSourceModel =>
-      this.onSceneItemRemovedHandler(sceneSourceModel)
+      this.onSceneItemRemovedHandler(sceneSourceModel),
     );
 
-    this.scenesService.sceneRemoved.subscribe(sceneModel =>
-      this.removeSource(sceneModel.id)
-    );
+    this.scenesService.sceneRemoved.subscribe(sceneModel => this.removeSource(sceneModel.id));
   }
 
   @mutation()
@@ -91,11 +96,12 @@ export class SourcesService extends StatefulService<ISourcesState>
 
   @mutation()
   private ADD_SOURCE(addOptions: {
-    id: string, name: string,
-    type: TSourceType,
-    channel?: number,
-    isTemporary?: boolean,
-    propertiesManagerType?: TPropertiesManager
+    id: string;
+    name: string;
+    type: TSourceType;
+    channel?: number;
+    isTemporary?: boolean;
+    propertiesManagerType?: TPropertiesManager;
   }) {
     const id = addOptions.id;
     const sourceModel: ISource = {
@@ -116,8 +122,8 @@ export class SourcesService extends StatefulService<ISourcesState>
       height: 0,
 
       muted: false,
-      resourceId: 'Source' + JSON.stringify([id]),
-      channel: addOptions.channel
+      resourceId: `Source${JSON.stringify([id])}`,
+      channel: addOptions.channel,
     };
 
     if (addOptions.isTemporary) {
@@ -149,7 +155,7 @@ export class SourcesService extends StatefulService<ISourcesState>
     name: string,
     type: TSourceType,
     settings: Dictionary<any> = {},
-    options: ISourceAddOptions = {}
+    options: ISourceAddOptions = {},
   ): Source {
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
@@ -173,7 +179,7 @@ export class SourcesService extends StatefulService<ISourcesState>
       type,
       channel: options.channel,
       isTemporary: options.isTemporary,
-      propertiesManagerType: managerType
+      propertiesManagerType: managerType,
     });
     const source = this.getSource(id);
     const muted = obsInput.muted;
@@ -183,7 +189,7 @@ export class SourcesService extends StatefulService<ISourcesState>
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
       manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
-      type: managerType
+      type: managerType,
     };
 
     if (source.hasProps()) setupConfigurableDefaults(obsInput);
@@ -227,10 +233,10 @@ export class SourcesService extends StatefulService<ISourcesState>
         'aac',
         'wav',
         'gif',
-        'webm'
+        'webm',
       ],
       browser_source: ['html'],
-      text_gdiplus: ['txt']
+      text_gdiplus: ['txt'],
     };
     let ext = path.split('.').splice(-1)[0];
     if (!ext) return null;
@@ -246,13 +252,13 @@ export class SourcesService extends StatefulService<ISourcesState>
       } else if (type === 'browser_source') {
         settings = {
           is_local_file: true,
-          local_file: path
+          local_file: path,
         };
       } else if (type === 'ffmpeg_source') {
         settings = {
           is_local_file: true,
           local_file: path,
-          looping: true
+          looping: true,
         };
       } else if (type === 'text_gdiplus') {
         settings = { text: fs.readFileSync(path).toString() };
@@ -288,9 +294,10 @@ export class SourcesService extends StatefulService<ISourcesState>
       // resolve the device id by the device name here
       if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
 
-      const device = type === 'dshow_input' ?
-        this.hardwareService.getDshowDeviceByName(settings[propName]) :
-        this.hardwareService.getDeviceByName(settings[propName]);
+      const device =
+        type === 'dshow_input'
+          ? this.hardwareService.getDshowDeviceByName(settings[propName])
+          : this.hardwareService.getDeviceByName(settings[propName]);
 
       if (!device) return;
       resolvedSettings[propName] = device.id;
@@ -304,7 +311,9 @@ export class SourcesService extends StatefulService<ISourcesState>
     // setup default settings
     if (type === 'browser_source') {
       if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
-      if (resolvedSettings.url === void 0) resolvedSettings.url = 'https://streamlabs.com/browser-source';
+      if (resolvedSettings.url === void 0) {
+        resolvedSettings.url = 'https://streamlabs.com/browser-source';
+      }
     }
 
     if (type === 'text_gdiplus') {
@@ -333,11 +342,11 @@ export class SourcesService extends StatefulService<ISourcesState>
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
-      { description: 'OvrStream', value: 'ovrstream_dc_source' }
+      { description: 'OvrStream', value: 'ovrstream_dc_source' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
-      obsAvailableTypes.includes(type.value)
+      obsAvailableTypes.includes(type.value),
     );
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
@@ -369,7 +378,7 @@ export class SourcesService extends StatefulService<ISourcesState>
         const size = {
           id: item.sourceId,
           width: sourcesSize[index].width,
-          height: sourcesSize[index].height
+          height: sourcesSize[index].height,
         };
         this.UPDATE_SOURCE(size);
       }
@@ -394,11 +403,7 @@ export class SourcesService extends StatefulService<ISourcesState>
         if (!source) return;
 
         if (source.width !== update.width || source.height !== update.height) {
-          const size = {
-            id: source.sourceId,
-            width: update.width,
-            height: update.height
-          };
+          const size = { id: source.sourceId, width: update.width, height: update.height };
           this.UPDATE_SOURCE(size);
         }
         this.updateSourceFlags(source, update.outputFlags);
@@ -406,24 +411,14 @@ export class SourcesService extends StatefulService<ISourcesState>
     }
   }
 
-  private updateSourceFlags(
-    source: ISource,
-    flags: number,
-    doNotEmit?: boolean
-  ) {
+  private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if (source.audio !== audio || source.video !== video) {
-      this.UPDATE_SOURCE({
-        id: source.sourceId,
-        audio,
-        video,
-        async,
-        doNotDuplicate
-      });
+      this.UPDATE_SOURCE({ audio, video, async, doNotDuplicate, id: source.sourceId });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }
@@ -457,7 +452,7 @@ export class SourcesService extends StatefulService<ISourcesState>
 
   get sources(): Source[] {
     return Object.values(this.state.sources).map(sourceModel =>
-      this.getSource(sourceModel.sourceId)
+      this.getSource(sourceModel.sourceId),
     );
   }
 
@@ -491,7 +486,7 @@ export class SourcesService extends StatefulService<ISourcesState>
       WidgetType.SubGoal,
       WidgetType.MediaShare,
       WidgetType.SponsorBanner,
-      WidgetType.AlertBox
+      WidgetType.AlertBox,
     ];
 
     if (isWidget && this.userService.isLoggedIn()) {
@@ -507,8 +502,8 @@ export class SourcesService extends StatefulService<ISourcesState>
           queryParams: { sourceId },
           size: {
             width: 900,
-            height: 1024
-          }
+            height: 1024,
+          },
         });
 
         return;
@@ -528,7 +523,7 @@ export class SourcesService extends StatefulService<ISourcesState>
         if (page && page.redirectPropertiesToTopNavSlot) {
           this.navigationService.navigate('PlatformAppContainer', {
             appId: app.id,
-            sourceId: source.sourceId
+            sourceId: source.sourceId,
           });
 
           // If we navigated, we don't want to open source properties,
@@ -545,8 +540,8 @@ export class SourcesService extends StatefulService<ISourcesState>
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 800
-      }
+        height: 800,
+      },
     });
   }
 
@@ -556,8 +551,8 @@ export class SourcesService extends StatefulService<ISourcesState>
       title: $t('Add Source'),
       size: {
         width: 1200,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -568,8 +563,8 @@ export class SourcesService extends StatefulService<ISourcesState>
       queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
-        height: 540
-      }
+        height: 540,
+      },
     });
   }
 
@@ -580,8 +575,8 @@ export class SourcesService extends StatefulService<ISourcesState>
       queryParams: { sourceId },
       size: {
         width: 400,
-        height: 250
-      }
+        height: 250,
+      },
     });
   }
 }

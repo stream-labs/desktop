@@ -2,25 +2,23 @@ import { IWidgetData, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
 import { InheritMutations } from '../../stateful-service';
 
-export interface IMediaShareData extends IWidgetData {
-}
+export interface IMediaShareData extends IWidgetData {}
 
 @InheritMutations()
 export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData> {
-
   getApiSettings() {
     return {
       type: WidgetType.MediaShare,
       url: `https://${this.getHost()}/widgets/chatbot?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/chatbot?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/chatbot?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'mediaShareSettingsUpdate',
       goalCreateEvent: 'newmediaShare',
       goalResetEvent: 'mediaShareEnd',
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
   getWidgetType() {
     return WidgetType.MediaShare;
@@ -32,7 +30,7 @@ export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData>
 
   getPreviewUrl() {
     alert('got preview url');
-    return `https://${ this.getHost() }/widgets/chatbot/v1/${this.getWidgetToken()}?simulate=1`;
+    return `https://${this.getHost()}/widgets/chatbot/v1/${this.getWidgetToken()}?simulate=1`;
   }
 
   getDataUrl() {

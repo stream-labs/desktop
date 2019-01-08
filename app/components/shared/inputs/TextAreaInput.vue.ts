@@ -8,10 +8,8 @@ interface IWTextMetadata extends IInputMetadata {
   min: number;
 }
 
-@Component({
-})
+@Component({})
 export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
-
   @Prop()
   readonly value: string;
 

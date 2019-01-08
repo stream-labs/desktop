@@ -1,5 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
-import { WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 
@@ -24,21 +23,20 @@ export interface IDonationTickerData extends IWidgetData {
 
 @InheritMutations()
 export class DonationTickerService extends WidgetSettingsService<IDonationTickerData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.DonationTicker,
-      url: `https://${ this.getHost() }/widgets/donation-ticker?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/donation-ticker?token=${this.getWidgetToken()}&simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
+      url: `https://${this.getHost()}/widgets/donation-ticker?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/donation-ticker?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/ticker`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/ticker`,
       settingsUpdateEvent: 'donationTickerSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      hasTestButtons: true
-    }
+      hasTestButtons: true,
+    };
   }
 
   protected patchAfterFetch(data: any): IDonationTickerData {

@@ -9,7 +9,6 @@ import { mutation } from '../stateful-service';
 
 @ServiceHelper()
 export class WidgetSource implements IWidgetSource {
-
   @Inject() private sourcesService: SourcesService;
   @Inject() private widgetsService: WidgetsService;
 
@@ -17,7 +16,7 @@ export class WidgetSource implements IWidgetSource {
   readonly sourceId: string;
   readonly previewSourceId: string;
 
-  private widgetSourceState: IWidgetSource;
+  private readonly widgetSourceState: IWidgetSource;
 
   constructor(sourceId: string) {
     this.widgetSourceState = this.widgetsService.state.widgetSources[sourceId];
@@ -41,9 +40,8 @@ export class WidgetSource implements IWidgetSource {
    * the previewSource may have a different url for simulating widget's activity
    */
   createPreviewSource(): Source {
-
     if (this.previewSourceId) {
-      throw new Error('Only one preview source is allowed for widget')
+      throw new Error('Only one preview source is allowed for widget');
     }
 
     const source = this.getSource();
@@ -51,14 +49,14 @@ export class WidgetSource implements IWidgetSource {
     const previewSourceSettings = {
       ...source.getSettings(),
       shutdown: false,
-      url: apiSettings.previewUrl
+      url: apiSettings.previewUrl,
     };
 
     const previewSource = this.sourcesService.createSource(
       source.name,
       source.type,
       previewSourceSettings,
-      { isTemporary: true}
+      { isTemporary: true },
     );
 
     this.SET_PREVIEW_SOURCE_ID(previewSource.sourceId);

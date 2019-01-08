@@ -4,7 +4,6 @@ import { ITextMetadata } from './index';
 
 @Component({})
 export default class TextInput extends BaseInput<string, ITextMetadata> {
-
   @Prop()
   readonly value: string;
 
@@ -14,10 +13,10 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
   getValidations() {
     return {
       ...super.getValidations(),
-      date_format:  this.options.dateFormat,
-      min: this.options.min,
+      date_format: this.options.dateFormat,
       max: this.options.max,
-      alpha_num: this.options.alphaNum
+      min: this.options.min,
+      alpha_num: this.options.alphaNum,
     };
   }
 }

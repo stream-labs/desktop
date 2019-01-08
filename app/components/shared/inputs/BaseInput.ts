@@ -6,7 +6,6 @@ import { IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm.vue';
 
 export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
-
   @Prop()
   readonly value: TValueType;
 
@@ -40,6 +39,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
     super();
 
     // try to find parent-form and parent-input
+    // tslint:disable-next-line:no-this-assignment TODO
     let comp: Vue = this;
     do {
       comp = comp.$parent;
@@ -55,10 +55,9 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
 
-    const needToSendEventToForm = (
-      this.form &&
-      !this.parentInput || (this.parentInput && !this.parentInput.delegateChildrenEvents)
-    );
+    const needToSendEventToForm =
+      (this.form && !this.parentInput) ||
+      (this.parentInput && !this.parentInput.delegateChildrenEvents);
 
     if (needToSendEventToForm) this.form.emitInput(eventData, event);
   }
@@ -84,7 +83,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   getOptions(): TMetadataType {
     // merge props and metadata to the 'options' object
     // override this method if you need add more props to the 'option' object
-    const metadata = this.metadata || {} as TMetadataType;
+    const metadata = this.metadata || ({} as TMetadataType);
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
     return options;
@@ -93,6 +92,4 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   get options(): TMetadataType {
     return this.getOptions();
   }
-
 }
-

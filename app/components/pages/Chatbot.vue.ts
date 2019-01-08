@@ -10,7 +10,7 @@ import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import ChatbotQuotes from 'components/page-components/Chatbot/ChatbotQuotes.vue';
 import ChatbotQueue from 'components/page-components/Chatbot/ChatbotQueue.vue';
-import { ChatbotApiService, ChatbotBaseApiService } from 'services/chatbot';
+import { ChatbotApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
@@ -49,8 +49,8 @@ export default class Chatbot extends Vue {
       children: [
         { title: 'Custom Commands' },
         { title: 'Default Commands' },
-        { title: 'Variables' }
-      ]
+        { title: 'Variables' },
+      ],
     },
     { title: 'Timers', enabled: true },
     { title: 'Mod Tools', enabled: true },
@@ -73,7 +73,7 @@ export default class Chatbot extends Vue {
     Queue: 'fas fa-list-ul',
     Loyalty: 'fas fa-dollar-sign',
     Poll: 'icon-suggestions',
-    Betting: 'fas fa-money-bill-wave'
+    Betting: 'fas fa-money-bill-wave',
   };
 
   selectedTab = 'Modules';
@@ -85,7 +85,6 @@ export default class Chatbot extends Vue {
     return this.chatbotApiService.Base.state.globallyEnabled;
   }
 
-  //@Debounce(1000)
   async onToggleEnableChatbotHandler() {
     await this.chatbotApiService.Base.toggleEnableChatbot();
   }

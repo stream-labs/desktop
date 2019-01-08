@@ -11,18 +11,16 @@ import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-import {
-  IncrementalRolloutService,
-  EAvailableFeatures
-} from 'services/incremental-rollout';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
 Vue.use(VueResize);
 
 @Component({
   components: {
-    Login
-  }
+    Login,
+  },
 })
 export default class TopNav extends Vue {
   @Inject() appService: AppService;
@@ -37,7 +35,14 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
-  studioModeTooltip = 'Studio Mode';
+  studioModeTooltip = $t('Studio Mode');
+  settingsTooltip = $t('Settings');
+  helpTooltip = $t('Get Help');
+  logoutTooltip = $t('Logout');
+  sunTooltip = $t('Day mode');
+  moonTooltip = $t('Night mode');
+
+  availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
   mounted() {
     this.topNav = this.$refs.top_nav;
@@ -47,8 +52,7 @@ export default class TopNav extends Vue {
     return EAvailableFeatures;
   }
 
-  @Prop()
-  locked: boolean;
+  @Prop() locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
@@ -136,6 +140,13 @@ export default class TopNav extends Vue {
         this.featureIsEnabled(this.availableFeatures.platform)) &&
       this.userService.isLoggedIn() &&
       this.userService.platform.type === 'twitch'
+    );
+  }
+
+  get chatbotVisible() {
+    return (
+      this.userService.isLoggedIn() &&
+      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
     );
   }
 
