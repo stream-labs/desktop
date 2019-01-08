@@ -10,9 +10,10 @@ import { WindowsService } from 'services/windows';
 import { StreamingService } from 'services/streaming';
 import { TObsFormData } from '../obs/inputs/ObsInput';
 import GenericFormGroups from '../obs/inputs/GenericFormGroups.vue';
+import StartStreamingButton from '../StartStreamingButton.vue';
 
 @Component({
-  components: { ModalLayout, GenericFormGroups },
+  components: { ModalLayout, GenericFormGroups, StartStreamingButton },
 })
 export default class Troubleshooter extends Vue {
   @Inject() private notificationsService: INotificationsServiceApi;
