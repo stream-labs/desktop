@@ -96,24 +96,6 @@ export default class ChatbotModules extends ChatbotBase {
           });
         },
       },
-      {
-        title: $t('Mini Games'),
-        description: comingSoonText,
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
-        enabled: false,
-        onExpand: () => {},
-        onToggleEnabled: () => {},
-        comingSoon: true,
-      },
-      {
-        title: $t('Counter'),
-        description: comingSoonText,
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
-        enabled: false,
-        onExpand: () => {},
-        onToggleEnabled: () => {},
-        comingSoon: true,
-      },
     ];
     return modules;
   }
