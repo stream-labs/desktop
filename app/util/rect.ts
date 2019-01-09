@@ -38,6 +38,10 @@ export class Rect implements IRectangle {
     this.y = pos.y;
   }
 
+  getSize(): Vec2 {
+    return v2(this.width, this.height);
+  }
+
   /**
    * returns the relative distance from the rectangle to point
    * { x: 0, y: 0 } is top-left corner

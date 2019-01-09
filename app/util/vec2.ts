@@ -33,6 +33,7 @@ export class Vec2 extends Vector2 {
         return (...args: any[]) => {
           const result = new Vector2(target.x, target.y)[propName](...args);
           if (result instanceof Vector2) return new Vec2(result);
+          return result;
         };
       },
     });
