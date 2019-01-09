@@ -60,7 +60,7 @@ export default class ExtraSettings extends Vue {
       electron.remote.clipboard.writeText(file);
       alert(
         $t(
-          'Your cache directory has been successfully uploaded. ' +
+          'Your cache directory has been successfully uploaded.  ' +
             'The file name %{file} has been copied to your clipboard.',
           { file },
         ),
