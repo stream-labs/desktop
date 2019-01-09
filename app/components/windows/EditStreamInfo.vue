@@ -24,8 +24,12 @@
         :value="pageModel"
         @input="(pageId) => setFacebookPageId(pageId)"
       />
-      <ObsTextInput v-model="streamTitleModel" />
-      <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
+      <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title') }" />
+      <h-form-group
+        v-if="isYoutube || isFacebook"
+        v-model="streamDescriptionModel"
+        :metadata="{ type: 'text-area', name: 'stream_description', title: $t('Description'), rows: 4 }"
+      />
       <ObsListInput
         v-if="isTwitch || isMixer || isFacebook"
         :value="gameModel"

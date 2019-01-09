@@ -20,6 +20,7 @@
       @click="toggleVisible">
       {{ textVisible ? $t('Hide') : $t('Show') }}
     </button>
+    <slot></slot>
   </span>
 </template>
 
