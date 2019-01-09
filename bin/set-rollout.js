@@ -13,10 +13,6 @@ function important(msg) {
   sh.echo(colors.cyan(msg));
 }
 
-function error(msg) {
-  sh.echo(colors.red(`ERROR: ${msg}`));
-}
-
 async function setRollout(version, rollout, bucket) {
   const proc = cp.fork(
     path.resolve(__dirname, 'aws-wrapper.js'),
