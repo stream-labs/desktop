@@ -7,6 +7,8 @@
       @input="emitInput($event.target.value)"
       class="text-area radius"
       :name="uuid"
+      :disabled="metadata.disabled"
+      :rows="metadata.rows || 2"
       v-validate="validate"
     />
     <span class="input-error" v-show="errors.first(uuid)">

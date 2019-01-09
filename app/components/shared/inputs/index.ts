@@ -58,6 +58,7 @@ export interface ITextMetadata extends IInputMetadata {
   min?: number;
   dateFormat?: string;
   alphaNum?: boolean;
+  masked?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
