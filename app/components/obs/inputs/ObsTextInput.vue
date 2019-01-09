@@ -1,7 +1,10 @@
 <template>
 <v-form-group :title="value.description">
-  <text-area-input v-if="value.multiline" :value="value.value" @input="onInputHandler" :metadata="metadata" />
-  <text-input v-else :value="value.value" @input="onInputHandler" :metadata="metadata" />
+  <div style="display: flex;">
+    <text-area-input v-if="value.multiline" :value="value.value" @input="onInputHandler" :metadata="metadata" />
+    <text-input v-else :value="value.value" @input="onInputHandler" :metadata="metadata" />
+    <slot></slot>
+  </div>
 </v-form-group>
 </template>
 

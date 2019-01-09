@@ -17,6 +17,7 @@ class ObsTextInput extends ObsInput<IObsInput<string>> {
       masked: this.value.masked,
       disabled: this.value.enabled === false,
       rows: 4,
+      fullWidth: true,
     };
   }
 

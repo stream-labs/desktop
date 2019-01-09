@@ -1,5 +1,10 @@
 <template>
-  <span class="text-input" data-role="input" data-type="text" :data-name="options.name">
+  <span
+    :class="{ 'text-input': true, 'full-width': metadata.fullWidth }"
+    data-role="input"
+    data-type="text"
+    :data-name="options.name"
+  >
     <input
         :type="textVisible ? 'text' : 'password'"
         :placeholder="options.placeholder"
@@ -26,6 +31,10 @@
   .text-input {
     position: relative;
     display: flex;
+  }
+
+  .text-input.full-width {
+    width: 100%
   }
 
   .button--input {
