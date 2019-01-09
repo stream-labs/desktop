@@ -33,7 +33,7 @@
     <div class="section-content">
       <bool-input
         v-model="mediaBackupOptOut"
-        :metadata="{ title: $t('Do not back up my media files in the cloud (requires app restart)')}"
+        :title="$t('Do not back up my media files in the cloud (requires app restart)')"
         name="media_backup_opt_out"
       />
     </div>
