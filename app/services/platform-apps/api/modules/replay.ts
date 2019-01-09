@@ -1,5 +1,6 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
 import { StreamingService, EReplayBufferState } from 'services/streaming';
+import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
 import { FileReturnWrapper } from 'services/guest-api';
@@ -20,6 +21,7 @@ export class ReplayModule extends Module {
   permissions = [EApiPermissions.Streaming];
 
   @Inject() streamingService: StreamingService;
+  @Inject() settingsService: SettingsService;
 
   /**
    * Maps file id to filepath
@@ -59,6 +61,34 @@ export class ReplayModule extends Module {
   @apiMethod()
   stopBuffer() {
     this.streamingService.stopReplayBuffer();
+  }
+
+  @apiMethod()
+  getEnabled() {
+    return this.settingsService.state.Output.RecRB;
+  }
+
+  @apiMethod()
+  setEnabled(ctx: IApiContext, enabled: boolean) {
+    if (this.getState().status === EReplayBufferState.Offline) {
+      this.settingsService.setSettingsPatch({ Output: { RecRB: enabled } });
+    } else {
+      throw new Error('Replay buffer must be stopped before its settings can be changed!');
+    }
+  }
+
+  @apiMethod()
+  getDuration() {
+    return this.settingsService.state.Output.RecRBTime;
+  }
+
+  @apiMethod()
+  setDuration(ctx: IApiContext, duration: number) {
+    if (this.getState().status === EReplayBufferState.Offline) {
+      this.settingsService.setSettingsPatch({ Output: { RecRBTime: duration } });
+    } else {
+      throw new Error('Replay buffer must be stopped before its settings can be changed!');
+    }
   }
 
   @apiMethod()

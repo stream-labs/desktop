@@ -21,7 +21,6 @@ import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
-import { throttle } from 'lodash-decorators';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
