@@ -87,6 +87,8 @@ async function setRollout(version, rollout, bucket) {
   await setRollout(version, newRollout, 'streamlabs-obs');
   await setRollout(version, newRollout, 'slobs-cdn.streamlabs.com');
 
+  info(`${version} is now at ${newRollout} rollout!`);
+
 })().then(() => {
   sh.exit(0);
 });
