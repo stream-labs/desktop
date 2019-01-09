@@ -4,7 +4,12 @@
  */
 
 import electron from 'electron';
-import { IGuestApiRequest, IGuestApiResponse, IGuestApiCallback } from '../app/services/guest-api';
+import {
+  IGuestApiRequest,
+  IGuestApiResponse,
+  IGuestApiCallback,
+  EResponseResultProcessing,
+} from '../app/services/guest-api';
 import uuid from 'uuid/v4';
 import fs from 'fs';
 import util from 'util';
@@ -12,6 +17,8 @@ import mime from 'mime';
 import path from 'path';
 
 (() => {
+  const readFile = util.promisify(fs.readFile);
+
   global.eval = function() {
     throw new Error('Eval is disabled for security');
   };
@@ -53,13 +60,25 @@ import path from 'path';
     requests[response.requestId].callbacks[response.callbackId](...response.args);
   });
 
-  electron.ipcRenderer.on('guestApiResponse', (event: any, response: IGuestApiResponse) => {
+  electron.ipcRenderer.on('guestApiResponse', async (event: any, response: IGuestApiResponse) => {
     if (!requests[response.id]) return;
 
-    if (response.error) {
-      requests[response.id].reject(response.result);
+    let result: any;
+
+    // Perform any processing on the result if required
+    if (response.resultProcessing === EResponseResultProcessing.File) {
+      result = await readFile(response.result).then(data => {
+        const parsed = path.parse(response.result);
+        return new File([data], parsed.base, { type: mime.getType(parsed.ext) });
+      });
     } else {
-      requests[response.id].resolve(response.result);
+      result = response.result;
+    }
+
+    if (response.error) {
+      requests[response.id].reject(result);
+    } else {
+      requests[response.id].resolve(result);
     }
 
     // Delete the request object if there aren't any callbacks
@@ -130,13 +149,4 @@ import path from 'path';
   }
 
   global['streamlabsOBS'] = getProxy();
-
-  global['tmpLoadFile'] = (filename: string) => {
-    const readFile = util.promisify(fs.readFile);
-
-    return readFile(filename).then(data => {
-      const parsed = path.parse(filename);
-      return new File([data], parsed.base, { type: mime.getType(parsed.ext) });
-    });
-  };
 })();
