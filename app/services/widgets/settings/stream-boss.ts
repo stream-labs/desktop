@@ -129,9 +129,9 @@ export abstract class StreamBossService extends BaseGoalService<
         options: [
           { value: 'default', title: 'Default' },
           { value: 'future', title: 'Future' },
-          { value: 'noimage', title: 'No Image' },
-          { value: 'slim', title: 'Slim' },
-          { value: 'curved', title: 'Curved' },
+          { value: 'noimg', title: 'No Image' },
+          { value: 'pill', title: 'Slim' },
+          { value: 'future-curve', title: 'Curved' },
         ],
       }),
 
