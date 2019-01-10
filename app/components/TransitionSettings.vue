@@ -1,6 +1,6 @@
 <template>
 <div>
-  <ObsTextInput v-model="nameModel"/>
+  <v-form-group v-model="nameModel" :metadata="{ title: $t('Name'), type: 'text', name: 'name' }" />
   <ObsListInput v-model="typeModel"/>
   <ObsIntInput v-model="durationModel"/>
 

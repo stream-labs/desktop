@@ -200,11 +200,7 @@ export class SourceFiltersService extends Service {
         value: availableTypesList[0].value,
         options: availableTypesList,
       },
-      name: {
-        description: $t('Filter name'),
-        name: 'name',
-        value: 'New filter',
-      },
+      name: $t('New filter'),
     };
   }
 

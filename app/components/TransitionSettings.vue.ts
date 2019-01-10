@@ -6,10 +6,12 @@ import * as inputComponents from 'components/obs/inputs';
 import { TObsFormData, IObsListInput, IObsInput } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
   components: {
     GenericForm,
+    VFormGroup,
     ...inputComponents,
   },
 })
@@ -44,16 +46,12 @@ export default class SceneTransitions extends Vue {
     this.transitionsService.setDuration(this.transitionId, model.value);
   }
 
-  get nameModel(): IObsInput<string> {
-    return {
-      description: $t('Name'),
-      name: 'name',
-      value: this.transition.name,
-    };
+  get nameModel(): string {
+    return this.transition.name;
   }
 
-  set nameModel(name: IObsInput<string>) {
-    this.transitionsService.renameTransition(this.transitionId, name.value);
+  set nameModel(name: string) {
+    this.transitionsService.renameTransition(this.transitionId, name);
   }
 
   get transition() {
