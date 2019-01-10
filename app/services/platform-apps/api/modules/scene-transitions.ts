@@ -206,12 +206,23 @@ export class SceneTransitionsModule extends Module {
   }
 
   /**
+   * Get a list of the currently active transition connections
+   *
+   * @param _ctx API context
+   */
+  @apiMethod()
+  async getConnections(_ctx: IApiContext): Promise<ITransitionConnection[]> {
+    return this.transitionsService.state.connections;
+  }
+
+  /**
    * Delete a scene transition connection
    *
    * @param _ctx API Context
    * @param connectionId ID of the connection to be deleted
    * @return `true` if the connection was successfully deleted
    */
+  @apiMethod()
   async deleteConnection(_ctx: IApiContext, connectionId: string): Promise<boolean> {
     this.transitionsService.deleteConnection(connectionId);
     return true;
