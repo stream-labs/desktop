@@ -97,7 +97,7 @@ export class ReplayModule extends Module {
   }
 
   @apiMethod()
-  getReplayFileContents(ctx: IApiContext, fileId: string) {
+  getFileContents(ctx: IApiContext, fileId: string) {
     if (!this.availableFiles[fileId]) {
       throw new Error(`The file with id ${fileId} does not exist!`);
     }
