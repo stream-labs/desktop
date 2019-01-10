@@ -64,8 +64,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (source.channel) return true;
 
       // prevent sources without linked sceneItems to be saved
-      if (!linkedSourcesIds.includes(source.sourceId)) return false;
-      return true;
+      return linkedSourcesIds.includes(source.sourceId);
     });
   }
 

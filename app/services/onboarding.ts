@@ -55,8 +55,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   ObsImport: {
     isEligible: service => {
-      if (service.options.isLogin) return false;
-      return true;
+      return !service.options.isLogin;
     },
     next: 'SelectWidgets',
   },
@@ -71,8 +70,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeBrandDevice: {
     isEligible: service => {
-      if (service.options.isLogin) return false;
-      return true;
+      return !service.options.isLogin;
     },
     next: 'OptimizeA',
   },

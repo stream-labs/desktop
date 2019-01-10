@@ -95,11 +95,7 @@ export default class Main extends Vue {
   mainContentsRight = false;
 
   get leftDock() {
-    if (this.customizationService.state.leftDock) {
-      this.mainContentsRight = true;
-    } else {
-      this.mainContentsRight = false;
-    }
+    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -178,18 +174,10 @@ export default class Main extends Vue {
   windowSizeHandler() {
     this.windowWidth = window.innerWidth;
 
-    if (this.windowWidth < 1100) {
-      this.hasLiveDock = false;
-    } else {
-      this.hasLiveDock = true;
-    }
+    this.hasLiveDock = this.windowWidth >= 1100;
   }
 
   handleResize() {
-    if (this.$refs.mainMiddle.clientWidth < 1200) {
-      this.compactView = true;
-    } else {
-      this.compactView = false;
-    }
+    this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 }
