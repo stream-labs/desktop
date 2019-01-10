@@ -19,7 +19,12 @@
   <validated-form slot="font-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }" />
     <v-form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ tooltip: fontFamilyTooltip }" />
-    <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
+    <v-form-group
+      :title="$t('Font Size')"
+      type="fontSize"
+      v-model="wData.settings.text_size"
+      :metadata="{ tooltip: fontSizeTooltip, min: 10, max: 80 }"
+    />
   </validated-form>
 
   <validated-form slot="visual-properties" @input="save()" v-if="loaded">
