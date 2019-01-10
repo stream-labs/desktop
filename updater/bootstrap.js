@@ -293,14 +293,11 @@ async function entry(info) {
     
     const updaterStartCommand = `start \"\"  \"${updaterPath}\" `  
     
-    updaterArgs.push('&& echo update_started_fine_app_can_be_closed');  
-
     log.info(updaterArgs);
 
     const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
         cwd: info.tempDir,
         detached: false,
-        //stdio: 'ignore',
         shell: true
     });
     
@@ -315,21 +312,13 @@ async function entry(info) {
         update_spawned.on('error', resolve);
     });
     
-    const primiseDataError = new Promise(resolve => {
-        update_spawned.stderr.on('data', resolve);
-    });
-
-    const primiseDataOut = new Promise(resolve => {
-        update_spawned.stdout.on('data', resolve);
-    });
-
     //wait for something to happen
-    const promise = await Promise.race([primiseError, primiseExit, primiseDataOut, primiseDataError]); 
+    const promise = await Promise.race([primiseError, primiseExit]);  
     log.info('Updater spawn promise ' + `result \"${promise}\"`);
     
     update_spawned.unref();
 
-    if(`${promise}`.startsWith("update_started_fine_app_can_be_closed") )  //hardcoded string "update_started_fine_app_can_be_closed" 
+    if(`${promise}` == "0" ) 
     {
         return true;  
     } else {
