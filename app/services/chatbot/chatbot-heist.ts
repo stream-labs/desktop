@@ -46,6 +46,7 @@ export class ChatbotHeistApiService extends PersistentStatefulService<
             viewers: 50,
           },
           start_delay: 120,
+          cooldown: 300,
         },
         messages: {
           group: {

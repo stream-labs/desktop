@@ -525,6 +525,7 @@ export interface IHeistPreferencesGeneralSettings {
   min_entries: number;
   max_amount: number;
   start_delay: number;
+  cooldown: number;
   probability: {
     viewers: number;
     subscribers: number;

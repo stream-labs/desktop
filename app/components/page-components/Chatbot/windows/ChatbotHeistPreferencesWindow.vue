@@ -41,6 +41,13 @@
                   :metadata="metaData.startDelay"
                 />
               </div>
+              <div class="columns small-4">
+                <VFormGroup
+                  :title="$t('Cooldown')"
+                  v-model="newHeistPreferences.settings.general.cooldown"
+                  :metadata="metaData.cooldown"
+                />
+              </div>
             </div>
           </div>
         </div>

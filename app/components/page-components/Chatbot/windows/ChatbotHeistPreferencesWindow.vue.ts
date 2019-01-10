@@ -48,6 +48,7 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
           viewers: 0,
         },
         start_delay: 120,
+        cooldown: 300,
       },
       messages: {
         group: {
@@ -93,6 +94,15 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
         min: 0,
         max: 3600,
         placeholder: $t('Start Delay'),
+        tooltip: $t('Delay in Seconds'),
+      },
+      cooldown: {
+        required: true,
+        type: EInputType.number,
+        min: 10,
+        max: 86400,
+        placeholder: $t('Cooldown'),
+        tooltip: $t('Cooldown in Seconds'),
       },
       viewersChance: {
         required: true,
