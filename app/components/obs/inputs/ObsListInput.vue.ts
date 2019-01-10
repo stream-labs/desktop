@@ -31,6 +31,17 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
     this.$emit('search-change', value);
   }
 
+  get metadata() {
+    return {
+      loading: this.loading,
+      placeholder: this.placeholder,
+      allowEmpty: this.allowEmpty,
+      internalSearch: this.internalSearch,
+      title: this.value.description,
+      name: this.value.name,
+    };
+  }
+
   get currentValue() {
     const option = this.value.options.find((opt: IObsListOption<string>) => {
       return this.value.value === opt.value;

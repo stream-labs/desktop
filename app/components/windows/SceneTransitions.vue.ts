@@ -155,7 +155,7 @@ export default class SceneTransitions extends Vue {
   }
 
   nameForType(type: ETransitionType) {
-    return this.transitionsService.getTypes().find(t => t.value === type).description;
+    return this.transitionsService.getTypes().find(t => t.value === type).title;
   }
 
   done() {
