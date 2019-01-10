@@ -2,8 +2,9 @@ import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { ObsListInput, ObsBoolInput } from 'components/obs/inputs';
+import { ObsListInput } from 'components/obs/inputs';
 import { IObsInput, IObsListInput } from 'components/obs/inputs/ObsInput';
+import { BoolInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
@@ -33,7 +34,7 @@ interface IMultiSelectProfiles {
   components: {
     ModalLayout,
     ObsListInput,
-    ObsBoolInput,
+    BoolInput,
     HFormGroup,
     Multiselect,
   },
@@ -77,11 +78,7 @@ export default class EditStreamInfo extends Vue {
     options: [],
   };
 
-  doNotShowAgainModel: IObsInput<boolean> = {
-    name: 'do_not_show_again',
-    description: $t('Do not show this message when going live'),
-    value: false,
-  };
+  doNotShowAgainModel: boolean = false;
 
   startTimeModel: { time: number; date: string } = {
     time: null,
@@ -204,7 +201,7 @@ export default class EditStreamInfo extends Vue {
   updateAndGoLive() {
     this.updatingInfo = true;
 
-    if (this.doNotShowAgainModel.value) {
+    if (this.doNotShowAgainModel) {
       alert(
         $t('You will not be asked again to update your stream info when going live. ') +
           $t('You can re-enable this from the settings.'),

@@ -92,7 +92,12 @@
           </div>
         </div>
       </div>
-      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode && !isFacebook"/>
+      <bool-input
+        v-if="!midStreamMode && !isFacebook"
+        v-model="doNotShowAgainModel"
+        name='do_not_show_again'
+        :metadata="{ title: $t('Do not show this message when going live') }"
+      />
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
