@@ -115,13 +115,17 @@ export class SourceFiltersService extends Service {
       }
 
       /* We have either a video filter or source */
-      /* Can't apply asynchronous video filters to non-asynchronous video souces. */
+      /* Can't apply asynchronous video filters to non-asynchronous video sources. */
       if (!source.async && filterType.async) {
         return false;
       }
 
       /* Video filters can be applied to video sources. */
-      return source.video && filterType.video;
+      if (source.video && filterType.video) {
+        return true;
+      }
+
+      return false;
     });
   }
 

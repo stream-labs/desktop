@@ -207,7 +207,11 @@ export class DragHandler {
       return false;
     }
 
-    return b.offset + b.length >= a.offset;
+    if (b.offset + b.length < a.offset) {
+      return false;
+    }
+
+    return true;
   }
 
   private getNearestEdgeDistance(sourceEdge: IEdge, targetEdges: IEdge[]) {
