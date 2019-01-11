@@ -2,9 +2,7 @@ import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { ObsListInput } from 'components/obs/inputs';
-import { IObsInput, IObsListInput } from 'components/obs/inputs/ObsInput';
-import { BoolInput } from 'components/shared/inputs/inputs';
+import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
@@ -23,6 +21,7 @@ import {
 } from 'services/video-encoding-optimizations';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import { shell } from 'electron';
+import { IListOption } from '../shared/inputs';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -33,9 +32,9 @@ interface IMultiSelectProfiles {
 @Component({
   components: {
     ModalLayout,
-    ObsListInput,
     BoolInput,
     HFormGroup,
+    ListInput,
     Multiselect,
   },
 })
@@ -64,19 +63,11 @@ export default class EditStreamInfo extends Vue {
 
   streamDescriptionModel: string = '';
 
-  gameModel: IObsListInput<string> = {
-    name: 'stream_game',
-    description: $t('Game'),
-    value: '',
-    options: [],
-  };
+  gameModel: string = '';
+  gameOptions: IListOption<string>[] = [];
 
-  pageModel: IObsListInput<string> = {
-    name: 'stream_page',
-    description: $t('Facebook Page'),
-    value: '',
-    options: [],
-  };
+  pageModel: string = '';
+  pageOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
 
@@ -119,20 +110,20 @@ export default class EditStreamInfo extends Vue {
   async populateModels() {
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
-    this.gameModel.value = this.streamInfoService.state.channelInfo.game || '';
+    this.gameModel = this.streamInfoService.state.channelInfo.game || '';
     this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
-    this.gameModel.options = [
+    this.gameOptions = [
       {
-        description: this.streamInfoService.state.channelInfo.game,
+        title: this.streamInfoService.state.channelInfo.game,
         value: this.streamInfoService.state.channelInfo.game,
       },
     ];
 
     if (this.facebookPages) {
-      this.pageModel.value = this.facebookPages.page_id;
-      this.pageModel.options = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
+      this.pageModel = this.facebookPages.page_id;
+      this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
         value: page.id,
-        description: `${page.name} | ${page.category}`,
+        title: `${page.name} | ${page.category}`,
       }));
       this.hasPages = !!this.facebookPages.pages.length;
     }
@@ -145,14 +136,14 @@ export default class EditStreamInfo extends Vue {
       const platform = this.userService.platform.type;
       const service = getPlatformService(platform);
 
-      this.gameModel.options = [];
+      this.gameOptions = [];
 
       service.searchGames(searchString).then(games => {
         this.searchingGames = false;
         if (games && games.length) {
           games.forEach(game => {
-            this.gameModel.options.push({
-              description: game.name,
+            this.gameOptions.push({
+              title: game.name,
               value: game.name,
             });
           });
@@ -164,7 +155,7 @@ export default class EditStreamInfo extends Vue {
   loadAvailableProfiles() {
     if (!this.midStreamMode) {
       const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-        this.gameModel.value,
+        this.gameModel,
       );
 
       const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
@@ -192,7 +183,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   // For some reason, v-model doesn't work with ListInput
-  onGameInput(gameModel: IObsListInput<string>) {
+  onGameInput(gameModel: string) {
     this.gameModel = gameModel;
 
     this.loadAvailableProfiles();
@@ -211,7 +202,7 @@ export default class EditStreamInfo extends Vue {
     }
 
     this.streamInfoService
-      .setStreamInfo(this.streamTitleModel, this.streamDescriptionModel, this.gameModel.value)
+      .setStreamInfo(this.streamTitleModel, this.streamDescriptionModel, this.gameModel)
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -247,7 +238,7 @@ export default class EditStreamInfo extends Vue {
     const streamInfo = {
       title: this.streamTitleModel,
       description: this.streamDescriptionModel,
-      game: this.gameModel.value,
+      game: this.gameModel,
     };
     if (scheduledStartTime) {
       await service
@@ -347,12 +338,22 @@ export default class EditStreamInfo extends Vue {
     return this.streamInfoService.state.error;
   }
 
+  get gameMetadata() {
+    return {
+      loading: this.searchingGames,
+      internalSearch: false,
+      allowEmpty: true,
+      placeholder: $t('Search'),
+      options: this.gameOptions,
+    };
+  }
+
   fetchFacebookPages() {
     return this.userService.getFacebookPages();
   }
 
-  setFacebookPageId(model: IObsListInput<string>) {
-    this.userService.postFacebookPage(model.value);
+  setFacebookPageId(value: string) {
+    this.userService.postFacebookPage(value);
   }
 
   openFBPageCreateLink() {
@@ -379,7 +380,7 @@ export default class EditStreamInfo extends Vue {
 
   get profiles() {
     const multiselectArray: IMultiSelectProfiles[] = [];
-    let profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
+    let profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel);
     if (profiles.length === 0) {
       profiles = this.videoEncodingOptimizationService.getGameProfiles('Generic');
     }

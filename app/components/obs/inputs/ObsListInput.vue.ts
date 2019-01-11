@@ -37,7 +37,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
       placeholder: this.placeholder,
       allowEmpty: this.allowEmpty,
       internalSearch: this.internalSearch,
-      title: this.value.description,
+      title: this.value.showDescription !== false ? this.value.description : null,
       name: this.value.name,
     };
   }
