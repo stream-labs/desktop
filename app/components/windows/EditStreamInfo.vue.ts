@@ -292,7 +292,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   goLive() {
-    this.streamingService.startStreaming();
+    this.streamingService.toggleStreaming();
     this.navigationService.navigate('Live');
     this.windowsService.closeChildWindow();
   }
