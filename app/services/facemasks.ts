@@ -319,6 +319,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.state.device;
   }
 
+  getEnabledStatus() {
+    return this.settings.enabled;
+  }
+
   fetchFacemaskSettings() {
     return this.formRequest('slobs/facemasks/settings');
   }

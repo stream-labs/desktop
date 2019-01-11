@@ -31,7 +31,10 @@
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
       <div class="left-accordion__input">
-        <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
+        <validated-form v-if="alert !== 'facemasks'" @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
+        <validated-form v-if="alert === 'facemasks'" @input="handleFacemaskInput()">
+          <toggle-input v-model="facemaskEnabled" />
+        </validated-form>
       </div>
       <div
         v-if="wData && selectedAlert === alert"
@@ -88,7 +91,7 @@
       <v-form-group v-model="selectedVariation.settings.text.color2" :metadata="metadata.secondaryColor" />
     </div>
   </validated-form>
-  <validated-form slot="media-properties" key="media-properties" @input="save()" v-if="selectedVariation">
+  <validated-form slot="media-properties" key="media-properties" @input="handleFacemaskInput()" v-if="selectedVariation">
     <v-form-group
       v-if="selectedAlert === 'facemasks'"
       :value="facemaskDevice.value"
@@ -120,7 +123,7 @@
       <v-form-group v-model="selectedVariation.settings.tts.security" :metadata="metadata.ttsSecurity" />
     </div>
   </validated-form>
-  <validated-form slot="animation-properties" key="animation-properties" @input="save()" v-if="selectedVariation">
+  <validated-form slot="animation-properties" key="animation-properties" @input="handleFacemaskInput()" v-if="selectedVariation">
     <v-form-group v-model="selectedVariation.settings.showAnimation" :metadata="metadata.showAnimation" />
     <v-form-group v-model="selectedVariation.settings.hideAnimation" :metadata="metadata.hideAnimation" />
     <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />

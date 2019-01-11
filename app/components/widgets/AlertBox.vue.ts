@@ -99,6 +99,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   languages: any[] = [];
 
   facemaskDevice = this.facemasksService.getEnabledDevice();
+  facemaskEnabled = this.facemasksService.getEnabledStatus();
 
   get metadata() {
     return this.service.getMetadata(this.selectedAlert, this.languages);
@@ -219,12 +220,12 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   handleFacemaskInput() {
     if (this.selectedAlert === 'facemasks') {
-      const { duration } = this.selectedVariation;
-      const { enabled } = this.wData.settings.facemasks;
-      this.facemasksService.updateFacemaskSettings({ duration, enabled, device: this.facemaskDevice })
+      const { duration } = this.selectedVariation.settings;
+      this.facemasksService.updateFacemaskSettings(
+        { duration, enabled: this.facemaskEnabled, device: this.facemaskDevice }
+        )
         .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
-    } else {
-      this.save();
     }
+    this.save();
   }
 }
