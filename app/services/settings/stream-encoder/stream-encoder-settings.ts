@@ -161,7 +161,7 @@ export class StreamEncoderSettingsService extends Service {
       this.settingsService.setSettingValue('Output', encoderFieldsMap[encoder].preset, settingsPatch.preset);
     }
 
-    if (settingsPatch.encoderOptions && encoder == 'x264') {
+    if (settingsPatch.encoderOptions !== void 0 && encoder == 'x264') {
       this.settingsService.setSettingValue(
         'Output',
         encoderFieldsMap[encoder].encoderOptions,
