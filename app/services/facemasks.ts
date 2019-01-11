@@ -118,7 +118,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         .then(response => {
           this.checkFacemaskSettings(response);
         })
-        .catch(err => {
+        .catch(() => {
           this.SET_ACTIVE(false);
         });
     } else {
@@ -346,15 +346,12 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     headers.append('Content-Type', 'text/json');
 
     const request = new Request(url, {
-      method: 'POST',
       headers,
-      body: JSON.stringify(settingsData)
-      });
+      method: 'POST',
+      body: JSON.stringify(settingsData),
+    });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
-  }
+    return fetch(request).then(handleResponse);
   }
 
   setupFilter() {
@@ -420,9 +417,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return new Promise((resolve, reject) => {
       const asyncReads = missing.map(uuid => this.readFile(uuid));
       Promise.all(asyncReads)
-        .then(results => {
-          resolve();
-        })
+        .then(results => resolve())
         .catch(err => {
           this.notifyFailure();
           reject();
@@ -443,7 +438,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     );
 
     Promise.all(downloads)
-      .then(responses => {
+      .then(() => {
         this.activate();
       })
       .catch(err => {
