@@ -182,6 +182,7 @@ export class VideoEncodingOptimizationService
   }
 
   private restorePreviousValues() {
+    this.streamEncoderSettingsService.setSettings({ encoderOptions: ''}); // clear encoderOptions settings
     this.settingsService.setSettings('Output', this.previousSettings.output);
     this.settingsService.setSettings('Video', this.previousSettings.video);
   }
