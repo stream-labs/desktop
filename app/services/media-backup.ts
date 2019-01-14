@@ -252,6 +252,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     const formData = {
       checksum,
       file,
+      modified: new Date().toISOString(),
     };
 
     return await new Promise<{ id: number }>((resolve, reject) => {
