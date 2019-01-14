@@ -286,6 +286,13 @@ export class ApiClient {
     });
   }
 
+  /**
+   * Wait for API event
+   * Skip events if constraint returned a false value
+   * @example
+   *  // wait for event that has a `fader` property
+   *  const event = await client.waitForEvent((event: any) => !!event.fader)
+   */
   waitForEvent<TEvent extends Dictionary<any>>(
     constraint: (event: TEvent) => boolean,
   ): Promise<TEvent> {
