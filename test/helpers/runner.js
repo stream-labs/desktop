@@ -1,7 +1,7 @@
 /**
  * Tests runner script:
  * - run tests
- * - if some tests failed retry anly these tests
+ * - if some tests failed retry only these tests
  */
 
 const { execSync } = require('child_process');

@@ -297,6 +297,11 @@ function startApp() {
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
