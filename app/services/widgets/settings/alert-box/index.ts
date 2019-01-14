@@ -117,9 +117,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       primaryColor: metadata.color({ title: $t('Text Color Primary') }),
       secondaryColor: metadata.color({ title: $t('Text Color Secondary') }),
       textColor: metadata.color({ title: $t('Text Color') }),
-      showMessage: metadata.bool({ title: $t('Show Message?') }),
-      messageEmojis: metadata.bool({ title: $t('Allow Twitch Emojis?') }),
-      ttsEnabled: metadata.bool({ title: $t('Enable TTS?') }),
+      showMessage: metadata.toggle({ title: $t('Show Message?') }),
+      messageEmojis: metadata.toggle({ title: $t('Allow Twitch Emojis?') }),
+      ttsEnabled: metadata.toggle({ title: $t('Enable TTS?') }),
       unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
       unlimitedMediaMod: metadata.toggle({
         title: $t('Unlimited Media Sharing Alert Moderation Delay'),

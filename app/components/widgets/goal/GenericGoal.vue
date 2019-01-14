@@ -29,6 +29,7 @@
   </validated-form>
 
   <validated-form slot="visual-properties" name="visual-properties-form" v-if="loaded" @input="save()">
+    <v-form-group v-if="goalType === 'sub'" v-model="wData.settings.include_resubs" :metadata="metadata.include_resubs" />
     <v-form-group v-model="wData.settings.layout" :metadata="metadata.layout"/>
     <v-form-group v-model="wData.settings.background_color" :metadata="metadata.background_color"/>
     <v-form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
