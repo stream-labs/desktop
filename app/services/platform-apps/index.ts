@@ -562,7 +562,12 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
           ];
 
-          const scriptDomainWhitelist = ['www.googletagmanager.com', 'www.google-analytics.com'];
+          const scriptDomainWhitelist = [
+            'www.googletagmanager.com',
+            'www.google-analytics.com',
+            'widget.intercom.io',
+            'js.intercomcdn.com',
+          ];
 
           const parsed = url.parse(details.url);
 
@@ -591,9 +596,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
             cb({});
             return;
           }
+
           // Cancel all other script requests.
-          // TODO: Handle production apps
-          console.log('canceling', details);
           cb({ cancel: true });
           return;
         }

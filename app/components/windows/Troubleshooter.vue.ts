@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
+import { Subscription } from 'rxjs';
+import { debounceTime, tap } from 'rxjs/operators';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { TIssueCode } from 'services/troubleshooter';
@@ -26,8 +28,16 @@ export default class Troubleshooter extends Vue {
 
   issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TIssueCode;
 
+  private subscription: Subscription;
+
   mounted() {
     this.getSettings();
+    this.subscription = this.streamingService.streamingStatusChange
+      .pipe(
+        debounceTime(500),
+        tap(this.getSettings),
+      )
+      .subscribe();
   }
 
   get issue(): INotification {
@@ -60,6 +70,10 @@ export default class Troubleshooter extends Vue {
 
   moment(time: number): string {
     return moment(time).fromNow();
+  }
+
+  destroyed() {
+    this.subscription.unsubscribe();
   }
 }
 

@@ -11,11 +11,12 @@ const request = require('request');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
+const testCmd = process.env.CI ? 'yarn test:ci' : 'yarn test';
 
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync('yarn test ' + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(`${testCmd} ${args.join(' ')}`, { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }
@@ -34,7 +35,7 @@ function retryTests() {
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
-    execSync('yarn test ' + args.concat(retryingArgs).join(' '), { stdio: [0, 1, 2] });
+    execSync(`${testCmd} ${args.concat(retryingArgs).join(' ')}`, { stdio: [0, 1, 2] });
     log('retrying succeed');
   } catch (e) {
     retryingFailed = true;

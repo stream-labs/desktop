@@ -2,8 +2,9 @@ import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { ObsTextInput, ObsListInput, ObsBoolInput } from 'components/obs/inputs';
-import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
+import { ObsListInput } from 'components/obs/inputs';
+import { IObsInput, IObsListInput } from 'components/obs/inputs/ObsInput';
+import { BoolInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
@@ -32,9 +33,8 @@ interface IMultiSelectProfiles {
 @Component({
   components: {
     ModalLayout,
-    ObsTextInput,
     ObsListInput,
-    ObsBoolInput,
+    BoolInput,
     HFormGroup,
     Multiselect,
   },
@@ -60,18 +60,9 @@ export default class EditStreamInfo extends Vue {
 
   // Form Models:
 
-  streamTitleModel: IObsInput<string> = {
-    name: 'stream_title',
-    description: $t('Title'),
-    value: '',
-  };
+  streamTitleModel: string = '';
 
-  streamDescriptionModel: IObsTextInputValue = {
-    name: 'stream_description',
-    description: 'Description',
-    value: '',
-    multiline: true,
-  };
+  streamDescriptionModel: string = '';
 
   gameModel: IObsListInput<string> = {
     name: 'stream_game',
@@ -87,11 +78,7 @@ export default class EditStreamInfo extends Vue {
     options: [],
   };
 
-  doNotShowAgainModel: IObsInput<boolean> = {
-    name: 'do_not_show_again',
-    description: $t('Do not show this message when going live'),
-    value: false,
-  };
+  doNotShowAgainModel: boolean = false;
 
   startTimeModel: { time: number; date: string } = {
     time: null,
@@ -131,9 +118,9 @@ export default class EditStreamInfo extends Vue {
 
   async populateModels() {
     this.facebookPages = await this.fetchFacebookPages();
-    this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
+    this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
     this.gameModel.value = this.streamInfoService.state.channelInfo.game || '';
-    this.streamDescriptionModel.value = this.streamInfoService.state.channelInfo.description;
+    this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
     this.gameModel.options = [
       {
         description: this.streamInfoService.state.channelInfo.game,
@@ -214,7 +201,7 @@ export default class EditStreamInfo extends Vue {
   updateAndGoLive() {
     this.updatingInfo = true;
 
-    if (this.doNotShowAgainModel.value) {
+    if (this.doNotShowAgainModel) {
       alert(
         $t('You will not be asked again to update your stream info when going live. ') +
           $t('You can re-enable this from the settings.'),
@@ -224,11 +211,7 @@ export default class EditStreamInfo extends Vue {
     }
 
     this.streamInfoService
-      .setStreamInfo(
-        this.streamTitleModel.value,
-        this.streamDescriptionModel.value,
-        this.gameModel.value,
-      )
+      .setStreamInfo(this.streamTitleModel, this.streamDescriptionModel, this.gameModel.value)
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -262,8 +245,8 @@ export default class EditStreamInfo extends Vue {
     const scheduledStartTime = this.formatDateString();
     const service = getPlatformService(this.userService.platform.type);
     const streamInfo = {
-      title: this.streamTitleModel.value,
-      description: this.streamDescriptionModel.value,
+      title: this.streamTitleModel,
+      description: this.streamDescriptionModel,
       game: this.gameModel.value,
     };
     if (scheduledStartTime) {
@@ -309,7 +292,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   goLive() {
-    this.streamingService.startStreaming();
+    this.streamingService.toggleStreaming();
     this.navigationService.navigate('Live');
     this.windowsService.closeChildWindow();
   }

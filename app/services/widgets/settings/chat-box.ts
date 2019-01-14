@@ -50,7 +50,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
     return formMetadata({
       theme: metadata.list({
         options: [
-          { title: 'Clean', value: 'standard' },
+          { title: 'Clean', value: 'clean' },
           { title: 'Boxed', value: 'boxed' },
           { title: 'Twitch', value: 'twitch' },
           { title: 'Old School', value: 'oldschool' },

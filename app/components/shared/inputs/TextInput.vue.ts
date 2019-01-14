@@ -10,6 +10,12 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
   @Prop({ default: () => ({}) })
   readonly metadata: ITextMetadata;
 
+  textVisible = !this.metadata.masked;
+
+  toggleVisible() {
+    this.textVisible = !this.textVisible;
+  }
+
   getValidations() {
     return {
       ...super.getValidations(),

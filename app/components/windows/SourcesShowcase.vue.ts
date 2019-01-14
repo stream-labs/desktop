@@ -145,8 +145,7 @@ export default class SourcesShowcase extends Vue {
       .getAvailableSourcesTypesList()
       .filter(type => {
         if (type.value === 'text_ft2_source') return false;
-        if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
-        return true;
+        return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
       })
       .map(listItem => {
         return {
