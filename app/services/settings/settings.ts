@@ -136,7 +136,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -164,23 +164,24 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     // We hide the encoder preset and settings if the optimized ones are in used
-    // if (
-    //   categoryName === 'Output' &&
-    //   this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
-    // ) {
-    //   const encoder = obsEncoderToEncoder(
-    //     this.findSettingValue(settings, 'Streaming', 'Encoder') ||
-    //     this.findSettingValue(settings, 'Streaming', 'StreamEncoder')
-    //   );
-    //   // Setting preset visibility
-    //   settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
-    //   // Setting encoder settings visibility
-    //   if (encoder == 'x264') {
-    //     settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, { visible: false });
-    //   }
-    // }
+    if (
+      categoryName === 'Output' &&
+      this.videoEncodingOptimizationService.state.useOptimizedProfile
+    ) {
+      const encoder = obsEncoderToEncoder(
+        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
+          this.findSettingValue(settings, 'Streaming', 'StreamEncoder'),
+      );
+      // Setting preset visibility
+      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
+      // Setting encoder settings visibility
+      if (encoder === 'x264') {
+        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, {
+          visible: false,
+        });
+      }
+    }
 
-    console.log('get settings', settings);
     return settings;
   }
 
