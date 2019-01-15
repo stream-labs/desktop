@@ -49,7 +49,7 @@
       v-if="inspectedSource === 'streamlabel'"
       :name="$t('Stream Label')"
       :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
-      key="28">
+      key="streamlabel-source-info">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
@@ -62,6 +62,15 @@
         <li>{{ $t('Monthly Follows') }}</li>
         <li>{{ $t('Many more') }}</li>
       </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === 'replay'"
+      :name="$t('Instant Replay')"
+      :description="$t('Automatically plays your most recently captured replay in your stream.')"
+      key="replay-source-info">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/media.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/media.png"/>
     </add-source-info>
 
     <add-source-info
@@ -135,6 +144,13 @@
             @click="inspectSource('streamlabel')"
             @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
             <div>{{ $t('Stream Label') }}</div>
+          </div>
+          <div
+            class="source source--widget"
+            :class="{ 'source--active': inspectedSource === 'replay' }"
+            @click="inspectSource('replay')"
+            @dblclick="selectSource('ffmpeg_source', { propertiesManager: 'replay' })">
+            <div>{{ $t('Instant Replay') }}</div>
           </div>
         </div>
       </div>

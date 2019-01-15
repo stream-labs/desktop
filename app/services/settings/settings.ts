@@ -30,13 +30,18 @@ export interface ISettingsState {
     ScreenSnapping: boolean;
     SourceSnapping: boolean;
     CenterSnapping: boolean;
+    ReplayBufferWhileStreaming: boolean;
+    KeepReplayBufferStreamStops: boolean;
   };
   Stream: {
     key: string;
     streamType: string;
     service: string;
   };
-  Output: Dictionary<TObsValue>;
+  Output: {
+    RecRB?: boolean;
+    RecRBTime?: number;
+  };
   Video: {
     Base: string;
   };
@@ -134,18 +139,12 @@ export class SettingsService extends StatefulService<ISettingsState>
     // have not implemented them yet.
     const BLACK_LIST_NAMES = [
       'SysTrayMinimizeToTray',
-      'ReplayBufferWhileStreaming',
-      'KeepReplayBufferStreamStops',
       'SysTrayEnabled',
       'CenterSnapping',
       'HideProjectorCursor',
       'ProjectorAlwaysOnTop',
       'SaveProjectors',
       'SysTrayWhenStarted',
-      'RecRBSuffix',
-      'FilenameFormatting',
-      'OverwriteIfExists',
-      'RecRBPrefix',
     ];
 
     for (const group of settings) {
@@ -321,6 +320,29 @@ export class SettingsService extends StatefulService<ISettingsState>
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.loadSettingsIntoStore();
+  }
+
+  setSettingsPatch(patch: Partial<ISettingsState>) {
+    // Tech Debt: This is a product of the node-obs settings API.
+    // This function represents a cleaner API we would like to have
+    // in the future.
+
+    Object.keys(patch).forEach(categoryName => {
+      const category: Dictionary<any> = patch[categoryName];
+      const formSubCategories = this.getSettingsFormData(categoryName);
+
+      Object.keys(category).forEach(paramName => {
+        formSubCategories.forEach(subCategory => {
+          subCategory.parameters.forEach(subCategoryParam => {
+            if (subCategoryParam.name === paramName) {
+              subCategoryParam.value = category[paramName];
+            }
+          });
+        });
+      });
+
+      this.setSettings(categoryName, formSubCategories);
+    });
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {

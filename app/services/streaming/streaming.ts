@@ -12,11 +12,12 @@ import {
   IStreamingServiceState,
   EStreamingState,
   ERecordingState,
+  EReplayBufferState,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from 'services/platforms';
+import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
@@ -24,6 +25,7 @@ import { NotificationsService, ENotificationType, INotification } from 'services
 enum EOBSOutputType {
   Streaming = 'streaming',
   Recording = 'recording',
+  ReplayBuffer = 'replay-buffer',
 }
 
 enum EOBSOutputSignal {
@@ -33,6 +35,8 @@ enum EOBSOutputSignal {
   Stop = 'stop',
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
+  Wrote = 'wrote',
+  WriteError = 'writing_error',
 }
 
 interface IOBSOutputSignalInfo {
@@ -54,6 +58,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
+  replayBufferStatusChange = new Subject<EReplayBufferState>();
+  replayBufferFileWrite = new Subject<string>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -65,6 +71,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
     recordingStatusTime: new Date().toISOString(),
+    replayBufferStatus: EReplayBufferState.Offline,
+    replayBufferStatusTime: new Date().toISOString(),
   };
 
   init() {
@@ -99,15 +107,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  finishStartStreaming() {
+  private finishStartStreaming() {
     const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
     const confirmText = 'Are you sure you want to start streaming?';
     if (shouldConfirm && !confirm(confirmText)) return;
+
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
+
     obs.NodeObs.OBS_service_startStreaming();
+
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
+    }
+
+    const replayWhenStreaming = this.settingsService.state.General.ReplayBufferWhileStreaming;
+
+    if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
+      this.startReplayBuffer();
     }
   }
 
@@ -140,6 +158,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
         this.toggleRecording();
+      }
+
+      const keepReplaying = this.settingsService.state.General.KeepReplayBufferStreamStops;
+      if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
+        this.stopReplayBuffer();
       }
 
       this.announcementsService.updateBanner();
@@ -176,6 +199,28 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.recordingStatus === ERecordingState.Offline) {
       obs.NodeObs.OBS_service_startRecording();
       return;
+    }
+  }
+
+  startReplayBuffer() {
+    if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
+    obs.NodeObs.OBS_service_startReplayBuffer();
+  }
+
+  stopReplayBuffer() {
+    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
+      obs.NodeObs.OBS_service_stopReplayBuffer(false);
+    } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
+      obs.NodeObs.OBS_service_stopReplayBuffer(true);
+    }
+  }
+
+  saveReplay() {
+    if (this.state.replayBufferStatus === EReplayBufferState.Running) {
+      this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
+      this.replayBufferStatusChange.next(EReplayBufferState.Saving);
+      obs.NodeObs.OBS_service_processReplayBufferHotkey();
     }
   }
 
@@ -277,9 +322,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
-    if (info.type === EOBSOutputType.Streaming) {
-      const time = new Date().toISOString();
+    const time = new Date().toISOString();
 
+    if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
@@ -320,20 +365,31 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
-      const time = new Date().toISOString();
+      const nextState: ERecordingState = {
+        [EOBSOutputSignal.Start]: ERecordingState.Recording,
+        [EOBSOutputSignal.Starting]: ERecordingState.Starting,
+        [EOBSOutputSignal.Stop]: ERecordingState.Offline,
+        [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+      }[info.signal];
 
-      if (info.signal === EOBSOutputSignal.Start) {
-        this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
-        this.recordingStatusChange.next(ERecordingState.Recording);
-      } else if (info.signal === EOBSOutputSignal.Starting) {
-        this.SET_RECORDING_STATUS(ERecordingState.Starting, time);
-        this.recordingStatusChange.next(ERecordingState.Starting);
-      } else if (info.signal === EOBSOutputSignal.Stop) {
-        this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
-        this.recordingStatusChange.next(ERecordingState.Offline);
-      } else if (info.signal === EOBSOutputSignal.Stopping) {
-        this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
-        this.recordingStatusChange.next(ERecordingState.Stopping);
+      this.SET_RECORDING_STATUS(nextState, time);
+      this.recordingStatusChange.next(nextState);
+    } else if (info.type === EOBSOutputType.ReplayBuffer) {
+      const nextState: EReplayBufferState = {
+        [EOBSOutputSignal.Start]: EReplayBufferState.Running,
+        [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
+        [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
+        [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
+        [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
+      }[info.signal];
+
+      if (nextState) {
+        this.SET_REPLAY_BUFFER_STATUS(nextState, time);
+        this.replayBufferStatusChange.next(nextState);
+      }
+
+      if (info.signal === EOBSOutputSignal.Wrote) {
+        this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
       }
     }
 
@@ -382,5 +438,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private SET_RECORDING_STATUS(status: ERecordingState, time: string) {
     this.state.recordingStatus = status;
     this.state.recordingStatusTime = time;
+  }
+
+  @mutation()
+  private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
+    this.state.replayBufferStatus = status;
+    if (time) this.state.replayBufferStatusTime = time;
   }
 }
