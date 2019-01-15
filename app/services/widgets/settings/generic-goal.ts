@@ -69,6 +69,8 @@ export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoa
         placeholder: 'MM/DD/YYYY',
       }),
 
+      include_resubs: metadata.toggle({ title: $t('Include resubs?') }),
+
       layout: metadata.list({
         title: $t('Layout'),
         options: [
