@@ -29,7 +29,9 @@
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
-    "commit": "commit"
+    "commit": "commit",
+    "strict-null-check": "yarn clear && tsc -p tsconfig.strict.json",
+    "strict-null-check:watch": "yarn strict-null-check --watch"
   },
   "prettier": {
     "singleQuote": true,
