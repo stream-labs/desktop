@@ -141,8 +141,7 @@ export class ApiClient {
         body: requestBody,
         completed: false,
       };
-      // tslint:disable-next-line:prefer-template TODO
-      const rawMessage = JSON.stringify(requestBody) + '\n';
+      const rawMessage = `${JSON.stringify(requestBody)}\n`;
       this.log('Sent:', rawMessage);
       this.socket.write(rawMessage);
     });
@@ -160,8 +159,7 @@ export class ApiClient {
 
     if (!requestBody.id) throw 'id is required';
 
-    // tslint:disable-next-line:prefer-template TODO
-    const rawMessage = JSON.stringify(requestBody) + '\n';
+    const rawMessage = `${JSON.stringify(requestBody)}\n`;
     this.log('Sent:', rawMessage);
 
     const client = new snp.Client(PIPE_PATH);
