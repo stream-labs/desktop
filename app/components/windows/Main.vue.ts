@@ -5,6 +5,8 @@ import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -49,8 +51,8 @@ import electron from 'electron';
     DesignSystem,
     PlatformAppWebview,
     PlatformAppStore,
-    Help
-  }
+    Help,
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -63,6 +65,7 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
+    this.handleResize();
   }
 
   get title() {
@@ -89,7 +92,10 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  mainContentsRight = false;
+
   get leftDock() {
+    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -135,5 +141,43 @@ export default class Main extends Vue {
       const file = files.item(fi);
       this.scenesService.activeScene.addFile(file.path);
     }
+  }
+
+  $refs: {
+    mainMiddle: HTMLDivElement;
+  };
+
+  compactView = false;
+
+  get mainResponsiveClasses() {
+    const classes = [];
+
+    if (this.compactView) {
+      classes.push('main-middle--compact');
+    }
+
+    return classes.join(' ');
+  }
+
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  windowWidth: number;
+
+  hasLiveDock = true;
+
+  windowSizeHandler() {
+    this.windowWidth = window.innerWidth;
+
+    this.hasLiveDock = this.windowWidth >= 1100;
+  }
+
+  handleResize() {
+    this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 }

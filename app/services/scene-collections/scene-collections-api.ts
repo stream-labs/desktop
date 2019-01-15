@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export interface ISceneCollectionsServiceApi {
   /**
@@ -74,7 +74,7 @@ export interface ISceneCollectionSchema {
   scenes: {
     id: string;
     name: string;
-    sceneItems: { sceneItemId: string, sourceId: string }[]
+    sceneItems: { sceneItemId: string; sourceId: string }[];
   }[];
 
   sources: {

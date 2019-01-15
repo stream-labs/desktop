@@ -1,15 +1,14 @@
 import { Module, apiMethod, apiEvent, EApiPermissions } from './module';
 import { Inject } from 'util/injector';
 import { CustomizationService } from 'services/customization';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 enum ETheme {
   Day = 'day',
-  Night = 'night'
+  Night = 'night',
 }
 
 export class ThemeModule extends Module {
-
   moduleName = 'Theme';
   permissions: EApiPermissions[] = [];
 
@@ -28,10 +27,8 @@ export class ThemeModule extends Module {
   @apiEvent()
   themeChanged = new Subject<ETheme>();
 
-
   @apiMethod()
   getTheme(): ETheme {
     return this.customizationService.nightMode ? ETheme.Night : ETheme.Day;
   }
-
 }

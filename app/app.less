@@ -89,7 +89,7 @@ label {
   .weight(@medium);
   font-size: 12px;
   color: @white;
-  padding: 0px 4px;
+  padding: 0 4px;
   .margin-left();
   line-height: 16px
 }
@@ -97,7 +97,6 @@ label {
 a,
 .link {
   .transition();
-  text-decoration: underline;
   .weight(@medium);
   color: @day-link;
   text-decoration: none;
@@ -362,7 +361,27 @@ select {
   background-color: @day-bg;
 }
 
+// Toasts
+.toast-alert {
+  background-color: @red !important;
+}
 
+.toast-busy {
+  background-color: @yellow !important;
+  margin-top: 250px !important;
+}
+
+.toast-success {
+  background-color: @teal !important;
+}
+
+.toast-success__schedule {
+  padding: 10px 20px !important;
+}
+
+.toast-action {
+  color: @white !important;
+}
 
 // Night theme rules
 .night-theme {

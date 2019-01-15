@@ -1,12 +1,6 @@
-import {
-  Module,
-  apiMethod,
-  apiEvent,
-  EApiPermissions,
-  IApiContext
-} from './module';
+import { Module, apiMethod, apiEvent, EApiPermissions, IApiContext } from './module';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { INotificationsServiceApi } from 'services/notifications';
 
 type TIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED' | 'FRAMES_DROPPED';
@@ -14,7 +8,7 @@ type TIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED' | 'FRAMES_DROPPED';
 enum ENotificationType {
   INFO = 'INFO',
   WARNING = 'WARNING',
-  SUCCESS = 'SUCCESS'
+  SUCCESS = 'SUCCESS',
 }
 
 interface INotificationOptions {

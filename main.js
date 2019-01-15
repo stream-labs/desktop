@@ -289,7 +289,7 @@ function startApp() {
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
     // setTimeout(() => {
-    //   openDevTools();
+      //openDevTools();
     // }, 10 * 1000);
   }
 }
@@ -297,6 +297,11 @@ function startApp() {
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
@@ -327,9 +332,11 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
-  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    if (
+      !process.argv.includes('--skip-update') &&
+      ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
     const updateInfo = {
-      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      baseUrl: 'https://slobs-cdn.streamlabs.com',
       version: pjson.version,
       exec: process.argv,
       cwd: process.cwd(),

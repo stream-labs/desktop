@@ -2,9 +2,8 @@ import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Inject } from '../../util/injector';
 import { WindowsService } from 'services/windows';
-import { IWidgetsServiceApi } from 'services/widgets';
-import { IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { Subscription } from 'rxjs/Subscription';
+import { IWidgetData, IWidgetsServiceApi, WidgetSettingsService } from 'services/widgets';
+import { Subscription } from 'rxjs';
 import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
@@ -15,9 +14,10 @@ export interface IWidgetNavItem {
 }
 
 @Component({})
-export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
-  extends Vue {
-
+export default class WidgetSettings<
+  TData extends IWidgetData,
+  TService extends WidgetSettingsService<TData>
+> extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: IWidgetsServiceApi;
 
@@ -30,7 +30,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
   fontFamilyTooltip = $t(
     'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' +
-      ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
+      ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.',
   );
 
   navItems: IWidgetNavItem[];
@@ -84,26 +84,24 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
     } catch (e) {
+      const errorMessage = e && e.message ? e.message : $t('Save failed, something went wrong.');
       this.onDataUpdatedHandler(this.lastSuccessfullySavedWData);
       this.requestState = 'fail';
-      this.onFailHandler();
+      this.onFailHandler(errorMessage);
     }
     this.pendingRequests--;
   }
 
-  onFailHandler() {
-    this.$toasted.show(
-      $t('Save failed, something went wrong.'),
-      {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 3000,
-        singleton: true
-      }
-    );
+  onFailHandler(msg: string) {
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 3000,
+      singleton: true,
+    });
   }
 
   protected afterFetch() {
     // override me if you need
-  };
+  }
 }

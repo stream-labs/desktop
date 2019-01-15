@@ -1,18 +1,20 @@
 <template>
-<div class="banner" :class="[bannerExists ? 'show' : '']">
-  <img class="bg-image" :src="currentBanner.thumbnail" />
-  <div class="image-container">
-    <img class="shadow-image__left" :src="currentBanner.thumbnail" />
-    <img class="shadow-image__right" :src="currentBanner.thumbnail" />
-    <img class="main-image" :src="currentBanner.thumbnail" />
-  </div>
-  <div class="title-container">
-    <h3 class="title">{{ headerText }}</h3>
-    <p class="subheading">{{ currentBanner.subHeader }}</p>
-  </div>
-  <div class="cta-container">
-    <button class="button learn-more" @click="followLink()" :disabled="!bannerExists">{{ currentBanner.linkTitle }}</button>
-    <button class="dismiss-button" @click="closeBanner()" :disabled="!bannerExists || processingClose">{{ $t('Dismiss') }}</button>
+<div>
+  <div class="banner" :class="[bannerExists ? 'show' : '']" @click="followLink()">
+    <img class="bg-image" :src="currentBanner.thumbnail" />
+    <div class="image-container">
+      <img class="shadow-image__left" :src="currentBanner.thumbnail" />
+      <img class="shadow-image__right" :src="currentBanner.thumbnail" />
+      <img class="main-image" :src="currentBanner.thumbnail" />
+    </div>
+    <div class="title-container">
+      <h3 class="title">{{ headerText }}</h3>
+      <p class="subheading">{{ currentBanner.subHeader }}</p>
+    </div>
+    <div class="cta-container">
+      <button class="button learn-more" :disabled="!bannerExists">{{ currentBanner.linkTitle }}</button>
+      <button class="dismiss-button" @click.stop="closeBanner()" :disabled="!bannerExists || processingClose">{{ $t('Dismiss') }}</button>
+    </div>
   </div>
 </div>
 </template>
@@ -20,9 +22,9 @@
 <script lang="ts" src="./NewsBanner.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
-.banner{
+.banner {
   width: 100%;
   min-height: 0;
   max-height: 0;
@@ -36,10 +38,10 @@
 }
 
 .banner.show {
-  min-height: 100px;
+  min-height: 92px;
   max-height: 140px;
-  padding: 20px;
-  transition: all 0.5s ease-in-out;
+  .padding(2);
+  .transition();
 }
 
 .bg-image {

@@ -4,7 +4,7 @@ import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers
 import { logOut } from './helpers/spectron/user';
 
 
-useSpectron({ skipOnboarding: false });
+useSpectron({ skipOnboarding: false, appArgs: '--nosync' });
 
 test('Adding some starter widgets', async t => {
   const app = t.context.app;

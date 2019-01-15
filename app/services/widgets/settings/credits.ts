@@ -1,15 +1,16 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
-import { WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/stateful-service';
+import { authorizedHeaders } from 'util/requests';
 
 export interface ICreditsSettings extends IWidgetSettings {
   theme: string;
   credit_title: string;
   credit_subtitle: string;
   background_color: string;
-  text_color: string;
-  text_size: 14;
+  font_color: string;
+  font_size: 14;
+  font: string;
   muted_chatters: string;
   bits: boolean;
   subscribers: boolean;
@@ -33,20 +34,25 @@ export interface ICreditsData extends IWidgetData {
 
 @InheritMutations()
 export class CreditsService extends WidgetSettingsService<ICreditsData> {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.Credits,
-      url: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
+      url: `https://${this.getHost()}/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,
       settingsUpdateEvent: 'endCreditsSettingsUpdate',
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
-
+  testRollCredits() {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(`https://${this.getHost()}/api/v5/slobs/widget/test/endcredits`, {
+      headers,
+    });
+    return fetch(request);
+  }
 }

@@ -8,13 +8,13 @@ import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 import { $t } from 'services/i18n';
-import { Subscription } from 'rxjs/subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
   components: {
     ModalLayout,
-    Display
-  }
+    Display,
+  },
 })
 export default class Projector extends Vue {
   @Inject() windowsService: WindowsService;
@@ -56,10 +56,7 @@ export default class Projector extends Vue {
     const currentWindow = electron.remote.getCurrentWindow();
     this.windowsService.setOneOffFullscreen(this.windowId, true);
     this.oldBounds = currentWindow.getBounds();
-    currentWindow.setPosition(
-      display.bounds.x,
-      display.bounds.y
-    );
+    currentWindow.setPosition(display.bounds.x, display.bounds.y);
     currentWindow.setFullScreen(true);
     document.addEventListener('keydown', this.exitFullscreen);
   }

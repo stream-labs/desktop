@@ -1,5 +1,4 @@
 import { EEncoder } from 'services/settings';
-import { key } from 'aws-sdk/clients/signer';
 
 export interface IEncoderProfile {
   game: string;
@@ -12,11 +11,4 @@ export interface IEncoderProfile {
   resolutionOut: string;
   options: string;
   description?: string;
-}
-
-export type TGameProfileType = 'highPerformance' | 'highQuality';
-
-export interface IGameProfiles {
-  highPerformance: string;
-  highQuality: string;
 }

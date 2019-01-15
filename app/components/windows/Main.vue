@@ -2,11 +2,17 @@
 <div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
   <div class="main-spacer"></div>
-  <news-banner />
-  <div class="main-contents">
+  <news-banner/>
+  <div
+    class="main-contents"
+    :class="{
+      'main-contents--right': isLoggedIn && leftDock && !isOnboarding && hasLiveDock,
+      'main-contents--left': isLoggedIn && !leftDock && !isOnboarding && hasLiveDock }">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
-    <div class="main-middle">
+    <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
+      <resize-observer @notify="handleResize"></resize-observer>
+
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
       <div v-if="shouldLockContent" class="main-loading">
@@ -34,7 +40,7 @@
         v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
         :is="page"
         :params="params"/>
-      <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
+      <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 
     <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
@@ -44,8 +50,20 @@
 
 <script lang="ts" src="./Main.vue.ts"></script>
 
+<style lang="less">
+.main-middle--compact {
+  .performance-metric-icon {
+    height: 12px;
+  }
+
+  .performance-metric {
+    font-size: 12px;
+  }
+}
+</style>
+
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .main {
   display: flex;
@@ -54,16 +72,25 @@
 }
 
 .main-contents {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 100%;
+}
+
+.main-contents--right {
+  grid-template-columns: auto 1fr;
+}
+
+.main-contents--left {
+  grid-template-columns: 1fr auto;
 }
 
 .main-middle {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  width: 72%;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-spacer {

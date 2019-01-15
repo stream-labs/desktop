@@ -1,6 +1,4 @@
-import {
-  WIDGET_INITIAL_STATE
-} from './widget-settings';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
@@ -51,36 +49,37 @@ export interface IStreamBossCreateOptions {
 }
 
 @InheritMutations()
-export abstract class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
-
+export abstract class StreamBossService extends BaseGoalService<
+  IStreamBossData,
+  IStreamBossCreateOptions
+> {
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.StreamBoss,
       url: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/streamboss?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'streambossSettingsUpdate',
       goalCreateEvent: 'newStreamboss',
       goalResetEvent: 'streambossEnd',
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
-      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamboss/settings`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamboss/settings`,
+      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamboss`,
       testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
 
   getMetadata() {
     return formMetadata({
-
       // CREATE BOSS
 
       total_health: metadata.number({
         title: $t('Starting Health'),
         required: true,
-        min: 0
+        min: 0,
       }),
 
       mode: metadata.list({
@@ -89,23 +88,27 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
           {
             title: $t('Fixed'),
             value: 'fixed',
-            description: $t('The boss will spawn with the set amount of health everytime.')
+            description: $t('The boss will spawn with the set amount of health everytime.'),
           },
           {
             title: $t('Incremental'),
             value: 'incremental',
-            description: $t('The boss will have additional health each time he is defeated. The amount is set below.')
-          },          {
+            description: $t(
+              'The boss will have additional health each time he is defeated. The amount is set below.',
+            ),
+          },
+          {
             title: $t('Overkill'),
             value: 'overkill',
             description: $t(
-              'The boss\' health will change depending on how much damage is dealt on the killing blow.' +
-              'Excess damage multiplied by the multiplier will be the boss\' new health. I.e. 150 damage with 100 ' +
-              'health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n' +
-              'Set your multiplier below.'
-            )
+              "The boss' health will change depending on how much damage is dealt on the killing blow." +
+                "Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 " +
+                // tslint:disable-next-line:max-line-length
+                'health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n' +
+                'Set your multiplier below.',
+            ),
           },
-        ]
+        ],
       }),
 
       // SETTINGS
@@ -114,11 +117,11 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
         title: $t('Fade Time (s)'),
         min: 0,
         max: 20,
-        description: $t('Set to 0 to always appear on screen')
+        description: $t('Set to 0 to always appear on screen'),
       }),
 
       boss_heal: metadata.bool({
-        title: $t('Damage From Boss Heals')
+        title: $t('Damage From Boss Heals'),
       }),
 
       skin: metadata.list({
@@ -126,38 +129,38 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
         options: [
           { value: 'default', title: 'Default' },
           { value: 'future', title: 'Future' },
-          { value: 'noimage', title: 'No Image' },
-          { value: 'slim', title: 'Slim' },
-          { value: 'curved', title: 'Curved' }
-        ]
+          { value: 'noimg', title: 'No Image' },
+          { value: 'pill', title: 'Slim' },
+          { value: 'future-curve', title: 'Curved' },
+        ],
       }),
 
       kill_animation: metadata.animation({
-        title: $t('Kill Animation')
+        title: $t('Kill Animation'),
       }),
 
       bg_transparent: metadata.bool({
-        title: $t('Transparent Background')
+        title: $t('Transparent Background'),
       }),
 
       follow_multiplier: metadata.number({
-        title: $t('Damage Per Follower')
+        title: $t('Damage Per Follower'),
       }),
 
       bit_multiplier: metadata.number({
-        title: $t('Damage Per Bit')
+        title: $t('Damage Per Bit'),
       }),
 
       sub_multiplier: metadata.number({
-        title: $t('Damage Per Subscriber')
+        title: $t('Damage Per Subscriber'),
       }),
 
       donation_multiplier: metadata.number({
-        title: $t('Damage Per Dollar Donation')
+        title: $t('Damage Per Dollar Donation'),
       }),
 
       background_color: metadata.color({
-        title: $t('Background Color')
+        title: $t('Background Color'),
       }),
 
       text_color: metadata.color({
@@ -165,22 +168,20 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
       }),
 
       bar_text_color: metadata.color({
-        title: $t('Health Text Color')
+        title: $t('Health Text Color'),
       }),
 
       bar_color: metadata.color({
-        title: $t('Health Bar Color')
+        title: $t('Health Bar Color'),
       }),
 
       bar_bg_color: metadata.color({
-        title: $t('Health Bar Background Color')
+        title: $t('Health Bar Background Color'),
       }),
 
       font: metadata.fontFamily({
-        title: $t('Font')
-      })
-
+        title: $t('Font'),
+      }),
     });
   }
-
 }

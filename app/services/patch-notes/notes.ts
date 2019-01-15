@@ -1,16 +1,26 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.11.2',
-  title: 'Bug Fixes 🔧',
+  version: '0.11.9',
+  title: 'Settings and Bug Fixes',
   showChest: false,
   notes: [
-    'Fixed an issue that would sometimes result in a "Failed to load scene collection" message',
-    'Fixed visual flickering in volmeters',
-    'Fixed a source of crashes on Windows 7',
-    'Fixed various input bugs in widget settings',
-    'Added hotkey support for media hotkeys',
-    'Fixed an issue that sometimes caused projectors to pop up as a white screen',
-    'Fixed a bug that would cause sources to move while they are being cropped'
-  ]
+    'Added auto reconnect stream settings',
+    'Added IP binding',
+    'Added Browser source acceleration',
+    'Added a new setting to set SLOBS to run on the GPU or CPU: this option requires a restart of the app',
+    'Added the ability to schedule streams for Facebook and Youtube',
+    'Added Game Capture hotkeys',
+    'Added custom output resolution in advanced output settings',
+    'Added the possibility to change some stream settings directly from the dropped frames notification',
+    'Fixed Audio Monitoring device not working correctly',
+    'Fixed a crash on startup when the Chinese language is selected',
+    'Fixed duplicated audio device id',
+    'Fixed SLOBS crashing on startup if the facemask plugin failed to load',
+    'Fixed lossless video recording quality not working',
+    'Fixed Snapping settings resetting when restarting SLOBS',
+    'Fixed an issue where Facebook Live users could not use a custom streaming server',
+    'Fixed an issue where Facebook Live users could not go live if they had the stream info window disabled',
+    'And many more bug and stability fixes',
+  ],
 };

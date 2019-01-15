@@ -6,7 +6,6 @@ import { Inject } from '../util/injector';
 // we should allow overriding this value. But for now we
 // are just keeping the value in one place.
 export class HostsService extends Service {
-
   get streamlabs() {
     if (Util.useLocalHost()) {
       return 'streamlabs.site';
@@ -52,10 +51,12 @@ export class HostsService extends Service {
     return 'platform.streamlabs.com';
   }
 
+  get analitycs() {
+    return 'r2d2.streamlabs.com';
+  }
 }
 
 export class UrlService extends Service {
-
   @Inject('HostsService') private hosts: HostsService;
 
   get protocol() {
@@ -65,6 +66,4 @@ export class UrlService extends Service {
   getStreamlabsApi(endpoint: string) {
     return `${this.protocol}${this.hosts.streamlabs}/api/v5/slobs/${endpoint}`;
   }
-
-
 }

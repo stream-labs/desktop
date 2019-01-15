@@ -3,19 +3,33 @@
   :show-controls="false"
   :customControls="true">
   <div slot="content">
-    <div v-if="infoLoading">
+    <div v-if="infoLoading || populatingModels">
       <i class="fa fa-spinner fa-pulse" />
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
       {{ $t('There was an error fetching your channel information.  You can try') }}
-      <a @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
+      <a class="description-link" @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
       {{ $t('or you can') }}
-      <a @click="goLive">{{ $t('just go live.') }}</a>
+      <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
-    <div v-if="!infoLoading && !infoError">
-      <ObsTextInput v-model="streamTitleModel" />
-      <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
+    <div v-if="!infoLoading && !infoError && !populatingModels">
+      <div class="warning" v-if="isFacebook && !hasPages">
+        {{ $t('It looks like you don\'t have any Pages. Head to ') }}
+        <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
+        {{ $t(' to create a page, and then try again.') }}
+      </div>
+      <ObsListInput
+        v-if="isFacebook && hasPages && !midStreamMode"
+        :value="pageModel"
+        @input="(pageId) => setFacebookPageId(pageId)"
+      />
+      <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title') }" />
+      <h-form-group
+        v-if="isYoutube || isFacebook"
+        v-model="streamDescriptionModel"
+        :metadata="{ type: 'text-area', name: 'stream_description', title: $t('Description'), rows: 4 }"
+      />
       <ObsListInput
         v-if="isTwitch || isMixer || isFacebook"
         :value="gameModel"
@@ -31,7 +45,11 @@
         {{ $t('Checking optimized setting for') }} {{ gameModel.value }}...
       </h-form-group>
 
-      <div v-if="selectedProfile">
+      <div v-if="isSchedule">
+        <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
+        <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
+      </div>
+      <div v-if="areAvailableProfiles">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
@@ -58,7 +76,12 @@
           </div>
         </div>
       </div>
-      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
+      <bool-input
+        v-if="!midStreamMode && !isFacebook"
+        v-model="doNotShowAgainModel"
+        name='do_not_show_again'
+        :metadata="{ title: $t('Do not show this message when going live') }"
+      />
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -75,12 +98,12 @@
       class="button button--default"
       :disabled="updatingInfo"
       @click="cancel">
-      {{ $t('Cancel') }}
+      {{ isSchedule ? $t('Close') : $t('Cancel') }}
     </button>
     <button
       class="button button--action"
-      :disabled="updatingInfo"
-      @click="updateAndGoLive">
+      :disabled="updatingInfo || (isFacebook && !hasPages)"
+      @click="handleSubmit">
       <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" />
       {{ submitText }}
     </button>
@@ -92,6 +115,10 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
+
+.description-link {
+  text-decoration: underline;
+}
 
 .edit-stream-info-option-desc {
   height: 20px;

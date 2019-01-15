@@ -1,36 +1,45 @@
 import uuid from 'uuid/v4';
-import { IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { WidgetType } from 'services/widgets';
+import { IWidgetData, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
-import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVariation } from './alert-box-api';
-import { API_NAME_MAP, REGEX_TESTERS, newVariation, conditions } from './alert-box-data';
+import {
+  IAlertBoxApiSettings,
+  IAlertBoxMixerSettings,
+  IAlertBoxSetting,
+  IAlertBoxSettings,
+  IAlertBoxVariation,
+} from './alert-box-api';
+import { API_NAME_MAP, conditions, newVariation, REGEX_TESTERS } from './alert-box-data';
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
 
-export interface IAlertBoxData extends IWidgetData { settings: IAlertBoxSettings; tts_languages?: any[]; }
+export interface IAlertBoxData extends IWidgetData {
+  settings: IAlertBoxSettings;
+  custom: { js: string; html: string; css: string };
+  tts_languages?: any[];
+}
 
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;
 
   apiNames() {
-    return Object.keys(API_NAME_MAP).map((key) => API_NAME_MAP[key]);
+    return Object.keys(API_NAME_MAP).map(key => API_NAME_MAP[key]);
   }
 
   getApiSettings() {
     return {
       type: WidgetType.AlertBox,
-      url: `https://${ this.getHost() }/alert-box/v3/${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/alert-box/v3/${this.getWidgetToken()}`,
+      url: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
-    }
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+    };
   }
 
   conditionsByType(type: string) {
@@ -43,9 +52,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
 
   toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation: IAlertBoxVariation) {
     const newSettings = { ...data };
-    Object.keys(newSettings).forEach((type) => {
+    Object.keys(newSettings).forEach(type => {
       const variations = newSettings[type].variations;
-      const found = variations && variations.find((vari: IAlertBoxVariation) => variation.id === vari.id);
+      const found =
+        variations && variations.find((vari: IAlertBoxVariation) => variation.id === vari.id);
       if (found) {
         found.settings.customHtmlEnabled = enabled;
       }
@@ -57,28 +67,42 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return {
       moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
       alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
-      textThickness: metadata.slider({ title: $t('Font Weight'), min: 300, max: 900, interval: 100 }),
+      textThickness: metadata.slider({
+        title: $t('Font Weight'),
+        min: 300,
+        max: 900,
+        interval: 100,
+      }),
       soundVolume: metadata.slider({ title: $t('Volume'), min: 0, max: 100 }),
-      messageWeight: metadata.slider({ title: $t('Font Weight'), min: 300, max: 900, interval: 100 }),
+      messageWeight: metadata.slider({
+        title: $t('Font Weight'),
+        min: 300,
+        max: 900,
+        interval: 100,
+      }),
       ttsVolume: metadata.slider({ title: $t('Volume'), min: 0, max: 100 }),
       duration: metadata.slider({ title: $t('Alert Duration'), min: 2, max: 300 }),
       textDelay: metadata.slider({ title: $t('Text Delay'), min: 0, max: 60 }),
       ttsSecurity: metadata.slider({
         title: $t('Spam Security'),
         description: $t(
+          // tslint:disable-next-line:prefer-template
           'This slider helps you filter shared media before it can be submitted.\n' +
-          '1: No security\n' +
-          '2: 65%+ rating, 5k+ views\n' +
-          '3: 75%+ rating, 40k+ views\n' +
-          '4: 80%+ rating, 300k+ views\n' +
-          '5: 85%+ rating, 900k+ views'
+            '1: No security\n' +
+            '2: 65%+ rating, 5k+ views\n' +
+            '3: 75%+ rating, 40k+ views\n' +
+            '4: 80%+ rating, 300k+ views\n' +
+            '5: 85%+ rating, 900k+ views',
         ),
         max: 5,
         min: 1,
-        interval: 1
+        interval: 1,
       }),
       ttsLanguage: metadata.sectionedMultiselect({ title: $t('Language'), options: languages }),
-      conditions: metadata.list({ title: $t('Variation Condition'), options: this.conditionsByType(type) }),
+      conditions: metadata.list({
+        title: $t('Variation Condition'),
+        options: this.conditionsByType(type),
+      }),
       fontSize: metadata.fontSize({ title: $t('Font Size') }),
       fontFamily: metadata.fontFamily({ title: $t('Font') }),
       minAmount: metadata.number({ title: $t('Min. Amount to Show') }),
@@ -97,18 +121,26 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       messageEmojis: metadata.bool({ title: $t('Allow Twitch Emojis?') }),
       ttsEnabled: metadata.bool({ title: $t('Enable TTS?') }),
       unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
-      unlimitedMediaMod: metadata.toggle({ title: $t('Unlimited Media Sharing Alert Moderation Delay') }),
+      unlimitedMediaMod: metadata.toggle({
+        title: $t('Unlimited Media Sharing Alert Moderation Delay'),
+      }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),
       variationFrequency: metadata.frequency({ title: $t('Variation Frequency') }),
-      template: metadata.textArea({ title: $t('Message Template') })
+      template: metadata.textArea({ title: $t('Message Template') }),
     };
   }
 
-  protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
+  protected patchAfterFetch(data: {
+    settings: IAlertBoxApiSettings;
+    type: WidgetType;
+    custom: { js: string; html: string; css: string };
+  }): IAlertBoxData {
     const { settings, ...rest } = data;
-    const newSettings = this.transformSettings(settings);
-    return { ...rest, settings: newSettings };
+    const newSettings = settings.mixer_account
+      ? this.transformSettings({ ...settings, ...settings.mixer_account })
+      : this.transformSettings(settings);
+    return { ...rest, settings: newSettings, custom_defaults: rest.custom };
   }
 
   protected patchBeforeSend(settings: IAlertBoxSettings): IAlertBoxApiSettings {
@@ -117,17 +149,17 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
 
   private transformSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
     const triagedSettings = this.triageSettings(settings);
-    Object.keys(triagedSettings).forEach((key) => {
+    Object.keys(triagedSettings).forEach(key => {
       if (key === 'subs') {
         triagedSettings['subs'] = this.varifySetting({
           showResubMessage: triagedSettings['resubs'].show_message,
           ...triagedSettings['subs'],
-          ...triagedSettings['resubs']
+          ...triagedSettings['resubs'],
         });
       } else if (this.apiNames().includes(key) && key !== 'resubs') {
         triagedSettings[key] = this.varifySetting(triagedSettings[key]);
       }
-    })
+    });
     // resubs are folded into the sub settings
     triagedSettings['resubs'] = undefined;
 
@@ -135,11 +167,13 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private triageSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
-    const newSettings= {} as IAlertBoxSettings;
-    Object.keys(settings).forEach((key) => {
+    const newSettings = {} as IAlertBoxSettings;
+    Object.keys(settings).forEach(key => {
       let testSuccess = false;
-      REGEX_TESTERS.forEach((test) => {
-        const newKey = /^show/.test(key) ? key.replace(test.tester, 'show_') : key.replace(test.tester, '');
+      REGEX_TESTERS.forEach(test => {
+        const newKey = /^show/.test(key)
+          ? key.replace(test.tester, 'show_')
+          : key.replace(test.tester, '');
         if (test.tester.test(key)) {
           testSuccess = true;
           if (!newSettings[test.name]) {
@@ -168,14 +202,19 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   private varifySetting(setting: any): IAlertBoxSetting {
     const { show_message, enabled, variations, showResubMessage, ...rest } = setting;
     const defaultVariation = this.reshapeVariation(rest);
-    const idVariations = variations.map((variation: IAlertBoxVariation) => ({ id: uuid(), ...variation }))
+    const idVariations = variations.map((variation: IAlertBoxVariation) => ({
+      id: uuid(),
+      ...variation,
+    }));
     idVariations.unshift(defaultVariation);
-    return { showMessage: show_message, enabled, variations: idVariations, showResubMessage };
+    return { enabled, showResubMessage, showMessage: show_message, variations: idVariations };
   }
 
   private reshapeVariation(setting: any): IAlertBoxVariation {
-    const imgHref = setting.image_href === '/images/gallery/default.gif' ?
-      'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' : setting.image_href;
+    const imgHref =
+      setting.image_href === '/images/gallery/default.gif'
+        ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
+        : setting.image_href;
     return {
       condition: null,
       conditionData: null,
@@ -203,7 +242,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           resubFormat: setting.resub_message_template,
           tierUpgradeFormat: setting.tier_upgrade_message_template,
           size: setting.font_size,
-          thickness: setting.font_weight
+          thickness: setting.font_weight,
         },
         textDelay: Math.floor(setting.text_delay / 1000),
         type: '',
@@ -216,7 +255,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           libraryDefaults: setting.gif_library_defaults,
           libraryEnabled: setting.gif_library_enabled,
           minAmount: setting.gifs_min_amount_to_share,
-          duration: setting.max_gif_duration ? Math.floor(setting.max_gif_duration / 1000) : null
+          duration: setting.max_gif_duration ? Math.floor(setting.max_gif_duration / 1000) : null,
         },
         message: {
           minAmount: setting.message_min_amount || setting.alert_message_min_amount,
@@ -224,16 +263,16 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
           font: setting.message_font,
           color: setting.message_font_color,
           size: setting.message_font_size,
-          weight: setting.message_font_weight
+          weight: setting.message_font_weight,
         },
         tts: {
           enabled: setting.tts_enabled,
           minAmount: setting.tts_min_amount,
           language: setting.tts_language,
           security: setting.tts_security,
-          volume: setting.tts_volume
-        }
-      }
+          volume: setting.tts_volume,
+        },
+      },
     };
   }
 
@@ -281,7 +320,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_gif_library_defaults`]: settings.gif.libraryDefaults,
       [`${prefix}_gif_library_enabled`]: settings.gif.libraryEnabled,
       [`${prefix}_gifs_min_amount_to_share`]: settings.gif.minAmount,
-      [`${prefix}_max_gif_duration`]: settings.gif.duration
+      [`${prefix}_max_gif_duration`]: settings.gif.duration,
     };
   }
 
@@ -316,23 +355,27 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       resub_tts_enabled: settings.tts.enabled,
       resub_tts_language: settings.tts.language,
       resub_tts_security: settings.tts.security,
-      resub_tts_volume: settings.tts.volume
+      resub_tts_volume: settings.tts.volume,
     };
   }
 
   private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
     const settingsObj = {} as IAlertBoxApiSettings;
-    Object.keys(settings).forEach((setting) => {
-      const prefix = Object.keys(API_NAME_MAP).find((key) => API_NAME_MAP[key] === setting);
+    Object.keys(settings).forEach(setting => {
+      const prefix = Object.keys(API_NAME_MAP).find(key => API_NAME_MAP[key] === setting);
       if (prefix && prefix !== 'resub') {
         const bitsPrefix = prefix === 'bit' ? 'bits' : prefix;
         const defaultVariation = settings[setting].variations.shift();
         settingsObj[`${prefix}_variations`] = settings[setting].variations;
         settingsObj[`${bitsPrefix}_enabled`] = settings[setting].enabled;
         settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
-        const flattenedDefault = prefix === 'sub' ?
-          this.unshapeSubs(defaultVariation) :  this.unshapeVariation(defaultVariation, bitsPrefix);
-        Object.keys(flattenedDefault).forEach((key) => settingsObj[key] = flattenedDefault[key]);
+        const flattenedDefault =
+          prefix === 'sub'
+            ? this.unshapeSubs(defaultVariation)
+            : this.unshapeVariation(defaultVariation, bitsPrefix);
+        Object.keys(flattenedDefault).forEach(key => {
+          settingsObj[key] = flattenedDefault[key];
+        });
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }

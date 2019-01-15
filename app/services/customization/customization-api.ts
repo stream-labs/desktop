@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ICustomizationServiceState {
@@ -11,7 +11,9 @@ export interface ICustomizationServiceState {
   livedockCollapsed: boolean;
   previewSize: number;
   livedockSize: number;
+  bottomdockSize: number;
   performanceMode: boolean;
+  previewEnabled: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
   enableFFZEmotes: boolean;

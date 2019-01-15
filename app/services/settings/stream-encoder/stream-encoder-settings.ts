@@ -1,4 +1,4 @@
-import { invert, cloneDeep } from  'lodash';
+import { invert, cloneDeep } from 'lodash';
 import { Service } from 'services/service';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
@@ -7,7 +7,7 @@ export enum EEncoder {
   x264 = 'x264',
   qsv = 'qsv',
   nvenc = 'nvenc',
-  amd = 'amd'
+  amd = 'amd',
 }
 
 enum EObsEncoder {
@@ -18,21 +18,39 @@ enum EObsEncoder {
   amd = 'amd',
   amd_amf_h264 = 'amd_amf_h264',
   qsv = 'qsv',
-  obs_qsv11 = 'obs_qsv11'
+  obs_qsv11 = 'obs_qsv11',
 }
 
-export const QUALITY_ORDER =  [
-
+export const QUALITY_ORDER = [
   // x264
-  'ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower',
+  'ultrafast',
+  'superfast',
+  'veryfast',
+  'faster',
+  'fast',
+  'medium',
+  'slow',
+  'slower',
 
   // NVENC
-  'hp', 'fast', 'bd', 'llhp', 'default', 'll', 'llhq', 'hq', 'medium', 'slow', 'losslesshp', 'lossless',
+  'hp',
+  'fast',
+  'bd',
+  'llhp',
+  'default',
+  'll',
+  'llhq',
+  'hq',
+  'medium',
+  'slow',
+  'losslesshp',
+  'lossless',
 
   // QSV
-  'speed', 'balanced', 'quality'
+  'speed',
+  'balanced',
+  'quality',
 ];
-
 
 export interface IStreamEncoderSettings {
   mode: 'Simple' | 'Advanced';
@@ -46,13 +64,12 @@ export interface IStreamEncoderSettings {
   hasCustomResolution: boolean;
 }
 
-const simpleEncoderToAndancedEncoderMap = {
-  'x264': 'obs_x264',
-  'qsv': 'obs_qsv11',
-  'nvenc': 'ffmpeg_nvenc',
-  'amd': 'amd_amf_h26'
+const simpleEncoderToAnvancedEncoderMap = {
+  x264: 'obs_x264',
+  qsv: 'obs_qsv11',
+  nvenc: 'ffmpeg_nvenc',
+  amd: 'amd_amf_h26',
 };
-
 
 /**
  * each encoder have different set of fields
@@ -60,19 +77,18 @@ const simpleEncoderToAndancedEncoderMap = {
 export const encoderFieldsMap = {
   x264: { preset: 'preset', encoderOptions: 'x264opts' },
   nvenc: { preset: 'preset' },
-  qsv: { preset: 'target_usage' }
+  qsv: { preset: 'target_usage' },
 };
 
-
 function simpleEncoderToAdvancedEncoder(encoder: EEncoder) {
-  return simpleEncoderToAndancedEncoderMap[encoder];
+  return simpleEncoderToAnvancedEncoderMap[encoder];
 }
 
 /**
- * returns a short encoder name if exists
+ * returns a short encoder's name if exists
  */
 export function obsEncoderToEncoder(obsEncoder: EObsEncoder): EEncoder {
-  const encoder = invert(simpleEncoderToAndancedEncoderMap)[obsEncoder] || obsEncoder;
+  const encoder = invert(simpleEncoderToAnvancedEncoderMap)[obsEncoder] || obsEncoder;
   return encoder as EEncoder;
 }
 
@@ -92,32 +108,39 @@ export class StreamEncoderSettingsService extends Service {
     const mode = this.settingsService.findSettingValue(output, 'Untitled', 'Mode');
     const encoder = obsEncoderToEncoder(
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder')
+        this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
     ) as EEncoder;
-    const preset: string = this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
+    const preset: string =
+      this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'QSVPreset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'target_usage') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'QualityPreset') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'AMDPreset');
-    const bitrate: number = this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
+    const bitrate: number =
+      this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate');
-    const inputResolution: string = this.settingsService.findSettingValue(video, 'Untitled', 'Base');
+    const inputResolution: string = this.settingsService.findSettingValue(
+      video,
+      'Untitled',
+      'Base',
+    );
     const outputResolution: string =
       this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') ||
       this.settingsService.findSettingValue(video, 'Untitled', 'Output');
-    const encoderOptions = this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') ||
+    const encoderOptions =
+      this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'x264opts');
     const rescaleOutput = this.settingsService.findSettingValue(output, 'Streaming', 'Rescale');
 
-    const resolutions = this.settingsService.findSetting(video, 'Untitled', 'Output')
-      .options
-      .map((option: any) => option.value);
+    const resolutions = this.settingsService
+      .findSetting(video, 'Untitled', 'Output')
+      .options.map((option: any) => option.value);
 
     const hasCustomResolution = !resolutions.includes(outputResolution);
 
-    return  {
+    return {
       mode,
       encoder,
       preset, // in some cases OBS returns \r at the end of the string
@@ -126,27 +149,29 @@ export class StreamEncoderSettingsService extends Service {
       outputResolution,
       encoderOptions,
       rescaleOutput,
-      hasCustomResolution
+      hasCustomResolution,
     };
   }
 
-
   setSettings(settingsPatch: Partial<IStreamEncoderSettings>) {
-    if (settingsPatch.mode) this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
+    if (settingsPatch.mode) {
+      this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
+    }
 
     const currentSettings = this.getSettings();
 
     if (settingsPatch.encoder) {
-      if (currentSettings.mode == 'Advanced') {
+      if (currentSettings.mode === 'Advanced') {
         this.settingsService.setSettingValue(
           'Output',
           'Encoder',
-          simpleEncoderToAdvancedEncoder(settingsPatch.encoder));
+          simpleEncoderToAdvancedEncoder(settingsPatch.encoder),
+        );
       } else {
         this.settingsService.setSettingValue(
           'Output',
           'StreamEncoder',
-          simpleEncoderToAdvancedEncoder(settingsPatch.encoder)
+          simpleEncoderToAdvancedEncoder(settingsPatch.encoder),
         );
       }
     }
@@ -158,24 +183,23 @@ export class StreamEncoderSettingsService extends Service {
     }
 
     if (settingsPatch.preset) {
-      this.settingsService.setSettingValue('Output', encoderFieldsMap[encoder].preset, settingsPatch.preset);
+      this.settingsService.setSettingValue(
+        'Output',
+        encoderFieldsMap[encoder].preset,
+        settingsPatch.preset,
+      );
     }
 
-    if (settingsPatch.encoderOptions !== void 0 && encoder == 'x264') {
+    if (settingsPatch.encoderOptions !== void 0 && encoder === 'x264') {
       this.settingsService.setSettingValue(
         'Output',
         encoderFieldsMap[encoder].encoderOptions,
-        settingsPatch.encoderOptions
+        settingsPatch.encoderOptions,
       );
     }
 
     if (settingsPatch.rescaleOutput !== void 0) {
-      this.settingsService.setSettingValue(
-        'Output',
-        'Rescale',
-        settingsPatch.rescaleOutput
-      );
+      this.settingsService.setSettingValue('Output', 'Rescale', settingsPatch.rescaleOutput);
     }
   }
-
 }

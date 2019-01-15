@@ -8,7 +8,7 @@
     <div v-if="!transitionsEnabled" class="transition-blank">
       {{ $t('You need at least 2 scenes to edit transitions.') }}
     </div>
-    <tabs :tabs="tabs" v-model="selectedTab" v-else>
+    <tabs :tabs="tabs" className="scene-transition__tabs" v-model="selectedTab" v-else>
       <div slot="transitions" class="transition-tab">
         <button class="button button--action" @click="addTransition">
           {{$t('Add Transition')}}
@@ -39,7 +39,11 @@
               <td class="table__controls">
                 <i
                   @click="editTransition(transition.id)"
-                  class="icon-edit transition-control" />
+                  class="transition-control"
+                  :class="getClassNames(transition.id)"
+                  :title="getEditableMessage(transition.id)"
+                />
+
                 <i
                   @click="deleteTransition(transition.id)"
                   class="icon-trash transition-control" />
@@ -110,6 +114,12 @@
 
 <script lang="ts" src="./SceneTransitions.vue.ts"></script>
 
+<style lang="less">
+.scene-transition__tabs {
+  padding: 0 20px !important;
+}
+</style>
+
 <style lang="less" scoped>
 @import "../../styles/index";
 
@@ -151,6 +161,9 @@
 
 .transition-control {
   margin-left: 10px;
+}
+
+.transition-control:not(.disabled) {
   cursor: pointer;
   .icon-hover();
 }
@@ -180,6 +193,10 @@
     &:hover {
       color: @white;
     }
+  }
+  .transition-control.disabled:hover {
+    cursor: not-allowed;
+    color: inherit;
   }
 }
 </style>

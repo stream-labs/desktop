@@ -1,8 +1,9 @@
+import { Subscription } from 'rxjs';
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
-import { PlatformAppsService } from 'services/platform-apps';
-import { Subscription } from 'rxjs/Subscription';
 import * as obs from '../../../../obs-api';
+import { PlatformAppsService } from 'services/platform-apps';
+import { TransitionsService } from 'services/transitions';
 
 export interface IPlatformAppManagerSettings {
   appId: string;
@@ -12,6 +13,7 @@ export interface IPlatformAppManagerSettings {
 
 export class PlatformAppManager extends PropertiesManager {
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() transitionsService: TransitionsService;
 
   blacklist = ['url', 'is_local_file'];
 
@@ -38,13 +40,15 @@ export class PlatformAppManager extends PropertiesManager {
 
         // Force an update, since the URL probably didn't change, so
         // the browser source won't automatically reload it
-        (this.obsSource.properties.get('refreshnocache') as obs.IButtonProperty)
-          .buttonClicked(this.obsSource);
+        (this.obsSource.properties.get('refreshnocache') as obs.IButtonProperty).buttonClicked(
+          this.obsSource,
+        );
       }
     });
 
     this.unloadSub = this.platformAppsService.appUnload.subscribe(appId => {
       if (appId === this.settings.appId) {
+        this.transitionsService.clearPlatformAppTransitions(appId);
         this.updateUrl();
       }
     });
@@ -65,7 +69,7 @@ export class PlatformAppManager extends PropertiesManager {
     const url = this.platformAppsService.getPageUrlForSource(
       this.settings.appId,
       this.settings.appSourceId,
-      this.settings.appSettings
+      this.settings.appSettings,
     );
 
     // This app was uninstalled or unsubscribed to

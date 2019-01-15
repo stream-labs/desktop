@@ -5,7 +5,6 @@ import electron from 'electron';
 import * as obs from '../../obs-api';
 
 export class ObsUserPluginsService extends Service {
-
   async initialize() {
     // Make a best effort but don't stop SLOBS from loading
     try {
@@ -23,10 +22,7 @@ export class ObsUserPluginsService extends Service {
     const name = path.parse(dllFile).name;
     const dataDir = path.join(this.dataDir, name);
     await this.ensureDirectory(dataDir);
-    const module = obs.ModuleFactory.open(
-      path.join(this.pluginsDir, dllFile),
-      dataDir
-    );
+    const module = obs.ModuleFactory.open(path.join(this.pluginsDir, dllFile), dataDir);
     module.initialize();
   }
 
@@ -73,5 +69,4 @@ export class ObsUserPluginsService extends Service {
       });
     });
   }
-
 }

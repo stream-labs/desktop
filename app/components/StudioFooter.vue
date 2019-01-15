@@ -27,6 +27,9 @@
         <span>REC</span>
       </button>
     </div>
+    <div class="nav-item" v-if="canSchedule">
+      <button class="button button--default" @click="openScheduleStream" >{{ $t('Schedule Stream')}}</button>
+    </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
     </div>
@@ -37,7 +40,7 @@
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .footer {
   display: flex;
@@ -59,11 +62,6 @@
 
 .nav-item {
   .margin-left(2);
-
-  @media(max-width: 1200px) {
-    font-size: 12px;
-    margin-left: 12px;
-  }
 }
 
 .error-wrapper {
@@ -73,7 +71,7 @@
 }
 
 .platform-error {
-  background: rgba(251,72,76,.28);
+  background: rgba(251, 72, 76, 0.28);
   padding: 5px;
   .radius();
 
@@ -91,7 +89,7 @@
   .alert-button {
     height: 18px;
     line-height: 12px;
-    background: rgba(251,72,76,.36);
+    background: rgba(251, 72, 76, 0.36);
     margin: 0 5px;
     padding: 0 8px;
     font-size: 10px;
@@ -110,7 +108,7 @@
   .transition();
   .weight(@bold);
   box-sizing: content-box;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
 
   span {
     font-size: 10px;
@@ -137,7 +135,7 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 2px 0px rgba(252, 62, 63, 0.6);
+    box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
   }
   70% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0.6);

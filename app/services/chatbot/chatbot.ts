@@ -2,13 +2,13 @@ import Vue from 'vue';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 import {
   MediaShareService,
   IMediaShareData,
-  IMediaShareBan
+  IMediaShareBan,
 } from 'services/widgets/settings/media-share';
 import io from 'socket.io-client';
 
@@ -45,13 +45,11 @@ import {
   IChatbotSocketAuthResponse,
   ChatbotSocketRoom,
   ISongRequestPreferencesResponse,
-  ISongRequestResponse
+  ISongRequestResponse,
 } from './chatbot-interfaces';
 import { $t } from '../i18n';
 
-export class ChatbotApiService extends PersistentStatefulService<
-  IChatbotApiServiceState
-> {
+export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
   @Inject() userService: UserService;
   @Inject() chatbotCommonService: ChatbotCommonService;
   @Inject() mediaShareService: MediaShareService;
@@ -67,83 +65,83 @@ export class ChatbotApiService extends PersistentStatefulService<
     defaultCommandsResponse: {
       commands: {},
       'link-protection': {},
-      giveaway: {}
+      giveaway: {},
     },
     customCommandsResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     commandVariablesResponse: [],
     timersResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     chatAlertsResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     capsProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     symbolProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     linkProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     wordProtectionResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     quotesResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     quotePreferencesResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     queuePreferencesResponse: {
       enabled: false,
-      settings: null
+      settings: null,
     },
     queueStateResponse: {
-      status: 'Closed'
+      status: 'Closed',
     },
     queueEntriesResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     queuePickedResponse: {
       pagination: {
         current: 1,
-        total: 1
+        total: 1,
       },
-      data: []
+      data: [],
     },
     songRequestPreferencesResponse: {
       banned_media: [],
-      settings: null
+      settings: null,
     },
     songRequestResponse: {
       enabled: false,
-      settings: null
-    }
+      settings: null,
+    },
   };
 
   //
@@ -158,19 +156,16 @@ export class ChatbotApiService extends PersistentStatefulService<
       const request = new Request(url, {
         headers,
         method: 'POST',
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
 
       fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
-        .then((response: IChatbotAuthResponse) => {
-          this.LOGIN(response);
+        .then(handleResponse)
+        .then((json: IChatbotAuthResponse) => {
+          this.LOGIN(json);
           resolve(true);
         })
-        .catch(err => {
-          reject(err);
-        });
+        .catch(err => reject(err));
     });
   }
 
@@ -185,13 +180,13 @@ export class ChatbotApiService extends PersistentStatefulService<
   api(method: string, endpoint: string, data: any) {
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
-    let options: {
+    const options: {
       headers: any;
       method: string;
       body?: string;
     } = {
       headers,
-      method
+      method,
     };
     if (method.toLowerCase() === 'post' || method.toLowerCase() === 'put') {
       options.headers.append('Content-Type', 'application/json');
@@ -199,20 +194,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     }
     const request = new Request(url, options);
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => {
-        return response.json();
-      })
-      .catch(error => {
-        // errors contain string response. Need to json()
-        // and return the promised error
-        return error
-          .json()
-          .then((errJson: Promise<IChatbotErrorResponse>) =>
-            Promise.reject(errJson)
-          );
-      });
+    return fetch(request).then(handleResponse);
   }
 
   //
@@ -223,12 +205,12 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {}).then(
       (response: IChatbotSocketAuthResponse) => {
         this.LOGIN_TO_SOCKET(response);
-      }
+      },
     );
   }
 
   connectToQueueSocketChannels() {
-    let socket = io.connect(this.socketUrl);
+    const socket = io.connect(this.socketUrl);
     socket.emit('authenticate', { token: this.state.socketToken });
 
     socket.on('queue.open', (response: IQueueStateResponse) => {
@@ -272,57 +254,48 @@ export class ChatbotApiService extends PersistentStatefulService<
   //
 
   fetchChatbotGlobalEnabled() {
-    return this.api('GET', 'status', {}).then(
-      (response: IChatbotStatusResponse) => {
-        // check for clients
+    return this.api('GET', 'status', {}).then((response: IChatbotStatusResponse) => {
+      // check for clients
 
-        const clientFound = response.clients.services.some(value => {
-          return value.toLowerCase() == this.userService.platform.type;
-        });
+      const clientFound = response.clients.services.some(value => {
+        return value.toLowerCase() === this.userService.platform.type;
+      });
 
-        // all status online.
-        this.UPDATE_GLOBALLY_ENABLED(
-          response.worker.status === 'Online' &&
-            response.worker.type === 'Full' &&
-            response.clients.status === 'Online' &&
-            clientFound
-        );
-      }
-    );
+      // all status online.
+      this.UPDATE_GLOBALLY_ENABLED(
+        response.worker.status === 'Online' &&
+          response.worker.type === 'Full' &&
+          response.clients.status === 'Online' &&
+          clientFound,
+      );
+    });
   }
 
   fetchDefaultCommands() {
-    return this.api('GET', 'commands/default', {}).then(
-      (response: IDafaultCommandsResponse) => {
-        this.UPDATE_DEFAULT_COMMANDS(response);
-      }
-    );
+    return this.api('GET', 'commands/default', {}).then((response: IDafaultCommandsResponse) => {
+      this.UPDATE_DEFAULT_COMMANDS(response);
+    });
   }
 
-  fetchCustomCommands(
-    page = this.state.customCommandsResponse.pagination.current,
-    query = ''
-  ) {
+  fetchCustomCommands(page = this.state.customCommandsResponse.pagination.current, query = '') {
     return this.api('GET', `commands?page=${page}&query=${query}`, {}).then(
       (response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
-      }
+      },
     );
   }
 
   fetchCommandVariables() {
-    return this.api('GET', 'commands/variables', {}).then(
-      (response: ICommandVariablesResponse) => {
-        this.UPDATE_COMMAND_VARIABLES(response);
-      }
-    );
+    return this.api('GET', 'commands/variables', {}).then((response: ICommandVariablesResponse) => {
+      this.UPDATE_COMMAND_VARIABLES(response);
+    });
   }
 
   fetchTimers(page = this.state.timersResponse.pagination.current, query = '') {
     return this.api('GET', `timers?page=${page}&query=${query}`, {}).then(
       (response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
-      }
+      },
     );
   }
 
@@ -330,7 +303,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', 'settings/chat-notifications', {}).then(
       (response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
-      }
+      },
     );
   }
 
@@ -338,7 +311,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', 'settings/caps-protection', {}).then(
       (response: ICapsProtectionResponse) => {
         this.UPDATE_CAPS_PROTECTION(response);
-      }
+      },
     );
   }
 
@@ -346,7 +319,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', 'settings/symbol-protection', {}).then(
       (response: ISymbolProtectionResponse) => {
         this.UPDATE_SYMBOL_PROTECTION(response);
-      }
+      },
     );
   }
 
@@ -354,7 +327,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', 'settings/link-protection', {}).then(
       (response: ILinkProtectionResponse) => {
         this.UPDATE_LINK_PROTECTION(response);
-      }
+      },
     );
   }
 
@@ -362,7 +335,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', 'settings/words-protection', {}).then(
       (response: IWordProtectionResponse) => {
         this.UPDATE_WORD_PROTECTION(response);
-      }
+      },
     );
   }
 
@@ -370,72 +343,55 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
       (response: IQuotesResponse) => {
         this.UPDATE_QUOTES(response);
-      }
+      },
     );
   }
 
   fetchQuotePreferences() {
-    return this.api('GET', 'settings/quotes', {}).then(
-      (response: IQuotePreferencesResponse) => {
-        this.UPDATE_QUOTE_PREFERENCES(response);
-      }
-    );
+    return this.api('GET', 'settings/quotes', {}).then((response: IQuotePreferencesResponse) => {
+      this.UPDATE_QUOTE_PREFERENCES(response);
+    });
   }
 
   fetchQueuePreferences() {
-    return this.api('GET', 'settings/queue', {}).then(
-      (response: IQueuePreferencesResponse) => {
-        this.UPDATE_QUEUE_PREFERENCES(response);
-      }
-    );
+    return this.api('GET', 'settings/queue', {}).then((response: IQueuePreferencesResponse) => {
+      this.UPDATE_QUEUE_PREFERENCES(response);
+    });
   }
 
   fetchQueueState() {
-    return this.api('GET', 'queue', {}).then(
-      (response: IQueueStateResponse) => {
-        this.UPDATE_QUEUE_STATE(response);
-      }
-    );
+    return this.api('GET', 'queue', {}).then((response: IQueueStateResponse) => {
+      this.UPDATE_QUEUE_STATE(response);
+    });
   }
 
-  fetchQueueEntries(
-    page = this.state.queueEntriesResponse.pagination.current,
-    query = ''
-  ) {
-    return this.api(
-      'GET',
-      `queue/entries?page=${page}&query=${query}`,
-      {}
-    ).then((response: IQueueEntriesResponse) => {
-      this.UPDATE_QUEUE_ENTRIES(response);
-    });
+  fetchQueueEntries(page = this.state.queueEntriesResponse.pagination.current, query = '') {
+    return this.api('GET', `queue/entries?page=${page}&query=${query}`, {}).then(
+      (response: IQueueEntriesResponse) => {
+        this.UPDATE_QUEUE_ENTRIES(response);
+      },
+    );
   }
 
   fetchQueuePicked(page = this.state.queuePickedResponse.pagination.current) {
     return this.api('GET', `queue/picked?page=${page}`, {}).then(
       (response: IQueuePickedResponse) => {
         this.UPDATE_QUEUE_PICKED(response);
-      }
+      },
     );
   }
 
   fetchSongRequestPreferencesData() {
-    return this.mediaShareService
-      .fetchData()
-      .then((response: IMediaShareData) => {
-        this.UPDATE_SONG_REQUEST_PREFERENCES(
-          response as ISongRequestPreferencesResponse
-        );
-      });
+    return this.mediaShareService.fetchData().then((response: IMediaShareData) => {
+      this.UPDATE_SONG_REQUEST_PREFERENCES(response as ISongRequestPreferencesResponse);
+    });
   }
 
   fetchSongRequest() {
     // mostly used for enable/disable only
-    return this.api('GET', 'settings/songrequest', {}).then(
-      (response: ISongRequestResponse) => {
-        this.UPDATE_SONG_REQUEST(response);
-      }
-    );
+    return this.api('GET', 'settings/songrequest', {}).then((response: ISongRequestResponse) => {
+      this.UPDATE_SONG_REQUEST(response);
+    });
   }
 
   //
@@ -449,18 +405,17 @@ export class ChatbotApiService extends PersistentStatefulService<
           | ICapsProtectionResponse
           | ISymbolProtectionResponse
           | ILinkProtectionResponse
-          | IWordProtectionResponse
+          | IWordProtectionResponse,
       ) => {
         switch (slug) {
           case 'chat-notifications':
             this.UPDATE_CHAT_ALERTS(response as IChatAlertsResponse);
+            break;
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(response as ICapsProtectionResponse);
             break;
           case 'symbol-protection':
-            this.UPDATE_SYMBOL_PROTECTION(
-              response as ISymbolProtectionResponse
-            );
+            this.UPDATE_SYMBOL_PROTECTION(response as ISymbolProtectionResponse);
             break;
           case 'link-protection':
             this.UPDATE_LINK_PROTECTION(response as ILinkProtectionResponse);
@@ -470,22 +425,22 @@ export class ChatbotApiService extends PersistentStatefulService<
             break;
         }
         return Promise.resolve(response);
-      }
+      },
     );
   }
 
   toggleEnableChatbot() {
     const platforms = ChatbotClients.map(client => client.toLowerCase());
 
-    let containsPlatform = platforms.some(value => {
-      return value.toLowerCase() == this.userService.platform.type;
+    const containsPlatform = platforms.some(value => {
+      return value.toLowerCase() === this.userService.platform.type;
     });
 
     if (containsPlatform) {
       return Promise.all([
         this.state.globallyEnabled
           ? this.leavePlatformChannel(this.userService.platform.type)
-          : this.joinPlatformChannel(this.userService.platform.type)
+          : this.joinPlatformChannel(this.userService.platform.type),
       ]).then((response: IChatbotAPIPostResponse[]) => {
         this.fetchChatbotGlobalEnabled();
       });
@@ -504,28 +459,24 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('POST', 'commands/default/reset', {}).then(
       (response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
-      }
+      },
     );
   }
 
   resetDefaultCommand(slugName: string, commandName: string) {
-    return this.api(
-      'POST',
-      `settings/${slugName}/commands/${commandName}/reset`,
-      {}
-    ).then((response: IDefaultCommand) => {
-      return Promise.resolve(response);
-    });
+    return this.api('POST', `settings/${slugName}/commands/${commandName}/reset`, {}).then(
+      (response: IDefaultCommand) => {
+        return Promise.resolve(response);
+      },
+    );
   }
 
   // create
   createCustomCommand(data: ICustomCommand) {
-    return this.api('POST', 'commands', data).then(
-      (response: ICustomCommand) => {
-        this.fetchCustomCommands();
-        this.chatbotCommonService.closeChildWindow();
-      }
-    );
+    return this.api('POST', 'commands', data).then((response: ICustomCommand) => {
+      this.fetchCustomCommands();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
   createTimer(data: IChatbotTimer) {
@@ -543,126 +494,110 @@ export class ChatbotApiService extends PersistentStatefulService<
   }
 
   // Update
-  updateDefaultCommand(
-    slugName: string,
-    commandName: string,
-    data: IDefaultCommand
-  ) {
-    return this.api(
-      'POST',
-      `settings/${slugName}/commands/${commandName}`,
-      data
-    ).then((response: IChatbotAPIPostResponse) => {
-      if (response.success === true) {
-        this.fetchDefaultCommands();
+  updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
+    return this.api('POST', `settings/${slugName}/commands/${commandName}`, data).then(
+      (response: IChatbotAPIPostResponse) => {
+        if (response.success) {
+          this.fetchDefaultCommands();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      },
+    );
+  }
+
+  updateCustomCommand(id: string, data: ICustomCommand) {
+    return this.api('PUT', `commands/${id}`, data).then((response: IChatbotAPIPutResponse) => {
+      if (response.success) {
+        this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
       }
     });
   }
 
-  updateCustomCommand(id: string, data: ICustomCommand) {
-    return this.api('PUT', `commands/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
-        if (response.success === true) {
-          this.fetchCustomCommands();
-          this.chatbotCommonService.closeChildWindow();
-        }
-      }
-    );
-  }
-
   updateTimer(id: string, data: IChatbotTimer) {
-    return this.api('PUT', `timers/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
-        if (response.success === true) {
-          this.fetchTimers();
-          this.chatbotCommonService.closeChildWindow();
-        }
+    return this.api('PUT', `timers/${id}`, data).then((response: IChatbotAPIPutResponse) => {
+      if (response.success) {
+        this.fetchTimers();
+        this.chatbotCommonService.closeChildWindow();
       }
-    );
+    });
   }
 
   updateChatAlerts(data: IChatAlertsResponse) {
     return this.api('POST', 'settings/chat-notifications', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchChatAlerts();
         }
-      }
+      },
     );
   }
 
   updateCapsProtection(data: ICapsProtectionResponse) {
     return this.api('POST', 'settings/caps-protection', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchCapsProtection();
         }
-      }
+      },
     );
   }
 
   updateSymbolProtection(data: ISymbolProtectionResponse) {
     return this.api('POST', 'settings/symbol-protection', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchSymbolProtection();
         }
-      }
+      },
     );
   }
 
   updateLinkProtection(data: ILinkProtectionResponse) {
     return this.api('POST', 'settings/link-protection', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchLinkProtection();
         }
-      }
+      },
     );
   }
 
   updateWordProtection(data: IWordProtectionResponse) {
     return this.api('POST', 'settings/words-protection', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchWordProtection();
         }
-      }
+      },
     );
   }
 
   updateQuote(id: number, data: IQuote) {
-    return this.api('PUT', `quotes/${id}`, data).then(
-      (response: IChatbotAPIPutResponse) => {
-        if (response.success === true) {
-          this.fetchQuotes();
-          this.chatbotCommonService.closeChildWindow();
-        }
+    return this.api('PUT', `quotes/${id}`, data).then((response: IChatbotAPIPutResponse) => {
+      if (response.success) {
+        this.fetchQuotes();
+        this.chatbotCommonService.closeChildWindow();
       }
-    );
+    });
   }
 
   updateQuotePreferences(data: IQuotePreferencesResponse) {
-    return this.api('POST', 'settings/quotes', data).then(
-      (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
-          this.fetchQuotePreferences();
-          this.chatbotCommonService.closeChildWindow();
-        }
+    return this.api('POST', 'settings/quotes', data).then((response: IChatbotAPIPostResponse) => {
+      if (response.success) {
+        this.fetchQuotePreferences();
+        this.chatbotCommonService.closeChildWindow();
       }
-    );
+    });
   }
 
   updateQueuePreferences(data: IQueuePreferencesResponse) {
-    return this.api('POST', 'settings/queue', data).then(
-      (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
-          this.fetchQueuePreferences();
-          this.chatbotCommonService.closeChildWindow();
-        }
+    return this.api('POST', 'settings/queue', data).then((response: IChatbotAPIPostResponse) => {
+      if (response.success) {
+        this.fetchQueuePreferences();
+        this.chatbotCommonService.closeChildWindow();
       }
-    );
+    });
   }
 
   openQueue(title: string) {
@@ -693,10 +628,10 @@ export class ChatbotApiService extends PersistentStatefulService<
   updateSongRequest(data: ISongRequestResponse) {
     return this.api('POST', 'settings/songrequest', data).then(
       (response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
+        if (response.success) {
           this.fetchSongRequest();
         }
-      }
+      },
     );
   }
 
@@ -704,33 +639,27 @@ export class ChatbotApiService extends PersistentStatefulService<
   // DELETE methods
   //
   deleteCustomCommand(id: string) {
-    return this.api('DELETE', `commands/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchCustomCommands();
-        }
+    return this.api('DELETE', `commands/${id}`, {}).then((response: IChatbotAPIDeleteResponse) => {
+      if (response.success) {
+        this.fetchCustomCommands();
       }
-    );
+    });
   }
 
   deleteTimer(id: string) {
-    return this.api('DELETE', `timers/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchTimers();
-        }
+    return this.api('DELETE', `timers/${id}`, {}).then((response: IChatbotAPIDeleteResponse) => {
+      if (response.success) {
+        this.fetchTimers();
       }
-    );
+    });
   }
 
   deleteQuote(id: number) {
-    return this.api('DELETE', `quotes/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchQuotes();
-        }
+    return this.api('DELETE', `quotes/${id}`, {}).then((response: IChatbotAPIDeleteResponse) => {
+      if (response.success) {
+        this.fetchQuotes();
       }
-    );
+    });
   }
 
   clearQueueEntries() {
@@ -846,9 +775,7 @@ export class ChatbotApiService extends PersistentStatefulService<
   }
 
   @mutation()
-  private UPDATE_SONG_REQUEST_PREFERENCES(
-    response: ISongRequestPreferencesResponse
-  ) {
+  private UPDATE_SONG_REQUEST_PREFERENCES(response: ISongRequestPreferencesResponse) {
     Vue.set(this.state, 'songRequestPreferencesResponse', response);
   }
 
@@ -858,9 +785,7 @@ export class ChatbotApiService extends PersistentStatefulService<
   }
 }
 
-export class ChatbotCommonService extends PersistentStatefulService<
-  IChatbotCommonServiceState
-> {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {
@@ -869,7 +794,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     defaultCommandToUpdate: null,
     timerToUpdate: null,
     quoteToUpdate: null,
-    modBannerVisible: true
+    modBannerVisible: true,
   };
 
   hideModBanner() {
@@ -893,8 +818,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Custom Command Window',
       size: {
         width: 650,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 
@@ -907,8 +832,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Default Command Window',
       size: {
         width: 650,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -921,8 +846,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Timer Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -932,8 +857,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Alerts Window',
       size: {
         width: 1000,
-        height: 700
-      }
+        height: 700,
+      },
     });
   }
 
@@ -943,8 +868,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Caps Protection Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -954,8 +879,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Symbol Protection Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -965,8 +890,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Link Protection Window',
       size: {
         width: 650,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -976,8 +901,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Word Protection Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -990,8 +915,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Quote Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -1001,8 +926,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Queue Preferences Window',
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -1012,8 +937,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chatbot Quote Preferences Window',
       size: {
         width: 650,
-        height: 300
-      }
+        height: 300,
+      },
     });
   }
 
@@ -1024,8 +949,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       preservePrevWindow: true,
       size: {
         width: 650,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -1035,8 +960,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
       title: 'Chat Song Request Onboarding Window',
       size: {
         width: 750,
-        height: 550
-      }
+        height: 550,
+      },
     });
   }
 
