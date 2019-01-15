@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import { StreamingService } from '../services/streaming';
+import { StreamingService, EReplayBufferState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
@@ -14,6 +14,7 @@ import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { SettingsService } from 'services/settings';
 
 @Component({
   components: {
@@ -29,6 +30,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
 
   @Prop() locked: boolean;
 
@@ -90,5 +92,33 @@ export default class StudioFooterComponent extends Vue {
         service.verifyAbleToStream();
       }
     }
+  }
+
+  get replayBufferEnabled() {
+    return this.settingsService.state.Output.RecRB;
+  }
+
+  get replayBufferOffline() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Offline;
+  }
+
+  get replayBufferStopping() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Stopping;
+  }
+
+  get replayBufferSaving() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Saving;
+  }
+
+  toggleReplayBuffer() {
+    if (this.streamingService.state.replayBufferStatus === EReplayBufferState.Offline) {
+      this.streamingService.startReplayBuffer();
+    } else {
+      this.streamingService.stopReplayBuffer();
+    }
+  }
+
+  saveReplay() {
+    this.streamingService.saveReplay();
   }
 }

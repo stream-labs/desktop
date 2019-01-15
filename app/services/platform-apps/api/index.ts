@@ -15,6 +15,7 @@ import { HotkeysModule } from './modules/hotkeys';
 import { ObsPluginsModule } from './modules/obs-plugins';
 import { DisplayModule } from './modules/display';
 import { SceneTransitionsModule } from './modules/scene-transitions';
+import { ReplayModule } from './modules/replay';
 
 export class PlatformAppsApi {
   modules: Dictionary<Module> = {};
@@ -35,6 +36,7 @@ export class PlatformAppsApi {
     this.registerModule(new ObsPluginsModule());
     this.registerModule(new DisplayModule());
     this.registerModule(new SceneTransitionsModule());
+    this.registerModule(new ReplayModule());
   }
 
   private registerModule(module: Module) {

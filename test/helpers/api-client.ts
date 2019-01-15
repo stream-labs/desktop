@@ -141,8 +141,7 @@ export class ApiClient {
         body: requestBody,
         completed: false,
       };
-      // tslint:disable-next-line:prefer-template TODO
-      const rawMessage = JSON.stringify(requestBody) + '\n';
+      const rawMessage = `${JSON.stringify(requestBody)}\n`;
       this.log('Sent:', rawMessage);
       this.socket.write(rawMessage);
     });
@@ -160,8 +159,7 @@ export class ApiClient {
 
     if (!requestBody.id) throw 'id is required';
 
-    // tslint:disable-next-line:prefer-template TODO
-    const rawMessage = JSON.stringify(requestBody) + '\n';
+    const rawMessage = `${JSON.stringify(requestBody)}\n`;
     this.log('Sent:', rawMessage);
 
     const client = new snp.Client(PIPE_PATH);
@@ -286,6 +284,13 @@ export class ApiClient {
     });
   }
 
+  /**
+   * Wait for API event
+   * Skip events if constraint returned a false value
+   * @example
+   *  // wait for event that has a `fader` property
+   *  const event = await client.waitForEvent((event: any) => !!event.fader)
+   */
   waitForEvent<TEvent extends Dictionary<any>>(
     constraint: (event: TEvent) => boolean,
   ): Promise<TEvent> {
