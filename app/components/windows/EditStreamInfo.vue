@@ -63,8 +63,7 @@
                   <span>
                     {{ $t('Use optimized encoder settings for') }}
                     {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.encoder }}
-                  </span>
-                  <span>
+                  </span>&nbsp;<span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
                       :title="$t('Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience')">

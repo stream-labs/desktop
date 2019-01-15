@@ -25,6 +25,7 @@ import {
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
 import { shell } from 'electron';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
   components: {
@@ -32,6 +33,7 @@ import { shell } from 'electron';
     ObsListInput,
     FormInput,
     HFormGroup,
+    VFormGroup,
     Multiselect,
     BoolInput,
   },

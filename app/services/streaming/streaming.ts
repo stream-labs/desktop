@@ -190,7 +190,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       title: $t('Update Stream Info'),
       queryParams: {},
       size: {
-        width: 500,
+        width: 600,
         height: 400,
       },
     });
