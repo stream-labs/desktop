@@ -49,7 +49,7 @@
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
       </div>
-      <div v-if="areAvailableProfiles">
+      <div v-if="selectedProfile">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">

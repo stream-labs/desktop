@@ -50,8 +50,6 @@ export default class EditStreamInfo extends Vue {
   updatingInfo = false;
   updateError = false;
   selectedProfile: IEncoderProfile = null;
-  areAvailableProfiles = false;
-  isGenericProfiles = false;
   hasPages = false;
   populatingModels = false;
 
@@ -81,7 +79,6 @@ export default class EditStreamInfo extends Vue {
     time: null,
     date: null,
   };
-
 
   facebookPages: IStreamlabsFacebookPages;
 
@@ -170,7 +167,9 @@ export default class EditStreamInfo extends Vue {
   async loadAvailableProfiles() {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
-    this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(this.gameModel.value);
+    this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
+      this.gameModel.value,
+    );
     this.searchProfilesPending = false;
   }
 
