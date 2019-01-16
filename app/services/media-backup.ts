@@ -2,12 +2,11 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import request from 'request';
-import crypto from 'crypto';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import electron from 'electron';
-import { isUrl } from '../util/requests';
+import { getChecksum, isUrl } from 'util/requests';
 
 const uuid = window['require']('uuid/v4');
 
@@ -198,7 +197,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         let checksum: string;
 
         try {
-          checksum = await this.withRetry(() => this.getChecksum(fileToCheck));
+          checksum = await this.withRetry(() => getChecksum(fileToCheck));
         } catch (e) {
           // This is not a fatal error, we can download a new copy
           console.warn(`[Media Backup] Error calculating checksum: ${e}`);
@@ -246,7 +245,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   }
 
   private async uploadFile(filePath: string) {
-    const checksum = await this.getChecksum(filePath);
+    const checksum = await getChecksum(filePath);
     const file = fs.createReadStream(filePath);
 
     const formData = {
@@ -288,17 +287,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
           }
         },
       );
-    });
-  }
-
-  private getChecksum(filePath: string) {
-    return new Promise<string>((resolve, reject) => {
-      const file = fs.createReadStream(filePath);
-      const hash = crypto.createHash('md5');
-
-      file.on('data', data => hash.update(data));
-      file.on('end', () => resolve(hash.digest('hex')));
-      file.on('error', e => reject(e));
     });
   }
 
