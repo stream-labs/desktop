@@ -127,7 +127,7 @@
             v-model="editedCommand.full_response"
             :metadata="metadata.full_response"
           />
-                    <VFormGroup
+          <VFormGroup
             v-if="defaultCommandToUpdate.win_response"
             :title="$t('Win Response')"
             v-model="editedCommand.win_response"
@@ -142,7 +142,7 @@
           <VFormGroup
             v-if="defaultCommandToUpdate.permission"
             :title="$t('Permission')"
-            v-model="defaultCommandToUpdate.permission.level"
+            v-model="editedCommand.permission.level"
             :metadata="metadata.permission"
           />
           <VFormGroup
@@ -153,6 +153,24 @@
           />
         </div>
         <div v-show="selectedTab === 'advanced'">
+          <div class="row" v-if="defaultCommandToUpdate.cooldowns">
+            <div class="small-6 columns">
+              <VFormGroup
+                v-if="defaultCommandToUpdate.cooldowns.global !== undefined"
+                :title="$t('Global Command Cooldown')"
+                v-model="editedCommand.cooldowns.global"
+                :metadata="metadata.cooldown"
+              />
+            </div>
+            <div class="small-6 columns">
+              <VFormGroup
+                v-if="defaultCommandToUpdate.cooldowns.user !== undefined"
+                :title="$t('User Command Cooldown')"
+                v-model="editedCommand.cooldowns.user"
+                :metadata="metadata.usercooldown"
+              />
+            </div>
+          </div>
           <ChatbotAliases v-model="editedCommand.aliases"/>
         </div>
       </validated-form>

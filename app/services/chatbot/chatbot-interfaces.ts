@@ -287,6 +287,7 @@ export interface IDefaultCommand {
   music_response?: string;
   max_response?: string;
   full_response?: string;
+  cooldowns: IChatbotCooldown;
 }
 
 export interface IDafaultCommandsSlug {

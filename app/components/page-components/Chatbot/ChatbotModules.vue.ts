@@ -15,6 +15,7 @@ export default class ChatbotModules extends ChatbotBase {
     this.chatbotApiService.Alerts.fetchChatAlerts();
     this.chatbotApiService.SongRequest.fetchSongRequest();
     this.chatbotApiService.Heist.fetchHeistPreferences();
+    this.chatbotApiService.Gamble.fetchGamblePreferences();
   }
 
   get modules() {

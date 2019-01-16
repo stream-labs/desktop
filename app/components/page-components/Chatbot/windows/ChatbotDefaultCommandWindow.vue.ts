@@ -239,6 +239,22 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         max: 450,
         uuid: $t('Full Response'),
       }),
+      cooldown: {
+        type: EInputType.number,
+        title: $t('Cooldown'),
+        placeholder: $t('Cooldown'),
+        tooltip: $t('Value in seconds'),
+        min: 0,
+        max: 86400,
+      },
+      usercooldown: {
+        type: EInputType.number,
+        title: $t('User Cooldown'),
+        placeholder: $t('User Cooldown'),
+        tooltip: $t('Value in seconds'),
+        min: 0,
+        max: 86400,
+      },
       response_type: this.responseTypeMetadata,
     };
   }
