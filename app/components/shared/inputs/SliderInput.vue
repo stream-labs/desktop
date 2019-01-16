@@ -14,7 +14,7 @@
     :speed="0"
     :height="4"
     :formatter="formatter"
-    :piecewise="!!options.interval"
+    :piecewise="options.interval && options.interval >= 1"
     ref="slider"
     :piecewiseStyle="{
         position: 'absolute',
