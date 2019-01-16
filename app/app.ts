@@ -48,10 +48,10 @@ if (isProduction) {
   electron.crashReporter.start({
     productName: 'streamlabs-obs',
     companyName: 'streamlabs',
+    ignoreSystemCrashHandler: true,
     submitURL:
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
-      'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      'https://sentry.io/api/1283430/minidump/' +
+      '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
       version: slobsVersion,
       processType: 'renderer',
