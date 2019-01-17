@@ -1,0 +1,23 @@
+{
+  "version": "2",
+  "checks": {
+    "file-lines": {
+      "config": {
+        "threshold": 500
+      }
+    }
+  },
+  "plugins": {
+    "tslint": {
+      "enabled": true,
+      "config": "tslint.json"
+    }
+  },
+  "exclude_patterns": [
+    "test/",
+    "bin/",
+    "scripts/",
+    "**/*.d.ts",
+    "app/services/streamlabels/definitions.ts"
+  ]
+}
