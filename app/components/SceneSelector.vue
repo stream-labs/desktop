@@ -80,5 +80,9 @@
 
 .scene-collections__dropdown {
   min-width: 200px;
+
+  & /deep/ .popper {
+    text-align: left;
+  }
 }
 </style>

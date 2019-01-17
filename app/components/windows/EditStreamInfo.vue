@@ -19,10 +19,11 @@
         <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
         {{ $t(' to create a page, and then try again.') }}
       </div>
-      <ObsListInput
+      <h-form-group
         v-if="isFacebook && hasPages && !midStreamMode"
         :value="pageModel"
         @input="(pageId) => setFacebookPageId(pageId)"
+        :metadata="{ type: 'list', name: 'stream_page', title: $t('Facebook Page'), options: pageOptions }"
       />
       <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title') }" />
       <h-form-group
@@ -30,15 +31,18 @@
         v-model="streamDescriptionModel"
         :metadata="{ type: 'text-area', name: 'stream_description', title: $t('Description'), rows: 4 }"
       />
-      <ObsListInput
+      <h-form-group
         v-if="isTwitch || isMixer || isFacebook"
-        :value="gameModel"
-        :allowEmpty="true"
-        placeholder="Search"
-        :internal-search="false"
-        :loading="searchingGames"
-        @search-change="debouncedGameSearch"
-        @input="onGameInput"/>
+        :title="$t('Game')"
+        name="stream_game"
+      >
+        <list-input
+          @search-change="debouncedGameSearch"
+          @input="onGameInput"
+          :value="gameModel"
+          :metadata="gameMetadata"
+        />
+      </h-form-group>
       <div v-if="isSchedule">
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />

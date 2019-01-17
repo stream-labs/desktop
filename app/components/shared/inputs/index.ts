@@ -50,6 +50,8 @@ export interface ITimerMetadata extends INumberMetadata {
 export interface IListMetadata<TValueType> extends IInputMetadata {
   options: IListOption<TValueType>[];
   allowEmpty?: boolean;
+  loading?: boolean;
+  internalSearch?: boolean;
 }
 
 export interface ITextMetadata extends IInputMetadata {

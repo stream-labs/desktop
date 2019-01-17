@@ -1,9 +1,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
-import { Multiselect } from 'vue-multiselect';
+import { ListInput } from 'components/shared/inputs/inputs';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
-  components: { Multiselect },
+  components: { HFormGroup, ListInput },
 })
 class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   static obsType: TObsType;
@@ -29,6 +30,17 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
 
   onSearchChange(value: string) {
     this.$emit('search-change', value);
+  }
+
+  get metadata() {
+    return {
+      loading: this.loading,
+      placeholder: this.placeholder,
+      allowEmpty: this.allowEmpty,
+      internalSearch: this.internalSearch,
+      name: this.value.name,
+      options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
+    };
   }
 
   get currentValue() {

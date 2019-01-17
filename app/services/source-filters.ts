@@ -194,12 +194,7 @@ export class SourceFiltersService extends Service {
     });
 
     return {
-      type: {
-        description: $t('Filter type'),
-        name: 'type',
-        value: availableTypesList[0].value,
-        options: availableTypesList,
-      },
+      type: availableTypesList[0].value,
       name: $t('New filter'),
     };
   }
