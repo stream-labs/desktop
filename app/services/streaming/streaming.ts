@@ -25,6 +25,7 @@ import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -60,6 +61,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
   @Inject() private announcementsService: AnnouncementsService;
+  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -349,6 +351,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.usageStatisticsService.recordEvent('stream_start', {
           ...streamEncoderInfo,
           game,
+          useOptimizedProfile: this.videoEncodingOptimizationService.state.useOptimizedProfile,
         });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
