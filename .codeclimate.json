@@ -12,5 +12,8 @@
       "enabled": true,
       "config": "tslint.json"
     }
-  }
+  },
+  "exclude_patterns": [
+    "app/services/streamlabels/definitions.ts"
+  ]
 }
