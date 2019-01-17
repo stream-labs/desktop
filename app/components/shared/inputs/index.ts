@@ -52,6 +52,7 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
+  noResult?: string;
 }
 
 export interface ITextMetadata extends IInputMetadata {
