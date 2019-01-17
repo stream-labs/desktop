@@ -51,7 +51,7 @@ export default class StudioEditor extends Vue {
   currentX: number;
   currentY: number;
   isCropping: boolean;
-  canDrag = false;
+  canDrag = true;
 
   $refs: {
     display: HTMLDivElement;
