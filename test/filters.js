@@ -16,10 +16,10 @@ test('Adding and removing a source filter', async t => {
   await openFiltersWindow(t, sourceName);
   await focusChild(t);
 
-  t.true(await app.client.isExisting('label=Opacity'));
+  t.true(await app.client.isExisting('div=Opacity'));
 
   await removeFilter(t, sourceName, filterName);
   await openFiltersWindow(t, sourceName);
 
-  t.false(await app.client.isExisting('label=Opacity'));
+  t.false(await app.client.isExisting('div=Opacity'));
 });
