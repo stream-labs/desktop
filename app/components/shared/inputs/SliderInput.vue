@@ -14,16 +14,19 @@
     :speed="0"
     :height="4"
     :formatter="formatter"
-    :piecewise="options.interval && options.interval >= 1"
+    :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
+    :piecewiseLabel="options.piecewiseLabel"
+    :data="options.data"
     ref="slider"
     :piecewiseStyle="{
         position: 'absolute',
-        'backgroundColor': nightMode ? '#253239' : '#eaecee',
+        backgroundColor: nightMode ? '#253239' : '#eaecee',
         height: '2px',
         width: '2px',
         'borderRadius': '1px',
         top: '12px'
     }"
+    :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
     :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
   />
   <input
