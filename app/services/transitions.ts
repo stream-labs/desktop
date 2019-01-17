@@ -1,7 +1,8 @@
 import { mutation, StatefulService } from 'services/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'util/injector';
-import { IObsListOption, TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
+import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
+import { IListOption } from 'components/shared/inputs';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
@@ -97,15 +98,15 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
-  getTypes(): IObsListOption<ETransitionType>[] {
+  getTypes(): IListOption<ETransitionType>[] {
     return [
-      { description: $t('Cut'), value: ETransitionType.Cut },
-      { description: $t('Fade'), value: ETransitionType.Fade },
-      { description: $t('Swipe'), value: ETransitionType.Swipe },
-      { description: $t('Slide'), value: ETransitionType.Slide },
-      { description: $t('Fade to Color'), value: ETransitionType.FadeToColor },
-      { description: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
-      { description: $t('Stinger'), value: ETransitionType.Stinger },
+      { title: $t('Cut'), value: ETransitionType.Cut },
+      { title: $t('Fade'), value: ETransitionType.Fade },
+      { title: $t('Swipe'), value: ETransitionType.Swipe },
+      { title: $t('Slide'), value: ETransitionType.Slide },
+      { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
+      { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
+      { title: $t('Stinger'), value: ETransitionType.Stinger },
     ];
   }
 
