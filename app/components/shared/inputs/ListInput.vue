@@ -9,10 +9,18 @@
     :placeholder="placeholder"
     label="description"
     :allow-empty="options.allowEmpty"
-    @input="onInputHandler">
-
+    :internal-search="options.internalSearch"
+    :loading="options.loading"
+    :disabled="options.disabled"
+    @input="onInputHandler"
+    @search-change="onSearchChange"
+  >
     <template slot="option" slot-scope="props">
       <span :data-option-value="props.option.value">{{ props.option.description }}</span>
+    </template>
+
+    <template v-if="options.noResult" slot="noResult">
+      {{ options.noResult }}
     </template>
 
   </multiselect>

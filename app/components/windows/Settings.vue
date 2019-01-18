@@ -59,7 +59,7 @@
 
 <style lang="less">
 .settings-container {
-  .input-container {
+  .alignable-input {
     flex-direction: column;
 
     .input-label,

@@ -6,15 +6,15 @@
   :data-name="options.name"
 >
   <vue-slider class="slider w-form-group__input"
-    :value="value"
-    @input="value => updateValue(value)"
+    :value="localValue"
+    @input="value => updateLocalValue(value)"
     :max="options.max"
     :min="options.min"
     :interval="options.interval"
     :speed="0"
     :height="4"
     :formatter="formatter"
-    :piecewise="!!options.interval"
+    :piecewise="options.interval && options.interval >= 1"
     ref="slider"
     :piecewiseStyle="{
         position: 'absolute',
@@ -30,8 +30,8 @@
     v-if="options.hasValueBox && !options.usePercentages"
     class="slider-input"
     type="text"
-    :value="value"
-    @input="updateValue(parseFloat($event.target.value))"
+    :value="localValue"
+    @input="updateLocalValue(parseFloat($event.target.value))"
     @keydown="handleKeydown"
   />
 </div>

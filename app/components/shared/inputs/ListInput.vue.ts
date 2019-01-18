@@ -59,4 +59,8 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
   get selectedOption(): IListOption<string> {
     return this.options.options.find(option => option.value === this.value);
   }
+
+  onSearchChange(value: string) {
+    this.$emit('search-change', value);
+  }
 }
