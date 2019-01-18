@@ -92,6 +92,7 @@ export class CrashReporterService extends Service {
 
   private writeStateFile(code: EAppState) {
     this.appState = { code, version: this.version };
+    if (process.env.NODE_ENV !== 'production') return;
     try {
       fs.writeFileSync(this.appStateFile, JSON.stringify(this.appState));
     } catch (e) {
