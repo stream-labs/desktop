@@ -15,7 +15,10 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 enum EAppState {
   Starting = 'starting',
   Idle = 'idle',
+  StartStreaming = 'start_streaming',
   Streaming = 'streaming',
+  StopStreaming = 'stop_streaming',
+  Reconnecting = 'reconnecting',
   Closing = 'closing',
   CleanExit = 'clean_exit',
 }
@@ -63,6 +66,18 @@ export class CrashReporterService extends Service {
         this.setState(EAppState.Streaming);
       }
 
+      if (status === EStreamingState.Starting) {
+        this.setState(EAppState.StartStreaming);
+      }
+
+      if (status === EStreamingState.Ending) {
+        this.setState(EAppState.StopStreaming);
+      }
+
+      if (status === EStreamingState.Reconnecting) {
+        this.setState(EAppState.Reconnecting);
+      }
+
       if (status === EStreamingState.Offline) {
         this.setState(EAppState.Idle);
       }
@@ -80,10 +95,12 @@ export class CrashReporterService extends Service {
 
   private setState(state: EAppState) {
     this.appState = state;
-    try {
-      fs.writeFileSync(this.appStateFile, state);
-    } catch (e) {
-      console.error('Error writing app state file', e);
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        fs.writeFileSync(this.appStateFile, state);
+      } catch (e) {
+        console.error('Error writing app state file', e);
+      }
     }
   }
 
