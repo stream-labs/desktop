@@ -66,11 +66,12 @@ export interface ITextMetadata extends IInputMetadata {
 }
 
 export interface ISliderMetadata extends IInputMetadata {
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
   interval?: number;
   usePercentages?: boolean;
   hasValueBox?: boolean;
+  data?: string[];
 }
 
 export interface IListOption<TValue> {

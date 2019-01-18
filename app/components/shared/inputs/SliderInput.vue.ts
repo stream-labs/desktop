@@ -41,7 +41,11 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
 
   @debounce(100)
   updateValue(value: number) {
-    this.emitInput(this.roundNumber(value));
+    if (isNaN(Number(value))) {
+      this.emitInput(value);
+    } else {
+      this.emitInput(this.roundNumber(value));
+    }
   }
 
   get nightMode() {
