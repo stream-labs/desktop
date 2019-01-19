@@ -3,7 +3,11 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import moment from 'moment';
 import { padStart } from 'lodash';
-import { SettingsService } from 'services/settings';
+import {
+  IStreamEncoderSettings,
+  SettingsService,
+  StreamEncoderSettingsService,
+} from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import electron from 'electron';
@@ -21,6 +25,7 @@ import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -49,12 +54,14 @@ interface IOBSOutputSignalInfo {
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
+  @Inject() streamEncoderSettingsService: StreamEncoderSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
   @Inject() private announcementsService: AnnouncementsService;
+  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -230,7 +237,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       title: $t('Update Stream Info'),
       queryParams: {},
       size: {
-        width: 500,
+        width: 600,
         height: 400,
       },
     });
@@ -329,11 +336,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
 
-        let streamEncoderInfo: Dictionary<string> = {};
+        let streamEncoderInfo: Partial<IStreamEncoderSettings> = {};
         let game: string = null;
 
         try {
-          streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
+          streamEncoderInfo = this.streamEncoderSettingsService.getSettings();
           if (this.streamInfoService.state.channelInfo) {
             game = this.streamInfoService.state.channelInfo.game;
           }
@@ -344,6 +351,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.usageStatisticsService.recordEvent('stream_start', {
           ...streamEncoderInfo,
           game,
+          useOptimizedProfile: this.videoEncodingOptimizationService.state.useOptimizedProfile,
         });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);

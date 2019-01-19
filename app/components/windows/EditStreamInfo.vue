@@ -43,56 +43,36 @@
           :metadata="gameMetadata"
         />
       </h-form-group>
+      <h-form-group v-if="searchProfilesPending">
+        {{ $t('Checking optimized setting for') }} {{ gameModel }}...
+      </h-form-group>
       <div v-if="isSchedule">
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
       </div>
-      <div v-if="areAvailableProfiles">
+      <div v-if="selectedProfile">
         <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
             <div class="checkbox">
-              <div v-if="!isGenericProfiles">
+              <div>
                 <input
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use {{gameModel.value}} encoder settings</span></label>
-              </div>
-              <div v-else>
-                <input
-                  type="checkbox"
-                  v-model="useOptimizedProfile"
-                />
-                <label><span>{{ $t('Use optimized encoder settings') }}</span>
+                <label>
                   <span>
+                    {{ $t('Use optimized encoder settings for') }}
+                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.encoder }}
+                  </span>&nbsp;<span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
-                      :title="$t('Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends')">
+                      :title="$t('Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience')">
                     </i>
                   </span>
                 </label>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="input-container select" v-show="useOptimizedProfile">
-          <div class="input-label">
-            <label>Profile</label>
-          </div>
-          <div class="input-wrapper">
-            <multiselect
-              :allowEmpty="false"
-              :options="profiles"
-              track-by="value"
-              :close-on-select="true"
-              label="description"
-              v-model="encoderProfile">
-              <template slot="option" slot-scope="props">
-                <div class="edit-stream-info-option-desc">{{ props.option.description }}</div>
-                <div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>
-              </template>
-            </multiselect>
           </div>
         </div>
       </div>
