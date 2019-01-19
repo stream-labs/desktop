@@ -14,7 +14,6 @@ import { WindowsService } from 'services/windows';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
-import FormInput from 'components/shared/inputs/FormInput.vue';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
@@ -26,7 +25,6 @@ import { IListOption } from '../shared/inputs';
 @Component({
   components: {
     ModalLayout,
-    FormInput,
     HFormGroup,
     BoolInput,
     ListInput,
