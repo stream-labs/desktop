@@ -44,7 +44,7 @@
         />
       </h-form-group>
       <h-form-group v-if="searchProfilesPending">
-        {{ $t('Checking optimized setting for') }} {{ gameModel.value }}...
+        {{ $t('Checking optimized setting for') }} {{ gameModel }}...
       </h-form-group>
       <div v-if="isSchedule">
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />

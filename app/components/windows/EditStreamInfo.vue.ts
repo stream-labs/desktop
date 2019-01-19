@@ -13,7 +13,6 @@ import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { Multiselect } from 'vue-multiselect';
 import { $t } from 'services/i18n';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
@@ -22,7 +21,6 @@ import {
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
 import { shell } from 'electron';
-import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { IListOption } from '../shared/inputs';
 
 @Component({
@@ -30,10 +28,8 @@ import { IListOption } from '../shared/inputs';
     ModalLayout,
     FormInput,
     HFormGroup,
-    VFormGroup,
     BoolInput,
     ListInput,
-    Multiselect,
   },
 })
 export default class EditStreamInfo extends Vue {
