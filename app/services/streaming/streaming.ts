@@ -359,10 +359,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
-        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
+        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
