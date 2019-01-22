@@ -25,7 +25,7 @@
         @input="(pageId) => setFacebookPageId(pageId)"
         :metadata="{ type: 'list', name: 'stream_page', title: $t('Facebook Page'), options: pageOptions }"
       />
-      <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title') }" />
+      <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title'), fullWidth: true }" />
       <h-form-group
         v-if="isYoutube || isFacebook"
         v-model="streamDescriptionModel"
@@ -51,37 +51,20 @@
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
       </div>
       <div v-if="selectedProfile">
-        <div class="input-container" v-if="isTwitch || isYoutube">
-          <div class="input-label"/>
-          <div class="input-wrapper">
-            <div class="checkbox">
-              <div>
-                <input
-                  type="checkbox"
-                  v-model="useOptimizedProfile"
-                />
-                <label>
-                  <span>
-                    {{ $t('Use optimized encoder settings for') }}
-                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.encoder }}
-                  </span>&nbsp;<span>
-                    <i class="tooltip-trigger fa fa-question-circle has-tooltip"
-                      style="font-size:15px;whitespace: nowrap;"
-                      :title="$t('Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience')">
-                    </i>
-                  </span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
+        <h-form-group
+          v-if="isTwitch || isYoutube"
+          :metadata="{ tooltip: $t('Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience') }"
+        >
+          <bool-input v-model="useOptimizedProfile" :metadata="optimizedProfileMetadata" />
+        </h-form-group>
       </div>
-      <bool-input
-        v-if="!midStreamMode && !isFacebook"
-        v-model="doNotShowAgainModel"
-        name='do_not_show_again'
-        :metadata="{ title: $t('Do not show this message when going live') }"
-      />
+      <h-form-group v-if="!midStreamMode && !isFacebook">
+        <bool-input
+          v-model="doNotShowAgainModel"
+          name='do_not_show_again'
+          :metadata="{ title: $t('Do not show this message when going live') }"
+        />
+      </h-form-group>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
