@@ -26,6 +26,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
 
   onInputHandler(option: IObsListOption<string> | string) {
     const value = typeof option === 'string' ? option : option.value;
+
     this.emitInput({ ...this.value, value });
   }
 
@@ -49,9 +50,9 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
       return this.value.value === opt.value;
     });
 
-    if (option) return option;
+    if (option) return option.value;
     if (this.allowEmpty) return '';
-    return this.value.options[0];
+    return this.value.options[0].value;
   }
 }
 
