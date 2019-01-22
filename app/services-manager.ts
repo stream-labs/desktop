@@ -99,6 +99,7 @@ import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 import { AlertBoxService } from 'services/widgets/settings/alert-box';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+import { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 
 const { ipcRenderer } = electron;
 
@@ -206,6 +207,7 @@ export class ServicesManager extends Service {
     HardwareService,
     PrefabsService,
     Prefab,
+    PlatformAppAssetsService,
   };
 
   private instances: Dictionary<Service> = {};
