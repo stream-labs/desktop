@@ -62,8 +62,8 @@
                 />
                 <label>
                   <span>
-                    {{ $t('Use optimized encoder settings for') }}
-                    {{ selectedProfile.game !== 'DEFAULT' ? selectedProfile.game : selectedProfile.encoder }}
+                    {{ $t('Use optimized encoder settings') }}
+                    {{ selectedProfile.game !== 'DEFAULT' ? `for ${gameModel}` : '' }}
                   </span>&nbsp;<span>
                     <i class="tooltip-trigger fa fa-question-circle has-tooltip"
                       style="font-size:15px;whitespace: nowrap;"
