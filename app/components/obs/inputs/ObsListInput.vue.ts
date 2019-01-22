@@ -24,8 +24,9 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop({ default: false })
   loading: boolean;
 
-  onInputHandler(option: IObsListOption<string>) {
-    this.emitInput({ ...this.value, value: option ? option.value : null });
+  onInputHandler(option: IObsListOption<string> | string) {
+    const value = typeof option === 'string' ? option : option.value;
+    this.emitInput({ ...this.value, value });
   }
 
   onSearchChange(value: string) {
