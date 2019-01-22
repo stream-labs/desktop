@@ -17,6 +17,7 @@
     "test/",
     "bin/",
     "scripts/",
+    "vendor/",
     "**/*.d.ts",
     "app/services/streamlabels/definitions.ts"
   ]
