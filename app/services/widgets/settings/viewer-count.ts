@@ -56,6 +56,7 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
         mixer: { enabled: settings.mixer },
         twitch: { enabled: settings.twitch },
       },
+      font_size: settings.font_size.replace(/\D/g, ''),
     };
   }
 }
