@@ -290,9 +290,9 @@ async function entry(info) {
         updaterArgs.push('-p');
         updaterArgs.push(statusWindow.webContents.getOSProcessId().toString());
     }
-    
-    const updaterStartCommand = `start \"\"  \"${updaterPath}\" `  
-    
+
+    const updaterStartCommand = `start \"\"  \"${updaterPath}\" `
+
     log.info(updaterArgs);
 
     const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
@@ -300,8 +300,8 @@ async function entry(info) {
         detached: false,
         shell: true
     });
-    
-    log.info('updater process ' + `pid ${update_spawned.pid}`);  
+
+    log.info('updater process ' + `pid ${update_spawned.pid}`);
 
     //make promises for app exit , error , data and some timeout
     const primiseExit = new Promise(resolve => {
@@ -311,19 +311,14 @@ async function entry(info) {
     const primiseError = new Promise(resolve => {
         update_spawned.on('error', resolve);
     });
-    
+
     //wait for something to happen
-    const promise = await Promise.race([primiseError, primiseExit]);  
+    const promise = await Promise.race([primiseError, primiseExit]);
     log.info('Updater spawn promise ' + `result \"${promise}\"`);
-    
+
     update_spawned.unref();
 
-    if(`${promise}` == "0" ) 
-    {
-        return true;  
-    } else {
-        return false; 
-    }
+    return `${promise}` === "0";
 }
 
 module.exports = async (info) => {
