@@ -162,7 +162,6 @@ export default class EditStreamInfo extends Vue {
   // For some reason, v-model doesn't work with ListInput
   onGameInput(gameModel: string) {
     this.gameModel = gameModel;
-
     this.loadAvailableProfiles();
   }
 
@@ -339,6 +338,17 @@ export default class EditStreamInfo extends Vue {
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/pages/creation/');
     this.windowsService.closeChildWindow();
+  }
+
+  get optimizedProfileMetadata() {
+    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.selectedProfile.game}` : '';
+    return {
+      title: $t('Use optimized encoder settings ') + game,
+      tooltip: $t(
+        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
+          'resolution may be changed for a better quality of experience',
+      ),
+    };
   }
 
   get dateMetadata() {
