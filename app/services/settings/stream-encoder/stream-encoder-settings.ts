@@ -114,7 +114,7 @@ export class StreamEncoderSettingsService extends Service {
     let preset: string;
 
     if (encoder === 'amd') {
-      // The settings for AMD also have a Preset field but it's not what we want
+      // The settings for AMD also have a Preset field but it's not what we need
       preset =
         this.settingsService.findSettingValue(output, 'Streaming', 'QualityPreset') ||
         this.settingsService.findSettingValue(output, 'Streaming', 'AMDPreset');
