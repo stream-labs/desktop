@@ -341,7 +341,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get optimizedProfileMetadata() {
-    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.selectedProfile.game}` : '';
+    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.gameModel}` : '';
     return {
       title: $t('Use optimized encoder settings ') + game,
       tooltip: $t(
