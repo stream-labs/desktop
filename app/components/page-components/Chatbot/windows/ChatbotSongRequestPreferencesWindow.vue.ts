@@ -29,11 +29,11 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
   securityDescription = $t(
     // tslint:disable-next-line:prefer-template
     'This slider helps you filter shared media before it can be submitted.\n' +
-      '1: No security\n' +
-      '2: 65%+ rating, 5k+ views\n' +
-      '3: 75%+ rating, 40k+ views\n' +
-      '4: 80%+ rating, 300k+ views\n' +
-      '5: 85%+ rating, 900k+ views',
+      'Off: No security\n' +
+      'Low: 65%+ rating, 5k+ views\n' +
+      'Medium: 75%+ rating, 40k+ views\n' +
+      'High: 80%+ rating, 300k+ views\n' +
+      'Very High: 85%+ rating, 900k+ views',
   );
 
   selectedTab: string = 'general';
@@ -76,12 +76,7 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
           min: 0,
           placeholder: $t('Number of votes to skip song'),
         }),
-        filter_level: metadataHelper.slider({
-          min: 0,
-          max: 4,
-          interval: 1,
-          description: this.securityDescription,
-        }),
+        filter_level: metadataHelper.spamSecurity({ tooltip: this.securityDescription }),
       },
       new_banned_media: metadataHelper.text({
         required: true,
