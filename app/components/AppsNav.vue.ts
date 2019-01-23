@@ -7,6 +7,11 @@ import VueResize from 'vue-resize';
 import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
 
+/**
+ * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
+ */
+const DEFAULT_SCROLL_DELTA = 250;
+
 @Component({
   components: { HScroll },
 })
@@ -20,6 +25,10 @@ export default class AppsNav extends Vue {
     canScroll: false,
     canScrollLeft: false,
     canScrollRight: false,
+  };
+
+  $refs: {
+    scroll: HScroll;
   };
 
   isSelectedApp(appId: string) {
@@ -58,5 +67,17 @@ export default class AppsNav extends Vue {
 
   navigateApp(appId: string) {
     this.navigationService.navigate('PlatformAppContainer', { appId });
+  }
+
+  scrollLeft() {
+    this.scrollNav(-DEFAULT_SCROLL_DELTA);
+  }
+
+  scrollRight() {
+    this.scrollNav(DEFAULT_SCROLL_DELTA);
+  }
+
+  private scrollNav(horizontal: number) {
+    this.$refs.scroll.scrollBy(horizontal, 0, true);
   }
 }
