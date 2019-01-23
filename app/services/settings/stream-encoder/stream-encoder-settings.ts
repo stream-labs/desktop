@@ -68,7 +68,7 @@ const simpleEncoderToAnvancedEncoderMap = {
   x264: 'obs_x264',
   qsv: 'obs_qsv11',
   nvenc: 'ffmpeg_nvenc',
-  amd: 'amd_amf_h26',
+  amd: 'amd_amf_h264',
 };
 
 /**
@@ -78,6 +78,7 @@ export const encoderFieldsMap = {
   x264: { preset: 'preset', encoderOptions: 'x264opts' },
   nvenc: { preset: 'preset' },
   qsv: { preset: 'target_usage' },
+  amd: { preset: 'QualityPreset' },
 };
 
 function simpleEncoderToAdvancedEncoder(encoder: EEncoder) {
@@ -110,14 +111,22 @@ export class StreamEncoderSettingsService extends Service {
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
         this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
     ) as EEncoder;
-    const preset: string =
-      this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'QSVPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'target_usage') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'QualityPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'AMDPreset');
+    let preset: string;
+
+    if (encoder === 'amd') {
+      // The settings for AMD also have a Preset field but it's not what we want
+      preset =
+        this.settingsService.findSettingValue(output, 'Streaming', 'QualityPreset') ||
+        this.settingsService.findSettingValue(output, 'Streaming', 'AMDPreset');
+    } else {
+      preset =
+        this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
+        this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
+        this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
+        this.settingsService.findSettingValue(output, 'Streaming', 'QSVPreset') ||
+        this.settingsService.findSettingValue(output, 'Streaming', 'target_usage');
+    }
+
     const bitrate: number =
       this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate');
