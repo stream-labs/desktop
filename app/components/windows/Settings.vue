@@ -59,11 +59,13 @@
 
 <style lang="less">
 .settings-container {
+  .input-container,
   .alignable-input {
     flex-direction: column;
 
     .input-label,
-    .input-wrapper {
+    .input-wrapper,
+    .input-body {
       width: 100%;
     }
 
