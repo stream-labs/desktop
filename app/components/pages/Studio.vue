@@ -12,7 +12,7 @@
     </div>
   </div>
   <div v-if="!previewEnabled" class="no-preview">
-    <div class="message">
+    <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
     </div>

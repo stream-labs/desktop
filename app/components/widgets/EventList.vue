@@ -2,24 +2,29 @@
 <widget-editor :navItems="navItems">
   <validated-form slot="manage-list-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Enable Events')">
-      <bool-input :title="$t('Donations')" v-model="wData.settings.show_donations"/>
-      <bool-input :title="$t('Follows')" v-model="wData.settings.show_follows"/>
-      <bool-input :title="$t('Subscriptions')" v-model="wData.settings.show_subscriptions"/>
-      <bool-input :title="$t('Show Resubs')" v-model="wData.settings.show_resubs"/>
-      <bool-input :title="$t('Show Sub Tiers')" v-model="wData.settings.show_sub_tiers"/>
-      <bool-input :title="$t('Hosts')" v-model="wData.settings.show_hosts"/>
-      <bool-input :title="$t('Bits')" v-model="wData.settings.show_bits"/>
-      <bool-input :title="$t('Raids')" v-model="wData.settings.show_raids"/>
-      <bool-input :title="$t('Merch')" v-model="wData.settings.show_merch"/>
+      <bool-input v-if="isMixer" :title="$t('Follows')" v-model="wData.settings.mixer_account.show_follows" />
+      <bool-input v-if="isMixer" :title="$t('Hosts')" v-model="wData.settings.mixer_account.show_hosts" />
+      <bool-input v-if="isMixer" :title="$t('Subscriptions')" v-model="wData.settings.mixer_account.show_subscriptions" />
+      <bool-input
+        v-for="event in eventsForPlatform"
+        :key="event.key"
+        :title="event.title"
+        v-model="wData.settings[event.key]"
+      />
     </v-form-group>
-    <v-form-group :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
+    <v-form-group v-if="isTwitch" :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
     <v-form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
   </validated-form>
 
   <validated-form slot="font-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }" />
     <v-form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ tooltip: fontFamilyTooltip }" />
-    <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
+    <v-form-group
+      :title="$t('Font Size')"
+      type="fontSize"
+      v-model="wData.settings.text_size"
+      :metadata="{ tooltip: fontSizeTooltip, min: 10, max: 80 }"
+    />
   </validated-form>
 
   <validated-form slot="visual-properties" @input="save()" v-if="loaded">

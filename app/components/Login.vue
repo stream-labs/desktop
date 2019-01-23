@@ -7,7 +7,7 @@
     </div>
     <div
       v-else>
-      <a class="link link--uppercase" @click="login">
+      <a class="link" @click="login">
         <i class="fas fa-sign-in-alt"/> {{ $t('Login') }}
       </a>
     </div>
@@ -17,13 +17,17 @@
 <script lang="ts" src="./Login.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .user__name {
   .weight(@medium);
 
-  @media(max-width: 1600px) {
+  @media (max-width: 1600px) {
     display: none;
   }
+}
+
+.fa-sign-in-alt {
+  .margin-right();
 }
 </style>

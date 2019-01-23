@@ -1,32 +1,40 @@
 <template>
-<div class="w-form-group__wrapper slider-container">
+<div
+  class="w-form-group__wrapper slider-container"
+  data-role="input"
+  data-type="slider"
+  :data-name="options.name"
+>
   <vue-slider class="slider w-form-group__input"
-    :value="value"
-    @input="value => updateValue(value)"
+    :value="localValue"
+    @input="value => updateLocalValue(value)"
     :max="options.max"
     :min="options.min"
     :interval="options.interval"
     :speed="0"
     :height="4"
     :formatter="formatter"
-    :piecewise="!!options.interval"
+    :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
+    :piecewiseLabel="options.piecewiseLabel"
+    :data="options.data"
     ref="slider"
     :piecewiseStyle="{
         position: 'absolute',
-        'backgroundColor': nightMode ? '#253239' : '#eaecee',
+        backgroundColor: nightMode ? '#253239' : '#eaecee',
         height: '2px',
         width: '2px',
         'borderRadius': '1px',
         top: '12px'
     }"
+    :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
     :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
   />
   <input
     v-if="options.hasValueBox && !options.usePercentages"
     class="slider-input"
     type="text"
-    :value="value"
-    @input="updateValue(parseFloat($event.target.value))"
+    :value="localValue"
+    @input="updateLocalValue(parseFloat($event.target.value))"
     @keydown="handleKeydown"
   />
 </div>
@@ -51,7 +59,8 @@
 
 .slider {
   background: transparent;
-  padding: 8px;
+  .padding-v-sides();
+  .padding-h-sides(@0)!important;
   margin: 0;
   flex-grow: 1;
   height: auto;

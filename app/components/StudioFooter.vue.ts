@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import { StreamingService } from '../services/streaming';
+import { StreamingService, EReplayBufferState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
@@ -12,7 +12,9 @@ import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
+import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { SettingsService } from 'services/settings';
 
 @Component({
   components: {
@@ -20,13 +22,15 @@ import { $t } from 'services/i18n';
     TestWidgets,
     PerformanceMetrics,
     NotificationsArea,
-    GlobalSyncStatus
-  }
+    GlobalSyncStatus,
+  },
 })
 export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
 
   @Prop() locked: boolean;
 
@@ -50,6 +54,12 @@ export default class StudioFooterComponent extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  get canSchedule() {
+    return (
+      this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type)
+    );
+  }
+
   get youtubeEnabled() {
     if (this.userService.platform) {
       const platform = this.userService.platform.type;
@@ -62,9 +72,16 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal(
-      'https://youtube.com/live_dashboard_splash'
-    );
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+  }
+
+  openScheduleStream() {
+    this.windowsService.showWindow({
+      componentName: 'EditStreamInfo',
+      title: $t('Schedule Stream'),
+      queryParams: { isSchedule: true },
+      size: { width: 500, height: 670 },
+    });
   }
 
   confirmYoutubeEnabled() {
@@ -77,5 +94,31 @@ export default class StudioFooterComponent extends Vue {
     }
   }
 
-  recordTooltip = $t('Set path in Settings > Output.');
+  get replayBufferEnabled() {
+    return this.settingsService.state.Output.RecRB;
+  }
+
+  get replayBufferOffline() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Offline;
+  }
+
+  get replayBufferStopping() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Stopping;
+  }
+
+  get replayBufferSaving() {
+    return this.streamingService.state.replayBufferStatus === EReplayBufferState.Saving;
+  }
+
+  toggleReplayBuffer() {
+    if (this.streamingService.state.replayBufferStatus === EReplayBufferState.Offline) {
+      this.streamingService.startReplayBuffer();
+    } else {
+      this.streamingService.stopReplayBuffer();
+    }
+  }
+
+  saveReplay() {
+    this.streamingService.saveReplay();
+  }
 }

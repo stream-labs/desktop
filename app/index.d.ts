@@ -1,4 +1,5 @@
 /// <reference path="../vendor/toasted.d.ts" />
+/// <reference path="../vendor/urijs.d.ts" />
 
 // all global interfaces here
 
@@ -38,6 +39,12 @@ interface IResource {
   resourceId: string;
 }
 
+interface IRGBColor {
+  r: number;
+  g: number;
+  b: number;
+}
+
 // list of modules without type definitions
 declare module 'raven-js/*';
 declare module 'v-tooltip';
@@ -58,6 +65,8 @@ declare module 'recursive-readdir';
 declare module 'vue-toasted';
 declare module 'hyperform';
 declare module 'emojione';
+declare module 'vue-resize';
+declare module 'serve-handler';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

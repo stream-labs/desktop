@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
+import { BoolInput } from 'components/shared/inputs/inputs';
 import { CacheUploaderService } from 'services/cache-uploader';
 import { Inject } from 'util/injector';
-import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 import { CustomizationService } from 'services/customization';
-import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { StreamlabelsService } from 'services/streamlabels';
 import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
@@ -14,7 +13,7 @@ import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ObsBoolInput }
+  components: { BoolInput },
 })
 export default class ExtraSettings extends Vue {
   @Inject() cacheUploaderService: CacheUploaderService;
@@ -27,28 +26,22 @@ export default class ExtraSettings extends Vue {
 
   cacheUploading = false;
 
-  get streamInfoUpdateModel(): IObsInput<boolean> {
-    return {
-      name: 'stream_info_udpate',
-      description: $t('Confirm stream title and game before going live'),
-      value: this.customizationService.state.updateStreamInfoOnLive
-    };
+  get streamInfoUpdate() {
+    return this.customizationService.state.updateStreamInfoOnLive;
   }
 
-  setStreamInfoUpdate(model: IObsInput<boolean>) {
-    this.customizationService.setUpdateStreamInfoOnLive(model.value);
+  set streamInfoUpdate(value: boolean) {
+    this.customizationService.setUpdateStreamInfoOnLive(value);
   }
 
   showCacheDir() {
-    electron.remote.shell.showItemInFolder(
-      electron.remote.app.getPath('userData')
-    );
+    electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
   }
 
   deleteCacheDir() {
     if (
       confirm(
-        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!')
+        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!'),
       )
     ) {
       electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
@@ -61,7 +54,11 @@ export default class ExtraSettings extends Vue {
     this.cacheUploaderService.uploadCache().then(file => {
       electron.remote.clipboard.writeText(file);
       alert(
-        $t('Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.', { file })
+        $t(
+          'Your cache directory has been successfully uploaded.  ' +
+            'The file name %{file} has been copied to your clipboard.',
+          { file },
+        ),
       );
       this.cacheUploading = false;
     });
@@ -79,15 +76,14 @@ export default class ExtraSettings extends Vue {
   }
 
   get isTwitch() {
-    return (
-      this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch'
-    );
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'twitch';
+  }
+
+  get isFacebook() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
   }
 
   get isRecordingOrStreaming() {
-    return (
-      this.streamingService.isStreaming || this.streamingService.isRecording
-    );
+    return this.streamingService.isStreaming || this.streamingService.isRecording;
   }
 }

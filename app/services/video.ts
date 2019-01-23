@@ -6,7 +6,7 @@ import { Inject } from '../util/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
 
 const { remote } = electron;
@@ -16,6 +16,9 @@ const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 export interface IDisplayOptions {
   sourceId?: string;
   paddingSize?: number;
+  electronWindowId?: number;
+  slobsWindowId?: string;
+  paddingColor?: IRGBColor;
 }
 
 export class Display {
@@ -33,35 +36,35 @@ export class Display {
     x: 0,
     y: 0,
     width: 0,
-    height: 0
+    height: 0,
   };
 
-  windowId: string;
+  electronWindowId: number;
+  slobsWindowId: string;
 
-  private selectionSubscription: Subscription;
+  private readonly selectionSubscription: Subscription;
 
   sourceId: string;
-  
+
   boundDestroy: any;
   boundClose: any;
   displayDestroyed: boolean;
 
   constructor(public name: string, options: IDisplayOptions = {}) {
-    this.windowId = Utils.isChildWindow() ? 'child' : 'main';
-
     this.sourceId = options.sourceId;
+    this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
+    this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
+
+    const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     if (this.sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
-        remote.getCurrentWindow().getNativeWindowHandle(),
+        electronWindow.getNativeWindowHandle(),
         this.sourceId,
-        name
+        name,
       );
     } else {
-      obs.NodeObs.OBS_content_createDisplay(
-        remote.getCurrentWindow().getNativeWindowHandle(),
-        name
-      );
+      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
     }
     this.displayDestroyed = false;
 
@@ -69,7 +72,16 @@ export class Display {
       this.switchGridlines(state.selectedIds.length <= 1);
     });
 
-    obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    if (options.paddingColor) {
+      obs.NodeObs.OBS_content_setPaddingColor(
+        name,
+        options.paddingColor.r,
+        options.paddingColor.g,
+        options.paddingColor.b,
+      );
+    } else {
+      obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    }
 
     if (options.paddingSize != null) {
       obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
@@ -79,7 +91,7 @@ export class Display {
 
     this.boundClose = this.remoteClose.bind(this);
 
-    remote.getCurrentWindow().on('close', this.boundClose);
+    electronWindow.on('close', this.boundClose);
   }
 
   /**
@@ -92,11 +104,12 @@ export class Display {
     const trackingFun = () => {
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
-      if ((rect.x !== this.currentPosition.x) ||
-        (rect.y !== this.currentPosition.y) ||
-        (rect.width !== this.currentPosition.width) ||
-        (rect.height !== this.currentPosition.height)) {
-
+      if (
+        rect.x !== this.currentPosition.x ||
+        rect.y !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      ) {
         this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
       }
@@ -107,13 +120,13 @@ export class Display {
   }
 
   getScaledRectangle(rect: ClientRect): IRectangle {
-    const factor: number = this.windowsService.state[this.windowId].scaleFactor;
+    const factor: number = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
     return {
       x: rect.left * factor,
       y: rect.top * factor,
       width: rect.width * factor,
-      height: rect.height * factor
+      height: rect.height * factor,
     };
   }
 
@@ -131,6 +144,7 @@ export class Display {
   }
 
   remoteClose() {
+    this.outputRegionCallbacks = [];
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
@@ -140,7 +154,7 @@ export class Display {
   }
 
   destroy() {
-    remote.getCurrentWindow().removeListener('close', this.boundClose);
+    remote.BrowserWindow.fromId(this.electronWindowId).removeListener('close', this.boundClose);
     this.remoteClose();
   }
 
@@ -154,7 +168,7 @@ export class Display {
 
     this.outputRegion = {
       ...position,
-      ...size
+      ...size,
     };
 
     this.outputRegionCallbacks.forEach(cb => {
@@ -177,7 +191,6 @@ export class Display {
 }
 
 export class VideoService extends Service {
-
   @Inject()
   settingsService: SettingsService;
 
@@ -188,23 +201,32 @@ export class VideoService extends Service {
 
     // Watch for changes to the base resolution.
     // This seems super freaking hacky.
-    this.settingsService.store.watch(state => {
-      return state.SettingsService.Video.Base;
-    }, () => {
-      // This gives the setting time to propagate
-      setTimeout(() => {
-        Object.values(this.activeDisplays).forEach(display => {
-          display.refreshOutputRegion();
-        });
-      }, 1000);
-    });
+    this.settingsService.store.watch(
+      state => {
+        return state.SettingsService.Video.Base;
+      },
+      () => {
+        // This gives the setting time to propagate
+        setTimeout(() => {
+          Object.values(this.activeDisplays).forEach(display => {
+            display.refreshOutputRegion();
+          });
+        }, 1000);
+      },
+    );
   }
 
   // Generates a random string:
   // https://gist.github.com/6174/6062387
   getRandomDisplayId() {
-    return Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+      Math.random()
+        .toString(36)
+        .substring(2, 15)
+    );
   }
 
   getScreenRectangle() {
@@ -212,7 +234,7 @@ export class VideoService extends Service {
       x: 0,
       y: 0,
       width: this.baseWidth,
-      height: this.baseHeight
+      height: this.baseHeight,
     });
   }
 
@@ -231,8 +253,7 @@ export class VideoService extends Service {
 
     return {
       width,
-      height
+      height,
     };
   }
-
 }

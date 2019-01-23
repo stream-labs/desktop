@@ -1,13 +1,13 @@
 import { Inject } from 'util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
 
-
 export enum EAvailableFeatures {
-  chatbot = 'slobs--chatbot'
+  chatbot = 'slobs--chatbot',
+  platform = 'slobs--platform',
 }
 
 interface IIncrementalRolloutServiceState {
@@ -18,8 +18,13 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
 
-  static defaultState: IIncrementalRolloutServiceState = {
-    availableFeatures: []
+  static initialState: IIncrementalRolloutServiceState = {
+    availableFeatures: [],
+  };
+
+  init() {
+    this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
+    this.userService.userLogout.subscribe(() => this.resetAvailableFeatures());
   }
 
   @mutation()
@@ -32,7 +37,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   }
 
   featureIsEnabled(feature: EAvailableFeatures): boolean {
-    if (Utils.isDevMode() || Utils.isPreview()) return true; //always show for dev mode and preview
+    if (Utils.isDevMode()) return true; // always show for dev mode
 
     return this.availableFeatures.indexOf(feature) > -1;
   }
@@ -45,12 +50,14 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
       const request = new Request(url, { headers });
 
       return fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
+        .then(handleResponse)
         .then(response => {
           this.SET_AVAILABLE_FEATURES(response.features);
         });
     }
   }
 
+  resetAvailableFeatures() {
+    this.SET_AVAILABLE_FEATURES([]);
+  }
 }

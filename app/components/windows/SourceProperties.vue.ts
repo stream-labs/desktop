@@ -11,7 +11,7 @@ import WidgetProperties from 'components/custom-source-properties/WidgetProperti
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
 import PlatformAppProperties from 'components/custom-source-properties/PlatformAppProperties.vue';
 import { $t } from 'services/i18n';
-import { Subscription } from 'rxjs/subscription';
+import { Subscription } from 'rxjs';
 import electron from 'electron';
 
 @Component({
@@ -21,11 +21,10 @@ import electron from 'electron';
     GenericForm,
     WidgetProperties,
     StreamlabelProperties,
-    PlatformAppProperties
-  }
+    PlatformAppProperties,
+  },
 })
 export default class SourceProperties extends Vue {
-
   @Inject()
   sourcesService: ISourcesServiceApi;
 
@@ -51,17 +50,13 @@ export default class SourceProperties extends Vue {
     this.sourcesSubscription.unsubscribe();
   }
 
-
   get propertiesManagerUI() {
-    if (this.source) return  this.source.getPropertiesManagerUI();
+    if (this.source) return this.source.getPropertiesManagerUI();
   }
-
 
   onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
-    source.setPropertiesFormData(
-      [properties[changedIndex]]
-    );
+    source.setPropertiesFormData([properties[changedIndex]]);
     this.refresh();
   }
 
@@ -81,10 +76,8 @@ export default class SourceProperties extends Vue {
     this.closeWindow();
   }
 
-
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
     return source ? $t('Properties for %{sourceName}', { sourceName: source.name }) : '';
   }
-
 }

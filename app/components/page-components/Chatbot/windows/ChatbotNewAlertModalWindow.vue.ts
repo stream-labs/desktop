@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
@@ -9,67 +8,74 @@ import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
-  IListMetadata,
-  ITextMetadata,
-  INumberMetadata,
   EInputType,
-} from 'components/shared/inputs/index';
-
-import {
-  IAlertMessage,
-  NEW_ALERT_MODAL_ID,
-  ChatbotAlertType,
-} from 'services/chatbot';
+  IListMetadata,
+  INumberMetadata,
+  ITextMetadata,
+} from 'components/shared/inputs';
+import { ChatbotAlertType, IAlertMessage, NEW_ALERT_MODAL_ID } from 'services/chatbot';
 
 interface INewAlertMetadata {
   follow: {
     newMessage: {
       message: ITextMetadata;
     };
-  },
+  };
   sub: {
     newMessage: {
       tier: IListMetadata<string>;
       amount: INumberMetadata;
       message: ITextMetadata;
       is_gifted: IListMetadata<boolean>;
-    }
-  },
+    };
+  };
   tip: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
-    }
-  },
+    };
+  };
   host: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
-    }
-  },
+    };
+  };
   raid: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
-    }
-  },
+    };
+  };
   bits: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
-    }
-  },
+    };
+  };
   sub_mystery_gift: {
     newMessage: {
       tier: IListMetadata<string>;
       amount: INumberMetadata;
       message: ITextMetadata;
-    }
-  }
+    };
+  };
+  superchat: {
+    newMessage: {
+      amount: INumberMetadata;
+      message: ITextMetadata;
+    };
+  };
+  sponsor: {
+    newMessage: {
+      amount: INumberMetadata;
+      message: ITextMetadata;
+    };
+  };
 }
 
 interface INewAlertData {
-  [id: string] : {
+  [id: string]: {
     newMessage: IAlertMessage;
   };
   follow: {
@@ -92,7 +98,13 @@ interface INewAlertData {
   };
   sub_mystery_gift: {
     newMessage: IAlertMessage;
-  }
+  };
+  sponsor: {
+    newMessage: IAlertMessage;
+  };
+  superchat: {
+    newMessage: IAlertMessage;
+  };
 }
 
 @Component({
@@ -101,8 +113,8 @@ interface INewAlertData {
     TextAreaInput,
     ListInput,
     NumberInput,
-    ValidatedForm
-  }
+    ValidatedForm,
+  },
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop()
@@ -123,6 +135,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get title() {
+    if (this.selectedType === 'sponsor') {
+      return `${this.isEdit ? 'Edit' : 'New'} Member Alert`;
+    }
+
     return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
   }
 
@@ -132,6 +148,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   get isSubscription() {
     return this.selectedType === 'sub';
+  }
+
+  get isTwitch() {
+    return this.chatbotApiService.userService.platform.type === 'twitch';
+  }
+
+  get isYoutube() {
+    return this.chatbotApiService.userService.platform.type === 'youtube';
   }
 
   get isFollower() {
@@ -146,6 +170,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return this.selectedType === 'raid';
   }
 
+  get isSponsor() {
+    return this.selectedType === 'sponsor';
+  }
+
+  get isSuperChat() {
+    return this.selectedType === 'superchat';
+  }
+
   get isBit() {
     return this.selectedType === 'bits';
   }
@@ -155,25 +187,23 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get disabledSubmit() {
-    const { message, tier, amount } = this.newAlert[
-      this.selectedType
-    ].newMessage;
+    const { message, tier, amount } = this.newAlert[this.selectedType].newMessage;
     if (this.isFollower) return !message;
     if (this.isSubscription) return !amount || !message || !tier;
 
     return amount === null || !message;
   }
 
-  get metadata() {
-    const metadata: INewAlertMetadata = {
+  get metadata(): INewAlertMetadata {
+    return {
       follow: {
         newMessage: {
           message: {
             type: EInputType.text,
             required: true,
-            placeholder: $t('Message to follower')
-          }
-        }
+            placeholder: $t('Message to follower'),
+          },
+        },
       },
       sub: {
         newMessage: {
@@ -182,28 +212,28 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.list,
             options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
               value: tier,
-              title: $t(tier)
-            }))
+              title: $t(tier),
+            })),
           },
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Number of months subscribed')
+            placeholder: $t('Number of months subscribed'),
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to subscriber')
+            placeholder: $t('Message to subscriber'),
           },
           is_gifted: {
             required: true,
             type: EInputType.list,
             options: ['yes', 'no'].map(isGifted => ({
               value: isGifted === 'yes',
-              title: $t(isGifted)
-            }))
-          }
-        }
+              title: $t(isGifted),
+            })),
+          },
+        },
       },
       tip: {
         newMessage: {
@@ -211,14 +241,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.number,
             min: 0,
             required: true,
-            placeholder: $t('Minimum amount')
+            placeholder: $t('Minimum amount'),
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to donator')
-          }
-        }
+            placeholder: $t('Message to donator'),
+          },
+        },
       },
       host: {
         newMessage: {
@@ -226,14 +256,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             min: 0,
-            placeholder: $t('Minimum viewer count')
+            placeholder: $t('Minimum viewer count'),
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to hosts')
-          }
-        }
+            placeholder: $t('Message to hosts'),
+          },
+        },
       },
       raid: {
         newMessage: {
@@ -241,14 +271,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             min: 0,
             type: EInputType.number,
             required: true,
-            placeholder: $t('Minimum amount')
+            placeholder: $t('Minimum amount'),
           },
           message: {
             required: true,
             type: EInputType.textArea,
-            placeholder: $t('Message to raider')
-          }
-        }
+            placeholder: $t('Message to raider'),
+          },
+        },
       },
       bits: {
         newMessage: {
@@ -256,14 +286,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             min: 0,
-            placeholder: $t('Minimum bit count')
+            placeholder: $t('Minimum bit count'),
           },
           message: {
             required: true,
             type: EInputType.textArea,
-            placeholder: $t('Message to Bit donators')
-          }
-        }
+            placeholder: $t('Message to Bit donators'),
+          },
+        },
       },
       sub_mystery_gift: {
         newMessage: {
@@ -272,73 +302,111 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.list,
             options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
               value: tier,
-              title: $t(tier)
-            }))
+              title: $t(tier),
+            })),
           },
           amount: {
             required: true,
             type: EInputType.number,
-            placeholder: $t('Number of months subscribed')
+            placeholder: $t('Number of months subscribed'),
           },
           message: {
             type: EInputType.textArea,
             required: true,
-            placeholder: $t('Message to subscriber')
+            placeholder: $t('Message to subscriber'),
           },
-        }
+        },
+      },
+      superchat: {
+        newMessage: {
+          amount: {
+            required: true,
+            type: EInputType.number,
+            placeholder: $t('Minimum Amount'),
+          },
+          message: {
+            type: EInputType.textArea,
+            required: true,
+            placeholder: $t('Message to Super Chatter'),
+          },
+        },
+      },
+      sponsor: {
+        newMessage: {
+          amount: {
+            required: true,
+            type: EInputType.number,
+            placeholder: $t('Minimum Amount'),
+          },
+          message: {
+            type: EInputType.textArea,
+            required: true,
+            placeholder: $t('Message to Member'),
+          },
+        },
       },
     };
-    return metadata;
   }
 
-  get initialNewAlertState() {
-    const initialState: INewAlertData = {
+  get initialNewAlertState(): INewAlertData {
+    return {
       follow: {
         newMessage: {
-          message: null
-        }
+          message: null,
+        },
       },
       sub: {
         newMessage: {
           amount: null,
           message: null,
           is_gifted: false,
-          tier: $t('Prime')
-        }
+          tier: $t('Prime'),
+        },
       },
       tip: {
         newMessage: {
           amount: null,
-          message: null
-        }
+          message: null,
+        },
       },
       host: {
         newMessage: {
           amount: null,
-          message: null
-        }
+          message: null,
+        },
       },
       raid: {
         newMessage: {
           amount: null,
-          message: null
-        }
+          message: null,
+        },
       },
       bits: {
         newMessage: {
           amount: null,
-          message: null
-        }
+          message: null,
+        },
       },
       sub_mystery_gift: {
         newMessage: {
           amount: null,
           message: null,
-          tier: $t('Prime')
-        }
+          tier: $t('Prime'),
+        },
+      },
+      sponsor: {
+        newMessage: {
+          amount: null,
+          message: null,
+        },
+      },
+      superchat: {
+        newMessage: {
+          amount: null,
+          message: null,
+        },
       },
     };
-    return initialState;
   }
 
   bindOnSubmitAndCheckIfEdited(event: any) {

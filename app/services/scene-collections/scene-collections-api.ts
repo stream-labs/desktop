@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export interface ISceneCollectionsServiceApi {
   /**
@@ -18,6 +18,13 @@ export interface ISceneCollectionsServiceApi {
    * about the scene and sources inside them.
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]>;
+
+  /**
+   * Install a new overlay from a file path
+   * @param filePath the location of the overlay file
+   * @param name the name of the overlay
+   */
+  loadOverlay(filePath: string, name: string): Promise<void>;
 
   /**
    * Contains a list of collections
@@ -67,7 +74,7 @@ export interface ISceneCollectionSchema {
   scenes: {
     id: string;
     name: string;
-    sceneItems: { sceneItemId: string, sourceId: string }[]
+    sceneItems: { sceneItemId: string; sourceId: string }[];
   }[];
 
   sources: {

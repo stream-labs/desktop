@@ -4,7 +4,7 @@
   <div class="flex">
     <div class="source-name">{{ audioSource.source.name }}</div>
     <div class="db-value">
-      <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
+      <div v-if="audioSource.fader.deflection === 0">-Inf dB</div>
       <div v-if="audioSource.fader.deflection !== 0">{{ audioSource.fader.db.toFixed(1) }} dB</div>
     </div>
   </div>
@@ -52,7 +52,8 @@
 
 .mixer-item {
   position: relative;
-  .padding();
+  .padding-h-sides(2);
+  .padding-v-sides();
 
   .source-name {
     flex: 1

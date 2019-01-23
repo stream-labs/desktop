@@ -2,10 +2,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
-import {
-  TipJarService,
-  ITipJarData
-} from 'services/widgets/settings/tip-jar';
+import { TipJarService, ITipJarData } from 'services/widgets/settings/tip-jar';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
@@ -28,13 +25,13 @@ const nameMap = () => ({
   youtube_superchats: $t('Youtube Super Chats'),
   periscope_superhearts: $t('Periscope Super Hearts'),
   picarto_follows: $t('Picarto Follows'),
-  picarto_subscriptions: $t('Picarto Subscriptions')
+  picarto_subscriptions: $t('Picarto Subscriptions'),
 });
 
 const mediaGalleryInputs = {
   twitch: ['twitch_follows'],
   youtube: ['youtube_subscribers', 'youtube_sponsors'],
-  mixer: ['mixer_subscriptions', 'mixer_follows']
+  mixer: ['mixer_subscriptions', 'mixer_follows'],
 };
 
 @Component({
@@ -43,8 +40,8 @@ const mediaGalleryInputs = {
     VFormGroup,
     ValidatedForm,
     ImagePickerInput,
-    ...inputComponents
-  }
+    ...inputComponents,
+  },
 })
 export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   @Inject() userService: UserService;
@@ -53,16 +50,16 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   textColorTooltip = $t('A hex code for the base text color.');
 
   backgroundColorDescription = $t(
-    'Note: This background color is for preview purposes only. It will not be shown in your stream.'
+    'Note: This background color is for preview purposes only. It will not be shown in your stream.',
   );
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
-  inputOptions: { description: string, value: string }[] = [];
+  inputOptions: { description: string; value: string }[] = [];
   navItems = [
     { value: 'manage-jar', label: $t('Manage Jar') },
     { value: 'font', label: $t('Font Settings') },
-    { value: 'images', label: $t('Bit Images') },
-    { value: 'source', label: $t('Source') }
+    { value: 'images', label: $t('Images') },
+    { value: 'source', label: $t('Source') },
   ];
 
   titleFromKey(key: string) {
@@ -70,7 +67,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   }
 
   get iterableTypes() {
-    return Object.keys(this.wData.settings.types).filter((key) => key !== '_id');
+    return Object.keys(this.wData.settings.types).filter(key => key !== '_id');
   }
 
   get platform() {
@@ -83,6 +80,9 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   }
 
   afterFetch() {
-    this.inputOptions = this.wData.jars.map((jar: string) => ({ description: `${this.jarSrc}${jar}.png`, value: jar }));
+    this.inputOptions = this.wData.jars.map((jar: string) => ({
+      description: `${this.jarSrc}${jar}.png`,
+      value: jar,
+    }));
   }
 }

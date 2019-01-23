@@ -1,7 +1,8 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
-import { WidgetType } from '../widgets';
-import { Observable } from 'rxjs/Observable';
+import { WidgetType } from 'services/widgets';
+import { Observable } from 'rxjs';
+import { IAudioSource } from 'services/audio';
 
 export interface ISource extends IResource {
   sourceId: string;
@@ -14,6 +15,7 @@ export interface ISource extends IResource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
+  propertiesManagerType: TPropertiesManager;
   channel?: number;
 }
 
@@ -50,7 +52,7 @@ export interface ISourcesServiceApi {
     name: string,
     type: TSourceType,
     settings?: Dictionary<any>,
-    options?: ISourceCreateOptions
+    options?: ISourceAddOptions,
   ): ISourceApi;
   removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
@@ -73,43 +75,38 @@ export interface ISourcesServiceApi {
   sourceRemoved: Observable<ISource>;
 }
 
-
-export interface ISourceCreateOptions {
+export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>> {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
-  propertiesManagerSettings?: Dictionary<any>;
+  propertiesManagerSettings?: TPropertiesManagerSettings;
+  audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
 }
 
 export type TSourceType =
-  'image_source' |
-  'color_source' |
-  'browser_source' |
-  'slideshow' |
-  'ffmpeg_source' |
-  'text_gdiplus' |
-  'text_ft2_source' |
-  'monitor_capture' |
-  'window_capture' |
-  'game_capture' |
-  'dshow_input' |
-  'wasapi_input_capture' |
-  'wasapi_output_capture' |
-  'decklink-input' |
-  'scene' |
-  'ndi_source' |
-  'openvr_capture' |
-  'liv_capture' |
-  'ovrstream_dc_source'
-  ;
+  | 'image_source'
+  | 'color_source'
+  | 'browser_source'
+  | 'slideshow'
+  | 'ffmpeg_source'
+  | 'text_gdiplus'
+  | 'text_ft2_source'
+  | 'monitor_capture'
+  | 'window_capture'
+  | 'game_capture'
+  | 'dshow_input'
+  | 'wasapi_input_capture'
+  | 'wasapi_output_capture'
+  | 'decklink-input'
+  | 'scene'
+  | 'ndi_source'
+  | 'openvr_capture'
+  | 'liv_capture'
+  | 'ovrstream_dc_source';
 
 // Register new properties managers here
-export type TPropertiesManager =
-  | 'default'
-  | 'widget'
-  | 'streamlabels'
-  | 'platformApp';
+export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -126,9 +123,4 @@ export interface ISourceDisplayData {
   description: string;
   demoFilename?: string;
   supportList?: string[];
-}
-
-export interface ISourceAddOptions {
-  propertiesManager: TPropertiesManager;
-  propertiesManagerSettings: Dictionary<any>;
 }

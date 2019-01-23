@@ -2,6 +2,7 @@ import { TPlatform } from '../platforms';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { WidgetType } from './widgets-data';
 import { ISourceApi } from 'services/sources';
+import { IAlertBoxVariation } from './settings/alert-box/alert-box-api';
 
 export interface ISerializableWidget {
   name: string;
@@ -13,11 +14,7 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (
-  host: string,
-  token: string,
-  platform: TPlatform
-) => string;
+type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
 
 export interface IWidgetTester {
   name: string;
@@ -71,16 +68,16 @@ export interface IWidgetApi extends IWidgetSource {
 }
 
 export interface IWidgetsServiceApi {
-  getWidgetSource(sourceId: string): IWidgetApi
+  getWidgetSource(sourceId: string): IWidgetApi;
 }
 
 export interface IWidgetSettingsServiceApi {
   getApiSettings(): IWidgetApiSettings;
   fetchData(): Promise<any>;
   saveSettings(settings: IWidgetSettings): Promise<any>;
+  toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation?: IAlertBoxVariation): void;
   state: IWidgetSettingsGenericState;
 }
-
 
 export interface IWidgetSettings {
   custom_enabled: boolean;
@@ -90,7 +87,6 @@ export interface IWidgetSettings {
 }
 
 export interface IWidgetData {
-
   type: WidgetType;
 
   settings: IWidgetSettings;
@@ -110,6 +106,7 @@ export interface IWidgetSettingsGenericState {
   rawData: Dictionary<any>; // widget data before patching
 }
 
-export interface IWidgetSettingsState<TWidgetData extends IWidgetData> extends IWidgetSettingsGenericState {
+export interface IWidgetSettingsState<TWidgetData extends IWidgetData>
+  extends IWidgetSettingsGenericState {
   data: TWidgetData;
 }

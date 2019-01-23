@@ -1,10 +1,9 @@
 <template>
-  <div class="row">
-    <div class="col-xs-4">
+  <div class="row alignable-input">
+    <label class="input-label">
       {{ options.title }}
-    </div>
-    <div class="col-xs-8">
-
+    </label>
+    <div class="input-body">
       <div class="input-container input-container--no-margin">
         <form-input
           :value="value"
@@ -39,7 +38,13 @@
   @import "../../../styles/index";
 
   .row {
+    display: flex;
+    margin: 0;
     .margin-bottom(1);
+  }
+
+  .input-body {
+    width: 70%;
   }
 
   .input-container {
@@ -49,16 +54,14 @@
     justify-content: flex-start;
   }
 
-
-
   .slots {
     width: 100%;
   }
 
   .tooltip {
     position: relative;
-    margin-left: 8px;
-    font-size: 16px;
+    .margin-left();
+    font-size: 14px;
     align-self: center;
     display: inline-block;
     z-index: 1;

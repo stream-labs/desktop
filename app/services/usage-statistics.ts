@@ -1,18 +1,14 @@
-import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
+import { Throttle } from 'lodash-decorators';
+import { Service } from './service';
 
-export type TUsageEvent =
-  'stream_start' |
-  'stream_end' |
-  'app_start' |
-  'app_close' |
-  'crash';
+export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
 interface IUsageApiData {
   installer_id?: string;
@@ -22,20 +18,30 @@ interface IUsageApiData {
   data: string;
 }
 
+type TAnalyticsEvent = 'TCP_API_REQUEST'; // add more types if you need
+
+interface IAnalyticsEvent {
+  product: string;
+  version: number;
+  event: string;
+  value?: any;
+  time?: string;
+  count?: number;
+  uuid?: string;
+  saveUser?: boolean;
+}
 
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
-
     return {
       ...descriptor,
       value(...args: any[]): any {
         UsageStatisticsService.instance.recordEvent(event);
         descriptor.value.apply(this, args);
-      }
+      },
     };
   };
 }
-
 
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
@@ -43,6 +49,8 @@ export class UsageStatisticsService extends Service {
 
   installerId: string;
   version = electron.remote.process.env.SLOBS_VERSION;
+
+  private anaiticsEvents: IAnalyticsEvent[] = [];
 
   init() {
     this.loadInstallerId();
@@ -87,18 +95,18 @@ export class UsageStatisticsService extends Service {
   recordEvent(event: TUsageEvent, metadata: object = {}) {
     if (!this.isProduction) return;
 
-    const headers = new Headers();
+    let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
     const bodyData: IUsageApiData = {
+      event,
       slobs_user_id: this.userService.getLocalUserId(),
       version: this.version,
-      event,
-      data: JSON.stringify(metadata)
+      data: JSON.stringify(metadata),
     };
 
     if (this.userService.isLoggedIn()) {
-      authorizedHeaders(this.userService.apiToken, headers);
+      headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 
     if (this.installerId) {
@@ -106,12 +114,39 @@ export class UsageStatisticsService extends Service {
     }
 
     const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {
-      method: 'POST',
       headers,
-      body: JSON.stringify(bodyData)
+      method: 'POST',
+      body: JSON.stringify(bodyData),
     });
 
     return fetch(request);
   }
 
+  recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
+    this.anaiticsEvents.push({
+      event,
+      value,
+      product: 'SLOBS',
+      version: this.version,
+      count: 1,
+      uuid: this.userService.getLocalUserId(),
+    });
+    this.sendAnalytics();
+  }
+
+  @Throttle(2 * 60 * 1000)
+  private sendAnalytics() {
+    const data = { analyticsTokens: [...this.anaiticsEvents] };
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    this.anaiticsEvents.length = 0;
+
+    const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
+      headers,
+      method: 'post',
+      body: JSON.stringify(data || {}),
+    });
+    fetch(request).then(handleResponse);
+  }
 }

@@ -18,7 +18,7 @@
 
 <script lang="ts" src="./Tabs.vue.ts"></script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../styles/index";
 
 .tabs__container {
@@ -27,27 +27,24 @@
 
 .tabs {
   display: flex;
-  background-color: @day-primary;
+  background: transparent;
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  .padding-top(@0);
-  .padding-bottom(@0);
-  .padding-right(2);
-  .padding-left(2);
-  height: 54px;
+  height: 48px;
+  border: 0;
   border-bottom: 1px solid @day-border;
+  padding: 0;
 }
 
 .tab-content {
-  height: calc(~'100% - 54px');
+  height: calc(~'100% - 48px');
   position: relative;
   overflow-y: auto;
 }
 
 .night-theme {
   .tabs {
-    background-color: @night-primary;
     border-color: @night-border;
   }
 }

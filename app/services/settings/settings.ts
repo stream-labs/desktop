@@ -1,10 +1,12 @@
+import { invert, cloneDeep } from 'lodash';
 import { StatefulService, mutation } from 'services/stateful-service';
 import {
-  obsValuesToInputValues,
   inputValuesToObsValues,
-  TObsValue,
+  obsValuesToInputValues,
   TObsFormData,
-  IObsListInput
+  IObsListInput,
+  IObsInput,
+  TObsValue,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -13,13 +15,16 @@ import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
-import {
-  VideoEncodingOptimizationService,
-  IOutputSettings
-} from '../video-encoding-optimizations';
-import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
+import {
+  encoderFieldsMap,
+  StreamEncoderSettingsService,
+  obsEncoderToEncoder,
+} from './stream-encoder';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
+import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EDeviceType } from '../hardware';
 
 export interface ISettingsState {
   General: {
@@ -32,12 +37,18 @@ export interface ISettingsState {
     ScreenSnapping: boolean;
     SourceSnapping: boolean;
     CenterSnapping: boolean;
+    ReplayBufferWhileStreaming: boolean;
+    KeepReplayBufferStreamStops: boolean;
   };
   Stream: {
     key: string;
     streamType: string;
+    service: string;
   };
-  Output: Dictionary<TObsValue>;
+  Output: {
+    RecRB?: boolean;
+    RecRBTime?: number;
+  };
   Video: {
     Base: string;
   };
@@ -50,14 +61,11 @@ export interface ISettingsState {
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
-
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi {
   static initialState = {};
 
-  static convertFormDataToState(
-    settingsFormData: TSettingsFormData
-  ): ISettingsState {
+  static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
     const settingsState: Partial<ISettingsState> = {};
     for (const groupName in settingsFormData) {
       settingsFormData[groupName].forEach(subGroup => {
@@ -76,6 +84,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private windowsService: WindowsService;
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private streamEncoderSettingsService: StreamEncoderSettingsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -100,27 +109,27 @@ export class SettingsService extends StatefulService<ISettingsState>
       queryParams: { categoryName },
       size: {
         width: 800,
-        height: 800
-      }
+        height: 800,
+      },
     });
   }
 
   advancedSettingEnabled(): boolean {
-    return (
-      Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings')
-    );
+    return Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings');
   }
 
   getCategories(): string[] {
     let categories = obs.NodeObs.OBS_settings_getListCategories();
-    categories = categories
-      .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
+    categories = categories.concat([
+      'Scene Collections',
+      'Notifications',
+      'Appearance',
+      'Remote Control',
+    ]);
 
-    // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
-
-    if (this.platformAppsService.state.devMode) {
+    if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
+      categories = categories.concat(['Experimental']);
     }
 
     if (this.platformAppsService.state.loadedApps.filter(app => !app.unpacked).length > 0) {
@@ -132,115 +141,56 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
     const BLACK_LIST_NAMES = [
       'SysTrayMinimizeToTray',
-      'ReplayBufferWhileStreaming',
-      'KeepReplayBufferStreamStops',
       'SysTrayEnabled',
       'CenterSnapping',
       'HideProjectorCursor',
       'ProjectorAlwaysOnTop',
       'SaveProjectors',
       'SysTrayWhenStarted',
-      'RecRBSuffix',
-      'LowLatencyEnable',
-      'BindIP',
-      'FilenameFormatting',
-      'MaxRetries',
-      'NewSocketLoopEnable',
-      'OverwriteIfExists',
-      'RecRBPrefix',
-      'Reconnect',
-      'RetryDelay'
     ];
 
     for (const group of settings) {
       group.parameters = obsValuesToInputValues(group.parameters, {
         disabledFields: BLACK_LIST_NAMES,
-        transformListOptions: true
+        transformListOptions: true,
       });
     }
 
     // We hide the encoder preset and settings if the optimized ones are in used
     if (
       categoryName === 'Output' &&
-      this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
+      this.videoEncodingOptimizationService.state.useOptimizedProfile
     ) {
-      const outputSettings: IOutputSettings = this.videoEncodingOptimizationService.getCurrentOutputSettings();
-
-      const indexSubCategory = settings.indexOf(
-        settings.find((category: any) => {
-          return category.nameSubCategory === 'Streaming';
-        })
+      const encoder = obsEncoderToEncoder(
+        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
+          this.findSettingValue(settings, 'Streaming', 'StreamEncoder'),
       );
-
-      const parameters = settings[indexSubCategory].parameters;
-
       // Setting preset visibility
-      const indexPreset = parameters.indexOf(
-        parameters.find((parameter: any) => {
-          return parameter.name === outputSettings.presetField;
-        })
-      );
-      settings[indexSubCategory].parameters[indexPreset].visible = false;
-
-      // Setting encoder settings value
-      const indexX264Settings = parameters.indexOf(
-        parameters.find((parameter: any) => {
-          return parameter.name === outputSettings.encoderSettingsField;
-        })
-      );
-      settings[indexSubCategory].parameters[indexX264Settings].visible = false;
+      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
+      // Setting encoder settings visibility
+      if (encoder === 'x264') {
+        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, {
+          visible: false,
+        });
+      }
     }
 
     return settings;
   }
 
-  /**
-   * Returns some information about the user's streaming settings.
-   * This is used in aggregate to improve our optimized video encoding.
-   *
-   * P.S. Settings needs a refactor... badly
-   */
-  getStreamEncoderSettings() {
-    const output = this.getSettingsFormData('Output');
-    const video = this.getSettingsFormData('Video');
-
-    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
-      this.findSettingValue(output, 'Streaming', 'StreamEncoder');
-    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
-      this.findSettingValue(output, 'Streaming', 'Preset') ||
-      this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
-      this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
-      this.findSettingValue(output, 'Streaming', 'target_usage') ||
-      this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
-      this.findSettingValue(output, 'Streaming', 'AMDPreset');
-    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
-      this.findSettingValue(output, 'Streaming', 'VBitrate');
-    const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
-    const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
-
-    return  {
-      encoder,
-      preset,
-      bitrate,
-      baseResolution,
-      outputResolution
-    };
-  }
-
-  private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
-    let settingValue: any;
-
+  findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
+    let inputModel: any;
     settings.find(subCategory => {
       if (subCategory.nameSubCategory === category) {
         subCategory.parameters.find(param => {
           if (param.name === setting) {
-            settingValue = param.value || (param as IObsListInput<string>).options[0].value;
+            inputModel = param;
             return true;
           }
         });
@@ -249,7 +199,44 @@ export class SettingsService extends StatefulService<ISettingsState>
       }
     });
 
-    return settingValue;
+    return inputModel;
+  }
+
+  findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    const formModel = this.findSetting(settings, category, setting);
+    if (!formModel) return;
+    return formModel.value !== void 0
+      ? formModel.value
+      : (formModel as IObsListInput<string>).options[0].value;
+  }
+
+  findValidListValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    const formModel = this.findSetting(settings, category, setting);
+    if (!formModel) return;
+    const options = (formModel as IObsListInput<string>).options;
+    const option = options.find(option => option.value === formModel.value);
+    return option ? option.value : options[0].value;
+  }
+
+  private patchSetting(
+    settingsFormData: ISettingsSubCategory[],
+    name: string,
+    patch: Partial<IObsInput<TObsValue>>,
+  ) {
+    // tslint:disable-next-line
+    settingsFormData = cloneDeep(settingsFormData);
+    for (const subcategory of settingsFormData) {
+      for (const field of subcategory.parameters) {
+        if (field.name !== name) continue;
+        Object.assign(field, patch);
+      }
+    }
+    return settingsFormData;
+  }
+
+  setSettingValue(category: string, name: string, value: TObsValue) {
+    const newSettings = this.patchSetting(this.getSettingsFormData(category), name, { value });
+    this.setSettings(category, newSettings);
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
@@ -261,14 +248,8 @@ export class SettingsService extends StatefulService<ISettingsState>
     const parameters: TObsFormData = [];
 
     // collect output channels info
-    for (
-      let channel = E_AUDIO_CHANNELS.OUTPUT_1;
-      channel <= E_AUDIO_CHANNELS.OUTPUT_2;
-      channel++
-    ) {
-      const source = sourcesInChannels.find(
-        source => source.channel === channel
-      );
+    for (let channel = E_AUDIO_CHANNELS.OUTPUT_1; channel <= E_AUDIO_CHANNELS.OUTPUT_2; channel++) {
+      const source = sourcesInChannels.find(source => source.channel === channel);
       const deviceInd = channel;
 
       parameters.push({
@@ -280,23 +261,17 @@ export class SettingsService extends StatefulService<ISettingsState>
         visible: true,
         options: [{ description: 'Disabled', value: null }].concat(
           audioDevices
-            .filter(device => device.type === 'output')
+            .filter(device => device.type === EDeviceType.audioOutput)
             .map(device => {
               return { description: device.description, value: device.id };
-            })
-        )
+            }),
+        ),
       });
     }
 
     // collect input channels info
-    for (
-      let channel = E_AUDIO_CHANNELS.INPUT_1;
-      channel <= E_AUDIO_CHANNELS.INPUT_3;
-      channel++
-    ) {
-      const source = sourcesInChannels.find(
-        source => source.channel === channel
-      );
+    for (let channel = E_AUDIO_CHANNELS.INPUT_1; channel <= E_AUDIO_CHANNELS.INPUT_3; channel++) {
+      const source = sourcesInChannels.find(source => source.channel === channel);
       const deviceInd = channel - 2;
 
       parameters.push({
@@ -307,18 +282,20 @@ export class SettingsService extends StatefulService<ISettingsState>
         enabled: true,
         visible: true,
         options: [{ description: 'Disabled', value: null }].concat(
-          audioDevices.filter(device => device.type === 'input').map(device => {
-            return { description: device.description, value: device.id };
-          })
-        )
+          audioDevices
+            .filter(device => device.type === EDeviceType.audioInput)
+            .map(device => {
+              return { description: device.description, value: device.id };
+            }),
+        ),
       });
     }
 
     return [
       {
+        parameters,
         nameSubCategory: 'Untitled',
-        parameters
-      }
+      },
     ];
   }
 
@@ -331,15 +308,36 @@ export class SettingsService extends StatefulService<ISettingsState>
       dataToSave.push({
         ...subGroup,
         parameters: inputValuesToObsValues(subGroup.parameters, {
-          valueToCurrentValue: true
-        })
+          valueToCurrentValue: true,
+        }),
       });
     }
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
-    this.SET_SETTINGS(
-      SettingsService.convertFormDataToState({ [categoryName]: settingsData })
-    );
+    this.loadSettingsIntoStore();
+  }
+
+  setSettingsPatch(patch: Partial<ISettingsState>) {
+    // Tech Debt: This is a product of the node-obs settings API.
+    // This function represents a cleaner API we would like to have
+    // in the future.
+
+    Object.keys(patch).forEach(categoryName => {
+      const category: Dictionary<any> = patch[categoryName];
+      const formSubCategories = this.getSettingsFormData(categoryName);
+
+      Object.keys(category).forEach(paramName => {
+        formSubCategories.forEach(subCategory => {
+          subCategory.parameters.forEach(subCategoryParam => {
+            if (subCategoryParam.name === paramName) {
+              subCategoryParam.value = category[paramName];
+            }
+          });
+        });
+      });
+
+      this.setSettings(categoryName, formSubCategories);
+    });
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
@@ -347,14 +345,8 @@ export class SettingsService extends StatefulService<ISettingsState>
 
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
-      const isOutput = [
-        E_AUDIO_CHANNELS.OUTPUT_1,
-        E_AUDIO_CHANNELS.OUTPUT_2
-      ].includes(channel);
-      const source = this.sourcesService
-        .getSources()
-        .find(source => source.channel === channel);
-
+      const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
+      const source = this.sourcesService.getSources().find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {
@@ -362,7 +354,6 @@ export class SettingsService extends StatefulService<ISettingsState>
           return;
         }
       } else if (deviceForm.value !== null) {
-
         const device = audioDevices.find(device => device.id === deviceForm.value);
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
@@ -371,13 +362,13 @@ export class SettingsService extends StatefulService<ISettingsState>
             displayName,
             isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
             {},
-            { channel }
+            { channel },
           );
         } else {
-          source.updateSettings({ device_id: deviceForm.value, name: displayName });
+          source.setName(displayName);
+          source.updateSettings({ device_id: deviceForm.value });
         }
       }
-
     });
   }
 

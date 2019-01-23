@@ -1,7 +1,6 @@
 import { Service } from 'services/service';
 import electron from 'electron';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import { Subscription, Observable } from 'rxjs';
 
 /**
  * Shared message interchange format
@@ -13,10 +12,20 @@ export interface IGuestApiRequest {
   args: any[];
 }
 
+/**
+ * Describes how to treat the contents of the result field
+ * on an IGuestApiResponse.
+ */
+export enum EResponseResultProcessing {
+  None = 'none',
+  File = 'file',
+}
+
 export interface IGuestApiResponse {
   id: string;
   error: boolean;
   result: any;
+  resultProcessing: EResponseResultProcessing;
 }
 
 export interface IGuestApiCallback {
@@ -38,22 +47,35 @@ export interface IRequestHandler {
 }
 
 /**
+ * Guest API functions that need to return a `File` object to
+ * the remote guest can return an instance of this wrapper
+ * containing the file path instead.
+ */
+export class FileReturnWrapper {
+  constructor(public filePath: string) {}
+}
+
+/**
  * This class allows injection of functions into webviews.
  */
 export class GuestApiService extends Service {
-
   handlers: Dictionary<Function> = {};
 
   init() {
-    electron.ipcRenderer.on('guestApiRequest', (event: Electron.Event, request: IGuestApiRequest) => {
-      const { webContentsId } = request;
+    electron.ipcRenderer.on(
+      'guestApiRequest',
+      (event: Electron.Event, request: IGuestApiRequest) => {
+        const { webContentsId } = request;
 
-      if (this.handlers[webContentsId]) {
-        this.handlers[webContentsId](request);
-      } else {
-        console.error(`Received guest API request from unregistered webContents ${webContentsId}`);
-      }
-    });
+        if (this.handlers[webContentsId]) {
+          this.handlers[webContentsId](request);
+        } else {
+          console.error(
+            `Received guest API request from unregistered webContents ${webContentsId}`,
+          );
+        }
+      },
+    );
   }
 
   /**
@@ -85,14 +107,14 @@ export class GuestApiService extends Service {
       const contents = electron.remote.webContents.fromId(webContentsId);
 
       const mappedArgs = request.args.map(arg => {
-        const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__guestApiCallback;
+        const isCallbackPlaceholder = typeof arg === 'object' && arg && arg.__guestApiCallback;
 
         if (isCallbackPlaceholder) {
           return (...args: any[]) => {
             const callbackObj: IGuestApiCallback = {
+              args,
               requestId: request.id,
               callbackId: arg.id,
-              args
             };
 
             this.safeSend(contents, 'guestApiCallback', callbackObj);
@@ -109,7 +131,8 @@ export class GuestApiService extends Service {
         const response: IGuestApiResponse = {
           id: request.id,
           error: true,
-          result: `Error: The function ${request.methodPath.join('.')} does not exist!`
+          result: `Error: The function ${request.methodPath.join('.')} does not exist!`,
+          resultProcessing: EResponseResultProcessing.None,
         };
         this.safeSend(contents, 'guestApiResponse', response);
         return;
@@ -120,11 +143,23 @@ export class GuestApiService extends Service {
       } else {
         endpoint(...mappedArgs)
           .then(result => {
-            const response: IGuestApiResponse = {
-              id: request.id,
-              error: false,
-              result
-            };
+            let response: IGuestApiResponse;
+
+            if (result instanceof FileReturnWrapper) {
+              response = {
+                result: result.filePath,
+                resultProcessing: EResponseResultProcessing.File,
+                id: request.id,
+                error: false,
+              };
+            } else {
+              response = {
+                result,
+                resultProcessing: EResponseResultProcessing.None,
+                id: request.id,
+                error: false,
+              };
+            }
 
             this.safeSend(contents, 'guestApiResponse', response);
           })
@@ -132,21 +167,22 @@ export class GuestApiService extends Service {
             const result = rawResult instanceof Error ? rawResult.message : rawResult;
 
             const response: IGuestApiResponse = {
+              result,
+              resultProcessing: EResponseResultProcessing.None,
               id: request.id,
               error: true,
-              result
             };
 
             this.safeSend(contents, 'guestApiResponse', response);
           });
       }
-    }
+    };
 
     webContents.send('guestApiReady');
   }
 
   private safeSend(contents: Electron.WebContents, channel: string, msg: any) {
-    if (!contents.isDestroyed()) {
+    if (contents && !contents.isDestroyed()) {
       contents.send(channel, msg);
     }
   }
@@ -169,7 +205,7 @@ export class GuestApiService extends Service {
       const endpoint = handler[path[0]];
 
       // Make sure this actually looks like an endpoint
-      if ((endpoint instanceof Function) || (endpoint instanceof Observable)) return endpoint;
+      if (endpoint instanceof Function || endpoint instanceof Observable) return endpoint;
       return;
     }
 

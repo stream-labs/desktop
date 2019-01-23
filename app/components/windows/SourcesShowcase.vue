@@ -8,17 +8,15 @@
     class="add-source">
     <!-- Standard sources -->
     <add-source-info
-      v-for="source in availableSources"
-      :key="source.value"
-      v-if="inspectedSource === source.value"
-      :name="sourceData(source.value).name"
-      :description="sourceData(source.value).description"
-      :showSupport="!!sourceData(source.value).supportList"
+      v-if="inspectedSourceDefinition"
+      :name="inspectedSourceDefinition.name"
+      :description="inspectedSourceDefinition.description"
+      :showSupport="!inspectedSourceDefinition.prefabId && !!sourceData(inspectedSourceDefinition.type).supportList"
     >
-      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(source.value, 'day')" />
-      <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(source.value, 'night')"/>
+      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(inspectedSourceDefinition.type, 'day')" />
+      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(inspectedSourceDefinition.type, 'night')"/>
       <ul slot="support-list" class="source-support__list">
-        <li v-for="support in sourceData(source.value).supportList" :key="support">
+        <li v-for="support in sourceData(inspectedSourceDefinition.type).supportList" :key="support">
           {{ support }}
         </li>
       </ul>
@@ -51,7 +49,7 @@
       v-if="inspectedSource === 'streamlabel'"
       :name="$t('Stream Label')"
       :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
-      key="28">
+      key="streamlabel-source-info">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
@@ -64,6 +62,15 @@
         <li>{{ $t('Monthly Follows') }}</li>
         <li>{{ $t('Many more') }}</li>
       </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === 'replay'"
+      :name="$t('Instant Replay')"
+      :description="$t('Automatically plays your most recently captured replay in your stream.')"
+      key="replay-source-info">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/media.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/media.png"/>
     </add-source-info>
 
     <add-source-info
@@ -85,7 +92,7 @@
       v-if="inspectedSource === null">
       <div class="source-welcome">
         <div class="source-info__text">
-          <h3>{{ $t('Welcome to sources!') }}</h3>
+          <h2>{{ $t('Welcome to sources!') }}</h2>
           <ol>
             <li>{{ $t('Browse through our Standard and Widget sources') }}</li>
             <li>{{ $t('Click a source to get more details about it') }}</li>
@@ -99,24 +106,24 @@
       </div>
     </div>
 
-    <div class="sources">
+    <div class="sources" :class="{'sources--has-platform-apps' : showAppSources}">
       <div class="source-group">
-        <h2>{{ $t('Standard') }}</h2>
+        <h3>{{ $t('Standard') }}</h3>
         <ul class="source-list">
           <li
             v-for="source in availableSources"
-            :key="source.value"
+            :key="source.id"
             class="source source--standard"
-            :class="{'source--active': inspectedSource === source.value}"
-            @click="inspectSource(source.value)"
-            @dblclick="selectSource(source.value)">
-            {{ $t(source.description) }}
+            :class="{'source--active': inspectedSource === source.id}"
+            @click="inspectSource(source.id)"
+            @dblclick="source.prefabId ? selectPrefab(source.prefabId) : selectSource(source.id)">
+            {{ $t(source.name) }}
           </li>
         </ul>
       </div>
 
       <div class="source-group" v-if="loggedIn">
-        <h2>{{ $t('Widgets') }}</h2>
+        <h3>{{ $t('Widgets') }}</h3>
         <div class="source-list">
           <div
             v-for="type in iterableWidgetTypes"
@@ -138,11 +145,18 @@
             @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
             <div>{{ $t('Stream Label') }}</div>
           </div>
+          <div
+            class="source source--widget"
+            :class="{ 'source--active': inspectedSource === 'replay' }"
+            @click="inspectSource('replay')"
+            @dblclick="selectSource('ffmpeg_source', { propertiesManager: 'replay' })">
+            <div>{{ $t('Instant Replay') }}</div>
+          </div>
         </div>
       </div>
 
       <div class="source-group" v-if="showAppSources">
-        <h2>{{ $t('Apps') }}</h2>
+        <h3>{{ $t('Apps') }}</h3>
         <ul class="source-list">
           <li
             v-for="appSource in availableAppSources"
@@ -182,8 +196,8 @@
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
-  flex: 0 0 210px;
-  height: 210px;
+  flex: 0 0 225px;
+  height: 225px;
   align-items: flex-start;
 }
 
@@ -212,27 +226,18 @@ h2 {
 .source-welcome {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   width: 100%;
 }
 
 .sources {
   .padding(2);
-  display: flex;
-  flex: 1 0 auto;
-
-  .source-group {
-    &:last-child {
-      padding: 16px 0 16px 16px;
-      border-right: none;
-    }
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 16px;
 }
 
-.source-group {
-  margin: -16px 0px -16px 0px;
-  padding: 16px 16px 16px 0;
-  flex: 0 0 33%;
+.sources--has-platform-apps {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .source-list {
@@ -258,15 +263,20 @@ h2 {
   background-color: @day-section;
   width: 49%;
   .radius();
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
 
   &:hover,
   &.source--active {
     color: @day-title;
     .weight(@medium);
-    background-color: @light-2;
+    background-color: @light-3;
   }
 
-  >div {
+  > div {
     white-space: nowrap;
     text-overflow: ellipsis;
     max-width: 100%;

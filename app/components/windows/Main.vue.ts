@@ -1,9 +1,12 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import VueResize from 'vue-resize';
+Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -25,13 +28,15 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
-import PlatformAppContainer from '../pages/PlatformAppContainer.vue';
+import PlatformAppWebview from '../PlatformAppWebview.vue';
+import Help from '../pages/Help.vue';
 import electron from 'electron';
 
 @Component({
   components: {
     TitleBar,
     TopNav,
+    AppsNav,
     Studio,
     Dashboard,
     BrowseOverlays,
@@ -44,9 +49,10 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
-    PlatformAppContainer,
-    PlatformAppStore
-  }
+    PlatformAppWebview,
+    PlatformAppStore,
+    Help,
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -59,6 +65,7 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
+    this.handleResize();
   }
 
   get title() {
@@ -85,7 +92,10 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  mainContentsRight = false;
+
   get leftDock() {
+    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -105,16 +115,11 @@ export default class Main extends Vue {
     return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
   }
 
-  appStyles(appId: string) {
-    if (this.page === 'PlatformAppContainer' && this.params.appId === appId) {
-      return {};
-    } else {
-      return {
-        position: 'absolute',
-        top: '-10000px'
-      };
-    }
+  isAppVisible(appId: string) {
+    return this.page === 'PlatformAppContainer' && this.params.appId === appId;
   }
+
+  appPageSlot = EAppPageSlot.TopNav;
 
   /**
    * Only certain pages get locked out while the application
@@ -136,5 +141,43 @@ export default class Main extends Vue {
       const file = files.item(fi);
       this.scenesService.activeScene.addFile(file.path);
     }
+  }
+
+  $refs: {
+    mainMiddle: HTMLDivElement;
+  };
+
+  compactView = false;
+
+  get mainResponsiveClasses() {
+    const classes = [];
+
+    if (this.compactView) {
+      classes.push('main-middle--compact');
+    }
+
+    return classes.join(' ');
+  }
+
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  windowWidth: number;
+
+  hasLiveDock = true;
+
+  windowSizeHandler() {
+    this.windowWidth = window.innerWidth;
+
+    this.hasLiveDock = this.windowWidth >= 1100;
+  }
+
+  handleResize() {
+    this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 }

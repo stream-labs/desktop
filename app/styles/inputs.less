@@ -50,7 +50,7 @@
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
-    line-height: 34px;
+    line-height: 32px;
   }
 }
 
@@ -65,11 +65,11 @@ textarea {
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: @day-paragraph;
   .radius();
   box-shadow: none;
-  height: 34px;
+  height: 32px;
   padding: 0 @spacing;
 
   &:focus {
@@ -80,8 +80,8 @@ textarea {
 
   &:disabled,
   .is-disabled {
-    background-color: @light-2;
-    border-color: @light-2;
+    background-color: @light-3;
+    border-color: @light-3;
   }
 
   &.input--transparent {
@@ -101,7 +101,7 @@ textarea {
 
 
 .multiselect {
-  min-height: 34px;
+  min-height: 32px;
 }
 
 .multiselect__input {
@@ -115,7 +115,7 @@ textarea {
   width: auto;
   height: auto;
   right: 8px;
-  top: 0px;
+  top: 0;
   line-height: 32px;
   position: relative;
   min-width: 220px;
@@ -179,7 +179,7 @@ textarea {
 }
 
 .multiselect__element {
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   display: inline-block;
   min-width: 100%;
@@ -205,7 +205,7 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @light-1;
+  background: @light-3;
   color: @day-title;
 
   &:after {
@@ -214,11 +214,11 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @light-1;
+  background: @light-3;
   color: @day-title;
 
   &.multiselect__option--highlight {
-    background: @light-1;
+    background: @light-3;
 
     &:after {
       display: none;
@@ -287,7 +287,7 @@ textarea {
 
   .colorpicker__swatch {
     position: absolute;
-    top: 7px;
+    top: 6px;
     right: @spacing;
     .radius();
     border: 1px solid #ccc;

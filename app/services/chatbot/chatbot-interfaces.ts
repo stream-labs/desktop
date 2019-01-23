@@ -1,7 +1,7 @@
 import {
   MediaShareService,
   IMediaShareData,
-  IMediaShareBan
+  IMediaShareBan,
 } from 'services/widgets/settings/media-share';
 
 // state
@@ -149,8 +149,8 @@ export interface ISongRequestPreferencesResponse {
   settings: {
     advanced_settings: {
       auto_play: boolean;
-    }
-  }
+    };
+  };
 }
 
 export interface ISongRequestResponse {
@@ -437,7 +437,7 @@ export interface ISongRequestGeneral {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Subscriber Only' = 1 << 1
+  'Subscriber Only' = 1 << 1,
 }
 
 export enum ChatbotPermissionsEnums {
@@ -446,18 +446,18 @@ export enum ChatbotPermissionsEnums {
   'Subscriber Only' = 1 << 1,
   'Moderator Only' = 1 << 5,
   'Streamer Only' = 1 << 7,
-  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
+  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5),
 }
 
 export enum ChatbotPunishments {
   Purge = 'Purge',
   Timeout = 'Timeout',
-  Ban = 'Ban'
+  Ban = 'Ban',
 }
 
 export enum ChatbotResponseTypes {
   Chat = 'Chat',
-  Whisper = 'Whisper'
+  Whisper = 'Whisper',
 }
 
 export type ChatbotAlertType =
@@ -467,7 +467,9 @@ export type ChatbotAlertType =
   | 'raid'
   | 'sub'
   | 'bits'
-  | 'sub_mystery_gift';
+  | 'sub_mystery_gift'
+  | 'sponsor'
+  | 'superchat';
 
 export type ChatbotSocketRoom = 'queue' | 'giveaway';
 

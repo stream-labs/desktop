@@ -12,13 +12,18 @@ import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { AppService } from '../services/app';
+import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
+Vue.use(VueResize);
 
 @Component({
   components: {
-    Login
-  }
+    Login,
+  },
 })
 export default class TopNav extends Vue {
+  @Inject() appService: AppService;
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
@@ -30,14 +35,24 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
-  studioModeTooltip = 'Studio Mode';
+  studioModeTooltip = $t('Studio Mode');
+  settingsTooltip = $t('Settings');
+  helpTooltip = $t('Get Help');
+  logoutTooltip = $t('Logout');
+  sunTooltip = $t('Day mode');
+  moonTooltip = $t('Night mode');
+
+  availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
+
+  mounted() {
+    this.topNav = this.$refs.top_nav;
+  }
 
   get availableFeatures() {
     return EAvailableFeatures;
   }
 
-  @Prop()
-  locked: boolean;
+  @Prop() locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
@@ -71,6 +86,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('DesignSystem');
   }
 
+  navigateHelp() {
+    this.navigationService.navigate('Help');
+  }
+
   featureIsEnabled(feature: EAvailableFeatures) {
     return this.incrementalRolloutService.featureIsEnabled(feature);
   }
@@ -99,18 +118,6 @@ export default class TopNav extends Vue {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
 
-  get topNavApps() {
-    return this.platformAppsService.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
-        return page.slot === EAppPageSlot.TopNav;
-      });
-    });
-  }
-
-  navigateApp(appId: string) {
-    this.navigationService.navigate('PlatformAppContainer', { appId });
-  }
-
   get isDevMode() {
     return Utils.isDevMode();
   }
@@ -128,6 +135,28 @@ export default class TopNav extends Vue {
   }
 
   get appStoreVisible() {
-    return this.platformAppsService.state.storeVisible && this.isUserLoggedIn;
+    return this.platformAppsService.state.storeVisible;
+  }
+
+  get chatbotVisible() {
+    return (
+      this.userService.isLoggedIn() &&
+      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
+    );
+  }
+
+  get loading() {
+    return this.appService.state.loading;
+  }
+
+  $refs: {
+    top_nav: HTMLDivElement;
+  };
+
+  topNav: HTMLDivElement;
+  responsiveClass = false;
+
+  handleResize() {
+    this.responsiveClass = this.topNav.clientWidth < 1200;
   }
 }

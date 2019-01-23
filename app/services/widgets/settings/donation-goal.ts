@@ -5,24 +5,23 @@ import { InheritMutations } from 'services/stateful-service';
 
 @InheritMutations()
 export class DonationGoalService extends GenericGoalService {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
       type: WidgetType.DonationGoal,
-      url: `https://${ this.getHost()}/widgets/donation-goal?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${ this.getHost() }/widgets/donation-goal?token=${this.getWidgetToken()}`,
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/donationgoal`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/donationgoal`,
-      goalUrl: `https://${ this.getHost() }/api/v5/slobs/donation/goal`,
-      goalResetUrl: `https://${ this.getHost() }/api/v5/slobs/donation/goal/end`,
+      url: `https://${this.getHost()}/widgets/donation-goal?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/donation-goal?token=${this.getWidgetToken()}`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal`,
+      goalUrl: `https://${this.getHost()}/api/v5/slobs/donation/goal`,
+      goalResetUrl: `https://${this.getHost()}/api/v5/slobs/donation/goal/end`,
       settingsUpdateEvent: 'donationGoalSettingsUpdate',
       goalCreateEvent: 'donationGoalStart',
       goalResetEvent: 'donationGoalEnd',
       hasTestButtons: true,
       customCodeAllowed: true,
-      customFieldsAllowed: true
-    }
+      customFieldsAllowed: true,
+    };
   }
 }

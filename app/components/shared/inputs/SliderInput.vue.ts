@@ -1,15 +1,16 @@
 import VueSlider from 'vue-slider-component';
-import { throttle } from 'lodash-decorators';
+import { debounce } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
-import { CustomizationService } from '../../../services/customization';
-import { Inject } from '../../../util/injector';
+import { CustomizationService } from 'services/customization';
+import ResizeSensor from 'css-element-queries/src/ResizeSensor';
+import { Inject } from 'util/injector';
 import { ISliderMetadata } from './index';
 
 @Component({
-  components: { VueSlider }
+  components: { VueSlider },
 })
-export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
+export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Inject() customizationService: CustomizationService;
 
   @Prop() readonly value: number;
@@ -19,25 +20,32 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
   interval: number;
   isFullyMounted = false;
 
+  localValue = this.value;
+
   $refs: { slider: any };
 
   mounted() {
-
     // setup defaults
     this.interval = this.options.interval || 1;
     this.usePercentages = this.options.usePercentages || false;
 
     // Hack to prevent transitions from messing up slider width
-    setTimeout(() => {
-      if (this.$refs.slider) this.$refs.slider.refresh();
-      this.isFullyMounted = true;
-    }, 500);
+    setTimeout(() => this.onResizeHandler(), 500);
+    new ResizeSensor(this.$el, () => this.onResizeHandler());
   }
 
-  @throttle(500)
+  updateLocalValue(value: number) {
+    this.localValue = value;
+    this.updateValue(value);
+  }
+
+  @debounce(100)
   updateValue(value: number) {
-    if (!this.isFullyMounted) return;
-    this.emitInput(this.roundNumber(value));
+    if (isNaN(Number(value))) {
+      this.emitInput(value);
+    } else {
+      this.emitInput(this.roundNumber(value));
+    }
   }
 
   get nightMode() {
@@ -56,7 +64,12 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
 
   formatter(value: number) {
     let formattedValue = String(value);
-    if (this.usePercentages) formattedValue = Math.round(value * 100) + '%';
+    if (this.usePercentages) formattedValue = `${Math.round(value * 100)}%`;
     return formattedValue;
+  }
+
+  @debounce(500)
+  private onResizeHandler() {
+    if (this.$refs.slider) this.$refs.slider.refresh();
   }
 }

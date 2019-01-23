@@ -1,13 +1,6 @@
 table {
   color: @day-paragraph;
 
-  i,
-  .fa,
-  .fas,
-  .far {
-    .icon-hover();
-  }
-
   thead {
     background: transparent;
     border: 1px solid transparent;
@@ -19,7 +12,7 @@ table {
 
     tr {
       &:nth-child(odd) {
-        background-color: @light-1;
+        background-color: @light-2;
         border: 0;
       }
 
@@ -30,13 +23,22 @@ table {
     }
   }
 
+  tr {
+    th,
+    td {
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
   td,
   th {
-    padding: 8px 12px;
+    .padding();
 
     .input-container {
       width: 100%;
-      margin-bottom: 0!important;
+      margin-bottom: 0 !important;
       display: block;
     }
 
@@ -58,11 +60,9 @@ table {
   }
 
   th {
-    color: @grey;
-    text-transform: uppercase;
+    color: @light-5;
     .weight(@medium);
-    letter-spacing: 1.5px;
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 

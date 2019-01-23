@@ -5,35 +5,39 @@
 
       <div class="onboarding-title">{{ $t('Optimize') }} {{ deviceName }}</div>
 
-      <div class="onboarding-desc" v-if="status == 'init' || status == 'pending'">
+      <div class="onboarding-desc" v-if="status === ''">
+        {{ $t('Collecting some information about your PC...') }}
+      </div>
+
+      <div class="onboarding-desc" v-if="status === 'init' || status === 'pending'">
         {{ $t('We found optimized settings for your PC') }}
       </div>
 
-      <div v-if="status == 'fail'" class="onboarding-desc">
+      <div v-if="status === 'fail'" class="onboarding-desc">
         {{ $t('Something went wrong') }}
       </div>
 
-      <div v-if="status == 'success'" class="onboarding-desc">
+      <div v-if="status === 'success'" class="onboarding-desc">
         {{ $t('Your Streamblabs OBS is ready to go') }}
       </div>
 
-      <button class="button button--action button--lg" v-if="status == 'init'" @click="install()">
+      <button class="button button--action button--lg" v-if="status === 'init'" @click="install()">
         {{ $t('Download and Apply') }}
       </button>
 
-      <button class="button button--default button--lg is-disabled" v-if="status == 'pending'">
+      <button class="button button--default button--lg is-disabled" v-if="status === 'pending'">
         {{ $t('Downloading...') }}
       </button>
 
-      <button class="button button--action button--lg" v-if="status == 'fail'" @click="install()">
+      <button class="button button--action button--lg" v-if="status === 'fail'" @click="install()">
         {{ $t('Retry') }}
       </button>
 
-      <button class="button button--action button--lg" v-if="status == 'success'" @click="next()">
+      <button class="button button--action button--lg" v-if="status === 'success'" @click="next()">
         {{ $t('OK') }}
       </button>
 
-      <div class="setup-later" v-if="status == 'init' || status == 'fail'">
+      <div class="setup-later" v-if="status === 'init' || status === 'fail'">
         <span>{{ $t('Rather do this manually?') }}</span>
         <a @click="skip">{{ $t('Setup later') }}</a>
       </div>

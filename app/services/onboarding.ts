@@ -19,7 +19,7 @@ interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
   isOptimize: boolean; // When re-running the optimizer after onboarding
   isSecurityUpgrade: boolean; // When logging in, display a special message
-                              // about our security upgrade.
+  // about our security upgrade.
 }
 
 interface IOnboardingServiceState {
@@ -42,7 +42,7 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
-    next: 'SceneCollectionsImport'
+    next: 'SceneCollectionsImport',
   },
 
   SceneCollectionsImport: {
@@ -50,15 +50,14 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isSecurityUpgrade) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'ObsImport'
+    next: 'ObsImport',
   },
 
   ObsImport: {
     isEligible: service => {
-      if (service.options.isLogin) return false;
-      return true;
+      return !service.options.isLogin;
     },
-    next: 'SelectWidgets'
+    next: 'SelectWidgets',
   },
 
   SelectWidgets: {
@@ -66,11 +65,13 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'OptimizeA'
+    next: 'OptimizeBrandDevice',
   },
 
   OptimizeBrandDevice: {
-    isEligible: service => service.brandDeviceService.hasOptimizedSettings,
+    isEligible: service => {
+      return !service.options.isLogin;
+    },
     next: 'OptimizeA',
   },
 
@@ -80,28 +81,25 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.completedSteps.includes('OptimizeBrandDevice')) return false;
       return service.isTwitchAuthed;
     },
-    next: 'OptimizeB'
+    next: 'OptimizeB',
   },
 
   OptimizeB: {
     isEligible: service => {
       return service.completedSteps.includes('OptimizeA');
-    }
-  }
-
+    },
+  },
 };
 
-export class OnboardingService extends StatefulService<
-  IOnboardingServiceState
-> {
+export class OnboardingService extends StatefulService<IOnboardingServiceState> {
   static initialState: IOnboardingServiceState = {
     options: {
       isLogin: false,
       isOptimize: false,
-      isSecurityUpgrade: false
+      isSecurityUpgrade: false,
     },
     currentStep: null,
-    completedSteps: []
+    completedSteps: [],
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
@@ -172,7 +170,7 @@ export class OnboardingService extends StatefulService<
       isLogin: false,
       isOptimize: false,
       isSecurityUpgrade: false,
-      ...options
+      ...options,
     };
 
     const step = options.isOptimize ? 'OptimizeA' : 'Connect';
@@ -190,10 +188,7 @@ export class OnboardingService extends StatefulService<
   }
 
   get isTwitchAuthed() {
-    return (
-      this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch'
-    );
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'twitch';
   }
 
   private goToNextStep(step: TOnboardingStep) {

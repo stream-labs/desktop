@@ -1,9 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-
-import {
-  ITextMetadata,
-} from 'components/shared/inputs/index';
+import { ITextMetadata } from 'components/shared/inputs';
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
@@ -13,14 +10,12 @@ export default class ChatbotAliases extends ChatbotBase {
   newAlias: string = '';
 
   textInputMetadata: ITextMetadata = {
-    placeholder: '!example'
+    placeholder: '!example',
   };
 
   get isDuplicate() {
     // remove "!" and check the rest
-    const existingWithoutPrefix = this.value.map(alias =>
-      alias.replace('!', '')
-    );
+    const existingWithoutPrefix = this.value.map(alias => alias.replace('!', ''));
     const newWithoutPrefix = this.newAlias.replace('!', '');
     return (
       existingWithoutPrefix.length > 0 &&
@@ -37,7 +32,7 @@ export default class ChatbotAliases extends ChatbotBase {
     if (!this.newAlias) return;
     if (this.isDuplicate) return;
 
-    let newAliasArray = this.value.slice(0);
+    const newAliasArray = this.value.slice(0);
     newAliasArray.push(this.formatAlias(this.newAlias));
     this.$emit('input', newAliasArray);
     this.newAlias = '';
@@ -45,7 +40,7 @@ export default class ChatbotAliases extends ChatbotBase {
 
   formatAlias(value: string) {
     if (!value.startsWith('!')) {
-      return '!' + value.replace(/\s/g, '');
+      return `!${value.replace(/\s/g, '')}`;
     }
     return value.replace(/\s/g, '');
   }

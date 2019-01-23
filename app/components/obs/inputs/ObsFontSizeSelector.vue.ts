@@ -1,35 +1,22 @@
 import { ObsInput } from './ObsInput';
 import { Component, Prop } from 'vue-property-decorator';
-import { Multiselect } from 'vue-multiselect';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { SliderInput } from 'components/shared/inputs/inputs';
 
-@Component({ components: { Multiselect } })
+@Component({ components: { SliderInput, HFormGroup } })
 export default class ObsFontSizeSelector extends ObsInput<number> {
-
   @Prop()
   value: number;
 
-  setFontSizePreset(size: string) {
-    this.emitInput(Number(size));
+  setFontSizePreset(size: number) {
+    this.emitInput(size);
+  }
+
+  get metadata() {
+    return { data: this.fontSizePresets, piecewise: true, piecewiseLabel: true };
   }
 
   get fontSizePresets() {
-    return [
-      '9',
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '18',
-      '24',
-      '36',
-      '48',
-      '64',
-      '72',
-      '96',
-      '144',
-      '288'
-    ];
+    return [9, 10, 11, 12, 13, 14, 18, 24, 36, 48, 64, 72, 96, 144, 288];
   }
-
 }

@@ -1,5 +1,14 @@
 <template>
-<div class="studio-controls row expanded">
+<div class="studio-controls row expanded" :style="{height: height + 'px'}">
+  <resize-bar
+    position="top"
+    v-model="height"
+    @onresizestop="onResizeStopHandler()"
+    @onresizestart="onResizeStartHandler()"
+    :max="maxHeight"
+    :min="minHeight"
+    :reverse="true"
+  />
   <scene-selector class="studio-controls-panel small-4 columns" />
   <source-selector class="studio-controls-panel small-4 columns" />
   <mixer class="studio-controls-panel small-4 columns" />
@@ -23,6 +32,10 @@
 <style lang="less">
 @import "../styles/index";
 
+.studio-controls {
+  position: relative;
+}
+
 .studio-controls-panel {
   display: flex;
   flex-direction: column;
@@ -42,9 +55,6 @@
 
 .studio-controls__label {
   margin-bottom: 0;
-  .weight(@medium);
-  color: @day-title;
-  font-size: 14px;
 }
 
 .studio-controls-selector {

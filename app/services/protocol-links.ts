@@ -3,6 +3,7 @@ import electron from 'electron';
 import url from 'url';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
+import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 
 function protocolHandler(base: string) {
@@ -24,6 +25,7 @@ interface IProtocolLinkInfo {
 
 export class ProtocolLinksService extends Service {
   @Inject() navigationService: NavigationService;
+  @Inject() platformAppsService: PlatformAppsService;
   @Inject() platformAppStoreService: PlatformAppStoreService;
 
   // Maps base URL components to handler function names
@@ -36,9 +38,8 @@ export class ProtocolLinksService extends Service {
     });
 
     // Other instances started with a protocol link will receive this message
-    electron.ipcRenderer.on(
-      'protocolLink',
-      (event: Electron.Event, link: string) => this.handleLink(link)
+    electron.ipcRenderer.on('protocolLink', (event: Electron.Event, link: string) =>
+      this.handleLink(link),
     );
   }
 
@@ -47,7 +48,7 @@ export class ProtocolLinksService extends Service {
     const info: IProtocolLinkInfo = {
       base: parsed.host,
       path: parsed.pathname,
-      query: parsed.searchParams
+      query: parsed.searchParams,
     };
 
     if (this.handlers[info.base]) {
@@ -67,7 +68,7 @@ export class ProtocolLinksService extends Service {
     if (parts) {
       this.navigationService.navigate('BrowseOverlays', {
         type: parts[1],
-        id: parts[2]
+        id: parts[2],
       });
     }
   }
@@ -75,5 +76,16 @@ export class ProtocolLinksService extends Service {
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
     this.platformAppStoreService.paypalAuthSuccess();
+  }
+
+  @protocolHandler('app')
+  private navigateApp(info: IProtocolLinkInfo) {
+    const appId = info.path.replace('/', '');
+
+    if (this.platformAppsService.getApp(appId)) {
+      this.navigationService.navigate('PlatformAppContainer', { appId });
+    } else {
+      this.navigationService.navigate('PlatformAppStore', { appId });
+    }
   }
 }

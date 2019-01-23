@@ -2,8 +2,6 @@ import { Node } from '../node';
 import { SceneItem } from 'services/scenes';
 import { FontLibraryService } from 'services/font-library';
 import { Inject } from 'util/injector';
-import * as fi from 'node-fontinfo';
-import { EFontStyle } from 'obs-studio-node';
 import path from 'path';
 
 interface ISchema {
@@ -27,8 +25,7 @@ export class TextNode extends Node<ISchema, IContext> {
     // storing a full path that could possibly leak information
     // about a person's computer.
     if (settings['custom_font']) {
-      const file = path.parse(settings['custom_font']).base;
-      settings['custom_font'] = file;
+      settings['custom_font'] = path.parse(settings['custom_font']).base;
     }
 
     settings['file'] = '';

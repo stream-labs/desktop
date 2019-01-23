@@ -21,7 +21,10 @@ export default class PlatformAppProperties extends Vue {
   }
 
   navigateApp() {
-    this.navigationService.navigate('PlatformAppContainer', { appId: this.appId });
+    this.navigationService.navigate('PlatformAppContainer', {
+      appId: this.appId,
+      sourceId: this.source.sourceId,
+    });
     this.windowsService.closeChildWindow();
   }
 
@@ -48,5 +51,4 @@ export default class PlatformAppProperties extends Vue {
   get isUnpacked() {
     return this.app.unpacked;
   }
-
 }

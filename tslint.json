@@ -1,13 +1,15 @@
 {
-  "extends": "tslint-config-prettier",
+  "extends": ["tslint-config-airbnb", "tslint-config-prettier", "tslint-plugin-prettier"],
   "rules": {
-    "max-line-length": {
-      "options": [120]
-    },
-    "quotemark": [true, "single", "avoid-escape", "avoid-template"],
-    "curly": [true, "ignore-same-line"],
-    "no-consecutive-blank-lines": [true, 2]
-  },
-  "jsRules": {
+    "prettier": true,
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+    // We do imports where our files are suffixed .vue and this rule would expect we import as e.g. MainVue
+    "import-name": false,
+    // TODO: fix instances instead
+    "no-increment-decrement": false,
+    // This is no longer required on refactor/mutation-names branch TODO: remove
+    "function-name": false,
+    "no-boolean-literal-compare": false
   }
 }
+

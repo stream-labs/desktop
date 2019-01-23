@@ -9,10 +9,9 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { Multiselect }
+  components: { Multiselect },
 })
 export default class ObsImport extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
@@ -31,7 +30,7 @@ export default class ObsImport extends Vue {
   selectedProfile = this.profiles[0] || '';
 
   created() {
-    if (this.sceneCollections && (this.sceneCollections.length > 0)) return;
+    if (this.sceneCollections && this.sceneCollections.length > 0) return;
     this.startFresh();
   }
 
@@ -79,5 +78,4 @@ export default class ObsImport extends Vue {
   next() {
     this.onboardingService.next();
   }
-
 }

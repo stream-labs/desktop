@@ -6,6 +6,7 @@ import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 
@@ -16,6 +17,7 @@ export default class StartStreamingButton extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
   @Inject() mediaBackupService: MediaBackupService;
+  @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   @Prop() disabled: boolean;
 
@@ -30,13 +32,14 @@ export default class StartStreamingButton extends Vue {
             {
               title: $t('Cloud Backup'),
               type: 'warning',
-              message: $t('Your media files are currently being synced with the cloud. ') +
+              message:
+                $t('Your media files are currently being synced with the cloud. ') +
                 $t('It is recommended that you wait until this finishes before going live.'),
-              buttons: [$t('Wait'), $t('Go Live Anyway')]
+              buttons: [$t('Wait'), $t('Go Live Anyway')],
             },
             goLive => {
               resolve(!!goLive);
-            }
+            },
           );
         });
 
@@ -45,12 +48,13 @@ export default class StartStreamingButton extends Vue {
 
       if (
         this.userService.isLoggedIn() &&
-        this.customizationService.state.updateStreamInfoOnLive &&
-        (this.userService.platform.type === 'twitch' ||
-        this.userService.platform.type === 'mixer')
+        (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
+        if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
+          await this.videoEncodingOptimizationService.applyProfileFromCache();
+        }
         this.streamingService.toggleStreaming();
         if (this.userService.isLoggedIn()) {
           this.navigationService.navigate('Live');
@@ -99,10 +103,18 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.isStreaming;
   }
 
+  get isFacebook() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+  }
+
   get isDisabled() {
-    return this.disabled ||
-      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
-      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+    return (
+      this.disabled ||
+      (this.streamingStatus === EStreamingState.Starting &&
+        this.streamingService.delaySecondsRemaining === 0) ||
+      (this.streamingStatus === EStreamingState.Ending &&
+        this.streamingService.delaySecondsRemaining === 0)
+    );
   }
 
   @Watch('streamingStatus')

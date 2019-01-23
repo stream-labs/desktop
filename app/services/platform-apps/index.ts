@@ -1,11 +1,10 @@
-import { StatefulService } from 'services/stateful-service';
-import { mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions } from './api/modules/module';
+import { EApiPermissions, IWebviewTransform } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
@@ -13,9 +12,10 @@ import electron from 'electron';
 import { DevServer } from './dev-server';
 import url from 'url';
 import { HostsService } from 'services/hosts';
-import { handleErrors, authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { trim, compact } from 'lodash';
+import { compact, trim, without } from 'lodash';
+import uuid from 'uuid/v4';
 
 const DEV_PORT = 8081;
 
@@ -23,7 +23,7 @@ const DEV_PORT = 8081;
  * The type of source to create, for V1 only supports browser
  */
 enum EAppSourceType {
-  Browser = 'browser_source'
+  Browser = 'browser_source',
 }
 
 /**
@@ -37,7 +37,7 @@ interface IAppSourceAbout {
 
 enum ESourceSizeType {
   Absolute = 'absolute',
-  Relative = 'relative'
+  Relative = 'relative',
 }
 
 export interface IAppSource {
@@ -50,13 +50,13 @@ export interface IAppSource {
     type: ESourceSizeType;
     width: number;
     height: number;
-  },
+  };
   redirectPropertiesToTopNavSlot: boolean;
 }
 
 export enum EAppPageSlot {
   TopNav = 'top_nav',
-  Chat = 'chat'
+  Chat = 'chat',
 }
 
 interface IAppPage {
@@ -67,7 +67,7 @@ interface IAppPage {
   popOutSize?: {
     width: number;
     height: number;
-  }
+  };
 }
 
 interface IAppManifest {
@@ -98,6 +98,7 @@ export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
+  beta: boolean;
   appToken: string;
   poppedOutSlots: EAppPageSlot[];
   appPath?: string;
@@ -123,9 +124,7 @@ interface ISubscriptionResponse {
   expires_at: string;
 }
 
-export class PlatformAppsService extends
-  StatefulService<IPlatformAppServiceState> {
-
+export class PlatformAppsService extends StatefulService<IPlatformAppServiceState> {
   @Inject() windowsService: WindowsService;
   @Inject() guestApiService: GuestApiService;
   @Inject() videoService: VideoService;
@@ -135,18 +134,24 @@ export class PlatformAppsService extends
   static initialState: IPlatformAppServiceState = {
     devMode: false,
     loadedApps: [],
-    storeVisible: false
+    storeVisible: false,
   };
 
   appLoad = new Subject<ILoadedApp>();
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
-  private localStorageKey = 'PlatformAppsUnpacked';
+  private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
+  private disabledLocalStorageKey = 'PlatformAppsDisabled';
 
-  apiManager = new PlatformAppsApi();
+  // Lazy initialize the API
+  private _apiManager: PlatformAppsApi;
+  private get apiManager() {
+    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
+    return this._apiManager;
+  }
 
-  devServer: DevServer;
+  private devServer: DevServer;
 
   /**
    * Using initialize because it needs to be async
@@ -166,9 +171,8 @@ export class PlatformAppsService extends
     this.installProductionApps();
     this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
 
-    if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
-      const data = JSON.parse(localStorage.getItem(this.localStorageKey));
-
+    if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
+      const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
       if (data.appPath && data.appToken) {
         this.installUnpackedApp(data.appPath, data.appToken);
       }
@@ -180,34 +184,47 @@ export class PlatformAppsService extends
    */
   async fetchProductionApps(): Promise<IProductionAppResponse[]> {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(
-      `https://${this.hostsService.platform}/api/v1/sdk/installed_apps`,
-      { headers }
-    );
+    const request = new Request(`https://${this.hostsService.platform}/api/v1/sdk/installed_apps`, {
+      headers,
+    });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .catch(() => []);
+  }
+
+  getDisabledAppsFromStorage(): string[] {
+    const disabledAppsStr = localStorage.getItem(this.disabledLocalStorageKey);
+    return disabledAppsStr ? JSON.parse(disabledAppsStr) : [];
   }
 
   /**
    * Install production apps
    */
   async installProductionApps() {
+    if (this.userService.platform.type !== 'twitch') return;
+
     const productionApps = await this.fetchProductionApps();
+
+    const disabledApps = this.getDisabledAppsFromStorage();
+
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
-      const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
+
+      const unpackedVersionLoaded = this.state.loadedApps.find(
+        loadedApp => loadedApp.id === app.id_hash,
+      );
+
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
+        beta: app.is_beta,
         appUrl: app.cdn_url,
         appToken: app.app_token,
         poppedOutSlots: [],
         icon: app.icon,
-        enabled: !unpackedVersionLoaded
+        enabled: !(unpackedVersionLoaded || disabledApps.includes(app.id_hash)),
       });
     });
   }
@@ -216,14 +233,13 @@ export class PlatformAppsService extends
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/is_app_store_visible`,
-      { headers }
+      { headers },
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.is_app_store_visible)
-      .catch(() => false)
+      .catch(() => false);
   }
 
   /**
@@ -238,7 +254,7 @@ export class PlatformAppsService extends
 
     const manifestPath = path.join(appPath, 'manifest.json');
 
-    if (!await this.fileExists(manifestPath)) {
+    if (!(await this.fileExists(manifestPath))) {
       return 'Error: manifest.json is missing!';
     }
 
@@ -268,12 +284,13 @@ export class PlatformAppsService extends
     this.addApp({
       id,
       manifest,
-      unpacked: true,
       appPath,
       appToken,
+      unpacked: true,
+      beta: false,
       devPort: DEV_PORT,
       poppedOutSlots: [],
-      enabled: true
+      enabled: true,
     });
   }
 
@@ -287,15 +304,24 @@ export class PlatformAppsService extends
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked)) return;
+    if (
+      this.state.loadedApps.find(
+        loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked,
+      )
+    ) {
+      return;
+    }
 
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
-      localStorage.setItem(this.localStorageKey, JSON.stringify({
-        appPath: app.appPath,
-        appToken
-      }));
+      localStorage.setItem(
+        this.unpackedLocalStorageKey,
+        JSON.stringify({
+          appToken,
+          appPath: app.appPath,
+        }),
+      );
     }
     this.appLoad.next(this.getApp(id));
   }
@@ -307,7 +333,7 @@ export class PlatformAppsService extends
       'version',
       'permissions',
       'sources',
-      'pages'
+      'pages',
     ]);
 
     // Validate sources
@@ -319,20 +345,20 @@ export class PlatformAppsService extends
         'name',
         'id',
         'about',
-        'file'
+        'file',
       ]);
 
       // Validate about
-      this.validateObject(source.about, `manifest.sources[${i}].about`, [
-        'description'
-      ]);
+      this.validateObject(source.about, `manifest.sources[${i}].about`, ['description']);
 
       // Check for existence of file
       const filePath = this.getFilePath(appPath, manifest.buildPath, source.file, true);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
-        throw new Error(`Missing file: manifest.sources[${i}].file does not exist. Searching at path: ${filePath}`);
+        throw new Error(
+          `Missing file: manifest.sources[${i}].file does not exist. Searching at path: ${filePath}`,
+        );
       }
     }
 
@@ -343,14 +369,13 @@ export class PlatformAppsService extends
     for (let i = 0; i < manifest.pages.length; i++) {
       const page = manifest.pages[i];
 
-      this.validateObject(page, `manifest.pages[${i}]`, [
-        'slot',
-        'file'
-      ]);
+      this.validateObject(page, `manifest.pages[${i}]`, ['slot', 'file']);
 
       if (seenSlots[page.slot]) {
-        throw new Error(`Error: manifest.pages[${i}].slot "${page.slot}" ` +
-          'is already taken. There can only be 1 page per slot.');
+        throw new Error(
+          `Error: manifest.pages[${i}].slot "${page.slot}" ` +
+            'is already taken. There can only be 1 page per slot.',
+        );
       }
 
       seenSlots[page.slot] = true;
@@ -360,7 +385,9 @@ export class PlatformAppsService extends
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
-        throw new Error(`Missing file: manifest.pages[${i}].file does not exist. Searching at path: ${filePath}`);
+        throw new Error(
+          `Missing file: manifest.pages[${i}].file does not exist. Searching at path: ${filePath}`,
+        );
       }
     }
   }
@@ -387,22 +414,19 @@ export class PlatformAppsService extends
   }
 
   unloadApps() {
-    this.state.loadedApps.forEach(app => {
-      this.REMOVE_APP(app.id);
-      this.appUnload.next(app.id);
-    });
-    localStorage.removeItem(this.localStorageKey);
-    // TODO: navigate to live if on that topnav tab
-
-    if (this.devServer) {
-      this.devServer.stopListening();
-      this.devServer = null;
-    }
+    this.state.loadedApps.forEach(app => this.unloadApp(app));
   }
 
-  unloadApp(appId: string) {
-    this.REMOVE_APP(appId);
-    this.appUnload.next(appId);
+  unloadApp(app: ILoadedApp) {
+    this.REMOVE_APP(app.id);
+    if (app.unpacked) {
+      localStorage.removeItem(this.unpackedLocalStorageKey);
+      if (this.devServer) {
+        this.devServer.stopListening();
+        this.devServer = null;
+      }
+    }
+    this.appUnload.next(app.id);
   }
 
   async reloadApp(appId: string) {
@@ -414,8 +438,8 @@ export class PlatformAppsService extends
     }
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
-    if (!await this.fileExists(manifestPath)) {
-      this.unloadApp(appId);
+    if (!(await this.fileExists(manifestPath))) {
+      this.unloadApp(app);
       return 'Error: manifest.json is missing!';
     }
 
@@ -428,10 +452,7 @@ export class PlatformAppsService extends
       return e.message;
     }
 
-    this.UPDATE_APP_MANIFEST(
-      appId,
-      manifest
-    );
+    this.UPDATE_APP_MANIFEST(appId, manifest);
     this.appReload.next(appId);
   }
 
@@ -439,26 +460,23 @@ export class PlatformAppsService extends
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/app_id?app_token=${appToken}`,
-      { headers }
+      { headers },
     );
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.id_hash)
       .catch(() => null);
   }
 
   private getIsDevMode(): Promise<boolean> {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(
-      `https://${this.hostsService.platform}/api/v1/sdk/dev_mode`,
-      { headers }
-    );
+    const request = new Request(`https://${this.hostsService.platform}/api/v1/sdk/dev_mode`, {
+      headers,
+    });
 
     return fetch(request)
-      .then(handleErrors)
-      .then(res => res.json())
+      .then(handleResponse)
       .then(json => json.dev_mode)
       .catch(() => false);
   }
@@ -476,9 +494,21 @@ export class PlatformAppsService extends
     });
   }
 
-  exposeAppApi(appId: string, webContentsId: number) {
+  exposeAppApi(
+    appId: string,
+    webContentsId: number,
+    electronWindowId: number,
+    slobsWindowId: string,
+    transformSubjectId: string,
+  ) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app);
+    const api = this.apiManager.getApi(
+      app,
+      webContentsId,
+      electronWindowId,
+      slobsWindowId,
+      this.getTransformSubject(transformSubjectId),
+    );
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
@@ -493,7 +523,8 @@ export class PlatformAppsService extends
    */
   getAppPartition(appId: string) {
     const app = this.getApp(appId);
-    const partition = `persist:platformApp-${appId}`;
+    const userId = this.userService.platformId;
+    const partition = `platformApp-${appId}-${userId}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
@@ -505,7 +536,7 @@ export class PlatformAppsService extends
 
         if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
 
-        if ((parsed.hostname === 'cvp.twitch.tv') && (details.resourceType = 'script')) {
+        if (parsed.hostname === 'cvp.twitch.tv' && (details.resourceType = 'script')) {
           cb({});
           return;
         }
@@ -528,12 +559,24 @@ export class PlatformAppsService extends
         if (details.resourceType === 'script') {
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
-            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
+            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
+          ];
+
+          const scriptDomainWhitelist = [
+            'www.googletagmanager.com',
+            'www.google-analytics.com',
+            'widget.intercom.io',
+            'js.intercomcdn.com',
           ];
 
           const parsed = url.parse(details.url);
 
           if (scriptWhitelist.includes(details.url)) {
+            cb({});
+            return;
+          }
+
+          if (scriptDomainWhitelist.includes(parsed.hostname)) {
             cb({});
             return;
           }
@@ -553,9 +596,8 @@ export class PlatformAppsService extends
             cb({});
             return;
           }
+
           // Cancel all other script requests.
-          // TODO: Handle production apps
-          console.log('canceling', details);
           cb({ cancel: true });
           return;
         }
@@ -633,13 +675,14 @@ export class PlatformAppsService extends
       if (source.initialSize.type === ESourceSizeType.Absolute) {
         return {
           width: source.initialSize.width,
-          height: source.initialSize.height
-        }
+          height: source.initialSize.height,
+        };
+        // tslint:disable-next-line:no-else-after-return TODO
       } else if (source.initialSize.type === ESourceSizeType.Relative) {
         return {
           width: source.initialSize.width * this.videoService.baseWidth,
-          height: source.initialSize.height * this.videoService.baseHeight
-        }
+          height: source.initialSize.height * this.videoService.baseHeight,
+        };
       }
     }
 
@@ -653,8 +696,8 @@ export class PlatformAppsService extends
     if (page.popOutSize) {
       return {
         width: page.popOutSize.width,
-        height: page.popOutSize.height
-      }
+        height: page.popOutSize.height,
+      };
     }
 
     // Default to 600x500
@@ -665,11 +708,11 @@ export class PlatformAppsService extends
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  getApp(appId: string) : ILoadedApp {
+  getApp(appId: string): ILoadedApp {
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod
     // generally we want to do actions with enabled one first
-    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled === true);
+    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled);
     if (enabledApp) return enabledApp;
     return this.state.loadedApps.find(app => app.id === appId);
   }
@@ -682,18 +725,21 @@ export class PlatformAppsService extends
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
-    this.windowsService.createOneOffWindow({
-      componentName: 'PlatformAppPopOut',
-      queryParams: { appId, pageSlot },
-      title: app.manifest.name,
-      size: this.getPagePopOutSize(appId, pageSlot)
-    }, windowId);
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'PlatformAppPopOut',
+        queryParams: { appId, pageSlot },
+        title: app.manifest.name,
+        size: this.getPagePopOutSize(appId, pageSlot),
+      },
+      windowId,
+    );
 
     this.POP_OUT_SLOT(appId, pageSlot);
 
     const sub = this.windowsService.windowDestroyed.subscribe(winId => {
       if (winId === windowId) {
-        this.POP_IN_SLOT(appId, pageSlot)
+        this.POP_IN_SLOT(appId, pageSlot);
         sub.unsubscribe();
       }
     });
@@ -705,10 +751,42 @@ export class PlatformAppsService extends
 
     if (enabling) {
       this.appLoad.next(app);
+      localStorage.setItem(
+        this.disabledLocalStorageKey,
+        JSON.stringify(without(this.getDisabledAppsFromStorage(), app.id)),
+      );
     } else {
       this.appUnload.next(appId);
+      localStorage.setItem(
+        this.disabledLocalStorageKey,
+        JSON.stringify(this.getDisabledAppsFromStorage().concat([app.id])),
+      );
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
+  }
+
+  /* These functions exist primary to work around our n window
+   * system because rxjs subjects are not serializable
+   */
+
+  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
+
+  createTransformSubject(initial: IWebviewTransform) {
+    const id = uuid();
+    this.transformSubjects[id] = new BehaviorSubject(initial);
+    return id;
+  }
+
+  getTransformSubject(id: string) {
+    return this.transformSubjects[id];
+  }
+
+  removeTransformSubject(id: string) {
+    delete this.transformSubjects[id];
+  }
+
+  nextTransformSubject(id: string, value: IWebviewTransform) {
+    this.transformSubjects[id].next(value);
   }
 
   /**
@@ -756,7 +834,7 @@ export class PlatformAppsService extends
   }
 
   @mutation()
-  private POP_IN_SLOT(appId: string, slot:EAppPageSlot) {
+  private POP_IN_SLOT(appId: string, slot: EAppPageSlot) {
     this.state.loadedApps.forEach(app => {
       if (app.id === appId) {
         app.poppedOutSlots = app.poppedOutSlots.filter(s => s !== slot);

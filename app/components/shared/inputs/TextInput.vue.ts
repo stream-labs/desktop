@@ -4,19 +4,25 @@ import { ITextMetadata } from './index';
 
 @Component({})
 export default class TextInput extends BaseInput<string, ITextMetadata> {
-
   @Prop()
   readonly value: string;
 
-  @Prop({ default: {} })
+  @Prop({ default: () => ({}) })
   readonly metadata: ITextMetadata;
+
+  textVisible = !this.metadata.masked;
+
+  toggleVisible() {
+    this.textVisible = !this.textVisible;
+  }
 
   getValidations() {
     return {
       ...super.getValidations(),
-      date_format:  this.options.dateFormat,
+      date_format: this.options.dateFormat,
       max: this.options.max,
-      alpha_num: this.options.alphaNum
+      min: this.options.min,
+      alpha_num: this.options.alphaNum,
     };
   }
 }

@@ -6,12 +6,14 @@ import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
+import { NavigationService, TAppPage } from 'services/navigation';
 
 @Component({})
 export default class Dashboard extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
   @Inject() facemasksService: FacemasksService;
+  @Inject() navigationService: NavigationService;
   @Inject() i18nService: I18nService;
   @Prop() params: Dictionary<string>;
 
@@ -20,18 +22,19 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.$refs.dashboard.addEventListener('dom-ready', () => {
+    this.$refs.dashboard.addEventListener('did-finish-load', () => {
       this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
         testAudio: this.testAudio,
         getStatus: this.getStatus,
         getDevices: this.getDevices,
         enableMask: this.enableMask,
         updateSettings: this.updateSettings,
-        getDownloadProgress: this.getDownloadProgress
+        getDownloadProgress: this.getDownloadProgress,
+        navigate: this.navigate,
       });
     });
 
-    this.i18nService.setWebviewLocale(this.$refs.dashboard);
+    I18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
       electron.remote.shell.openExternal(e.url);
     });
@@ -70,6 +73,10 @@ export default class Dashboard extends Vue {
   }
 
   async testAudio(volume: number) {
-    return this.facemasksService.playTestAudio(volume);
+    return;
+  }
+
+  async navigate(page: TAppPage) {
+    this.navigationService.navigate(page);
   }
 }

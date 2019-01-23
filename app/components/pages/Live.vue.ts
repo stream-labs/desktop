@@ -19,8 +19,8 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     SceneSelector,
     Mixer,
     Display,
-    Slider
-  }
+    Slider,
+  },
 })
 export default class Live extends Vue {
   @Inject() userService: UserService;
@@ -36,7 +36,7 @@ export default class Live extends Vue {
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
   mounted() {
-    this.i18nService.setWebviewLocale(this.$refs.webview);
+    I18nService.setWebviewLocale(this.$refs.webview);
 
     this.$refs.webview.addEventListener('new-window', e => {
       const match = e.url.match(/dashboard\/([^\/^\?]*)/);
@@ -45,7 +45,7 @@ export default class Live extends Vue {
         this.popout();
       } else if (match) {
         this.navigationService.navigate('Dashboard', {
-          subPage: match[1]
+          subPage: match[1],
         });
       }
     });

@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
 import { StreamingService, EStreamingState, ERecordingState } from 'services/streaming';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { StreamInfoService } from 'services/stream-info';
 
 interface IOutputState {
@@ -18,7 +18,6 @@ interface IStreamInfo {
 }
 
 export class StreamingRecordingModule extends Module {
-
   moduleName = 'StreamingRecording';
   permissions = [EApiPermissions.Streaming];
 
@@ -56,12 +55,13 @@ export class StreamingRecordingModule extends Module {
 
   private serializeStreamInfo() {
     return {
-      title: this.streamInfoService.state.channelInfo ?
-        this.streamInfoService.state.channelInfo.title : null,
-      game: this.streamInfoService.state.channelInfo ?
-        this.streamInfoService.state.channelInfo.game : null,
-      viewerCount: this.streamInfoService.state.viewerCount
+      title: this.streamInfoService.state.channelInfo
+        ? this.streamInfoService.state.channelInfo.title
+        : null,
+      game: this.streamInfoService.state.channelInfo
+        ? this.streamInfoService.state.channelInfo.game
+        : null,
+      viewerCount: this.streamInfoService.state.viewerCount,
     };
   }
-
 }

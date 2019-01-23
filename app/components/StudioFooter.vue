@@ -23,10 +23,21 @@
         :disabled="locked"
         class="record-button"
         @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }"
-        v-tooltip.left="recordTooltip">
+        :class="{ active: streamingService.isRecording }">
         <span>REC</span>
       </button>
+    </div>
+    <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
+      <button class="button button--default" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
+    </div>
+    <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
+      <button class="button button--soft-warning" @click="toggleReplayBuffer">{{ $t('Stop') }}</button>
+      <button class="button button--default" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping">
+        {{ $t('Save Replay') }}
+      </button>
+    </div>
+    <div class="nav-item" v-if="canSchedule">
+      <button class="button button--default" @click="openScheduleStream" >{{ $t('Schedule Stream')}}</button>
     </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
@@ -38,7 +49,7 @@
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .footer {
   display: flex;
@@ -60,11 +71,6 @@
 
 .nav-item {
   .margin-left(2);
-
-  @media(max-width: 1200px) {
-    font-size: 12px;
-    margin-left: 12px;
-  }
 }
 
 .error-wrapper {
@@ -74,7 +80,7 @@
 }
 
 .platform-error {
-  background: rgba(251,72,76,.28);
+  background: rgba(251, 72, 76, 0.28);
   padding: 5px;
   .radius();
 
@@ -92,7 +98,7 @@
   .alert-button {
     height: 18px;
     line-height: 12px;
-    background: rgba(251,72,76,.36);
+    background: rgba(251, 72, 76, 0.36);
     margin: 0 5px;
     padding: 0 8px;
     font-size: 10px;
@@ -103,18 +109,15 @@
   position: relative;
   width: 30px;
   height: 30px;
-  background-color: #dcdfe2;
-  border: none;
+  background-color: @day-button;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .6;
   .transition();
   .weight(@bold);
-  border: 1px solid #c4c5c5;
   box-sizing: content-box;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
 
   span {
     font-size: 10px;
@@ -122,25 +125,46 @@
   }
 
   &:hover {
-    opacity: 1;
+    background-color: darken(@day-button, 8%);
   }
 
   &.active {
-    opacity: 1;
-    animation: pulse 2.5s infinite;
-    border: 1px solid @red;
+    animation: pulse 2.5s linear infinite;
+    background-color: @red;
+
+    span {
+      color: @white;
+    }
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
+    box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(0, 0, 0, 0);
+    box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0.6);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0);
+  }
+}
+
+.replay-button-group {
+  font-size: 0;
+
+  >button:nth-child(1) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  >button:nth-child(2) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 }
 
@@ -154,11 +178,15 @@
   }
 
   .record-button {
-    background-color: #3c4c53;
+    background-color: @night-button;
     border-color: @night-border;
 
+    &:hover {
+      background-color: lighten(@night-button, 8%);
+    }
+
     &.active {
-      border-color: @red;
+      background-color: @red;
     }
 
     &:focus {

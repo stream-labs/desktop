@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { StatefulService, mutation } from './stateful-service';
 import electron from 'electron';
@@ -19,13 +19,12 @@ const STATS_UPDATE_INTERVAL = 2 * 1000;
 
 // Keeps a store of up-to-date performance metrics
 export class PerformanceService extends StatefulService<IPerformanceState> {
-
   static initialState: IPerformanceState = {
     CPU: 0,
     numberDroppedFrames: 0,
     percentageDroppedFrames: 0,
     bandwidth: 0,
-    frameRate: 0
+    frameRate: 0,
   };
 
   droppedFramesDetected = new Subject<number>();
@@ -40,25 +39,30 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   init() {
     this.intervalId = window.setInterval(() => {
-      const stats: IPerformanceState =
-        obs.NodeObs.OBS_API_getPerformanceStatistics();
-      if (stats.percentageDroppedFrames) {
-        this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
-      }
-
-      const am = electron.remote.app.getAppMetrics();
-
-      stats.CPU += am.map(proc => {
-        return proc.cpu.percentCPUUsage;
-      }).reduce((sum, usage) => sum + usage);
-
-      this.SET_PERFORMANCE_STATS(stats);
+      electron.ipcRenderer.send('requestPerformanceStats');
     }, STATS_UPDATE_INTERVAL);
+
+    electron.ipcRenderer.on(
+      'performanceStatsResponse',
+      (e: electron.Event, am: electron.ProcessMetric[]) => {
+        const stats: IPerformanceState = obs.NodeObs.OBS_API_getPerformanceStatistics();
+        if (stats.percentageDroppedFrames) {
+          this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
+        }
+
+        stats.CPU += am
+          .map(proc => {
+            return proc.cpu.percentCPUUsage;
+          })
+          .reduce((sum, usage) => sum + usage);
+
+        this.SET_PERFORMANCE_STATS(stats);
+      },
+    );
   }
 
   stop() {
     clearInterval(this.intervalId);
     this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
-
 }

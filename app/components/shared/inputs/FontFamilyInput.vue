@@ -1,9 +1,9 @@
 <template>
-<div class="container">
+<div class="container" data-role="input" data-type="fontFamily" :data-name="options.name">
   <list-input
     :value="value"
     :metadata="listInputMetadata"
-    @input="value => emitInput(value)"
+    @input="(value, event) => emitInput(value, event)"
   />
 </div>
 </template>

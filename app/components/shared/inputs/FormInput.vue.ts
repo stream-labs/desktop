@@ -4,25 +4,23 @@ import { EInputType, IInputMetadata } from 'components/shared/inputs';
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 
-
 /**
  * Generic Form Input
  */
 @Component({
   components: {
     ...sharedInputComponents,
-    ...widgetInputComponents
-  }
+    ...widgetInputComponents,
+  },
 })
 export default class FormInput extends BaseInput<any, IInputMetadata> {
-
   @Prop()
   readonly type: EInputType;
 
   @Prop()
   readonly value: undefined;
 
-  @Prop()
+  @Prop({ default: () => ({}) })
   readonly metadata: IInputMetadata;
 
   @Prop()
@@ -33,6 +31,8 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
    */
   get componentName() {
     const type = this.options.type;
+
+    // tslint:disable-next-line:prefer-template
     return type.charAt(0).toUpperCase() + type.substr(1) + 'Input';
   }
 
@@ -43,5 +43,4 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
     options.title = this.title || options.title;
     return options;
   }
-
 }

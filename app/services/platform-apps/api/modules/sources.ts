@@ -1,7 +1,14 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
+import {
+  Module,
+  EApiPermissions,
+  apiMethod,
+  apiEvent,
+  NotImplementedError,
+  IApiContext,
+} from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
 import { AudioService } from 'services/audio';
@@ -24,12 +31,12 @@ interface ISource {
   flags: ISourceFlags;
   size: ISourceSize;
   appId?: string;
+  appSourceId?: string;
   muted?: boolean;
   volume?: number;
 }
 
 export class SourcesModule extends Module {
-
   moduleName = 'Sources';
   permissions = [EApiPermissions.ScenesSources];
 
@@ -47,7 +54,7 @@ export class SourcesModule extends Module {
     this.sourcesService.sourceUpdated.subscribe(sourceData => {
       const source = this.sourcesService.getSourceById(sourceData.sourceId);
       this.sourceUpdated.next(this.serializeSource(source));
-    })
+    });
     this.sourcesService.sourceRemoved.subscribe(sourceData => {
       this.sourceRemoved.next(sourceData.sourceId);
     });
@@ -73,6 +80,13 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
+  getSource(_ctx: IApiContext, id: string): ISource | null {
+    const source = this.sourcesService.getSource(id);
+
+    return source ? this.serializeSource(source) : null;
+  }
+
+  @apiMethod()
   getAppSources(ctx: IApiContext) {
     return this.getSources().filter(source => {
       return source.appId === ctx.app.id;
@@ -91,7 +105,7 @@ export class SourcesModule extends Module {
     const source = this.getAppSourceForApp(sourceId, ctx.app.id);
 
     source.setPropertiesManagerSettings({
-      appSettings: settings
+      appSettings: settings,
     });
   }
 
@@ -111,11 +125,7 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   createSource(ctx: IApiContext, name: string, type: TSourceType, settings: Dictionary<any> = {}) {
-    const source = this.sourcesService.createSource(
-      name,
-      type,
-      settings
-    );
+    const source = this.sourcesService.createSource(name, type, settings);
 
     return this.serializeSource(source);
   }
@@ -125,25 +135,17 @@ export class SourcesModule extends Module {
    */
   @apiMethod()
   createAppSource(ctx: IApiContext, name: string, appSourceId: string) {
-    const size = this.platformAppsService.getAppSourceSize(
-      ctx.app.id,
-      appSourceId
-    );
+    const size = this.platformAppsService.getAppSourceSize(ctx.app.id, appSourceId);
 
     // TODO: We support other app source types in the future
-    const source = this.sourcesService.createSource(
-      name,
-      'browser_source',
-      size,
-      {
-        propertiesManager: 'platformApp',
-        propertiesManagerSettings: {
-          appId: ctx.app.id,
-          appSourceId,
-          appSettings: {}
-        }
-      }
-    );
+    const source = this.sourcesService.createSource(name, 'browser_source', size, {
+      propertiesManager: 'platformApp',
+      propertiesManagerSettings: {
+        appSourceId,
+        appId: ctx.app.id,
+        appSettings: {},
+      },
+    });
 
     return this.serializeSource(source);
   }
@@ -155,7 +157,9 @@ export class SourcesModule extends Module {
 
     const source = this.sourcesService.getSource(patch.id);
 
-    if (patch.name) source.setName(patch.name);
+    if (patch.name) {
+      source.setName(patch.name);
+    }
 
     if (patch.muted != null) {
       this.audioService.getSource(patch.id).setMuted(patch.muted);
@@ -198,16 +202,18 @@ export class SourcesModule extends Module {
       flags: {
         audio: source.audio,
         video: source.video,
-        async: source.async
+        async: source.async,
       },
       size: {
         width: source.width,
-        height: source.height
-      }
+        height: source.height,
+      },
     };
 
     if (source.getPropertiesManagerType() === 'platformApp') {
-      serialized.appId = source.getPropertiesManagerSettings().appId;
+      const settings = source.getPropertiesManagerSettings();
+      serialized.appId = settings.appId;
+      serialized.appSourceId = settings.appSourceId;
     }
 
     if (source.audio) {
@@ -218,6 +224,4 @@ export class SourcesModule extends Module {
 
     return serialized;
   }
-
 }
-

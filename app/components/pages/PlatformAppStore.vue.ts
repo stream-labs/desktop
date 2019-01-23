@@ -17,23 +17,24 @@ export default class PlatformAppStore extends Vue {
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
 
+  @Prop() params: {
+    appId?: string;
+  };
+
   $refs: {
     appStoreWebview: Electron.WebviewTag;
   };
 
   mounted() {
-    this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
+    this.$refs.appStoreWebview.addEventListener('did-finish-load', () => {
       if (Utils.isDevMode()) {
         this.$refs.appStoreWebview.openDevTools();
       }
-      this.guestApiService.exposeApi(
-        this.$refs.appStoreWebview.getWebContents().id,
-        {
-          reloadProductionApps: this.reloadProductionApps,
-          openLinkInBrowser: this.openLinkInBrowser,
-          onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler
-        }
-      );
+      this.guestApiService.exposeApi(this.$refs.appStoreWebview.getWebContents().id, {
+        reloadProductionApps: this.reloadProductionApps,
+        openLinkInBrowser: this.openLinkInBrowser,
+        onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
+      });
     });
   }
 
@@ -54,6 +55,6 @@ export default class PlatformAppStore extends Vue {
   }
 
   get appStoreUrl() {
-    return this.userService.appStoreUrl();
+    return this.userService.appStoreUrl(this.params.appId);
   }
 }

@@ -1,8 +1,8 @@
 <template>
 <div
   class="live-dock"
-  :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize * 100) + '%' }">
+  :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
+  :style="{ width: (liveDockSize) + 'px' }">
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
@@ -12,6 +12,13 @@
       'icon-down icon-right': onLeft
     }" />
   </div>
+
+  <resize-bar
+    v-if="!collapsed"
+    :position="onLeft ? 'right' : 'left'"
+    @onresizestart="onResizeStartHandler"
+    @onresizestop="onResizeStopHandler"
+  />
 
   <transition name="slide-fade">
     <div
@@ -51,7 +58,7 @@
         <div class="live-dock-platform-tools">
           <a
             @click="showEditStreamInfo"
-            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
             v-tooltip="editStreamInfoTooltip">
             <i class="icon-edit" />
           </a>
@@ -81,20 +88,23 @@
               :metadata="chatAppsListMetadata"
             />
           </div>
-          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+            {{ $t('Refresh Chat') }}
+          </a>
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
-        <chat :style="chatStyles()" ref="chat" />
+      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+        <!-- v-if is required because left-side chat will not properly load on application startup -->
+        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
         <PlatformAppWebview
           v-for="app in chatApps"
           v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
-          :style="chatStyles(app.id)"
           :key="app.id"
           class="live-dock-platform-app-webview"
           :appId="app.id"
           :pageSlot="slot"
+          :visible="isAppVisible(app.id)"
         />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
@@ -110,15 +120,19 @@
 <script lang="ts" src="./LiveDock.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .live-dock {
   position: relative;
   z-index: 1000;
   width: 28%;
+  box-sizing: border-box;
   border-left: 1px solid @day-border;
   .padding(2);
-  .transition();
+
+  &.can-animate {
+    .transition();
+  }
 
   &.live-dock--left {
     border-right: 1px solid @day-border;
@@ -130,7 +144,7 @@
   }
 
   &.collapsed {
-    width: 20px!important;
+    width: 20px !important;
     padding: 0;
   }
 
@@ -152,7 +166,7 @@
   }
 
   i {
-    font-size: 6px;
+    font-size: 10px;
   }
 }
 
@@ -163,13 +177,9 @@
 .live-dock-header {
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
+  .margin-bottom();
   align-items: center;
   justify-content: space-between;
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
-  }
 }
 
 .live-dock-text {
@@ -186,16 +196,12 @@
 .live-dock-info {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  .margin-bottom();
 
   .live-dock-platform-tools {
     a {
       padding: 0 8px;
     }
-  }
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
   }
 }
 
@@ -275,7 +281,6 @@
 .live-dock-platform-app-webview {
   .flex--grow();
 }
-
 
 .night-theme {
   .live-dock {

@@ -7,16 +7,16 @@ import { WindowsService } from 'services/windows';
 
 @Component({
   components: {
-    ModalLayout
-  }
+    ModalLayout,
+  },
 })
 export default class FFZSettings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
 
   $refs: {
-    ffzSettings: Electron.WebviewTag
-  }
+    ffzSettings: Electron.WebviewTag;
+  };
 
   nightMode = false;
 
@@ -29,15 +29,20 @@ export default class FFZSettings extends Vue {
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);
 
-      webview.executeJavaScript(`
+      webview.executeJavaScript(
+        `
         var ffzscript1 = document.createElement('script');
         ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
         document.head.appendChild(ffzscript1);
-      `, true);
-    })
+      `,
+        true,
+      );
+    });
   }
 
   get popoutURL() {
-    return `https://www.twitch.tv/popout/frankerfacez/chat?ffz-settings${this.nightMode ? '&darkpopout' : ''}`
+    return `https://www.twitch.tv/popout/frankerfacez/chat?ffz-settings${
+      this.nightMode ? '&darkpopout' : ''
+    }`;
   }
 }

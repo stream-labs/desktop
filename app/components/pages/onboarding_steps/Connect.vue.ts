@@ -25,7 +25,7 @@ export default class Connect extends Vue {
       },
       () => {
         this.onboardingService.next();
-      }
+      },
     );
   }
 
@@ -35,7 +35,8 @@ export default class Connect extends Vue {
     return {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
-      mixer: 'fas fa-times'
+      mixer: 'fas fa-times',
+      facebook: 'fab fa-facebook',
     }[platform];
   }
 
@@ -50,5 +51,4 @@ export default class Connect extends Vue {
   contactSupport() {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
-
 }

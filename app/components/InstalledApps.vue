@@ -3,9 +3,9 @@
     <table>
       <thead>
         <tr>
-          <th> {{ $t('icon') }} </th>
-          <th> {{ $t('name')}} </th>
-          <th> {{ $t('vers')}} </th>
+          <th> {{ $t('Icon') }} </th>
+          <th> {{ $t('Name')}} </th>
+          <th> {{ $t('Vers')}} </th>
           <th></th>
         </tr>
       </thead>
@@ -17,15 +17,16 @@
           <td> <img :src="app.icon" alt="-" width='50'> </td>
           <td> {{ app.manifest.name }} </td>
           <td> {{ app.manifest.version }} </td>
-          <td>
+          <td class="button-container button-container--right">
             <button
               v-if="isEnabled(app.id)"
               @click="reload(app.id)"
-              class="button button--action">Reload</button>
+              class="button button--trans"><i class="icon-reset"></i>{{ $t('Reload') }}</button>
             <button
               v-if="noUnpackedVersionLoaded(app.id)"
               @click="toggleEnable(app)"
-              class="button button--default">
+              class="button"
+              :class="{ 'button--soft-warning': isEnabled(app.id), 'button--default': !isEnabled(app.id) }">
               {{ isEnabled(app.id) ? 'Disable' : 'Enable' }}
             </button>
             <div v-else>
@@ -51,5 +52,11 @@
 <style lang="less" scoped>
 table td:last-child {
   text-align: right;
+}
+
+.button-container {
+  .button {
+    margin-right: 0;
+  }
 }
 </style>
