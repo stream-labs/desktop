@@ -3,11 +3,11 @@
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
-    :options="multiselectOptions"
+    :options="options.options"
     track-by="value"
     :close-on-select="true"
     :placeholder="placeholder"
-    label="description"
+    label="title"
     :allow-empty="options.allowEmpty"
     :internal-search="options.internalSearch"
     :loading="options.loading"
@@ -17,7 +17,7 @@
     @search-change="onSearchChange"
   >
     <template slot="option" slot-scope="props">
-      <span :data-option-value="props.option.value">{{ props.option.description }}</span>
+      <span :data-option-value="props.option.value">{{ props.option.title }}</span>
     </template>
 
     <template v-if="options.noResult" slot="noResult">
