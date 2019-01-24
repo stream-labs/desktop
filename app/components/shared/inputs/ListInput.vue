@@ -12,6 +12,7 @@
     :internal-search="options.internalSearch"
     :loading="options.loading"
     :disabled="options.disabled"
+    :allow-custom="options.allowCustom"
     @input="onInputHandler"
     @search-change="onSearchChange"
   >

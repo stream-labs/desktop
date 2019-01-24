@@ -1,9 +1,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
-import { Multiselect } from 'vue-multiselect';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { ListInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { Multiselect },
+  components: { HFormGroup, ListInput },
 })
 class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   static obsType: TObsType;
@@ -17,8 +18,8 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop({ default: false })
   allowEmpty: boolean;
 
-  onInputHandler(option: IObsListOption<string>) {
-    this.emitInput({ ...this.value, value: option.value });
+  onInputHandler(value: string) {
+    this.emitInput({ ...this.value, value });
   }
 
   onSearchChange(value: string) {
@@ -39,6 +40,16 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
     }
 
     return this.value.options[0];
+  }
+
+  get metadata() {
+    return {
+      disabled: this.value.enabled === false,
+      options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
+      allowEmpty: this.allowEmpty,
+      placeholder: this.placeholder,
+      allowCustom: this.getCustomResolution,
+    };
   }
 
   getCustomResolution(search: string) {
