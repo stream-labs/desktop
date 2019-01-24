@@ -59,8 +59,6 @@ export class ScalableRectangle extends Rect implements IScalableRectangle {
     };
 
     this.rotation = options.rotation || 0;
-
-    // this.anchor = AnchorPoint.NorthWest;
     this.origin = v2(AnchorPositions[AnchorPoint.NorthWest]);
   }
 

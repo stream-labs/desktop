@@ -547,11 +547,19 @@ export class Selection implements ISelection {
     this.getItems().forEach(item => item.resetTransform());
   }
 
+  /**
+   * Scale items.
+   * Origin is the center point of scaling relative to the bounding-box of the selection
+   * Where origin = [0, 0] - is top-left corner and [1, 1] is the bottom right corner of the selection
+   */
   scale(scale: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
     const originPos = this.getBoundingRect().getOffsetFromOrigin(origin);
     this.getItems().forEach(item => item.scaleWithOffset(scale, originPos));
   }
 
+  /**
+   * same as .scale() but use absolute `offset` point instead of a relative `origin` point
+   */
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
   }

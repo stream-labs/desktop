@@ -16,15 +16,6 @@ export class Rect implements IRectangle {
     this.height = options.height;
   }
 
-  getModel(): IRectangle {
-    return {
-      x: this.x,
-      y: this.y,
-      height: this.height,
-      width: this.width,
-    };
-  }
-
   getAspectRatio() {
     return this.width / this.height;
   }
