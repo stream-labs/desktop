@@ -290,7 +290,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
     });
     try {
-      fetch(request);
+      fetch(request).then(() => this.updatePlatformChannelId(pageId));
     } catch {
       console.error(new Error('Could not set Facebook page'));
     }
