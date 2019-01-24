@@ -37,7 +37,7 @@
   .radius();
   .padding();
   text-align: center;
-  background-color: @info-light;
+  background-color: rgba(202, 157, 0, 0.08);
   color: @info-dark;
 
   .icon-close {
@@ -62,11 +62,13 @@
   .label--beta {
     background-color: #ca9d00;
     .radius();
+    font-weight: 500;
   }
 
   .redirect-link {
     text-decoration: underline;
     .cursor--pointer;
+    font-weight:500;
   }
 }
 </style>
