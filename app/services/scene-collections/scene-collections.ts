@@ -828,8 +828,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       const filtered = files.filter(file => {
         if (file.match(/\.bak$/)) return false;
         const name = file.replace(/\.[^/.]+$/, '');
-        if (!name) return false;
-        return true;
+        return !!name;
       });
 
       for (const file of filtered) {

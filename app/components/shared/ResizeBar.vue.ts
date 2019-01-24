@@ -41,7 +41,7 @@ export default class ResizeBar extends Vue {
     this.$root.$el.addEventListener('mousemove', mouseMoveListener);
     this.$root.$el.addEventListener(
       'mouseup',
-      event => {
+      (event: MouseEvent) => {
         this.$root.$el.removeEventListener('mousemove', mouseMoveListener);
         this.stopMouseTracking(event);
       },

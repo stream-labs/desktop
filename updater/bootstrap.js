@@ -124,7 +124,7 @@ async function checkChance(info, version) {
 
     log.info(`You rolled ${roll}`);
 
-    return (roll <= chance);
+    return roll <= chance;
 }
 
 /* Note that latest-updater.exe never changes
@@ -291,16 +291,34 @@ async function entry(info) {
         updaterArgs.push(statusWindow.webContents.getOSProcessId().toString());
     }
 
+    const updaterStartCommand = `start \"\"  \"${updaterPath}\" `
+
     log.info(updaterArgs);
 
-    cp.spawn(`${updaterPath}`, updaterArgs, {
+    const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
         cwd: info.tempDir,
-        detached: true,
-        stdio: 'ignore',
+        detached: false,
         shell: true
     });
 
-    return true;
+    log.info('updater process ' + `pid ${update_spawned.pid}`);
+
+    //make promises for app exit , error , data and some timeout
+    const primiseExit = new Promise(resolve => {
+        update_spawned.on('exit', resolve);
+    });
+
+    const primiseError = new Promise(resolve => {
+        update_spawned.on('error', resolve);
+    });
+
+    //wait for something to happen
+    const promise = await Promise.race([primiseError, primiseExit]);
+    log.info('Updater spawn promise ' + `result \"${promise}\"`);
+
+    update_spawned.unref();
+
+    return `${promise}` === "0";
 }
 
 module.exports = async (info) => {

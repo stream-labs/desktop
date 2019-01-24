@@ -1,28 +1,28 @@
 <template>
-<div class="input-container">
-  <div class="input-label">
-    <label>{{ value.description }}</label>
+<h-form-group :title="value.description">
+  <div class="path-input__row">
+    <text-input :value="value.value" @input="handleChange" />
+    <button @click="showFileDialog" class="button button--default">
+      {{ $t('Browse') }}
+    </button>
   </div>
-  <div class="input-wrapper">
-    <div class="flex">
-      <input
-        type="text"
-        ref="input"
-        :value="value.value"
-        class="path__input"
-        @change="handleChange">
-      <button
-        @click="showFileDialog"
-        class="path__browse-button button button--default">
-        {{ $t('Browse') }}
-      </button>
-    </div>
-  </div>
-</div>
+</h-form-group>
 </template>
 
 <script lang="ts" src="./ObsPathInput.vue.ts"></script>
 
 <style lang="less" scoped>
+  .path-input__row {
+    display: flex;
+    flex-wrap: nowrap;
 
+    > span {
+      flex-wrap: nowrap;
+      width: 100%;
+    }
+
+    button {
+      margin-left: 12px;
+    }
+  }
 </style>

@@ -56,7 +56,7 @@ const WHITE_LIST = [
   'hu-HU',
   'it-IT',
   'ja-JP',
-  'Ko-KR',
+  'ko-KR',
   'pl-PL',
   'pt-PT',
   'pt-BR',

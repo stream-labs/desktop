@@ -12,10 +12,20 @@ export interface IGuestApiRequest {
   args: any[];
 }
 
+/**
+ * Describes how to treat the contents of the result field
+ * on an IGuestApiResponse.
+ */
+export enum EResponseResultProcessing {
+  None = 'none',
+  File = 'file',
+}
+
 export interface IGuestApiResponse {
   id: string;
   error: boolean;
   result: any;
+  resultProcessing: EResponseResultProcessing;
 }
 
 export interface IGuestApiCallback {
@@ -34,6 +44,15 @@ type RequestHandlerEndpoint = RequestHandlerMethod | RequestHandlerObservable;
  */
 export interface IRequestHandler {
   [key: string]: RequestHandlerEndpoint | IRequestHandler;
+}
+
+/**
+ * Guest API functions that need to return a `File` object to
+ * the remote guest can return an instance of this wrapper
+ * containing the file path instead.
+ */
+export class FileReturnWrapper {
+  constructor(public filePath: string) {}
 }
 
 /**
@@ -113,6 +132,7 @@ export class GuestApiService extends Service {
           id: request.id,
           error: true,
           result: `Error: The function ${request.methodPath.join('.')} does not exist!`,
+          resultProcessing: EResponseResultProcessing.None,
         };
         this.safeSend(contents, 'guestApiResponse', response);
         return;
@@ -123,11 +143,23 @@ export class GuestApiService extends Service {
       } else {
         endpoint(...mappedArgs)
           .then(result => {
-            const response: IGuestApiResponse = {
-              result,
-              id: request.id,
-              error: false,
-            };
+            let response: IGuestApiResponse;
+
+            if (result instanceof FileReturnWrapper) {
+              response = {
+                result: result.filePath,
+                resultProcessing: EResponseResultProcessing.File,
+                id: request.id,
+                error: false,
+              };
+            } else {
+              response = {
+                result,
+                resultProcessing: EResponseResultProcessing.None,
+                id: request.id,
+                error: false,
+              };
+            }
 
             this.safeSend(contents, 'guestApiResponse', response);
           })
@@ -136,6 +168,7 @@ export class GuestApiService extends Service {
 
             const response: IGuestApiResponse = {
               result,
+              resultProcessing: EResponseResultProcessing.None,
               id: request.id,
               error: true,
             };

@@ -1,6 +1,8 @@
 // Helper methods for making HTTP requests
-
+import request from 'request';
 import fs from 'fs';
+import crypto from 'crypto';
+import humps from 'humps';
 
 /**
  * Passing this function as your first "then" handler when making
@@ -13,6 +15,23 @@ export const handleResponse = (response: Response): Promise<any> => {
   if (response.ok) return response.json();
   return response.json().then(json => Promise.reject(json));
 };
+
+export const handleErrors = (response: Response): Promise<any> => {
+  if (response.ok) return Promise.resolve(response);
+  return response.json().then(json => Promise.reject(json));
+};
+
+/**
+ * transforms response keys to lowerCamelCase
+ * helps to keep consistent code style in the project
+ */
+export function camelize(response: Response): Promise<any> {
+  return new Promise(resolve => {
+    return response.json().then(json => {
+      resolve(humps.camelizeKeys(json));
+    });
+  });
+}
 
 export function requiresToken() {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -44,6 +63,7 @@ export function authorizedHeaders(token: string, headers = new Headers()): Heade
   return headers;
 }
 
+// DEPRECATED: this is synchronous and also complex
 export async function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     return fetch(srcUrl)
@@ -65,6 +85,16 @@ export async function downloadFile(srcUrl: string, dstPath: string): Promise<voi
   });
 }
 
+export async function downloadFileAlt(srcUrl: string, dstPath: string) {
+  return new Promise((resolve, reject) => {
+    const writer = fs.createWriteStream(dstPath);
+    request.get(srcUrl).pipe(writer);
+
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+}
+
 function concatUint8Arrays(a: Uint8Array, b: Uint8Array) {
   const c = new Uint8Array(a.length + b.length);
   c.set(a, 0);
@@ -73,3 +103,14 @@ function concatUint8Arrays(a: Uint8Array, b: Uint8Array) {
 }
 
 export const isUrl = (x: string): boolean => !!x.match(/^https?:/);
+
+export function getChecksum(filePath: string) {
+  return new Promise<string>((resolve, reject) => {
+    const file = fs.createReadStream(filePath);
+    const hash = crypto.createHash('md5');
+
+    file.on('data', data => hash.update(data));
+    file.on('end', () => resolve(hash.digest('hex')));
+    file.on('error', e => reject(e));
+  });
+}

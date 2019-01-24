@@ -12,7 +12,7 @@ import { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from 
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
 import { CustomizationService } from './services/customization';
-import { HostsService } from './services/hosts';
+import { HostsService, UrlService } from './services/hosts';
 import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
@@ -21,8 +21,8 @@ import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
 import { PersistentStatefulService } from './services/persistent-stateful-service';
-import { SettingsService } from './services/settings';
-import { Source, SourcesService } from './services/sources';
+import { SettingsService, StreamEncoderSettingsService } from './services/settings';
+import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
 import { WidgetSource, WidgetsService, WidgetTester } from './services/widgets';
@@ -99,7 +99,7 @@ import { MediaShareService } from 'services/widgets/settings/media-share';
 import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 import { AlertBoxService } from 'services/widgets/settings/alert-box';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
-import { Rect } from './util/rect';
+import { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 
 const { ipcRenderer } = electron;
 
@@ -125,6 +125,7 @@ export class ServicesManager extends Service {
     AudioSource,
     CustomizationService,
     HostsService,
+    UrlService,
     HotkeysService,
     Hotkey,
     KeyListenerService,
@@ -135,6 +136,7 @@ export class ServicesManager extends Service {
     PerformanceMonitorService,
     PersistentStatefulService,
     SettingsService,
+    StreamEncoderSettingsService,
     SourceFiltersService,
     SourcesService,
     Source,
@@ -169,7 +171,6 @@ export class ServicesManager extends Service {
     JsonrpcService,
     SelectionService,
     Selection,
-    Rect,
     FileManagerService,
     PatchNotesService,
     ProtocolLinksService,
@@ -206,6 +207,7 @@ export class ServicesManager extends Service {
     HardwareService,
     PrefabsService,
     Prefab,
+    PlatformAppAssetsService,
   };
 
   private instances: Dictionary<Service> = {};

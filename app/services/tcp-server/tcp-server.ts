@@ -463,6 +463,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
+    if (this.isRequestsHandlingStopped) return;
+
     this.log('send response', response);
 
     // unhandled exceptions completely destroy Rx.Observable subscription

@@ -19,76 +19,52 @@
         <a class="description-link" @click="openFBPageCreateLink">{{ $t('Facebook Page Creation') }}</a>
         {{ $t(' to create a page, and then try again.') }}
       </div>
-      <ObsListInput
+      <h-form-group
         v-if="isFacebook && hasPages && !midStreamMode"
         :value="pageModel"
         @input="(pageId) => setFacebookPageId(pageId)"
+        :metadata="{ type: 'list', name: 'stream_page', title: $t('Facebook Page'), options: pageOptions }"
       />
-      <ObsTextInput v-model="streamTitleModel" />
-      <ObsTextInput  v-if="isYoutube || isFacebook" v-model="streamDescriptionModel" />
-      <ObsListInput
+      <h-form-group v-model="streamTitleModel" :metadata="{ type: 'text', name: 'stream_title', title: $t('Title'), fullWidth: true }" />
+      <h-form-group
+        v-if="isYoutube || isFacebook"
+        v-model="streamDescriptionModel"
+        :metadata="{ type: 'text-area', name: 'stream_description', title: $t('Description'), rows: 4 }"
+      />
+      <h-form-group
         v-if="isTwitch || isMixer || isFacebook"
-        :value="gameModel"
-        :allowEmpty="true"
-        placeholder="Search"
-        :internal-search="false"
-        :loading="searchingGames"
-        @search-change="debouncedGameSearch"
-        @input="onGameInput"/>
+        :title="$t('Game')"
+        name="stream_game"
+      >
+        <list-input
+          @search-change="debouncedGameSearch"
+          @input="onGameInput"
+          :value="gameModel"
+          :metadata="gameMetadata"
+        />
+      </h-form-group>
+      <h-form-group v-if="searchProfilesPending">
+        {{ $t('Checking optimized setting for') }} {{ gameModel }}...
+      </h-form-group>
       <div v-if="isSchedule">
         <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
         <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
       </div>
-      <div v-if="areAvailableProfiles">
-        <div class="input-container" v-if="isTwitch || isYoutube">
-          <div class="input-label"/>
-          <div class="input-wrapper">
-            <div class="checkbox">
-              <div v-if="!isGenericProfiles">
-                <input
-                  type="checkbox"
-                  v-model="useOptimizedProfile"
-                />
-                <label><span>Use {{gameModel.value}} encoder settings</span></label>
-              </div>
-              <div v-else>
-                <input
-                  type="checkbox"
-                  v-model="useOptimizedProfile"
-                />
-                <label><span>{{ $t('Use optimized encoder settings') }}</span>
-                  <span>
-                    <i class="tooltip-trigger fa fa-question-circle has-tooltip"
-                      style="font-size:15px;whitespace: nowrap;"
-                      :title="$t('Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends')">
-                    </i>
-                  </span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="input-container select" v-show="useOptimizedProfile">
-          <div class="input-label">
-            <label>Profile</label>
-          </div>
-          <div class="input-wrapper">
-            <multiselect
-              :allowEmpty="false"
-              :options="profiles"
-              track-by="value"
-              :close-on-select="true"
-              label="description"
-              v-model="encoderProfile">
-              <template slot="option" slot-scope="props">
-                <div class="edit-stream-info-option-desc">{{ props.option.description }}</div>
-                <div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>
-              </template>
-            </multiselect>
-          </div>
-        </div>
+      <div v-if="selectedProfile">
+        <h-form-group
+          v-if="isTwitch || isYoutube"
+          :metadata="{ tooltip: $t('Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience') }"
+        >
+          <bool-input v-model="useOptimizedProfile" :metadata="optimizedProfileMetadata" />
+        </h-form-group>
       </div>
-      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode && !isFacebook"/>
+      <h-form-group v-if="!midStreamMode && !isFacebook">
+        <bool-input
+          v-model="doNotShowAgainModel"
+          name='do_not_show_again'
+          :metadata="{ title: $t('Do not show this message when going live') }"
+        />
+      </h-form-group>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}

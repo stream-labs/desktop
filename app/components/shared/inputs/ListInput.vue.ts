@@ -47,6 +47,7 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     });
 
     if (option) return option;
+    if (!!this.getOptions().allowEmpty) return null;
     return options[0];
   }
 
@@ -58,5 +59,9 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
 
   get selectedOption(): IListOption<string> {
     return this.options.options.find(option => option.value === this.value);
+  }
+
+  onSearchChange(value: string) {
+    this.$emit('search-change', value);
   }
 }

@@ -151,11 +151,7 @@ export class SelectionService extends StatefulService<ISelectionState>
       .getObsScene()
       .getItems()
       .forEach(obsSceneItem => {
-        if (activeObsIds.includes(obsSceneItem.id)) {
-          obsSceneItem.selected = true;
-        } else {
-          obsSceneItem.selected = false;
-        }
+        obsSceneItem.selected = activeObsIds.includes(obsSceneItem.id);
       });
 
     this.updated.next(this.state);

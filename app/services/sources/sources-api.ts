@@ -106,7 +106,7 @@ export type TSourceType =
   | 'ovrstream_dc_source';
 
 // Register new properties managers here
-export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp';
+export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;

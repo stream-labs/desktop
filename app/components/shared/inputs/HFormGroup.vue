@@ -1,8 +1,8 @@
 <template>
-  <div class="row">
-    <div class="input-label">
+  <div class="row alignable-input">
+    <label class="input-label">
       {{ options.title }}
-    </div>
+    </label>
     <div class="input-body">
       <div class="input-container input-container--no-margin">
         <form-input
@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="input-footer">
+      <div class="input-footer" v-if="options.description || inputErrors.length">
         <div class="whisper" v-if="options.description && !inputErrors.length">
           {{ options.description }}
         </div>

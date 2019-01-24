@@ -50,6 +50,9 @@ export interface ITimerMetadata extends INumberMetadata {
 export interface IListMetadata<TValueType> extends IInputMetadata {
   options: IListOption<TValueType>[];
   allowEmpty?: boolean;
+  loading?: boolean;
+  internalSearch?: boolean;
+  noResult?: string;
 }
 
 export interface ITextMetadata extends IInputMetadata {
@@ -58,14 +61,17 @@ export interface ITextMetadata extends IInputMetadata {
   min?: number;
   dateFormat?: string;
   alphaNum?: boolean;
+  masked?: boolean;
+  fullWidth?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
   interval?: number;
   usePercentages?: boolean;
   hasValueBox?: boolean;
+  data?: string[];
 }
 
 export interface IListOption<TValue> {

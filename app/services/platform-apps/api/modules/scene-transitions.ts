@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 import { getType } from 'mime';
 import { apiMethod, EApiPermissions, IApiContext, Module } from './module';
 import {
@@ -8,6 +8,7 @@ import {
 } from 'services/transitions';
 import { Inject } from 'util/injector';
 import { PlatformAppsService } from '../../index';
+import { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 
 type AudioFadeStyle = 'fadeOut' | 'crossFade';
 
@@ -81,9 +82,11 @@ export class SceneTransitionsModule extends Module {
 
   permissions = [EApiPermissions.SceneTransitions];
 
-  @Inject() transitionsService: TransitionsService;
+  @Inject() private transitionsService: TransitionsService;
 
-  @Inject() platformAppsService: PlatformAppsService;
+  @Inject() private platformAppsService: PlatformAppsService;
+
+  @Inject() private platformAppAssetsService: PlatformAppAssetsService;
 
   /**
    * Create a scene transition
@@ -101,10 +104,15 @@ export class SceneTransitionsModule extends Module {
   async createTransition(ctx: IApiContext, options: TransitionOptions): Promise<ITransition> {
     if (options.type === 'stinger') {
       const appId = ctx.app.id;
-      const { url } = options;
+      const { url: originalUrl } = options;
 
-      if (!this.isVideo(url)) {
+      if (!this.isVideo(originalUrl)) {
         throw new Error('Invalid file specified, you must provide a video file.');
+      }
+
+      if (!this.platformAppAssetsService.hasAsset(appId, originalUrl)) {
+        // TODO: avoid mutation
+        options.url = await this.platformAppAssetsService.addPlatformAppAsset(appId, originalUrl);
       }
 
       const { shouldLock = false, name, ...settings } = options;
@@ -114,11 +122,21 @@ export class SceneTransitionsModule extends Module {
         ...settings,
       } as TransitionOptions);
 
-      return this.transitionsService.createTransition(
+      const transition = this.transitionsService.createTransition(
         ETransitionType.Stinger,
         name,
         transitionOptions,
       );
+
+      this.platformAppAssetsService.linkAsset(
+        appId,
+        options.url,
+        originalUrl,
+        'transition',
+        transition.id,
+      );
+
+      return transition;
     }
 
     throw new Error('Not Implemented');
@@ -206,12 +224,23 @@ export class SceneTransitionsModule extends Module {
   }
 
   /**
+   * Get a list of the currently active transition connections
+   *
+   * @param _ctx API context
+   */
+  @apiMethod()
+  async getConnections(_ctx: IApiContext): Promise<ITransitionConnection[]> {
+    return this.transitionsService.state.connections;
+  }
+
+  /**
    * Delete a scene transition connection
    *
    * @param _ctx API Context
    * @param connectionId ID of the connection to be deleted
    * @return `true` if the connection was successfully deleted
    */
+  @apiMethod()
   async deleteConnection(_ctx: IApiContext, connectionId: string): Promise<boolean> {
     this.transitionsService.deleteConnection(connectionId);
     return true;
@@ -260,7 +289,7 @@ export class SceneTransitionsModule extends Module {
       },
       settings: {
         ...settings,
-        path: this.platformAppsService.getAssetUrl(appId, options.url),
+        path: options.url,
       },
     };
   }
