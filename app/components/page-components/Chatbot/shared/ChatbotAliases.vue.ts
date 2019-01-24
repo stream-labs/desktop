@@ -46,7 +46,7 @@ export default class ChatbotAliases extends ChatbotBase {
 
   formatAlias(value: string) {
     if (!value.startsWith('!')) {
-      return `'!${value.replace(/\s/g, '')}`;
+      return `!${value.replace(/\s/g, '')}`;
     }
     return value.replace(/\s/g, '');
   }

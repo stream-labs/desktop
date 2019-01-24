@@ -1,19 +1,36 @@
 <template>
-<div v-if="modBannerVisible" class="mod-chat-banner flex flex--space-between">
-  <div>
-    <i class="icon-information" />
-    <span>
-      Don't forget to mod streamlabs chatbot by typing <span class="mod-chat-banner__code-highlight">/mod streamlabs</span> in your chat.
-    </span>
+  <div v-if="modBannerVisible" class="mod-chat-banner flex flex--space-between">
+    <div v-if="isYoutube">
+      <i class="icon-information"/>
+      Don't forget to mod Streamlabs by going to your
+      <span
+        class="redirect-link"
+        @click="openCommunitySettings()"
+      >Youtube Community Settings</span>
+      and adding
+      <span
+        style="text-transform:none;margin:0px 8px;"
+        class="label label--left label--beta"
+      >https://www.youtube.com/channel/UCNL8jaJ9hId96P13QmQXNtA</span>
+      as a moderator.
+    </div>
+    <div v-else>
+      <i class="icon-information"/>
+      <span>
+        Don't forget to mod Streamlabs by typing
+        <span
+          class="mod-chat-banner__code-highlight"
+        >/mod streamlabs</span> in your chat.
+      </span>
+    </div>
+    <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
   </div>
-  <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
-</div>
 </template>
 
 <script lang='ts' src="./ChatbotBanner.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../../styles/index";
+@import '../../../../styles/index';
 .mod-chat-banner {
   .margin();
   display: flex;
@@ -41,6 +58,15 @@
     background-color: @yellow-med-opac;
     user-select: all;
   }
-}
 
+  .label--beta {
+    background-color: #ca9d00;
+    .radius();
+  }
+
+  .redirect-link {
+    text-decoration: underline;
+    .cursor--pointer;
+  }
+}
 </style>

@@ -111,7 +111,7 @@
           />
           <VFormGroup
             v-if="defaultCommandToUpdate.music_response"
-            :title="$t('Banned Response')"
+            :title="$t('Music Response')"
             v-model="editedCommand.music_response"
             :metadata="metadata.music_response"
           />
