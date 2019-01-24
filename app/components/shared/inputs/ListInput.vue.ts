@@ -46,6 +46,12 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
       return this.value === opt.value;
     });
 
+    if (this.value && this.options.allowCustom) {
+      const option = { value: this.value, title: this.value } as IListOption<string>;
+      this.options.options.push(option);
+      return option;
+    }
+
     if (option) return option;
     if (!!this.getOptions().allowEmpty) return null;
     return options[0];

@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
+import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { ListInput } from 'components/shared/inputs/inputs';
 
@@ -24,22 +24,6 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
 
   onSearchChange(value: string) {
     this.$emit('search-change', value);
-  }
-
-  get currentValue() {
-    let option = this.value.options.find((opt: IObsListOption<string>) => {
-      return this.value.value === opt.value;
-    });
-
-    if (option) return option;
-
-    if (this.value.value) {
-      option = { value: this.value.value, description: this.value.value } as IObsListOption<string>;
-      this.value.options.push(option);
-      return option;
-    }
-
-    return this.value.options[0];
   }
 
   get metadata() {
