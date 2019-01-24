@@ -30,7 +30,7 @@
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
     "commit": "commit",
-    "postinstall": "del .\\node_modules\\obs-studio-node\\obs-plugins\\64bit\\facemask-plugin* && rmdir /s /Q .\\node_modules\\obs-studio-node\\data\\obs-plugins\\facemask-plugin && move .\\node_modules\\facemask-plugin\\slobs\\RelWithDebInfo\\obs-plugins\\* .\\node_modules\\obs-studio-node\\obs-plugins\\64bit && move .\\node_modules\\facemask-plugin\\slobs\\RelWithDebInfo\\data\\obs-plugins\\facemask-plugin .\\node_modules\\obs-studio-node\\data\\obs-plugins && rmdir /s /Q .\\node_modules\\facemask-plugin"
+    "postinstall": "scripts/facemask-plugin-move.bat"
   },
   "prettier": {
     "singleQuote": true,
@@ -103,7 +103,7 @@
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.89-iojs-v2.0.8.tar.gz",
-    "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.7.6.tar.gz",
+    "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.7.6(8).tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
