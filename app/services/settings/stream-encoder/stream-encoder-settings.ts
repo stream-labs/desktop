@@ -115,16 +115,18 @@ export class StreamEncoderSettingsService extends Service {
 
     if (encoder === 'amd') {
       // The settings for AMD also have a Preset field but it's not what we need
-      preset =
-        this.settingsService.findValidListValue(output, 'Streaming', 'QualityPreset') ||
-        this.settingsService.findValidListValue(output, 'Streaming', 'AMDPreset');
+      preset = [
+        this.settingsService.findValidListValue(output, 'Streaming', 'QualityPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'AMDPreset'),
+      ].find(item => item !== void 0);
     } else {
-      preset =
-        this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
-        this.settingsService.findValidListValue(output, 'Streaming', 'Preset') ||
-        this.settingsService.findValidListValue(output, 'Streaming', 'NVENCPreset') ||
-        this.settingsService.findValidListValue(output, 'Streaming', 'QSVPreset') ||
-        this.settingsService.findValidListValue(output, 'Streaming', 'target_usage');
+      preset = [
+        this.settingsService.findValidListValue(output, 'Streaming', 'preset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'Preset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'NVENCPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'QSVPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'target_usage'),
+      ].find(item => item !== void 0);
     }
 
     const bitrate: number =
