@@ -94,7 +94,7 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseDblClick(event: MouseEvent) {
-    const overSource = this.getOverSource(event)
+    const overSource = this.getOverSource(event);
 
     if (!overSource) return;
 
