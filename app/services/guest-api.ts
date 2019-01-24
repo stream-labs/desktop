@@ -85,15 +85,19 @@ export class GuestApiService extends Service {
    * @param requestHandler an object with the API you want to expose
    */
   exposeApi(webContentsId: number, requestHandler: IRequestHandler) {
+    const webContents = electron.remote.webContents.fromId(webContentsId);
+
     // Do not expose an API twice for the same webview
-    if (this.handlers[webContentsId]) return;
+    if (this.handlers[webContentsId]) {
+      webContents.send('guestApiReady');
+      return;
+    }
 
     // Tracks rxjs subscriptions for this webview so they can be unsubscribed
     let subscriptions: Subscription[] = [];
 
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
-    const webContents = electron.remote.webContents.fromId(webContentsId);
     webContents.on('destroyed', () => {
       delete this.handlers[webContentsId];
 
