@@ -15,7 +15,7 @@ export class DevServer {
         cleanUrls: false,
         headers: [
           {
-            source: '*',
+            source: '**',
             headers: [
               {
                 key: 'Cache-Control',
