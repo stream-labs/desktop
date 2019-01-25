@@ -28,6 +28,7 @@ export { SourceFiltersService } from './services/source-filters';
 export { CacheUploaderService } from './services/cache-uploader';
 export { TcpServerService } from './services/tcp-server';
 export { IpcServerService } from './services/ipc-server';
+export { JsonrpcService } from './services/jsonrpc';
 export { DismissablesService } from 'services/dismissables';
 export { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 export { SceneCollectionsService } from 'services/scene-collections';
