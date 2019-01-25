@@ -153,6 +153,9 @@ export class StreamEncoderSettingsService extends Service {
     };
   }
 
+  /**
+   * This method helps to simplify tuning the encoder's settings
+   */
   setSettings(settingsPatch: Partial<IStreamEncoderSettings>) {
     if (settingsPatch.mode) {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
@@ -200,6 +203,14 @@ export class StreamEncoderSettingsService extends Service {
 
     if (settingsPatch.rescaleOutput !== void 0) {
       this.settingsService.setSettingValue('Output', 'Rescale', settingsPatch.rescaleOutput);
+    }
+
+    if (settingsPatch.bitrate !== void 0) {
+      if (currentSettings.mode === 'Advanced') {
+        this.settingsService.setSettingValue('Output', 'bitrate', settingsPatch.bitrate);
+      } else {
+        this.settingsService.setSettingValue('Output', 'VBitrate', settingsPatch.bitrate);
+      }
     }
   }
 }
