@@ -20,7 +20,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   interval: number;
   isFullyMounted = false;
 
-  localValue = this.value;
+  localValue = this.value || 0;
 
   $refs: { slider: any };
 

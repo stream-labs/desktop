@@ -85,15 +85,19 @@ export class GuestApiService extends Service {
    * @param requestHandler an object with the API you want to expose
    */
   exposeApi(webContentsId: number, requestHandler: IRequestHandler) {
+    const webContents = electron.remote.webContents.fromId(webContentsId);
+
     // Do not expose an API twice for the same webview
-    if (this.handlers[webContentsId]) return;
+    if (this.handlers[webContentsId]) {
+      this.safeSend(webContents, 'guestApiReady');
+      return;
+    }
 
     // Tracks rxjs subscriptions for this webview so they can be unsubscribed
     let subscriptions: Subscription[] = [];
 
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
-    const webContents = electron.remote.webContents.fromId(webContentsId);
     webContents.on('destroyed', () => {
       delete this.handlers[webContentsId];
 
@@ -104,84 +108,117 @@ export class GuestApiService extends Service {
     });
 
     this.handlers[webContentsId] = (request: IGuestApiRequest) => {
-      const contents = electron.remote.webContents.fromId(webContentsId);
-
-      const mappedArgs = request.args.map(arg => {
-        const isCallbackPlaceholder = typeof arg === 'object' && arg && arg.__guestApiCallback;
-
-        if (isCallbackPlaceholder) {
-          return (...args: any[]) => {
-            const callbackObj: IGuestApiCallback = {
-              args,
-              requestId: request.id,
-              callbackId: arg.id,
-            };
-
-            this.safeSend(contents, 'guestApiCallback', callbackObj);
-          };
-        }
-
-        return arg;
-      });
-
+      const mappedArgs = this.getMappedArgs(request, webContents);
       const endpoint = this.getEndpointFromPath(requestHandler, request.methodPath);
 
       if (!endpoint) {
         // The path requested does not exist
-        const response: IGuestApiResponse = {
-          id: request.id,
-          error: true,
-          result: `Error: The function ${request.methodPath.join('.')} does not exist!`,
-          resultProcessing: EResponseResultProcessing.None,
-        };
-        this.safeSend(contents, 'guestApiResponse', response);
+        this.handleMissingEndpoint(request, webContents);
         return;
       }
 
       if (endpoint instanceof Observable) {
         subscriptions.push(endpoint.subscribe(mappedArgs[0]));
       } else {
-        endpoint(...mappedArgs)
-          .then(result => {
-            let response: IGuestApiResponse;
-
-            if (result instanceof FileReturnWrapper) {
-              response = {
-                result: result.filePath,
-                resultProcessing: EResponseResultProcessing.File,
-                id: request.id,
-                error: false,
-              };
-            } else {
-              response = {
-                result,
-                resultProcessing: EResponseResultProcessing.None,
-                id: request.id,
-                error: false,
-              };
-            }
-
-            this.safeSend(contents, 'guestApiResponse', response);
-          })
-          .catch(rawResult => {
-            const result = rawResult instanceof Error ? rawResult.message : rawResult;
-
-            const response: IGuestApiResponse = {
-              result,
-              resultProcessing: EResponseResultProcessing.None,
-              id: request.id,
-              error: true,
-            };
-
-            this.safeSend(contents, 'guestApiResponse', response);
-          });
+        this.callEndpointMethod(endpoint, mappedArgs, request, webContents);
       }
     };
 
-    webContents.send('guestApiReady');
+    this.safeSend(webContents, 'guestApiReady');
   }
 
-  private safeSend(contents: Electron.WebContents, channel: string, msg: any) {
+  /**
+   * Extracts mapped args from a request.  Placeholders for callbacks
+   * will be replaced with actual functions.
+   * @param request the request object
+   * @param contents the calling webcontents
+   */
+  private getMappedArgs(request: IGuestApiRequest, contents: electron.WebContents): any[] {
+    return request.args.map(arg => {
+      const isCallbackPlaceholder = typeof arg === 'object' && arg && arg.__guestApiCallback;
+
+      if (isCallbackPlaceholder) {
+        return (...args: any[]) => {
+          const callbackObj: IGuestApiCallback = {
+            args,
+            requestId: request.id,
+            callbackId: arg.id,
+          };
+
+          this.safeSend(contents, 'guestApiCallback', callbackObj);
+        };
+      }
+
+      return arg;
+    });
+  }
+
+  /**
+   * Sends a message stating that the requested endpoint does not exist
+   * @param request the request object
+   * @param contents the calling webcontents
+   */
+  private handleMissingEndpoint(request: IGuestApiRequest, contents: electron.WebContents) {
+    const response: IGuestApiResponse = {
+      id: request.id,
+      error: true,
+      result: `Error: The function ${request.methodPath.join('.')} does not exist!`,
+      resultProcessing: EResponseResultProcessing.None,
+    };
+    this.safeSend(contents, 'guestApiResponse', response);
+  }
+
+  /**
+   * Call an endpoint method, and handle proxying the response
+   * back to the calling webcontents.
+   * @param method The endpoint method to call
+   * @param args The args to call with
+   * @param request The request object
+   * @param contents The calling webcontents
+   */
+  private callEndpointMethod(
+    method: RequestHandlerMethod,
+    args: any[],
+    request: IGuestApiRequest,
+    contents: electron.webContents,
+  ) {
+    method(...args)
+      .then(result => {
+        let response: IGuestApiResponse;
+
+        if (result instanceof FileReturnWrapper) {
+          response = {
+            result: result.filePath,
+            resultProcessing: EResponseResultProcessing.File,
+            id: request.id,
+            error: false,
+          };
+        } else {
+          response = {
+            result,
+            resultProcessing: EResponseResultProcessing.None,
+            id: request.id,
+            error: false,
+          };
+        }
+
+        this.safeSend(contents, 'guestApiResponse', response);
+      })
+      .catch(rawResult => {
+        const result = rawResult instanceof Error ? rawResult.message : rawResult;
+
+        const response: IGuestApiResponse = {
+          result,
+          resultProcessing: EResponseResultProcessing.None,
+          id: request.id,
+          error: true,
+        };
+
+        this.safeSend(contents, 'guestApiResponse', response);
+      });
+  }
+
+  private safeSend(contents: Electron.WebContents, channel: string, msg?: any) {
     if (contents && !contents.isDestroyed()) {
       contents.send(channel, msg);
     }
