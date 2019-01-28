@@ -13,7 +13,7 @@ export default class ObsFontSizeSelector extends ObsInput<number> {
   }
 
   get metadata() {
-    return { data: this.fontSizePresets, piecewise: true, piecewiseLabel: true };
+    return { data: this.fontSizePresets, piecewise: true, piecewiseLabel: true, max: 288, min: 9 };
   }
 
   get fontSizePresets() {

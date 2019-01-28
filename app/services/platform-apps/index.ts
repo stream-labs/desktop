@@ -202,8 +202,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    * Install production apps
    */
   async installProductionApps() {
-    if (this.userService.platform.type !== 'twitch') return;
-
     const productionApps = await this.fetchProductionApps();
 
     const disabledApps = this.getDisabledAppsFromStorage();

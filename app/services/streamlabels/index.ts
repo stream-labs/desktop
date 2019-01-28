@@ -216,7 +216,7 @@ export class StreamlabelsService extends Service {
       .then(() => true);
   }
 
-  restartSession(): Promise<Boolean> {
+  restartSession(): Promise<boolean> {
     if (!this.userService.isLoggedIn()) return;
 
     const url = `https://${

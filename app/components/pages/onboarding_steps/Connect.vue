@@ -8,7 +8,7 @@
         {{ $t('We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can') }}
         <a @click="contactSupport">$t('contact support.')</a>
       </div>
-      <div class="onboarding-desc" v-else>{{ $t('Sign in with your Twitch or Youtube account to get started with Streamlabs') }}</div>
+      <div class="onboarding-desc" v-else>{{ $t('Sign in with your streaming account to get started with Streamlabs') }}</div>
       <div class="signup-buttons">
         <button
           class="button button--twitch"

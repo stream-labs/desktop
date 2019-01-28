@@ -25,12 +25,14 @@
           :key="`${audioSource.name}${formInput.name}`"
           :class="'column-' + formInput.name"
         >
-          <component
-              v-if="propertyComponentForType(formInput.type)"
-              :is="propertyComponentForType(formInput.type)"
-              :value="formInput"
-              @input="value => onInputHandler(audioSource, formInput.name, value.value)"
-          />
+          <div class="advanced-audio-input">
+            <component
+                v-if="propertyComponentForType(formInput.type)"
+                :is="propertyComponentForType(formInput.type)"
+                :value="formInput"
+                @input="value => onInputHandler(audioSource, formInput.name, value.value)"
+            />
+          </div>
         </td>
       </tr>
 
@@ -55,6 +57,15 @@ tr {
     &:nth-child(1) {
       white-space: nowrap;
     }
+  }
+}
+
+.advanced-audio-input {
+  .alignable-input {
+    margin-bottom: 0;
+  }
+  .alignable-input /deep/ .input-body {
+    width: 100%;
   }
 }
 </style>

@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="input-footer">
+      <div class="input-footer" v-if="options.description || inputErrors.length">
         <div class="whisper" v-if="options.description && !inputErrors.length">
           {{ options.description }}
         </div>
