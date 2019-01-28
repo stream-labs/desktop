@@ -117,7 +117,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     fontObj.path = '';
 
     // Apply current values for parameters that were not passed
-    if (fontObj.face === void 0) fontObj.face = this.$refs.font.value.family;
+    if (fontObj.face === void 0) fontObj.face = this.value.value.face;
     if (fontObj.size === void 0) fontObj.size = this.value.value.size;
     if (fontObj.flags === void 0) fontObj.flags = this.getFlagsFromFont(this.$refs.font.value);
 
