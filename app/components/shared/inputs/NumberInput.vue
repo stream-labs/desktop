@@ -2,13 +2,22 @@
   <span class="number-input" data-role="input" data-type="number" :data-name="options.name">
     <input
         type="text"
+        ref="input"
         :placeholder="options.placeholder"
         :value="value"
-        @input="emitInput($event.target.value)"
+        @input="handleInput($event.target.value)"
+        @mousewheel="onMouseWheelHandler"
         :name="uuid"
         v-validate="validate"
     />
-
+    <div v-if="options.isInteger" class="arrows" @mousewheel="onMouseWheelHandler">
+      <div class="arrow arrow-up" @click="increment">
+        <i class="fa fa-chevron-up"></i>
+      </div>
+      <div class="arrow arrow-down" @click="decrement">
+        <i class="fa fa-chevron-down"></i>
+      </div>
+    </div>
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}
     </span>
@@ -18,12 +27,49 @@
 <script lang="ts" src="./NumberInput.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../../styles/index";
+
   .number-input {
     position: relative;
+    display: block;
 
     .input-error {
       position: absolute;
       white-space: nowrap;
+    }
+
+    .arrows {
+      .absolute(0, 8px, 0, auto);
+      width: 30px;
+      color: @grey;
+      opacity: .7;
+      cursor: pointer;
+      .transition();
+
+      &:hover {
+        opacity: 1;
+      }
+
+      .arrow {
+        display: flex !important;
+
+        .fa {
+          position: relative;
+          font-size: 9px;
+        }
+
+        &:active {
+          color: black;
+        }
+
+        &.arrow-up {
+          .absolute(6px, 0px, auto, auto);
+        }
+
+        &.arrow-down {
+          .absolute(auto, 0px, 6px, auto);
+        }
+      }
     }
   }
 </style>
