@@ -1,6 +1,7 @@
 <template>
 <h-form-group>
   <div class="row">
+    <label v-if="value.showDescription !== false">{{ value.description }}</label>
     <bool-input
       v-for="(flag, index) in flags"
       :key="index"
