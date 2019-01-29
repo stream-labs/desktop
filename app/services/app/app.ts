@@ -166,13 +166,13 @@ export class AppService extends StatefulService<IAppState> {
 
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
-      obs.NodeObs.StopCrashHandler();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
+      obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();
       this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
