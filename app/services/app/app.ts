@@ -158,7 +158,6 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
-    obs.NodeObs.StopCrashHandler();
 
     this.crashReporterService.beginShutdown();
 
@@ -167,6 +166,7 @@ export class AppService extends StatefulService<IAppState> {
 
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
+      obs.NodeObs.StopCrashHandler();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
