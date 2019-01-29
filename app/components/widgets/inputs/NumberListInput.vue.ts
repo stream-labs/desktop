@@ -11,7 +11,8 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
 
   @Prop() readonly title: string;
 
-  @Prop({ default: 'Select Option' }) readonly placeholder: string;
+  @Prop({ default: 'Select Option' })
+  readonly placeholder: string;
 
   onInputHandler(option: IListOption<number>) {
     if (option) {
