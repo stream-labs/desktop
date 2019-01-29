@@ -23,10 +23,8 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   emitInput(value: string) {
     let formattedValue = value;
     if (isNaN(Number(formattedValue))) formattedValue = '0';
-    if (formattedValue !== value) {
-      this.$refs.input.value = formattedValue;
-    }
-    super.emitInput(formattedValue);
+    if (formattedValue !== value) this.$refs.input.value = formattedValue;
+    super.emitInput(Number(formattedValue));
   }
 
   updateValue(value: string, force = false) {

@@ -23,13 +23,13 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
     };
   }
 
-  updateValue(value: string) {
-    let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
-    if (this.value.type === 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
-      formattedValue = '0';
+  updateValue(value: number) {
+    let formattedValue = value;
+    if (this.value.type === 'OBS_PROPERTY_UINT' && formattedValue < 0) {
+      formattedValue = 0;
     }
 
-    this.emitInput({ ...this.value, value: Number(formattedValue) });
+    this.emitInput({ ...this.value, value: formattedValue });
   }
 }
 

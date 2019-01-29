@@ -5,7 +5,10 @@
     v-model="typeModel"
     :metadata="{ title: $t('Type'), type: 'list', name: 'type', options: typeOptions }"
   />
-  <ObsIntInput v-model="durationModel"/>
+  <v-form-group
+    v-model="durationModel"
+    :metadata="{ type: 'number', isInteger: true, title: $t('Duration'), name: 'duration' }"
+  />
 
   <GenericForm v-model="properties" @input="saveProperties"></GenericForm>
 </div>
