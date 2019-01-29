@@ -8011,9 +8011,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.90-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.91-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.90-iojs-v2.0.8.tar.gz#584729445e50694d677e2bb60c89d3aca25492ec"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.91-iojs-v2.0.8.tar.gz#bbf27a6a0e94df3e9e636c87836a25590f52a381"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -11544,6 +11544,21 @@ uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
 
+v-dropdown@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/v-dropdown/-/v-dropdown-1.0.7.tgz#ce1efb9f53ecd6180959189d66136d1490113e30"
+  integrity sha512-clX2Dt3WX8dQrd4UBTUWRJAj02FozVKLyLbB4cvKziZ2/Urxk1P48/mE0C26LXFSMROR0BCQOEVchsP+hFX6/w==
+  dependencies:
+    vue "^2.5.21"
+
+v-selectpage@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/v-selectpage/-/v-selectpage-2.0.2.tgz#f96dfba050d57cc958b674030d5185f4d96c9a15"
+  integrity sha512-8dAKJjEDc1k3aj6fYF8vDjDqgJrneeQ3CDHe5ux1ZOrRMko212GG4sKd5BvFpvS2p4nKgk3Gn9o7dX6esUMzzA==
+  dependencies:
+    v-dropdown "^1.0.7"
+    vue "^2.5.11"
+
 v-tooltip@2.0.0-rc.31:
   version "2.0.0-rc.31"
   resolved "https://registry.yarnpkg.com/v-tooltip/-/v-tooltip-2.0.0-rc.31.tgz#be3b1ed847e8309518d41dc9915b3bfdff0c0482"
@@ -11749,6 +11764,11 @@ vue@2.5.21:
   version "2.5.21"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.21.tgz#3d33dcd03bb813912ce894a8303ab553699c4a85"
   integrity sha512-Aejvyyfhn0zjVeLvXd70h4hrE4zZDx1wfZqia6ekkobLmUZ+vNFQer53B4fu0EjWBSiqApxPejzkO1Znt3joxQ==
+
+vue@^2.5.11, vue@^2.5.21:
+  version "2.5.22"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.22.tgz#3bf88041af08b8539c37b268b70ca79245e9cc30"
+  integrity sha512-pxY3ZHlXNJMFQbkjEgGVMaMMkSV1ONpz+4qB55kZuJzyJOhn6MSy/YZdzhdnumegNzVTL/Dn3Pp4UrVBYt1j/g==
 
 vuedraggable@2.8.5:
   version "2.8.5"
