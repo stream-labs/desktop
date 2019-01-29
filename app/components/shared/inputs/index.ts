@@ -41,6 +41,7 @@ export interface INumberMetadata extends IInputMetadata {
   min?: number;
   max?: number;
   placeholder?: string;
+  isInteger?: boolean;
 }
 
 export interface ITimerMetadata extends INumberMetadata {
