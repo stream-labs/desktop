@@ -55,6 +55,7 @@
     "icon": "media/images/icon.ico",
     "files": [
       "bundles",
+      "!bundles/*.js.map",
       "node_modules",
       "vendor",
       "app/i18n",
