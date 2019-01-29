@@ -27,6 +27,7 @@ import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
+import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -52,6 +53,14 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
+/**
+ * Streaming context that's passed if we need to use in an after hook
+ */
+export interface StreamingContext {
+  twitchTags?: TTwitchTagWithLabel[];
+  allTwitchTags?: TTwitchTag[];
+}
+
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
@@ -74,6 +83,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
+
+  private context: StreamingContext = null;
 
   static initialState = {
     streamingStatus: EStreamingState.Offline,
@@ -105,15 +116,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * @deprecated Use toggleStreaming instead
    */
-  startStreaming() {
-    this.toggleStreaming();
+  startStreaming(ctx?: StreamingContext) {
+    this.toggleStreaming(ctx);
   }
 
   /**
    * @deprecated Use toggleStreaming instead
    */
-  stopStreaming() {
-    this.toggleStreaming();
+  stopStreaming(ctx?: StreamingContext) {
+    this.toggleStreaming(ctx);
   }
 
   private finishStartStreaming() {
@@ -140,7 +151,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  toggleStreaming() {
+  toggleStreaming(ctx?: StreamingContext) {
+    this.context = ctx;
+
     if (this.state.streamingStatus === EStreamingState.Offline) {
       if (this.userService.isLoggedIn && this.userService.platform) {
         const service = getPlatformService(this.userService.platform.type);
@@ -243,7 +256,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       queryParams: {},
       size: {
         width: 600,
-        height: 400,
+        height: 550,
       },
     });
   }
@@ -340,6 +353,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.runPlatformAfterGoLiveHook();
 
         let streamEncoderInfo: Partial<IStreamEncoderSettings> = {};
         let game: string = null;
@@ -457,5 +471,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
     this.state.replayBufferStatus = status;
     if (time) this.state.replayBufferStatusTime = time;
+  }
+
+  private runPlatformAfterGoLiveHook() {
+    if (this.userService.isLoggedIn && this.userService.platform) {
+      const service = getPlatformService(this.userService.platform.type);
+      if (typeof service.afterGoLive === 'function') {
+        service.afterGoLive(this.context);
+      }
+    }
   }
 }

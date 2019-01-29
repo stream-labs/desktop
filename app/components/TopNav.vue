@@ -135,6 +135,8 @@
 
 <style lang="less" scoped>
 @import '../styles/index';
+@import '../styles/badges';
+
 .top-nav {
   display: flex;
   flex-direction: row;
@@ -231,24 +233,6 @@
   left: -2px;
 }
 
-.badge {
-  .radius();
-  font-size: 12px;
-  margin: 0 0 0 8px;
-  padding: 0 4px;
-  text-transform: capitalize;
-  vertical-align: text-bottom;
-  border: 1px solid transparent;
-  line-height: 16px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.badge--new {
-  background: @purple-semi;
-  color: @purple;
-}
-
 .night-theme {
   .top-nav {
     background-color: @night-primary;
@@ -283,11 +267,6 @@
 
   .theme-toggle__icon--sun {
     display: none;
-  }
-
-  .badge--new {
-    background: @purple;
-    color: @white;
   }
 }
 </style>
