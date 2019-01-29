@@ -185,6 +185,7 @@
     "typescript": "3.2.1",
     "unzip-stream": "0.3.0",
     "urijs": "1.19.1",
+    "v-selectpage": "^2.0.2",
     "v-tooltip": "2.0.0-rc.31",
     "vee-validate": "2.1.0-beta.6",
     "vue": "2.5.21",
