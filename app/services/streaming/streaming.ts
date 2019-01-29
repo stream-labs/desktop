@@ -26,6 +26,7 @@ import { UserService } from 'services/user';
 import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
+import { NavigationService } from 'services/navigation';
 import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 
 enum EOBSOutputType {
@@ -71,6 +72,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() userService: UserService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() private navigationService: NavigationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -129,6 +131,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
     const confirmText = 'Are you sure you want to start streaming?';
     if (shouldConfirm && !confirm(confirmText)) return;
+
+    if (this.userService.isLoggedIn()) this.navigationService.navigate('Live');
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
 
