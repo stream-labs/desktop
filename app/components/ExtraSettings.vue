@@ -26,7 +26,7 @@
   <div class="section">
     <div class="section-content">
       <bool-input
-        v-if="!isFacebook"
+        v-if="isLoggedIn && !isFacebook"
         v-model="streamInfoUpdate"
         name="stream_info_udpate"
         :metadata="{ title: $t('Confirm stream title and game before going live') }"
