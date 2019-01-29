@@ -111,7 +111,8 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   // Values that are left blank will be filled with
   // the currently selected value.
   setFont(args: IObsFont) {
-    // if (args.size === this.value.value.size) return;
+    // Stops slider component from eagerly setting value on component load
+    if (args.size === this.value.value.size) return;
     const fontObj = { ...args };
 
     // If we want to properly apply a system font, path must be null
