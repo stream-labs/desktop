@@ -28,7 +28,7 @@
       </button>
     </div>
     <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
-      <button class="button button--default" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
+      <button class="button button--default replay-button" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
     </div>
     <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
       <button class="button button--soft-warning" @click="toggleReplayBuffer">{{ $t('Stop') }}</button>
@@ -154,8 +154,17 @@
   }
 }
 
+.replay-button {
+  font-size: 12px;
+}
+
 .replay-button-group {
   font-size: 0;
+  white-space: nowrap;
+
+  >button {
+    font-size: 12px;
+  }
 
   >button:nth-child(1) {
     border-top-right-radius: 0;

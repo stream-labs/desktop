@@ -1,6 +1,5 @@
 import {
   IStreamEncoderSettings,
-  QUALITY_ORDER,
   SettingsService,
   StreamEncoderSettingsService,
 } from 'services/settings';
@@ -145,6 +144,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       encoderOptions: encoderProfile.options,
       preset: encoderProfile.presetOut,
       rescaleOutput: false, // prevent using the rescaled resolution from encoder settings
+      bitrate: currentSettings.bitrate,
     };
 
     if (!currentSettings.hasCustomResolution) {

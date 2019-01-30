@@ -332,6 +332,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   setFacebookPageId(value: string) {
+    this.pageModel = value;
     this.userService.postFacebookPage(value);
   }
 

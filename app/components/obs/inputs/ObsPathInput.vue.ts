@@ -2,17 +2,14 @@ import { Component, Prop } from 'vue-property-decorator';
 import { IObsPathInputValue, TObsType, ObsInput } from './ObsInput';
 import electron from 'electron';
 import OpenDialogOptions = Electron.OpenDialogOptions;
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { TextInput } from 'components/shared/inputs/inputs';
 
-@Component
+@Component({ components: { HFormGroup, TextInput } })
 class ObsPathInput extends ObsInput<IObsPathInputValue> {
   static obsType: TObsType[];
 
-  @Prop()
-  value: IObsPathInputValue;
-
-  $refs: {
-    input: HTMLInputElement;
-  };
+  @Prop() value: IObsPathInputValue;
 
   showFileDialog() {
     const options: OpenDialogOptions = {
@@ -32,13 +29,12 @@ class ObsPathInput extends ObsInput<IObsPathInputValue> {
     const paths = electron.remote.dialog.showOpenDialog(options);
 
     if (paths) {
-      this.$refs.input.value = paths[0];
-      this.handleChange();
+      this.handleChange(paths[0]);
     }
   }
 
-  handleChange() {
-    this.emitInput({ ...this.value, value: this.$refs.input.value });
+  handleChange(value: string) {
+    this.emitInput({ ...this.value, value });
   }
 }
 

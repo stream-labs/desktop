@@ -5,6 +5,7 @@
 
     <h-scroll
       @change="(model) => scrollModel = model"
+      ref="scroll"
       class="apps-tab__container"
     >
       <span
@@ -28,11 +29,11 @@
     </h-scroll>
 
 
-    <div class="left" v-if="scrollModel.canScrollLeft" >
+    <div class="left" v-if="scrollModel.canScrollLeft" @click="scrollLeft" >
       <i class="icon-down icon-left"></i>
     </div>
 
-    <div class="right" v-if="scrollModel.canScrollRight">
+    <div class="right" v-if="scrollModel.canScrollRight" @click="scrollRight">
       <i class="icon-down icon-right"></i>
     </div>
 

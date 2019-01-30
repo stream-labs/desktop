@@ -149,7 +149,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     if (
       this.state.streamingStatus === EStreamingState.Starting ||
-      this.state.streamingStatus === EStreamingState.Live
+      this.state.streamingStatus === EStreamingState.Live ||
+      this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
       const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
