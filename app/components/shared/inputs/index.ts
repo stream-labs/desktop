@@ -53,6 +53,7 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
+  allowCustom?: Function;
   noResult?: string;
 }
 

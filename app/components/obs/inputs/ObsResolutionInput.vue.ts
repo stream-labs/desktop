@@ -1,9 +1,10 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
-import { Multiselect } from 'vue-multiselect';
+import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { ListInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { Multiselect },
+  components: { HFormGroup, ListInput },
 })
 class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   static obsType: TObsType;
@@ -17,28 +18,22 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop({ default: false })
   allowEmpty: boolean;
 
-  onInputHandler(option: IObsListOption<string>) {
-    this.emitInput({ ...this.value, value: option.value });
+  onInputHandler(value: string) {
+    this.emitInput({ ...this.value, value });
   }
 
   onSearchChange(value: string) {
     this.$emit('search-change', value);
   }
 
-  get currentValue() {
-    let option = this.value.options.find((opt: IObsListOption<string>) => {
-      return this.value.value === opt.value;
-    });
-
-    if (option) return option;
-
-    if (this.value.value) {
-      option = { value: this.value.value, description: this.value.value } as IObsListOption<string>;
-      this.value.options.push(option);
-      return option;
-    }
-
-    return this.value.options[0];
+  get metadata() {
+    return {
+      disabled: this.value.enabled === false,
+      options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
+      allowEmpty: this.allowEmpty,
+      placeholder: this.placeholder,
+      allowCustom: this.getCustomResolution,
+    };
   }
 
   getCustomResolution(search: string) {
