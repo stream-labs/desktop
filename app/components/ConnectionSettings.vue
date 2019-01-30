@@ -6,7 +6,7 @@
   />
   <v-form-group
     v-model="transitionModel"
-    :metadata="{ type: 'list', title: $t('Beginning Scene'), name: 'transition', options: transitionOptions }"
+    :metadata="{ type: 'list', title: $t('Scene Transition'), name: 'transition', options: transitionOptions }"
   />
   <v-form-group
     v-model="toSceneModel"
