@@ -121,6 +121,16 @@ export class CreditsService extends WidgetSettingsService<ICreditsData> {
         interval: 5,
         min: 15,
       }),
+      followers: metadata.bool({ title: $t('Show Followers') }),
+      subscribers: metadata.bool({ title: $t('Show Subscribers') }),
+      donations: metadata.bool({ title: $t('Show donations') }),
+      bits: metadata.bool({ title: $t('Show Cheers') }),
+      moderators: metadata.bool({ title: $t('Show Moderators') }),
     });
   }
 }
+// followers"/>
+//          <bool-input :title="$t('Show Subscribers')" v-model="wData.settings.subscribers"/>
+//                                                              <bool-input :title="$t('Show donations')" v-model="wData.settings.donations"/>
+//                                                                                                                <bool-input :title="$t('Show Cheers')" v-model="wData.settings.bits"/>
+//                                                                                                                                                               <bool-input :title="$t('Show Moderators')" v-model="wData.settings.moderators"/>

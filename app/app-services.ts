@@ -4,6 +4,8 @@
 
 // OFFLINE SERVICES
 export { AppService } from './services/app';
+export { InternalApiService } from './services/api/internal-api';
+export { ExternalApiService } from './services/api/external-api';
 export { SourcesService, Source } from './services/sources';
 export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from './services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
@@ -26,9 +28,9 @@ export { TransitionsService } from 'services/transitions';
 export { FontLibraryService } from './services/font-library';
 export { SourceFiltersService } from './services/source-filters';
 export { CacheUploaderService } from './services/cache-uploader';
-export { TcpServerService } from './services/tcp-server';
-export { IpcServerService } from './services/ipc-server';
-export { JsonrpcService } from './services/jsonrpc';
+export { TcpServerService } from './services/api/tcp-server';
+export { IpcServerService } from './services/api/ipc-server';
+export { JsonrpcService } from './services/api/jsonrpc';
 export { DismissablesService } from 'services/dismissables';
 export { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 export { SceneCollectionsService } from 'services/scene-collections';

@@ -22,6 +22,7 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
+import { ChildWindowApiClient } from 'services/api/child-window-api-client';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;

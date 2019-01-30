@@ -3,7 +3,6 @@ import { mutation } from '../stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
-import { ServicesManager } from '../../services-manager';
 import { IObsInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import {
   ENotificationType,
@@ -13,6 +12,7 @@ import {
   INotificationsSettings,
 } from './notifications-api';
 import { $t } from 'services/i18n';
+import { InternalApiService } from 'services/api/internal-api';
 
 interface INotificationsState {
   settings: INotificationsSettings;
@@ -30,7 +30,7 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
   };
 
   @Inject() private windowsService: WindowsService;
-  servicesManager: ServicesManager = ServicesManager.instance;
+  @Inject() private internalApiService: InternalApiService;
 
   notificationPushed = new Subject<INotification>();
   notificationRead = new Subject<number[]>();
@@ -66,7 +66,7 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
     const notify = this.getNotification(notificationId);
     if (!notify || !notify.action) return;
 
-    this.servicesManager.executeServiceRequest(notify.action);
+    this.internalApiService.executeServiceRequest(notify.action);
   }
 
   getAll(type?: ENotificationType): INotification[] {

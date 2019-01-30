@@ -1,8 +1,9 @@
-import { Service } from './service';
-import { ServicesManager } from '../services-manager';
+import { Service } from 'services/service';
 import electron from 'electron';
 import { Subscription } from 'rxjs';
-import { IJsonRpcRequest, IJsonRpcResponse, IJsonRpcEvent } from 'services/jsonrpc';
+import { IJsonRpcRequest, IJsonRpcResponse, IJsonRpcEvent } from 'services/api/jsonrpc/index';
+import { Inject } from 'util/injector';
+import { InternalApiService } from 'services/api/internal-api';
 
 const { ipcRenderer } = electron;
 
@@ -11,9 +12,10 @@ const { ipcRenderer } = electron;
  * using by child window
  */
 export class IpcServerService extends Service {
-  servicesManager: ServicesManager = ServicesManager.instance;
   servicesEventsSubscription: Subscription;
   requestHandler: Function;
+
+  @Inject() private internalApiService: InternalApiService;
 
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
@@ -23,13 +25,13 @@ export class IpcServerService extends Service {
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');
 
-    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(event =>
+    this.servicesEventsSubscription = this.internalApiService.serviceEvent.subscribe(event =>
       this.sendEvent(event),
     );
   }
 
   exec(request: IJsonRpcRequest) {
-    return this.servicesManager.executeServiceRequest(request);
+    return this.internalApiService.executeServiceRequest(request);
   }
 
   stopListening() {
