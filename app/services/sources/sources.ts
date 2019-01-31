@@ -143,7 +143,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
     if (this.state.sources[sourcePatch.id]) {
       Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
-    } else {
+    } else if (this.state.temporarySources[sourcePatch.id]) {
       Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
     }
   }
