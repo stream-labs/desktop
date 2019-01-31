@@ -32,7 +32,7 @@ export abstract class RpcApi extends Service {
   private requestErrors: string[] = [];
 
   /**
-   * keep created subscriptions in main window to not allow to subscribe to the channel twice
+   * Keep created subscriptions in the main window to not allow to subscribe to the channel twice
    */
   subscriptions: Dictionary<Subscription> = {};
 
