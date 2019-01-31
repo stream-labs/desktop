@@ -20,6 +20,7 @@
     "progress": "^2.0.0",
     "semver": "^5.4.1",
     "sentry-cli-binary": "^1.24.1",
-    "shelljs": "^0.7.8"
+    "shelljs": "^0.7.8",
+    "webfont": "^8.1.4"
   }
 }
