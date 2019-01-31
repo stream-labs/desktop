@@ -9,14 +9,14 @@ const { ipcRenderer } = electron;
 
 /**
  * A client for communication with internalApi
- * This class is instantiating only in the child window and one-off windows
+ * Only the child window and one-off windows instantiate this class
  */
 export class InternalApiClient {
   private servicesManager: ServicesManager = ServicesManager.instance;
 
   /**
    * If the result of calling a service method in the main window is promise -
-   * we create a linked promise in the child window and keep it callbacks here until
+   * we create a linked promise in the child window and keep its callbacks here until
    * the promise in the main window will be resolved or rejected
    */
   private promises: Dictionary<Function[]> = {};
@@ -111,11 +111,8 @@ export class InternalApiClient {
     });
   }
 
-  /**
-   * ServiceManager already applied the proxy-function to all services in the ChildWindow
-   * So its services are safe to use here
-   */
   getResource(resourceId: string) {
+    // ServiceManager already applied the proxy-function to all services in the ChildWindow
     return this.servicesManager.getResource(resourceId);
   }
 
@@ -143,7 +140,7 @@ export class InternalApiClient {
         if (message.result.emitter === 'PROMISE') {
           const promisePayload = message.result;
           if (promisePayload) {
-            // skip the promise result if this promise created from another window
+            // skip the promise result if this promise has been created from another window
             if (!promises[promisePayload.resourceId]) return;
 
             // resolve or reject the promise depending on the response from the main window

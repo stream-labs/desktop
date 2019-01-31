@@ -26,13 +26,13 @@ export class ServicesManager extends Service {
   };
 
   /**
-   * store instances of already initialized singleton services
+   * store instances of initialized singleton services
    */
   private instances: Dictionary<Service> = {};
 
   /**
-   * Child or one-off windows don't call services methods directly
-   * They use internalApiClient to send IPC requests to the services in the main window
+   * The child windows or one-off windows don't execute services methods directly
+   * They use InternalApiClient to send IPC requests to the main window
    */
   private internalApiClient: InternalApiClient;
 
@@ -45,7 +45,7 @@ export class ServicesManager extends Service {
     // Setup a different behavior for services if we're not in the MainWindow now
     if (!Utils.isMainWindow()) {
       this.internalApiClient = new InternalApiClient();
-      // redirect all methods calls to the main window's services
+      // redirect all services methods calls to the main window's services
       Service.setupProxy(service => this.internalApiClient.applyIpcProxy(service));
       // don't call the init method for all services
       Service.setupInitFunction(service => null);

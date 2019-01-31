@@ -4,13 +4,16 @@ import { InternalApiService } from './internal-api';
 import * as apiResources from './external-api/resources';
 import { Service } from 'services/service';
 
-export interface Serializable {
+export interface ISerializable {
   // really wish to have something like
   // `type TSerializable = number | string | boolean | null | Dictionary<TSerializable> | Array<TSerializable>;`
   // instead of `any` here
   getModel(): any;
 }
 
+/**
+ * A decorator to mark class as a singleton
+ */
 export function Singleton() {
   return function(Klass: any) {
     Klass.isSingleton = true;
@@ -23,12 +26,22 @@ export function Singleton() {
  * This API is documented and must not have breaking changes
  */
 export class ExternalApiService extends RpcApi {
+  /**
+   * InternalApiService is for fallback calls
+   */
   @Inject() private internalApiService: InternalApiService;
+  /**
+   * List of all API resources
+   * @see RpcApi.getResource()
+   */
   private resources = { ...apiResources };
+  /**
+   * Instances of singleton resources
+   */
   private instances: Dictionary<Service> = {};
 
   init() {
-    // initialize singletons
+    // initialize all singletons
     Object.keys(this.resources).forEach(resourceName => {
       const Resource = this.resources[resourceName];
       if (Resource.isSingleton) this.instances[resourceName] = new Resource();
@@ -36,7 +49,7 @@ export class ExternalApiService extends RpcApi {
   }
 
   getResource(resourceId: string) {
-    // if resource is singleton return the singleton instance
+    // if resource is singleton than return the singleton instance
     if (this.instances[resourceId]) return this.instances[resourceId];
 
     // if resource is not singleton
@@ -49,7 +62,7 @@ export class ExternalApiService extends RpcApi {
       return new (Helper as any)(...constructorArgs);
     }
 
-    // it looks like this resource has been not found in the external API
+    // this resource has been not found in the external API
     // try to fallback to InternalApiService
     return this.internalApiService.getResource(resourceId);
   }

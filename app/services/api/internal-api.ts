@@ -4,7 +4,7 @@ import Utils from '../utils';
 
 /**
  * Internal SLOBS API for usage inside SLOBS itself
- * This API is using for Child-window and one-offs windows and tests
+ * This API is using by Child-window, one-offs windows and tests
  */
 export class InternalApiService extends RpcApi {
   getResource(resourceId: string) {

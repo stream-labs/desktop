@@ -188,8 +188,18 @@ export abstract class RpcApi extends Service {
   }
 
   /**
-   * the information about resource scheme helps to improve performance for API clients
+   * the information about resource scheme that helps to improve performance for API clients
    * this is undocumented feature is mainly for our API client that we're using in tests
+   *
+   * @example
+   * getResourceScheme('ScenesService')
+   * // ^returns
+   * {
+   *   getScenes: 'function';
+   *   activeSceneId: 'number';
+   *   activeScene: Object;
+   * }
+   *
    */
   getResourceScheme(resourceId: string): Dictionary<string> {
     const resource = this.getResource(resourceId);
