@@ -46,7 +46,7 @@ interface IServer {
 const TCP_PORT = 28194;
 
 /**
- * A transport layer for TCP communications with internal API
+ * A transport layer for TCP and Websockets communications with internal API
  */
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {

@@ -8,7 +8,7 @@ import { InternalApiService } from 'services/api/internal-api';
 const { ipcRenderer } = electron;
 
 /**
- * A transport layer for IPC communications between service in the child and main window
+ * A transport layer for IPC communications between services in the child and main window
  */
 export class IpcServerService extends Service {
   servicesEventsSubscription: Subscription;
