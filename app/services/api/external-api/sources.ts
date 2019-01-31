@@ -7,6 +7,7 @@ import {
 } from 'services/sources';
 import { Inject } from 'util/injector';
 import { ISerializable, Singleton } from 'services/api/external-api';
+import { ServiceHelper } from 'services/stateful-service';
 
 export interface ISourceAddOptions {
   channel?: number;
@@ -97,6 +98,9 @@ interface ISourceModel {
   channel?: number;
 }
 
+// We need ServiceHelper to mark this class as serializable
+// TODO: refactor ServiceHelper, it has too much logic under the hood
+@ServiceHelper()
 export class Source implements ISerializable {
   @Inject() private sourcesService: InternalSourcesService;
   private source: InternalSource;
@@ -105,6 +109,9 @@ export class Source implements ISerializable {
     this.source = this.sourcesService.getSource(sourceId);
   }
 
+  /**
+   * serialize source
+   */
   getModel(): ISourceModel {
     return {
       sourceId: this.sourceId,

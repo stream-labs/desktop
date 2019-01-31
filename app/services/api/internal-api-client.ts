@@ -125,7 +125,7 @@ export class InternalApiClient {
 
   /**
    *  The main window sends results of promises resolve/reject and RXJS events as JSON messages via IPC to the child window
-   *  Listen and handle this messages here
+   *  Listen and handle these messages here
    */
   private listenMainWindowMessages() {
     const promises = this.promises;

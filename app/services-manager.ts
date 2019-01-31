@@ -26,7 +26,7 @@ export class ServicesManager extends Service {
   };
 
   /**
-   * store instances of initialized singleton services
+   * Stores instances of initialized singleton services
    */
   private instances: Dictionary<Service> = {};
 

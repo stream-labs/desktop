@@ -48,6 +48,10 @@ export class ExternalApiService extends RpcApi {
     });
   }
 
+  /**
+   * @see RpcApi.getResource()
+   * @override
+   */
   getResource(resourceId: string) {
     // if resource is singleton than return the singleton instance
     if (this.instances[resourceId]) return this.instances[resourceId];
