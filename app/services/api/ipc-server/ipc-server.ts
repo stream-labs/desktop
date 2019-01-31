@@ -1,15 +1,14 @@
 import { Service } from 'services/service';
 import electron from 'electron';
 import { Subscription } from 'rxjs';
-import { IJsonRpcRequest, IJsonRpcResponse, IJsonRpcEvent } from 'services/api/jsonrpc/index';
+import { IJsonRpcRequest, IJsonRpcResponse, IJsonRpcEvent } from 'services/api/jsonrpc';
 import { Inject } from 'util/injector';
 import { InternalApiService } from 'services/api/internal-api';
 
 const { ipcRenderer } = electron;
 
 /**
- * sever for handling API requests from IPC
- * using by child window
+ * A transport layer for IPC communications between service in the child and mine window
  */
 export class IpcServerService extends Service {
   servicesEventsSubscription: Subscription;

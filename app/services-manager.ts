@@ -5,18 +5,36 @@ import { ObserveList } from './util/service-observer';
 import { StatefulService } from './services/stateful-service';
 
 import * as appServices from './app-services';
-import { ChildWindowApiClient } from './services/api/child-window-api-client';
+import { InternalApiClient } from 'services/api/internal-api-client';
 
+/**
+ * This service is initializing in all application windows
+ * It keeps collection of all application services and
+ * allows to access these services via Dependency Injection pattern.
+ * @see Inject() decorator
+ * Also it initialize all services with `InitAfter()` decorator
+ * @see InitAfter() decorator
+ * This is only the service that executes its methods in all widows
+ * instead of redirecting the calls to the main window
+ */
 export class ServicesManager extends Service {
   /**
-   * list of used application services
+   * List of used application services
    */
   services: Dictionary<any> = {
     ...appServices,
   };
 
+  /**
+   * store instances of already initialized singleton services
+   */
   private instances: Dictionary<Service> = {};
-  private childWindowApiClient: ChildWindowApiClient;
+
+  /**
+   * Child or one-off windows don't call services methods directly
+   * They use internalApiClient to send IPC requests to the services in the main window
+   */
+  private internalApiClient: InternalApiClient;
 
   init() {
     // this helps to debug services from the console
@@ -24,27 +42,29 @@ export class ServicesManager extends Service {
       window['sm'] = this;
     }
 
+    // Setup a different behavior for services if we're not in the MainWindow now
     if (!Utils.isMainWindow()) {
-      this.childWindowApiClient = new ChildWindowApiClient();
-      Service.setupProxy(service => this.childWindowApiClient.applyIpcProxy(service));
-      Service.setupInitFunction(service => {
-        return true;
-      });
-      return;
+      this.internalApiClient = new InternalApiClient();
+      // redirect all methods calls to the main window's services
+      Service.setupProxy(service => this.internalApiClient.applyIpcProxy(service));
+      // don't call the init method for all services
+      Service.setupInitFunction(service => null);
+    } else {
+      // if it's a main window, subscribe to serviceAfterInit event
+      // to initialize services with `InitAfter()` decorator
+      Service.serviceAfterInit.subscribe(service => this.initObservers(service));
     }
-    Service.serviceAfterInit.subscribe(service => this.initObservers(service));
   }
 
+  /**
+   * Find and initialize all observer-services which subscribed with `InitAfter` decorator
+   */
   private initObservers(observableService: Service): Service[] {
     const observeList: ObserveList = ObserveList.instance;
     const items = observeList.observations.filter(item => {
       return item.observableServiceName === observableService.serviceName;
     });
     return items.map(item => this.getService(item.observerServiceName).instance);
-  }
-
-  listenMessages() {
-    this.childWindowApiClient.listenMessages();
   }
 
   getService(serviceName: string) {
@@ -84,32 +104,6 @@ export class ServicesManager extends Service {
     const constructorArgsStr = resourceId.substr(helperName.length);
     const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
     return this.getHelper(helperName, constructorArgs);
-  }
-
-  /**
-   * the information about resource scheme helps to improve performance for API clients
-   * this is undocumented feature is mainly for our API client that we're using in tests
-   */
-  getResourceScheme(resourceId: string): Dictionary<string> {
-    const resource = this.getResource(resourceId);
-    if (!resource) {
-      return null;
-    }
-    const resourceScheme = {};
-
-    // collect resource keys from the whole prototype chain
-    const keys: string[] = [];
-    let proto = resource;
-    do {
-      keys.push(...Object.keys(proto));
-      proto = Object.getPrototypeOf(proto);
-    } while (proto.constructor.name !== 'Object');
-
-    keys.forEach(key => {
-      resourceScheme[key] = typeof resource[key];
-    });
-
-    return resourceScheme;
   }
 
   private getHelper(name: string, constructorArgs: any[]) {

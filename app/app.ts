@@ -22,7 +22,6 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
-import { ChildWindowApiClient } from 'services/api/child-window-api-client';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -120,7 +119,6 @@ document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
   const storePromise = createStore();
-  const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const i18nService: I18nService = I18nService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
@@ -132,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Utils.isChildWindow()) {
       ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
     }
-    servicesManager.listenMessages();
   }
 
   storePromise.then(async store => {

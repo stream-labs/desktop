@@ -7,53 +7,31 @@ import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
 const { ipcRenderer } = electron;
 
-export class ChildWindowApiClient {
+/**
+ * A client for communication with internalApi
+ * This class is instantiating only in the child window and one-off windows
+ */
+export class InternalApiClient {
   private servicesManager: ServicesManager = ServicesManager.instance;
 
   /**
-   * if result of calling a service method in the main window is promise -
+   * If the result of calling a service method in the main window is promise -
    * we create a linked promise in the child window and keep it callbacks here until
    * the promise in the main window will be resolved or rejected
    */
-  private windowPromises: Dictionary<Function[]> = {};
+  private promises: Dictionary<Function[]> = {};
   /**
-   * almost the same as windowPromises but for keeping subscriptions
+   * almost the same as `promises` but for keeping subscriptions
    */
-  private windowSubscriptions: Dictionary<Subject<any>> = {};
+  private subscriptions: Dictionary<Subject<any>> = {};
 
-  /**
-   * start listen messages from main window
-   */
-  listenMessages() {
-    const promises = this.windowPromises;
-
-    ipcRenderer.on(
-      'services-message',
-      (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
-        if (message.result._type !== 'EVENT') return;
-
-        // handle promise reject/resolve
-        if (message.result.emitter === 'PROMISE') {
-          const promisePayload = message.result;
-          if (promisePayload) {
-            if (!promises[promisePayload.resourceId]) return; // this a promise created from another API client
-            const [resolve, reject] = promises[promisePayload.resourceId];
-            const callback = promisePayload.isRejected ? reject : resolve;
-            callback(promisePayload.data);
-            delete promises[promisePayload.resourceId];
-          }
-        } else if (message.result.emitter === 'STREAM') {
-          const resourceId = message.result.resourceId;
-          if (!this.windowSubscriptions[resourceId]) return;
-          this.windowSubscriptions[resourceId].next(message.result.data);
-        }
-      },
-    );
+  constructor() {
+    this.listenMainWindowMessages();
   }
 
   /**
-   * uses for child window services
-   * all services methods calls will be sent to the main window
+   * All services methods calls will be sent to the main window
+   * TODO: add more comments and try to refactor
    */
   applyIpcProxy(service: Service): Service {
     const availableServices = Object.keys(this.servicesManager.services);
@@ -101,13 +79,13 @@ export class ChildWindowApiClient {
             if (result.emitter === 'PROMISE') {
               return new Promise((resolve, reject) => {
                 const promiseId = result.resourceId;
-                this.windowPromises[promiseId] = [resolve, reject];
+                this.promises[promiseId] = [resolve, reject];
               });
             }
 
             if (result.emitter === 'STREAM') {
-              return (this.windowSubscriptions[result.resourceId] =
-                this.windowSubscriptions[result.resourceId] || new Subject());
+              return (this.subscriptions[result.resourceId] =
+                this.subscriptions[result.resourceId] || new Subject());
             }
           }
 
@@ -133,11 +111,54 @@ export class ChildWindowApiClient {
     });
   }
 
+  /**
+   * ServiceManager already applied the proxy-function to all services in the ChildWindow
+   * So its services are safe to use here
+   */
   getResource(resourceId: string) {
     return this.servicesManager.getResource(resourceId);
   }
 
+  /**
+   * just a shortcut for static functions in JsonrpcService
+   */
   get jsonrpc() {
     return JsonrpcService;
+  }
+
+  /**
+   *  The main window sends results of promises resolve/reject and RXJS events as JSON messages via IPC to the child window
+   *  Listen and handle this messages here
+   */
+  private listenMainWindowMessages() {
+    const promises = this.promises;
+
+    ipcRenderer.on(
+      'services-message',
+      (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
+        // handle only `EVENT` messages here
+        if (message.result._type !== 'EVENT') return;
+
+        // handle promise reject/resolve
+        if (message.result.emitter === 'PROMISE') {
+          const promisePayload = message.result;
+          if (promisePayload) {
+            // skip the promise result if this promise created from another window
+            if (!promises[promisePayload.resourceId]) return;
+
+            // resolve or reject the promise depending on the response from the main window
+            const [resolve, reject] = promises[promisePayload.resourceId];
+            const callback = promisePayload.isRejected ? reject : resolve;
+            callback(promisePayload.data);
+            delete promises[promisePayload.resourceId];
+          }
+        } else if (message.result.emitter === 'STREAM') {
+          // handle RXJS events
+          const resourceId = message.result.resourceId;
+          if (!this.subscriptions[resourceId]) return;
+          this.subscriptions[resourceId].next(message.result.data);
+        }
+      },
+    );
   }
 }

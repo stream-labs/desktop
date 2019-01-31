@@ -6,14 +6,15 @@ import {
   TSourceType,
 } from 'services/sources';
 import { Inject } from 'util/injector';
-import { Service } from 'services/service';
+import { Serializable, Singleton } from 'services/api/external-api';
 
 export interface ISourceAddOptions {
   channel?: number;
   isTemporary?: boolean;
 }
 
-class SourcesService extends Service {
+@Singleton()
+export class SourcesService {
   @Inject() protected sourcesService: InternalSourcesService;
 
   createSource(
@@ -96,7 +97,7 @@ interface ISourceModel {
   channel?: number;
 }
 
-class Source {
+export class Source implements Serializable {
   @Inject() private sourcesService: InternalSourcesService;
   private source: InternalSource;
 
@@ -107,7 +108,7 @@ class Source {
   getModel(): ISourceModel {
     return {
       sourceId: this.sourceId,
-      name: this.source.name,
+      name: 'MYSOURCE',
       type: this.source.type,
       audio: this.source.audio,
       video: this.source.video,

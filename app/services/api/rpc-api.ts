@@ -13,6 +13,12 @@ import {
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
 
+/**
+ * A base class for implementing serializable JSON-RPC API
+ * with supporting of Promises and Subscriptions
+ * @see InternalApiService
+ * @see ExternalApiService
+ */
 export abstract class RpcApi extends Service {
   serviceEvent = new Subject<IJsonRpcResponse<IJsonRpcEvent>>();
   protected servicesManager: ServicesManager = ServicesManager.instance;
@@ -30,19 +36,17 @@ export abstract class RpcApi extends Service {
    */
   subscriptions: Dictionary<Subscription> = {};
 
-  isMutationBufferingEnabled() {
-    return this.mutationsBufferingEnabled;
-  }
-
-  addMutationToBuffer(mutation: IMutation) {
-    this.bufferedMutations.push(mutation);
-  }
+  /**
+   * Resource is the main abstraction for this RPC API
+   * Basically its an object with methods which return serializable values or
+   * `Promise` or RXJS `Subscription`
+   */
+  abstract getResource(resourceId: string): any;
 
   /**
    * execute service requests and handle errors
    */
   executeServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
-    console.log('execute request', request);
     let response: IJsonRpcResponse<any>;
     this.requestErrors = []; // cleanup errors from previous request
     try {
@@ -52,7 +56,6 @@ export abstract class RpcApi extends Service {
     }
 
     if (this.requestErrors.length) response = this.onErrorsHandler(request, this.requestErrors);
-    console.log('response', response);
     return response;
   }
 
@@ -81,6 +84,10 @@ export abstract class RpcApi extends Service {
     return JsonrpcService;
   }
 
+  /**
+   *  Handles requests to services, but doesn't handle exceptions
+   *  TODO: add more comments and try to refactor
+   */
   private handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
     const methodName = request.method;
@@ -181,21 +188,6 @@ export abstract class RpcApi extends Service {
   }
 
   /**
-   * returns Service instance or ServiceHelper instance
-   * @example
-   * sourcesService = getResource('SourcesService')
-   *
-   * @example
-   * source = getResource('Source[12]')
-   */
-  getResource(resourceId: string) {
-    if (resourceId === 'ServicesManager') {
-      return this;
-    }
-    return this.servicesManager.getResource(resourceId);
-  }
-
-  /**
    * the information about resource scheme helps to improve performance for API clients
    * this is undocumented feature is mainly for our API client that we're using in tests
    */
@@ -230,8 +222,8 @@ export abstract class RpcApi extends Service {
   }
 
   /**
-   * start buffering mutations to send them
-   * as result of a service's method call
+   * This prevents to send mutations to the API client until the API request is not completed
+   * Save all mutations called in the main window to buffer, and send them when API request is completed
    */
   private startBufferingMutations() {
     this.mutationsBufferingEnabled = true;
@@ -247,6 +239,18 @@ export abstract class RpcApi extends Service {
     return mutations;
   }
 
+  isMutationBufferingEnabled() {
+    return this.mutationsBufferingEnabled;
+  }
+
+  addMutationToBuffer(mutation: IMutation) {
+    this.bufferedMutations.push(mutation);
+  }
+
+  /**
+   * The promise that the client has been executed is resolved/rejected
+   * Send this conformation back to the client
+   */
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
     this.serviceEvent.next(
       this.jsonrpc.createEvent({

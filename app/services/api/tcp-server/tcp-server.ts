@@ -15,7 +15,6 @@ import {
 } from 'services/api/jsonrpc/index';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import { InternalApiService } from 'services/api/internal-api';
 import { ExternalApiService } from '../external-api';
 
 const net = require('net');
@@ -46,6 +45,9 @@ interface IServer {
 
 const TCP_PORT = 28194;
 
+/**
+ * A transport layer for TCP communications with internal API
+ */
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {

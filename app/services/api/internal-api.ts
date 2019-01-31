@@ -3,7 +3,8 @@ import { IJsonRpcRequest, IJsonRpcResponse } from 'services/api/jsonrpc';
 import Utils from '../utils';
 
 /**
- * Internal API for usage in the child-window and one-offs windows
+ * Internal SLOBS API for usage inside SLOBS itself
+ * This API is using for Child-window and one-offs windows and tests
  */
 export class InternalApiService extends RpcApi {
   getResource(resourceId: string) {
