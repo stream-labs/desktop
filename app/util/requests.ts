@@ -12,8 +12,15 @@ import humps from 'humps';
  * handle it explicitly.
  */
 export const handleResponse = (response: Response): Promise<any> => {
-  if (response.ok) return response.json();
-  return response.json().then(json => Promise.reject(json));
+  const contentType = response.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+
+  if (!response.ok) {
+    return isJson
+      ? response.json().then(json => Promise.reject(json))
+      : response.text().then(text => Promise.reject(text));
+  }
+  return isJson ? response.json() : response.text();
 };
 
 export const handleErrors = (response: Response): Promise<any> => {
