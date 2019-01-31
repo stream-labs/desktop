@@ -2,62 +2,12 @@ import electron from 'electron';
 import uuid from 'uuid/v4';
 import 'reflect-metadata';
 import { Service } from 'services/service';
-import { AutoConfigService } from 'services/auto-config';
-import { ObsImporterService } from 'services/obs-importer';
-import { YoutubeService } from 'services/platforms/youtube';
-import { TwitchService } from 'services/platforms/twitch';
-import { MixerService } from 'services/platforms/mixer';
-import { FacebookService } from 'services/platforms/facebook';
-import { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from './services/scenes';
-import { ClipboardService } from './services/clipboard';
-import { AudioService, AudioSource } from './services/audio';
-import { CustomizationService } from './services/customization';
-import { HostsService, UrlService } from './services/hosts';
-import { Hotkey, HotkeysService } from './services/hotkeys';
-import { KeyListenerService } from './services/key-listener';
-import { NavigationService } from './services/navigation';
-import { NotificationsService } from './services/notifications';
-import { OnboardingService } from './services/onboarding';
-import { PerformanceService } from './services/performance';
-import { PerformanceMonitorService } from './services/performance-monitor';
-import { PersistentStatefulService } from './services/persistent-stateful-service';
-import { SettingsService, StreamEncoderSettingsService } from './services/settings';
-import { SourcesService, Source } from './services/sources';
-import { UserService } from './services/user';
-import { VideoService } from './services/video';
-import { WidgetSource, WidgetsService, WidgetTester } from './services/widgets';
-import { WindowsService } from './services/windows';
-import { StatefulService } from './services/stateful-service';
-import { TransitionsService } from 'services/transitions';
-import { FontLibraryService } from './services/font-library';
-import { SourceFiltersService } from './services/source-filters';
-import { AppService } from './services/app';
-import { ShortcutsService } from './services/shortcuts';
-import { CacheUploaderService } from './services/cache-uploader';
-import { TcpServerService } from './services/tcp-server';
-import { IpcServerService } from './services/ipc-server';
-import { UsageStatisticsService } from './services/usage-statistics';
-import { StreamInfoService } from './services/stream-info';
-import { StreamingService } from './services/streaming';
-import { StreamlabelsService } from './services/streamlabels';
-import { PlatformAppsService } from 'services/platform-apps';
-import { PlatformAppStoreService } from 'services/platform-app-store';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
 import { ObserveList } from './util/service-observer';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { GuestApiService } from 'services/guest-api';
-import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { DismissablesService } from 'services/dismissables';
-import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { TroubleshooterService } from 'services/troubleshooter';
-import { Selection, SelectionService } from 'services/selection';
-import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
-import { SceneCollectionsStateService } from 'services/scene-collections/state';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { from, Observable, Subject, Subscription } from 'rxjs';
+import { StatefulService } from './services/stateful-service';
 import {
   E_JSON_RPC_ERROR,
   IJsonRpcEvent,
@@ -66,41 +16,10 @@ import {
   IMutation,
   JsonrpcService,
 } from 'services/jsonrpc';
-import { FileManagerService } from 'services/file-manager';
-import { CrashReporterService } from 'services/crash-reporter';
-import { PatchNotesService } from 'services/patch-notes';
-import { ProtocolLinksService } from 'services/protocol-links';
-import { WebsocketService } from 'services/websocket';
-import { ProjectorService } from 'services/projector';
-import { FacemasksService } from 'services/facemasks';
-import { I18nService } from 'services/i18n';
-import { MediaBackupService } from 'services/media-backup';
-import { OutageNotificationsService } from 'services/outage-notifications';
-import { MediaGalleryService } from 'services/media-gallery';
-import { AnnouncementsService } from 'services/announcements';
-import { BrandDeviceService } from 'services/auto-config/brand-device';
-import { ObsUserPluginsService } from 'services/obs-user-plugins';
-import { HardwareService } from 'services/hardware';
-import { Prefab, PrefabsService } from 'services/prefabs';
-
-import { BitGoalService } from 'services/widgets/settings/bit-goal';
-import { ChatBoxService } from 'services/widgets/settings/chat-box';
-import { DonationGoalService } from 'services/widgets/settings/donation-goal';
-import { FollowerGoalService } from 'services/widgets/settings/follower-goal';
-import { ViewerCountService } from 'services/widgets/settings/viewer-count';
-import { StreamBossService } from 'services/widgets/settings/stream-boss';
-import { DonationTickerService } from 'services/widgets/settings/donation-ticker';
-import { CreditsService } from 'services/widgets/settings/credits';
-import { EventListService } from 'services/widgets/settings/event-list';
-import { TipJarService } from 'services/widgets/settings/tip-jar';
-import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
-import { SubGoalService } from 'services/widgets/settings/sub-goal';
-import { MediaShareService } from 'services/widgets/settings/media-share';
-import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
-import { AlertBoxService } from 'services/widgets/settings/alert-box';
-import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 
 const { ipcRenderer } = electron;
+
+import * as appServices from './app-services';
 
 export class ServicesManager extends Service {
   serviceEvent = new Subject<IJsonRpcResponse<IJsonRpcEvent>>();
@@ -109,103 +28,7 @@ export class ServicesManager extends Service {
    * list of used application services
    */
   private services: Dictionary<any> = {
-    AutoConfigService,
-    YoutubeService,
-    TwitchService,
-    MixerService,
-    FacebookService,
-    ScenesService,
-    SceneItemNode,
-    SceneItem,
-    SceneItemFolder,
-    Scene,
-    ClipboardService,
-    AudioService,
-    AudioSource,
-    CustomizationService,
-    HostsService,
-    UrlService,
-    HotkeysService,
-    Hotkey,
-    KeyListenerService,
-    NavigationService,
-    NotificationsService,
-    OnboardingService,
-    PerformanceService,
-    PerformanceMonitorService,
-    PersistentStatefulService,
-    SettingsService,
-    StreamEncoderSettingsService,
-    SourceFiltersService,
-    SourcesService,
-    Source,
-    StreamingService,
-    UserService,
-    VideoService,
-    WidgetsService,
-    WidgetSource,
-    WidgetTester,
-    WindowsService,
-    FontLibraryService,
-    ObsImporterService,
-    OverlaysPersistenceService,
-    AppService,
-    ShortcutsService,
-    CacheUploaderService,
-    UsageStatisticsService,
-    IpcServerService,
-    TcpServerService,
-    StreamInfoService,
-    StreamlabelsService,
-    PlatformAppsService,
-    PlatformAppStoreService,
-    GuestApiService,
-    VideoEncodingOptimizationService,
-    CrashReporterService,
-    DismissablesService,
-    SceneCollectionsServerApiService,
-    SceneCollectionsService,
-    SceneCollectionsStateService,
-    TroubleshooterService,
-    JsonrpcService,
-    SelectionService,
-    Selection,
-    FileManagerService,
-    PatchNotesService,
-    ProtocolLinksService,
-    ProjectorService,
-    TransitionsService,
-    MediaBackupService,
-    WebsocketService,
-    FacemasksService,
-    I18nService,
-    OutageNotificationsService,
-    BitGoalService,
-    DonationGoalService,
-    FollowerGoalService,
-    ChatBoxService,
-    ViewerCountService,
-    ChatbotApiService,
-    ChatbotCommonService,
-    StreamBossService,
-    DonationTickerService,
-    CreditsService,
-    EventListService,
-    TipJarService,
-    SpinWheelService,
-    SponsorBannerService,
-    SubGoalService,
-    MediaGalleryService,
-    IncrementalRolloutService,
-    AnnouncementsService,
-    MediaShareService,
-    AlertBoxService,
-    ChatbotWidgetService,
-    BrandDeviceService,
-    ObsUserPluginsService,
-    HardwareService,
-    PrefabsService,
-    Prefab,
+    ...appServices,
   };
 
   private instances: Dictionary<Service> = {};

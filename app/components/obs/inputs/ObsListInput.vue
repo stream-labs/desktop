@@ -1,7 +1,7 @@
 <template>
 <h-form-group :title="value.showDescription !== false ? value.description : null">
   <list-input
-    :value="currentValue"
+    :value="value.value"
     :metadata="metadata"
     @input="onInputHandler"
     @search-change="onSearchChange"

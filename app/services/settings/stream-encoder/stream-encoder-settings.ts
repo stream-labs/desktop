@@ -68,7 +68,7 @@ const simpleEncoderToAnvancedEncoderMap = {
   x264: 'obs_x264',
   qsv: 'obs_qsv11',
   nvenc: 'ffmpeg_nvenc',
-  amd: 'amd_amf_h26',
+  amd: 'amd_amf_h264',
 };
 
 /**
@@ -78,6 +78,7 @@ export const encoderFieldsMap = {
   x264: { preset: 'preset', encoderOptions: 'x264opts' },
   nvenc: { preset: 'preset' },
   qsv: { preset: 'target_usage' },
+  amd: { preset: 'QualityPreset' },
 };
 
 function simpleEncoderToAdvancedEncoder(encoder: EEncoder) {
@@ -110,14 +111,24 @@ export class StreamEncoderSettingsService extends Service {
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
         this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
     ) as EEncoder;
-    const preset: string =
-      this.settingsService.findValidListValue(output, 'Streaming', 'preset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'Preset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'QSVPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'target_usage') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'QualityPreset') ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'AMDPreset');
+    let preset: string;
+
+    if (encoder === 'amd') {
+      // The settings for AMD also have a Preset field but it's not what we need
+      preset = [
+        this.settingsService.findValidListValue(output, 'Streaming', 'QualityPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'AMDPreset'),
+      ].find(item => item !== void 0);
+    } else {
+      preset = [
+        this.settingsService.findValidListValue(output, 'Streaming', 'preset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'Preset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'NVENCPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'QSVPreset'),
+        this.settingsService.findValidListValue(output, 'Streaming', 'target_usage'),
+      ].find(item => item !== void 0);
+    }
+
     const bitrate: number =
       this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate');
@@ -153,6 +164,9 @@ export class StreamEncoderSettingsService extends Service {
     };
   }
 
+  /**
+   * This method helps to simplify tuning the encoder's settings
+   */
   setSettings(settingsPatch: Partial<IStreamEncoderSettings>) {
     if (settingsPatch.mode) {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
@@ -200,6 +214,14 @@ export class StreamEncoderSettingsService extends Service {
 
     if (settingsPatch.rescaleOutput !== void 0) {
       this.settingsService.setSettingValue('Output', 'Rescale', settingsPatch.rescaleOutput);
+    }
+
+    if (settingsPatch.bitrate !== void 0) {
+      if (currentSettings.mode === 'Advanced') {
+        this.settingsService.setSettingValue('Output', 'bitrate', settingsPatch.bitrate);
+      } else {
+        this.settingsService.setSettingValue('Output', 'VBitrate', settingsPatch.bitrate);
+      }
     }
   }
 }

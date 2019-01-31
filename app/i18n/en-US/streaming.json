@@ -50,5 +50,9 @@
   "Stop Replay Buffer": "Stop Replay Buffer",
   "Stopping...": "Stopping...",
   "Your stream has been scheduled for %{time} from now. If you'd like to make another schedule please enter a different time": "Your stream has been scheduled for %{time} from now. If you'd like to make another schedule please enter a different time",
-  "Stop streaming to access these controls:": "Stop streaming to access these controls:"
+  "Stop streaming to access these controls:": "Stop streaming to access these controls:",
+  "Tags": "Tags",
+  "Select stream tags": "Select stream tags",
+  "You can now edit your channel tags from this screen.": "You can now edit your channel tags from this screen.",
+  "Log out and back in to reauthorize additional permissions.": "Log out and back in to reauthorize additional permissions."
 }

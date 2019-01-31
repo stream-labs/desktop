@@ -167,6 +167,10 @@ export class FormMonkey {
   async setListValue(selector: string, value: string) {
     await this.client.click(`${selector} .multiselect`);
     await this.client.click(`${selector} [data-option-value="${value}"]`);
+
+    // the vue-multiselect's popup-div needs time to be closed
+    // otherwise it can overlap the elements under it
+    await sleep(100);
   }
 
   async setColorValue(selector: string, value: string) {

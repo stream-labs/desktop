@@ -2,9 +2,9 @@ import * as widgetInputComponents from './inputs';
 import {
   inputComponents as sharedInputComponents,
   metadata as sharedMetadata,
-  EInputType,
   IInputMetadata,
   IListMetadata,
+  ISliderMetadata,
 } from 'components/shared/inputs';
 
 export * from './inputs';
@@ -19,6 +19,11 @@ export enum EWInput {
   frequency = 'frequency',
   sectionedMultiselect = 'sectionedMultiselect',
   numberList = 'numberList',
+  spamSecurity = 'spamSecurity',
+}
+
+export interface ISpamSecurityMetadata extends ISliderMetadata {
+  indexModifier?: number;
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
@@ -40,4 +45,6 @@ export const metadata = {
     } as IListMetadata<{ label: string; options: { value: string; label: string }[] }>),
   numberList: (options: IListMetadata<number>) =>
     ({ type: EWInput.numberList, ...options } as IListMetadata<number>),
+  spamSecurity: (options: ISpamSecurityMetadata) =>
+    ({ type: EWInput.spamSecurity, ...options } as ISpamSecurityMetadata),
 };
