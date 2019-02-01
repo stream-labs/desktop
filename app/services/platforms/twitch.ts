@@ -175,13 +175,9 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data),
     });
 
-    // prettier-ignore
-    return Promise.all([
-      fetch(request).then(handleResponse),
-      this.setStreamTags(tags).catch(e => {
-        console.error('Failed to update tags', e);
-      }),
-    ]).then(_ => true);
+    return Promise.all([fetch(request).then(handleResponse), this.setStreamTags(tags)]).then(
+      _ => true,
+    );
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
@@ -213,7 +209,13 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   @requiresToken()
-  setStreamTags(tags: TTwitchTag[]) {
+  async setStreamTags(tags: TTwitchTag[]) {
+    const hasPermission = await this.hasScope('user:edit:broadcast');
+
+    if (!hasPermission) {
+      return false;
+    }
+
     return updateTags(this.getRawHeaders(true, true))(tags)(this.twitchId);
   }
 
