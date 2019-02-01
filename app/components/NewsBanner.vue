@@ -1,124 +1,83 @@
-<template>
-<div>
-  <div class="banner" :class="[bannerExists ? 'show' : '']" @click="followLink()">
-    <img class="bg-image" :src="currentBanner.thumbnail" />
-    <div class="image-container">
-      <img class="shadow-image__left" :src="currentBanner.thumbnail" />
-      <img class="shadow-image__right" :src="currentBanner.thumbnail" />
-      <img class="main-image" :src="currentBanner.thumbnail" />
-    </div>
-    <div class="title-container">
-      <h3 class="title">{{ headerText }}</h3>
-      <p class="subheading">{{ currentBanner.subHeader }}</p>
-    </div>
-    <div class="cta-container">
-      <button class="button learn-more" :disabled="!bannerExists">{{ currentBanner.linkTitle }}</button>
-      <button class="dismiss-button" @click.stop="closeBanner()" :disabled="!bannerExists || processingClose">{{ $t('Dismiss') }}</button>
-    </div>
-  </div>
-</div>
-</template>
+<script lang="tsx">
+import Vue from 'vue';
+import { shell } from 'electron';
+import emojione from 'emojione';
+import { AnnouncementsService } from 'services/announcements';
+import { Inject } from 'util/injector';
+import { Component } from 'vue-property-decorator';
+import { NavigationService, TAppPage } from 'services/navigation';
+import { $t } from 'services/i18n';
+import cx from 'classnames';
+import styles from './NewsBanner.m.less';
 
-<script lang="ts" src="./NewsBanner.vue.ts"></script>
+@Component({})
+export default class NewsBanner extends Vue {
+  @Inject() announcementsService: AnnouncementsService;
+  @Inject() navigationService: NavigationService;
 
-<style lang="less" scoped>
-@import '../styles/index';
+  processingClose = false;
 
-.banner {
-  width: 100%;
-  min-height: 0;
-  max-height: 0;
-  background-color: @teal;
-  color: @white;
-  display: flex;
-  position: relative;
-  align-content: center;
-  overflow: hidden;
-  transition: all 0.5s cubic-bezier(0, 1, 0, 1);
-}
+  get currentBanner() {
+    return this.announcementsService.state;
+  }
 
-.banner.show {
-  min-height: 92px;
-  max-height: 140px;
-  .padding(2);
-  .transition();
-}
+  get bannerExists() {
+    return this.announcementsService.bannerExists();
+  }
 
-.bg-image {
-  position: absolute;
-  opacity: 0.1;
-  height: 400%;
-  top: -100%;
-  left: -100px;
-  filter: blur(6px);
-}
+  get headerText() {
+    return emojione.shortnameToUnicode(this.currentBanner.header);
+  }
 
-.image-container {
-  position: relative;
-  margin-left: 50px;
-  width: 80px;
+  async closeBanner(e?: Event) {
+    e.stopPropagation();
+    this.processingClose = true;
+    await this.announcementsService.closeBanner();
+    this.processingClose = false;
+  }
 
-  img {
-    top: 50%;
-    transform: translate(0, -50%);
+  followLink() {
+    if (!this.currentBanner) return;
+    if (this.currentBanner.linkTarget === 'slobs') {
+      this.navigationService.navigate(
+        this.currentBanner.link as TAppPage,
+        this.currentBanner.params,
+      );
+    } else {
+      shell.openExternal(this.currentBanner.link);
+    }
+    if (this.currentBanner.closeOnLink) {
+      this.closeBanner();
+    }
+  }
+
+  render(h: Function) {
+    return (
+      <div>
+        <div class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })} onClick={this.followLink}>
+          <img class={styles.bgImage} src={this.currentBanner.thumbnail} />
+          <div class={styles.imageContainer}>
+            <img class={styles.shadowImageLeft} src={this.currentBanner.thumbnail} />
+            <img class={styles.shadowImageRight} src={this.currentBanner.thumbnail} />
+            <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
+          </div>
+          <div class={styles.titleContainer}>
+            <h3 class={styles.title}>{this.headerText}</h3>
+            <p class={styles.subheading}>{this.currentBanner.subHeader}</p>
+          </div>
+          <div class={styles.ctaContainer}>
+            <button
+              class={cx('button', styles.learnMore)}
+              disabled={!this.bannerExists}
+            >{this.currentBanner.linkTitle}</button>
+            <button
+              class={styles.dismissButton}
+              onClick={this.closeBanner} disabled={!this.bannerExists || this.processingClose}
+            >{$t('Dismiss')}</button>
+          </div>
+        </div>
+      </div>
+    );
   }
 }
-
-.shadow-image__left,
-.shadow-image__right {
-  opacity: 0.8;
-  width: 80%;
-  position: absolute;
-  top: 10%;
-}
-
-.shadow-image__right {
-  right: -30%;
-}
-
-.shadow-image__left {
-  left: -30%;
-}
-
-.main-image {
-  position: relative;
-  width: auto;
-  z-index: 1;
-}
-
-.title-container {
-  z-index: 1;
-  margin-left: 50px;
-}
-
-.title {
-  display: inline-block;
-  font-size: 20px;
-}
-
-.subheading {
-  display: block;
-  max-width: 900px;
-  color: @white;
-}
-
-.cta-container {
-  margin-left: auto;
-}
-
-.learn-more {
-  background-color: @white;
-  color: @black;
-  font-size: 14px;
-  font-weight: 500;
-  display: inline-block;
-  padding: 0 12px;
-}
-
-.dismiss-button {
-  display: block;
-  text-decoration: underline;
-  margin-top: 8px;
-  width: 100%;
-}
-</style>
+</script>
