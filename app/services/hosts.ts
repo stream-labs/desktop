@@ -24,4 +24,7 @@ export class HostsService extends Service {
     }
     return 'https://n-air-app.nicovideo.jp/authorize';
   }
+  get niconicoNAirInformationsFeed() {
+    return 'http://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml';
+  }
 }

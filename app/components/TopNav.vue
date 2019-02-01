@@ -30,6 +30,15 @@
         <i class="icon-help" /><span>{{ $t('common.help') }}</span>
       </a>
     </div>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a
+        @click="openInformations"
+        class="link">
+        <!-- TODO: アイコンを入れる -->
+        <span v-if="hasUnseenInformation">info(hasUnseen)</span>
+        <span v-else>info</span>
+      </a>
+    </div>
   </div>
 
   <div class="top-nav-profile">
