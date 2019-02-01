@@ -52,7 +52,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
     this.loading = true;
 
     try {
-      this.error = await this.platformAppsService.installUnpackedApp(
+      this.error = await this.platformAppsService.loadUnpackedApp(
         this.appPathValue,
         this.appTokenValue,
       );

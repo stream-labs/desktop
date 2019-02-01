@@ -66,68 +66,69 @@ export default class PlatformAppWebview extends Vue {
   }
 
   attachWebviewListeners() {
-    if (!this.$refs.appView) return;
+    // if (!this.$refs.appView) return;
 
-    this.$refs.appView.addEventListener('did-finish-load', () => {
-      const app = this.platformAppsService.getApp(this.appId);
+    // this.$refs.appView.addEventListener('did-finish-load', () => {
+    //   const app = this.platformAppsService.getApp(this.appId);
 
-      if (app.unpacked) {
-        this.$refs.appView.openDevTools();
-      }
+    //   if (app.unpacked) {
+    //     this.$refs.appView.openDevTools();
+    //   }
 
-      // We have to do this in the dom-ready listener.  It seems that if
-      // we attempt to fetch the webContents too early, the initial webContents
-      // is destroyed and it is replaced with another one.
-      const webContents = this.$refs.appView.getWebContents();
+    //   // We have to do this in the dom-ready listener.  It seems that if
+    //   // we attempt to fetch the webContents too early, the initial webContents
+    //   // is destroyed and it is replaced with another one.
+    //   const webContents = this.$refs.appView.getWebContents();
 
-      this.platformAppsService.exposeAppApi(
-        this.appId,
-        webContents.id,
-        electron.remote.getCurrentWindow().id,
-        Utils.getCurrentUrlParams().windowId,
-        this.transformSubjectId,
-      );
+    //   this.platformAppsService.exposeAppApi(
+    //     this.appId,
+    //     webContents.id,
+    //     electron.remote.getCurrentWindow().id,
+    //     Utils.getCurrentUrlParams().windowId,
+    //     this.transformSubjectId,
+    //   );
 
-      /**
-       * This has to be done from the main process to work properly
-       * @see https://github.com/electron/electron/issues/1378
-       */
-      electron.ipcRenderer.send('webContents-preventNavigation', webContents.id);
+    //   /**
+    //    * This has to be done from the main process to work properly
+    //    * @see https://github.com/electron/electron/issues/1378
+    //    */
+    //   electron.ipcRenderer.send('webContents-preventNavigation', webContents.id);
 
-      // We allow opening dev tools for beta apps only
-      if (app.beta) {
-        webContents.on('before-input-event', (e, input) => {
-          if (input.type === 'keyDown' && input.code === 'KeyI' && input.control && input.shift) {
-            this.$refs.appView.openDevTools();
-          }
-        });
-      }
-    });
+    //   // We allow opening dev tools for beta apps only
+    //   if (app.beta) {
+    //     webContents.on('before-input-event', (e, input) => {
+    //       if (input.type === 'keyDown' && input.code === 'KeyI' && input.control && input.shift) {
+    //         this.$refs.appView.openDevTools();
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   destroyed() {
-    this.reloadSub.unsubscribe();
-    if (this.resizeInterval) clearInterval(this.resizeInterval);
-    this.platformAppsService.removeTransformSubject(this.transformSubjectId);
+    // this.reloadSub.unsubscribe();
+    // if (this.resizeInterval) clearInterval(this.resizeInterval);
+    // this.platformAppsService.removeTransformSubject(this.transformSubjectId);
   }
 
-  get appUrl() {
-    return this.platformAppsService.getPageUrlForSlot(this.appId, this.pageSlot);
-  }
+  // get appUrl() {
+  //   return this.platformAppsService.getPageUrlForSlot(this.appId, this.pageSlot);
+  // }
 
   get appPartition() {
     return this.platformAppsService.getAppPartition(this.appId);
   }
 
   get webviewStyles() {
-    if (this.visible) {
-      return {};
-    }
+    return '';
+    // if (this.visible) {
+    //   return {};
+    // }
 
-    return {
-      position: 'absolute',
-      top: '-10000px',
-    };
+    // return {
+    //   position: 'absolute',
+    //   top: '-10000px',
+    // };
   }
 
   currentPosition: IVec2;

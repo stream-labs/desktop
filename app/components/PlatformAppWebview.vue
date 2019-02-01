@@ -3,13 +3,17 @@
   class="platform-app-container"
   ref="resizeContainer"
   :style="webviewStyles">
-  <webview
+  <!-- <webview
     v-if="renderWebview && !poppedOut"
     class="platform-app-webview"
     ref="appView"
     :src="appUrl"
     :partition="appPartition"
-    preload="bundles/guest-api" />
+    preload="bundles/guest-api" /> -->
+  <div
+    v-if="renderWebview && !poppedOut"
+    class="platform-app-webview"
+    ref="appView" />
   <div v-else class="platform-app-popped-out">
     This app is currently popped out into an external window.
   </div>

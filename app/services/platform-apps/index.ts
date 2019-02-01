@@ -1,4 +1,5 @@
 import { mutation, StatefulService } from 'services/stateful-service';
+import { serviceModule } from 'services/service';
 import path from 'path';
 import fs from 'fs';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -16,6 +17,7 @@ import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
 import { compact, trim, without } from 'lodash';
 import uuid from 'uuid/v4';
+import { PlatformContainerManager } from './container-manager';
 
 const DEV_PORT = 8081;
 
@@ -144,12 +146,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
   private disabledLocalStorageKey = 'PlatformAppsDisabled';
 
-  // Lazy initialize the API
-  private _apiManager: PlatformAppsApi;
-  private get apiManager() {
-    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
-    return this._apiManager;
-  }
+  @serviceModule(PlatformAppsApi) private apiManager: PlatformAppsApi;
+  @serviceModule(PlatformContainerManager) private containerManager: PlatformContainerManager;
 
   private devServer: DevServer;
 
@@ -159,7 +157,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   async initialize() {
     this.userService.userLogin.subscribe(async () => {
       this.unloadApps();
-      this.installProductionApps();
+      this.loadProductionApps();
       this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
@@ -168,13 +166,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 
-    this.installProductionApps();
+    this.loadProductionApps();
     this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
 
     if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
       if (data.appPath && data.appToken) {
-        this.installUnpackedApp(data.appPath, data.appToken);
+        this.loadUnpackedApp(data.appPath, data.appToken);
       }
     }
   }
@@ -199,11 +197,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   /**
-   * Install production apps
+   * Load production apps
    */
-  async installProductionApps() {
+  async loadProductionApps() {
     const productionApps = await this.fetchProductionApps();
-
     const disabledApps = this.getDisabledAppsFromStorage();
 
     productionApps.forEach(app => {
@@ -213,7 +210,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         loadedApp => loadedApp.id === app.id_hash,
       );
 
-      this.addApp({
+      this.loadApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
@@ -241,9 +238,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   /**
-   * For now, there can only be 1 unpacked app at a time
+   * Loads an unpacked app.
+   * There can only be 1 unpacked app at a time.
    */
-  async installUnpackedApp(appPath: string, appToken: string) {
+  async loadUnpackedApp(appPath: string, appToken: string) {
     const id = await this.getAppIdFromServer(appToken);
 
     if (id == null) {
@@ -279,7 +277,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       this.SET_PROD_APP_ENABLED(id, false);
     }
 
-    this.addApp({
+    this.loadApp({
       id,
       manifest,
       appPath,
@@ -300,7 +298,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  addApp(app: ILoadedApp) {
+  loadApp(app: ILoadedApp) {
     const { id, appToken } = app;
     if (
       this.state.loadedApps.find(
@@ -310,7 +308,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       return;
     }
 
-    this.ADD_APP(app);
+    this.LOAD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
       localStorage.setItem(
@@ -321,6 +319,9 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         }),
       );
     }
+
+
+
     this.appLoad.next(this.getApp(id));
   }
 
@@ -416,7 +417,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   unloadApp(app: ILoadedApp) {
-    this.REMOVE_APP(app.id);
+    this.UNLOAD_APP(app.id);
     if (app.unpacked) {
       localStorage.removeItem(this.unpackedLocalStorageKey);
       if (this.devServer) {
@@ -430,27 +431,18 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   async reloadApp(appId: string) {
     const app = this.getApp(appId);
 
+    // For production apps we don't actually do anything here except
+    // tell all webviews/sources to refresh themselves.
     if (!app.unpacked) {
       this.appReload.next(appId);
       return;
     }
-    const manifestPath = path.join(app.appPath, 'manifest.json');
 
-    if (!(await this.fileExists(manifestPath))) {
-      this.unloadApp(app);
-      return 'Error: manifest.json is missing!';
-    }
+    this.unloadApp(app);
+    const error = await this.loadUnpackedApp(app.appPath, app.appToken);
 
-    const manifest = JSON.parse(await this.loadManifestFromDisk(manifestPath));
+    if (error) return error;
 
-    try {
-      await this.validateManifest(manifest, app.appPath);
-    } catch (e) {
-      this.unloadApps();
-      return e.message;
-    }
-
-    this.UPDATE_APP_MANIFEST(appId, manifest);
     this.appReload.next(appId);
   }
 
@@ -610,14 +602,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return partition;
   }
 
-  getPageUrlForSlot(appId: string, slot: EAppPageSlot) {
-    const app = this.getApp(appId);
-    const page = app.manifest.pages.find(page => page.slot === slot);
-    if (!page) return null;
-
-    return this.getPageUrl(appId, page.file);
-  }
-
   isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
     const app = this.getApp(appId);
     if (!app) return false;
@@ -634,7 +618,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
-    let url = this.getPageUrl(appId, source.file);
+    let url = this.containerManager.getPageUrl(app, source.file);
 
     if (settings) {
       url = `${url}&settings=${encodeURIComponent(settings)}`;
@@ -645,24 +629,18 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return url;
   }
 
-  getPageUrl(appId: string, page: string) {
-    const app = this.getApp(appId);
-    const url = this.getAssetUrl(appId, page);
-    return `${url}?app_token=${app.appToken}`;
-  }
-
   getAssetUrl(appId: string, asset: string) {
     const app = this.getApp(appId);
-    let url: string;
+    if (!app) return null;
 
-    if (app.unpacked) {
-      const trimmed = trim(app.manifest.buildPath, '/ ');
-      url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
-    } else {
-      url = compact([app.appUrl, asset]).join('/');
-    }
+    return this.containerManager.getAssetUrl(app, asset);
+  }
 
-    return url;
+  getPageContainerIdForSlot(appId: string, slot: EAppPageSlot) {
+    const app = this.getApp(appId);
+    if (!app) return null;
+
+    return this.containerManager.getContainerId(app, slot);
   }
 
   getAppSourceSize(appId: string, sourceId: string) {
@@ -787,17 +765,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.transformSubjects[id].next(value);
   }
 
-  /**
-   * Replace for now
-   * @param app the app
-   */
   @mutation()
-  private ADD_APP(app: ILoadedApp) {
+  private LOAD_APP(app: ILoadedApp) {
     this.state.loadedApps.push(app);
   }
 
   @mutation()
-  private REMOVE_APP(appId: string) {
+  private UNLOAD_APP(appId: string) {
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod
     // generally we want to do actions with enabled one first
@@ -806,15 +780,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     } else {
       this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
     }
-  }
-
-  @mutation()
-  private UPDATE_APP_MANIFEST(appId: string, manifest: IAppManifest) {
-    this.state.loadedApps.forEach(app => {
-      if (app.id === appId) {
-        app.manifest = manifest;
-      }
-    });
   }
 
   @mutation()
