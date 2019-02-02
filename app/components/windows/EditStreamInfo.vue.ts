@@ -189,9 +189,13 @@ export default class EditStreamInfo extends Vue {
   async loadAvailableProfiles() {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
-    this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
-      this.gameModel,
-    );
+    try {
+      this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
+        this.gameModel,
+      );
+    } catch (e) {
+      console.error('Error fetching optimized game profiles!', e);
+    }
     this.searchProfilesPending = false;
   }
 

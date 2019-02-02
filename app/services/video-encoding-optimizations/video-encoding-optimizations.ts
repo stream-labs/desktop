@@ -115,9 +115,11 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       profiles = this.state.lastLoadedProfiles;
     } else {
       // try to fetch game-specific profile
-      profiles = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${game.toUpperCase()}`))
+      profiles = await fetch(this.urlService.getStreamlabsApi(`gamepresets/${encodeURIComponent(game.toUpperCase())}`))
         .then(handleErrors)
         .then(camelize);
+
+      console.log(profiles);
     }
 
     // if no game-specific profile found then fetch generic profiles
