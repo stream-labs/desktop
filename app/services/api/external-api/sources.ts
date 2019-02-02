@@ -84,7 +84,7 @@ export class SourcesService {
   }
 }
 
-interface ISourceModel {
+export interface ISourceModel {
   sourceId: string;
   name: string;
   type: TSourceType;
