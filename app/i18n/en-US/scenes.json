@@ -17,6 +17,7 @@
   "Create Output Projector": "Create Output Projector",
   "Studio Mode": "Studio Mode",
   "Are you sure you want to remove %{sceneName}?": "Are you sure you want to remove %{sceneName}?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Disable Performance Mode",
   "Scene Collections": "Scene Collections",
   "The building blocks of your scene. Also contains widgets.": "The building blocks of your scene. Also contains widgets.",
