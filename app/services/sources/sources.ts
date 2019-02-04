@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import { cloneDeep } from 'lodash';
+import * as Sentry from '@sentry/browser';
 import {
   IObsListOption,
   setupConfigurableDefaults,
@@ -141,10 +142,22 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @mutation()
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
-    if (this.state.sources[sourcePatch.id]) {
-      Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
-    } else {
-      Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
+    try {
+      if (this.state.sources[sourcePatch.id]) {
+        Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+      } else {
+        Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
+      }
+    } catch (e) {
+      /*
+       * Tracking an exception on sentry, where sourcePath.id is undefined,
+       * but is hard to see where it's coming from, add breadcrumb with update data
+       */
+      Sentry.addBreadcrumb({
+        message: 'Failed to update source',
+        data: sourcePatch,
+      });
+      throw e;
     }
   }
 
