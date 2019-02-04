@@ -1,4 +1,3 @@
-<script lang="tsx">
 import Vue from 'vue';
 import { shell } from 'electron';
 import emojione from 'emojione';
@@ -30,7 +29,7 @@ export default class NewsBanner extends Vue {
   }
 
   async closeBanner(e?: Event) {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     this.processingClose = true;
     await this.announcementsService.closeBanner();
     this.processingClose = false;
@@ -54,7 +53,10 @@ export default class NewsBanner extends Vue {
   render(h: Function) {
     return (
       <div>
-        <div class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })} onClick={this.followLink}>
+        <div
+          class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })}
+          onClick={this.followLink}
+        >
           <img class={styles.bgImage} src={this.currentBanner.thumbnail} />
           <div class={styles.imageContainer}>
             <img class={styles.shadowImageLeft} src={this.currentBanner.thumbnail} />
@@ -66,18 +68,19 @@ export default class NewsBanner extends Vue {
             <p class={styles.subheading}>{this.currentBanner.subHeader}</p>
           </div>
           <div class={styles.ctaContainer}>
-            <button
-              class={cx('button', styles.learnMore)}
-              disabled={!this.bannerExists}
-            >{this.currentBanner.linkTitle}</button>
+            <button class={cx('button', styles.learnMore)} disabled={!this.bannerExists}>
+              {this.currentBanner.linkTitle}
+            </button>
             <button
               class={styles.dismissButton}
-              onClick={this.closeBanner} disabled={!this.bannerExists || this.processingClose}
-            >{$t('Dismiss')}</button>
+              onClick={this.closeBanner}
+              disabled={!this.bannerExists || this.processingClose}
+            >
+              {$t('Dismiss')}
+            </button>
           </div>
         </div>
       </div>
     );
   }
 }
-</script>
