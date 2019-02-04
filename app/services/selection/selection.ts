@@ -100,11 +100,17 @@ export class SelectionService extends StatefulService<ISelectionState>
     if (!lastSelected) return;
 
     const name = lastSelected.name;
+    const selectionLength = this.getSelection().getIds.call(this).length;
+    const message =
+      selectionLength > 1
+        ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
+        : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
+
     electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {
+        message,
         type: 'warning',
-        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
         buttons: [$t('Cancel'), $t('OK')],
       },
       ok => {
