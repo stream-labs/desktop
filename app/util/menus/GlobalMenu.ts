@@ -10,14 +10,14 @@ export function setupGlobalContextMenuForEditableElement() {
     const hasText = params.selectionText.trim().length > 0;
     const menu = new Menu();
     menu.append({
-      label: 'Undo',
+      label: $t('common.undo'),
       accelerator: 'Ctrl+Z',
       role: 'undo',
       enabled: params.editFlags.canUndo,
       visible: params.isEditable,
     });
     menu.append({
-      label: 'Redo',
+      label: $t('common.redo'),
       accelerator: 'Ctrl+Y',
       role: 'redo',
       enabled: params.editFlags.canRedo,
@@ -25,21 +25,21 @@ export function setupGlobalContextMenuForEditableElement() {
     });
     menu.append({ type: 'separator' });
     menu.append({
-      label: 'Cut',
+      label: $t('common.cut'),
       accelerator: 'Ctrl+X',
       role: 'cut',
       enabled: hasText && params.editFlags.canCut,
       visible: params.isEditable,
     });
     menu.append({
-      label: 'Copy',
+      label: $t('common.copy'),
       accelerator: 'Ctrl+C',
       role: 'copy',
       enabled: hasText && params.editFlags.canCopy,
       visible: params.isEditable,
     });
     menu.append({
-      label: 'Paste',
+      label: $t('common.paste'),
       accelerator: 'Ctrl+V',
       role: 'paste',
       enabled: params.editFlags.canPaste,
@@ -47,7 +47,7 @@ export function setupGlobalContextMenuForEditableElement() {
     });
     menu.append({ type: 'separator' });
     menu.append({
-      label: 'Select All',
+      label: $t('common.selectAll'),
       accelerator: 'Ctrl+A',
       role: 'selectall',
       enabled: params.editFlags.canSelectAll,
