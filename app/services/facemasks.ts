@@ -62,11 +62,6 @@ interface IFacemaskDonation {
   facemask: string;
 }
 
-interface IDownloadProgress {
-  uuid: string;
-  progress: number;
-}
-
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -92,7 +87,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     },
   };
 
-  downloadProgress: IDownloadProgress[] = [];
+  downloadProgress = {};
 
   static defaultState: IFacemasksServiceState = {
     device: { name: null, value: null },
@@ -274,11 +269,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       }
 
       const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
+      this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+
       const downloads = missingMasks.map(mask =>
         this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
       );
-
-      this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
 
       Promise.all(downloads)
         .then(responses => {
@@ -295,7 +290,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   setDownloadProgress(downloads: string[]) {
     this.settings.facemasks.forEach(mask => {
-      this.downloadProgress.push({ uuid: mask.uuid, progress: 1 });
+      this.downloadProgress[mask.uuid] = 1;
     });
     downloads.forEach(uuid => {
       this.downloadProgress[uuid] = 0;
@@ -308,13 +303,14 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
 
     let current = 0;
-    this.downloadProgress.forEach(mask => {
-      current += mask.progress;
+    Object.keys(this.downloadProgress).forEach(key => {
+      current += this.downloadProgress[key];
     });
-    if (current / this.downloadProgress.length === 1) {
+
+    if (current / Object.keys(this.downloadProgress).length === 1) {
       return this.state.active ? 'Ready' : 'Loading';
     }
-    return 'Downloading Masks';
+    return `${((current / Object.keys(this.downloadProgress).length) * 100).toFixed(2)}%`;
   }
 
   getEnabledDevice() {
@@ -496,15 +492,14 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
         response.on('data', chunk => {
           current += chunk.length;
-          this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] =
-            current / length;
+          this.downloadProgress[uuid] = current / length;
           fileContent += chunk;
         });
 
         writeStream.on('finish', () => {
           try {
             const data = JSON.parse(fileContent) as IFacemask;
-            this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] = 1;
+            this.downloadProgress[uuid] = 1;
             resolve(data.modtime);
           } catch (err) {
             reject(err);
