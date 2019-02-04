@@ -22,6 +22,4 @@ console.log(`Wrapping ${process.argv[2]} with arguments ${args}`);
 
 const proc = cp.fork(process.argv[2], args);
 
-proc.on('exit', code => {
-	process.exit(code);
-});
+proc.on('exit', process.exit);
