@@ -9,19 +9,16 @@ import Utils from 'services/utils';
 @Component({})
 export default class PlatformAppWebview extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
-  @Prop() appId: string;
-  @Prop() pageSlot: EAppPageSlot;
-  @Prop() poppedOut: boolean;
+  // @Prop() appId: string;
+  // @Prop() pageSlot: EAppPageSlot;
+  @Prop() params: { appId: string; pageSlot: EAppPageSlot };
   @Prop({ default: true }) visible: boolean;
 
   $refs: {
-    appView: Electron.WebviewTag;
     resizeContainer: HTMLDivElement;
   };
 
   reloadSub: Subscription;
-
-  renderWebview = true;
 
   transformSubjectId: string;
 
@@ -42,27 +39,43 @@ export default class PlatformAppWebview extends Vue {
 
     this.attachWebviewListeners();
 
-    this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
-      if (this.appId === appId) {
-        this.renderWebview = false;
+    if (!this.poppedOut) {
+      const viewId = this.platformAppsService.getPageContainerIdForSlot(this.appId, this.pageSlot);
+      const view = electron.remote.BrowserView.fromId(viewId);
+      const win = electron.remote.getCurrentWindow();
+      (win as any).addBrowserView(view);
+      const rect = this.$refs.resizeContainer.getBoundingClientRect();
+      view.setBounds({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+    }
 
-        // This feels like a massive code smell.
-        // Ideally we would have a better way to destroy and
-        // recreate the webcontents
-        this.$nextTick(() => {
-          this.renderWebview = true;
+    // TODO: Handle reloads
 
-          this.$nextTick(() => {
-            this.attachWebviewListeners();
-          });
-        });
-      }
-    });
+    // this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
+    //   if (this.appId === appId) {
+    //     this.renderWebview = false;
+
+    //     // This feels like a massive code smell.
+    //     // Ideally we would have a better way to destroy and
+    //     // recreate the webcontents
+    //     this.$nextTick(() => {
+    //       this.renderWebview = true;
+
+    //       this.$nextTick(() => {
+    //         this.attachWebviewListeners();
+    //       });
+    //     });
+    //   }
+    // });
   }
 
   @Watch('poppedOut')
   handlePopoutChange() {
     this.$nextTick(() => this.attachWebviewListeners());
+  }
+
+  get poppedOut() {
+    return Utils.isMainWindow() &&
+      this.platformAppsService.getApp(this.appId).poppedOutSlots.includes(this.pageSlot);
   }
 
   attachWebviewListeners() {
@@ -115,10 +128,6 @@ export default class PlatformAppWebview extends Vue {
   //   return this.platformAppsService.getPageUrlForSlot(this.appId, this.pageSlot);
   // }
 
-  get appPartition() {
-    return this.platformAppsService.getAppPartition(this.appId);
-  }
-
   get webviewStyles() {
     return '';
     // if (this.visible) {
@@ -158,5 +167,13 @@ export default class PlatformAppWebview extends Vue {
       size: { x: rect.width, y: rect.height },
       visible: this.visible,
     });
+  }
+
+  get appId() {
+    return this.params.appId;
+  }
+
+  get pageSlot() {
+    return this.params.pageSlot;
   }
 }

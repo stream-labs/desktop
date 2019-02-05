@@ -1,12 +1,11 @@
 import { mutation, StatefulService } from 'services/stateful-service';
-import { serviceModule } from 'services/service';
+import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { EApiPermissions, IWebviewTransform } from './api/modules/module';
-import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
 import electron from 'electron';
@@ -18,6 +17,7 @@ import { UserService } from 'services/user';
 import { compact, trim, without } from 'lodash';
 import uuid from 'uuid/v4';
 import { PlatformContainerManager } from './container-manager';
+import ExecuteInCurrentWindow from 'util/execute-in-current-window';
 
 const DEV_PORT = 8081;
 
@@ -146,8 +146,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
   private disabledLocalStorageKey = 'PlatformAppsDisabled';
 
-  @serviceModule(PlatformAppsApi) private apiManager: PlatformAppsApi;
-  @serviceModule(PlatformContainerManager) private containerManager: PlatformContainerManager;
+  @lazyModule(PlatformContainerManager) private containerManager: PlatformContainerManager;
 
   private devServer: DevServer;
 
@@ -320,8 +319,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       );
     }
 
-
-
+    this.containerManager.registerApp(app);
     this.appLoad.next(this.getApp(id));
   }
 
@@ -484,124 +482,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  exposeAppApi(
-    appId: string,
-    webContentsId: number,
-    electronWindowId: number,
-    slobsWindowId: string,
-    transformSubjectId: string,
-  ) {
-    const app = this.getApp(appId);
-    const api = this.apiManager.getApi(
-      app,
-      webContentsId,
-      electronWindowId,
-      slobsWindowId,
-      this.getTransformSubject(transformSubjectId),
-    );
-
-    // Namespace under v1 for now.  Eventually we may want to add
-    // a v2 API.
-    this.guestApiService.exposeApi(webContentsId, { v1: api });
-  }
-
-  sessionsInitialized: Dictionary<boolean> = {};
-
-  /**
-   * Returns a session partition id for the app id.
-   * These are non-persistent for now
-   */
-  getAppPartition(appId: string) {
-    const app = this.getApp(appId);
-    const userId = this.userService.platformId;
-    const partition = `platformApp-${appId}-${userId}`;
-
-    if (!this.sessionsInitialized[partition]) {
-      const session = electron.remote.session.fromPartition(partition);
-      const frameUrls: string[] = [];
-      let mainFrame = '';
-
-      session.webRequest.onBeforeRequest((details, cb) => {
-        const parsed = url.parse(details.url);
-
-        if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
-
-        if (parsed.hostname === 'cvp.twitch.tv' && (details.resourceType = 'script')) {
-          cb({});
-          return;
-        }
-
-        if (details.resourceType === 'subFrame') {
-          // Subframes from other origins are allowed to load scripts.  The same origin
-          // policy will prevent them from accessing the parent window.
-          if (parsed.hostname !== mainFrame) {
-            frameUrls.push(details.url);
-            cb({});
-            return;
-          }
-        }
-
-        if (details['referrer'] && frameUrls.includes(details['referrer'])) {
-          cb({});
-          return;
-        }
-
-        if (details.resourceType === 'script') {
-          const scriptWhitelist = [
-            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
-            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
-          ];
-
-          const scriptDomainWhitelist = [
-            'www.googletagmanager.com',
-            'www.google-analytics.com',
-            'widget.intercom.io',
-            'js.intercomcdn.com',
-          ];
-
-          const parsed = url.parse(details.url);
-
-          if (scriptWhitelist.includes(details.url)) {
-            cb({});
-            return;
-          }
-
-          if (scriptDomainWhitelist.includes(parsed.hostname)) {
-            cb({});
-            return;
-          }
-
-          if (details.url.startsWith(app.appUrl)) {
-            cb({});
-            return;
-          }
-
-          if (parsed.host === `localhost:${DEV_PORT}`) {
-            cb({});
-            return;
-          }
-
-          // Let through all chrome dev tools requests
-          if (parsed.protocol === 'chrome-devtools:') {
-            cb({});
-            return;
-          }
-
-          // Cancel all other script requests.
-          cb({ cancel: true });
-          return;
-        }
-
-        // Let through all other requests (XHR, assets, etc)
-        cb({});
-      });
-
-      this.sessionsInitialized[partition] = true;
-    }
-
-    return partition;
-  }
-
   isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
     const app = this.getApp(appId);
     if (!app) return false;
@@ -684,6 +564,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
+  @ExecuteInCurrentWindow()
   getApp(appId: string): ILoadedApp {
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod

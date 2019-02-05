@@ -115,10 +115,6 @@ export default class Main extends Vue {
     return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
   }
 
-  isAppVisible(appId: string) {
-    return this.page === 'PlatformAppContainer' && this.params.appId === appId;
-  }
-
   appPageSlot = EAppPageSlot.TopNav;
 
   /**

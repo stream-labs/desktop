@@ -509,7 +509,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         });
 
         if (page && page.redirectPropertiesToTopNavSlot) {
-          this.navigationService.navigate('PlatformAppContainer', {
+          this.navigationService.navigate('PlatformAppWebview', {
             appId: app.id,
             sourceId: source.sourceId,
           });
