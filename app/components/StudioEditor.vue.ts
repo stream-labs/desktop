@@ -52,7 +52,7 @@ export default class StudioEditor extends Vue {
   currentX: number;
   currentY: number;
   isCropping: boolean;
-  canDrag = false;
+  canDrag = true;
 
   $refs: {
     display: HTMLDivElement;
@@ -88,13 +88,14 @@ export default class StudioEditor extends Vue {
       }
     }
 
+    // prevent dragging if the clicking is past the source
+    if (!this.getOverSource(event)) this.canDrag = false;
+
     this.updateCursor(event);
   }
 
   handleMouseDblClick(event: MouseEvent) {
-    const overSource = this.sceneItems.find(source => {
-      return this.isOverSource(event, source);
-    });
+    const overSource = this.getOverSource(event);
 
     if (!overSource) return;
 
@@ -137,9 +138,7 @@ export default class StudioEditor extends Vue {
     // If neither a drag or resize was initiated, it must have been
     // an attempted selection or right click.
     if (!this.dragHandler && !this.resizeRegion) {
-      const overSource = this.sceneItems.find(source => {
-        return this.isOverSource(event, source);
-      });
+      const overSource = this.getOverSource(event);
 
       // Either select a new source, or deselect all sources
       if (overSource) {
@@ -246,8 +245,6 @@ export default class StudioEditor extends Vue {
 
         // Start dragging it
         this.startDragging(event);
-      } else {
-        this.canDrag = false;
       }
     }
 
@@ -365,9 +362,7 @@ export default class StudioEditor extends Vue {
       if (overResize) {
         this.$refs.display.style.cursor = overResize.cursor;
       } else {
-        const overSource = _.find(this.sceneItems, source => {
-          return this.isOverSource(event, source);
-        });
+        const overSource = this.getOverSource(event);
 
         if (overSource) {
           this.$refs.display.style.cursor = '-webkit-grab';
@@ -406,13 +401,24 @@ export default class StudioEditor extends Vue {
     return true;
   }
 
-  // Determines if the given mouse event is over the
-  // given source
+  /**
+   * Determines if the given mouse event is over the
+   * given source
+   */
   isOverSource(event: MouseEvent, source: SceneItem) {
     const rect = new ScalableRectangle(source.getRectangle());
     rect.normalize();
 
     return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
+  }
+
+  /**
+   * returns the source under the cursor
+   */
+  private getOverSource(event: MouseEvent): SceneItem {
+    return this.sceneItems.find(source => {
+      return this.isOverSource(event, source);
+    });
   }
 
   // Determines if the given mouse event is over any
