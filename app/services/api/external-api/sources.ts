@@ -80,7 +80,7 @@ export class SourcesService {
   }
 
   get sourceRemoved(): Observable<ISourceModel> {
-    return this.sourcesService.sourceUpdated;
+    return this.sourcesService.sourceRemoved;
   }
 }
 
