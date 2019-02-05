@@ -1,27 +1,24 @@
 import { Observable } from 'rxjs';
-import { ISourceApi, TSourceType, ISourceAddOptions } from 'services/sources';
-import { ISelection, TNodesList } from 'services/selection';
-import { InjectFromExternalApi, Singleton } from '../external-api';
+import { TSourceType } from 'services/sources/index';
+import { InjectFromExternalApi, Singleton } from '../../external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import {
   ScenesService as InternalScenesService,
   SceneItemNode as InternalSceneNode,
   SceneItem as InternalSceneItem,
   SceneItemFolder as InternalSceneItemFolder,
-  ISceneItemActions
-} from 'services/scenes';
-import { Source, SourcesService, ISourceModel } from './sources';
-import { Inject } from '../../../util/injector';
-
+  Scene as InternalScene,
+  ISceneItemActions,
+} from 'services/scenes/index';
+import { Source, SourcesService, ISourceModel, ISourceAddOptions } from '../sources/sources';
+import { Inject } from '../../../../util/injector';
 
 /**
  * Api for scenes management
  */
 @Singleton()
 export class ScenesService {
-
   @Inject() private scenesService: InternalScenesService;
-
 
   getScene(id: string): Scene {
     return new Scene(id);
@@ -92,88 +89,186 @@ export interface ISceneItem extends ISceneItemSettings, ISceneNode {
   sourceId: string;
 }
 
+export interface ISceneItemFolder extends ISceneNode {
+  name: string;
+}
+
 export type TSceneNode = ISceneItem | ISceneItemFolder;
 
 export interface IScene {
   id: string;
   name: string;
-  nodes: (ISceneItem | ISceneItemFolder)[];
+  nodes: ISceneNode[];
+}
+
+export type TSceneNodeType = 'item' | 'folder';
+
+interface SceneItemNodeModel {
+  id: string;
+  sceneId: string;
+  sceneNodeType: TSceneNodeType;
+  parentId?: string;
+  childrenIds?: string[];
 }
 
 @ServiceHelper()
 export class Scene {
-
   @InjectFromExternalApi() private scenesService: ScenesService;
+  @InjectFromExternalApi() private sourcesService: SourcesService;
+  @Inject('ScenesService') private internalScenesService: InternalScenesService;
 
-  constructor(private sceneId: string) {}
+  private scene: InternalScene;
+
+  constructor(private sceneId: string) {
+    this.scene = this.internalScenesService.getScene(sceneId);
+  }
 
   getModel(): IScene {
-    const scene = this.scenesService.getScene(this.sceneId);
     return {
-      name: scene.name
-      nodes:
-    }
+      id: this.scene.id,
+      name: this.scene.name,
+      nodes: this.getNodes().map(node => node.getModel()),
+    };
   }
 
-  getNode(sceneNodeId: string): TSceneNode {
-
+  getNode(sceneNodeId: string): SceneNode {
+    const node = this.scene.getNode(sceneNodeId);
+    return node.sceneNodeType === 'folder'
+      ? this.getFolder(sceneNodeId)
+      : this.getItem(sceneNodeId);
   }
-  getNodeByName(name: string): TSceneNodeApi;
-  getItem(sceneItemId: string): ISceneItemApi;
-  getFolder(sceneFolderId: string): ISceneItemFolderApi;
-  getNodes(): TSceneNodeApi[];
-  getRootNodes(): TSceneNodeApi[];
-  getItems(): ISceneItemApi[];
-  getFolders(): ISceneItemFolderApi[];
+
+  getNodeByName(name: string): SceneNode {
+    const node = this.scene.getNodeByName(name);
+    return node ? this.getNode(node.id) : null;
+  }
+
+  getItem(sceneItemId: string): SceneItem {
+    const folder = this.scene.getItem(sceneItemId);
+    if (!folder) return null;
+    return folder ? new SceneItem(folder.sceneId, folder.id) : null;
+  }
+
+  getFolder(sceneFolderId: string): SceneItemFolder {
+    const folder = this.scene.getFolder(sceneFolderId);
+    if (!folder) return null;
+    return folder ? new SceneItemFolder(folder.sceneId, folder.id) : null;
+  }
+
+  getNodes(): SceneNode[] {
+    return this.scene.getNodes().map(node => this.getNode(node.id));
+  }
+
+  getRootNodes(): SceneNode[] {
+    return this.scene.getRootNodes().map(node => this.getNode(node.sceneId));
+  }
+
+  getItems(): SceneItem[] {
+    return this.scene.getItems().map(item => this.getItem(item.id));
+  }
+
+  getFolders(): SceneItemFolder[] {
+    return this.scene.getFolders().map(folder => this.getFolder(folder.id));
+  }
 
   /**
    * returns scene items of scene + scene items of nested scenes
    */
-  getNestedItems(): ISceneItemApi[];
+  getNestedItems(): SceneItem[] {
+    return this.scene.getNestedItems().map(item => this.getItem(item.id));
+  }
 
   /**
    * returns sources of scene + sources of nested scenes
    * result also includes nested scenes
    */
-  getNestedSources(): ISourceApi[];
+  getNestedSources(): Source[] {
+    return this.scene
+      .getNestedSources()
+      .map(source => this.sourcesService.getSource(source.sourceId));
+  }
 
   /**
    * return nested scenes in the safe-to-add order
    */
-  getNestedScenes(): ISceneApi[];
+  getNestedScenes(): Scene[] {
+    return this.scene.getNestedScenes().map(scene => this.scenesService.getScene(scene.id));
+  }
 
   /**
    * returns the source linked to scene
    */
-  getSource(): ISourceApi;
+  getSource(): Source {
+    return this.sourcesService.getSource(this.scene.id);
+  }
 
-  addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
-  createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
-  createFolder(name: string): ISceneItemFolderApi;
+  addSource(sourceId: string, options?: ISceneNodeAddOptions): SceneItem {
+    const newItem = this.scene.addSource(sourceId, options);
+    return newItem ? this.getItem(newItem.sceneItemId) : null;
+  }
+
+  createAndAddSource(name: string, type: TSourceType): SceneItem {
+    const newItem = this.scene.createAndAddSource(name, type);
+    return newItem ? this.getItem(newItem.sceneItemId) : null;
+  }
+
+  createFolder(name: string): SceneItemFolder {
+    return this.getFolder(this.scene.createFolder(name).id);
+  }
 
   /**
    * creates sources from file system folders and files
    * source type depends on the file extension
    */
-  addFile(path: string, folderId?: string): TSceneNodeApi;
+  addFile(path: string, folderId?: string): SceneNode {
+    const newNode = this.scene.addFile(path, folderId);
+    return newNode ? this.getNode(newNode.id) : null;
+  }
 
   /**
    * removes all nodes from the scene
    */
-  clear(): void;
-  removeFolder(folderId: string): void;
-  removeItem(sceneItemId: string): void;
-  remove(): void;
-  canAddSource(sourceId: string): boolean;
-  setName(newName: string): void;
-  getModel(): IScene;
-  makeActive(): void;
-  getSelection(itemsList?: TNodesList): ISelection;
+  clear(): void {
+    return this.scene.clear();
+  }
+
+  removeFolder(folderId: string): void {
+    return this.removeFolder(folderId);
+  }
+
+  removeItem(sceneItemId: string): void {
+    return this.scene.removeItem(sceneItemId);
+  }
+
+  remove(): void {
+    this.scene.remove();
+  }
+
+  canAddSource(sourceId: string): boolean {
+    return this.scene.canAddSource(sourceId);
+  }
+
+  setName(newName: string): void {
+    return this.scene.setName(newName);
+  }
+
+  makeActive(): void {
+    return this.scene.makeActive();
+  }
+
+  // getSelection(itemsList?: TNodesList): ISelection;
 }
 
 export interface ISceneNodeAddOptions {
   id?: string; // A new ID will be assigned if one is not provided
   sourceAddOptions?: ISourceAddOptions;
+}
+
+interface ICrop {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
 }
 
 export interface ISceneItemInfo {
@@ -194,8 +289,6 @@ export interface IScenesState {
   displayOrder: string[];
   scenes: Dictionary<IScene>;
 }
-
-
 
 export interface ITransform {
   position: IVec2;
@@ -242,28 +335,18 @@ export interface ISceneItemActions {
   setContentCrop(): void;
 }
 
-
-export type TSceneNodeType = 'item' | 'folder';
-
-interface SceneItemNodeModel {
-  id: string;
-  sceneId: string;
-  sceneNodeType: TSceneNodeType;
-  parentId?: string;
-  childrenIds?: string[];
-}
-
 /**
  * API for scene items and folders
  */
 export abstract class SceneNode {
-
   @Inject('InternalScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
+  protected scene: InternalScene;
   protected sceneNode: InternalSceneNode;
 
-  constructor(public nodeId: string, public sceneId: string) {
-    this.sceneNode = this.scenesService.getScene(this.sceneId).getNode(this.nodeId);
+  constructor(public sceneId: string, public nodeId: string) {
+    this.scene = this.internalScenesService.getScene(sceneId);
+    this.sceneNode = this.scene.getNode(this.nodeId);
   }
 
   getModel(): ISceneNode {
@@ -272,8 +355,8 @@ export abstract class SceneNode {
       sceneId: this.sceneNode.sceneId,
       sceneNodeType: this.sceneNode.sceneNodeType,
       parentId: this.sceneNode.parentId,
-      childrenIds: this.sceneNode.childrenIds
-    }
+      childrenIds: this.sceneNode.childrenIds,
+    };
   }
 
   getScene(): Scene {
@@ -289,9 +372,9 @@ export abstract class SceneNode {
   /**
    * Returns parent folder
    */
-  // getParent(): SceneItemFolder {
-  //
-  // };
+  getParent(): SceneItemFolder {
+    return this.getScene().getFolder(this.sceneNode.parentId);
+  }
 
   /**
    * Sets parent folder
@@ -418,7 +501,7 @@ export abstract class SceneNode {
   getPrevNode(): SceneNode {
     const node = this.sceneNode.getPrevNode();
     return this.getScene().getNode(node.id);
-  };
+  }
 
   /**
    * Returns a node with the next nodeIndex
@@ -433,7 +516,7 @@ export abstract class SceneNode {
    */
   getNextItem(): SceneItem {
     const item = this.sceneNode.getNextItem();
-    return this.getScene().getNode(item.id);
+    return this.getScene().getItem(item.id);
   }
 
   /**
@@ -441,8 +524,8 @@ export abstract class SceneNode {
    */
   getPrevItem(): SceneItem {
     const item = this.sceneNode.getPrevItem();
-    return this.getScene().getNode(item.id);
-  };
+    return this.getScene().getItem(item.id);
+  }
 
   /**
    * Returns a node path - the chain of all parent ids for the node
@@ -452,10 +535,8 @@ export abstract class SceneNode {
   }
 }
 
-
 @ServiceHelper()
-export class SceneItem extends SceneNode, ISceneItemActions {
-
+export class SceneItem extends SceneNode implements ISceneItemActions {
   private sceneItem: InternalSceneItem;
 
   @InjectFromExternalApi() private sourcesService: SourcesService;
@@ -479,21 +560,67 @@ export class SceneItem extends SceneNode, ISceneItemActions {
       sceneItemId: this.sceneItem.sceneItemId,
       transform: this.sceneItem.transform,
       visible: this.sceneItem.visible,
-      locked: this.sceneItem.locked
-    }
+      locked: this.sceneItem.locked,
+    };
   }
-}
 
+  setSettings(settings: Partial<ISceneItemSettings>): void {
+    return this.sceneItem.setSettings(settings);
+  }
 
-export interface ISceneItemFolder extends ISceneNode {
-  name: string;
+  setVisibility(visible: boolean): void {
+    return this.sceneItem.setVisibility(visible);
+  }
+
+  setTransform(transform: IPartialTransform): void {
+    return this.sceneItem.setTransform(transform);
+  }
+
+  resetTransform(): void {
+    return this.sceneItem.resetTransform();
+  }
+
+  flipX(): void {
+    return this.sceneItem.flipX();
+  }
+
+  flipY(): void {
+    return this.sceneItem.flipY();
+  }
+
+  stretchToScreen(): void {
+    return this.sceneItem.stretchToScreen();
+  }
+
+  fitToScreen(): void {
+    return this.sceneItem.fitToScreen();
+  }
+
+  centerOnScreen(): void {
+    return this.sceneItem.centerOnScreen();
+  }
+
+  rotate(deg: number): void {
+    return this.sceneItem.rotate(deg);
+  }
+
+  remove(): void {
+    return this.sceneItem.remove();
+  }
+
+  /**
+   * only for scene sources
+   */
+  setContentCrop(): void {
+    return this.setContentCrop();
+  }
 }
 
 /**
  * API for folders
  */
+@ServiceHelper()
 export class SceneItemFolder extends SceneNode {
-
   private sceneFolder: InternalSceneItemFolder;
 
   @InjectFromExternalApi() private sourcesService: SourcesService;
@@ -510,7 +637,7 @@ export class SceneItemFolder extends SceneNode {
     return {
       name: this.sceneFolder.name,
       ...super.getModel(),
-    }
+    };
   }
 
   /**
@@ -518,9 +645,9 @@ export class SceneItemFolder extends SceneNode {
    * To get all nested children
    * @see getNestedNodes
    */
-  getNodes(): TSceneNode[] {
+  getNodes(): SceneNode[] {
     const scene = this.getScene();
-    return this.sceneFolder.getNodes().map(node => scene.getNode(node.id))
+    return this.sceneFolder.getNodes().map(node => scene.getNode(node.id));
   }
 
   /**
@@ -528,14 +655,14 @@ export class SceneItemFolder extends SceneNode {
    */
   getItems(): SceneItem[] {
     const scene = this.getScene();
-    return this.sceneFolder.getItems().map(item => scene.getNode(item.id))
+    return this.sceneFolder.getItems().map(item => scene.getItem(item.id));
   }
   /**
    * Returns all direct children folders
    */
   getFolders(): SceneItemFolder[] {
     const scene = this.getScene();
-    return this.sceneFolder.getFolders().map(folder => scene.getNode(folder.id))
+    return this.sceneFolder.getFolders().map(folder => scene.getFolder(folder.id));
   }
 
   /**
@@ -545,7 +672,7 @@ export class SceneItemFolder extends SceneNode {
    */
   getNestedNodes(): SceneNode[] {
     const scene = this.getScene();
-    return this.sceneFolder.getNestedNodes().map(node => scene.getNode(node.id))
+    return this.sceneFolder.getNestedNodes().map(node => scene.getNode(node.id));
   }
 
   /**
@@ -569,5 +696,4 @@ export class SceneItemFolder extends SceneNode {
   ungroup(): void {
     return this.sceneFolder.ungroup();
   }
-
 }
