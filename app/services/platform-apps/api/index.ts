@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Module, TApiModule, IApiContext, IWebviewTransform } from './modules/module';
+import { Module, TApiModule, IApiContext, IBrowserViewTransform } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule } from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
@@ -54,17 +54,13 @@ export class PlatformAppsApi {
   getApi(
     app: ILoadedApp,
     webContentsId: number,
-    electronWindowId: number,
-    slobsWindowId: string,
-    webviewTransform: Observable<IWebviewTransform>,
+    webviewTransform: Observable<IBrowserViewTransform>,
   ) {
     const api: Dictionary<TApiModule> = {};
 
     const context: IApiContext = {
       app,
       webContentsId,
-      electronWindowId,
-      slobsWindowId,
       webviewTransform,
     };
 

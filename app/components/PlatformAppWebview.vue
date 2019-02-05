@@ -28,8 +28,4 @@
 .platform-app-popped-out {
   .padding();
 }
-
-.platform-app-webview {
-  flex-grow: 1;
-}
 </style>

@@ -9,12 +9,13 @@ import { PlatformAppsApi } from './api';
 import { lazyModule } from 'util/lazy-module';
 import { GuestApiService } from 'services/guest-api';
 import { BehaviorSubject } from 'rxjs';
-import { IWebviewTransform } from './api/modules/module';
+import { IBrowserViewTransform } from './api/modules/module';
 
 interface IPersistentContainer {
   appId: string;
   slot: EAppPageSlot;
   container: electron.BrowserView;
+  transform: BehaviorSubject<IBrowserViewTransform>;
 }
 
 /**
@@ -47,6 +48,13 @@ export class PlatformContainerManager {
           container,
           appId: app.id,
           slot: page.slot,
+          transform: new BehaviorSubject<IBrowserViewTransform>({
+            pos: { x: 0, y: 0 },
+            size: { x: 0, y: 0 },
+            mounted: false,
+            electronWindowId: null,
+            slobsWindowId: null,
+          }),
         });
       }
     });
@@ -59,25 +67,41 @@ export class PlatformContainerManager {
    */
   unregisterApp(app: ILoadedApp) {}
 
-  /**
-   * Get the container id (Electron BrowserView id) for
-   * the requested app and slot.  If the slot is persistent,
-   * the running container id will be returned.  If the slot
-   * is not persistent, a new container will be spun up and
-   * the id will be returned.
-   * @param app The app
-   * @param slot The page slot
-   */
-  getContainerId(app: ILoadedApp, slot: EAppPageSlot) {
+  mountContainer(
+    app: ILoadedApp,
+    slot: EAppPageSlot,
+    electronWindowId: number,
+    slobsWindowId: string,
+  ) {
+    const container = this.getContainerForSlot(app, slot);
+    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+
+    // TODO: Types for electron fork changes
+    (win as any).addBrowserView(container);
+
+    // TODO: Update transform, hook up listeners
+
+    return container.id;
+  }
+
+  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
+    const cont = this.containers.find(cont => cont.container.id === containerId);
+    cont.container.setBounds({ x: pos.x, y: pos.y, width: size.x, height: size.y });
+
+    // TODO: Update transform
+  }
+
+  private getContainerForSlot(app: ILoadedApp, slot: EAppPageSlot) {
     const existingContainer = this.containers.find(
       cont => cont.appId === app.id && cont.slot === slot,
     );
 
     if (existingContainer) {
-      return existingContainer.container.id;
+      return existingContainer.container;
     }
 
-    return this.createContainer(app, slot).id;
+    // TODO: Store container in this.containers?
+    return this.createContainer(app, slot);
   }
 
   private createContainer(app: ILoadedApp, slot: EAppPageSlot) {
@@ -89,7 +113,6 @@ export class PlatformContainerManager {
       },
     });
 
-    console.log('creating container', app);
     if (app.unpacked) view.webContents.openDevTools();
 
     view.webContents.on('did-finish-load', () => {
@@ -251,11 +274,9 @@ export class PlatformContainerManager {
     const api = this.apiManager.getApi(
       app,
       webContentsId,
-      electronWindowId,
-      slobsWindowId,
       // this.getTransformSubject(transformSubjectId),
       // TODO Remove this hack to make displays work
-      new BehaviorSubject<IWebviewTransform>({} as IWebviewTransform),
+      new BehaviorSubject<IBrowserViewTransform>({} as IBrowserViewTransform),
     );
 
     // Namespace under v1 for now.  Eventually we may want to add

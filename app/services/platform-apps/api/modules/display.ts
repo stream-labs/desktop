@@ -29,38 +29,38 @@ export class DisplayModule extends Module {
 
   @apiMethod()
   create(ctx: IApiContext, options: IDisplayCreateOptions) {
-    const displayId = uuid();
+    // const displayId = uuid();
 
-    const display = new Display(displayId, {
-      electronWindowId: ctx.electronWindowId,
-      slobsWindowId: ctx.slobsWindowId,
-      paddingColor: options.paddingColor,
-      paddingSize: options.paddingSize || 0,
-    });
+    // const display = new Display(displayId, {
+    //   electronWindowId: ctx.electronWindowId,
+    //   slobsWindowId: ctx.slobsWindowId,
+    //   paddingColor: options.paddingColor,
+    //   paddingSize: options.paddingSize || 0,
+    // });
 
-    display.resize(options.size.x, options.size.y);
+    // display.resize(options.size.x, options.size.y);
 
-    this.displays[displayId] = {
-      display,
-      position: options.position,
-      size: options.size,
-      webviewVisible: true,
-      webviewPosition: { x: 0, y: 0 },
-    };
+    // this.displays[displayId] = {
+    //   display,
+    //   position: options.position,
+    //   size: options.size,
+    //   webviewVisible: true,
+    //   webviewPosition: { x: 0, y: 0 },
+    // };
 
-    this.displays[displayId].webviewSubscription = ctx.webviewTransform.subscribe(transform => {
-      const displayEntry = this.displays[displayId];
-      displayEntry.webviewVisible = transform.visible;
-      displayEntry.webviewPosition = transform.pos;
+    // this.displays[displayId].webviewSubscription = ctx.webviewTransform.subscribe(transform => {
+    //   const displayEntry = this.displays[displayId];
+    //   displayEntry.webviewVisible = transform.visible;
+    //   displayEntry.webviewPosition = transform.pos;
 
-      this.updateDisplay(displayEntry);
-    });
+    //   this.updateDisplay(displayEntry);
+    // });
 
-    electron.remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
-      this.destroyDisplay(displayId);
-    });
+    // electron.remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
+    //   this.destroyDisplay(displayId);
+    // });
 
-    return displayId;
+    // return displayId;
   }
 
   @apiMethod()

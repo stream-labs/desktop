@@ -5,6 +5,7 @@ import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';
 import Utils from 'services/utils';
+import { realpathSync } from 'fs';
 
 @Component({})
 export default class PlatformAppWebview extends Vue {
@@ -20,32 +21,40 @@ export default class PlatformAppWebview extends Vue {
 
   reloadSub: Subscription;
 
-  transformSubjectId: string;
-
   resizeInterval: number;
 
+  containerId: number;
+
   mounted() {
-    this.transformSubjectId = this.platformAppsService.createTransformSubject({
-      pos: { x: 0, y: 0 },
-      size: { x: 0, y: 0 },
-      visible: this.visible,
-    });
-
-    this.checkResize();
-
-    this.resizeInterval = window.setInterval(() => {
-      this.checkResize();
-    }, 500);
+    // this.transformSubjectId = this.platformAppsService.createTransformSubject({
+    //   pos: { x: 0, y: 0 },
+    //   size: { x: 0, y: 0 },
+    //   visible: this.visible,
+    //   electronWindowId: electron.remote.getCurrentWindow().id,
+    //   slobsWindowId: Utils.getWindowId(),
+    // });
 
     this.attachWebviewListeners();
 
+    // TODO: Remove Popout from this component
     if (!this.poppedOut) {
-      const viewId = this.platformAppsService.getPageContainerIdForSlot(this.appId, this.pageSlot);
-      const view = electron.remote.BrowserView.fromId(viewId);
-      const win = electron.remote.getCurrentWindow();
-      (win as any).addBrowserView(view);
-      const rect = this.$refs.resizeContainer.getBoundingClientRect();
-      view.setBounds({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+      // const viewId = this.platformAppsService.getPageContainerIdForSlot(this.appId, this.pageSlot);
+      // const view = electron.remote.BrowserView.fromId(viewId);
+      // const win = electron.remote.getCurrentWindow();
+      // (win as any).addBrowserView(view);
+      // const rect = this.$refs.resizeContainer.getBoundingClientRect();
+      // view.setBounds({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+      this.containerId = this.platformAppsService.mountConatiner(
+        this.appId,
+        this.pageSlot,
+        electron.remote.getCurrentWindow().id,
+        Utils.getWindowId(),
+      );
+      this.checkResize();
+
+      this.resizeInterval = window.setInterval(() => {
+        this.checkResize();
+      }, 100); // TODO: Is this too fast?
     }
 
     // TODO: Handle reloads
@@ -141,32 +150,25 @@ export default class PlatformAppWebview extends Vue {
   }
 
   currentPosition: IVec2;
+  currentSize: IVec2;
 
   checkResize() {
     const rect = this.$refs.resizeContainer.getBoundingClientRect();
 
     if (
       this.currentPosition == null ||
+      this.currentSize == null ||
       rect.left !== this.currentPosition.x ||
-      rect.top !== this.currentPosition.y
+      rect.top !== this.currentPosition.y ||
+      rect.width !== this.currentSize.x ||
+      rect.height !== this.currentSize.y
     ) {
-      this.emitTransform();
+      this.platformAppsService.setContainerBounds(
+        this.containerId,
+        { x: rect.left, y: rect.top },
+        { x: rect.width, y: rect.height },
+      );
     }
-  }
-
-  @Watch('visible')
-  emitTransform() {
-    const rect = this.$refs.resizeContainer.getBoundingClientRect();
-    this.currentPosition = {
-      x: rect.left,
-      y: rect.top,
-    };
-
-    this.platformAppsService.nextTransformSubject(this.transformSubjectId, {
-      pos: { x: rect.left, y: rect.top },
-      size: { x: rect.width, y: rect.height },
-      visible: this.visible,
-    });
   }
 
   get appId() {

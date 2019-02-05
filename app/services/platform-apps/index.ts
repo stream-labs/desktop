@@ -5,7 +5,7 @@ import fs from 'fs';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions, IWebviewTransform } from './api/modules/module';
+import { EApiPermissions, IBrowserViewTransform } from './api/modules/module';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
 import electron from 'electron';
@@ -516,11 +516,27 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.getAssetUrl(app, asset);
   }
 
-  getPageContainerIdForSlot(appId: string, slot: EAppPageSlot) {
+  // getPageContainerIdForSlot(appId: string, slot: EAppPageSlot) {
+  //   const app = this.getApp(appId);
+  //   if (!app) return null;
+
+  //   return this.containerManager.getContainerId(app, slot);
+  // }
+
+  mountConatiner(
+    appId: string,
+    slot: EAppPageSlot,
+    electronWindowId: number,
+    slobsWindowId: string,
+  ) {
     const app = this.getApp(appId);
     if (!app) return null;
 
-    return this.containerManager.getContainerId(app, slot);
+    return this.containerManager.mountContainer(app, slot, electronWindowId, slobsWindowId);
+  }
+
+  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
+    return this.containerManager.setContainerBounds(containerId, pos, size);
   }
 
   getAppSourceSize(appId: string, sourceId: string) {
@@ -620,30 +636,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       );
     }
     this.SET_PROD_APP_ENABLED(appId, enabling);
-  }
-
-  /* These functions exist primary to work around our n window
-   * system because rxjs subjects are not serializable
-   */
-
-  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
-
-  createTransformSubject(initial: IWebviewTransform) {
-    const id = uuid();
-    this.transformSubjects[id] = new BehaviorSubject(initial);
-    return id;
-  }
-
-  getTransformSubject(id: string) {
-    return this.transformSubjects[id];
-  }
-
-  removeTransformSubject(id: string) {
-    delete this.transformSubjects[id];
-  }
-
-  nextTransformSubject(id: string, value: IWebviewTransform) {
-    this.transformSubjects[id].next(value);
   }
 
   @mutation()
