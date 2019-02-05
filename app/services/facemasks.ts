@@ -152,7 +152,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   notifyPluginMissing() {
-    this.SET_ACTIVE(false);
     const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
       type: 'warning',
       message: $t('Unable to find face mask plugin. You will not be able to use Face Masks'),
@@ -264,6 +263,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
 
     if (!this.checkForPlugin()) {
+      this.SET_ACTIVE(false);
       this.notifyPluginMissing();
       return;
     }
