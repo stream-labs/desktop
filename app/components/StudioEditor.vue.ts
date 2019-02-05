@@ -3,15 +3,16 @@ import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
 import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'util/injector';
-import { ScenesService, SceneItem, Scene, TSceneNode } from 'services/scenes';
+import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
-import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
+import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService } from 'services/selection/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
+import { v2 } from '../util/vec2';
 
 interface IResizeRegion {
   name: string;
@@ -312,43 +313,45 @@ export default class StudioEditor extends Vue {
       ...options,
     };
 
-    const source = this.resizeRegion.item;
-    const rect = new ScalableRectangle(source.getRectangle());
+    let scaleXDelta = 1;
+    let scaleYDelta = 1;
+    const rect = this.selectionService.getBoundingRect();
+    const anchorPosition = rect.getOffsetFromOrigin(AnchorPositions[opts.anchor]);
 
-    rect.normalized(() => {
-      rect.withAnchor(opts.anchor, () => {
-        const distanceX = Math.abs(x - rect.x);
-        const distanceY = Math.abs(y - rect.y);
+    // resizeRegion is opposite the anchor point
+    const oppositePointsMap = { 0: 1, 0.5: 0.5, 1: 0 };
+    const resizeRegionPosition = v2(
+      oppositePointsMap[AnchorPositions[opts.anchor].x],
+      oppositePointsMap[AnchorPositions[opts.anchor].y],
+    );
 
-        let newScaleX = distanceX / rect.croppedWidth;
-        let newScaleY = distanceY / rect.croppedHeight;
+    // represents the direction of resizing
+    const scaleVector = resizeRegionPosition.sub(v2(AnchorPositions[opts.anchor]));
 
-        // To preserve aspect ratio, take the bigger of the
-        // two new scales.
-        if (opts.lockRatio) {
-          if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
-            newScaleY = newScaleX;
-          } else {
-            newScaleX = newScaleY;
-          }
-        }
+    if (scaleVector.x && !opts.lockX) {
+      const newWidth = Math.abs(x - anchorPosition.x);
+      scaleXDelta = newWidth / rect.width;
+    }
 
-        // Aspect ratio preservation overrides lockX and lockY
-        if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
-        if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
-      });
-    });
+    if (scaleVector.y && !opts.lockY) {
+      const newHeight = Math.abs(y - anchorPosition.y);
+      scaleYDelta = newHeight / rect.height;
+    }
 
-    this.scene.getItem(source.sceneItemId).setTransform({
-      position: {
-        x: rect.x,
-        y: rect.y,
-      },
-      scale: {
-        x: rect.scaleX,
-        y: rect.scaleY,
-      },
-    });
+    // preserve aspect ratio
+    if (opts.lockRatio) {
+      if (scaleVector.x) {
+        scaleYDelta = scaleXDelta;
+      } else {
+        scaleXDelta = scaleYDelta;
+      }
+    }
+
+    // scale all selected items
+    this.selectionService.scaleWithOffset(
+      { x: scaleXDelta, y: scaleYDelta },
+      this.selectionService.getBoundingRect().getOffsetFromOrigin(AnchorPositions[opts.anchor]),
+    );
   }
 
   updateCursor(event: MouseEvent) {
