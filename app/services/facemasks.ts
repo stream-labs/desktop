@@ -117,7 +117,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   startup() {
     this.fetchFacemaskSettings()
       .then(response => {
-        this.handleFacemaskSettings(response);
+        this.checkFacemaskSettings(response);
       })
       .catch(err => {
         this.SET_ACTIVE(false);
@@ -255,30 +255,25 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.settings.enabled && availableDeviceSelected;
   }
 
-  handleFacemaskSettings(settings: IFacemaskSettings) {
+  checkFacemaskSettings(settings: IFacemaskSettings) {
     this.settings = settings;
-    if (settings.enabled) {
-      this.handleFacemasksEnabled();
-    } else {
+
+    if (!settings.enabled) {
       this.SET_ACTIVE(false);
+      return;
     }
-  }
 
-  handleFacemasksEnabled() {
-    if (this.checkForPlugin()) {
-      this.applyFacemaskSettings();
-    } else {
+    if (!this.checkForPlugin()) {
       this.notifyPluginMissing();
+      return;
     }
-  }
 
-  applyFacemaskSettings() {
-    const uuids = this.settings.facemasks.map((mask: IFacemask) => {
+    const uuids = settings.facemasks.map((mask: IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
 
-    if (this.settings.device.name && this.settings.device.value) {
-      this.SET_DEVICE(this.settings.device.name, this.settings.device.value);
+    if (settings.device.name && settings.device.value) {
+      this.SET_DEVICE(settings.device.name, settings.device.value);
       this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
@@ -293,7 +288,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
     Promise.all(downloads)
       .then(responses => {
-        this.ensureModtimes(this.settings.facemasks);
+        this.ensureModtimes(settings.facemasks);
       })
       .catch(err => {
         console.log(err);
