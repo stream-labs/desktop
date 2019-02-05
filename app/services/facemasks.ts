@@ -117,7 +117,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   startup() {
     this.fetchFacemaskSettings()
       .then(response => {
-        this.checkFacemaskSettings(response);
+        this.handleFacemaskSettings(response);
       })
       .catch(err => {
         this.SET_ACTIVE(false);
@@ -255,42 +255,50 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.settings.enabled && availableDeviceSelected;
   }
 
-  checkFacemaskSettings(settings: IFacemaskSettings) {
+  handleFacemaskSettings(settings: IFacemaskSettings) {
     this.settings = settings;
     if (settings.enabled) {
-      if (this.checkForPlugin()) {
-        const uuids = settings.facemasks.map((mask: IFacemask) => {
-          return { uuid: mask.uuid, intro: mask.is_intro };
-        });
-
-        if (settings.device.name && settings.device.value) {
-          this.SET_DEVICE(settings.device.name, settings.device.value);
-          this.setupFilter();
-        } else {
-          this.SET_ACTIVE(false);
-        }
-
-        const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
-        const downloads = missingMasks.map(mask =>
-          this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
-        );
-
-        this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
-
-        Promise.all(downloads)
-          .then(responses => {
-            this.ensureModtimes(settings.facemasks);
-          })
-          .catch(err => {
-            console.log(err);
-            this.notifyFailure();
-          });
-      } else {
-        this.notifyPluginMissing();
-      }
+      this.handleFacemasksEnabled();
     } else {
       this.SET_ACTIVE(false);
     }
+  }
+
+  handleFacemasksEnabled() {
+    if (this.checkForPlugin()) {
+      this.applyFacemaskSettings();
+    } else {
+      this.notifyPluginMissing();
+    }
+  }
+
+  applyFacemaskSettings() {
+    const uuids = this.settings.facemasks.map((mask: IFacemask) => {
+      return { uuid: mask.uuid, intro: mask.is_intro };
+    });
+
+    if (this.settings.device.name && this.settings.device.value) {
+      this.SET_DEVICE(this.settings.device.name, this.settings.device.value);
+      this.setupFilter();
+    } else {
+      this.SET_ACTIVE(false);
+    }
+
+    const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
+    const downloads = missingMasks.map(mask =>
+      this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
+    );
+
+    this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+
+    Promise.all(downloads)
+      .then(responses => {
+        this.ensureModtimes(this.settings.facemasks);
+      })
+      .catch(err => {
+        console.log(err);
+        this.notifyFailure();
+      });
   }
 
   setDownloadProgress(downloads: string[]) {
