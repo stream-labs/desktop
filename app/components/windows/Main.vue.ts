@@ -4,7 +4,7 @@ import TopNav from '../TopNav.vue';
 import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
