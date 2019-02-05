@@ -516,13 +516,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.getAssetUrl(app, asset);
   }
 
-  // getPageContainerIdForSlot(appId: string, slot: EAppPageSlot) {
-  //   const app = this.getApp(appId);
-  //   if (!app) return null;
-
-  //   return this.containerManager.getContainerId(app, slot);
-  // }
-
   mountConatiner(
     appId: string,
     slot: EAppPageSlot,

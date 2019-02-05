@@ -107,16 +107,6 @@ export default class Main extends Vue {
     return this.platformAppsService.enabledApps;
   }
 
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
-  }
-
-  isAppPoppedOut(appId: string) {
-    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
-  }
-
-  appPageSlot = EAppPageSlot.TopNav;
-
   /**
    * Only certain pages get locked out while the application
    * is loading.  Other pages are OK to keep using.

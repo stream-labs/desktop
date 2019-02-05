@@ -1,18 +1,7 @@
 <template>
 <div
   class="platform-app-container"
-  ref="resizeContainer">
-  <!-- <webview
-    v-if="renderWebview && !poppedOut"
-    class="platform-app-webview"
-    ref="appView"
-    :src="appUrl"
-    :partition="appPartition"
-    preload="bundles/guest-api" /> -->
-  <div v-if="poppedOut" class="platform-app-popped-out">
-    This app is currently popped out into an external window.
-  </div>
-</div>
+  ref="appContainer" />
 </template>
 
 <script lang="ts" src="./PlatformAppWebview.vue.ts"></script>
@@ -23,9 +12,5 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.platform-app-popped-out {
-  .padding();
 }
 </style>
