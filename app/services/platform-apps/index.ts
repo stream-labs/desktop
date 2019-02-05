@@ -539,6 +539,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.setContainerBounds(containerId, pos, size);
   }
 
+  unmountContainer(containerId: number) {
+    this.containerManager.unmountContainer(containerId);
+  }
+
   getAppSourceSize(appId: string, sourceId: string) {
     const app = this.getApp(appId);
     const source = app.manifest.sources.find(source => source.id === sourceId);

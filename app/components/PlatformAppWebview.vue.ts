@@ -5,7 +5,6 @@ import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';
 import Utils from 'services/utils';
-import { realpathSync } from 'fs';
 
 @Component({})
 export default class PlatformAppWebview extends Vue {
@@ -129,8 +128,8 @@ export default class PlatformAppWebview extends Vue {
 
   destroyed() {
     // this.reloadSub.unsubscribe();
-    // if (this.resizeInterval) clearInterval(this.resizeInterval);
-    // this.platformAppsService.removeTransformSubject(this.transformSubjectId);
+    if (this.resizeInterval) clearInterval(this.resizeInterval);
+    this.platformAppsService.unmountContainer(this.containerId);
   }
 
   // get appUrl() {

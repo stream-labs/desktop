@@ -10,10 +10,12 @@ import { lazyModule } from 'util/lazy-module';
 import { GuestApiService } from 'services/guest-api';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
+import { first } from 'rxjs/operators';
 
-interface IPersistentContainer {
+interface IContainerInfo {
   appId: string;
   slot: EAppPageSlot;
+  persistent: boolean;
   container: electron.BrowserView;
   transform: BehaviorSubject<IBrowserViewTransform>;
 }
@@ -24,7 +26,7 @@ interface IPersistentContainer {
  * into any window.  These are implemented with electron BrowserViews.
  */
 export class PlatformContainerManager {
-  containers: IPersistentContainer[] = [];
+  containers: IContainerInfo[] = [];
 
   @Inject() private userService: UserService;
   @Inject() private guestApiService: GuestApiService;
@@ -43,19 +45,7 @@ export class PlatformContainerManager {
 
     app.manifest.pages.forEach(page => {
       if (page.persistent) {
-        const container = this.createContainer(app, page.slot);
-        this.containers.push({
-          container,
-          appId: app.id,
-          slot: page.slot,
-          transform: new BehaviorSubject<IBrowserViewTransform>({
-            pos: { x: 0, y: 0 },
-            size: { x: 0, y: 0 },
-            mounted: false,
-            electronWindowId: null,
-            slobsWindowId: null,
-          }),
-        });
+        this.createContainer(app, page.slot, true);
       }
     });
   }
@@ -73,38 +63,70 @@ export class PlatformContainerManager {
     electronWindowId: number,
     slobsWindowId: string,
   ) {
-    const container = this.getContainerForSlot(app, slot);
+    const containerInfo = this.getContainerInfoForSlot(app, slot);
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
     // TODO: Types for electron fork changes
-    (win as any).addBrowserView(container);
+    (win as any).addBrowserView(containerInfo.container);
 
-    // TODO: Update transform, hook up listeners
+    containerInfo.transform.pipe(first()).subscribe(transform => {
+      containerInfo.transform.next({
+        ...transform,
+        electronWindowId,
+        slobsWindowId,
+        mounted: true,
+      });
+    });
 
-    return container.id;
+    return containerInfo.container.id;
   }
 
   setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
     const cont = this.containers.find(cont => cont.container.id === containerId);
     cont.container.setBounds({ x: pos.x, y: pos.y, width: size.x, height: size.y });
 
-    // TODO: Update transform
+    cont.transform.pipe(first()).subscribe(transform => {
+      cont.transform.next({
+        ...transform,
+        pos,
+        size,
+      });
+    });
   }
 
-  private getContainerForSlot(app: ILoadedApp, slot: EAppPageSlot) {
+  unmountContainer(containerId: number) {
+    const cont = this.containers.find(cont => cont.container.id === containerId);
+    cont.transform.pipe(first()).subscribe(transform => {
+      const win = electron.remote.BrowserWindow.fromId(transform.electronWindowId);
+      // TODO: Fork typings
+      (win as any).removeBrowserView(cont.container);
+      cont.transform.next({
+        ...transform,
+        mounted: false,
+        electronWindowId: null,
+        slobsWindowId: null,
+      });
+
+      if (!cont.persistent) {
+        this.destroyContainer(containerId);
+      }
+    });
+  }
+
+  private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
     const existingContainer = this.containers.find(
       cont => cont.appId === app.id && cont.slot === slot,
     );
 
     if (existingContainer) {
-      return existingContainer.container;
+      return existingContainer;
     }
 
     // TODO: Store container in this.containers?
     return this.createContainer(app, slot);
   }
 
-  private createContainer(app: ILoadedApp, slot: EAppPageSlot) {
+  private createContainer(app: ILoadedApp, slot: EAppPageSlot, persistent = false): IContainerInfo {
     const view = new electron.remote.BrowserView({
       webPreferences: {
         nodeIntegration: false,
@@ -113,22 +135,39 @@ export class PlatformContainerManager {
       },
     });
 
+    const info: IContainerInfo = {
+      slot,
+      persistent,
+      container: view,
+      appId: app.id,
+      transform: new BehaviorSubject<IBrowserViewTransform>({
+        pos: { x: 0, y: 0 },
+        size: { x: 0, y: 0 },
+        mounted: false,
+        electronWindowId: null,
+        slobsWindowId: null,
+      }),
+    };
+
     if (app.unpacked) view.webContents.openDevTools();
 
     view.webContents.on('did-finish-load', () => {
-      this.exposeApi(
-        app,
-        view.webContents.id,
-        // TODO: Remove these hacks, handle dynamic window chaning
-        electron.remote.getCurrentWindow().id,
-        'main',
-        'asdf',
-      );
+      this.exposeApi(app, view.webContents.id, info.transform);
     });
 
     view.webContents.loadURL(this.getPageUrlForSlot(app, slot));
 
-    return view;
+    this.containers.push(info);
+
+    return info;
+  }
+
+  private destroyContainer(containerId: number) {
+    const cont = this.containers.find(cont => cont.container.id === containerId);
+    this.containers = this.containers.filter(c => c.container.id !== containerId);
+
+    // TODO: This actually exists
+    (cont.container as any).destroy();
   }
 
   private getPageUrlForSlot(app: ILoadedApp, slot: EAppPageSlot) {
@@ -267,17 +306,9 @@ export class PlatformContainerManager {
   private exposeApi(
     app: ILoadedApp,
     webContentsId: number,
-    electronWindowId: number,
-    slobsWindowId: string,
-    transformSubjectId: string,
+    transform: BehaviorSubject<IBrowserViewTransform>,
   ) {
-    const api = this.apiManager.getApi(
-      app,
-      webContentsId,
-      // this.getTransformSubject(transformSubjectId),
-      // TODO Remove this hack to make displays work
-      new BehaviorSubject<IBrowserViewTransform>({} as IBrowserViewTransform),
-    );
+    const api = this.apiManager.getApi(app, webContentsId, transform);
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
