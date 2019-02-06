@@ -5,7 +5,8 @@ import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
 import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
+import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -194,4 +195,77 @@ test('Set parent', async t => {
       Item3:
   `),
   );
+});
+
+
+test('Scale', async t => {
+
+  // create and select 2 400x400 color sources
+  sceneBuilder.build(`
+      Item1: color_source
+      Item2: color_source
+  `);
+
+  // TODO: find a reason why this test fails without `sleep` here
+  await sleep(1000);
+
+  selectionService.select([getNodeId('Item1'), getNodeId('Item2')]);
+  const item1 = scene.getItem(getNodeId('Item1'));
+  const item2 = scene.getItem(getNodeId('Item2'));
+
+  // set the item2 position into the bottom right corner of item 2
+  item2.setTransform({ position: { x: 400, y: 400 }});
+
+  // reduce the size of item2 by 2x
+  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0});
+
+  // check what everything is going well at this point
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 400,
+    y: 400
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.5,
+    y: 0.5
+  });
+
+  // reduce the size of selected items by 2x, use the NorthWest anchor
+  selectionService.scale({x: 0.5, y: 0.5}, { x: 0, y: 0});
+  t.deepEqual(item1.getModel().transform.position, {
+    x: 0,
+    y: 0
+  });
+  t.deepEqual(item1.getModel().transform.scale, {
+    x: 0.5,
+    y: 0.5
+  });
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 200,
+    y: 200
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.25,
+    y: 0.25
+  });
+
+  // reduce the size of selected items by 2x, use the East anchor
+  // scale only X coordinate
+  selectionService.scale({x: 0.5, y: 1}, { x: 1, y: 0.5});
+  t.deepEqual(item1.getModel().transform.position, {
+    x: 150,
+    y: 0
+  });
+  t.deepEqual(item1.getModel().transform.scale, {
+    x: 0.25,
+    y: 0.5
+  });
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 250,
+    y: 200
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.125,
+    y: 0.25
+  });
+
 });
