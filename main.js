@@ -138,9 +138,9 @@ function startApp() {
 
   const mainWindowIsVisible = electron.screen.getAllDisplays().some(display => (
     display.workArea.x < mainWindowState.x + mainWindowState.width &&
-    display.workArea.x + display.workArea.width > mainWindowState.x &&
+    mainWindowState.x < display.workArea.x + display.workArea.width &&
     display.workArea.y < mainWindowState.y &&
-    display.workArea.y < mainWindowState.y + mainWindowState.height
+    mainWindowState.y < display.workArea.y + display.workArea.height
   ));
 
   mainWindow = new BrowserWindow({
