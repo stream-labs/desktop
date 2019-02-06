@@ -21,6 +21,7 @@ import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import VueI18n from 'vue-i18n';
 import moment from 'moment';
+import { setupGlobalContextMenuForEditableElement } from 'util/menus/GlobalMenu';
 
 const { ipcRenderer, remote } = electron;
 
@@ -154,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    setupGlobalContextMenuForEditableElement();
   });
 
   // Used for replacing the contents of this window with
