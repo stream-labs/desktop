@@ -162,7 +162,20 @@ export class PlatformContainerManager {
       this.exposeApi(app, view.webContents.id, info.transform);
     });
 
+    /**
+     * This has to be done from the main process to work properly
+     * @see https://github.com/electron/electron/issues/1378
+     */
     electron.ipcRenderer.send('webContents-preventNavigation', view.webContents.id);
+
+    // We allow opening dev tools for beta apps only
+    if (app.beta) {
+      view.webContents.on('before-input-event', (e, input) => {
+        if (input.type === 'keyDown' && input.code === 'KeyI' && input.control && input.shift) {
+          view.webContents.openDevTools();
+        }
+      });
+    }
 
     view.webContents.loadURL(this.getPageUrlForSlot(app, slot));
 
