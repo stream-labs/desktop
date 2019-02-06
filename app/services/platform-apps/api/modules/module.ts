@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ILoadedApp } from '../..';
 
 export enum EApiPermissions {
@@ -29,7 +29,7 @@ export interface IBrowserViewTransform {
 export interface IApiContext {
   app: ILoadedApp;
   webContentsId: number;
-  webviewTransform: Observable<IBrowserViewTransform>;
+  pageTransform: BehaviorSubject<IBrowserViewTransform>;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;

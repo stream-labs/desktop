@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Module, TApiModule, IApiContext, IBrowserViewTransform } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule } from './modules/scenes';
@@ -54,14 +54,14 @@ export class PlatformAppsApi {
   getApi(
     app: ILoadedApp,
     webContentsId: number,
-    webviewTransform: Observable<IBrowserViewTransform>,
+    pageTransform: BehaviorSubject<IBrowserViewTransform>,
   ) {
     const api: Dictionary<TApiModule> = {};
 
     const context: IApiContext = {
       app,
       webContentsId,
-      webviewTransform,
+      pageTransform,
     };
 
     Object.keys(this.modules).forEach(moduleName => {

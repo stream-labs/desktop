@@ -35,7 +35,10 @@ export default class PlatformAppPageView extends Vue {
 
   destroyed() {
     if (this.resizeInterval) clearInterval(this.resizeInterval);
-    this.platformAppsService.unmountContainer(this.containerId);
+    this.platformAppsService.unmountContainer(
+      this.containerId,
+      electron.remote.getCurrentWindow().id,
+    );
   }
 
   currentPosition: IVec2;

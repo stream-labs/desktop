@@ -69,13 +69,11 @@ export class PlatformContainerManager {
     // TODO: Types for electron fork changes
     (win as any).addBrowserView(containerInfo.container);
 
-    containerInfo.transform.pipe(first()).subscribe(transform => {
-      containerInfo.transform.next({
-        ...transform,
-        electronWindowId,
-        slobsWindowId,
-        mounted: true,
-      });
+    containerInfo.transform.next({
+      ...containerInfo.transform.getValue(),
+      electronWindowId,
+      slobsWindowId,
+      mounted: true,
     });
 
     return containerInfo.container.id;
@@ -85,21 +83,25 @@ export class PlatformContainerManager {
     const cont = this.containers.find(cont => cont.container.id === containerId);
     cont.container.setBounds({ x: pos.x, y: pos.y, width: size.x, height: size.y });
 
-    cont.transform.pipe(first()).subscribe(transform => {
-      cont.transform.next({
-        ...transform,
-        pos,
-        size,
-      });
+    cont.transform.next({
+      ...cont.transform.getValue(),
+      pos,
+      size,
     });
   }
 
-  unmountContainer(containerId: number) {
+  unmountContainer(containerId: number, electronWindowId: number) {
     const cont = this.containers.find(cont => cont.container.id === containerId);
-    cont.transform.pipe(first()).subscribe(transform => {
-      const win = electron.remote.BrowserWindow.fromId(transform.electronWindowId);
-      // TODO: Fork typings
-      (win as any).removeBrowserView(cont.container);
+    const transform = cont.transform.getValue();
+
+    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    // TODO: Fork typings
+    (win as any).removeBrowserView(cont.container);
+
+    // If these are different, it means that another window (likely the main)
+    // already mounted this view first, so we don't need to do the following
+    // teardown.
+    if (transform.electronWindowId === electronWindowId) {
       cont.transform.next({
         ...transform,
         mounted: false,
@@ -110,7 +112,7 @@ export class PlatformContainerManager {
       if (!cont.persistent) {
         this.destroyContainer(containerId);
       }
-    });
+    }
   }
 
   private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
