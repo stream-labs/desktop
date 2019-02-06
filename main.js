@@ -395,9 +395,16 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       childWindow.setMinimumSize(width, height);
 
       if (windowOptions.center) {
-        const overflowsVertically = Math.max(0, mainWindowBounds.y + height - targetWorkArea.y - targetWorkArea.height);
-        const childX = (mainWindowBounds.x + (mainWindowBounds.width / 2)) - (width / 2);
-        const childY = mainWindowBounds.y - overflowsVertically;
+        const baseChildY = mainWindowBounds.y;
+        const overflowsBottom = Math.max(0, baseChildY + height - targetWorkArea.y - targetWorkArea.height);
+        const overflowsTop = Math.max(0, targetWorkArea.y - baseChildY);
+
+        const baseChildX = (mainWindowBounds.x + (mainWindowBounds.width / 2)) - (width / 2);
+        const overflowsRight = Math.max(0, baseChildX + width - targetWorkArea.x - targetWorkArea.width);
+        const overflowsLeft = Math.max(0, targetWorkArea.x - baseChildX);
+
+        const childX = baseChildX + overflowsLeft - overflowsRight;
+        const childY = baseChildY + overflowsTop - overflowsBottom;
 
         childWindow.setBounds({
           x: Math.floor(childX),
