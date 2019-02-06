@@ -162,6 +162,8 @@ export class PlatformContainerManager {
       this.exposeApi(app, view.webContents.id, info.transform);
     });
 
+    electron.ipcRenderer.send('webContents-preventNavigation', view.webContents.id);
+
     view.webContents.loadURL(this.getPageUrlForSlot(app, slot));
 
     this.containers.push(info);
