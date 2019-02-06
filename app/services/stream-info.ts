@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 interface IStreamInfoServiceState {
   fetching: boolean;
@@ -41,7 +41,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   viewerCountInterval: number;
 
-  streamInfoChanged = new Subject<IStreamInfo>();
+  streamInfoChanged = new BehaviorSubject<IStreamInfo>(StreamInfoService.initialState);
 
   init() {
     this.refreshStreamInfo();

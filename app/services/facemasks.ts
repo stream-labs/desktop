@@ -110,17 +110,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   startup() {
-    if (this.checkForPlugin()) {
-      this.fetchFacemaskSettings()
-        .then(response => {
-          this.checkFacemaskSettings(response);
-        })
-        .catch(err => {
-          this.SET_ACTIVE(false);
-        });
-    } else {
-      this.notifyPluginMissing();
-    }
+    this.fetchFacemaskSettings()
+      .then(response => {
+        this.checkFacemaskSettings(response);
+      })
+      .catch(err => {
+        this.SET_ACTIVE(false);
+      });
   }
 
   activate() {
@@ -151,7 +147,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   notifyPluginMissing() {
-    this.SET_ACTIVE(false);
     const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
       type: 'warning',
       message: $t('Unable to find face mask plugin. You will not be able to use Face Masks'),
@@ -256,36 +251,44 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   checkFacemaskSettings(settings: IFacemaskSettings) {
     this.settings = settings;
-    if (settings.enabled) {
-      const uuids = settings.facemasks.map((mask: IFacemask) => {
-        return { uuid: mask.uuid, intro: mask.is_intro };
-      });
 
-      if (settings.device.name && settings.device.value) {
-        this.SET_DEVICE(settings.device.name, settings.device.value);
-        this.setupFilter();
-      } else {
-        this.SET_ACTIVE(false);
-      }
+    if (!settings.enabled) {
+      this.SET_ACTIVE(false);
+      return;
+    }
 
-      const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
-      this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+    if (!this.checkForPlugin()) {
+      this.SET_ACTIVE(false);
+      this.notifyPluginMissing();
+      return;
+    }
 
-      const downloads = missingMasks.map(mask =>
-        this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
-      );
+    const uuids = settings.facemasks.map((mask: IFacemask) => {
+      return { uuid: mask.uuid, intro: mask.is_intro };
+    });
 
-      Promise.all(downloads)
-        .then(responses => {
-          this.ensureModtimes(settings.facemasks);
-        })
-        .catch(err => {
-          console.log(err);
-          this.notifyFailure();
-        });
+    if (settings.device.name && settings.device.value) {
+      this.SET_DEVICE(settings.device.name, settings.device.value);
+      this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
     }
+
+    const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
+    const downloads = missingMasks.map(mask =>
+      this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
+    );
+
+    this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+
+    Promise.all(downloads)
+      .then(responses => {
+        this.ensureModtimes(settings.facemasks);
+      })
+      .catch(err => {
+        console.log(err);
+        this.notifyFailure();
+      });
   }
 
   setDownloadProgress(downloads: string[]) {

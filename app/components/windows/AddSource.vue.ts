@@ -62,7 +62,9 @@ export default class AddSource extends Vue {
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
-    if (this.sourceAddOptions.propertiesManager === 'widget') {
+    if (this.sourceAddOptions.propertiesManager === 'replay') {
+      this.name = $t('Instant Replay');
+    } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
       const app = this.platformAppsService.getApp(

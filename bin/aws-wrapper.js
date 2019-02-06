@@ -20,4 +20,6 @@ args.push('--access-key', accessKey);
 
 console.log(`Wrapping ${process.argv[2]} with arguments ${args}`);
 
-cp.fork(process.argv[2], args);
+const proc = cp.fork(process.argv[2], args);
+
+proc.on('exit', process.exit);

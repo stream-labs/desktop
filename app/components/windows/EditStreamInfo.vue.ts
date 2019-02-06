@@ -11,7 +11,6 @@ import { debounce } from 'lodash';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
@@ -39,7 +38,6 @@ export default class EditStreamInfo extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
-  @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
@@ -96,6 +94,18 @@ export default class EditStreamInfo extends Vue {
   async created() {
     this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
 
+    this.streamInfoService.streamInfoChanged.subscribe(() => {
+      if (this.isTwitch && this.streamInfoService.state.channelInfo) {
+        if (!this.allTwitchTags && !this.twitchTags) {
+          this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
+          this.twitchTags = prepareOptions(
+            this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
+            this.streamInfoService.state.channelInfo.tags,
+          );
+        }
+      }
+    });
+
     if (this.streamInfoService.state.channelInfo) {
       this.populatingModels = true;
       if (this.isFacebook || this.isYoutube) {
@@ -116,7 +126,7 @@ export default class EditStreamInfo extends Vue {
       this.refreshStreamInfo();
     }
 
-    if (this.isTwitch) {
+    if (this.isTwitch && this.streamInfoService.state.channelInfo) {
       this.twitchService
         .hasScope('user:edit:broadcast')
         .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
@@ -208,7 +218,7 @@ export default class EditStreamInfo extends Vue {
         this.streamTitleModel,
         this.streamDescriptionModel,
         this.gameModel,
-        this.isTwitch && this.twitchTags.length ? this.twitchTags : undefined,
+        this.isTwitch && this.twitchTags && this.twitchTags.length ? this.twitchTags : undefined,
       )
       .then(success => {
         if (success) {
@@ -275,7 +285,7 @@ export default class EditStreamInfo extends Vue {
           this.$toasted.show(e.error.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 1000,
+            duration: 50 * e.error.message.length,
             singleton: true,
           });
         });
@@ -291,7 +301,6 @@ export default class EditStreamInfo extends Vue {
 
   goLive() {
     this.streamingService.toggleStreaming();
-    this.navigationService.navigate('Live');
     this.windowsService.closeChildWindow();
   }
 

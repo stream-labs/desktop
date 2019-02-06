@@ -36,7 +36,7 @@ export default class TwitchTagsInput extends Vue {
    * VSelectPage doesn't accept an array as initial value, so we have to provide
    * it a string.
    */
-  currentTags = this.value.map(tag => tag.tag_id).join(',');
+  currentTags = this.value ? this.value.map(tag => tag.tag_id).join(',') : null;
 
   get shouldDisable() {
     return this.value === null || !this.hasPermission;

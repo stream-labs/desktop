@@ -22,12 +22,14 @@
     "allowJs": false,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
-    "baseUrl": "./app"
+    "baseUrl": "./app",
+    "jsx": "preserve"
   },
   "exclude": [
     "node_modules"
   ],
   "include": [
+    "node_modules/vue-tsx-support/enable-check.d.ts",
     "./app/**/*.ts"
   ]
 }
