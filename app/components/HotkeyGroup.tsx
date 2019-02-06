@@ -15,19 +15,23 @@ export default class HotkeyGroup extends Vue {
   @Prop() title: string;
   collapsed = false;
 
+  header(h: Function) {
+    return this.title ? (
+      <h2
+        class="section-title section-title--dropdown"
+        onClick={() => (this.collapsed = !this.collapsed)}
+      >
+        {this.collapsed ? <i class="fa fa-plus section-title__icon" /> : null}
+        {!this.collapsed ? <i class="fa fa-minus section-title__icon" /> : null}
+        {this.title}
+      </h2>
+    ) : null;
+  }
+
   render(h: Function) {
     return (
       <div class="section">
-        {this.title ? (
-          <h2
-            class="section-title section-title--dropdown"
-            onClick={() => (this.collapsed = !this.collapsed)}
-          >
-            {this.collapsed ? <i class="fa fa-plus section-title__icon" /> : null}
-            {!this.collapsed ? <i class="fa fa-minus section-title__icon" /> : null}
-            {this.title}
-          </h2>
-        ) : null}
+        {this.header(h)}
         <transition name="expand">
           <div
             style={this.collapsed ? { display: 'none' } : null}
