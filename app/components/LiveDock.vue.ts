@@ -11,7 +11,7 @@ import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { $t } from 'services/i18n';
-import PlatformAppWebview from 'components/PlatformAppWebview.vue';
+import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
@@ -23,7 +23,7 @@ import { AppService } from 'services/app';
     Chat,
     Slider,
     ListInput,
-    PlatformAppWebview,
+    PlatformAppPageView,
     ResizeBar,
   },
 })
@@ -243,14 +243,6 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
-  }
-
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.Chat);
-  }
-
-  isAppVisible(appId: string) {
-    return this.selectedChat === appId;
   }
 
   get defaultChatStyles() {

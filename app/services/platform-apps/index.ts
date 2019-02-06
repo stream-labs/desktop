@@ -482,16 +482,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
-    const app = this.getApp(appId);
-    if (!app) return false;
-
-    const page = app.manifest.pages.find(page => page.slot === slot);
-    if (!page) return false;
-
-    return !!page.persistent;
-  }
-
   getPageUrlForSource(appId: string, appSourceId: string, settings = '') {
     const app = this.getApp(appId);
 

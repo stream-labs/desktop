@@ -4,7 +4,7 @@
   ref="appContainer" />
 </template>
 
-<script lang="ts" src="./PlatformAppWebview.vue.ts"></script>
+<script lang="ts" src="./PlatformAppPageView.vue.ts"></script>
 <style lang="less" scoped>
 @import "../styles/index";
 

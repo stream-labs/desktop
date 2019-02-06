@@ -10,7 +10,7 @@ export type TAppPage =
   | 'PatchNotes'
   | 'Chatbot'
   | 'DesignSystem'
-  | 'PlatformAppWebview'
+  | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'Help';
 
@@ -28,11 +28,6 @@ export class NavigationService extends StatefulService<INavigationState> {
   navigated = new Subject<INavigationState>();
 
   navigate(page: TAppPage, params: Dictionary<string> = {}) {
-    // TODO: Figure out a better solution for this hack
-    if (page === 'PlatformAppWebview') {
-      params['pageSlot'] = 'top_nav';
-    }
-
     this.NAVIGATE(page, params);
     this.navigated.next(this.state);
   }
