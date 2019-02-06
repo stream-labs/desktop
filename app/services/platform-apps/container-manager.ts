@@ -81,7 +81,12 @@ export class PlatformContainerManager {
 
   setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
     const cont = this.containers.find(cont => cont.container.id === containerId);
-    cont.container.setBounds({ x: pos.x, y: pos.y, width: size.x, height: size.y });
+    cont.container.setBounds({
+      x: Math.round(pos.x),
+      y: Math.round(pos.y),
+      width: Math.round(size.x),
+      height: Math.round(size.y),
+    });
 
     cont.transform.next({
       ...cont.transform.getValue(),

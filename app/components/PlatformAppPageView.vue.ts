@@ -55,10 +55,13 @@ export default class PlatformAppPageView extends Vue {
       rect.width !== this.currentSize.x ||
       rect.height !== this.currentSize.y
     ) {
+      this.currentPosition = { x: rect.left, y: rect.top };
+      this.currentSize = { x: rect.width, y: rect.height };
+
       this.platformAppsService.setContainerBounds(
         this.containerId,
-        { x: rect.left, y: rect.top },
-        { x: rect.width, y: rect.height },
+        this.currentPosition,
+        this.currentSize,
       );
     }
   }
