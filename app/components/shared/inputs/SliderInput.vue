@@ -29,6 +29,8 @@
     }"
     :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
     :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
+    :sliderStyle="options.sliderStyle"
+    :dotSize="options.dotSize"
   />
   <input
     v-if="options.hasValueBox && !options.usePercentages"
@@ -50,7 +52,6 @@
   width: 100%;
   display: flex;
   position: relative;
-  .padding-bottom(2);
 }
 
 .slider-input {
