@@ -10,7 +10,6 @@ import { lazyModule } from 'util/lazy-module';
 import { GuestApiService } from 'services/guest-api';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
-import { first } from 'rxjs/operators';
 
 interface IContainerInfo {
   appId: string;
@@ -55,7 +54,13 @@ export class PlatformContainerManager {
    * Any running containers will be shut down.
    * @param app The app to unregister
    */
-  unregisterApp(app: ILoadedApp) {}
+  unregisterApp(app: ILoadedApp) {
+    this.containers.forEach(cont => {
+      if (cont.appId === app.id) {
+        this.destroyContainer(cont.container.id);
+      }
+    });
+  }
 
   mountContainer(
     app: ILoadedApp,
@@ -81,6 +86,9 @@ export class PlatformContainerManager {
 
   setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
     const cont = this.containers.find(cont => cont.container.id === containerId);
+
+    if (!cont) return;
+
     cont.container.setBounds({
       x: Math.round(pos.x),
       y: Math.round(pos.y),
@@ -97,6 +105,9 @@ export class PlatformContainerManager {
 
   unmountContainer(containerId: number, electronWindowId: number) {
     const cont = this.containers.find(cont => cont.container.id === containerId);
+
+    if (!cont) return;
+
     const transform = cont.transform.getValue();
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
@@ -118,6 +129,16 @@ export class PlatformContainerManager {
         this.destroyContainer(containerId);
       }
     }
+  }
+
+  /**
+   * Refreshes all currently running containers for the provided app.
+   * @param app The app to refresh
+   */
+  refreshContainers(app: ILoadedApp) {
+    this.containers.forEach(cont => {
+      if (cont.appId === app.id) cont.container.webContents.reload();
+    });
   }
 
   private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
@@ -188,7 +209,8 @@ export class PlatformContainerManager {
     const cont = this.containers.find(cont => cont.container.id === containerId);
     this.containers = this.containers.filter(c => c.container.id !== containerId);
 
-    // TODO: This actually exists
+    // TODO: This just seems to be an error in the types provided,
+    // this isn't a new method added by our fork.
     (cont.container as any).destroy();
   }
 

@@ -265,7 +265,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     this.userLogout.next();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
-    this.platformAppsService.unloadApps();
+    this.platformAppsService.unloadAllApps();
   }
 
   getFacebookPages() {

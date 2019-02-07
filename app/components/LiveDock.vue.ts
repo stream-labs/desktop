@@ -188,7 +188,7 @@ export default class LiveDock extends Vue {
 
   refreshChat() {
     if (!this.showDefaultPlatformChat) {
-      this.platformAppsService.reloadApp(this.selectedChat);
+      this.platformAppsService.refreshApp(this.selectedChat);
       return;
     }
     this.$refs.chat.refresh();

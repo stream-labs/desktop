@@ -4,6 +4,7 @@ import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import electron from 'electron';
 import Utils from 'services/utils';
+import { Subscription } from 'rxjs';
 
 @Component({})
 export default class PlatformAppPageView extends Vue {
@@ -16,10 +17,23 @@ export default class PlatformAppPageView extends Vue {
   };
 
   resizeInterval: number;
-
   containerId: number;
+  loadSub: Subscription;
 
   mounted() {
+    this.mountContainer();
+
+    this.resizeInterval = window.setInterval(() => {
+      this.checkResize();
+    }, 100); // TODO: Is this too fast?
+
+    this.loadSub = this.platformAppsService.appLoad.subscribe(app => {
+      if (this.appId === app.id) this.mountContainer();
+    });
+  }
+
+  mountContainer() {
+    console.log('MOUNTING CONTAINER', this.appId);
     this.containerId = this.platformAppsService.mountConatiner(
       this.appId,
       this.pageSlot,
@@ -27,18 +41,20 @@ export default class PlatformAppPageView extends Vue {
       Utils.getWindowId(),
     );
     this.checkResize();
-
-    this.resizeInterval = window.setInterval(() => {
-      this.checkResize();
-    }, 100); // TODO: Is this too fast?
   }
 
-  destroyed() {
-    if (this.resizeInterval) clearInterval(this.resizeInterval);
+  unmountContainer() {
     this.platformAppsService.unmountContainer(
       this.containerId,
       electron.remote.getCurrentWindow().id,
     );
+  }
+
+  destroyed() {
+    console.log('tearing down');
+    if (this.resizeInterval) clearInterval(this.resizeInterval);
+    this.loadSub.unsubscribe();
+    this.unmountContainer();
   }
 
   currentPosition: IVec2;

@@ -58,7 +58,7 @@ export default class AppsNav extends Vue {
   }
 
   refreshApp(appId: string) {
-    this.platformAppsService.reloadApp(appId);
+    this.platformAppsService.refreshApp(appId);
   }
 
   get page() {

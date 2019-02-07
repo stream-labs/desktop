@@ -22,7 +22,7 @@ export class PlatformAppManager extends PropertiesManager {
   settings: IPlatformAppManagerSettings;
 
   loadSub: Subscription;
-  reloadSub: Subscription;
+  refreshSub: Subscription;
   unloadSub: Subscription;
 
   init() {
@@ -34,7 +34,7 @@ export class PlatformAppManager extends PropertiesManager {
       }
     });
 
-    this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
+    this.refreshSub = this.platformAppsService.sourceRefresh.subscribe(appId => {
       if (appId === this.settings.appId) {
         this.updateUrl();
 
@@ -56,7 +56,7 @@ export class PlatformAppManager extends PropertiesManager {
 
   destroy() {
     this.loadSub.unsubscribe();
-    this.reloadSub.unsubscribe();
+    this.refreshSub.unsubscribe();
     this.unloadSub.unsubscribe();
   }
 

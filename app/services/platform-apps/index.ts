@@ -2,22 +2,20 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions, IBrowserViewTransform } from './api/modules/module';
+import { EApiPermissions } from './api/modules/module';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
-import electron from 'electron';
 import { DevServer } from './dev-server';
-import url from 'url';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { compact, trim, without } from 'lodash';
-import uuid from 'uuid/v4';
+import { trim, without } from 'lodash';
 import { PlatformContainerManager } from './container-manager';
 import ExecuteInCurrentWindow from 'util/execute-in-current-window';
+import { NavigationService } from 'services/navigation';
 
 const DEV_PORT = 8081;
 
@@ -132,6 +130,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   @Inject() videoService: VideoService;
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() navigationService: NavigationService;
 
   static initialState: IPlatformAppServiceState = {
     devMode: false,
@@ -140,8 +139,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   };
 
   appLoad = new Subject<ILoadedApp>();
-  appReload = new Subject<string>();
   appUnload = new Subject<string>();
+
+  /**
+   * Signals all listening app sources that the provided
+   * app id should be refreshed to pick up changes.
+   */
+  sourceRefresh = new Subject<string>();
 
   private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
   private disabledLocalStorageKey = 'PlatformAppsDisabled';
@@ -155,7 +159,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    */
   async initialize() {
     this.userService.userLogin.subscribe(async () => {
-      this.unloadApps();
+      this.unloadAllApps();
       this.loadProductionApps();
       this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
       this.SET_DEV_MODE(await this.getIsDevMode());
@@ -410,11 +414,27 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  unloadApps() {
+  unloadAllApps() {
     this.state.loadedApps.forEach(app => this.unloadApp(app));
   }
 
   unloadApp(app: ILoadedApp) {
+    // Shut down running containers
+    this.containerManager.unregisterApp(app);
+
+    // Navigate away from the the app page if this is a production
+    // app.  We don't do this for unpacked apps because it's annoying
+    // when reloading apps in development to be navigated away, even
+    // though it looks a little janky if we don't.
+    if (
+      !app.unpacked &&
+      this.navigationService.state.currentPage === 'PlatformAppMainPage' &&
+      this.navigationService.state.params &&
+      this.navigationService.state.params.appId === app.id
+    ) {
+      this.navigationService.navigate('Studio');
+    }
+
     this.UNLOAD_APP(app.id);
     if (app.unpacked) {
       localStorage.removeItem(this.unpackedLocalStorageKey);
@@ -426,22 +446,28 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.appUnload.next(app.id);
   }
 
-  async reloadApp(appId: string) {
+  /**
+   * Refreshes an app.  For unpacked apps, this will pick up new changes
+   * on disk. For production apps, this will trigger a refresh of all runniing
+   * sources and containers, which can be useful for fixing minor issues.
+   * @param appId The id of the app to refresh
+   */
+  async refreshApp(appId: string) {
     const app = this.getApp(appId);
 
-    // For production apps we don't actually do anything here except
-    // tell all webviews/sources to refresh themselves.
-    if (!app.unpacked) {
-      this.appReload.next(appId);
-      return;
+    // For unpacked apps, we need to actually unload/reload them instead,
+    // since they may contain manifest.json changes.
+    if (app.unpacked) {
+      this.unloadApp(app);
+
+      const error = await this.loadUnpackedApp(app.appPath, app.appToken);
+
+      if (error) return error;
+    } else {
+      // For production apps, we force all sources and pages to refresh themselves
+      this.sourceRefresh.next(appId);
+      this.containerManager.refreshContainers(app);
     }
-
-    this.unloadApp(app);
-    const error = await this.loadUnpackedApp(app.appPath, app.appToken);
-
-    if (error) return error;
-
-    this.appReload.next(appId);
   }
 
   getAppIdFromServer(appToken: string): Promise<string> {
