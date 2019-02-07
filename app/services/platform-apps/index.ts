@@ -636,12 +636,14 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (app.enabled === enabling) return;
 
     if (enabling) {
+      this.containerManager.registerApp(app);
       this.appLoad.next(app);
       localStorage.setItem(
         this.disabledLocalStorageKey,
         JSON.stringify(without(this.getDisabledAppsFromStorage(), app.id)),
       );
     } else {
+      this.containerManager.unregisterApp(app);
       this.appUnload.next(appId);
       localStorage.setItem(
         this.disabledLocalStorageKey,

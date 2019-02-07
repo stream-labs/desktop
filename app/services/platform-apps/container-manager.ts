@@ -39,9 +39,6 @@ export class PlatformContainerManager {
    * @param app The app to register
    */
   registerApp(app: ILoadedApp) {
-    // TODO: Don't load beta/prod apps for now
-    if (!app.unpacked) return;
-
     app.manifest.pages.forEach(page => {
       if (page.persistent) {
         this.createContainer(app, page.slot, true);

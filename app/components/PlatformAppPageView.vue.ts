@@ -33,7 +33,6 @@ export default class PlatformAppPageView extends Vue {
   }
 
   mountContainer() {
-    console.log('MOUNTING CONTAINER', this.appId);
     this.containerId = this.platformAppsService.mountConatiner(
       this.appId,
       this.pageSlot,
@@ -51,7 +50,6 @@ export default class PlatformAppPageView extends Vue {
   }
 
   destroyed() {
-    console.log('tearing down');
     if (this.resizeInterval) clearInterval(this.resizeInterval);
     this.loadSub.unsubscribe();
     this.unmountContainer();
