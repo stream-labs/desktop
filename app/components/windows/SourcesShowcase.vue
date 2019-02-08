@@ -1,9 +1,9 @@
 <template>
 <modal-layout
-  :show-controls="false"
+  :showControls="false"
   :content-styles="{ padding: 0 }"
+  :customControls="true"
 >
-
   <div slot="content"
     class="add-source">
     <!-- Standard sources -->
@@ -174,7 +174,9 @@
         </ul>
       </div>
     </div>
-    <div class="modal-layout-controls">
+  </div>
+
+    <div slot="controls">
       <button
         @click="selectInspectedSource()"
         class="button button--action"
@@ -182,7 +184,6 @@
         {{ $t('Add Source') }}
       </button>
     </div>
-  </div>
 </modal-layout>
 </template>
 
@@ -246,8 +247,13 @@ h2 {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  height: ~"calc(100vh - 365px)";
+  overflow-y: auto;
+  align-content: flex-start;
 
   .source {
+    height: 30px;
+
     &:nth-child(1),
     &:nth-child(2) {
       margin-top: 0;
