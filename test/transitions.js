@@ -2,7 +2,6 @@ import test from 'ava';
 import { useSpectron, focusChild, focusMain } from './helpers/spectron/index';
 import { clickSceneTransitions, addScene } from './helpers/spectron/scenes';
 import { setFormDropdown, setFormInput, getFormInput } from './helpers/spectron/forms';
-import { sleep } from './helpers/sleep';
 import { dismissModal } from './helpers/spectron/modals';
 
 useSpectron();
@@ -31,7 +30,6 @@ test('Changing transition options', async t => {
   await app.client.click('.icon-edit');
   const durationValue = await getFormInput(t,'Duration');
   t.true(durationValue == transitionDuration);
-
   const transitionNameValue = await getFormInput(t,'Type');
   t.true(transitionNameValue == transitionType);
 });
