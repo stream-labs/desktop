@@ -31,6 +31,11 @@
         name="stream_info_udpate"
         :metadata="{ title: $t('Confirm stream title and game before going live') }"
       />
+      <bool-input
+        v-model="navigateToLive"
+        name="navigate_to_live"
+        :metadata="{ title: $t('Navigate to Live tab when going live') }"
+      />
       <div class="input-container">
         <button class="button button--default" @click="restartStreamlabelsSession">
           {{ $t('Restart Streamlabels Session') }}
