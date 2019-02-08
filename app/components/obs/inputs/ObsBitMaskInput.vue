@@ -18,6 +18,7 @@
 <style lang="less" scoped>
   .row {
     margin-bottom: 0;
+    justify-content: flex-end;
   }
 
   .row > div {

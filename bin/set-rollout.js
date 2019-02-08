@@ -13,7 +13,7 @@ function important(msg) {
   sh.echo(colors.cyan(msg));
 }
 
-async function setRollout(version, rollout, bucket) {
+function setRollout(version, rollout, bucket) {
   const proc = cp.fork(
     path.resolve(__dirname, 'aws-wrapper.js'),
     [
@@ -23,8 +23,10 @@ async function setRollout(version, rollout, bucket) {
       '--chance', rollout
     ]
   );
-  await new Promise(resolve => {
-    proc.on('exit', resolve);
+  return new Promise((resolve, reject) => {
+    proc.on('exit', code => {
+      code ? reject() : resolve();
+    });
   });
 }
 
@@ -80,10 +82,15 @@ async function setRollout(version, rollout, bucket) {
 
   info(`Setting ${newRollout}% rollout for version ${version}...`);
 
-  await setRollout(version, newRollout, 'streamlabs-obs');
-  await setRollout(version, newRollout, 'slobs-cdn.streamlabs.com');
+  try {
+    await setRollout(version, newRollout, 'streamlabs-obs');
+    await setRollout(version, newRollout, 'slobs-cdn.streamlabs.com');
+  } catch (e) {
+    info('Failed to set rollout');
+    sh.exit(1);
+  }
 
-  info(`${version} is now at ${newRollout} rollout!`);
+  info(`${version} is now at ${newRollout}% rollout!`);
 
 })().then(() => {
   sh.exit(0);

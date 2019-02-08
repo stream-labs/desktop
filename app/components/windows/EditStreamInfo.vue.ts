@@ -11,7 +11,6 @@ import { debounce } from 'lodash';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
@@ -39,7 +38,6 @@ export default class EditStreamInfo extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
-  @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
@@ -287,7 +285,7 @@ export default class EditStreamInfo extends Vue {
           this.$toasted.show(e.error.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 1000,
+            duration: 50 * e.error.message.length,
             singleton: true,
           });
         });
@@ -303,7 +301,6 @@ export default class EditStreamInfo extends Vue {
 
   goLive() {
     this.streamingService.toggleStreaming();
-    this.navigationService.navigate('Live');
     this.windowsService.closeChildWindow();
   }
 

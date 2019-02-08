@@ -19,7 +19,7 @@
       <number-input v-model="wData.settings.min_amount_to_share" />
       <span>{{ $t('USD') }}</span>
     </v-form-group>
-    <v-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
+    <v-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip, isInteger: true }">
       <number-input v-model="wData.settings.max_duration" />
       <span>{{ $t('seconds') }}</span>
     </v-form-group>
