@@ -41,6 +41,7 @@ export interface INumberMetadata extends IInputMetadata {
   min?: number;
   max?: number;
   placeholder?: string;
+  isInteger?: boolean;
 }
 
 export interface ITimerMetadata extends INumberMetadata {
@@ -52,6 +53,7 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
+  allowCustom?: Function;
   noResult?: string;
 }
 

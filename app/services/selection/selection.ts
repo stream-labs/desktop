@@ -20,7 +20,8 @@ import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from '.
 import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
-import { CenteringAxis } from 'util/ScalableRectangle';
+import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
+import { Rect } from '../../util/rect';
 
 /**
  * represents selection of active scene and provide shortcuts
@@ -58,7 +59,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   getIds: () => string[];
   getInvertedIds: () => string[];
   getInverted: () => TSceneNode[];
-  getBoundingRect: () => IRectangle;
+  getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
   getSize: () => number;
@@ -78,6 +79,8 @@ export class SelectionService extends StatefulService<ISelectionState>
   setVisibility: (isVisible: boolean) => void;
   setTransform: (transform: IPartialTransform) => void;
   resetTransform: () => void;
+  scale: (scale: IVec2, origin?: IVec2) => void;
+  scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -100,11 +103,17 @@ export class SelectionService extends StatefulService<ISelectionState>
     if (!lastSelected) return;
 
     const name = lastSelected.name;
+    const selectionLength = this.getSelection().getIds.call(this).length;
+    const message =
+      selectionLength > 1
+        ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
+        : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
+
     electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {
+        message,
         type: 'warning',
-        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
         buttons: [$t('Cancel'), $t('OK')],
       },
       ok => {
@@ -328,7 +337,7 @@ export class Selection implements ISelection {
     return this.state.selectedIds.length;
   }
 
-  getBoundingRect(): IRectangle {
+  getBoundingRect(): Rect {
     const items = this.getVisualItems();
     if (!items.length) return null;
 
@@ -338,20 +347,19 @@ export class Selection implements ISelection {
     let maxBottom = -Infinity;
 
     items.forEach(item => {
-      const rect = item.getRectangle();
-      rect.normalize();
+      const rect = item.getBoundingRect();
       minTop = Math.min(minTop, rect.y);
       minLeft = Math.min(minLeft, rect.x);
       maxRight = Math.max(maxRight, rect.x + rect.width);
       maxBottom = Math.max(maxBottom, rect.y + rect.height);
     });
 
-    return {
+    return new Rect({
       x: minLeft,
       y: minTop,
       width: maxRight - minLeft,
       height: maxBottom - minTop,
-    };
+    });
   }
 
   getInverted(): TSceneNode[] {
@@ -539,6 +547,23 @@ export class Selection implements ISelection {
 
   resetTransform() {
     this.getItems().forEach(item => item.resetTransform());
+  }
+
+  /**
+   * Scale items.
+   * Origin is the center point of scaling relative to the bounding-box of the selection
+   * Where origin = [0, 0] - is top-left corner and [1, 1] is the bottom right corner of the selection
+   */
+  scale(scale: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
+    const originPos = this.getBoundingRect().getOffsetFromOrigin(origin);
+    this.getItems().forEach(item => item.scaleWithOffset(scale, originPos));
+  }
+
+  /**
+   * same as .scale() but use absolute `offset` point instead of a relative `origin` point
+   */
+  scaleWithOffset(scale: IVec2, offset: IVec2) {
+    this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
   }
 
   flipY() {

@@ -3,7 +3,12 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
-import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
+import {
+  ScalableRectangle,
+  CenteringAxis,
+  AnchorPositions,
+  AnchorPoint,
+} from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
@@ -21,6 +26,8 @@ import {
   TSceneNodeType,
 } from './index';
 import { SceneItemNode } from './scene-node';
+import { v2, Vec2 } from '../../util/vec2';
+import { Rect } from '../../util/rect';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -247,6 +254,52 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     });
   }
 
+  /**
+   * set scale and adjust the item position according to the origin parameter
+   */
+  setScale(newScaleModel: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
+    const rect = new ScalableRectangle(this.getRectangle());
+    rect.normalized(() => {
+      rect.withOrigin(origin, () => {
+        rect.scaleX = newScaleModel.x;
+        rect.scaleY = newScaleModel.y;
+      });
+    });
+
+    this.setTransform({
+      position: {
+        x: rect.x,
+        y: rect.y,
+      },
+      scale: {
+        x: rect.scaleX,
+        y: rect.scaleY,
+      },
+    });
+  }
+
+  /**
+   * set a new scale relative to the current scale
+   */
+  scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
+    const rect = this.getRectangle();
+    let currentScale: Vec2;
+    rect.normalized(() => {
+      currentScale = v2(rect.scaleX, rect.scaleY);
+    });
+    const newScale = v2(scaleDelta).multiply(currentScale);
+    this.setScale(newScale, origin);
+  }
+
+  /**
+   * set a new scale relative to the current scale
+   * Use offset coordinates as an origin
+   */
+  scaleWithOffset(scaleDelta: IVec2, offset: IVec2) {
+    const origin = this.getBoundingRect().getOriginFromOffset(offset);
+    this.scale(scaleDelta, origin);
+  }
+
   flipY() {
     this.preservePosition(() => {
       const rect = this.getRectangle();
@@ -353,6 +406,20 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       height: this.height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
+    });
+  }
+
+  /**
+   * returns a simple bounding rectangle
+   */
+  getBoundingRect(): Rect {
+    const rect = this.getRectangle();
+    rect.normalize();
+    return new Rect({
+      x: rect.x,
+      y: rect.y,
+      width: rect.scaledWidth,
+      height: rect.scaledHeight,
     });
   }
 
