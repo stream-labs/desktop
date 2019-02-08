@@ -1,5 +1,11 @@
 <template>
-<div class="list-input" data-role="input" data-type="list" :data-name="options.name">
+<div
+  class="list-input"
+  data-role="input"
+  data-type="list"
+  :data-name="options.name"
+  :class="{ 'full-width': options.fullWidth }"
+>
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
@@ -35,6 +41,10 @@
 
 <style lang="less" scoped>
 @import "../../../styles/index";
+
+.list-input.full-width {
+  width: 100%;
+}
 
 .description {
   margin-top: 6px;
