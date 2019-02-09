@@ -5,12 +5,12 @@ import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
-import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
   components: {
     GenericForm,
-    VFormGroup,
+    HFormGroup,
     ...inputComponents,
   },
 })
