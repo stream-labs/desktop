@@ -63,6 +63,10 @@ tr {
 .advanced-audio-input {
   .alignable-input {
     margin-bottom: 0;
+
+    /deep/ .row {
+      justify-content: flex-end;
+    }
   }
   .alignable-input /deep/ .input-body {
     width: 100%;
