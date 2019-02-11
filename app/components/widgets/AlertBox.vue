@@ -30,7 +30,7 @@
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
-      <div class="left-accordion__input">
+      <div class="left-accordion__input" v-if="wData.settings[alert]">
         <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
       </div>
       <div v-if="wData && selectedAlert === alert">
