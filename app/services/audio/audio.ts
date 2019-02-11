@@ -204,8 +204,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   setFader(sourceId: string, patch: Partial<IFader>) {
     const obsFader = this.sourceData[sourceId].fader;
-    if (![null, undefined].includes(patch.deflection)) obsFader.deflection = patch.deflection;
-    if (![null, undefined].includes(patch.mul)) obsFader.mul = patch.mul;
+    if (patch.deflection != null) obsFader.deflection = patch.deflection;
+    if (patch.mul != null) obsFader.mul = patch.mul;
     // We never set db directly
 
     const fader = this.fetchFaderDetails(sourceId);
