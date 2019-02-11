@@ -5,15 +5,25 @@ import {
   Selection as InternalSelection,
   SelectionService as InternalSelectionService,
 } from 'services/selection';
-import { Scene, SceneItem, SceneItemFolder, SceneNode, ScenesService } from './scenes';
+import { ScenesService } from './scenes';
 import { Source, SourcesService } from '../sources/sources';
 import { Inject } from '../../../../util/injector';
+import { Scene } from './scene';
+import { SceneItem } from './scene-item';
+import { SceneItemFolder } from './scene-folder';
+import { SceneNode } from './scene-node';
 
 export interface ISelectionModel {
   selectedIds: string[];
   lastSelectedId: string;
 }
 
+/**
+ * Allows call bulk actions with scene items and folders.
+ * Selection can contain items only for one scene.
+ * @see Scene.getSelection() to fetch a selection object
+ * @see SelectionService to make items active
+ */
 @ServiceHelper()
 export class Selection implements ISceneItemActions {
   @InjectFromExternalApi() private sourcesService: SourcesService;
@@ -290,10 +300,7 @@ export class Selection implements ISceneItemActions {
 }
 
 /**
- * Allows call bulk actions with scene items and folders.
- * Selection can contain items only for one scene.
- * @see Scene.getSelection() to fetch a selection object
- * @see SelectionService to make items active
+ * Allows select/deselect items
  */
 @Singleton()
 export class SelectionService extends Selection {
