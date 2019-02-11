@@ -12,6 +12,7 @@ import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
@@ -32,6 +33,7 @@ export default class TopNav extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() facemasksService: FacemasksService;
 
   slideOpen = false;
 
@@ -41,6 +43,7 @@ export default class TopNav extends Vue {
   logoutTooltip = $t('Logout');
   sunTooltip = $t('Day mode');
   moonTooltip = $t('Night mode');
+  facemasksTooltip = $t('Face Mask Settings');
 
   availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
@@ -106,8 +109,16 @@ export default class TopNav extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
+  get facemasksActive() {
+    return this.facemasksService.state.active;
+  }
+
   openSettingsWindow() {
     this.settingsService.showSettings();
+  }
+
+  openFacemaskSettingsWindow() {
+    this.facemasksService.showSettings();
   }
 
   toggleNightTheme() {
