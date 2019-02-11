@@ -18,11 +18,15 @@ import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
+import { WindowsService } from 'services/windows';
+import { throttle } from 'lodash-decorators';
 
 interface IFacemasksServiceState {
   device: IInputDeviceSelection;
   modtimeMap: Dictionary<IFacemaskMetadata>;
   active: boolean;
+  downloadProgress: number;
+  settings: IFacemaskSettings;
 }
 
 interface IFacemaskMetadata {
@@ -50,6 +54,12 @@ interface IFacemaskSettings {
   device: IInputDeviceSelection;
 }
 
+interface IUserFacemaskSettings {
+  enabled: boolean;
+  duration: number;
+  device: IInputDeviceSelection;
+}
+
 interface IFacemaskAlertMessage {
   name: string;
   formattedAmount: string;
@@ -69,6 +79,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() streamingService: StreamingService;
+  @Inject() private windowsService: WindowsService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
@@ -76,23 +87,23 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   registeredDonations = {};
 
-  settings: IFacemaskSettings = {
-    enabled: false,
-    facemasks: [],
-    audio_volume: 50,
-    duration: 10,
-    device: {
-      name: null,
-      value: null,
-    },
-  };
-
   downloadProgress = {};
 
   static defaultState: IFacemasksServiceState = {
     device: { name: null, value: null },
     modtimeMap: {},
     active: false,
+    downloadProgress: 0,
+    settings: {
+      enabled: false,
+      facemasks: [],
+      audio_volume: 50,
+      duration: 10,
+      device: {
+        name: null,
+        value: null,
+      },
+    },
   };
 
   init() {
@@ -234,7 +245,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         }
       });
     }
-
+    console.log(devices);
     return devices;
   }
 
@@ -246,11 +257,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           return enabledDeviceId === (device.value as string);
         })
       : false;
-    return this.settings.enabled && availableDeviceSelected;
+    return this.state.settings.enabled && availableDeviceSelected;
   }
 
   checkFacemaskSettings(settings: IFacemaskSettings) {
-    this.settings = settings;
+    this.SET_SETTINGS(settings);
 
     if (!settings.enabled) {
       this.SET_ACTIVE(false);
@@ -292,7 +303,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   setDownloadProgress(downloads: string[]) {
-    this.settings.facemasks.forEach(mask => {
+    this.state.settings.facemasks.forEach(mask => {
       this.downloadProgress[mask.uuid] = 1;
     });
     downloads.forEach(uuid => {
@@ -300,8 +311,30 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
+  @throttle(500)
+  updateDownloadProgress() {
+    let progress = 0;
+
+    if (!this.state.settings.enabled) {
+      return;
+    }
+
+    Object.keys(this.downloadProgress).forEach(key => {
+      progress += this.downloadProgress[key];
+    });
+
+    if (progress / Object.keys(this.downloadProgress).length === 1 && this.state.active) {
+      progress = 1;
+    } else {
+      progress = progress / Object.keys(this.downloadProgress).length;
+    }
+
+    this.SET_DOWNLOAD_PROGRESS(progress);
+  }
+
+  // Redundant function to be deleted once legacy settings page is sunsetted
   getDownloadProgress() {
-    if (!this.settings.enabled) {
+    if (!this.state.settings.enabled) {
       return 'Not Enabled';
     }
 
@@ -324,9 +357,24 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest('slobs/facemasks/settings');
   }
 
-  fetchInstallUpdate(uuid: string) {
-    return this.formRequest(`slobs/facemasks/install/${uuid}`);
+  async updateFacemaskSettings(settings: IUserFacemaskSettings) {
+    const endpoint = 'slobs/facemasks/settings';
+    const postData = {
+      method: 'POST',
+      body: JSON.stringify(settings),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    };
+    try {
+      await this.formRequest(endpoint, postData);
+      this.startup();
+    } catch (e) {
+
+    }
   }
+
+  // fetchInstallUpdate(uuid: string) {
+  //   return this.formRequest(`slobs/facemasks/install/${uuid}`);
+  // }
 
   fetchProfanityFilterSettings() {
     return this.formRequest('slobs/widget/settings?widget=donation_page');
@@ -360,7 +408,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
             'Face Mask Plugin',
             {
               maskFolder: this.facemasksDirectory,
-              alertDuration: this.settings.duration,
+              alertDuration: this.state.settings.duration,
               alertDoIntro: false,
               alertDoOutro: false,
               alertActivate: false,
@@ -370,7 +418,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           this.facemaskFilter = fmFilter;
           this.updateFilter({
             maskFolder: this.facemasksDirectory,
-            alertDuration: this.settings.duration,
+            alertDuration: this.state.settings.duration,
             alertDoIntro: false,
             alertDoOutro: false,
             alertActivate: false,
@@ -452,7 +500,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   enableMask(uuid: string) {
     this.downloadMask(uuid).then(modtime => {
       this.ADD_MODTIME(uuid, modtime, false);
-      this.fetchInstallUpdate(uuid);
+      // this.fetchInstallUpdate(uuid);
     });
   }
 
@@ -463,7 +511,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         .then(modtime => {
           if (modtime) {
             this.ADD_MODTIME(uuid, modtime, intro);
-            this.fetchInstallUpdate(uuid);
+            // this.fetchInstallUpdate(uuid);
           }
           resolve();
         })
@@ -496,6 +544,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         response.on('data', chunk => {
           current += chunk.length;
           this.downloadProgress[uuid] = current / length;
+          this.updateDownloadProgress();
           fileContent += chunk;
         });
 
@@ -503,6 +552,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           try {
             const data = JSON.parse(fileContent) as IFacemask;
             this.downloadProgress[uuid] = 1;
+            this.updateDownloadProgress();
             resolve(data.modtime);
           } catch (err) {
             reject(err);
@@ -510,6 +560,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         });
         response.pipe(writeStream);
       });
+    });
+  }
+
+  showSettings(categoryName?: string) {
+    this.windowsService.showWindow({
+      componentName: 'FacemaskSettings',
+      title: $t('Face Mask Settings'),
+      queryParams: { categoryName },
+      size: {
+        width: 800,
+        height: 800,
+      },
     });
   }
 
@@ -532,6 +594,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.state.device = { name, value };
   }
 
+  @mutation()
+  private SET_SETTINGS(settings: IFacemaskSettings) {
+    this.state.settings = settings;
+  }
+
+  @mutation()
+  private SET_DOWNLOAD_PROGRESS(progress: number) {
+    console.log(progress);
+    this.state.downloadProgress = progress;
+  }
+
   private ensureFacemasksDirectory() {
     if (!fs.existsSync(this.facemasksDirectory)) {
       fs.mkdirSync(this.facemasksDirectory);
@@ -550,11 +623,21 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return `${this.cdn}${uuid}.json`;
   }
 
-  private formRequest(endpoint: string) {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/${endpoint}`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
+  // private formRequest(endpoint: string) {
+  //   const url = `https://${this.hostsService.streamlabs}/api/v5/${endpoint}`;
+  //   const headers = authorizedHeaders(this.apiToken);
+  //   const request = new Request(url, { headers });
+
+  //   return fetch(request).then(handleResponse);
+  // }
+
+  private formRequest(endpoint: string, options: any = {}) {
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.apiToken, options.headers);
+    const url = `https://${host}/api/v5/${endpoint}`;
+    const request = new Request(url, { ...options, headers });
 
     return fetch(request).then(handleResponse);
   }
+
 }
