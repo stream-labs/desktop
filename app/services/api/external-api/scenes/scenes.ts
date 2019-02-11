@@ -11,6 +11,7 @@ import {
   ISceneItemActions,
 } from 'services/scenes/index';
 import { Source, SourcesService, ISourceModel, ISourceAddOptions } from '../sources/sources';
+import { Selection } from './selection';
 import { Inject } from '../../../../util/injector';
 
 /**
@@ -256,7 +257,9 @@ export class Scene {
     return this.scene.makeActive();
   }
 
-  // getSelection(itemsList?: TNodesList): ISelection;
+  getSelection(ids?: string[]): Selection {
+    return new Selection(this.sceneId, ids);
+  }
 }
 
 export interface ISceneNodeAddOptions {
@@ -339,7 +342,7 @@ export interface ISceneItemActions {
  * API for scene items and folders
  */
 export abstract class SceneNode {
-  @Inject('InternalScenesService') protected internalScenesService: InternalScenesService;
+  @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   protected scene: InternalScene;
   protected sceneNode: InternalSceneNode;
