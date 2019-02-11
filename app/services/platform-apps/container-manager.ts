@@ -147,7 +147,6 @@ export class PlatformContainerManager {
       return existingContainer;
     }
 
-    // TODO: Store container in this.containers?
     return this.createContainer(app, slot);
   }
 
