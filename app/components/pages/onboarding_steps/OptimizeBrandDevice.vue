@@ -18,7 +18,7 @@
       </div>
 
       <div v-if="status === 'success'" class="onboarding-desc">
-        {{ $t('Your Streamblabs OBS is ready to go') }}
+        {{ $t('Streamlabs OBS is ready to go') }}
       </div>
 
       <button class="button button--action button--lg" v-if="status === 'init'" @click="install()">
