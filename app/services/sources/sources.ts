@@ -539,9 +539,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('Add Source'),
       size: {
         width: 1200,
-        // TODO: CSS on this window is screwed up.  Window should expand naturally,
-        // We shouldn't have to perfectly size the window to the contents
-        height: 685,
+        height: 650,
       },
     });
   }

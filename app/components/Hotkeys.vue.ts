@@ -4,7 +4,7 @@ import { Inject } from '../util/injector';
 import { HotkeysService } from '../services/hotkeys';
 import { ScenesService } from '../services/scenes';
 import { SourcesService } from '../services/sources';
-import HotkeyGroup from './HotkeyGroup.vue';
+import HotkeyGroup from './HotkeyGroup';
 
 @Component({
   components: { HotkeyGroup },

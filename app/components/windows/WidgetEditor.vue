@@ -119,15 +119,13 @@
   }
 
   .top-settings {
-    .input-container {
-      margin-bottom: 0;
-      width: auto;
+    .row.alignable-input {
+      width: 80px;
       flex-direction: column;
-      .margin-right(2);
-      .margin-bottom(2);
-    }
-    .int-input{
-      width: 60px;
+
+      .input-body {
+        margin-left: 0;
+      }
     }
   }
 
