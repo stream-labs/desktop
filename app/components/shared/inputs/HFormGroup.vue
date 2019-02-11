@@ -47,6 +47,7 @@
 
   .input-body {
     width: 70%;
+    margin-left: auto;
   }
 
   .input-container {

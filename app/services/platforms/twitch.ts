@@ -1,5 +1,12 @@
 import { Service } from 'services/service';
-import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
+import {
+  IPlatformService,
+  IPlatformAuth,
+  IChannelInfo,
+  IGame,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
@@ -35,6 +42,14 @@ export class TwitchService extends Service implements IPlatformService {
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
   @Inject() streamInfoService: StreamInfoService;
+
+  capabilities = new Set<TPlatformCapability>([
+    'chat',
+    'scope-validation',
+    'tags',
+    'user-info',
+    'viewer-count',
+  ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -160,13 +175,9 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data),
     });
 
-    // prettier-ignore
-    return Promise.all([
-      fetch(request).then(handleResponse),
-      this.setStreamTags(tags).catch(e => {
-        console.error('Failed to update tags', e);
-      }),
-    ]).then(_ => true);
+    return Promise.all([fetch(request).then(handleResponse), this.setStreamTags(tags)]).then(
+      _ => true,
+    );
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
@@ -188,17 +199,23 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   @requiresToken()
-  getAllTags() {
+  getAllTags(): Promise<TTwitchTag[]> {
     return getAllTags(this.getRawHeaders(true));
   }
 
   @requiresToken()
-  getStreamTags() {
+  getStreamTags(): Promise<TTwitchTag[]> {
     return getStreamTags(this.twitchId, this.getRawHeaders(true, true));
   }
 
   @requiresToken()
-  setStreamTags(tags: TTwitchTag[]) {
+  async setStreamTags(tags: TTwitchTag[]) {
+    const hasPermission = await this.hasScope('user:edit:broadcast');
+
+    if (!hasPermission) {
+      return false;
+    }
+
     return updateTags(this.getRawHeaders(true, true))(tags)(this.twitchId);
   }
 
@@ -229,7 +246,7 @@ export class TwitchService extends Service implements IPlatformService {
       .then(json => json.results[0].hits);
   }
 
-  async hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
+  hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
     return fetch('https://id.twitch.tv/oauth2/validate', {
       headers: this.getHeaders(true),
     })
@@ -260,6 +277,12 @@ export class TwitchService extends Service implements IPlatformService {
     });
 
     return headers;
+  }
+
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
   }
 
   async beforeGoLive() {}
