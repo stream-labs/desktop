@@ -161,7 +161,7 @@ export class Scene {
   }
 
   getRootNodes(): SceneNode[] {
-    return this.scene.getRootNodes().map(node => this.getNode(node.sceneId));
+    return this.scene.getRootNodes().map(node => this.getNode(node.id));
   }
 
   getItems(): SceneItem[] {
