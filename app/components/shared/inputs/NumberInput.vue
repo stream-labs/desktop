@@ -1,5 +1,11 @@
 <template>
-  <span class="number-input" data-role="input" data-type="number" :data-name="options.name">
+  <span
+    class="number-input"
+    data-role="input"
+    data-type="number"
+    :data-name="options.name"
+    :class="{ 'full-width': options.fullWidth }"
+  >
     <input
         type="text"
         ref="input"
@@ -71,5 +77,9 @@
         }
       }
     }
+  }
+
+  .number-input.full-width {
+    width: 100%;
   }
 </style>

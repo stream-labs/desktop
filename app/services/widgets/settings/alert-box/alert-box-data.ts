@@ -53,6 +53,10 @@ export const conditions = () => ({
     { value: 'SUBSCRIPTION_GIFT', title: $t('When subscription is a gift') },
     { value: 'MIN_SUBMYSTERYGIFT', title: $t('User gifted at least <amount> subs at once') },
     { value: 'SUBTEMBER', title: $t('When user commits to continue their gift subscription') },
+    {
+      value: 'MIN_SUBSCRIPTION_STREAK',
+      title: $t('Streak shared with chat, and months subscribed in a streak is at least <months>'),
+    },
   ],
   hosts: [{ value: 'MIN_VIEWERS_ACQUIRED', title: $t('Viewers gained is at least <viewers>') }],
   bits: [

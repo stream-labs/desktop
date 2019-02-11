@@ -11,6 +11,7 @@
     :max="options.max"
     :min="options.min"
     :interval="options.interval"
+    :tooltip="options.displayValue || 'always'"
     :speed="0"
     :height="4"
     :formatter="formatter"
