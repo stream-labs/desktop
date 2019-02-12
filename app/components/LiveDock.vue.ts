@@ -6,7 +6,6 @@ import { Inject } from '../util/injector';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
-import Slider from './shared/Slider.vue';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -21,7 +20,6 @@ import { AppService } from 'services/app';
 @Component({
   components: {
     Chat,
-    Slider,
     ListInput,
     PlatformAppWebview,
     ResizeBar,
