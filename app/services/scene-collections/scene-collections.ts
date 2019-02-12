@@ -139,7 +139,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Generally called on application shutdown.
    */
   async deinitialize() {
-    this.disableAutoSave();
+    await this.disableAutoSave();
     await this.save();
     await this.deloadCurrentApplicationState();
     await this.safeSync();
@@ -280,7 +280,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param id An optional ID, if omitted the active collection ID is used
    */
   async duplicate(name: string, id?: string) {
-    this.disableAutoSave();
+    await this.disableAutoSave();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
@@ -540,7 +540,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.collectionWillSwitch.next();
 
-    this.disableAutoSave();
+    await this.disableAutoSave();
     await this.save();
 
     // we should remove inactive scenes first to avoid the switching between scenes
@@ -621,18 +621,23 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   private autoSaveInterval: number;
+  private autoSavePromise: Promise<void>;
 
   enableAutoSave() {
     if (this.autoSaveInterval) return;
-    this.autoSaveInterval = window.setInterval(() => {
-      this.save();
-      this.stateService.flushManifestFile();
+    this.autoSaveInterval = window.setInterval(async () => {
+      this.autoSavePromise = this.save();
+      await this.autoSavePromise;
+      await this.stateService.flushManifestFile();
     }, 60 * 1000);
   }
 
-  disableAutoSave() {
+  async disableAutoSave() {
     if (this.autoSaveInterval) clearInterval(this.autoSaveInterval);
     this.autoSaveInterval = null;
+
+    // Wait for the current saving process to finish
+    if (this.autoSavePromise) await this.autoSavePromise;
   }
 
   private async setActiveCollection(id: string) {
