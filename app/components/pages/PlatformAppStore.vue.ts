@@ -47,7 +47,7 @@ export default class PlatformAppStore extends Vue {
   }
 
   async reloadProductionApps() {
-    this.platformAppsService.installProductionApps();
+    this.platformAppsService.loadProductionApps();
   }
 
   get loggedIn() {

@@ -22,19 +22,19 @@ export class PlatformAppManager extends PropertiesManager {
   settings: IPlatformAppManagerSettings;
 
   loadSub: Subscription;
-  reloadSub: Subscription;
+  refreshSub: Subscription;
   unloadSub: Subscription;
 
   init() {
     this.loadSub = this.platformAppsService.appLoad.subscribe(app => {
-      // This is mostly an edge case, but this will reactive an old source
+      // This is mostly an edge case, but this will reactivate an old source
       // when the app is re-installed.
       if (app.id === this.settings.appId) {
         this.updateUrl();
       }
     });
 
-    this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
+    this.refreshSub = this.platformAppsService.sourceRefresh.subscribe(appId => {
       if (appId === this.settings.appId) {
         this.updateUrl();
 
@@ -56,7 +56,7 @@ export class PlatformAppManager extends PropertiesManager {
 
   destroy() {
     this.loadSub.unsubscribe();
-    this.reloadSub.unsubscribe();
+    this.refreshSub.unsubscribe();
     this.unloadSub.unsubscribe();
   }
 

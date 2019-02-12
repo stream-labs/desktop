@@ -97,14 +97,11 @@
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
         <!-- v-if is required because left-side chat will not properly load on application startup -->
         <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
-        <PlatformAppWebview
-          v-for="app in chatApps"
-          v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
-          :key="app.id"
+        <PlatformAppPageView
+          v-if="selectedChat !== 'default' && !collapsed"
           class="live-dock-platform-app-webview"
-          :appId="app.id"
+          :appId="selectedChat"
           :pageSlot="slot"
-          :visible="isAppVisible(app.id)"
         />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >

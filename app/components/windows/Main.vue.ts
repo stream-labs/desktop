@@ -4,7 +4,7 @@ import TopNav from '../TopNav.vue';
 import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
@@ -28,7 +28,7 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
-import PlatformAppWebview from '../PlatformAppWebview.vue';
+import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 
@@ -49,7 +49,7 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
-    PlatformAppWebview,
+    PlatformAppMainPage,
     PlatformAppStore,
     Help,
   },
@@ -106,20 +106,6 @@ export default class Main extends Vue {
   get platformApps() {
     return this.platformAppsService.enabledApps;
   }
-
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
-  }
-
-  isAppPoppedOut(appId: string) {
-    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
-  }
-
-  isAppVisible(appId: string) {
-    return this.page === 'PlatformAppContainer' && this.params.appId === appId;
-  }
-
-  appPageSlot = EAppPageSlot.TopNav;
 
   /**
    * Only certain pages get locked out while the application
