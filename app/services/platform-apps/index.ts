@@ -303,13 +303,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
   loadApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    if (
-      this.state.loadedApps.find(
-        loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked,
-      )
-    ) {
-      return;
-    }
 
     this.LOAD_APP(app);
     if (app.unpacked && app.appPath) {
@@ -422,18 +415,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     // Shut down running containers
     this.containerManager.unregisterApp(app);
 
-    // Navigate away from the the app page if this is a production
-    // app.  We don't do this for unpacked apps because it's annoying
-    // when reloading apps in development to be navigated away, even
-    // though it looks a little janky if we don't.
-    if (
-      !app.unpacked &&
-      this.navigationService.state.currentPage === 'PlatformAppMainPage' &&
-      this.navigationService.state.params &&
-      this.navigationService.state.params.appId === app.id
-    ) {
-      this.navigationService.navigate('Studio');
-    }
+    this.navigateToEditorIfOnPage(app.id);
 
     this.UNLOAD_APP(app.id);
     if (app.unpacked) {
@@ -455,22 +437,20 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   async refreshApp(appId: string) {
     const app = this.getApp(appId);
 
-    // For unpacked apps, we need to actually unload/reload them instead,
+    // For unpacked apps, we need to fully reload them,
     // since they may contain manifest.json changes.
     if (app.unpacked) {
-      this.unloadApp(app);
-
       const error = await this.loadUnpackedApp(app.appPath, app.appToken);
 
       if (error) return error;
     } else {
-      // For production apps, we force all sources and pages to refresh themselves
-      this.sourceRefresh.next(appId);
       this.containerManager.refreshContainers(app);
     }
+
+    this.sourceRefresh.next(appId);
   }
 
-  getAppIdFromServer(appToken: string): Promise<string> {
+  private getAppIdFromServer(appToken: string): Promise<string> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/app_id?app_token=${appToken}`,
@@ -645,6 +625,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     } else {
       this.containerManager.unregisterApp(app);
       this.appUnload.next(appId);
+      this.navigateToEditorIfOnPage(app.id);
+
       localStorage.setItem(
         this.disabledLocalStorageKey,
         JSON.stringify(this.getDisabledAppsFromStorage().concat([app.id])),
@@ -653,8 +635,19 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.SET_PROD_APP_ENABLED(appId, enabling);
   }
 
+  private navigateToEditorIfOnPage(appId: string) {
+    if (
+      this.navigationService.state.currentPage === 'PlatformAppMainPage' &&
+      this.navigationService.state.params &&
+      this.navigationService.state.params.appId === appId
+    ) {
+      this.navigationService.navigate('Studio');
+    }
+  }
+
   @mutation()
   private LOAD_APP(app: ILoadedApp) {
+    this.state.loadedApps = this.state.loadedApps.filter(a => a.id !== app.id);
     this.state.loadedApps.push(app);
   }
 

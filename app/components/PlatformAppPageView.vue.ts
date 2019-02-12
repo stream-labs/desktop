@@ -28,7 +28,10 @@ export default class PlatformAppPageView extends Vue {
     }, 100);
 
     this.loadSub = this.platformAppsService.appLoad.subscribe(app => {
-      if (this.appId === app.id) this.mountContainer();
+      if (this.appId === app.id) {
+        this.unmountContainer();
+        this.mountContainer();
+      }
     });
   }
 
@@ -39,10 +42,13 @@ export default class PlatformAppPageView extends Vue {
       electron.remote.getCurrentWindow().id,
       Utils.getWindowId(),
     );
+    console.log('MOUNTED CONATINER', this.containerId);
     this.checkResize();
   }
 
   unmountContainer() {
+    this.currentPosition = null;
+    this.currentSize = null;
     this.platformAppsService.unmountContainer(
       this.containerId,
       electron.remote.getCurrentWindow().id,

@@ -39,6 +39,9 @@ export class PlatformContainerManager {
    * @param app The app to register
    */
   registerApp(app: ILoadedApp) {
+    // Make sure this app isn't already registered
+    this.unregisterApp(app);
+
     app.manifest.pages.forEach(page => {
       if (page.persistent) {
         this.createContainer(app, page.slot, true);
