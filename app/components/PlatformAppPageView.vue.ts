@@ -42,7 +42,6 @@ export default class PlatformAppPageView extends Vue {
       electron.remote.getCurrentWindow().id,
       Utils.getWindowId(),
     );
-    console.log('MOUNTED CONATINER', this.containerId);
     this.checkResize();
   }
 
