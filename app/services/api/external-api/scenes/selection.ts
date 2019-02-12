@@ -1,5 +1,5 @@
 import { InjectFromExternalApi, Singleton } from '../../external-api';
-import { ServiceHelper } from '../../../stateful-service';
+import { ServiceHelper } from 'services/stateful-service';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
   Selection as InternalSelection,
@@ -39,6 +39,9 @@ export class Selection implements ISceneItemActions {
     return this.internalSelection;
   }
 
+  /**
+   * returns serializable representation of selection
+   */
   getModel(): ISelectionModel {
     return {
       lastSelectedId: this.selection.getLastSelectedId(),

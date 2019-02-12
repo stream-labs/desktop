@@ -3,10 +3,8 @@ import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
-import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
-import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -31,7 +29,6 @@ test('Selection', async t => {
   const selection = client.getResource<ISelectionServiceApi>('SelectionService');
   const scene = scenesService.activeScene;
 
-  // await sleep(20000);
   const color1 = scene.createAndAddSource('Color1', 'color_source');
   const color2 = scene.createAndAddSource('Color2', 'color_source');
   const color3 = scene.createAndAddSource('Color3', 'color_source');
@@ -67,7 +64,6 @@ test('Selection', async t => {
   selection.selectAll();
 
   t.is(selection.getSize(), 3);
-
 });
 
 test('Selection actions', async t => {
@@ -125,7 +121,7 @@ test('Place after', async t => {
     Folder1
       Item2:
       Item3:
-  `)
+  `),
   );
 });
 
@@ -148,7 +144,7 @@ test('Place after folder with deep nesting', async t => {
       Item1:
       Folder2
         Item2:
-  `)
+  `),
   );
 });
 
@@ -171,7 +167,7 @@ test('Place before', async t => {
       Item3:
       Item4:
     Item1:
-  `)
+  `),
   );
 });
 
@@ -194,6 +190,6 @@ test('Set parent', async t => {
         Item1:
         Item2:
       Item3:
-  `)
+  `),
   );
 });

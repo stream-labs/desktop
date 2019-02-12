@@ -3,7 +3,7 @@ import {
   Scene as InternalScene,
   SceneItemNode as InternalSceneNode,
   ScenesService as InternalScenesService,
-} from '../../../scenes';
+} from 'services/scenes';
 import { InjectFromExternalApi } from '../../external-api';
 import { ScenesService } from './scenes';
 import { Scene } from './scene';
@@ -21,7 +21,7 @@ export interface ISceneNode {
 }
 
 /**
- * API for scene items and folders
+ * A base API for Items and Folders
  */
 export abstract class SceneNode {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
@@ -34,6 +34,9 @@ export abstract class SceneNode {
     this.sceneNode = this.scene.getNode(this.nodeId);
   }
 
+  /**
+   * returns serialized representation on scene-node
+   */
   getModel(): ISceneNode {
     return {
       id: this.sceneNode.id,
@@ -70,6 +73,7 @@ export abstract class SceneNode {
   }
 
   /**
+   * Detaches the node from its parent
    * After detaching the parent the current node will be a first-level-nesting node
    */
   detachParent(): void {
@@ -77,14 +81,14 @@ export abstract class SceneNode {
   }
 
   /**
-   * Place the current node before provided node
+   * Place the current node before the provided node
    * This method can change the parent of current node
    */
   placeBefore(nodeId: string): void {
     return this.sceneNode.placeBefore(nodeId);
   }
   /**
-   * Place the current node after provided node
+   * Place the current node after the provided node
    * This method can change the parent of current node
    */
   placeAfter(nodeId: string): void {
@@ -108,29 +112,29 @@ export abstract class SceneNode {
   /**
    * Removes the node.
    * For folders, all nested folders and items also will be removed.
-   * To remove a folder without removing the nested nodes, use the `ISceneItemFolderApi.ungroup()` method
-   * @see ISceneItemFolderApi.ungroup()
+   * To remove a folder without removing the nested nodes, use the `SceneItemFolder.ungroup()` method
+   * @see SceneItemFolder.ungroup()
    */
   remove(): void {
     return this.sceneNode.remove();
   }
 
   /**
-   * Shortcut for `SelectionService.isSelected(id)`
+   * A shortcut for `SelectionService.isSelected(id)`
    */
   isSelected(): boolean {
     return this.isSelected();
   }
 
   /**
-   * Shortcut for `SelectionService.select(id)`
+   * A shortcut for `SelectionService.select(id)`
    */
   select(): void {
     return this.sceneNode.select();
   }
 
   /**
-   * Shortcut for `SelectionService.add(id)`
+   * A shortcut for `SelectionService.add(id)`
    */
   addToSelection(): void {
     return this.sceneNode.addToSelection();
@@ -207,7 +211,7 @@ export abstract class SceneNode {
   }
 
   /**
-   * Returns a node path - the chain of all parent ids for the node
+   * Returns the node path - the chain of all parent ids for the node
    */
   getPath(): string[] {
     return this.sceneNode.getPath();

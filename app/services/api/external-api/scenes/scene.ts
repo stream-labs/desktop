@@ -1,4 +1,4 @@
-import { ServiceHelper } from '../../../stateful-service';
+import { ServiceHelper } from 'services/stateful-service';
 import { InjectFromExternalApi } from '../../external-api';
 import { Source, SourcesService } from '../sources/sources';
 import { Inject } from '../../../../util/injector';

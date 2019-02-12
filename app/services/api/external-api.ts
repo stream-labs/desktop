@@ -21,6 +21,10 @@ export function Singleton() {
   };
 }
 
+/**
+ * Dependency-Injector for external-API modules
+ * @see Inject
+ */
 export function InjectFromExternalApi(serviceName?: string) {
   return function(target: Object, key: string) {
     Object.defineProperty(target, key, {

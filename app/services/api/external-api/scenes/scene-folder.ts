@@ -34,7 +34,7 @@ export class SceneItemFolder extends SceneNode {
   }
 
   /**
-   * Returns all direct children items and folders
+   * Returns all direct children
    * To get all nested children
    * @see getNestedNodes
    */
@@ -77,7 +77,8 @@ export class SceneItemFolder extends SceneNode {
 
   /**
    * Add an item or folder to the current folder
-   * Shortcut for `ISceneNodeApi.setParent()`
+   * A shortcut for `SceneNode.setParent()`
+   * @see SceneNode.setParent()
    */
   add(sceneNodeId: string): void {
     return this.sceneFolder.add(sceneNodeId);

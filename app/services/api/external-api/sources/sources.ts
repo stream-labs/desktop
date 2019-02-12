@@ -4,7 +4,7 @@ import {
   Source as InternalSource,
   SourcesService as InternalSourcesService,
   TSourceType,
-} from 'services/sources/index';
+} from 'services/sources';
 import { Inject } from 'util/injector';
 import { ISerializable, Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';

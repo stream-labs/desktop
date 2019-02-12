@@ -1,5 +1,5 @@
 import { ServiceHelper } from 'services/stateful-service';
-import { SceneItem as InternalSceneItem } from '../../../scenes';
+import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi } from '../../external-api';
 import { ISourceModel, Source, SourcesService } from '../sources/sources';
 import { ISceneNode, SceneNode } from './scene-node';
@@ -55,6 +55,9 @@ export interface ISceneItemActions {
   setContentCrop(): void;
 }
 
+/**
+ * API for scene-items
+ */
 @ServiceHelper()
 export class SceneItem extends SceneNode implements ISceneItemActions {
   private sceneItem: InternalSceneItem;
@@ -73,6 +76,9 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
     return this.sourcesService.getSource(this.sceneItem.sourceId);
   }
 
+  /**
+   * returns serialized representation of scene-item
+   */
   getModel(): ISceneItem & ISourceModel {
     return {
       ...this.getSource().getModel(),
