@@ -5,6 +5,16 @@
       "config": {
         "threshold": 500
       }
+    },
+    "similar-code": {
+      "config": {
+        "threshold": 75
+      }
+    },
+    "identical-code": {
+      "config": {
+        "threshold": 100
+      }
     }
   },
   "plugins": {
