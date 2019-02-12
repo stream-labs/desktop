@@ -25,7 +25,7 @@ export default class PlatformAppPageView extends Vue {
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
-    }, 100); // TODO: Is this too fast?
+    }, 100);
 
     this.loadSub = this.platformAppsService.appLoad.subscribe(app => {
       if (this.appId === app.id) this.mountContainer();

@@ -68,7 +68,7 @@ export class PlatformContainerManager {
     const containerInfo = this.getContainerInfoForSlot(app, slot);
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // TODO: Types for electron fork changes
+    // This method was added in our fork
     (win as any).addBrowserView(containerInfo.container);
 
     containerInfo.transform.next({
@@ -108,7 +108,7 @@ export class PlatformContainerManager {
     const transform = cont.transform.getValue();
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-    // TODO: Fork typings
+    // This method was added in our fork
     (win as any).removeBrowserView(cont.container);
 
     // If these are different, it means that another window (likely the main)
@@ -205,8 +205,8 @@ export class PlatformContainerManager {
     const cont = this.containers.find(cont => cont.container.id === containerId);
     this.containers = this.containers.filter(c => c.container.id !== containerId);
 
-    // TODO: This just seems to be an error in the types provided,
-    // this isn't a new method added by our fork.
+    // Electron types are incorrect here.  This method exists and is documented, but
+    // does not appear in the type definitions.
     (cont.container as any).destroy();
   }
 
