@@ -323,7 +323,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       );
     }
 
-    this.containerManager.registerApp(app);
+    if (app.enabled) this.containerManager.registerApp(app);
     this.appLoad.next(this.getApp(id));
   }
 
