@@ -61,11 +61,11 @@ export class ScenesService {
   }
 
   get itemRemoved(): Observable<ISceneItem> {
-    return this.scenesService.itemAdded;
+    return this.scenesService.itemRemoved;
   }
 
   get itemUpdated(): Observable<ISceneItem> {
-    return this.scenesService.itemAdded;
+    return this.scenesService.itemUpdated;
   }
 }
 
