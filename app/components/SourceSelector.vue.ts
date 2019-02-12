@@ -120,6 +120,7 @@ export default class SourceSelector extends Vue {
 
   showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
     const sceneNode = this.scene.getNode(sceneNodeId);
+    if (!sceneNode.isSelected()) sceneNode.select();
     const menuOptions = sceneNode
       ? {
           selectedSceneId: this.scene.id,
