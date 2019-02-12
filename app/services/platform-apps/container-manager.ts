@@ -85,47 +85,47 @@ export class PlatformContainerManager {
   }
 
   setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
-    const cont = this.containers.find(cont => cont.container.id === containerId);
+    const info = this.containers.find(cont => cont.container.id === containerId);
 
-    if (!cont) return;
+    if (!info) return;
 
-    cont.container.setBounds({
+    info.container.setBounds({
       x: Math.round(pos.x),
       y: Math.round(pos.y),
       width: Math.round(size.x),
       height: Math.round(size.y),
     });
 
-    cont.transform.next({
-      ...cont.transform.getValue(),
+    info.transform.next({
+      ...info.transform.getValue(),
       pos,
       size,
     });
   }
 
   unmountContainer(containerId: number, electronWindowId: number) {
-    const cont = this.containers.find(cont => cont.container.id === containerId);
+    const info = this.containers.find(cont => cont.container.id === containerId);
 
-    if (!cont) return;
+    if (!info) return;
 
-    const transform = cont.transform.getValue();
+    const transform = info.transform.getValue();
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     // This method was added in our fork
-    (win as any).removeBrowserView(cont.container);
+    (win as any).removeBrowserView(info.container);
 
-    // If these are different, it means that another window (likely the main)
-    // already mounted this view first, so we don't need to do the following
-    // teardown.
+    /* If these are different, it means that another window (likely the main)
+     * already mounted this view first, so we don't need to do the following
+     * teardown. */
     if (transform.electronWindowId === electronWindowId) {
-      cont.transform.next({
+      info.transform.next({
         ...transform,
         mounted: false,
         electronWindowId: null,
         slobsWindowId: null,
       });
 
-      if (!cont.persistent) {
+      if (!info.persistent) {
         this.destroyContainer(containerId);
       }
     }
@@ -136,9 +136,9 @@ export class PlatformContainerManager {
    * @param app The app to refresh
    */
   refreshContainers(app: ILoadedApp) {
-    this.containers.forEach(cont => {
-      if (cont.appId === app.id) cont.container.webContents.reload();
-    });
+    this.containers
+      .filter(info => info.appId === app.id)
+      .forEach(info => info.container.webContents.reload());
   }
 
   private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
@@ -146,9 +146,7 @@ export class PlatformContainerManager {
       cont => cont.appId === app.id && cont.slot === slot,
     );
 
-    if (existingContainer) {
-      return existingContainer;
-    }
+    if (existingContainer) return existingContainer;
 
     return this.createContainer(app, slot);
   }
@@ -205,12 +203,16 @@ export class PlatformContainerManager {
   }
 
   private destroyContainer(containerId: number) {
-    const cont = this.containers.find(cont => cont.container.id === containerId);
+    const info = this.containers.find(cont => cont.container.id === containerId);
+
+    if (!info) return;
+
+    // Remove the container from the list of containers
     this.containers = this.containers.filter(c => c.container.id !== containerId);
 
     // Electron types are incorrect here.  This method exists and is documented, but
     // does not appear in the type definitions.
-    (cont.container as any).destroy();
+    (info.container as any).destroy();
   }
 
   private getPageUrlForSlot(app: ILoadedApp, slot: EAppPageSlot) {

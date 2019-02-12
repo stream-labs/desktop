@@ -19,6 +19,8 @@ export default class PlatformAppPageView extends Vue {
   resizeInterval: number;
   containerId: number;
   loadSub: Subscription;
+  currentPosition: IVec2;
+  currentSize: IVec2;
 
   mounted() {
     this.mountContainer();
@@ -36,7 +38,7 @@ export default class PlatformAppPageView extends Vue {
   }
 
   mountContainer() {
-    this.containerId = this.platformAppsService.mountConatiner(
+    this.containerId = this.platformAppsService.mountContainer(
       this.appId,
       this.pageSlot,
       electron.remote.getCurrentWindow().id,
@@ -60,20 +62,10 @@ export default class PlatformAppPageView extends Vue {
     this.unmountContainer();
   }
 
-  currentPosition: IVec2;
-  currentSize: IVec2;
-
   checkResize() {
     const rect = this.$refs.appContainer.getBoundingClientRect();
 
-    if (
-      this.currentPosition == null ||
-      this.currentSize == null ||
-      rect.left !== this.currentPosition.x ||
-      rect.top !== this.currentPosition.y ||
-      rect.width !== this.currentSize.x ||
-      rect.height !== this.currentSize.y
-    ) {
+    if (this.currentPosition == null || this.currentSize == null || this.rectChanged(rect)) {
       this.currentPosition = { x: rect.left, y: rect.top };
       this.currentSize = { x: rect.width, y: rect.height };
 
@@ -83,5 +75,14 @@ export default class PlatformAppPageView extends Vue {
         this.currentSize,
       );
     }
+  }
+
+  private rectChanged(rect: ClientRect) {
+    return (
+      rect.left !== this.currentPosition.x ||
+      rect.top !== this.currentPosition.y ||
+      rect.width !== this.currentSize.x ||
+      rect.height !== this.currentSize.y
+    );
   }
 }

@@ -70,11 +70,7 @@ export class DisplayModule extends Module {
   private updateDisplay(displayEntry: IDisplayEntry, transform: IBrowserViewTransform) {
     // The container isn't mounted, so get rid of any active displays and stop
     if (!transform.mounted) {
-      if (displayEntry.display) {
-        displayEntry.display.destroy();
-        displayEntry.display = null;
-      }
-
+      if (displayEntry.display) this.removeDisplay(displayEntry);
       return;
     }
 
@@ -83,8 +79,7 @@ export class DisplayModule extends Module {
       displayEntry.display &&
       displayEntry.display.electronWindowId !== transform.electronWindowId
     ) {
-      displayEntry.display.destroy();
-      displayEntry.display = null;
+      this.removeDisplay(displayEntry);
     }
 
     // There is no active display, so create one
@@ -104,6 +99,18 @@ export class DisplayModule extends Module {
       transform.pos.x + displayEntry.options.position.x,
       transform.pos.y + displayEntry.options.position.y,
     );
+  }
+
+  /**
+   * Removes a display from an entry.  This should be used
+   * when the display currently exists from the context of
+   * the app, but the app is not currently being shown on
+   * any screen, so we want to destroy the display.
+   * @param entry The display entry
+   */
+  private removeDisplay(entry: IDisplayEntry) {
+    entry.display.destroy();
+    entry.display = null;
   }
 
   private destroyDisplay(displayId: string) {

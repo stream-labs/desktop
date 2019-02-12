@@ -512,7 +512,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.getAssetUrl(app, asset);
   }
 
-  mountConatiner(
+  mountContainer(
     appId: string,
     slot: EAppPageSlot,
     electronWindowId: number,
