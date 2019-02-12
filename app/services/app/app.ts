@@ -31,7 +31,6 @@ import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
-import Vue from 'vue';
 
 const crashHandler = window['require']('crash-handler');
 
