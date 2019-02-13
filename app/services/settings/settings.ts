@@ -142,7 +142,6 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
-    if (categoryName === 'Audio') return this.getAudioSettingsFormData();
     let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
@@ -164,6 +163,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       });
     }
 
+    if (categoryName === 'Audio') return this.getAudioSettingsFormData(settings[0]);
     // We hide the encoder preset and settings if the optimized ones are in used
     if (
       categoryName === 'Output' &&
@@ -242,7 +242,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.setSettings(category, newSettings);
   }
 
-  private getAudioSettingsFormData(): ISettingsSubCategory[] {
+  private getAudioSettingsFormData(OBSsettings: ISettingsSubCategory): ISettingsSubCategory[] {
     const audioDevices = this.audioService.getDevices();
     const sourcesInChannels = this.sourcesService
       .getSources()
@@ -295,6 +295,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     return [
+      OBSsettings,
       {
         parameters,
         nameSubCategory: 'Untitled',
@@ -303,7 +304,10 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
-    if (categoryName === 'Audio') return this.setAudioSettings(settingsData);
+    if (categoryName === 'Audio') {
+      this.setAudioSettings([settingsData[1]]);
+      settingsData.pop();
+    }
 
     const dataToSave = [];
 
