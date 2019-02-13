@@ -1,7 +1,7 @@
 <template>
   <div class="row alignable-input">
-    <div>
-      <label class="input-label">
+    <div class="input-label">
+      <label>
         {{ options.title }}
       </label>
     </div>
