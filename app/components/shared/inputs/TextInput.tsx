@@ -7,8 +7,7 @@ import { $t } from 'services/i18n';
 
 @Component({})
 export default class TextInput extends BaseInput<string, ITextMetadata> {
-  @Prop()
-  readonly value: string;
+  @Prop() readonly value: string;
 
   @Prop({ default: () => ({}) })
   readonly metadata: ITextMetadata;
@@ -29,6 +28,19 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     };
   }
 
+  toggleVisibleButton(h: Function) {
+    return (
+      this.metadata.masked && (
+        <button
+          class={cx('button', styles.buttonInput, 'button--default')}
+          onClick={this.toggleVisible}
+        >
+          {this.textVisible ? $t('Hide') : $t('Show')}
+        </button>
+      )
+    );
+  }
+
   render(h: Function) {
     return (
       <span
@@ -46,14 +58,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
           v-validate={this.validate}
           disabled={this.metadata.disabled}
         />
-        {this.metadata.masked && (
-          <button
-            class={cx('button', styles.buttonInput, 'button--default')}
-            onClick={this.toggleVisible}
-          >
-            {this.textVisible ? $t('Hide') : $t('Show')}
-          </button>
-        )}
+        {this.toggleVisibleButton(h)}
         {this.$slots.default}
       </span>
     );
