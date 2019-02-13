@@ -13,7 +13,6 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
-import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
@@ -32,7 +31,6 @@ interface IUserServiceState {
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
-  @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
@@ -86,7 +84,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on('testing-fakeAuth', async (e: Electron.Event, auth: IPlatformAuth) => {
       const service = getPlatformService(auth.platform.type);
-      this.login(service, auth);
+      await this.login(service, auth);
+      this.onboardingService.next();
     });
   }
 
