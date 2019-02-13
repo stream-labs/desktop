@@ -628,7 +628,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.autoSaveInterval = window.setInterval(async () => {
       this.autoSavePromise = this.save();
       await this.autoSavePromise;
-      await this.stateService.flushManifestFile();
+      this.stateService.flushManifestFile();
     }, 60 * 1000);
   }
 
