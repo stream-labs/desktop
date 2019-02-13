@@ -15,11 +15,6 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     input: HTMLInputElement;
   };
 
-  @Debounce(1000)
-  updateValueDebounced(value: string) {
-    this.updateValue(value, true);
-  }
-
   emitInput(value: string) {
     let formattedValue = value;
     if (isNaN(Number(formattedValue))) formattedValue = '0';
@@ -27,12 +22,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     super.emitInput(Number(formattedValue));
   }
 
-  updateValue(value: string, force = false) {
-    if (!force && this.options.min) {
-      // fields with min value don't work well without Debounce
-      this.updateValueDebounced(value);
-      return;
-    }
+  updateValue(value: string) {
     let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
 
     if (this.options.min !== void 0 && Number(value) < this.options.min) {
