@@ -222,17 +222,20 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async delete(id?: string): Promise<void> {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
-
     const removingActiveCollection = id === this.activeCollection.id;
 
-    await this.removeCollection(id);
-
     if (removingActiveCollection) {
-      if (this.collections.length > 0) {
-        await this.load(this.collections[0].id);
-      } else {
-        await this.create();
-      }
+      this.appService.runInLoadingMode(async () => {
+        await this.removeCollection(id);
+
+        if (this.collections.length > 0) {
+          await this.load(this.collections[0].id);
+        } else {
+          await this.create();
+        }
+      });
+    } else {
+      await this.removeCollection(id);
     }
   }
 
