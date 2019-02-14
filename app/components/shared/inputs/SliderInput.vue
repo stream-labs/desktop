@@ -1,25 +1,26 @@
 <template>
-<div
-  class="w-form-group__wrapper slider-container"
-  data-role="input"
-  data-type="slider"
-  :data-name="options.name"
->
-  <vue-slider class="slider w-form-group__input"
-    :value="localValue"
-    @input="value => updateLocalValue(value)"
-    :max="options.max"
-    :min="options.min"
-    :interval="options.interval"
-    :tooltip="options.displayValue || 'always'"
-    :speed="0"
-    :height="4"
-    :formatter="formatter"
-    :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
-    :piecewiseLabel="options.piecewiseLabel"
-    :data="options.data"
-    ref="slider"
-    :piecewiseStyle="{
+  <div
+    class="w-form-group__wrapper slider-container"
+    data-role="input"
+    data-type="slider"
+    :data-name="options.name"
+  >
+    <vue-slider
+      class="slider w-form-group__input"
+      :value="localValue"
+      @input="value => updateLocalValue(value)"
+      :max="options.max"
+      :min="options.min"
+      :interval="options.interval"
+      :tooltip="options.displayValue || 'always'"
+      :speed="0"
+      :height="4"
+      :formatter="formatter"
+      :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
+      :piecewiseLabel="options.piecewiseLabel"
+      :data="options.data"
+      ref="slider"
+      :piecewiseStyle="{
         position: 'absolute',
         backgroundColor: nightMode ? '#253239' : '#eaecee',
         height: '2px',
@@ -27,26 +28,26 @@
         'borderRadius': '1px',
         top: '12px'
     }"
-    :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
-    :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
-    :sliderStyle="options.sliderStyle"
-    :dotSize="options.dotSize"
-  />
-  <input
-    v-if="options.hasValueBox && !options.usePercentages"
-    class="slider-input"
-    type="text"
-    :value="localValue"
-    @input="updateLocalValue(parseFloat($event.target.value))"
-    @keydown="handleKeydown"
-  />
-</div>
+      :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
+      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
+      :sliderStyle="options.sliderStyle"
+      :dotSize="options.dotSize"
+    />
+    <input
+      v-if="options.hasValueBox && !options.usePercentages"
+      class="slider-input"
+      type="text"
+      :value="localValue"
+      @input="updateLocalValue($event.target.value)"
+      @keydown="handleKeydown"
+    >
+  </div>
 </template>
 
 <script lang="ts" src="./SliderInput.vue.ts"></script>
 
 <style lang="less">
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .slider-container {
   width: 100%;
@@ -62,7 +63,7 @@
 .slider {
   background: transparent;
   .padding-v-sides();
-  .padding-h-sides(@0)!important;
+  .padding-h-sides(@0) !important;
   margin: 0;
   flex-grow: 1;
   height: auto;
@@ -111,7 +112,7 @@
 
 .vue-slider-piecewise {
   .vue-slider-piecewise-dot {
-    display: none!important;
+    display: none !important;
   }
 }
 
