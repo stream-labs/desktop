@@ -10,7 +10,7 @@
         type="text"
         ref="input"
         :placeholder="options.placeholder"
-        :value="value"
+        :value="displayValue"
         @input="handleInput($event.target.value)"
         @mousewheel="onMouseWheelHandler"
         :name="uuid"
