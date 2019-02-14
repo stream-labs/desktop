@@ -20,6 +20,10 @@ export default class TitleBar extends Vue {
 
   @Prop() title: string;
 
+  get isMinimizable() {
+    return electron.remote.getCurrentWindow().isMinimizable();
+  }
+
   minimize() {
     electron.remote.getCurrentWindow().minimize();
   }
