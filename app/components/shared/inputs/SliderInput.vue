@@ -1,6 +1,7 @@
 <template>
 <div
   class="w-form-group__wrapper slider-container"
+  :class="[options.displayValue === 'false' ? '' : 'has-tooltip']"
   data-role="input"
   data-type="slider"
   :data-name="options.name"
@@ -52,6 +53,10 @@
   width: 100%;
   display: flex;
   position: relative;
+}
+
+.slider-container.has-tooltip {
+  padding-bottom: 16px;
 }
 
 .slider-input {

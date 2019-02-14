@@ -26,7 +26,6 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   }
 
   updateValue(value: string) {
-    console.log(value);
     let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
     if (this.timeout) clearTimeout(this.timeout);
 

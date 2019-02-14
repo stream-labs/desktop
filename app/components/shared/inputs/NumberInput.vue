@@ -16,7 +16,7 @@
         :name="uuid"
         v-validate="validate"
     />
-    <div v-if="options.isInteger" class="arrows" @mousewheel="onMouseWheelHandler">
+    <div v-if="options.isInteger" class="arrows">
       <div class="arrow arrow-up" @click="increment">
         <i class="fa fa-chevron-up"></i>
       </div>
@@ -24,9 +24,6 @@
         <i class="fa fa-chevron-down"></i>
       </div>
     </div>
-    <span class="input-error" v-show="errors.first(uuid)">
-      {{ errors.first(uuid) }}
-    </span>
   </span>
 </template>
 
