@@ -16,7 +16,7 @@ export default class GenericForm extends Vue {
   propertyComponentForType = propertyComponentForType;
 
   async onInputHandler(value: IObsInput<TObsValue>, index: number) {
-    this.$refs.form.validate();
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
