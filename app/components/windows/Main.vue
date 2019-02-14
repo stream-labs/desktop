@@ -15,13 +15,13 @@
 
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
-      <div v-if="shouldLockContent" class="main-loading">
+      <div v-if="applicationLoading" class="main-loading">
         <custom-loader></custom-loader>
       </div>
 
       <component
         class="main-page-container"
-        v-if="!shouldLockContent"
+        v-if="!applicationLoading"
         :is="page"
         :params="params"/>
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
