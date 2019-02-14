@@ -208,7 +208,6 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     parent: mainWindow,
-    modal: true,
     show: false,
     frame: false
   });
