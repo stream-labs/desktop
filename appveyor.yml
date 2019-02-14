@@ -5,7 +5,7 @@ install:
   # set a custom message as the full commit ID. This *has* to be the first job given the way
   # our service is designed, please don't move.
   - ps: Add-AppveyorMessage $env:APPVEYOR_REPO_COMMIT
-  - ps: Install-Product node 8 x64
+  - ps: Install-Product node 10 x64
   - yarn install --frozen-lockfile --check-files
   - yarn lint
   - yarn compile:ci
