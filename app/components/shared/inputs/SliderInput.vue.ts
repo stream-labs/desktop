@@ -6,6 +6,7 @@ import { CustomizationService } from 'services/customization';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { Inject } from 'util/injector';
 import { ISliderMetadata } from './index';
+import { isString } from 'util';
 
 @Component({
   components: { VueSlider },
@@ -20,7 +21,8 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   interval: number;
   isFullyMounted = false;
 
-  localValue = this.value || 0;
+  // The displaying value on and within the ui components.
+  localValue: number | string = this.value || 0;
 
   $refs: { slider: any };
 
@@ -34,9 +36,22 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
     new ResizeSensor(this.$el, () => this.onResizeHandler());
   }
 
+  /**
+   * Updates the local value that is used during the display processs.
+   * @param value The value that will be displayed on the interface.
+   */
   updateLocalValue(value: number) {
-    this.localValue = value;
-    this.updateValue(value);
+    const parsedValue = Number(value);
+
+    // Dislay a empty string if and only if the user deletes all of the input field.
+    if ((isNaN(parsedValue) && isString(value)) || (isString(value) && value === '')) {
+      // preview only, when there is no input or just a negative symbol.
+      this.localValue = value.trim() !== '-' ? '' : value;
+    } else if (value != null && !isNaN(value)) {
+      // Otherwise use the provided number value.
+      this.localValue = parsedValue;
+      this.updateValue(parsedValue);
+    }
   }
 
   @debounce(100)
