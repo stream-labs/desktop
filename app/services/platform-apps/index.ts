@@ -210,7 +210,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       if (app.is_beta && !app.manifest) return;
 
       const unpackedVersionLoaded = this.state.loadedApps.find(
-        loadedApp => loadedApp.id === app.id_hash,
+        loadedApp => loadedApp.id === app.id_hash && loadedApp.unpacked,
       );
 
       this.loadApp({
@@ -647,7 +647,9 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
   @mutation()
   private LOAD_APP(app: ILoadedApp) {
-    this.state.loadedApps = this.state.loadedApps.filter(a => a.id !== app.id);
+    this.state.loadedApps = this.state.loadedApps.filter(
+      a => a.id !== app.id || a.unpacked !== app.unpacked,
+    );
     this.state.loadedApps.push(app);
   }
 
