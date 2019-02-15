@@ -12,9 +12,6 @@
       :rows="metadata.rows || 2"
       v-validate="validate"
     />
-    <span class="input-error" v-show="errors.first(uuid)">
-      {{ errors.first(uuid) }}
-    </span>
   </span>
 </template>
 
