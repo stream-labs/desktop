@@ -3,8 +3,8 @@ import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 const request = require('request');
 
-const USERS_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
-const USERS_POOL_TOKEN = process.env.SLOBS_TEST_USERS_POOL_TOKEN;
+const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
+const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 let userName: string; // keep user's name if SLOBS is logged-in
 
 interface ITestUser {
@@ -29,7 +29,7 @@ export async function logOut(t: TExecutionContext) {
 
 /**
  * Login SLOBS into user's account
- * If env.USERS_POOL_TOKEN is set than request credentials from slobs-users-pool service
+ * If env.USER_POOL_TOKEN is set than request credentials from slobs-users-pool service
  * otherwise fetch credentials from ENV variables
  */
 export async function logIn(
@@ -40,8 +40,8 @@ export async function logIn(
 
   let authInfo: IPlatformAuth;
 
-  if (USERS_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(USERS_POOL_TOKEN, platform);
+  if (USER_POOL_TOKEN) {
+    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform);
   } else {
     authInfo = getAuthInfoFromEnv();
     if (!authInfo) {
@@ -56,13 +56,13 @@ export async function logIn(
 }
 
 /**
- * Users pool has limited amount of users
+ * UserPool has limited amount of users
  * We must let slobs-users-pool service know that we are not going to do any actions with reserved
  * account.
  */
 export async function releaseUserInPool() {
-  if (!userName || !USERS_POOL_TOKEN) return;
-  await requestUsersPool(`release/${userName}`);
+  if (!userName || !USER_POOL_TOKEN) return;
+  await requestUserPool(`release/${userName}`);
   userName = '';
 }
 
@@ -116,7 +116,7 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
   let attempts = 3;
   while (attempts--) {
     try {
-      user = await requestUsersPool('reserve');
+      user = await requestUserPool('reserve');
       break;
     } catch (e) {
       console.log(e);
@@ -146,12 +146,12 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
 /**
  * Make a GET request to slobs-users-pool service
  */
-async function requestUsersPool(path: string): Promise<any> {
+async function requestUserPool(path: string): Promise<any> {
   return new Promise((resolve, reject) => {
     request(
       {
-        url: `${USERS_POOL_URL}/${path}`,
-        headers: { Authorization: `Bearer ${process.env.SLOBS_TEST_USERS_POOL_TOKEN}` }
+        url: `${USER_POOL_URL}/${path}`,
+        headers: { Authorization: `Bearer ${USER_POOL_TOKEN}` },
       },
       (err: any, res: any, body: any) => {
         if (err || res.statusCode !== 200) {
