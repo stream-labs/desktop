@@ -116,7 +116,6 @@ export interface IPlatformAuth {
     id: string;
     channelId?: string;
   };
-  streamingKey?: string;
 }
 
 export interface IUserInfo {

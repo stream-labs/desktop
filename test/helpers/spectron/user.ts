@@ -14,7 +14,7 @@ interface ITestUser {
   platforms: {
     // tokens for platforms
     type: TPlatform; // twitch, youtube, etc..
-    id: string; // Streamlabs userId
+    id: string; // platform userId
     token: string; // platform token
     apiToken: string; // Streamlabs API token
     widgetToken: string; // needs for widgets showing
@@ -41,7 +41,6 @@ export async function logIn(
   let authInfo: IPlatformAuth;
 
   if (USERS_POOL_TOKEN) {
-    console.log('reserve user from pool');
     authInfo = await reserveUserFromPool(USERS_POOL_TOKEN, platform);
   } else {
     authInfo = getAuthInfoFromEnv();
