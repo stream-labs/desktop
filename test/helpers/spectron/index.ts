@@ -3,6 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { releaseUserInPool } from './user';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -181,6 +182,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       const client = await getClient();
       await client.unsubscribeAll();
+      await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp();

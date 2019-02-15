@@ -1,6 +1,6 @@
 import { test, useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
-import { logIn, blankSlate } from '../helpers/spectron/user';
+import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
