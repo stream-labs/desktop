@@ -1,9 +1,9 @@
 import { ObsInput } from './ObsInput';
 import { Component, Prop } from 'vue-property-decorator';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { SliderInput } from 'components/shared/inputs/inputs';
+import { $t } from 'services/i18n';
 
-@Component({ components: { SliderInput, HFormGroup } })
+@Component({ components: { HFormGroup } })
 export default class ObsFontSizeSelector extends ObsInput<number> {
   @Prop()
   value: number;
@@ -13,7 +13,15 @@ export default class ObsFontSizeSelector extends ObsInput<number> {
   }
 
   get metadata() {
-    return { data: this.fontSizePresets, piecewise: true, piecewiseLabel: true, max: 288, min: 9 };
+    return {
+      type: 'slider',
+      data: this.fontSizePresets,
+      piecewise: true,
+      piecewiseLabel: true,
+      max: 288,
+      min: 9,
+      title: $t('Font Size'),
+    };
   }
 
   get fontSizePresets() {

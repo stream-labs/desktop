@@ -1,7 +1,5 @@
 <template>
-<h-form-group :title="$t('Font Size')">
-  <slider-input :value="value" @input="val => setFontSizePreset(val)" :metadata="metadata" />
-</h-form-group>
+<h-form-group :value="value" @input="val => setFontSizePreset(val)" :metadata="metadata" />
 </template>
 
 <script lang="ts" src="./ObsFontSizeSelector.vue.ts"></script>
