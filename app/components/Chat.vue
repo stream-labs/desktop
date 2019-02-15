@@ -13,9 +13,7 @@
 <style lang="less" scoped>
 @import '../styles/index';
 .chat {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  .flex--grow();
   overflow: hidden; // webview content can affect external UI without this rule
 }
 

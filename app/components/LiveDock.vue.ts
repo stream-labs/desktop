@@ -13,9 +13,9 @@ import { $t } from 'services/i18n';
 import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
-import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { AppService } from 'services/app';
+import Tabs, { ITab } from 'components/Tabs.vue';
 
 @Component({
   components: {
@@ -23,6 +23,7 @@ import { AppService } from 'services/app';
     ListInput,
     PlatformAppPageView,
     ResizeBar,
+    Tabs,
   },
 })
 export default class LiveDock extends Vue {
@@ -46,7 +47,19 @@ export default class LiveDock extends Vue {
 
   slot = EAppPageSlot.Chat;
 
-  selectedChat = 'default';
+  // Safe getter/setter prevents getting stuck on the chat
+  // for an app that was unloaded.
+  underlyingSelectedChat = 'default';
+
+  get selectedChat() {
+    return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
+      ? this.underlyingSelectedChat
+      : 'default';
+  }
+
+  set selectedChat(val: string) {
+    this.underlyingSelectedChat = val;
+  }
 
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
@@ -208,22 +221,20 @@ export default class LiveDock extends Vue {
     });
   }
 
-  get chatAppsListMetadata() {
-    const options = [
+  get chatTabs(): ITab[] {
+    return [
       {
-        title: this.userService.platform.type as string,
+        name: this.userService.platform.type.toString(),
         value: 'default',
       },
-    ];
-    this.chatApps
-      .filter(app => !app.poppedOutSlots.includes(this.slot))
-      .forEach(chatApp => {
-        options.push({
-          title: chatApp.manifest.name,
-          value: chatApp.id,
-        });
-      });
-    return metadataHelper.list({ options });
+    ].concat(
+      this.chatApps.map(app => {
+        return {
+          name: app.manifest.name,
+          value: app.id,
+        };
+      }),
+    );
   }
 
   get isPopOutAllowed() {
