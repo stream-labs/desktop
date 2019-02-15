@@ -188,7 +188,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchPrefillData() {
-    if (!this.state.activePage) return;
+    if (!this.state.activePage || !this.state.activePage.id) return;
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
       'fields=status,stream_url,title,description';
