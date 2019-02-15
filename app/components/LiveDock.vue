@@ -84,13 +84,13 @@
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
           <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
+            <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
               class="live-dock-chat-apps__popout icon-pop-out-1"
               v-tooltip.left="$t('Pop out to new window')"
               v-if="isPopOutAllowed"
               @click="popOut"
             />
-            <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
         <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
@@ -99,6 +99,7 @@
           class="live-dock-platform-app-webview"
           :appId="selectedChat"
           :pageSlot="slot"
+          :key="selectedChat"
         />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >

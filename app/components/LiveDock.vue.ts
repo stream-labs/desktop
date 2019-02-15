@@ -228,12 +228,14 @@ export default class LiveDock extends Vue {
         value: 'default',
       },
     ].concat(
-      this.chatApps.map(app => {
-        return {
-          name: app.manifest.name,
-          value: app.id,
-        };
-      }),
+      this.chatApps
+        .filter(app => !app.poppedOutSlots.includes(this.slot))
+        .map(app => {
+          return {
+            name: app.manifest.name,
+            value: app.id,
+          };
+        }),
     );
   }
 
