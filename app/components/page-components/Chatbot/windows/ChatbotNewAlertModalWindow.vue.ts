@@ -1,17 +1,14 @@
 import { cloneDeep } from 'lodash';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
+import { TextInput, TextAreaInput, ListInput, NumberInput } from 'components/shared/inputs/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
-  IListMetadata,
-  ITextMetadata,
-  INumberMetadata,
   EInputType,
+  IListMetadata,
+  INumberMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs/index';
 
 import { IAlertMessage, NEW_ALERT_MODAL_ID, ChatbotAlertType } from 'services/chatbot';
@@ -195,8 +192,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return amount === null || !message;
   }
 
-  get metadata() {
-    const metadata: INewAlertMetadata = {
+  get metadata(): INewAlertMetadata {
+    return {
       follow: {
         newMessage: {
           message: {
@@ -363,11 +360,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         },
       },
     };
-    return metadata;
   }
 
-  get initialNewAlertState() {
-    const initialState: INewAlertData = {
+  get initialNewAlertState(): INewAlertData {
+    return {
       follow: {
         newMessage: {
           message: null,
@@ -425,7 +421,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         },
       },
     };
-    return initialState;
   }
 
   bindOnSubmitAndCheckIfEdited(event: any) {

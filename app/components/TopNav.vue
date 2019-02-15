@@ -19,8 +19,8 @@
     </button>
     <button
       @click="navigateChatBot"
-      class="tab-button tab-button--chatbot"
-      v-if="featureIsEnabled(availableFeatures.chatbot)"
+      class="tab-button"
+      v-if="featureIsEnabled(availableFeatures.chatbot) && chatbotVisible"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-community"/> <span class="tab-button__text">{{ $t('Cloudbot') }}</span>
@@ -62,8 +62,8 @@
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <div class="theme-toggle__bg"></div>
-        <img class="theme-toggle__icon theme-toggle__icon--moon" src="../../media/images/moon.png"/>
-        <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
+        <img class="theme-toggle__icon theme-toggle__icon--moon" v-tooltip.right="moonTooltip" src="../../media/images/moon.png"/>
+        <img class="theme-toggle__icon theme-toggle__icon--sun" v-tooltip.right="sunTooltip" src="../../media/images/sun.png"/>
       </button>
     </div>
     <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999">
@@ -83,7 +83,7 @@
       <a
         @click="navigateHelp"
         class="link">
-        <i class="icon-question"></i>
+        <i class="icon-question" v-tooltip.right="helpTooltip"></i>
         <span>{{ $t('Help') }}</span>
       </a>
     </div>
@@ -91,13 +91,16 @@
       <a
         @click="openSettingsWindow"
         class="link">
-        <i class="icon-settings"/><span>{{ $t('Settings') }}</span>
+        <i class="icon-settings" v-tooltip.right="settingsTooltip"/><span>{{ $t('Settings') }}</span>
       </a>
     </div>
-    <div class="top-nav-item">
+    <div class="top-nav-item" v-if="isUserLoggedIn" v-tooltip.right="logoutTooltip">
       <login/>
-    </div>
   </div>
+  <div class="top-nav-item" v-else>
+      <login/>
+  </div>
+ </div>
 </div>
 </template>
 
@@ -132,6 +135,8 @@
 
 <style lang="less" scoped>
 @import '../styles/index';
+@import '../styles/badges';
+
 .top-nav {
   display: flex;
   flex-direction: row;
@@ -206,7 +211,7 @@
 .theme-toggle__bg {
   height: 14px;
   width: 30px;
-  padding: 0px 16px;
+  padding: 0 16px;
   background: #e3e8eb;
   position: relative;
   border-radius: 10px;
@@ -226,24 +231,6 @@
   width: 18px;
   display: none;
   left: -2px;
-}
-
-.badge {
-  .radius();
-  font-size: 12px;
-  margin: 0 0 0 8px;
-  padding: 0 4px;
-  text-transform: capitalize;
-  vertical-align: text-bottom;
-  border: 1px solid transparent;
-  line-height: 16px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.badge--new {
-  background: @purple-semi;
-  color: @purple;
 }
 
 .night-theme {
@@ -280,11 +267,6 @@
 
   .theme-toggle__icon--sun {
     display: none;
-  }
-
-  .badge--new {
-    background: @purple;
-    color: @white;
   }
 }
 </style>

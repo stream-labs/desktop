@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { inputComponents } from 'components/widgets/inputs';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
@@ -20,6 +20,8 @@ import {
   },
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
+  @Prop() goalType: string;
+
   $refs: {
     form: ValidatedForm;
   };

@@ -1,15 +1,13 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.11.7',
-  title: 'Facebook Live Support',
+  version: '0.11.12',
+  title: 'Replay Buffer & Smart Video Encoding',
   showChest: false,
   notes: [
-    'You can now log in and stream to Facebook Live',
-    'Allow drag resizing of editor preview size and chat size',
-    'Fixed some issues when editing widget settings',
-    'Fixed a source of errors on shutdown',
-    'Fixed infinite loading when opening Widget Editor in some cases',
-    'Fixed an invalid server error in some cases',
+    'The replay buffer will continously record the latest moments of your stream, and can be saved ' +
+      'with the press of a hotkey. You can enable this feature in the Advanced Settings tab.',
+    'Added our game-aware video encoding optimizations to reduce the CPU/GPU usage and improve ' +
+      'the video quality of your streams. Currently 65 games are supported and it works with most encoders.',
   ],
 };

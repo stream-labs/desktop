@@ -41,7 +41,9 @@ export default class EditableSceneCollection extends Vue {
   }
 
   get isActive() {
-    return this.collection.id === this.sceneCollectionsService.activeCollection.id;
+    return (
+      this.collection && this.collection.id === this.sceneCollectionsService.activeCollection.id
+    );
   }
 
   handleKeypress(e: KeyboardEvent) {

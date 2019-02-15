@@ -1,4 +1,3 @@
-import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
@@ -7,6 +6,7 @@ import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { Throttle } from 'lodash-decorators';
+import { Service } from './service';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -95,7 +95,7 @@ export class UsageStatisticsService extends Service {
   recordEvent(event: TUsageEvent, metadata: object = {}) {
     if (!this.isProduction) return;
 
-    const headers = new Headers();
+    let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
     const bodyData: IUsageApiData = {
@@ -106,7 +106,7 @@ export class UsageStatisticsService extends Service {
     };
 
     if (this.userService.isLoggedIn()) {
-      authorizedHeaders(this.userService.apiToken, headers);
+      headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 
     if (this.installerId) {
@@ -122,14 +122,19 @@ export class UsageStatisticsService extends Service {
     return fetch(request);
   }
 
+  /**
+   * Record event for the analytics DB
+   */
   recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
+    if (!this.isProduction) return;
+
     this.anaiticsEvents.push({
       event,
       value,
       product: 'SLOBS',
       version: this.version,
       count: 1,
-      uuid: this.userService.state.auth ? this.userService.state.auth.platform.id : void 0,
+      uuid: this.userService.getLocalUserId(),
     });
     this.sendAnalytics();
   }
@@ -142,14 +147,11 @@ export class UsageStatisticsService extends Service {
 
     this.anaiticsEvents.length = 0;
 
-    const request = new Request(
-      `https://${this.hostsService.streamlabs}/api/v5/analytics/slobs/ping`,
-      {
-        method: 'post',
-        headers: authorizedHeaders(this.userService.apiToken),
-        body: JSON.stringify(data || {}),
-      },
-    );
+    const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
+      headers,
+      method: 'post',
+      body: JSON.stringify(data || {}),
+    });
     fetch(request).then(handleResponse);
   }
 }

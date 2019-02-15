@@ -54,6 +54,7 @@
                 :metadata="cooldownsMetadata"
               />
             </div>
+            <ChatbotAliases v-model="newCommand.aliases" />
           </div>
           <div class="row">
             <div class="small-6 columns">
@@ -87,7 +88,7 @@
 
 <script lang="ts" src="./ChatbotCustomCommandWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 .chatbot-add-command__container {
   padding-top: 45px;
 }

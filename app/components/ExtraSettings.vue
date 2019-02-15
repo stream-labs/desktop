@@ -25,10 +25,16 @@
   </div>
   <div class="section">
     <div class="section-content">
-      <ObsBoolInput
-        v-if="!isFacebook"
-        :value="streamInfoUpdateModel"
-        @input="setStreamInfoUpdate"
+      <bool-input
+        v-if="isLoggedIn && !isFacebook"
+        v-model="streamInfoUpdate"
+        name="stream_info_udpate"
+        :metadata="{ title: $t('Confirm stream title and game before going live') }"
+      />
+      <bool-input
+        v-model="navigateToLive"
+        name="navigate_to_live"
+        :metadata="{ title: $t('Navigate to Live tab when going live') }"
       />
       <div class="input-container">
         <button class="button button--default" @click="restartStreamlabelsSession">

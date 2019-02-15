@@ -2,13 +2,8 @@
 <widget-editor :navItems="navItems">
   <validated-form slot="manage-credits-properties" @input="save()" v-if="loaded">
     <!-- <button class="button button--action" @click="rollCredits">{{ $t('Roll Credits') }}</button> -->
-    <v-form-group :title="$t('Credit Title')" type="text" v-model="wData.settings.credit_title" />
-    <v-form-group
-      :title="$t('Credit Subtitle')"
-      type="text"
-      v-model="wData.settings.credit_title"
-      :metadata="{ tooltip: creditsSubtitleTooltip }"
-    />
+    <v-form-group v-model="wData.settings.credit_title" :metadata="metadata.title" />
+    <v-form-group  v-model="wData.settings.credit_title" :metadata="metadata.subtitle" />
     <v-form-group :title="$t('Includes')">
       <bool-input :title="$t('Show Followers')" v-model="wData.settings.followers"/>
       <bool-input :title="$t('Show Subscribers')" v-model="wData.settings.subscribers"/>
@@ -24,33 +19,18 @@
   </validated-form>
 
   <validated-form slot="visual-properties" @input="save()" v-if="loaded">
-    <v-form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
-    <v-form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
-    <v-form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
-    <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.font_size" :metadata="{ max: 100 }" />
-    <v-form-group type="color" :title="$t('Text Color')" v-model="wData.settings.font_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <v-form-group v-model="wData.settings.theme" :metadata="metadata.theme"/>
+    <v-form-group v-model="wData.settings.background_color" :metadata="metadata.backgroundColor" />
+    <v-form-group v-model="wData.settings.font" :metadata="metadata.fontFamily"/>
+    <v-form-group v-model="wData.settings.font_size" :metadata="metadata.fontSize" />
+    <v-form-group v-model="wData.settings.font_color" :metadata="metadata.fontColor"/>
 
     <v-form-group :title="$t('Loop Option')">
       <bool-input :title="$t('Loop the credits')" v-model="wData.settings.loop_credits"/>
     </v-form-group>
-    <v-form-group
-      type="slider"
-      :title="$t('Delay Time')"
-      v-model="wData.settings.delay_time"
-      :metadata="{ tooltip: delayTimeTooltip, max: 10, interval: 1 }"
-    />
-    <v-form-group
-      type="slider"
-      :title="$t('Roll Speed')"
-      v-model="wData.settings.roll_speed"
-      :metadata="{ tooltip: rollSpeedTooltip, max: 5, interval: 1 }"
-    />
-    <v-form-group
-      type="slider"
-      :title="$t('Roll Time')"
-      v-model="wData.settings.roll_time"
-      :metadata="{ tooltip: rollTimeTooltip, max: 150, interval: 5 }"
-    />
+    <v-form-group v-model="wData.settings.delay_time" :metadata="metadata.delayTime" />
+    <v-form-group v-model="wData.settings.roll_speed" :metadata="metadata.rollSpeed" />
+    <v-form-group v-model="wData.settings.roll_time" :metadata="metadata.rollTime" />
   </validated-form>
 </widget-editor>
 </template>

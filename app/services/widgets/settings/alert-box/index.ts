@@ -83,20 +83,16 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       ttsVolume: metadata.slider({ title: $t('Volume'), min: 0, max: 100 }),
       duration: metadata.slider({ title: $t('Alert Duration'), min: 2, max: 300 }),
       textDelay: metadata.slider({ title: $t('Text Delay'), min: 0, max: 60 }),
-      ttsSecurity: metadata.slider({
+      ttsSecurity: metadata.spamSecurity({
         title: $t('Spam Security'),
-        description: $t(
-          // tslint:disable-next-line:prefer-template
-          'This slider helps you filter shared media before it can be submitted.\n' +
-            '1: No security\n' +
-            '2: 65%+ rating, 5k+ views\n' +
-            '3: 75%+ rating, 40k+ views\n' +
-            '4: 80%+ rating, 300k+ views\n' +
-            '5: 85%+ rating, 900k+ views',
+        tooltip: $t(
+          'This setting helps control text to speech spam, such as "wwwwwwwwwww." ' +
+            'By default this is turned off, but most users will want to set this to Low or Medium. ' +
+            'The higher the security, the less spam, but also a higher chance of a legitimate message being flagged ' +
+            'as spam and not being read.',
         ),
-        max: 5,
-        min: 1,
-        interval: 1,
+        data: [$t('Off'), $t('Low'), $t('Medium'), $t('High')],
+        indexModifier: 1,
       }),
       ttsLanguage: metadata.sectionedMultiselect({ title: $t('Language'), options: languages }),
       conditions: metadata.list({
@@ -117,9 +113,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       primaryColor: metadata.color({ title: $t('Text Color Primary') }),
       secondaryColor: metadata.color({ title: $t('Text Color Secondary') }),
       textColor: metadata.color({ title: $t('Text Color') }),
-      showMessage: metadata.bool({ title: $t('Show Message?') }),
-      messageEmojis: metadata.bool({ title: $t('Allow Twitch Emojis?') }),
-      ttsEnabled: metadata.bool({ title: $t('Enable TTS?') }),
+      showMessage: metadata.toggle({ title: $t('Show Message?') }),
+      messageEmojis: metadata.toggle({ title: $t('Allow Twitch Emojis?') }),
+      ttsEnabled: metadata.toggle({ title: $t('Enable TTS?') }),
       unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
       unlimitedMediaMod: metadata.toggle({
         title: $t('Unlimited Media Sharing Alert Moderation Delay'),

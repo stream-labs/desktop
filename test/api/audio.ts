@@ -69,6 +69,6 @@ test('Events are emitted when the audio source is updated', async t => {
   audioService.audioSourceUpdated.subscribe();
   audioService.getSource(sourceId).setDeflection(0.5);
 
-  const event = await client.fetchNextEvent();
-  t.is(event.fader.deflection, 0.5);
+  const audioUpdatedEvent = await client.waitForEvent((event: any) => !!event.fader);
+  t.is(audioUpdatedEvent.fader.deflection, 0.5);
 });

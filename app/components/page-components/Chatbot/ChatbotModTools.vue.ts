@@ -18,9 +18,9 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.ModTools.fetchWordProtection();
   }
 
-  get modules() {
+  get modules(): IChatbotModule[] {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
-    const modules: IChatbotModule[] = [
+    return [
       {
         title: $t('Caps Protection'),
         description: $t('Restrict viewers from spamming all caps messages to chat.'),
@@ -84,7 +84,6 @@ export default class ChatbotModTools extends ChatbotBase {
         },
       },
     ];
-    return modules;
   }
 
   get capsProtection() {

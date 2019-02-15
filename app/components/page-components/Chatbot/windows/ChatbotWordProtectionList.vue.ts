@@ -3,10 +3,10 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
 import {
   IInputMetadata,
-  ITextMetadata,
   IListMetadata,
   INumberMetadata,
   EInputType,
+  ITextMetadata,
 } from 'components/shared/inputs/index';
 
 import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
@@ -70,6 +70,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
         title: 'This word / phrase contains a regular expression.',
       },
     };
+
     return metadata;
   }
 

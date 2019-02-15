@@ -21,6 +21,17 @@
                 :metadata="metadata.caps.general.punishment.type"
               />
             </div>
+            <VFormGroup
+              v-if="capsProtection.general.punishment.type === 'Timeout'"
+              :title="$t('Punishment Duration (Value in Minutes)')"
+              v-model="capsProtection.general.punishment.duration"
+              :metadata="metadata.caps.general.punishment.duration"
+            />
+            <VFormGroup
+              :title="$t('Punishment Response (Line breaks will be ignored)')"
+              v-model="capsProtection.general.message"
+              :metadata="metadata.caps.general.message"
+            />
           </div>
           <VFormGroup
             v-if="capsProtection.general.punishment.type === 'Timeout'"
@@ -70,7 +81,7 @@
 
 <script lang="ts" src="./ChatbotCapsProtectionWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 .chatbot-caps-protection__container {
   padding-top: 45px;
 }

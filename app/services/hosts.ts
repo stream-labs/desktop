@@ -1,5 +1,6 @@
 import { Service } from './service';
 import Util from 'services/utils';
+import { Inject } from '../util/injector';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we
@@ -48,5 +49,21 @@ export class HostsService extends Service {
 
   get platform() {
     return 'platform.streamlabs.com';
+  }
+
+  get analitycs() {
+    return 'r2d2.streamlabs.com';
+  }
+}
+
+export class UrlService extends Service {
+  @Inject('HostsService') private hosts: HostsService;
+
+  get protocol() {
+    return Util.useLocalHost() ? 'http://' : 'https://';
+  }
+
+  getStreamlabsApi(endpoint: string) {
+    return `${this.protocol}${this.hosts.streamlabs}/api/v5/slobs/${endpoint}`;
   }
 }

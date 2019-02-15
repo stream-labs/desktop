@@ -1,30 +1,32 @@
 <template>
-<div class="input-container" :class="{disabled: value.enabled === false}">
-  <div class="input-label" v-if="value.showDescription !== false"></div>
-  <div class="input-wrapper">
-    <div v-for="(flag, index) in flags" class="checkbox">
-      <input
-        type="checkbox"
-        :checked="flag"
-        :disabled="value.enabled == false"
-        @change="event => onChangeHandler(index, !!event.target['checked'])"
-      />
-      <label>{{ index + 1 }}</label>
-    </div>
+<h-form-group>
+  <div class="row">
+    <bool-input
+      v-for="(flag, index) in flags"
+      :key="index"
+      :value="flag"
+      :disabled="value.enabled == false"
+      @input="value => onChangeHandler(index, !!value)"
+      :title="index + 1"
+    />
   </div>
-</div>
+</h-form-group>
 </template>
 
 <script lang="ts" src="./ObsBitMaskInput.vue.ts"></script>
 
 <style lang="less" scoped>
-
-  .input-wrapper {
-    width: auto;
+  .row {
+    margin-bottom: 0;
+    justify-content: flex-end;
   }
 
-  .checkbox {
+  .row > div {
     width: auto;
     margin-right: 15px;
+
+    /deep/ .checkbox {
+      margin-bottom: 0;
+    }
   }
 </style>

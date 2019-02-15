@@ -64,8 +64,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (source.channel) return true;
 
       // prevent sources without linked sceneItems to be saved
-      if (!linkedSourcesIds.includes(source.sourceId)) return false;
-      return true;
+      return linkedSourcesIds.includes(source.sourceId);
     });
   }
 
@@ -120,6 +119,12 @@ export class SourcesNode extends Node<ISchema, {}> {
               monitoringType: audioSource.monitoringType,
               mixerHidden: audioSource.mixerHidden,
             };
+          }
+
+          if (data.propertiesManager === 'replay') {
+            // Don't save the last replay, otherwise it will just play an old
+            // replay when this source is loaded back in.
+            delete data.settings['local_file'];
           }
 
           resolve(data);

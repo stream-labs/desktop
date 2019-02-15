@@ -1,6 +1,12 @@
 import { Service } from '../service';
 import { StatefulService, mutation } from '../stateful-service';
-import { IPlatformService, IChannelInfo, IPlatformAuth } from '.';
+import {
+  IPlatformService,
+  IChannelInfo,
+  IPlatformAuth,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
@@ -19,6 +25,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+
+  capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
   static initialState: IYoutubeServiceState = {
     liveStreamingEnabled: true,
@@ -179,6 +187,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         .then(handleResponse)
         .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
     });
+    const req = new Request(url, { headers, body, method: 'POST' });
+    return fetch(req).then(handleResponse);
   }
 
   prepopulateInfo() {
@@ -287,5 +297,12 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   beforeGoLive() {
     return Promise.resolve();
+  }
+
+  // TODO: dedup
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
   }
 }

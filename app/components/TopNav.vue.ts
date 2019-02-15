@@ -135,11 +135,13 @@ export default class TopNav extends Vue {
   }
 
   get appStoreVisible() {
+    return this.platformAppsService.state.storeVisible;
+  }
+
+  get chatbotVisible() {
     return (
-      (this.platformAppsService.state.storeVisible ||
-        this.featureIsEnabled(this.availableFeatures.platform)) &&
       this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch'
+      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
     );
   }
 
@@ -162,10 +164,6 @@ export default class TopNav extends Vue {
   responsiveClass = false;
 
   handleResize() {
-    if (this.topNav.clientWidth < 1200) {
-      this.responsiveClass = true;
-    } else {
-      this.responsiveClass = false;
-    }
+    this.responsiveClass = this.topNav.clientWidth < 1200;
   }
 }

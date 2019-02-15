@@ -128,10 +128,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   fetchFaderDetails(sourceId: string): IFader {
     const source = this.sourcesService.getSource(sourceId);
     const obsFader = this.sourceData[source.sourceId].fader;
+    const deflection = Math.round(obsFader.deflection * 100) / 100.0;
 
     return {
+      deflection,
       db: obsFader.db || 0,
-      deflection: obsFader.deflection,
       mul: obsFader.mul,
     };
   }
@@ -166,7 +167,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       componentName: 'AdvancedAudio',
       title: $t('Advanced Audio Settings'),
       size: {
-        width: 1200,
+        width: 1370,
         height: 600,
       },
     });
@@ -203,14 +204,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   setFader(sourceId: string, patch: Partial<IFader>) {
     const obsFader = this.sourceData[sourceId].fader;
-
-    if (patch.deflection) obsFader.deflection = patch.deflection;
-    if (patch.mul) obsFader.mul = patch.mul;
+    if (patch.deflection != null) obsFader.deflection = patch.deflection;
+    if (patch.mul != null) obsFader.mul = patch.mul;
     // We never set db directly
 
     const fader = this.fetchFaderDetails(sourceId);
-    Object.assign({}, fader, patch);
-
     this.UPDATE_AUDIO_SOURCE(sourceId, { fader });
     this.audioSourceUpdated.next(this.state.audioSources[sourceId]);
   }

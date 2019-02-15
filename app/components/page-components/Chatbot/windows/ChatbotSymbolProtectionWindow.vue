@@ -24,6 +24,17 @@
               :metadata="metadata.symbol.general.punishment.type"
             />
           </div>
+          <VFormGroup
+            v-if="symbolProtection.general.punishment.type === 'Timeout'"
+            :title="$t('Punishment Duration (Value in Seconds)')"
+            v-model="symbolProtection.general.punishment.duration"
+            :metadata="metadata.symbol.general.punishment.duration"
+          />
+          <VFormGroup
+            :title="$t('Punishment Response (Line breaks will be ignored)')"
+            v-model="symbolProtection.general.message"
+            :metadata="metadata.symbol.general.message"
+          />
         </div>
         <VFormGroup
           v-if="symbolProtection.general.punishment.type === 'Timeout'"
@@ -76,13 +87,12 @@
         {{ $t("Save") }}
       </button>
     </div>
-  </div>
-</ModalLayout>
+  </ModalLayout>
 </template>
 
 <script lang="ts" src="./ChatbotSymbolProtectionWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 .chatbot-symbol-protection__container {
   padding-top: 45px;
 }

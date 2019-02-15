@@ -39,8 +39,8 @@
 
 <script lang="ts" src="./ChatbotQuotePreferencesWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
-@import "../../../../styles/index";
+<style lang="less" scoped>
+@import '../../../../styles/index';
 
 .window-toggle__wrapper {
   background-color: @day-primary;

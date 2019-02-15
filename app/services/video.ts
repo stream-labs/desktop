@@ -154,7 +154,8 @@ export class Display {
   }
 
   destroy() {
-    remote.BrowserWindow.fromId(this.electronWindowId).removeListener('close', this.boundClose);
+    const win = remote.BrowserWindow.fromId(this.electronWindowId);
+    if (win) win.removeListener('close', this.boundClose);
     this.remoteClose();
   }
 

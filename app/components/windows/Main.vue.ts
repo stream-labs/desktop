@@ -2,9 +2,9 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
 import AppsNav from '../AppsNav.vue';
-import NewsBanner from '../NewsBanner.vue';
+import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
@@ -28,7 +28,7 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
-import PlatformAppWebview from '../PlatformAppWebview.vue';
+import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 
@@ -49,7 +49,7 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
-    PlatformAppWebview,
+    PlatformAppMainPage,
     PlatformAppStore,
     Help,
   },
@@ -95,11 +95,7 @@ export default class Main extends Vue {
   mainContentsRight = false;
 
   get leftDock() {
-    if (this.customizationService.state.leftDock) {
-      this.mainContentsRight = true;
-    } else {
-      this.mainContentsRight = false;
-    }
+    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -110,20 +106,6 @@ export default class Main extends Vue {
   get platformApps() {
     return this.platformAppsService.enabledApps;
   }
-
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
-  }
-
-  isAppPoppedOut(appId: string) {
-    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
-  }
-
-  isAppVisible(appId: string) {
-    return this.page === 'PlatformAppContainer' && this.params.appId === appId;
-  }
-
-  appPageSlot = EAppPageSlot.TopNav;
 
   /**
    * Only certain pages get locked out while the application
@@ -178,18 +160,10 @@ export default class Main extends Vue {
   windowSizeHandler() {
     this.windowWidth = window.innerWidth;
 
-    if (this.windowWidth < 1100) {
-      this.hasLiveDock = false;
-    } else {
-      this.hasLiveDock = true;
-    }
+    this.hasLiveDock = this.windowWidth >= 1100;
   }
 
   handleResize() {
-    if (this.$refs.mainMiddle.clientWidth < 1200) {
-      this.compactView = true;
-    } else {
-      this.compactView = false;
-    }
+    this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 }

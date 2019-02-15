@@ -11,8 +11,8 @@ import { ICustomCommand, IChatbotErrorResponse } from 'services/chatbot';
 import {
   EInputType,
   IListMetadata,
-  ITextMetadata,
   INumberMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 
@@ -111,6 +111,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       type: EInputType.list,
       options: this.chatbotPermissions,
     };
+
     return permissionMetadata;
   }
 
@@ -121,6 +122,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       type: EInputType.list,
       options: this.chatbotResponseTypes,
     };
+
     return replyTypeMetadata;
   }
 

@@ -30,7 +30,7 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   }
 
   clearImage() {
-    this.emitInput(this.metadata.clearImage);
+    this.emitInput(this.metadata.clearImage || '');
   }
 
   previewImage() {

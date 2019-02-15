@@ -1,18 +1,33 @@
 <template>
-<div class="list-input" data-role="input" data-type="list" :data-name="options.name">
+<div
+  class="list-input"
+  data-role="input"
+  data-type="list"
+  :data-name="options.name"
+  :class="{ 'full-width': options.fullWidth }"
+>
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
-    :options="multiselectOptions"
+    :options="options.options"
     track-by="value"
     :close-on-select="true"
     :placeholder="placeholder"
-    label="description"
+    label="title"
     :allow-empty="options.allowEmpty"
-    @input="onInputHandler">
-
+    :internal-search="options.internalSearch"
+    :loading="options.loading"
+    :disabled="options.disabled"
+    :allow-custom="options.allowCustom"
+    @input="onInputHandler"
+    @search-change="onSearchChange"
+  >
     <template slot="option" slot-scope="props">
-      <span :data-option-value="props.option.value">{{ props.option.description }}</span>
+      <span :data-option-value="props.option.value">{{ props.option.title }}</span>
+    </template>
+
+    <template v-if="options.noResult" slot="noResult">
+      {{ options.noResult }}
     </template>
 
   </multiselect>
@@ -26,6 +41,10 @@
 
 <style lang="less" scoped>
 @import "../../../styles/index";
+
+.list-input.full-width {
+  width: 100%;
+}
 
 .description {
   margin-top: 6px;

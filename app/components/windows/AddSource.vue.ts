@@ -38,15 +38,21 @@ export default class AddSource extends Vue {
   }
 
   sources = this.sourcesService.getSources().filter(source => {
-    return (
-      source.isSameType({
-        type: this.sourceType,
-        propertiesManager: this.sourceAddOptions.propertiesManager,
-        widgetType: this.widgetType,
-        appId: this.sourceAddOptions.propertiesManagerSettings.appId,
-        appSourceId: this.sourceAddOptions.propertiesManagerSettings.appSourceId,
-      }) && source.sourceId !== this.scenesService.activeSceneId
+    const comparison = {
+      type: this.sourceType,
+      propertiesManager: this.sourceAddOptions.propertiesManager,
+      widgetType: this.widgetType,
+      appId: this.sourceAddOptions.propertiesManagerSettings.appId,
+      appSourceId: this.sourceAddOptions.propertiesManagerSettings.appSourceId,
+    };
+
+    const isSameType = source.isSameType(
+      comparison.propertiesManager === 'streamlabels'
+        ? { ...comparison, isStreamlabel: true }
+        : comparison,
     );
+
+    return isSameType && source.sourceId !== this.scenesService.activeSceneId;
   });
 
   existingSources = this.sources.map(source => {
@@ -56,7 +62,9 @@ export default class AddSource extends Vue {
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
-    if (this.sourceAddOptions.propertiesManager === 'widget') {
+    if (this.sourceAddOptions.propertiesManager === 'replay') {
+      this.name = $t('Instant Replay');
+    } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
       const app = this.platformAppsService.getApp(

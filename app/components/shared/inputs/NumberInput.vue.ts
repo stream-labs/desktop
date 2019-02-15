@@ -14,13 +14,59 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     input: HTMLInputElement;
   };
 
+  displayValue: number | string = this.value;
+
+  timeout: number;
+
   emitInput(value: string) {
     let formattedValue = value;
     if (isNaN(Number(formattedValue))) formattedValue = '0';
-    if (formattedValue !== value) {
-      this.$refs.input.value = formattedValue;
-    }
+    if (formattedValue !== value) this.displayValue = formattedValue;
     super.emitInput(Number(formattedValue));
+  }
+
+  updateValue(value: string) {
+    let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
+    if (this.timeout) clearTimeout(this.timeout);
+
+    if (this.options.min !== void 0 && Number(value) < this.options.min) {
+      this.timeout = window.setTimeout(() => (this.displayValue = this.options.min), 1000);
+      return;
+    }
+
+    if (this.options.max !== void 0 && Number(value) > this.options.max) {
+      formattedValue = String(this.options.max);
+    }
+
+    this.displayValue = formattedValue;
+    this.emitInput(formattedValue);
+  }
+
+  handleInput(value: string) {
+    this.displayValue = value;
+    if (this.options.isInteger) {
+      this.updateValue(value);
+    } else {
+      this.emitInput(value);
+    }
+  }
+
+  increment() {
+    this.updateValue(String(Number(this.displayValue) + 1));
+  }
+
+  decrement() {
+    this.updateValue(String(Number(this.displayValue) - 1));
+  }
+
+  onMouseWheelHandler(event: WheelEvent) {
+    const canChange =
+      (event.target !== this.$refs.input || this.$refs.input === document.activeElement) &&
+      this.options.isInteger;
+    if (!canChange) return;
+    if (event.deltaY > 0) this.decrement();
+    else this.increment();
+    event.preventDefault();
   }
 
   getValidations() {

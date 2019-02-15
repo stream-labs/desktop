@@ -8,7 +8,7 @@
   :selectedId="selectedId"
 >
   <!-- Left Toolbar -->
-  <div slot="leftbar">
+  <div slot="leftbar" v-if="wData">
     <div class="left-accordion__button alert-button">
       <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
       <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
@@ -25,38 +25,39 @@
     <div class="left-accordion__button" :class="{ active: selectedAlert === 'general' }" @click="selectAlertType('general')">
       {{ $t('Global Settings') }}
     </div>
-    <div v-for="alert in alertTypes" v-if="wData && wData.settings[alert]" :key="alert" style="position: relative;" >
+    <div v-for="alert in alertTypes" :key="alert" style="position: relative;" >
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
-      <div class="left-accordion__input">
+      <div class="left-accordion__input" v-if="wData.settings[alert]">
         <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
       </div>
-      <div
-        v-if="wData && selectedAlert === alert"
-        v-for="variation in wData.settings[alert].variations"
-        :key="variation.id"
-        @click="selectVariation(variation.id)"
-        class="variation-tile"
-        :class="{ active: selectedId === variation.id }"
-      >
-        <div class="variation-tile__image-box">
-          <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
-          <div class="variation-tile__name">
-            <input
-              type="text"
-              :value="variation.name"
-              :disabled="editingName !== variation.id"
-              :ref="`${variation.id}-name-input`"
-              @input="nameInputHandler($event.target.value)"
-              @blur="nameBlurHandler(variation.id)"
-            />
+      <div v-if="wData && selectedAlert === alert">
+        <div
+          v-for="variation in wData.settings[alert].variations"
+          :key="variation.id"
+          @click="selectVariation(variation.id)"
+          class="variation-tile"
+          :class="{ active: selectedId === variation.id }"
+        >
+          <div class="variation-tile__image-box">
+            <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
+            <div class="variation-tile__name">
+              <input
+                type="text"
+                :value="variation.name"
+                :disabled="editingName !== variation.id"
+                :ref="`${variation.id}-name-input`"
+                @input="nameInputHandler($event.target.value)"
+                @blur="nameBlurHandler(variation.id)"
+              />
+            </div>
           </div>
-        </div>
-        <div class="variation-tile__toolbar">
-          <i v-if="variation.deleteable" class="icon-trash" @click.stop="removeVariation(variation.id)" />
-          <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
+          <div class="variation-tile__toolbar">
+            <i v-if="variation.id !== 'default'" class="icon-trash" @click.stop="removeVariation(variation.id)" />
+            <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
+          </div>
         </div>
       </div>
     </div>

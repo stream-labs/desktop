@@ -1,5 +1,6 @@
 /// <reference path="../vendor/toasted.d.ts" />
 /// <reference path="../vendor/urijs.d.ts" />
+///<reference path="./jsx.d.ts"/>
 
 // all global interfaces here
 
@@ -67,6 +68,8 @@ declare module 'hyperform';
 declare module 'emojione';
 declare module 'vue-resize';
 declare module 'serve-handler';
+declare module 'v-selectpage';
+declare module '*.m.less';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

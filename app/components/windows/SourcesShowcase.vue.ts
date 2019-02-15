@@ -133,6 +133,8 @@ export default class SourcesShowcase extends Vue {
       this.selectSource(this.inspectedSource as TSourceType);
     } else if (this.inspectedSource === 'streamlabel') {
       this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
+    } else if (this.inspectedSource === 'replay') {
+      this.selectSource('ffmpeg_source', { propertiesManager: 'replay' });
     } else if (this.inspectedSource === 'app_source') {
       this.selectAppSource(this.inspectedAppId, this.inspectedAppSourceId);
     } else {
@@ -145,8 +147,7 @@ export default class SourcesShowcase extends Vue {
       .getAvailableSourcesTypesList()
       .filter(type => {
         if (type.value === 'text_ft2_source') return false;
-        if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
-        return true;
+        return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
       })
       .map(listItem => {
         return {

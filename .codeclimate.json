@@ -1,0 +1,34 @@
+{
+  "version": "2",
+  "checks": {
+    "file-lines": {
+      "config": {
+        "threshold": 500
+      }
+    },
+    "similar-code": {
+      "config": {
+        "threshold": 75
+      }
+    },
+    "identical-code": {
+      "config": {
+        "threshold": 100
+      }
+    }
+  },
+  "plugins": {
+    "tslint": {
+      "enabled": true,
+      "config": "tslint.json"
+    }
+  },
+  "exclude_patterns": [
+    "test/",
+    "bin/",
+    "scripts/",
+    "vendor/",
+    "**/*.d.ts",
+    "app/services/streamlabels/definitions.ts"
+  ]
+}
