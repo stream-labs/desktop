@@ -186,10 +186,6 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
     ).toFixed(2);
   }
 
-  get isTwitch() {
-    return this.chatbotApiService.Base.userService.platform.type === 'twitch';
-  }
-
   get loyaltyPreferences() {
     return this.chatbotApiService.Loyalty.state.loyaltyPreferencesResponse;
   }

@@ -19,6 +19,18 @@ export default class ChatbotWindowsBase extends ChatbotBase {
 
   onSaveHandler(): void {}
 
+  get isTwitch() {
+    return this.chatbotApiService.Base.userService.platform.type === 'twitch';
+  }
+
+  get isMixer() {
+    return this.chatbotApiService.Base.userService.platform.type === 'mixer';
+  }
+
+  get isYoutube() {
+    return this.chatbotApiService.Base.userService.platform.type === 'youtube';
+  }
+
   // switching between 2 child windows, link protection and default command(to edit link protection command)
   onToggleLinkProtectionWindowHandler() {
     const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()

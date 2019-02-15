@@ -3,7 +3,7 @@
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span>
-          {{ globallyEnabled ? $t('Chatbot Enabled') : $t('Chatbot Disabled') }}
+          {{ globallyEnabled ? $t('Cloudbot Enabled') : $t('Cloudbot Disabled') }}
         </span>
         <ToggleInput
           :value="globallyEnabled"

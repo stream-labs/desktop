@@ -30,6 +30,7 @@
         <button
           class="button button--action"
           @click="onShowNewChatAlertWindowHandler"
+          :disabled="selectedTypeMessages.length >= 100"
         >
           {{ $t('add alert') }}
         </button>

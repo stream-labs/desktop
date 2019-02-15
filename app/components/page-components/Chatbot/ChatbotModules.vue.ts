@@ -41,7 +41,7 @@ export default class ChatbotModules extends ChatbotBase {
           });
         },
       },
-      {
+      /*{
         title: $t('Song Request'),
         description: $t(
           'Allow your viewers to to request songs from Youtube and play the songs on stream.',
@@ -62,13 +62,13 @@ export default class ChatbotModules extends ChatbotBase {
             enabled: !this.songRequestCurrentlyEnabled,
           });
         },
-      },
+      },*/
       {
         title: $t('Heist'),
         description: $t(
           'Allow your viewers to work together and go on an adventure to earn extra loyalty points.',
         ),
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-heist--${backgroundUrlSuffix}.png`),
         enabled: this.heistCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openHeistPreferencesWindow();
@@ -85,7 +85,7 @@ export default class ChatbotModules extends ChatbotBase {
         description: $t(
           'Allow your viewers to gamble with their loyalty points by rolling a 100 sided die.',
         ),
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-gamble--${backgroundUrlSuffix}.png`),
         enabled: this.gambleCurrentlyEnabled,
         onExpand: () => {
           this.chatbotApiService.Common.openGamblePreferencesWindow();
