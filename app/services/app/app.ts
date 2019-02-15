@@ -187,7 +187,12 @@ export class AppService extends StatefulService<IAppState> {
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
       this.START_LOADING();
-      this.windowsService.closeChildWindow();
+
+      // The scene collections window is the only one we don't close when
+      // switching scene collections, because it results in poor UX.
+      if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
+        this.windowsService.closeChildWindow();
+      }
       this.windowsService.closeAllOneOffs();
 
       // This is kind of ugly, but it gives the browser time to paint before
