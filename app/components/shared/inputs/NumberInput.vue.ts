@@ -5,7 +5,8 @@ import { INumberMetadata } from './index';
 @Component({
   watch: {
     value(value) {
-      this['displayValue'] = value;
+      // @ts-ignore
+      this.updateValue(value);
     },
   },
 })
