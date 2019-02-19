@@ -27,6 +27,18 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
   updateValue(value: string) {
     let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
+    formattedValue = this.constrainValue(formattedValue);
+    this.displayValue = formattedValue;
+    this.emitInput(formattedValue);
+  }
+
+  updateDecimal(value: string) {
+    const formattedValue = this.constrainValue(value);
+    this.displayValue = formattedValue;
+    this.emitInput(formattedValue);
+  }
+
+  constrainValue(value: string) {
     if (this.timeout) clearTimeout(this.timeout);
 
     if (this.options.min !== void 0 && Number(value) < this.options.min) {
@@ -34,11 +46,10 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     }
 
     if (this.options.max !== void 0 && Number(value) > this.options.max) {
-      formattedValue = String(this.options.max);
+      return String(this.options.max);
     }
 
-    this.displayValue = formattedValue;
-    this.emitInput(formattedValue);
+    return value;
   }
 
   handleInput(value: string) {
@@ -46,7 +57,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     if (this.options.isInteger) {
       this.updateValue(value);
     } else {
-      this.emitInput(value);
+      this.updateDecimal(value);
     }
   }
 
