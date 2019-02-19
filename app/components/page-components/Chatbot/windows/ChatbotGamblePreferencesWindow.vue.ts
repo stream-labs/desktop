@@ -6,7 +6,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { IGamblePreferencesResponse } from 'services/chatbot';
 
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, metadata, formMetadata } from 'components/shared/inputs/index';
 import { debounce } from 'lodash-decorators';
 
 @Component({
@@ -37,57 +37,50 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
 
   // metadata
   get metaData() {
-    return {
-      min: {
+    return formMetadata({
+      min: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Min Amount'),
-      },
-      max: {
+        isInteger: true,
+      }),
+      max: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Max Amount'),
-      },
-      range1: {
+        isInteger: true,
+      }),
+      range1: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('1-25'),
-      },
-      range2: {
+        isInteger: true,
+      }),
+      range2: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('26-50'),
-      },
-      range3: {
+        isInteger: true,
+      }),
+      range3: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('51-75'),
-      },
-      range4: {
+        isInteger: true,
+      }),
+      range4: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('76-98'),
-      },
-      range5: {
+        isInteger: true,
+      }),
+      range5: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('99-100'),
-      },
-    };
+        isInteger: true,
+      }),
+    });
   }
 
   get gamblePreferences() {

@@ -3,7 +3,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
 import { IChatbotErrorResponse, IBettingProfile, IBettingOption } from 'services/chatbot';
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, metadata, formMetadata } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
@@ -47,41 +47,36 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
   ];
 
   get metaData() {
-    return {
-      title: {
+    return formMetadata({
+      title: metadata.text({
         required: true,
-        type: EInputType.text,
         max: 100,
         placeholder: $t('Title'),
-        uuid: $t('Title'),
-      },
-      duration: {
+      }),
+      duration: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 1,
         max: 86400,
         placeholder: $t('Duration'),
-        uuid: $t('Duration'),
-      },
-      min: {
+        isInteger: true,
+      }),
+      min: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 10,
         max: 100000,
         placeholder: $t('Minimum'),
         tooltip: $t('Minimum amount of points that is required to be bet'),
-        uuid: $t('Minimum'),
-      },
-      max: {
+        isInteger: true,
+      }),
+      max: metadata.number({
         required: true,
-        type: EInputType.number,
         min: 10,
         max: 100000,
         placeholder: $t('Maximum'),
         tooltip: $t('Maximum amount of points that is allowed to be bet'),
-        uuid: $t('Maximum'),
-      },
-    };
+        isInteger: true,
+      }),
+    });
   }
 
   selectedOption: IBettingOption = {

@@ -4,12 +4,13 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, formMetadata } from 'components/shared/inputs/index';
 
 import { IBettingOption } from 'services/chatbot';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import ChatbotWindowsBase from '../windows/ChatbotWindowsBase.vue';
 import { debounce } from 'lodash-decorators';
+import { metadata } from 'components/widgets/inputs';
 
 @Component({
   components: {
@@ -36,22 +37,18 @@ export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   @Prop() index: number = -1;
 
   get metaData() {
-    return {
-      name: {
+    return formMetadata({
+      name: metadata.text({
         required: true,
-        type: EInputType.text,
         max: 75,
         placeholder: $t('Option'),
-        uuid: $t('Option'),
-      },
-      parameter: {
+      }),
+      parameter: metadata.text({
         required: true,
-        type: EInputType.text,
         max: 20,
         placeholder: $t('Command'),
-        uuid: $t('Option'),
-      },
-    };
+      }),
+    });
   }
 
   get isEdit() {

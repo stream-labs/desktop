@@ -23,12 +23,20 @@ export default class ChatbotPollProfile extends ChatbotBase {
 
   get timeRemaining() {
     if (this.type === 'poll') {
-      if (this.isActive) {
-        return this.chatbotApiService.Poll.state.timeRemaining;
-      }
-      return this.profile.timer.enabled ? this.formatTime(this.profile.timer.duration) : '-';
+      return this.pollTimeRemaining;
     }
 
+    return this.betTimeRemaining;
+  }
+
+  get pollTimeRemaining() {
+    if (this.isActive) {
+      return this.chatbotApiService.Poll.state.timeRemaining;
+    }
+    return this.profile.timer.enabled ? this.formatTime(this.profile.timer.duration) : '-';
+  }
+
+  get betTimeRemaining() {
     if (this.isActive) {
       return this.chatbotApiService.Betting.state.timeRemaining;
     }

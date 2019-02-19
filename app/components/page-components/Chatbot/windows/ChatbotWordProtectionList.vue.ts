@@ -13,6 +13,7 @@ import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
+import { metadata } from 'components/widgets/inputs';
 
 @Component({
   components: { ValidatedForm },
@@ -36,42 +37,30 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   editIndex: number = -1;
 
   get metadata() {
-    const metadata: {
-      text: ITextMetadata;
-      punishment: {
-        duration: INumberMetadata;
-        type: IListMetadata<string>;
-      };
-      is_regex: IInputMetadata;
-    } = {
-      text: {
+    return {
+      text: metadata.text({
         required: true,
-        type: EInputType.text,
         placeholder: 'Add a link to add to list',
         max: 450,
-      },
+      }),
       punishment: {
-        duration: {
-          type: EInputType.number,
+        duration: metadata.number({
           required: true,
           placeholder: 'Punishment Duration (Value in Seconds)',
           min: 0,
           max: 86400,
-        },
-        type: {
+          isInteger: true,
+        }),
+        type: metadata.list({
           required: true,
-          type: EInputType.list,
           options: this.chatbotPunishments,
-        },
+        }),
       },
-      is_regex: {
+      is_regex: metadata.bool({
         required: true,
-        type: EInputType.bool,
         title: 'This word / phrase contains a regular expression.',
-      },
+      }),
     };
-
-    return metadata;
   }
 
   get NEW_WORD_PROTECTION_LIST_MODAL_ID() {

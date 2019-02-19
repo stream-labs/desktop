@@ -69,6 +69,11 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
       this.socket.removeAllListeners();
     }
 
+    this.authSocket();
+    this.assignListeners();
+  }
+
+  authSocket() {
     this.socket = io.connect(
       this.socketUrl,
       { transports: ['websocket'] },
@@ -76,7 +81,9 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     this.socket.emit('authenticate', {
       token: this.chatbotBaseApiService.state.socketToken,
     });
+  }
 
+  assignListeners() {
     this.socket.on('queue.open', (response: IQueueStateResponse) => {
       this.UPDATE_QUEUE_STATE(response);
     });

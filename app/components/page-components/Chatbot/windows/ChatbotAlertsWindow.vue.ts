@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import { Component } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import NavItem from 'components/shared/NavItem.vue';

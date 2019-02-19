@@ -73,17 +73,25 @@ export default class ChatbotActivePoll extends ChatbotBase {
 
   onToggleStateHandler() {
     if (this.type === 'poll') {
-      if (this.active.status === 'Open') {
-        this.chatbotApiService.Poll.closePoll();
-      } else {
-        this.chatbotApiService.Poll.openPoll();
-      }
+      this.togglePoll();
     } else {
-      if (this.active.status === 'Open') {
-        this.chatbotApiService.Betting.close();
-      } else {
-        this.chatbotApiService.Betting.open();
-      }
+      this.toggleBet();
+    }
+  }
+
+  togglePoll() {
+    if (this.active.status === 'Open') {
+      this.chatbotApiService.Poll.closePoll();
+    } else {
+      this.chatbotApiService.Poll.openPoll();
+    }
+  }
+
+  toggleBet() {
+    if (this.active.status === 'Open') {
+      this.chatbotApiService.Betting.close();
+    } else {
+      this.chatbotApiService.Betting.open();
     }
   }
 

@@ -6,9 +6,10 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { IHeistPreferencesResponse, IPollPreferencesResonse } from 'services/chatbot';
 
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, formMetadata } from 'components/shared/inputs/index';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
+import { metadata } from 'components/widgets/inputs';
 
 @Component({
   components: { ValidatedForm },
@@ -57,69 +58,52 @@ export default class ChatbotPollPreferencesWindow extends ChatbotWindowsBase {
 
   // metadata
   get metaData() {
-    return {
-      repeat: {
+    return formMetadata({
+      repeat: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Repeat Message'),
-        uuid: $t('Repeat Message'),
-      },
-      tie: {
+        blockReturn: true,
+      }),
+      tie: metadata.textArea({
         required: true,
         type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Tie Message'),
-        uuid: $t('Tie Message'),
         blockReturn: true,
-      },
-      win: {
+      }),
+      win: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Win Message'),
-        uuid: $t('Win Message'),
         blockReturn: true,
-      },
-      open: {
+      }),
+      open: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Open Message'),
-        uuid: $t('Open Message'),
         blockReturn: true,
-      },
-      close: {
+      }),
+      close: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Close Message'),
-        uuid: $t('Close Message'),
         blockReturn: true,
-      },
-      cancel: {
+      }),
+      cancel: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
-        min: 1,
         max: 450,
         placeholder: $t('Cancel Message'),
-        uuid: $t('Cancel Message'),
         blockReturn: true,
-      },
-      chatLines: {
+      }),
+      chatLines: metadata.slider({
         required: true,
         type: EInputType.slider,
         min: 5,
         max: 100,
         tooltip: $t('Amount of chat lines before the bot repeats the message.'),
-        isInteger: true,
-      },
-    };
+      }),
+    });
   }
 
   get pollPreferences() {

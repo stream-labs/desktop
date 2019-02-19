@@ -6,7 +6,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { IBettingPreferencesResponse } from 'services/chatbot';
 
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, metadata, formMetadata } from 'components/shared/inputs/index';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
 
@@ -54,61 +54,49 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
 
   // metadata
   get metaData() {
-    return {
-      repeat: {
+    return formMetadata({
+      repeat: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
         min: 1,
         max: 450,
         placeholder: $t('Repeat Message'),
-        uuid: $t('Repeat Message'),
-        isInteger: true,
-      },
-      win: {
+      }),
+      win: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
         min: 1,
         max: 450,
         placeholder: $t('Win Message'),
-        uuid: $t('Win Message'),
         blockReturn: false,
-      },
-      open: {
+      }),
+      open: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
         min: 1,
         max: 450,
         placeholder: $t('Open Message'),
-        uuid: $t('Open Message'),
         blockReturn: false,
-      },
-      close: {
+      }),
+      close: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
         min: 1,
         max: 450,
         placeholder: $t('Close Message'),
-        uuid: $t('Close Message'),
         blockReturn: false,
-      },
-      cancel: {
+      }),
+      cancel: metadata.textArea({
         required: true,
-        type: EInputType.textArea,
         min: 1,
         max: 450,
         placeholder: $t('Cancel Message'),
         uuid: $t('Cancel Message'),
         blockReturn: false,
-      },
-      chatLines: {
+      }),
+      chatLines: metadata.slider({
         required: true,
-        type: EInputType.slider,
         min: 5,
         max: 100,
         tooltip: $t('Amount of chat lines before the bot repeats the message.'),
-        isInteger: true,
-      },
-    };
+      }),
+    });
   }
 
   get pollPreferences() {
