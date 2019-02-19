@@ -63,7 +63,6 @@ export async function logIn(
  */
 export async function releaseUserInPool() {
   if (!userName || !USER_POOL_TOKEN) return;
-  console.log('release');
   await requestUserPool(`release/${userName}`);
   userName = '';
 }
@@ -150,7 +149,6 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
  */
 async function requestUserPool(path: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    console.log('reserve');
     request(
       {
         url: `${USER_POOL_URL}/${path}`,
