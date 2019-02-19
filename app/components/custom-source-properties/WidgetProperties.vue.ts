@@ -29,12 +29,12 @@ export default class WidgetProperties extends Vue {
   navigateWidgetSettings() {
     const widgetType = this.source.getPropertiesManagerSettings().widgetType;
 
-    if (widgetType === WidgetType.Chatbot) {
+    /*if (widgetType === WidgetType.Chatbot) {
       // chatbot widget doesnt exist on sl.com, but its own chatbot tab
       this.navigationService.navigate('Chatbot');
       this.chatbotApiChatbotApiService.Common.openSongRequestPreferencesWindow();
       return;
-    }
+    }*/
 
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',

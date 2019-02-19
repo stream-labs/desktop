@@ -199,38 +199,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
-  @Watch('linkProtection', { immediate: true, deep: true })
-  @debounce(1)
-  onLinkProtChanged(value: ILinkProtectionData, oldValue: ILinkProtectionData) {
-    if (oldValue && this.linkProtection != null) {
-      this.linkProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
-    }
-  }
-
-  @Watch('wordProtection', { immediate: true, deep: true })
-  @debounce(1)
-  onWordProtChanged(value: IWordProtectionData, oldValue: IWordProtectionData) {
-    if (oldValue && this.wordProtection != null) {
-      this.wordProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
-    }
-  }
-
-  @Watch('linkProtection', { immediate: true, deep: true })
-  @debounce(1)
-  onSymbolProtChanged(value: ISymbolProtectionData, oldValue: ISymbolProtectionData) {
-    if (oldValue && this.symbolProtection != null) {
-      this.symbolProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
-    }
-  }
-
-  @Watch('capsProtection', { immediate: true, deep: true })
-  @debounce(1)
-  onCapsProtChanged(value: ICapsProtectionData, oldValue: ICapsProtectionData) {
-    if (oldValue && this.capsProtection != null) {
-      this.capsProtection.general.message = value.general.message.replace(/(\r\n|\r|\n)/g, '');
-    }
-  }
-
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
     return {
       message: {
@@ -295,6 +263,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: this.placeholder(protectionType, 'message'),
         uuid: $t('Message'),
         max: 450,
+        blockReturn: true,
       },
     };
   }

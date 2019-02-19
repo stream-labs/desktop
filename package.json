@@ -186,7 +186,7 @@
     "tslint-loader": "3.6.0",
     "tslint-plugin-prettier": "2.0.1",
     "typedoc": "0.11.1",
-    "typescript": "^3.2.1",
+    "typescript": "3.2.1",
     "unzip-stream": "0.3.0",
     "urijs": "1.19.1",
     "v-selectpage": "^2.0.2",

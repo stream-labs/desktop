@@ -65,6 +65,7 @@ export interface ITextMetadata extends IInputMetadata {
   alphaNum?: boolean;
   masked?: boolean;
   fullWidth?: boolean;
+  blockReturn?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {

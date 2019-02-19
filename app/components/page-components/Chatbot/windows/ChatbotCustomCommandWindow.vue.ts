@@ -80,7 +80,6 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   onCommandChanged(value: ICustomCommand, oldValue: ICustomCommand) {
     if (oldValue) {
       this.newCommand.command = value.command.replace(/ +/g, '');
-      this.newCommand.response = value.response.replace(/(\r\n|\r|\n)/g, '');
     }
   }
 
@@ -102,6 +101,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     placeholder: $t('The phrase that will appear after a user enters the command'),
     max: 450,
     uuid: $t('Response'),
+    blockReturn: true,
   };
 
   get permissionMetadata() {
@@ -134,6 +134,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       tooltip: $t('Value in seconds'),
       min: 0,
       max: 86400,
+      isInteger: true,
     };
     return timerMetadata;
   }
@@ -145,6 +146,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
       placeholder: $t('Cost'),
       min: 0,
       max: 1000000,
+      isInteger: true,
     };
     return timerMetadata;
   }

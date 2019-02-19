@@ -1,5 +1,5 @@
 import { Component } from 'vue-property-decorator';
-import TextInput from 'components/shared/inputs/TextInput.vue';
+
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
@@ -13,7 +13,6 @@ import electron from 'electron';
 @Component({
   components: {
     VFormGroup,
-    TextInput,
     TextAreaInput,
     ListInput,
     NumberInput,

@@ -1,8 +1,14 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { INumberMetadata } from './index';
 
-@Component({})
+@Component({
+  watch: {
+    value(value) {
+      this['displayValue'] = value;
+    },
+  },
+})
 export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
   @Prop()
   readonly value: number | string; // the string type is for empty field

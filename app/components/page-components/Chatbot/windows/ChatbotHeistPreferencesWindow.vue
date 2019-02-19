@@ -2,18 +2,18 @@
   <ModalLayout :showControls="false" :customControls="true" :containsTabs="true">
     <div slot="fixed">
       <div class="row">
-      <div class="small-6 columns position--relative window-tab">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
-      </div>
-      <div class="small-6 columns position--relative window-tab">
-        <div class="window-toggle__wrapper">
-          <div @click="onToggleHeistPreferencesWindowHandler">
-            <span> {{ $t('Edit Command') }} </span>
-            <i class="fas fa-chevron-right window-toggle__icon"></i>
+        <div class="small-6 columns position--relative window-tab">
+          <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
+        </div>
+        <div class="small-6 columns position--relative window-tab">
+          <div class="window-toggle__wrapper">
+            <div @click="onToggleHeistPreferencesWindowHandler">
+              <span>{{ $t('Edit Command') }}</span>
+              <i class="fas fa-chevron-right window-toggle__icon"></i>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
     <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
       <div v-show="selectedTab === 'general'">
@@ -172,7 +172,6 @@
             />
           </div>
         </div>
-        
       </div>
     </validated-form>
     <div slot="controls" class="flex flex--space-between">

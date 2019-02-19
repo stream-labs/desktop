@@ -1,13 +1,9 @@
 <template>
-<ModalLayout
-  :showControls="false"
-  :customControls="true"
->
-  <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
-    </Tabs>
-  </div>
-  <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
+  <ModalLayout :showControls="false" :customControls="true">
+    <div slot="fixed">
+      <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
+    </div>
+    <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
       <div v-show="selectedTab === 'general' && symbolProtection">
         <div class="row">
           <div class="small-6 columns">
@@ -24,17 +20,6 @@
               :metadata="metadata.symbol.general.punishment.type"
             />
           </div>
-          <VFormGroup
-            v-if="symbolProtection.general.punishment.type === 'Timeout'"
-            :title="$t('Punishment Duration (Value in Seconds)')"
-            v-model="symbolProtection.general.punishment.duration"
-            :metadata="metadata.symbol.general.punishment.duration"
-          />
-          <VFormGroup
-            :title="$t('Punishment Response (Line breaks will be ignored)')"
-            v-model="symbolProtection.general.message"
-            :metadata="metadata.symbol.general.message"
-          />
         </div>
         <VFormGroup
           v-if="symbolProtection.general.punishment.type === 'Timeout'"
@@ -66,26 +51,17 @@
           :metadata="metadata.symbol.advanced.percent"
         />
       </div>
-  </validated-form>
-  <div slot="controls" class="flex flex--space-between">
-    <button
-      class="button button--default"
-      @click="onResetHandler">
-      {{ $t('Reset') }}
-    </button>
-    <div>
-      <button
-        class="button button--default"
-        @click="onCancelHandler">
-        {{ $t('Cancel') }}
-      </button>
-      <button
-        class="button button--action"
-        @click="onSaveHandler"
-        :disabled="errors.items.length > 0"
-      >
-        {{ $t("Save") }}
-      </button>
+    </validated-form>
+    <div slot="controls" class="flex flex--space-between">
+      <button class="button button--default" @click="onResetHandler">{{ $t('Reset') }}</button>
+      <div>
+        <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
+        <button
+          class="button button--action"
+          @click="onSaveHandler"
+          :disabled="errors.items.length > 0"
+        >{{ $t("Save") }}</button>
+      </div>
     </div>
   </ModalLayout>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <span class="text-area-container" :class="{ 'full-width': options.fullWidth }" >
+  <span class="text-area-container" :class="{ 'full-width': options.fullWidth }" v-if="!options.blockReturn" >
     <textarea
       type="text"
       :placeholder="options.placeholder"
@@ -11,6 +11,24 @@
       :disabled="metadata.disabled"
       :rows="metadata.rows || 2"
       v-validate="validate"
+    />
+    <span class="input-error" v-show="errors.first(uuid)">
+      {{ errors.first(uuid) }}
+    </span>
+  </span>
+  <span class="text-area-container" :class="{ 'full-width': options.fullWidth }" v-else>
+    <textarea
+      type="text"
+      :placeholder="options.placeholder"
+      :value="value"
+      @input="handleInput($event.target.value)"
+      class="text-area radius"
+      :class="{ 'full-width': options.fullWidth  }"
+      :name="uuid"
+      :disabled="metadata.disabled"
+      :rows="metadata.rows || 2"
+      v-validate="validate"
+      @keydown.enter.prevent
     />
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}

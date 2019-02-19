@@ -54,7 +54,6 @@
                 :metadata="cooldownsMetadata"
               />
             </div>
-            <ChatbotAliases v-model="newCommand.aliases" />
           </div>
           <div class="row">
             <div class="small-6 columns">

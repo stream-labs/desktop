@@ -145,13 +145,6 @@ export default class TopNav extends Vue {
     );
   }
 
-  get chatbotVisible() {
-    return (
-      this.userService.isLoggedIn() &&
-      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
-    );
-  }
-
   get loading() {
     return this.appService.state.loading;
   }

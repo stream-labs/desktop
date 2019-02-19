@@ -21,17 +21,6 @@
                 :metadata="metadata.caps.general.punishment.type"
               />
             </div>
-            <VFormGroup
-              v-if="capsProtection.general.punishment.type === 'Timeout'"
-              :title="$t('Punishment Duration (Value in Minutes)')"
-              v-model="capsProtection.general.punishment.duration"
-              :metadata="metadata.caps.general.punishment.duration"
-            />
-            <VFormGroup
-              :title="$t('Punishment Response (Line breaks will be ignored)')"
-              v-model="capsProtection.general.message"
-              :metadata="metadata.caps.general.message"
-            />
           </div>
           <VFormGroup
             v-if="capsProtection.general.punishment.type === 'Timeout'"
@@ -56,7 +45,7 @@
             v-model="capsProtection.advanced.maximum"
             :metadata="metadata.caps.advanced.maximum"
           />
-          <VFormGroup 
+          <VFormGroup
             v-if="selectedTab === 'advanced'"
             :title="$t('Maximum Percent')"
             v-model="capsProtection.advanced.percent"

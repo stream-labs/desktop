@@ -1,12 +1,12 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
-import * as _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
+import Vue from 'vue';
 import { IHeistPreferencesResponse } from 'services/chatbot';
 
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, metadata, formMetadata } from 'components/shared/inputs/index';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
 
@@ -38,14 +38,14 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
         max_amount: 1337,
         min_entries: 1,
         payout: {
-          moderators: 0,
-          subscribers: 0,
-          viewers: 0,
+          moderators: 1,
+          subscribers: 1,
+          viewers: 1,
         },
         probability: {
-          moderators: 0,
-          subscribers: 0,
-          viewers: 0,
+          moderators: 1,
+          subscribers: 1,
+          viewers: 1,
         },
         start_delay: 120,
         cooldown: 300,
@@ -73,152 +73,162 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
 
   // metadata
   get metaData() {
-    return {
-      minEntries: {
+    return formMetadata({
+      minEntries: metadata.number({
+        title: $t('Min Entries'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Min Entries'),
-      },
-      maxAmount: {
+        isInteger: true,
+      }),
+      maxAmount: metadata.number({
+        title: $t('Max Amount'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: Number.MAX_SAFE_INTEGER,
-        placeholder: $t('Max Amount'),
-      },
-      startDelay: {
+        isInteger: true,
+      }),
+      startDelay: metadata.number({
+        title: $t('Start Delay'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 3600,
-        placeholder: $t('Start Delay'),
+        isInteger: true,
         tooltip: $t('Delay in Seconds'),
-      },
-      cooldown: {
+      }),
+      cooldown: metadata.number({
+        title: $t('Cooldown'),
         required: true,
-        type: EInputType.number,
         min: 10,
         max: 86400,
-        placeholder: $t('Cooldown'),
+        isInteger: true,
         tooltip: $t('Cooldown in Seconds'),
-      },
-      viewersChance: {
+      }),
+      viewersChance: metadata.number({
+        title: $t('Viewer Chance'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Viewer Chance'),
-      },
-      subscribersChance: {
+        isInteger: true,
+      }),
+      subscribersChance: metadata.number({
+        title: $t('Subscriber Chance'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Subscriber Chance'),
-      },
-      moderatorsChance: {
+        isInteger: true,
+        tooltip: $t('Subscriber Chance'),
+      }),
+      moderatorsChance: metadata.number({
+        title: $t('Moderator Chance'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 100,
-        placeholder: $t('Moderator Chance'),
-      },
-      viewersPayout: {
+        isInteger: true,
+      }),
+      viewersPayout: metadata.number({
+        title: $t('Viewer Payout'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Viewer Payout'),
-      },
-      subscribersPayout: {
+        isInteger: true,
+      }),
+      subscribersPayout: metadata.number({
+        title: $t('Subscriber Payout'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Subscriber Payout'),
-      },
-      moderatorsPayout: {
+        isInteger: true,
+      }),
+      moderatorsPayout: metadata.number({
+        title: $t('Moderator Payout'),
         required: true,
-        type: EInputType.number,
         min: 0,
         max: 10000,
-        placeholder: $t('Moderator Payout'),
-      },
-      firstEntry: {
-        required: true,
-        type: EInputType.textArea,
-        min: 0,
-        max: 450,
+        isInteger: true,
+      }),
+      firstEntry: metadata.textArea({
+        title: $t('Moderator Payout'),
         placeholder: $t('On First Entry'),
-        uuid: $t('On First Entry'),
-      },
-      successfulStart: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        uuid: $t('On First Entry'),
+        blockReturn: true,
+      }),
+      successfulStart: metadata.textArea({
+        title: $t('On Successful Start'),
         placeholder: $t('On Successful Start'),
         uuid: $t('On Successful Start'),
-      },
-      failedStart: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      failedStart: metadata.textArea({
+        title: $t('On Failed Start'),
         placeholder: $t('On Failed Start'),
         uuid: $t('On Failed Start'),
-      },
-      results: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      results: metadata.textArea({
+        title: $t('Results'),
         placeholder: $t('Results'),
         uuid: $t('Results'),
-      },
-      soloWin: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      soloWin: metadata.textArea({
+        title: $t('On Win'),
         placeholder: $t('On Win'),
         uuid: $t('On Win'),
-      },
-      soloLoss: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      soloLoss: metadata.textArea({
+        title: $t('On Loss'),
         placeholder: $t('On Loss'),
         uuid: $t('On Loss'),
-      },
-      groupWin: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      groupWin: metadata.textArea({
+        title: $t('On Victory'),
         placeholder: $t('On Victory'),
         uuid: $t('On Victory'),
-      },
-      groupPartial: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      groupPartial: metadata.textArea({
+        title: $t('On Partial Victory'),
         placeholder: $t('On Partial Victory'),
         uuid: $t('On Partial Victory'),
-      },
-      groupLoss: {
         required: true,
-        type: EInputType.textArea,
         min: 0,
         max: 450,
+        blockReturn: true,
+      }),
+      groupLoss: metadata.textArea({
+        title: $t('On Defeat'),
         placeholder: $t('On Defeat'),
         uuid: $t('On Defeat'),
-      },
-    };
+        required: true,
+        min: 0,
+        max: 450,
+        blockReturn: true,
+      }),
+    });
   }
 
   onSelectTabHandler(tab: string) {
@@ -230,36 +240,7 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
   }
 
   mounted() {
-    this.newHeistPreferences = _.cloneDeep(this.heistPreferences);
-  }
-
-  @Watch('newHeistPreferences', { immediate: true, deep: true })
-  @debounce(1)
-  onCommandChanged(value: IHeistPreferencesResponse) {
-    if (value) {
-      const messages = _.cloneDeep(this.newHeistPreferences.settings.messages);
-
-      for (const group in messages) {
-        if (messages.hasOwnProperty(group)) {
-          if (value[group] !== messages[group]) {
-            if (typeof messages[group] === 'string' || messages[group] instanceof String) {
-              messages[group] = value.settings.messages[group].replace(/(\r\n|\r|\n)/g, '');
-            } else {
-              for (const key in messages[group]) {
-                if (messages[group].hasOwnProperty(key)) {
-                  messages[group][key] = value.settings.messages[group][key].replace(
-                    /(\r\n|\r|\n)/g,
-                    '',
-                  );
-                }
-              }
-            }
-          }
-        }
-      }
-
-      this.newHeistPreferences.settings.messages = messages;
-    }
+    this.newHeistPreferences = cloneDeep(this.heistPreferences);
   }
 
   @Watch('errors.items.length')
@@ -270,6 +251,7 @@ export default class ChatbotHeistPreferencesWindow extends ChatbotWindowsBase {
 
   async onResetHandler() {
     await this.chatbotApiService.Heist.resetSettings().then(response => {
+      console.log(response);
       this.newHeistPreferences = response;
     });
 

@@ -62,6 +62,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         max: 450,
         placeholder: $t('Repeat Message'),
         uuid: $t('Repeat Message'),
+        isInteger: true,
       },
       win: {
         required: true,
@@ -70,6 +71,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         max: 450,
         placeholder: $t('Win Message'),
         uuid: $t('Win Message'),
+        blockReturn: false,
       },
       open: {
         required: true,
@@ -78,6 +80,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         max: 450,
         placeholder: $t('Open Message'),
         uuid: $t('Open Message'),
+        blockReturn: false,
       },
       close: {
         required: true,
@@ -86,6 +89,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         max: 450,
         placeholder: $t('Close Message'),
         uuid: $t('Close Message'),
+        blockReturn: false,
       },
       cancel: {
         required: true,
@@ -94,6 +98,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         max: 450,
         placeholder: $t('Cancel Message'),
         uuid: $t('Cancel Message'),
+        blockReturn: false,
       },
       chatLines: {
         required: true,
@@ -101,6 +106,7 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
         min: 5,
         max: 100,
         tooltip: $t('Amount of chat lines before the bot repeats the message.'),
+        isInteger: true,
       },
     };
   }
@@ -115,33 +121,6 @@ export default class ChatbotBettingPreferencesWindow extends ChatbotWindowsBase 
 
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
-  }
-
-  @Watch('newBettingPreferences', { immediate: true, deep: true })
-  @debounce(1)
-  onCommandChanged(value: IBettingPreferencesResponse) {
-    if (value) {
-      const messages = value.settings.messages;
-      this.newBettingPreferences.settings.messages.open = messages.open.replace(
-        /(\r\n|\r|\n)/g,
-        '',
-      );
-      this.newBettingPreferences.settings.messages.close = messages.close.replace(
-        /(\r\n|\r|\n)/g,
-        '',
-      );
-      this.newBettingPreferences.settings.messages.cancel = messages.cancel.replace(
-        /(\r\n|\r|\n)/g,
-        '',
-      );
-      this.newBettingPreferences.settings.messages.win = messages.win.replace(/(\r\n|\r|\n)/g, '');
-
-      const repeat = value.settings.general.repeat_active;
-      this.newBettingPreferences.settings.general.repeat_active.message = repeat.message.replace(
-        /(\r\n|\r|\n)/g,
-        '',
-      );
-    }
   }
 
   @Watch('errors.items.length')

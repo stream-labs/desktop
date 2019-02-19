@@ -76,8 +76,9 @@ export default class ChatbotPollProfile extends ChatbotBase {
   onEditProfileHandler() {
     if (this.type === 'poll') {
       this.chatbotApiService.Common.openPollProfileWindow(this.profile);
+    } else {
+      this.chatbotApiService.Common.openBettingProfileWindow(this.profile as IBettingProfile);
     }
-    this.chatbotApiService.Common.openBettingProfileWindow(this.profile as IBettingProfile);
   }
 
   onDeleteProfileHandler() {

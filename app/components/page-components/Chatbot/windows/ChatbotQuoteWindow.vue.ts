@@ -30,13 +30,16 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
         placeholder: 'Quote',
         min: 1,
         max: 450,
+        blockReturn: true,
       }),
       game: metadataHelper.text({
         required: true,
+        max: 150,
         placeholder: 'Game',
       }),
       added_by: metadataHelper.text({
         required: true,
+        max: 100,
         placeholder: 'Added by',
       }),
     };
@@ -55,14 +58,6 @@ export default class ChatbotQuoteWindow extends ChatbotWindowsBase {
 
   get quoteToUpdate() {
     return this.chatbotApiService.Common.state.quoteToUpdate;
-  }
-
-  @Watch('newQuote', { immediate: true, deep: true })
-  @debounce(1)
-  onSymbolProtChanged(value: IQuote, oldValue: IQuote) {
-    if (oldValue) {
-      this.newQuote.message = value.message.replace(/(\r\n|\r|\n)/g, '');
-    }
   }
 
   @Watch('errors.items.length')

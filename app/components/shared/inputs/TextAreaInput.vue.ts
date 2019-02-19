@@ -6,6 +6,7 @@ interface IWTextMetadata extends IInputMetadata {
   placeholder: string;
   max: number;
   min: number;
+  blockReturn: boolean;
 }
 
 @Component({})
@@ -20,7 +21,12 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
     return {
       ...super.getValidations(),
       min: this.options.min,
-      max: this.options.max
+      max: this.options.max,
     };
+  }
+
+  handleInput(value: string) {
+    const formattedValue = value.replace(/(\r\n|\r|\n)/g, '');
+    this.emitInput(formattedValue);
   }
 }

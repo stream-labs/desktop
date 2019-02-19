@@ -1,5 +1,4 @@
 import { Component } from 'vue-property-decorator';
-import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
@@ -10,7 +9,6 @@ import ChatbotWindowsBase from '../windows/ChatbotWindowsBase.vue';
 @Component({
   components: {
     VFormGroup,
-    TextInput,
     TextAreaInput,
     ListInput,
     NumberInput,

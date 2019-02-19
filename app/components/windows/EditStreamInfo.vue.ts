@@ -245,13 +245,6 @@ export default class EditStreamInfo extends Vue {
     if (this.selectedProfile && this.useOptimizedProfile) {
       this.videoEncodingOptimizationService.applyProfile(this.selectedProfile);
     }
-
-    this.updatingInfo = false;
-  }
-
-  handleSubmit() {
-    if (this.isSchedule) return this.scheduleStream();
-    this.updateAndGoLive();
   }
 
   async scheduleStream() {
@@ -416,26 +409,6 @@ export default class EditStreamInfo extends Vue {
 
   get timeMetadata() {
     return { title: $t('Scheduled Time'), format: 'hm', max: 24 * 3600 };
-  }
-
-  private formatDateString() {
-    try {
-      const dateArray = this.startTimeModel.date.split('/');
-      let hours: string | number = Math.floor(this.startTimeModel.time / 3600);
-      hours = hours < 10 ? `0${hours}` : hours;
-      let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
-      minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[0]}-${
-        dateArray[1]
-      }T${hours}:${minutes}:00.0${moment().format('Z')}`;
-    } catch {
-      this.$toasted.show($t('Please enter a valid date'), {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
-    }
   }
 
   private formatDateString() {

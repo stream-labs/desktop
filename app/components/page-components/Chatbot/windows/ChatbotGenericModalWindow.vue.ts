@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
@@ -14,7 +13,6 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 @Component({
   components: {
     VFormGroup,
-    TextInput,
     TextAreaInput,
     ListInput,
     NumberInput,

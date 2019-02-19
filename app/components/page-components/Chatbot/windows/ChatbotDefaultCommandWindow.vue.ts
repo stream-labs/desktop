@@ -152,6 +152,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after the viewer wins'),
         max: 450,
         uuid: $t('Win Response'),
+        blockReturn: true,
       }),
       lose_response: metadataHelper.text({
         required: true,
@@ -159,6 +160,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after the viewer loses'),
         max: 450,
         uuid: $t('Lose Response'),
+        blockReturn: true,
       }),
       success_response: metadataHelper.text({
         required: true,
@@ -166,6 +168,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after a successful command'),
         max: 450,
         uuid: $t('Success Response'),
+        blockReturn: true,
       }),
       failed_response: metadataHelper.text({
         required: true,
@@ -173,6 +176,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after a failed command'),
         max: 450,
         uuid: $t('Failed Response'),
+        blockReturn: true,
       }),
       enabled_response: metadataHelper.text({
         required: true,
@@ -180,6 +184,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after a command is enabled'),
         max: 450,
         uuid: $t('Enabled Response'),
+        blockReturn: true,
       }),
       disabled_response: metadataHelper.text({
         required: true,
@@ -187,6 +192,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear after a command is disabled'),
         max: 450,
         uuid: $t('Disabled Response'),
+        blockReturn: true,
       }),
       duration_response: metadataHelper.text({
         required: true,
@@ -194,6 +200,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t("The phrase that will appear when a song's duration is too long"),
         max: 450,
         uuid: $t('Duration Response'),
+        blockReturn: true,
       }),
       rating_response: metadataHelper.text({
         required: true,
@@ -201,6 +208,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t("The phrase that will appear when a song's rating is too low"),
         max: 450,
         uuid: $t('Rating Response'),
+        blockReturn: true,
       }),
       views_response: metadataHelper.text({
         required: true,
@@ -208,6 +216,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t("The phrase that will appear when a song's view count is too low"),
         max: 450,
         uuid: $t('Views Response'),
+        blockReturn: true,
       }),
       banned_response: metadataHelper.text({
         required: true,
@@ -215,6 +224,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear when the user requested a banned song'),
         max: 450,
         uuid: $t('Banned Response'),
+        blockReturn: true,
       }),
       music_response: metadataHelper.text({
         required: true,
@@ -222,6 +232,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear when the song is not in the music category'),
         max: 450,
         uuid: $t('Music Response'),
+        blockReturn: true,
       }),
       max_response: metadataHelper.text({
         required: true,
@@ -231,6 +242,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         ),
         max: 450,
         uuid: $t('Max Response'),
+        blockReturn: true,
       }),
       full_response: metadataHelper.text({
         required: true,
@@ -238,23 +250,24 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear if your song queue is currently full'),
         max: 450,
         uuid: $t('Full Response'),
+        blockReturn: true,
       }),
-      cooldown: {
-        type: EInputType.number,
+      cooldown: metadataHelper.number({
         title: $t('Cooldown'),
         placeholder: $t('Cooldown'),
         tooltip: $t('Value in seconds'),
         min: 0,
         max: 86400,
-      },
-      usercooldown: {
-        type: EInputType.number,
+        isInteger: true,
+      }),
+      usercooldown: metadataHelper.number({
         title: $t('User Cooldown'),
         placeholder: $t('User Cooldown'),
         tooltip: $t('Value in seconds'),
         min: 0,
         max: 86400,
-      },
+        isInteger: true,
+      }),
       response_type: this.responseTypeMetadata,
     };
   }
@@ -265,20 +278,6 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
       options: this.chatbotResponseTypes,
     };
     return responseTypeMetadata;
-  }
-
-  @Watch('editedCommand', { immediate: true, deep: true })
-  @debounce(1)
-  onCommandChanged(value: IDefaultCommand, oldValue: IDefaultCommand) {
-    if (oldValue) {
-      this.editedCommand.command = value.command.replace(/ +/g, '');
-
-      for (const key in this.editedCommand) {
-        if (this.editedCommand.hasOwnProperty(key) && key.includes('response')) {
-          this.editedCommand[key] = value[key].replace(/(\r\n|\r|\n)/g, '');
-        }
-      }
-    }
   }
 
   @Watch('errors.items.length')

@@ -187,8 +187,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         .then(handleResponse)
         .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
     });
-    const req = new Request(url, { headers, body, method: 'POST' });
-    return fetch(req).then(handleResponse);
   }
 
   prepopulateInfo() {
