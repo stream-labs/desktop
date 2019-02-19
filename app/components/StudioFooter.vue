@@ -25,7 +25,8 @@
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
 
 .footer {
   display: flex;
@@ -55,7 +56,7 @@
 .error-wrapper {
   position: absolute;
   z-index: 2;
-  
+
 }
 
 .platform-error {

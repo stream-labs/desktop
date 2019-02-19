@@ -33,7 +33,7 @@
 <script lang="ts" src="./EditableListInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import "../../../styles/_colors";
 
 .editable-list__list {
   background: @bg-secondary;

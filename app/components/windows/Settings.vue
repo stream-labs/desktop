@@ -51,7 +51,7 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 .settings {
   display: flex;
@@ -74,7 +74,7 @@
 </style>
 
 <style lang="less">
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 /*
 配信中に設定ダイアログへ表示するメッセージのstyle

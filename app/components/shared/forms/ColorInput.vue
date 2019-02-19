@@ -32,7 +32,8 @@
 <script lang="ts" src="./ColorInput.vue.ts"></script>
 
 <style lang="less">
-@import "../../../styles/index";
+@import "../../../styles/_colors";
+@import "../../../styles/mixins";
 .colorpicker {
   position: relative;
   width: 220px;

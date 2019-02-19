@@ -180,7 +180,7 @@
 <script lang="ts" src="./SourcesShowcase.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 .source-info {
   padding: 0 20px;
@@ -209,7 +209,9 @@
 </style>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
+@import "../../styles/mixins";
+
 .modal-layout-controls {
   border-top: 1px solid @bg-secondary;
 }

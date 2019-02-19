@@ -36,7 +36,7 @@
 <script lang="ts" src="./AdvancedAudio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 table {
   min-width: 1060px;
@@ -49,14 +49,14 @@ table {
 .downmix {
   width: 120px;
 }
-.syncOffset {}     
+.syncOffset {}
 .audioMonitor {}
 .track {}
 
 .device,
 .volume,
 .downmix,
-.syncOffset,     
+.syncOffset,
 .audioMonitor,
 .track {
   color: @text-secondary;

@@ -8,7 +8,7 @@
 <script lang="ts" src="./MixerVolmeter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .volmeter {
   position: absolute;

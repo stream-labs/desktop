@@ -10,7 +10,8 @@
 <script lang="ts" src="./StreamingStatus.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
 
 .streaming-status-text {
   margin: 0 2px 0 4px;

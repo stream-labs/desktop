@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div class="top-nav-profile">    
+  <div class="top-nav-profile">
     <div class="top-nav-item" v-if="isDevMode">
       <a
         @click="openDevTools"
@@ -50,7 +50,7 @@
 <script lang="ts" src="./TopNav.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .top-nav {
   display: flex;

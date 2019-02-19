@@ -88,7 +88,8 @@
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
 
 <style lang="less" >
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .source-selector-action {

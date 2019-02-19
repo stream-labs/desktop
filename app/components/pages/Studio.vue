@@ -24,7 +24,7 @@
 <script lang="ts" src="./Studio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 .studio-page {
   display: flex;

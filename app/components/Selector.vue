@@ -26,7 +26,8 @@
 <script lang="ts" src="./Selector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
 
 .sortable-ghost {
   opacity: .7;

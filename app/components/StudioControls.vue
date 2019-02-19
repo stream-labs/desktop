@@ -14,7 +14,7 @@
 <script lang="ts" src="./StudioControls.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .studio-controls {
   position: relative;
@@ -76,7 +76,8 @@
 </style>
 
 <style lang="less">
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
 
 .studio-controls-panel {
   display: flex;
