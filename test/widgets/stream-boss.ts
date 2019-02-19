@@ -10,7 +10,6 @@ test('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
-  await logIn(t);
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   const setButtonSelector = 'button=Set Stream Boss Health';
