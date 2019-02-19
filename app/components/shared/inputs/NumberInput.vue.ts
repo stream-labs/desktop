@@ -6,7 +6,7 @@ import { INumberMetadata } from './index';
   watch: {
     value(value) {
       // @ts-ignore
-      this.updateValue(value);
+      this.handleInput(value);
     },
   },
 })
