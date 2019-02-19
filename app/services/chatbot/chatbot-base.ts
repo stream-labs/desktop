@@ -26,14 +26,8 @@ interface IChatbotBaseApiServiceState {
 export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBaseApiServiceState> {
   @Inject() userService: UserService;
 
-  apiUrl =
-    process.env.LOCAL_CHATBOT === 'true'
-      ? 'http://localhost:3000/'
-      : 'https://chatbot-api.streamlabs.com/';
-  socketUrl =
-    process.env.LOCAL_CHATBOT === 'true'
-      ? 'http://localhost:3004'
-      : 'https://chatbot-io.streamlabs.com';
+  apiUrl = 'https://chatbot-api.streamlabs.com/';
+  socketUrl = 'https://chatbot-io.streamlabs.com';
   version = 'api/v1/';
 
   static defaultState: IChatbotBaseApiServiceState = {

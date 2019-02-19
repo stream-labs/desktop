@@ -31,12 +31,13 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     return this.chatbotApiService.Base.userService.platform.type === 'youtube';
   }
 
+  get currentWindow() {
+    return this.chatbotApiService.Common.windowsService.getChildWindowOptions().componentName;
+  }
+
   // switching between 2 child windows, link protection and default command(to edit link protection command)
   onToggleLinkProtectionWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openLinkProtectionWindow();
         break;
@@ -54,10 +55,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleLoyaltyPreferencesWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
         break;
@@ -76,10 +74,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleHeistPreferencesWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
         break;
@@ -98,10 +93,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onTogglePollPreferencesWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openPollPreferencesWindow();
         break;
@@ -120,10 +112,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleBettingPreferencesWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openBettingPreferencesWindow();
         break;
@@ -141,10 +130,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleGamblePreferencesWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openGamblePreferencesWindow();
         break;
@@ -163,10 +149,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleQuoteWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openQuotePreferencesWindow();
         break;
@@ -184,10 +167,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleQueueWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openQueuePreferencesWindow();
         break;
@@ -205,10 +185,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleSongRequestWindowHandler() {
-    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
-      .componentName;
-
-    switch (currentWindow) {
+    switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openSongRequestPreferencesWindow();
         break;

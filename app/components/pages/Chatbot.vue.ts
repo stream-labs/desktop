@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import NavItem from 'components/shared/NavItem.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import ChatbotModules from 'components/page-components/Chatbot/ChatbotModules.vue';
@@ -15,7 +15,6 @@ import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
 import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
-import { Debounce } from 'lodash-decorators';
 import ChatbotPoll from 'components/page-components/Chatbot/ChatbotPoll.vue';
 import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vue';
 
@@ -35,8 +34,8 @@ import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vu
     ChatbotBanner,
     ChatbotLoyalty,
     ChatbotPoll,
-    ChatbotBetting
-  }
+    ChatbotBetting,
+  },
 })
 export default class Chatbot extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
@@ -58,7 +57,7 @@ export default class Chatbot extends Vue {
     { title: 'Queue', enabled: true },
     { title: 'Loyalty', enabled: true },
     { title: 'Poll', enabled: true },
-    { title: 'Betting', enabled: true }
+    { title: 'Betting', enabled: true },
   ];
 
   //
@@ -98,6 +97,6 @@ export default class Chatbot extends Vue {
         alert('Error authorizing you into chatbot');
       });
 
-      this.onToggleEnableChatbotHandler = this.onToggleEnableChatbotHandler.bind(this);
+    this.onToggleEnableChatbotHandler = this.onToggleEnableChatbotHandler.bind(this);
   }
 }

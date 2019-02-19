@@ -180,10 +180,10 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
   }
 
   get minAmount() {
-    return (
-      (this.newLoyaltyPreferences.settings.general.payout.live * 60) /
-      this.newLoyaltyPreferences.settings.general.interval.live
-    ).toFixed(2);
+    const livePayout = this.newLoyaltyPreferences.settings.general.payout.live;
+    const liveInterval = this.newLoyaltyPreferences.settings.general.interval.live;
+
+    return ((livePayout * 60) / liveInterval).toFixed(2);
   }
 
   get loyaltyPreferences() {
@@ -191,12 +191,11 @@ export default class ChatbotLoyaltyPreferencesWindow extends ChatbotWindowsBase 
   }
 
   get maxAmount() {
-    return (
-      ((this.newLoyaltyPreferences.settings.general.payout.live +
-        this.newLoyaltyPreferences.settings.general.payout.active) *
-        60) /
-      this.newLoyaltyPreferences.settings.general.interval.live
-    ).toFixed(2);
+    const livePayout = this.newLoyaltyPreferences.settings.general.payout.live;
+    const activePayout = this.newLoyaltyPreferences.settings.general.payout.active;
+    const liveInterval = this.newLoyaltyPreferences.settings.general.interval.live;
+
+    return (((livePayout + activePayout) * 60) / liveInterval).toFixed(2);
   }
 
   @Watch('newLoyaltyPreferences.settings.general.interval.live')
