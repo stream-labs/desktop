@@ -89,7 +89,9 @@ export default class Main extends Vue {
   }
 
   get showLoadingSpinner() {
-    return this.appService.state.loading && this.page !== 'Onboarding';
+    return (
+      this.appService.state.loading && this.page !== 'Onboarding' && this.page !== 'BrowseOverlays'
+    );
   }
 
   get isLoggedIn() {
