@@ -4,7 +4,7 @@
       type="text"
       :placeholder="options.placeholder"
       :value="value"
-      @input="emitInput($event.target.value)"
+      @input="handleInput"
       class="text-area radius"
       :class="{ 'full-width': options.fullWidth  }"
       :name="uuid"
