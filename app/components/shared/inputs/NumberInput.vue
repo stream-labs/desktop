@@ -4,7 +4,7 @@
     data-role="input"
     data-type="number"
     :data-name="options.name"
-    :class="{ 'full-width': options.fullWidth }"
+    :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   >
     <input
         type="text"
@@ -78,5 +78,10 @@
 
   .number-input.full-width {
     width: 100%;
+  }
+
+  .number-input.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>

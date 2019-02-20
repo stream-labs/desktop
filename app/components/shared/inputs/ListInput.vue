@@ -4,7 +4,7 @@
   data-role="input"
   data-type="list"
   :data-name="options.name"
-  :class="{ 'full-width': options.fullWidth }"
+  :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
 >
   <label>{{ title }}</label>
   <multiselect
@@ -44,6 +44,11 @@
 
 .list-input.full-width {
   width: 100%;
+}
+
+.list-input.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .description {
