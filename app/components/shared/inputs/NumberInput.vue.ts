@@ -31,6 +31,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
     if (this.options.min !== void 0 && Number(value) < this.options.min) {
       this.timeout = window.setTimeout(() => this.updateValue(`${this.options.min}`), 1000);
+      // TODO: Remove early return and re-implement proper validations
       return;
     }
 
