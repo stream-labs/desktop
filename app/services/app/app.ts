@@ -92,6 +92,7 @@ export class AppService extends StatefulService<IAppState> {
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
       electron.remote.process.env.SLOBS_IPC_USERDATA,
+      electron.remote.process.env.SLOBS_VERSION,
     );
 
     if (apiResult !== EVideoCodes.Success) {
