@@ -17,4 +17,4 @@ electron.VC.db
 plugins/
 yarn-error.log
 .opt-in
-
+.idea
