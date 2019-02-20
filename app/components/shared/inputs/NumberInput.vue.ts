@@ -51,17 +51,20 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   }
 
   increment() {
+    if (this.options.disabled) return;
     this.updateValue(String(Number(this.displayValue) + 1));
   }
 
   decrement() {
+    if (this.options.disabled) return;
     this.updateValue(String(Number(this.displayValue) - 1));
   }
 
   onMouseWheelHandler(event: WheelEvent) {
     const canChange =
       (event.target !== this.$refs.input || this.$refs.input === document.activeElement) &&
-      this.options.isInteger;
+      this.options.isInteger &&
+      !this.options.disabled;
     if (!canChange) return;
     if (event.deltaY > 0) this.decrement();
     else this.increment();

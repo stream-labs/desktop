@@ -15,6 +15,7 @@
         @mousewheel="onMouseWheelHandler"
         :name="uuid"
         v-validate="validate"
+        :disabled="options.disabled"
     />
     <div v-if="options.isInteger" class="arrows">
       <div class="arrow arrow-up" @click="increment">
@@ -82,6 +83,9 @@
 
   .number-input.disabled {
     opacity: 0.5;
-    cursor: not-allowed;
+
+    input {
+      cursor: not-allowed;
+    }
   }
 </style>
