@@ -33,6 +33,7 @@ import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { $t } from '../i18n';
+import { StreamingService, EStreamingState } from 'services/streaming';
 
 const uuid = window['require']('uuid/v4');
 
@@ -75,6 +76,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
   @Inject() transitionsService: TransitionsService;
+  @Inject() streamingService: StreamingService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -629,6 +631,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   enableAutoSave() {
     if (this.autoSaveInterval) return;
     this.autoSaveInterval = window.setInterval(async () => {
+      if (this.streamingService.state.streamingStatus === EStreamingState.Live) return;
+
       this.autoSavePromise = this.save();
       await this.autoSavePromise;
       this.stateService.flushManifestFile();
