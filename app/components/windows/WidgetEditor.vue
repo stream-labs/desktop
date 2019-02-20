@@ -162,7 +162,7 @@
     display: flex;
     align-items: center;
 
-    > div {
+    > div, form {
       display: flex;
       align-items: center;
     }
