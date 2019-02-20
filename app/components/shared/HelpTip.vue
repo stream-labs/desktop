@@ -14,7 +14,9 @@
 <script lang="ts" src="./HelpTip.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
+@import "../../styles/mixins";
+
 .help-tip {
   position: absolute;
   background: @text-primary;

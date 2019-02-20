@@ -19,7 +19,7 @@
 <script lang="ts" src="./StudioModeControls.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .studio-mode-controls {
   height: 60px;

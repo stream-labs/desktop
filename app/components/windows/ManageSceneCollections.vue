@@ -25,12 +25,13 @@
 <script lang="ts" src="./ManageSceneCollections.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
+@import "../../styles/mixins";
 
 .manage-scene-collections__header {
   margin-bottom: 20px;
-  .flex;
-  .flex--space-between;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 

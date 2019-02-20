@@ -23,7 +23,9 @@
 <script lang="ts" src="./Login.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
+@import "../styles/mixins";
+
 .login__status {
   display: flex;
   align-items: center;
@@ -33,7 +35,7 @@
   margin-right: 8px;
   display: flex;
   align-items: center;
-  
+
   .user__thumbnail {
     display: flex;
     align-items: center;

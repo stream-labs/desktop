@@ -29,7 +29,8 @@
 <script lang="ts" src="./IntInput.vue.ts"></script>
 
 <style lang="less">
-@import "../../../styles/index";
+@import "../../../styles/_colors";
+@import "../../../styles/mixins";
 
 .int-input {
   position: relative;

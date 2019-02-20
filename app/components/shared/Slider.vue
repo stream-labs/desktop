@@ -29,7 +29,8 @@
 <script lang="ts" src="./Slider.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/index";
+@import "../../styles/_colors";
+@import "../../styles/mixins";
 
 .slider-container {
   width: 100%;

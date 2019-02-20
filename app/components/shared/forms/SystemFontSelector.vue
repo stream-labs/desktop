@@ -58,7 +58,7 @@
 <script lang="ts" src="./SystemFontSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import "../../../styles/_colors";
 
 .multiselect--font {
   margin-bottom: 0px;

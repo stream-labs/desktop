@@ -34,7 +34,7 @@
 <script lang="ts" src="./ModalLayout.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .modal-layout {
   height: 100%;

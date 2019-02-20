@@ -25,7 +25,7 @@
 <script lang="ts" src="./SliderInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import "../../../styles/_colors";
 
 .slider-container {
   height: 45px;

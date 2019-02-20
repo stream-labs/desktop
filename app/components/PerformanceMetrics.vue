@@ -54,7 +54,7 @@
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../styles/_colors";
 
 .performance-metrics {
   flex-wrap: wrap;
@@ -71,7 +71,7 @@
 .performance-metric-wrapper {
   padding-right: 12px;
   color: @text-secondary;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .performance-metric {
