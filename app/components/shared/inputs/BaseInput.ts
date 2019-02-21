@@ -20,6 +20,9 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   @Prop({ default: () => ({}) })
   readonly metadata: TMetadataType;
 
+  @Prop()
+  readonly name: string;
+
   /**
    * true if the component listens and re-emits child-inputs events
    */
@@ -90,6 +93,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
     const metadata = this.metadata || ({} as TMetadataType);
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
+    options.name = this.name || metadata.name;
     return options;
   }
 

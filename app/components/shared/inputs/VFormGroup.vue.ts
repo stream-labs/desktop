@@ -8,16 +8,19 @@ import BaseFormGroup from './BaseFormGroup';
 })
 export default class VFormGroup extends BaseFormGroup {
   @Prop()
-  type: EInputType;
+  readonly type: EInputType;
 
   @Prop()
-  value: undefined;
+  readonly value: undefined;
 
   @Prop({ default: () => ({}) })
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   @Prop()
-  title: string;
+  readonly title: string;
+
+  @Prop()
+  readonly name: string;
 
   created() {
     super.created();

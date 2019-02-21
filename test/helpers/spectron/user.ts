@@ -5,7 +5,9 @@ const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
 const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
-let userName: string; // keep user's name if SLOBS is logged-in
+
+// keep user's name if SLOBS is logged-in, need this name to release the user back to the pool
+let userName: string;
 
 interface ITestUser {
   name: string; // must be unique
@@ -13,11 +15,13 @@ interface ITestUser {
   updated: string; // time of the last request for this user
   platforms: {
     // tokens for platforms
+    username: string; // Mixer use username as an id for API requests
     type: TPlatform; // twitch, youtube, etc..
     id: string; // platform userId
     token: string; // platform token
     apiToken: string; // Streamlabs API token
     widgetToken: string; // needs for widgets showing
+    channelId?: string; // for the Mixer and Facebook only
   }[];
 }
 
@@ -63,7 +67,6 @@ export async function logIn(
  */
 export async function releaseUserInPool() {
   if (!userName || !USER_POOL_TOKEN) return;
-  console.log('release');
   await requestUserPool(`release/${userName}`);
   userName = '';
 }
@@ -137,10 +140,11 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
     widgetToken: platform.widgetToken,
     apiToken: platform.apiToken,
     platform: {
+      username: platform.username,
       type: platformType,
       id: platform.id,
       token: platform.token,
-      username: user.name,
+      channelId: platform.channelId,
     },
   };
 }
@@ -150,7 +154,6 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
  */
 async function requestUserPool(path: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    console.log('reserve');
     request(
       {
         url: `${USER_POOL_URL}/${path}`,

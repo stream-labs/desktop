@@ -125,7 +125,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     return fetch(request)
       .then(handleResponse)
-      .then(json => json.items[0].contentDetails.boundStreamId);
+      .then(json => {
+        try {
+          return json.items[0].contentDetails.boundStreamId;
+        } catch (e) {
+          // TODO: investigate the reason why contentDetails doesn't exist for some accounts
+          throw e;
+        }
+      });
   }
 
   handleForbidden(response: Response): void {

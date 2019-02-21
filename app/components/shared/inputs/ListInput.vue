@@ -5,6 +5,7 @@
   data-type="list"
   :data-name="options.name"
   :class="{ 'full-width': options.fullWidth }"
+  :data-has-internal-search="!options.internalSearch"
 >
   <label>{{ title }}</label>
   <multiselect

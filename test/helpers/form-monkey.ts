@@ -50,6 +50,7 @@ export class FormMonkey {
    * fill the form with values
    */
   async fill(formName: string, formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
+    await this.client.waitForExist(`form[name="${formName}"]`);
     const inputs = await this.getInputs(formName);
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
@@ -67,6 +68,7 @@ export class FormMonkey {
       switch (input.type) {
         case 'text':
         case 'number':
+        case 'textArea':
           await this.setTextValue(input.selector, value);
           break;
         case 'bool':
@@ -150,14 +152,14 @@ export class FormMonkey {
   }
 
   async setTextValue(selector: string, value: string) {
-    const inputSelector = `${selector} input`;
+    const inputSelector = `${selector} input, ${selector} textarea`;
     // await this.client.click(inputSelector);
     await this.client.clearElement(inputSelector);
     await this.client.setValue(inputSelector, value);
   }
 
   async getTextValue(selector: string): Promise<string> {
-    return await this.client.getValue(`${selector} input`);
+    return await this.client.getValue(`${selector} input, ${selector} textarea`);
   }
 
   async getNumberValue(selector: string): Promise<number> {
@@ -165,8 +167,23 @@ export class FormMonkey {
   }
 
   async setListValue(selector: string, value: string) {
-    await this.client.click(`${selector} .multiselect`);
-    await this.client.click(`${selector} [data-option-value="${value}"]`);
+    const hasInternalSearch: boolean = JSON.parse(
+      await this.getAttribute(selector, 'data-has-internal-search'),
+    );
+
+    if (!hasInternalSearch) {
+      // the list input has a static list of options
+      await this.client.click(`${selector} .multiselect`);
+      await this.client.click(`${selector} [data-option-value="${value}"]`);
+    } else {
+      // the list input has a dynamic list of options
+
+      // type searching text
+      await this.setTextValue(selector, value);
+      // wait the options list load
+      await this.client.waitForExist(`${selector} .multiselect__element`);
+      await this.client.click(`${selector} .multiselect__element [data-option-value="${value}"]`);
+    }
 
     // the vue-multiselect's popup-div needs time to be closed
     // otherwise it can overlap the elements under it
@@ -187,10 +204,10 @@ export class FormMonkey {
   }
 
   async getListValue(selector: string): Promise<string> {
-    const id = ((await this.client.$(
+    return await this.getAttribute(
       `${selector} .multiselect .multiselect__option--selected span`,
-    )) as any).value.ELEMENT;
-    return (await this.client.elementIdAttribute(id, 'data-option-value')).value;
+      'data-option-value',
+    );
   }
 
   async setBoolValue(selector: string, value: boolean) {
@@ -257,8 +274,20 @@ export class FormMonkey {
     await ((this.client.keys(value) as any) as Promise<any>); // type text
   }
 
+  private async getAttribute(selector: string, attrName: string) {
+    const id = (await this.client.$(selector)).value.ELEMENT;
+    return (await this.client.elementIdAttribute(id, attrName)).value;
+  }
+
   private log(...args: any[]) {
     if (!this.showLogs) return;
     console.log(...args);
   }
+}
+
+/**
+ * a shortcut for FormMonkey.fill()
+ */
+export async function fillForm(t: TExecutionContext, formName: string, formData: Dictionary<any>) {
+  return new FormMonkey(t).fill(formName, formData);
 }

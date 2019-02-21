@@ -21,6 +21,9 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
   @Prop()
   readonly title: string;
 
+  @Prop()
+  readonly name: string;
+
   inputErrors: ErrorField[] = [];
 
   created() {
@@ -54,6 +57,7 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
     options.uuid = this.uuid;
     options.type = this.type || options.type;
     options.title = this.title || options.title;
+    options.name = this.name || options.name;
     return options;
   }
 }

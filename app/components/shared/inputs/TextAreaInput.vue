@@ -1,5 +1,11 @@
 <template>
-  <span class="text-area-container" :class="{ 'full-width': options.fullWidth }" >
+  <span
+    class="text-area-container"
+    data-role="input"
+    data-type="textArea"
+    :data-name="this.options.name"
+    :class="{ 'full-width': options.fullWidth }"
+  >
     <textarea
       type="text"
       :placeholder="options.placeholder"
