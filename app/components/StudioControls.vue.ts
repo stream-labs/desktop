@@ -5,7 +5,7 @@ import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
 import Mixer from './Mixer.vue';
 import { Inject } from 'util/injector';
-const ControlsArrow = require('../../media/images/controls-arrow.svg');
+import ControlsArrow from '../../media/images/controls-arrow.svg';
 
 @Component({
   components: {

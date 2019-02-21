@@ -12,7 +12,7 @@ import { StreamingService } from 'services/streaming';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
 import { QuestionaireService } from 'services/questionaire';
-const ClipBoardCopy = require('../../media/images/clipboard-copy.svg');
+import ClipBoardCopy from '../../media/images/clipboard-copy.svg';
 
 @Component({
   components: {

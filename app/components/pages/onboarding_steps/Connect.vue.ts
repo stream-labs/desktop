@@ -4,7 +4,7 @@ import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { Inject } from 'util/injector';
 import { OnboardingService } from 'services/onboarding';
-const NAirLogo = require('../../../../media/images/n-air-logo.svg');
+import NAirLogo from '../../../../media/images/n-air-logo.svg';
 
 @Component({
   components: {

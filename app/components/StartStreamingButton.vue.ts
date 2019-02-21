@@ -6,7 +6,7 @@ import { NavigationService } from 'services/navigation';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from '../services/windows';
 import { $t } from 'services/i18n';
-const StartStreamingIcon = require('../../media/images/start-streaming-icon.svg');
+import StartStreamingIcon from '../../media/images/start-streaming-icon.svg';
 
 @Component({
   components: {
