@@ -30,6 +30,8 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     const options = super.getOptions();
     return {
       ...options,
+      // internalSearch is true by default in vue-multiselect
+      internalSearch: options.internalSearch === void 0 ? true : options.internalSearch,
       allowEmpty: !!options.allowEmpty, // undefined value is not working for vue-multiselect
     };
   }

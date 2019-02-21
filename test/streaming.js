@@ -88,7 +88,7 @@ test('Streaming to Youtube', async t => {
 });
 
 
-test('Streaming to facebook', async t => {
+test('Streaming to Facebook', async t => {
 
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;
@@ -115,7 +115,7 @@ test('Streaming to facebook', async t => {
 });
 
 
-test('Streaming to mixer', async t => {
+test('Streaming to Mixer', async t => {
 
   // login into the account
   if (!(await logIn(t, 'mixer'))) return;

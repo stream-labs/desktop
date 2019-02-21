@@ -168,10 +168,10 @@ export class FormMonkey {
 
   async setListValue(selector: string, value: string) {
     const hasInternalSearch: boolean = JSON.parse(
-      await this.getAttribute(selector, 'data-has-internal-search'),
+      await this.getAttribute(selector, 'data-internal-search'),
     );
 
-    if (!hasInternalSearch) {
+    if (hasInternalSearch) {
       // the list input has a static list of options
       await this.client.click(`${selector} .multiselect`);
       await this.client.click(`${selector} [data-option-value="${value}"]`);
