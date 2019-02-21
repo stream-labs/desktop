@@ -1657,9 +1657,11 @@
     "@types/jest-diff" "*"
 
 "@types/jquery@*":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.1.tgz#55758d44d422756d6329cbf54e6d41931d7ba28f"
-  integrity sha512-N3h+rzN518yl2xKrW0o6KKdNmWZ+OwG6SoM5TBEQFF0tTv5wXPEsoOuYQ2Kt3/89XbcSZUJLdjiT/2c3BR/ApQ==
+  version "3.3.29"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.29.tgz#680a2219ce3c9250483722fccf5570d1e2d08abd"
+  integrity sha512-FhJvBninYD36v3k6c+bVk1DSZwh7B5Dpb/Pyk3HKVsiohn0nhbefZZ+3JXbWQhFyt0MxSl2jRDdGQPHeOHFXrQ==
+  dependencies:
+    "@types/sizzle" "*"
 
 "@types/lodash@4.14.74":
   version "4.14.74"
@@ -1728,6 +1730,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/sizzle@*":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
+
 "@types/socket.io-client@^1.4.31":
   version "1.4.31"
   resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.31.tgz#86b8986409384a9ee1a74993a70822c36114dc79"
@@ -1744,9 +1751,9 @@
   integrity sha512-MDQLxNFRLasqS4UlkWMSACMKeSm1x4Q3TxzUC7KQUsh6RK1ZrQ0VEyE3yzXcBu+K8ejVj4wuX32eUG02yNp+YQ==
 
 "@types/urijs@^1.15.37":
-  version "1.15.37"
-  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.37.tgz#42cd9d5af585053e9af5d009d77bfeb6b0b4cfe6"
-  integrity sha512-rlYmnD83NTjOYwIyS1MZ30MWy1mvKPY4iFX0n33hCR72RgHkR5pYoNuxcP2Ao+tBx16QYzd+gdMWixrVZYyVWQ==
+  version "1.15.38"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.38.tgz#733ff7f18d42de60d0cdba40d8e92673b27cd5a4"
+  integrity sha512-5VWXqu6V2IxXsPuSXYwCZHbh25U7pE+UJTFtKnNQRJLZA7o0D7fOQRJdgwBTMLNY0uc5F9GsFSang1VwNcPguA==
   dependencies:
     "@types/jquery" "*"
 
