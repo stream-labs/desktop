@@ -15,6 +15,11 @@
       "config": {
         "threshold": 100
       }
+    },
+    "method-complexity": {
+      "config": {
+        "threshold": 10
+      }
     }
   },
   "plugins": {
@@ -29,6 +34,7 @@
     "scripts/",
     "vendor/",
     "**/*.d.ts",
-    "app/services/streamlabels/definitions.ts"
+    "app/services/streamlabels/definitions.ts",
+    "**/*-api.ts"
   ]
 }
