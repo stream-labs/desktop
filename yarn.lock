@@ -1033,6 +1033,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/mmmagic@^0.4.29":
+  version "0.4.29"
+  resolved "https://registry.yarnpkg.com/@types/mmmagic/-/mmmagic-0.4.29.tgz#d33bba3bcc596233fbf73747935b4dfe6866f227"
+  integrity sha1-0zu6O8xZYjP79zdHk1tN/mhm8ic=
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "8.0.48"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.48.tgz#4e7da6e849d9e50be5865effaa55b1870ae4eede"
@@ -7419,6 +7426,13 @@ mkdirp@0.5.0:
   dependencies:
     minimist "0.0.8"
 
+mmmagic@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/mmmagic/-/mmmagic-0.5.2.tgz#dc415c0a06ef292de465f645657e43b3f3c65d00"
+  integrity sha512-HBi5MIvBK10yOkNF+7FZ1h8DyxNVZGNeYSWQmA1WDHz8f6XwlHsXxWUHNOEnPjU8kN+FArsImeCqI6Q3PDQq6Q==
+  dependencies:
+    nan "^2.11.0"
+
 moment@2.22.2:
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
@@ -7465,6 +7479,11 @@ mute-stream@0.0.7, mute-stream@~0.0.4:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
+
+nan@^2.11.0:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
+  integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
 
 nan@^2.9.2:
   version "2.10.0"
