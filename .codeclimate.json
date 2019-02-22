@@ -20,6 +20,16 @@
       "config": {
         "threshold": 10
       }
+    },
+    "method-lines": {
+      "config": {
+        "threshold": 30
+      }
+    },
+    "method-count": {
+      "config": {
+        "threshold": 30
+      }
     }
   },
   "plugins": {
