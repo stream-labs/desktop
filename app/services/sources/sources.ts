@@ -12,11 +12,7 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import {
-  WidgetsService,
-  WidgetType,
-  WidgetDisplayData
-} from 'services/widgets';
+import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
@@ -270,10 +266,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(
-      name,
-      (name: string) => this.getSourcesByName(name).length
-    );
+    return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
   }
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
@@ -446,9 +439,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
     });
-    return sourceModels.map(sourceModel =>
-      this.getSource(sourceModel.sourceId)
-    );
+    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
   get sources(): Source[] {
@@ -458,9 +449,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   getSource(id: string): Source {
-    return this.state.sources[id] || this.state.temporarySources[id]
-      ? new Source(id)
-      : void 0;
+    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
   }
 
   getSources() {
@@ -493,9 +482,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     if (isWidget && this.userService.isLoggedIn()) {
       const widgetType = source.getPropertiesManagerSettings().widgetType;
       if (widgetsWhitelist.includes(widgetType)) {
-        const componentName = this.widgetsService.getWidgetComponent(
-          widgetType
-        );
+        const componentName = this.widgetsService.getWidgetComponent(widgetType);
 
         this.windowsService.showWindow({
           componentName,

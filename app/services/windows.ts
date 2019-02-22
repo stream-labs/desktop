@@ -140,7 +140,7 @@ export function getComponents() {
     ChatbotPollProfileWindow,
     ChatbotPollPreferencesWindow,
     ChatbotBettingProfileWindow,
-    ChatbotBettingPreferencesWindow
+    ChatbotBettingPreferencesWindow,
   };
 }
 
@@ -345,7 +345,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
-      ...optionsPatch
+      ...optionsPatch,
     };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
@@ -387,10 +387,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   @mutation()
-  private CREATE_ONE_OFF_WINDOW(
-    windowId: string,
-    options: Partial<IWindowOptions>
-  ) {
+  private CREATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
     const opts = {
       componentName: 'Blank',
       scaleFactor: 1,
@@ -401,10 +398,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   @mutation()
-  private UPDATE_ONE_OFF_WINDOW(
-    windowId: string,
-    options: Partial<IWindowOptions>
-  ) {
+  private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
     const oldOpts = this.state[windowId];
     Vue.set(this.state, windowId, { ...oldOpts, ...options });
   }
