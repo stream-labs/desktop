@@ -44,12 +44,22 @@ interface IFacemask {
   modtime: number;
   uuid: string;
   is_intro: boolean;
+  type: string;
+  tier: number;
+  name: string;
 }
 
 interface IFacemaskSettings {
   enabled: boolean;
+  donations_enabled: boolean;
+  subs_enabled: boolean;
+  extension_enabled: boolean;
+  primary_platform: string;
+  t2masks: IFacemask[];
+  t3masks: IFacemask[];
+  userT2masks: string[];
+  userT3masks: string[];
   facemasks: IFacemask[];
-  audio_volume: number;
   duration: number;
   device: IInputDeviceSelection;
 }
@@ -96,8 +106,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     downloadProgress: 0,
     settings: {
       enabled: false,
+      donations_enabled: false,
+      subs_enabled: false,
+      extension_enabled: false,
+      primary_platform: 'twitch_account',
+      t2masks: [],
+      t3masks: [],
+      userT2masks: [],
+      userT3masks: [],
       facemasks: [],
-      audio_volume: 50,
       duration: 10,
       device: {
         name: null,
@@ -123,6 +140,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   startup() {
     this.fetchFacemaskSettings()
       .then(response => {
+        console.log(response);
         this.checkFacemaskSettings(response);
       })
       .catch(err => {
