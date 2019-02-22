@@ -11,7 +11,6 @@
       :disabled="metadata.disabled"
       :rows="metadata.rows || 2"
       v-validate="validate"
-      @keydown.enter.prevent
     />
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}
