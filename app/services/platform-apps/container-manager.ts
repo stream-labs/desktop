@@ -260,7 +260,7 @@ export class PlatformContainerManager {
    */
   private getAppPartition(app: ILoadedApp) {
     const userId = this.userService.platformId;
-    const partition = `platformApp-${app.id}-${userId}`;
+    const partition = `platformApp-${app.id}-${userId}-${app.unpacked}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);

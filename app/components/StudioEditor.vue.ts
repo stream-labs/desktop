@@ -336,7 +336,25 @@ export default class StudioEditor extends Vue {
     }
 
     // preserve aspect ratio
-    if (opts.lockRatio) scaleYDelta = scaleXDelta = Math.max(scaleXDelta, scaleYDelta);
+    if (opts.lockRatio) {
+      // if AnchorPoint is corner point
+      if (
+        [
+          AnchorPoint.SouthEast,
+          AnchorPoint.SouthWest,
+          AnchorPoint.NorthEast,
+          AnchorPoint.NorthWest,
+        ].includes(opts.anchor)
+      ) {
+        scaleYDelta = scaleXDelta = Math.max(scaleXDelta, scaleYDelta);
+      } else if (scaleVector.x) {
+        // if changing width
+        scaleYDelta = scaleXDelta;
+      } else {
+        // if changing height
+        scaleXDelta = scaleYDelta;
+      }
+    }
 
     // scale all selected items
     this.selectionService.scaleWithOffset(

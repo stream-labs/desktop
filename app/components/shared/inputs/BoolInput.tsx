@@ -15,7 +15,7 @@ export default class BoolInput extends BaseInput<boolean, { name: string; title:
       <div class="input-wrapper" data-role="input" data-type="bool" data-name={this.options.name}>
         <div class="checkbox" onClick={this.handleClick}>
           <input type="checkbox" checked={this.value} />
-          <label>{this.options.title || '&nbsp;'}</label>
+          <label>{this.options.title || '\u00A0' /* nbsp */}</label>
         </div>
       </div>
     );

@@ -33,6 +33,7 @@ import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { $t } from '../i18n';
+import { StreamingService, EStreamingState } from 'services/streaming';
 
 const uuid = window['require']('uuid/v4');
 
@@ -75,6 +76,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
   @Inject() transitionsService: TransitionsService;
+  @Inject() streamingService: StreamingService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -222,17 +224,20 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async delete(id?: string): Promise<void> {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
-
     const removingActiveCollection = id === this.activeCollection.id;
 
-    await this.removeCollection(id);
-
     if (removingActiveCollection) {
-      if (this.collections.length > 0) {
-        await this.load(this.collections[0].id);
-      } else {
-        await this.create();
-      }
+      this.appService.runInLoadingMode(async () => {
+        await this.removeCollection(id);
+
+        if (this.collections.length > 0) {
+          await this.load(this.collections[0].id);
+        } else {
+          await this.create();
+        }
+      });
+    } else {
+      await this.removeCollection(id);
     }
   }
 
@@ -626,6 +631,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   enableAutoSave() {
     if (this.autoSaveInterval) return;
     this.autoSaveInterval = window.setInterval(async () => {
+      if (this.streamingService.state.streamingStatus === EStreamingState.Live) return;
+
       this.autoSavePromise = this.save();
       await this.autoSavePromise;
       this.stateService.flushManifestFile();

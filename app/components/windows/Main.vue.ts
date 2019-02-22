@@ -88,6 +88,12 @@ export default class Main extends Vue {
     return this.appService.state.loading;
   }
 
+  get showLoadingSpinner() {
+    return (
+      this.appService.state.loading && this.page !== 'Onboarding' && this.page !== 'BrowseOverlays'
+    );
+  }
+
   get isLoggedIn() {
     return this.userService.isLoggedIn();
   }
@@ -105,18 +111,6 @@ export default class Main extends Vue {
 
   get platformApps() {
     return this.platformAppsService.enabledApps;
-  }
-
-  /**
-   * Only certain pages get locked out while the application
-   * is loading.  Other pages are OK to keep using.
-   */
-  get shouldLockContent() {
-    return (
-      this.applicationLoading &&
-      (this.navigationService.state.currentPage === 'Studio' ||
-        this.navigationService.state.currentPage === 'Live')
-    );
   }
 
   onDropHandler(event: DragEvent) {

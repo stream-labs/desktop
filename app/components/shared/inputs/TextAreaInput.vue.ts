@@ -25,8 +25,14 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
     };
   }
 
-  handleInput(value: string) {
-    const formattedValue = value.replace(/(\r\n|\r|\n)/g, '');
-    this.emitInput(formattedValue);
+  handleInput(event: { target: HTMLInputElement }) {
+    const val = this.options.blockReturn
+      ? event.target.value.replace(/(\r\n|\r|\n)/g, '')
+      : event.target.value;
+    const pos = event.target.selectionStart;
+    if (val !== this.value) {
+      this.$nextTick(() => (event.target.selectionEnd = pos));
+    }
+    this.emitInput(val);
   }
 }
