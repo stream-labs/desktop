@@ -31,7 +31,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     'giveaway',
     'loyalty',
     'queue',
-    'songrequest',
     'heist',
     'poll',
     'betting',
