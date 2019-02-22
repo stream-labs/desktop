@@ -6,10 +6,11 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import Display from 'components/shared/Display.vue';
 import { CustomizationService } from 'services/customization';
-import { SliderInput } from 'components/shared/inputs/inputs';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
+import { Debounce } from 'lodash-decorators';
+import ResizeBar from 'components/shared/ResizeBar.vue';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -19,7 +20,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     SceneSelector,
     Mixer,
     Display,
-    SliderInput,
+    ResizeBar,
   },
 })
 export default class Live extends Vue {
@@ -55,23 +56,12 @@ export default class Live extends Vue {
     this.userService.popoutRecentEvents();
   }
 
-  get sliderMetadata() {
-    return {
-      min: 275,
-      max: 600,
-      interval: 1,
-      displayValue: 'false',
-      dotSize: 11,
-      sliderStyle: { 'background-color': '#3c4c53' },
-    };
+  get previewWidth() {
+    return this.customizationService.state.previewWidth;
   }
 
-  get previewSize() {
-    return this.customizationService.state.previewSize;
-  }
-
-  set previewSize(previewSize: number) {
-    this.customizationService.setSettings({ previewSize });
+  set previewWidth(previewWidth: number) {
+    this.customizationService.setSettings({ previewWidth });
   }
 
   get previewEnabled() {
@@ -88,5 +78,30 @@ export default class Live extends Vue {
 
   get recenteventsUrl() {
     return this.userService.recentEventsUrl();
+  }
+
+  get height() {
+    return this.customizationService.state.bottomdockSize;
+  }
+
+  set height(value) {
+    this.customizationService.setSettings({ bottomdockSize: value });
+  }
+
+  get maxHeight() {
+    return this.$root.$el.getBoundingClientRect().height;
+  }
+
+  get minHeight() {
+    return 50;
+  }
+
+  onResizeStartHandler() {
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  @Debounce(500) // the preview window is flickering to much without debouncing
+  onResizeStopHandler() {
+    this.customizationService.setSettings({ previewEnabled: true });
   }
 }

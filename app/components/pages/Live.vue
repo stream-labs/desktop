@@ -8,14 +8,35 @@
 
     <div
       class="flex__item studio-controls"
-      :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
+      :style="{ flex: '0 0 ' + (height) + 'px' }">
+      <resize-bar
+        position="top"
+        v-model="height"
+        @onresizestop="onResizeStopHandler()"
+        @onresizestart="onResizeStartHandler()"
+        :max="maxHeight"
+        :min="minHeight"
+        :reverse="true"
+      />
+
+
       <scene-selector class="studio-controls-panel" />
 
       <mixer class="studio-controls-panel" />
 
       <div
         class="live-preview-container"
-        :style="{ width: previewSize + 'px' }">
+        :style="{ width: previewWidth + 'px' }">
+        <resize-bar
+          position="left"
+          v-model="previewWidth"
+          @onresizestop="onResizeStopHandler()"
+          @onresizestart="onResizeStartHandler()"
+          :min="275"
+          :max="600"
+          :reverse="true"
+        />
+
         <div class="content">
           <div class="studio-controls-top">
             <h4 class="studio-controls__label">
@@ -51,12 +72,6 @@
               </div>
             </div>
 
-            <div class="sizer-items">
-              <div class="sizer">
-                <slider-input v-model="previewSize" :metadata="sliderMetadata" />
-              </div>
-              <i class="fa fa-search fa-flip-horizontal" />
-            </div>
           </div>
         </div>
       </div>
