@@ -2801,6 +2801,11 @@ circular-dependency-plugin@3.0.0:
   resolved "https://registry.yarnpkg.com/circular-dependency-plugin/-/circular-dependency-plugin-3.0.0.tgz#9b68692e35b0e3510998d0164b6ae5011bea5760"
   integrity sha1-m2hpLjWw41EJmNAWS2rlARvqV2A=
 
+clamp@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
+  integrity sha1-ZqDmQBGBbjcZaCj9yMjBRzEshjQ=
+
 clap@^1.0.9:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/clap/-/clap-1.1.2.tgz#316545bf22229225a2cecaa6824cd2f56a9709ed"
@@ -10539,6 +10544,22 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
+streamlabs-beaker@0.2.40:
+  version "0.2.40"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.2.40.tgz#e808d05ec6902d8b165f3c8fc4e072ccd461b6af"
+  integrity sha512-CT8gwZIvhnpK1S7Q5x0YKNcvnR2rY8rCWPYwcnHhAasAWo1/TBRyYdC4ZclnVjZyuIY93CCadMywka9YLwPy8A==
+  dependencies:
+    v-tooltip "^2.0.0-rc.33"
+    vee-validate "^2.1.7"
+    vue "2.6.6"
+    vue-class-component "^6.0.0"
+    vue-color "^2.7.0"
+    vue-property-decorator "^7.0.0"
+    vue-router "^3.0.1"
+    vue-select "^2.5.1"
+    vue-slider-component "^2.8.0"
+    vuejs-paginate "^2.1.0"
+
 streamsink@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/streamsink/-/streamsink-1.2.0.tgz#efafee9f1e22d3591ed7de3dcaa95c3f5e79f73c"
@@ -11590,6 +11611,15 @@ v-tooltip@2.0.0-rc.31:
     popper.js "^1.12.9"
     vue-resize "^0.4.3"
 
+v-tooltip@^2.0.0-rc.33:
+  version "2.0.0-rc.33"
+  resolved "https://registry.yarnpkg.com/v-tooltip/-/v-tooltip-2.0.0-rc.33.tgz#78f7d8e9c34265622be65ba9dc78c67f1dc02b73"
+  integrity sha1-ePfY6cNCZWIr5lup3HjGfx3AK3M=
+  dependencies:
+    lodash.merge "^4.6.0"
+    popper.js "^1.12.9"
+    vue-resize "^0.4.3"
+
 v8-compile-cache@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.0.2.tgz#a428b28bb26790734c4fc8bc9fa106fccebf6a6c"
@@ -11622,6 +11652,11 @@ vee-validate@2.1.0-beta.6:
   version "2.1.0-beta.6"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.1.0-beta.6.tgz#df67af3b87f45f4c82c19783d782a8415cb375ce"
   integrity sha512-ED14wmxA1RlRkBUWowiKg0aV+Z0VOt67KkW2xRuM2uWh46paUhbnHc+5VogF4KVVj1s0P/Ci/IQz1ZxfUSn7MQ==
+
+vee-validate@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.1.7.tgz#33984454d8a633cdc4825a2cf5857747d91bae67"
+  integrity sha512-IyPDTTvIRY6o9y14jXlgfY76Qv+hmvYDwNaMn9JY5KbQN8a1tJAu7H/+a/+EdHg1w8Zl9tsdG8lndGqY1lyMzQ==
 
 vendors@^1.0.0:
   version "1.0.1"
@@ -11660,6 +11695,11 @@ vorpal@^1.10.0:
     strip-ansi "^3.0.0"
     wrap-ansi "^2.0.0"
 
+vue-class-component@^6.0.0:
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.3.2.tgz#e6037e84d1df2af3bde4f455e50ca1b9eec02be6"
+  integrity sha512-cH208IoM+jgZyEf/g7mnFyofwPDJTM/QvBNhYMjqGB8fCsRyTf68rH2ISw/G20tJv+5mIThQ3upKwoL4jLTr1A==
+
 vue-class-component@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.2.0.tgz#7adb1daa9a868c75f30f97f33f4f1b94aee62089"
@@ -11678,6 +11718,16 @@ vue-color@2.4.3:
   resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.4.3.tgz#184bff4e4c163a6dd391cdbf460172cef600c187"
   integrity sha512-gPO+4oCFRbpQNsJpecziEVsDBQJoDwCNMGPY393XNYabUUWB97Hkbi8ievRyJm4UZbYFAGn6TI1LcLkIxovzNw==
   dependencies:
+    lodash.throttle "^4.0.0"
+    material-colors "^1.0.0"
+    tinycolor2 "^1.1.2"
+
+vue-color@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.7.0.tgz#31e898370a5786fd6c3007388cb7242db6ba6988"
+  integrity sha512-fak9oPRL3BsYtakTGmWIS2yNRppRYNlMgGGq78CMH34ipU8fLgi/bT9JiSPcscpdTNLGracuOFuZ8OFeml+SQQ==
+  dependencies:
+    clamp "^1.0.1"
     lodash.throttle "^4.0.0"
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
@@ -11736,6 +11786,13 @@ vue-property-decorator@7.0.0:
   dependencies:
     vue-class-component "^6.2.0"
 
+vue-property-decorator@^7.0.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-7.3.0.tgz#d50d67f0b0f1c814f9f2fba36d6eeccbcc62dbb6"
+  integrity sha512-HarXfTQ/Nxm4s/APpAaGIGHq5ZzslApImQy8ZrtkfGamw8rUFAVgMS5C50/AQ80+wfw3Wpnf4bNzbmj75m/k2Q==
+  dependencies:
+    vue-class-component "^6.2.0"
+
 vue-resize@^0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-0.4.3.tgz#5bdfd1cd60eb2bf1ebc08dff1517754af69e4886"
@@ -11746,10 +11803,25 @@ vue-resize@^0.4.4:
   resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-0.4.4.tgz#dee9b8dd1b189e7e3f6ec47f86c60694a241bb17"
   integrity sha512-Lb/cnE2N9Y42ZJPw8wpjkpuX5a9ReerWNGcQRcbNCwfCnkHG6++FurNNmLIdU8dcCTH4c5rtTPdxBqFoRMK2cQ==
 
+vue-router@^3.0.1:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.2.tgz#dedc67afe6c4e2bc25682c8b1c2a8c0d7c7e56be"
+  integrity sha512-opKtsxjp9eOcFWdp6xLQPLmRGgfM932Tl56U9chYTnoWqKxQ8M20N7AkdEbM5beUh6wICoFGYugAX9vQjyJLFg==
+
+vue-select@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-2.5.1.tgz#9886e7123150a52dc8dbfe3202d0387268835aaa"
+  integrity sha512-Hs+arh7+0gLJoYiM3r9V/5CRn5XsAT8tVkouTkpDAWb923KFgraWrKDLSqz3ROedZUkuVIwkFuYq8+baHUf+bg==
+
 vue-slider-component@2.2.7:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.2.7.tgz#2551696ad01f3246ba48e6cdbb4b4cb70bcc52d6"
   integrity sha1-JVFpatAfMka6SObNu0tMtwvMUtY=
+
+vue-slider-component@^2.8.0:
+  version "2.8.6"
+  resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.8.6.tgz#6679e0df9100f77fd7acde114d8edfcc73c1617f"
+  integrity sha512-8VLLeIyKxP+L3wWZbz2EcvNK7KSjxYyNqj/446eL30yH6ZqPukPRrIjANzPWMBYsNvY2E0higRF/XufCq4yPPA==
 
 vue-spinner@1.0.3:
   version "1.0.3"
@@ -11792,6 +11864,11 @@ vue@2.5.21:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.21.tgz#3d33dcd03bb813912ce894a8303ab553699c4a85"
   integrity sha512-Aejvyyfhn0zjVeLvXd70h4hrE4zZDx1wfZqia6ekkobLmUZ+vNFQer53B4fu0EjWBSiqApxPejzkO1Znt3joxQ==
 
+vue@2.6.6:
+  version "2.6.6"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.6.tgz#dde41e483c11c46a7bf523909f4f2f816ab60d25"
+  integrity sha512-Y2DdOZD8sxApS+iUlwv1v8U1qN41kq6Kw45lM6nVZKhygeWA49q7VCCXkjXqeDBXgurrKWkYQ9cJeEJwAq0b9Q==
+
 vue@^2.5.11, vue@^2.5.21:
   version "2.5.22"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.22.tgz#3bf88041af08b8539c37b268b70ca79245e9cc30"
@@ -11803,6 +11880,11 @@ vuedraggable@2.8.5:
   integrity sha1-/6cu0iXQBvMTtDwi0uUgRrFelng=
   dependencies:
     sortablejs "^1.5.0"
+
+vuejs-paginate@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/vuejs-paginate/-/vuejs-paginate-2.1.0.tgz#93e1ad1539b713a688c7a2d3080bda60fcc6c77d"
+  integrity sha512-gnwyXlmCiDOu9MLWxN5UJ4PGijKGNOMpHG8ujsrynCzTJljn/rp7Jq0WiDGDAMi5/u0AHuYIHhced+tUW4jblA==
 
 vuex@3.0.1:
   version "3.0.1"
