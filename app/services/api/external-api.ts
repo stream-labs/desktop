@@ -4,13 +4,6 @@ import { InternalApiService } from './internal-api';
 import * as apiResources from './external-api/resources';
 import { Service } from 'services/service';
 
-export interface ISerializable {
-  // really wish to have something like
-  // `type TSerializable = number | string | boolean | null | Dictionary<TSerializable> | Array<TSerializable>;`
-  // instead of `any` here
-  getModel(): any;
-}
-
 /**
  * A decorator to mark class as a singleton
  */
