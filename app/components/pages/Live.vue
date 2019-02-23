@@ -37,7 +37,7 @@
           :reverse="true"
         />
 
-        <div class="content">
+        <div class="live-preview-container__content">
           <div class="studio-controls-top">
             <h4 class="studio-controls__label">
               {{ $t('Preview') }}
@@ -56,22 +56,14 @@
             </div>
           </div>
 
-          <div class="sizer-container">
-            <div class="live-display-wrapper" >
-              <div class="content" v-if="previewEnabled">
-                <display class="live-display" :drawUI="false" />
-              </div>
-
-              <div class="content" v-else>
-                <div class="live-display-placeholder">
-                  <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-                  <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-                  <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
-                  <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
-                </div>
-              </div>
+          <div class="live-display-wrapper sizer-container">
+            <display class="live-display" :drawUI="false" v-if="previewEnabled" />
+            <div class="live-display-placeholder" v-else>
+              <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
+              <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
+              <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
+              <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
             </div>
-
           </div>
         </div>
       </div>
@@ -83,7 +75,7 @@
 <script lang="ts" src="./Live.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/index";
+@import '../../styles/index';
 .sizer-container {
   width: 100%;
   .radius();
@@ -104,7 +96,7 @@
   width: 120px;
 
   .fa {
-    opacity: .4;
+    opacity: 0.4;
     font-size: 12px;
   }
 }
@@ -117,7 +109,7 @@
 </style>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 .live-container {
   display: flex;
   height: 100%;
@@ -170,12 +162,15 @@
 
 .live-preview-container {
   width: 300px;
-  .aspect-ratio(4,3);
   flex: 0 0 auto;
+  position: relative;
+}
+
+.live-preview-container__content {
+  height: 100%;
 }
 
 .live-display-wrapper {
-  .aspect-ratio(16, 9);
   width: 100%;
 }
 
