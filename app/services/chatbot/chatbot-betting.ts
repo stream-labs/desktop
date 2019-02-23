@@ -75,9 +75,11 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
       this.socket.removeAllListeners();
     }
 
-    this.UPDATE_TIMER();
+    this.UPDATE_TIMER(Date.now());
     // @ts-ignore - weird stuff going on with NodeJs.Timer & number ...
-    this.timer = setInterval(this.UPDATE_TIMER, 1000);
+    this.timer = setInterval(() => {
+      this.UPDATE_TIMER(Date.now());
+    }, 1000);
 
     this.socket = io.connect(
       this.socketUrl,
@@ -254,10 +256,12 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   //  Timer
   //
   @mutation()
-  private UPDATE_TIMER() {
+  private UPDATE_TIMER(now: number) {
     const activePoll = this.state.activeBettingResponse;
     const containsSettings =
-      activePoll.settings !== undefined && activePoll.settings.timer !== undefined;
+      activePoll.settings !== undefined &&
+      activePoll.settings.timer !== undefined &&
+      activePoll.settings.timer.enabled !== null;
 
     if (!containsSettings) {
       return;
@@ -267,13 +271,13 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
     const startedTimer = activePoll.settings.timer.started_at !== undefined;
 
     if (containsSettings && containsTimer && startedTimer) {
-      const timeElapsed = Date.now() - activePoll.settings.timer.started_at;
+      const timeElapsed = now - activePoll.settings.timer.started_at;
       const timerLength = activePoll.settings.timer.time_remaining * 1000;
 
       const duration = moment.duration(Math.max(0, timerLength - timeElapsed));
       this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     } else if (!activePoll.settings.timer.enabled) {
-      const timeElapsed = Date.now() - Date.parse(activePoll.created_at);
+      const timeElapsed = now - Date.parse(activePoll.created_at);
       const duration = moment.duration(Math.max(0, timeElapsed));
       this.state.timeRemaining = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
     }

@@ -34,21 +34,18 @@ export default class ChatbotCommandPreferencesWindow extends ChatbotWindowsBase 
         required: true,
         max: 450,
         placeholder: $t('Cost Message'),
-        uuid: $t('Cost Message'),
       }),
       permission: metadataHelper.text({
         type: EInputType.text,
         required: true,
         max: 450,
         placeholder: $t('Permission Message'),
-        uuid: $t('Permission Message'),
       }),
       cooldown: metadataHelper.text({
         type: EInputType.text,
         required: true,
         max: 450,
         placeholder: $t('Cooldown Message'),
-        uuid: $t('Cooldown Message'),
       }),
     };
   }

@@ -41,6 +41,7 @@ export default class ChatbotModules extends ChatbotBase {
           });
         },
       },
+      //  TODO: Commented for the time being seeing as it's not ready
       /*{
         title: $t('Song Request'),
         description: $t(
