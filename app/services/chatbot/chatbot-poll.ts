@@ -15,6 +15,8 @@ import {
   IChatbotAPIPutResponse,
   IChatbotAPIDeleteResponse,
   IActivePollResponse,
+  IPollOption,
+  IPollTimer,
 } from './chatbot-interfaces';
 
 // state
@@ -92,23 +94,23 @@ export class ChatbotPollApiService extends PersistentStatefulService<IChatbotPol
       this.UPDATE_POLL_STATE('Closed');
     });
 
-    this.socket.on('poll.cancel', (response: any) => {
+    this.socket.on('poll.cancel', () => {
       this.RESET_ACTIVE_POLL();
     });
 
-    this.socket.on('poll.complete', (response: any) => {
+    this.socket.on('poll.complete', () => {
       this.RESET_ACTIVE_POLL();
     });
 
-    this.socket.on('poll.update', (response: any) => {
+    this.socket.on('poll.update', (response: IPollOption[]) => {
       this.UPDATE_POLL_OPTIONS(response);
     });
 
-    this.socket.on('poll.timer.start', (response: any) => {
+    this.socket.on('poll.timer.start', (response: IPollTimer) => {
       this.UPDATE_POLL_TIMER(response);
     });
 
-    this.socket.on('poll.timer.stop', (response: any) => {
+    this.socket.on('poll.timer.stop', (response: IPollTimer) => {
       this.UPDATE_POLL_TIMER(response);
     });
   }
@@ -275,7 +277,7 @@ export class ChatbotPollApiService extends PersistentStatefulService<IChatbotPol
   }
 
   @mutation()
-  private UPDATE_POLL_OPTIONS(options: any) {
+  private UPDATE_POLL_OPTIONS(options: IPollOption[]) {
     this.state.activePollResponse.settings.options = options;
   }
 
@@ -294,7 +296,7 @@ export class ChatbotPollApiService extends PersistentStatefulService<IChatbotPol
   }
 
   @mutation()
-  private UPDATE_POLL_TIMER(data: any) {
+  private UPDATE_POLL_TIMER(data: IPollTimer) {
     this.state.activePollResponse.settings.timer = data;
   }
 

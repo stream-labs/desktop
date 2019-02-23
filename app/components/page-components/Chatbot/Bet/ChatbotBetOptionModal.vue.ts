@@ -62,6 +62,7 @@ export default class ChatbotBetOptionModal extends ChatbotWindowsBase {
   get baseCommand() {
     return `${
       this.chatbotApiService.Betting.state.bettingPreferencesResponse.settings.commands['bet']
+        .command
     } `;
   }
 

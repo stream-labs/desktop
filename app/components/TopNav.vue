@@ -12,7 +12,7 @@
   <div class="tabs">
     <button
       @click="navigateDashboard"
-      class="tab-button tab-button--dashboard"
+      class="tab-button"
       :class="{ active: page === 'Dashboard' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-dashboard"/> <span class="tab-button__text">{{ $t('Dashboard') }}</span>

@@ -670,13 +670,7 @@ export interface ILoyaltyDonations {
 export interface IPollProfile {
   id?: string;
   title: string;
-  timer: {
-    enabled: boolean;
-    duration: number;
-    job_id?: string;
-    started_at?: number;
-    time_remaining?: number;
-  };
+  timer: IPollTimer;
   options: IPollOption[];
   send_notification: boolean;
 }
@@ -685,6 +679,14 @@ export interface IPollOption {
   name: string;
   parameter: string;
   votes?: number;
+}
+
+export interface IPollTimer {
+  enabled: boolean;
+  duration: number;
+  job_id?: string;
+  started_at?: number;
+  time_remaining?: number;
 }
 
 export interface IPollGeneral {
@@ -728,19 +730,21 @@ export interface IPollCommand {
 export interface IBettingProfile {
   id?: string;
   title: string;
-  timer: {
-    enabled: boolean;
-    duration: number;
-    job_id?: string;
-    started_at?: number;
-    time_remaining?: number;
-  };
+  timer: IBettingTimer;
   loyalty: {
     min: number;
     max: number;
   };
   options: IBettingOption[];
   send_notification: boolean;
+}
+
+export interface IBettingTimer {
+  enabled: boolean;
+  duration: number;
+  job_id?: string;
+  started_at?: number;
+  time_remaining?: number;
 }
 
 export interface IBettingOption {

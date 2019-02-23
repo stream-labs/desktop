@@ -23,7 +23,7 @@
               <VFormGroup
                 :title="$t('Title')"
                 v-model="newProfile.title"
-                :metadata="metaData.title"
+                :metadata="newMetaData.title"
               />
             </div>
           </div>
@@ -82,7 +82,7 @@
                 />
                 <i class="icon-question icon-btn" v-tooltip="$t('Duration in seconds.')"/>
               </div>
-              <VFormGroup v-model="newProfile.timer.duration" :metadata="metaData.duration"/>
+              <VFormGroup v-model="newProfile.timer.duration" :metadata="newMetaData.duration"/>
               <div class="flex">
                 <BoolInput
                   class="poll-checkbox"
@@ -104,14 +104,14 @@
                   <VFormGroup
                     :title="$t('Minimum')"
                     v-model="newProfile.loyalty.min"
-                    :metadata="metaData.min"
+                    :metadata="newMetaData.min"
                   />
                 </div>
                 <div class="columns small-6">
                   <VFormGroup
                     :title="$t('Maximum')"
                     v-model="newProfile.loyalty.max"
-                    :metadata="metaData.max"
+                    :metadata="newMetaData.max"
                   />
                 </div>
               </div>

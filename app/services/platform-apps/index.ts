@@ -2,7 +2,7 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { EApiPermissions } from './api/modules/module';

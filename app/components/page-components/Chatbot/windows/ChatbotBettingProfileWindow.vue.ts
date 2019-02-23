@@ -8,6 +8,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { debounce } from 'lodash-decorators';
 import ChatbotBetOptionModal from '../Bet/ChatbotBetOptionModal.vue';
+import ChatbotPollProfileWindow from './ChatbotPollProfileWindow.vue';
 
 @Component({
   components: {
@@ -15,7 +16,7 @@ import ChatbotBetOptionModal from '../Bet/ChatbotBetOptionModal.vue';
     ChatbotBetOptionModal,
   },
 })
-export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
+export default class ChatbotBettingProfileWindow extends ChatbotPollProfileWindow {
   $refs: {
     form: ValidatedForm;
   };
@@ -35,18 +36,7 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     send_notification: false,
   };
 
-  tabs: ITab[] = [
-    {
-      name: $t('General'),
-      value: 'general',
-    },
-    {
-      name: $t('Advanced'),
-      value: 'advanced',
-    },
-  ];
-
-  get metaData() {
+  get newMetaData() {
     return formMetadata({
       title: metadata.text({
         required: true,
@@ -84,10 +74,6 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     parameter: null,
   };
 
-  selectedIndex: number = -1;
-
-  selectedTab: string = 'general';
-
   mounted() {
     // if editing existing custom command
     if (this.isEdit) {
@@ -110,18 +96,8 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     } `;
   }
 
-  get NEW_BET_OPTION_MODAL_ID() {
+  get MODAL_ID() {
     return 'new-betting-option';
-  }
-
-  @Watch('errors.items.length')
-  @debounce(200)
-  async onErrorsChanged() {
-    await this.$refs.form.validateAndGetErrorsCount();
-  }
-
-  onSelectTabHandler(tab: string) {
-    this.selectedTab = tab;
   }
 
   async onSaveHandler() {
@@ -134,46 +110,5 @@ export default class ChatbotBettingProfileWindow extends ChatbotWindowsBase {
     } else {
       await this.chatbotApiService.Betting.addProfile(this.newProfile).catch(this.onErrorHandler);
     }
-  }
-
-  onErrorHandler(errorResponse: IChatbotErrorResponse) {
-    if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert($t('This name is already taken. Try another name.'));
-    }
-  }
-
-  onAddOptionHandler(option: IBettingOption, index: number) {
-    if (!option) {
-      this.selectedOption = {
-        name: null,
-        parameter: null,
-      };
-    } else {
-      this.selectedOption = option;
-    }
-
-    this.selectedIndex = index;
-    this.$modal.show(this.NEW_BET_OPTION_MODAL_ID);
-  }
-
-  onAddedHandler(option: IBettingOption = null, index: number = -1) {
-    const dupe = _.find(this.newProfile.options, x => {
-      return (
-        x.name.toLowerCase() === option.name.toLowerCase() ||
-        x.parameter.toLowerCase() === option.parameter.toLowerCase()
-      );
-    });
-
-    if (!dupe) {
-      if (index === -1) {
-        this.newProfile.options.push(option);
-      } else {
-        this.newProfile.options.splice(index, 1, option);
-      }
-    }
-  }
-
-  onRemoveOptionHandler(index: number) {
-    this.newProfile.options.splice(index, 1);
   }
 }

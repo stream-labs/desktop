@@ -15,6 +15,8 @@ import {
   IBettingProfile,
   IBettingPreferencesResponse,
   IActiveBettingResponse,
+  IBettingOption,
+  IBettingTimer,
 } from './chatbot-interfaces';
 
 // state
@@ -102,23 +104,23 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
       this.UPDATE_BETTING_STATE('Picked');
     });
 
-    this.socket.on('betting.cancel', (response: any) => {
+    this.socket.on('betting.cancel', () => {
       this.RESET_ACTIVE_BETTING();
     });
 
-    this.socket.on('betting.complete', (response: any) => {
+    this.socket.on('betting.complete', () => {
       this.RESET_ACTIVE_BETTING();
     });
 
-    this.socket.on('betting.update', (response: any) => {
+    this.socket.on('betting.update', (response: IBettingOption[]) => {
       this.UPDATE_BETTING_OPTIONS(response);
     });
 
-    this.socket.on('betting.timer.start', (response: any) => {
+    this.socket.on('betting.timer.start', (response: IBettingTimer) => {
       this.UPDATE_BETTING_TIMER(response);
     });
 
-    this.socket.on('betting.timer.stop', (response: any) => {
+    this.socket.on('betting.timer.stop', (response: IBettingTimer) => {
       this.UPDATE_BETTING_TIMER(response);
     });
   }
@@ -291,7 +293,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   }
 
   @mutation()
-  private UPDATE_BETTING_OPTIONS(options: any) {
+  private UPDATE_BETTING_OPTIONS(options: IBettingOption[]) {
     this.state.activeBettingResponse.settings.options = options;
   }
 
@@ -310,7 +312,7 @@ export class ChatbotBettingApiService extends PersistentStatefulService<
   }
 
   @mutation()
-  private UPDATE_BETTING_TIMER(data: any) {
+  private UPDATE_BETTING_TIMER(data: IBettingTimer) {
     this.state.activeBettingResponse.settings.timer = data;
   }
 

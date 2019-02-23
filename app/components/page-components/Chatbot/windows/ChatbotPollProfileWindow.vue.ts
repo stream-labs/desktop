@@ -2,7 +2,13 @@ import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import * as _ from 'lodash';
-import { IChatbotErrorResponse, IPollOption, IPollProfile } from 'services/chatbot';
+import {
+  IChatbotErrorResponse,
+  IPollOption,
+  IPollProfile,
+  IBettingProfile,
+  IBettingOption,
+} from 'services/chatbot';
 import { EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
@@ -90,7 +96,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
     } `;
   }
 
-  get NEW_POLL_OPTION_MODAL_ID() {
+  get MODAL_ID() {
     return 'new-poll-option';
   }
 
@@ -118,39 +124,44 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
     if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert($t('This timer name is already taken. Try another name.'));
+      alert($t('This title is already taken. Try another title.'));
     }
   }
 
-  onAddOptionHandler(option: IPollOption, index: number) {
+  onAddOptionHandler(option: IPollOption | IBettingOption, index: number) {
     if (!option) {
       this.selectedOption = {
         name: null,
         parameter: null,
       };
     } else {
-      this.selectedOption = option;
+      this.selectedOption = _.cloneDeep(option);
     }
 
     this.selectedIndex = index;
-    this.$modal.show(this.NEW_POLL_OPTION_MODAL_ID);
+    this.$modal.show(this.MODAL_ID);
   }
 
-  onAddedHandler(option: IPollOption = null, index: number = -1) {
-    const dupe = _.find(this.newProfile.options, x => {
+  onAddedHandler(option: IPollOption | IBettingOption = null, index: number = -1) {
+    const dupeIndex = _.findIndex(this.newProfile.options, x => {
       return (
         x.name.toLowerCase() === option.name.toLowerCase() ||
         x.parameter.toLowerCase() === option.parameter.toLowerCase()
       );
     });
 
-    if (!dupe) {
-      if (index === -1) {
-        this.newProfile.options.push(option);
-      } else {
-        this.newProfile.options.splice(index, 1, option);
-      }
+    if (dupeIndex === -1 && index === -1) {
+      this.newProfile.options.push(option);
+    } else if (dupeIndex === index) {
+      this.newProfile.options.splice(index, 1, option);
     }
+
+    this.selectedOption = {
+      name: null,
+      parameter: null,
+    };
+
+    this.selectedIndex = -1;
   }
 
   onRemoveOptionHandler(index: number) {
