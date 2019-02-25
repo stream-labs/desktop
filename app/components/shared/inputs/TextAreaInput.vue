@@ -4,7 +4,7 @@
       type="text"
       :placeholder="options.placeholder"
       :value="value"
-      @input="emitInput($event.target.value)"
+      @input="handleInput"
       class="text-area radius"
       :class="{ 'full-width': options.fullWidth  }"
       :name="uuid"
@@ -12,9 +12,6 @@
       :rows="metadata.rows || 2"
       v-validate="validate"
     />
-    <span class="input-error" v-show="errors.first(uuid)">
-      {{ errors.first(uuid) }}
-    </span>
   </span>
 </template>
 

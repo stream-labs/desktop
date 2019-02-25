@@ -36,11 +36,6 @@
     position: relative;
     display: block;
 
-    .input-error {
-      position: absolute;
-      white-space: nowrap;
-    }
-
     .arrows {
       .absolute(0, 8px, 0, auto);
       width: 30px;
