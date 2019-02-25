@@ -435,7 +435,7 @@ interface IAlertBoxFacemaskSettings {
   facemaskdonation_sound_volume: number;
   facemaskdonation_text_animation: string;
   facemaskdonation_text_delay: number;
-  facemaskdonation_variations: IAlertBoxVariation[]
+  facemaskdonation_variations: IAlertBoxVariation[];
 }
 
 // ACCOUNT INTEGRATIONS
