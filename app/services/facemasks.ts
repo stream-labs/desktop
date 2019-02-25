@@ -44,8 +44,7 @@ interface IFacemask {
 
 interface IFacemaskSettings {
   enabled: boolean;
-  facemasks: IFacemask[];
-  audio_volume: number;
+  facemasks?: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
 }
@@ -84,7 +83,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   settings: IFacemaskSettings = {
     enabled: false,
     facemasks: [],
-    audio_volume: 50,
     duration: 10,
     device: {
       name: null,
@@ -324,6 +322,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.state.device;
   }
 
+  getEnabledStatus() {
+    return this.settings.enabled;
+  }
+
   fetchFacemaskSettings() {
     return this.formRequest('slobs/facemasks/settings');
   }
@@ -332,8 +334,27 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
+  updateFacemaskSettings(settingsData: IFacemaskSettings) {
+    return this.postFacemaskSettingsUpdate(settingsData).then(() => this.startup());
+  }
+
   fetchProfanityFilterSettings() {
     return this.formRequest('slobs/widget/settings?widget=donation_page');
+  }
+
+  postFacemaskSettingsUpdate(settingsData: IFacemaskSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
+    const headers = authorizedHeaders(this.apiToken);
+    headers.append('Content-Type', 'text/json');
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(settingsData),
+    });
+
+    return fetch(request).then(handleResponse);
   }
 
   setupFilter() {
@@ -399,9 +420,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return new Promise((resolve, reject) => {
       const asyncReads = missing.map(uuid => this.readFile(uuid));
       Promise.all(asyncReads)
-        .then(results => {
-          resolve();
-        })
+        .then(results => resolve())
         .catch(err => {
           this.notifyFailure();
           reject();
@@ -422,7 +441,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     );
 
     Promise.all(downloads)
-      .then(responses => {
+      .then(() => {
         this.activate();
       })
       .catch(err => {
