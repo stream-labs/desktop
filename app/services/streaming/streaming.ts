@@ -294,6 +294,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return 0;
   }
 
+  get isReplayBufferEnabled() {
+    return this.settingsService.state.Output.RecRB;
+  }
+
+  get isReplayBufferOffline() {
+    return this.state.replayBufferStatus === EReplayBufferState.Offline;
+  }
+
   /**
    * Gives a formatted time that the streaming output has been in
    * its current state.

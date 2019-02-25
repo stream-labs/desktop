@@ -29,6 +29,7 @@ import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import { StreamingService } from 'services/streaming';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
 
@@ -77,6 +78,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private streamingService: StreamingService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   private pid = require('process').pid;
@@ -150,6 +152,13 @@ export class AppService extends StatefulService<IAppState> {
     const _outageService = this.outageNotificationsService;
 
     this.crashReporterService.endStartup();
+
+    if (
+      this.streamingService.isReplayBufferEnabled &&
+      this.streamingService.isReplayBufferOffline
+    ) {
+      this.streamingService.startReplayBuffer();
+    }
 
     this.FINISH_LOADING();
     this.protocolLinksService.start(this.state.argv);
