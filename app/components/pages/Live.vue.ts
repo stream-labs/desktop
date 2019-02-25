@@ -65,7 +65,11 @@ export default class Live extends Vue {
   }
 
   get previewEnabled() {
-    return this.customizationService.state.livePreviewEnabled && !this.performanceModeEnabled;
+    return (
+      this.customizationService.state.livePreviewEnabled &&
+      !this.performanceModeEnabled &&
+      this.customizationService.state.previewEnabled
+    );
   }
 
   get performanceModeEnabled() {
