@@ -53,8 +53,8 @@
 
 .information-link {
   display: flex;
-  padding: 16px 40px 16px 16px;
   align-items: center;
+  padding: 16px 40px 16px 16px;
   text-decoration: none;
   position: relative;
 
@@ -117,8 +117,8 @@
 }
 
 .icon-warning {
-  font-size: 70px;
   color: @bg-primary;
+  font-size: 70px;
   margin-bottom: 16px;
 }
 
