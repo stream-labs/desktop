@@ -299,10 +299,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     widgetItem = scene.getItems().find(item => {
       const source = item.getSource();
       if (source.getPropertiesManagerType() !== 'widget') return false;
-      if (source.getPropertiesManagerSettings().widgetType !== widget.type) {
-        return false;
-      }
-      return true;
+      return source.getPropertiesManagerSettings().widgetType === widget.type;
     });
 
     // Otherwise, create a new one

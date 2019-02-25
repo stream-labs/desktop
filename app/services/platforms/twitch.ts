@@ -1,15 +1,55 @@
 import { Service } from 'services/service';
-import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
+import {
+  IPlatformService,
+  IPlatformAuth,
+  IChannelInfo,
+  IGame,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
 import { handleResponse, requiresToken, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
+import { StreamInfoService } from 'services/stream-info';
+import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
+import { TTwitchOAuthScope } from './twitch/scopes';
+
+/**
+ * Request headers that need to be sent to Twitch
+ */
+export interface ITwitchRequestHeaders {
+  Accept: 'application/vnd.twitchtv.v5+json';
+  Authorization?: string;
+  'Client-Id': string;
+  'Content-Type': 'application/json';
+}
+
+/**
+ * Result of a token validation response, which returns information including
+ * the list of authorized scopes.
+ */
+interface ITwitchOAuthValidateResponse {
+  clientId: string;
+  login: string;
+  scopes: string[];
+  user_id: string;
+}
 
 export class TwitchService extends Service implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+  @Inject() streamInfoService: StreamInfoService;
+
+  capabilities = new Set<TPlatformCapability>([
+    'chat',
+    'scope-validation',
+    'tags',
+    'user-info',
+    'viewer-count',
+  ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -21,9 +61,12 @@ export class TwitchService extends Service implements IPlatformService {
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
+    const scopes: TTwitchOAuthScope[] = ['channel_read', 'channel_editor', 'user:edit:broadcast'];
+
     const query =
       `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
-      'scope=channel_read,channel_editor&origin=slobs';
+      `scope=${scopes.join(',')}&origin=slobs`;
+
     return `https://${host}/slobs/login?${query}`;
   }
 
@@ -33,18 +76,6 @@ export class TwitchService extends Service implements IPlatformService {
 
   get twitchId() {
     return this.userService.platform.id;
-  }
-
-  getHeaders(authorized = false): Headers {
-    const headers = new Headers();
-
-    headers.append('Client-Id', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
-    headers.append('Content-Type', 'application/json');
-
-    if (authorized) headers.append('Authorization', `OAuth ${this.oauthToken}`);
-
-    return headers;
   }
 
   // TODO: Some of this code could probably eventually be
@@ -93,12 +124,22 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   fetchChannelInfo(): Promise<IChannelInfo> {
-    return this.fetchRawChannelInfo().then(json => {
-      return {
+    return Promise.all([
+      this.fetchRawChannelInfo().then(json => ({
         title: json.status,
         game: json.game,
-      };
-    });
+      })),
+      this.getStreamTags(),
+      // Fetch stream tags once per session as they're unlikely to change that often
+      this.streamInfoService.state.channelInfo &&
+      this.streamInfoService.state.channelInfo.availableTags
+        ? Promise.resolve(this.streamInfoService.state.channelInfo.availableTags)
+        : this.getAllTags(),
+    ]).then(([channel, tags, availableTags]) => ({
+      ...channel,
+      tags,
+      availableTags,
+    }));
   }
 
   @requiresToken()
@@ -125,7 +166,7 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   @requiresToken()
-  putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
+  putChannelInfo({ title, game, tags = [] }: IChannelInfo): Promise<boolean> {
     const headers = this.getHeaders(true);
     const data = { channel: { game, status: title } };
     const request = new Request(`https://api.twitch.tv/kraken/channels/${this.twitchId}`, {
@@ -134,9 +175,9 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(() => true);
+    return Promise.all([fetch(request).then(handleResponse), this.setStreamTags(tags)]).then(
+      _ => true,
+    );
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
@@ -155,6 +196,27 @@ export class TwitchService extends Service implements IPlatformService {
     return Promise.resolve(
       `https://twitch.tv/popout/${this.userService.platform.username}/chat?${nightMode}`,
     );
+  }
+
+  @requiresToken()
+  getAllTags(): Promise<TTwitchTag[]> {
+    return getAllTags(this.getRawHeaders(true));
+  }
+
+  @requiresToken()
+  getStreamTags(): Promise<TTwitchTag[]> {
+    return getStreamTags(this.twitchId, this.getRawHeaders(true, true));
+  }
+
+  @requiresToken()
+  async setStreamTags(tags: TTwitchTag[]) {
+    const hasPermission = await this.hasScope('user:edit:broadcast');
+
+    if (!hasPermission) {
+      return false;
+    }
+
+    return updateTags(this.getRawHeaders(true, true))(tags)(this.twitchId);
   }
 
   searchCommunities(searchString: string) {
@@ -184,7 +246,44 @@ export class TwitchService extends Service implements IPlatformService {
       .then(json => json.results[0].hits);
   }
 
-  beforeGoLive() {
-    return Promise.resolve();
+  hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
+    return fetch('https://id.twitch.tv/oauth2/validate', {
+      headers: this.getHeaders(true),
+    })
+      .then(handleResponse)
+      .then((response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope));
   }
+
+  private getRawHeaders(authorized = false, isNewApi = false) {
+    const map: ITwitchRequestHeaders = {
+      'Client-Id': this.clientId,
+      Accept: 'application/vnd.twitchtv.v5+json',
+      'Content-Type': 'application/json',
+    };
+
+    return authorized
+      ? {
+          ...map,
+          Authorization: `${isNewApi ? 'Bearer' : 'OAuth'} ${this.oauthToken}`,
+        }
+      : map;
+  }
+
+  private getHeaders(authorized = false, isNewApi = false): Headers {
+    const headers = new Headers();
+
+    Object.entries(this.getRawHeaders(authorized, isNewApi)).forEach(([key, value]) => {
+      headers.append(key, value);
+    });
+
+    return headers;
+  }
+
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
+  }
+
+  async beforeGoLive() {}
 }

@@ -21,7 +21,7 @@ export default class PlatformAppProperties extends Vue {
   }
 
   navigateApp() {
-    this.navigationService.navigate('PlatformAppContainer', {
+    this.navigationService.navigate('PlatformAppMainPage', {
       appId: this.appId,
       sourceId: this.source.sourceId,
     });

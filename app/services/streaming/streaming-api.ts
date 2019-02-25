@@ -15,11 +15,20 @@ export enum ERecordingState {
   Stopping = 'stopping',
 }
 
+export enum EReplayBufferState {
+  Running = 'running',
+  Stopping = 'stopping',
+  Offline = 'offline',
+  Saving = 'saving',
+}
+
 export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
   recordingStatus: ERecordingState;
   recordingStatusTime: string;
+  replayBufferStatus: EReplayBufferState;
+  replayBufferStatusTime: string;
 }
 
 export interface IStreamingServiceApi {

@@ -40,8 +40,7 @@ export default class ChatbotAliases extends ChatbotBase {
 
   formatAlias(value: string) {
     if (!value.startsWith('!')) {
-      // tslint:disable-next-line:prefer-template TODO
-      return '!' + value.replace(/\s/g, '');
+      return `!${value.replace(/\s/g, '')}`;
     }
     return value.replace(/\s/g, '');
   }

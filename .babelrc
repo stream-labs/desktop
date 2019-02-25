@@ -2,6 +2,7 @@
   "presets": ["@babel/preset-env"],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": false }],
-    "transform-class-properties"
+    "transform-class-properties",
+    "transform-vue-jsx"
   ]
 }

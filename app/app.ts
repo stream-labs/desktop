@@ -26,6 +26,7 @@ import electronLog from 'electron-log';
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+const isPreview = !!remote.process.env.SLOBS_PREVIEW;
 
 window['obs'] = window['require']('obs-studio-node');
 
@@ -48,10 +49,9 @@ if (isProduction) {
   electron.crashReporter.start({
     productName: 'streamlabs-obs',
     companyName: 'streamlabs',
+    ignoreSystemCrashHandler: true,
     submitURL:
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
-      'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
       version: slobsVersion,
       processType: 'renderer',
@@ -66,7 +66,7 @@ if (
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
-    sampleRate: 0.1,
+    sampleRate: isPreview ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
@@ -105,7 +105,7 @@ if (
   };
 }
 
-require('./app.less');
+require('./app.g.less');
 
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);

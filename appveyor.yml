@@ -1,7 +1,11 @@
 build: off
 
 install:
-  - ps: Install-Product node 8 x64
+  # unfortunately, `commitId` in hooks is abbreviated and we can't work with that for Upsource
+  # set a custom message as the full commit ID. This *has* to be the first job given the way
+  # our service is designed, please don't move.
+  - ps: Add-AppveyorMessage $env:APPVEYOR_REPO_COMMIT
+  - ps: Install-Product node 10 x64
   - yarn install --frozen-lockfile --check-files
   - yarn lint
   - yarn compile:ci
@@ -23,6 +27,10 @@ test_script:
 notifications:
   - provider: GitHubPullRequest
     template: "{{#failed}}:x: build failed{{/failed}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
+  # Build status to Upsource
+  - provider: Webhook
+    url: https://n2svzw3n4f.execute-api.us-east-1.amazonaws.com/dev/hooks/appveyor
+    on_build_status_changed: true
 
 cache:
   - plugins

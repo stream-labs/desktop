@@ -124,7 +124,7 @@ async function checkChance(info, version) {
 
     log.info(`You rolled ${roll}`);
 
-    return (roll <= chance);
+    return roll <= chance;
 }
 
 /* Note that latest-updater.exe never changes
@@ -132,14 +132,19 @@ async function checkChance(info, version) {
  * application we're using. The base url should
  * always have an endpoint of `/latest-updater.exe`
  * that points to the updater executable or at
- * least redirects to it. */
+ * least redirects to it. Except for a preview version 
+ * where preview-updater.exe name will be used */
 async function fetchUpdater(info, progress) {
+    let updater_name = 'latest-updater.exe';
+    if(process.env.SLOBS_PREVIEW) {
+        updater_name = 'preview-updater.exe';
+    }
     const reqInfo = {
         baseUrl: info.baseUrl,
-        uri: '/latest-updater.exe'
+        uri: `/${updater_name}`
     };
 
-    const updaterPath = path.resolve(info.tempDir, 'latest-updater.exe');
+    const updaterPath = path.resolve(info.tempDir, updater_name);
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
@@ -237,9 +242,7 @@ async function entry(info) {
 
     const latestVersion = await getVersion(info);
 
-    /* Latest version doesn't necessarily need
-    * to be greater than the current version!
-    * If it's different, update to latest. */
+    /* Latest version need to be greater than the current version! */
     if (!latestVersion) {
         log.info('Failed to fetch latest version!');
         return false;
@@ -291,16 +294,34 @@ async function entry(info) {
         updaterArgs.push(statusWindow.webContents.getOSProcessId().toString());
     }
 
+    const updaterStartCommand = `start \"\"  \"${updaterPath}\" `
+
     log.info(updaterArgs);
 
-    cp.spawn(`${updaterPath}`, updaterArgs, {
+    const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
         cwd: info.tempDir,
-        detached: true,
-        stdio: 'ignore',
+        detached: false,
         shell: true
     });
 
-    return true;
+    log.info('updater process ' + `pid ${update_spawned.pid}`);
+
+    //make promises for app exit , error , data and some timeout
+    const primiseExit = new Promise(resolve => {
+        update_spawned.on('exit', resolve);
+    });
+
+    const primiseError = new Promise(resolve => {
+        update_spawned.on('error', resolve);
+    });
+
+    //wait for something to happen
+    const promise = await Promise.race([primiseError, primiseExit]);
+    log.info('Updater spawn promise ' + `result \"${promise}\"`);
+
+    update_spawned.unref();
+
+    return `${promise}` === "0";
 }
 
 module.exports = async (info) => {

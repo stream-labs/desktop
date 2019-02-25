@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from 'util/injector';
-import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 
@@ -14,8 +14,8 @@ export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
-  @Inject() navigationService: NavigationService;
   @Inject() mediaBackupService: MediaBackupService;
+  @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   @Prop() disabled: boolean;
 
@@ -50,10 +50,10 @@ export default class StartStreamingButton extends Vue {
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
-        this.streamingService.toggleStreaming();
-        if (this.userService.isLoggedIn()) {
-          this.navigationService.navigate('Live');
+        if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
+          await this.videoEncodingOptimizationService.applyProfileFromCache();
         }
+        this.streamingService.toggleStreaming();
       }
     }
   }

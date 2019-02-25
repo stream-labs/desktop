@@ -135,12 +135,7 @@ export default class TopNav extends Vue {
   }
 
   get appStoreVisible() {
-    return (
-      (this.platformAppsService.state.storeVisible ||
-        this.featureIsEnabled(this.availableFeatures.platform)) &&
-      this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch'
-    );
+    return this.platformAppsService.state.storeVisible;
   }
 
   get chatbotVisible() {
@@ -162,10 +157,6 @@ export default class TopNav extends Vue {
   responsiveClass = false;
 
   handleResize() {
-    if (this.topNav.clientWidth < 1200) {
-      this.responsiveClass = true;
-    } else {
-      this.responsiveClass = false;
-    }
+    this.responsiveClass = this.topNav.clientWidth < 1200;
   }
 }

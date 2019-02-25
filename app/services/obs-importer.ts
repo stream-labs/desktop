@@ -124,11 +124,7 @@ export class ObsImporterService extends Service {
         this.importMixerSources(configJSON);
         this.importTransitions(configJSON);
 
-        if (this.scenesService.scenes.length === 0) {
-          return false;
-        }
-
-        return true;
+        return this.scenesService.scenes.length !== 0;
       },
     });
   }

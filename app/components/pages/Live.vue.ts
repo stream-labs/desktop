@@ -6,7 +6,7 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import Display from 'components/shared/Display.vue';
 import { CustomizationService } from 'services/customization';
-import Slider from 'components/shared/Slider.vue';
+import { SliderInput } from 'components/shared/inputs/inputs';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
@@ -19,7 +19,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     SceneSelector,
     Mixer,
     Display,
-    Slider,
+    SliderInput,
   },
 })
 export default class Live extends Vue {
@@ -53,6 +53,17 @@ export default class Live extends Vue {
 
   popout() {
     this.userService.popoutRecentEvents();
+  }
+
+  get sliderMetadata() {
+    return {
+      min: 275,
+      max: 600,
+      interval: 1,
+      displayValue: 'false',
+      dotSize: 11,
+      sliderStyle: { 'background-color': '#3c4c53' },
+    };
   }
 
   get previewSize() {

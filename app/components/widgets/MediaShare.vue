@@ -19,12 +19,12 @@
       <number-input v-model="wData.settings.min_amount_to_share" />
       <span>{{ $t('USD') }}</span>
     </v-form-group>
-    <v-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
+    <v-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip, isInteger: true }">
       <number-input v-model="wData.settings.max_duration" />
       <span>{{ $t('seconds') }}</span>
     </v-form-group>
     <v-form-group :title="$t('Buffer Time')" type="slider" v-model="wData.settings.buffer_time" :metadata="bufferMeta" />
-    <v-form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
+    <v-form-group :title="$t('Spam Security')" type="spamSecurity" v-model="wData.settings.security" :metadata="{ tooltip: securityDescription }" />
   </validated-form>
 </widget-editor>
 </template>

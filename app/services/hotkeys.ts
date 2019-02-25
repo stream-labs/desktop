@@ -132,6 +132,11 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Transition (Studio Mode)'),
     down: () => getTransitionsService().executeStudioModeTransition(),
   },
+  SAVE_REPLAY: {
+    name: 'SAVE_REPLAY',
+    description: () => $t('Save Replay'),
+    down: () => getStreamingService().saveReplay(),
+  },
 };
 
 const SOURCE_ACTIONS: HotkeyGroup = {
@@ -238,6 +243,8 @@ const ACTIONS: HotkeyGroup = {
 export interface IHotkey {
   actionName: string;
   bindings: IBinding[];
+  description?: string;
+  resourceId?: string;
   sceneId?: string;
   sourceId?: string;
   sceneItemId?: string;

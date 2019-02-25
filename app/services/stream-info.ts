@@ -1,11 +1,11 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { IChannelInfo, getPlatformService } from 'services/platforms';
+import { IChannelInfo, getPlatformService, Tag } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'util/injector';
 import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 interface IStreamInfoServiceState {
   fetching: boolean;
@@ -41,7 +41,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   viewerCountInterval: number;
 
-  streamInfoChanged = new Subject<IStreamInfo>();
+  streamInfoChanged = new BehaviorSubject<IStreamInfo>(StreamInfoService.initialState);
 
   init() {
     this.refreshStreamInfo();
@@ -86,14 +86,14 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       });
   }
 
-  setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
+  setStreamInfo(title: string, description: string, game: string, tags?: Tag[]): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
     if (this.userService.platform.type === 'facebook' && game === '') {
       return Promise.reject('You must select a game.');
     }
 
     return platform
-      .putChannelInfo({ title, game, description })
+      .putChannelInfo({ title, game, description, tags })
       .then(success => {
         this.refreshStreamInfo();
         this.createGameAssociation(game);

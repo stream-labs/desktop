@@ -34,6 +34,15 @@ export default class HScroll extends Vue {
     this.onInvalidateHandler();
   }
 
+  scrollBy(horizontal: number, vertical: number, animate: boolean = false) {
+    this.$el.scrollBy({
+      top: vertical,
+      left: horizontal,
+      behavior: animate ? 'smooth' : 'auto',
+    });
+    this.onInvalidateHandler();
+  }
+
   /**
    * recalculate scrolling restrictions
    */

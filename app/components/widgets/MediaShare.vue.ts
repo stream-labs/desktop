@@ -50,14 +50,13 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
   securityDescription = $t(
     // tslint:disable-next-line:prefer-template
     'This slider helps you filter shared media before it can be submitted.\n' +
-      '1: No security\n' +
-      '2: 65%+ rating, 5k+ views\n' +
-      '3: 75%+ rating, 40k+ views\n' +
-      '4: 80%+ rating, 300k+ views\n' +
-      '5: 85%+ rating, 900k+ views',
+      'Off: No security\n' +
+      'Low: 65%+ rating, 5k+ views\n' +
+      'Medium: 75%+ rating, 40k+ views\n' +
+      'High: 80%+ rating, 300k+ views\n' +
+      'Very High: 85%+ rating, 900k+ views',
   );
 
-  securityMeta = { description: this.securityDescription, max: 5, interval: 1 };
   bufferMeta = { tooltip: this.bufferTimeTooltip, max: 30, interval: 1 };
 
   navItems = [

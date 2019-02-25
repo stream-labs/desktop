@@ -52,16 +52,9 @@
             </div>
 
             <div class="sizer-items">
-              <Slider
-                v-model="previewSize"
-                :min="275"
-                :max="600"
-                :interval="1"
-                tooltip="false"
-                class="sizer"
-                :dotSize="11"
-                :sliderStyle="{ 'background-color': '#3c4c53' }"
-              />
+              <div class="sizer">
+                <slider-input v-model="previewSize" :metadata="sliderMetadata" />
+              </div>
               <i class="fa fa-search fa-flip-horizontal" />
             </div>
           </div>
@@ -93,6 +86,7 @@
   position: absolute;
   display: flex;
   align-items: center;
+  width: 120px;
 
   .fa {
     opacity: .4;

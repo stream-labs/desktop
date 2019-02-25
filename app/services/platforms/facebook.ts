@@ -1,5 +1,12 @@
 import { StatefulService, mutation } from '../stateful-service';
-import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
+import {
+  IPlatformService,
+  IPlatformAuth,
+  IChannelInfo,
+  IGame,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
@@ -35,6 +42,13 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+
+  capabilities = new Set<TPlatformCapability>([
+    'chat',
+    'user-info',
+    'viewer-count',
+    'stream-schedule',
+  ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
@@ -174,7 +188,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchPrefillData() {
-    if (!this.state.activePage) return;
+    if (!this.state.activePage || !this.state.activePage.id) return;
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
       'fields=status,stream_url,title,description';
@@ -249,7 +263,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   @requiresToken()
-  searchGames(searchString: string): Promise<IGame[]> {
+  async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return;
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`;
     const headers = this.getHeaders();
@@ -280,5 +294,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       });
     });
     this.settingsService.setSettings('Stream', settings);
+  }
+
+  // TODO: dedup
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
   }
 }

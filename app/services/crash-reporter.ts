@@ -15,13 +15,21 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 enum EAppState {
   Starting = 'starting',
   Idle = 'idle',
+  StreamStarting = 'stream_starting',
+  StreamEnding = 'stream_ending',
   Streaming = 'streaming',
+  StreamReconnecting = 'stream_reconnecting',
   Closing = 'closing',
   CleanExit = 'clean_exit',
 }
 
+interface ICrashReporterState {
+  code: EAppState;
+  version: string; // SLOBS version
+}
+
 export class CrashReporterService extends Service {
-  appState = EAppState.CleanExit;
+  private appState: ICrashReporterState;
 
   @Inject() streamingService: StreamingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -37,51 +45,56 @@ export class CrashReporterService extends Service {
   ///////////////////////////////////////////////////////////////
 
   beginStartup() {
-    try {
-      if (fs.existsSync(this.appStateFile)) {
-        this.appState = fs.readFileSync(this.appStateFile).toString() as EAppState;
-      }
-    } catch (e) {
-      console.error('Error loading app state file', e);
-    }
+    this.appState = this.readStateFile();
 
     // Report any crash that happened last time
-    if (this.appState !== EAppState.CleanExit) {
+    if (this.appState.code !== EAppState.CleanExit) {
       this.usageStatisticsService.recordEvent('crash', {
         crashType: this.appState,
       });
     }
 
-    this.setState(EAppState.Starting);
+    this.writeStateFile(EAppState.Starting);
   }
 
   endStartup() {
-    this.setState(EAppState.Idle);
+    this.writeStateFile(EAppState.Idle);
 
     this.streamingSubscription = this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status === EStreamingState.Live) {
-        this.setState(EAppState.Streaming);
-      }
-
-      if (status === EStreamingState.Offline) {
-        this.setState(EAppState.Idle);
+      switch (status) {
+        case EStreamingState.Starting:
+          this.writeStateFile(EAppState.StreamStarting);
+          break;
+        case EStreamingState.Reconnecting:
+          this.writeStateFile(EAppState.StreamReconnecting);
+          break;
+        case EStreamingState.Live:
+          this.writeStateFile(EAppState.Streaming);
+          break;
+        case EStreamingState.Ending:
+          this.writeStateFile(EAppState.StreamEnding);
+          break;
+        case EStreamingState.Offline:
+          this.writeStateFile(EAppState.Idle);
+          break;
       }
     });
   }
 
   beginShutdown() {
     this.streamingSubscription.unsubscribe();
-    this.setState(EAppState.Closing);
+    this.writeStateFile(EAppState.Closing);
   }
 
   endShutdown() {
-    this.setState(EAppState.CleanExit);
+    this.writeStateFile(EAppState.CleanExit);
   }
 
-  private setState(state: EAppState) {
-    this.appState = state;
+  private writeStateFile(code: EAppState) {
+    this.appState = { code, version: this.version };
+    if (process.env.NODE_ENV !== 'production') return;
     try {
-      fs.writeFileSync(this.appStateFile, state);
+      fs.writeFileSync(this.appStateFile, JSON.stringify(this.appState));
     } catch (e) {
       console.error('Error writing app state file', e);
     }
@@ -89,5 +102,26 @@ export class CrashReporterService extends Service {
 
   private get appStateFile() {
     return path.join(electron.remote.app.getPath('userData'), 'appState');
+  }
+
+  private readStateFile(): ICrashReporterState {
+    const clearState = { code: EAppState.CleanExit, version: this.version };
+    try {
+      if (!fs.existsSync(this.appStateFile)) return clearState;
+      const stateString = fs.readFileSync(this.appStateFile).toString() as EAppState;
+      try {
+        return JSON.parse(stateString);
+      } catch (e) {
+        // the old version of crash-reporter file contained only a code string
+        return { code: stateString, version: this.version };
+      }
+    } catch (e) {
+      console.error('Error loading app state file', e);
+      return clearState;
+    }
+  }
+
+  private get version(): string {
+    return electron.remote.process.env.SLOBS_VERSION;
   }
 }

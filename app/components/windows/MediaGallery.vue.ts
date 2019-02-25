@@ -61,8 +61,7 @@ export default class MediaGallery extends Vue {
 
     return this.galleryInfo.files.filter(file => {
       if (this.category !== 'stock' && file.isStock) return false;
-      if (this.type && file.type !== this.type) return false;
-      return true;
+      return !(this.type && file.type !== this.type);
     });
   }
 
@@ -200,6 +199,7 @@ export default class MediaGallery extends Vue {
   }
 
   async upload(filepaths: string[]) {
+    if (!filepaths || !filepaths.length) return;
     this.setBusy($t('Uploading...'));
     this.galleryInfo = await this.mediaGalleryService.upload(filepaths);
     this.setNotBusy();

@@ -12,7 +12,7 @@ import ChatbotQuotes from 'components/page-components/Chatbot/ChatbotQuotes.vue'
 import ChatbotQueue from 'components/page-components/Chatbot/ChatbotQueue.vue';
 import { ChatbotApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
-import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
+import ToggleInput from 'components/shared/inputs/ToggleInput';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
 
 @Component({
