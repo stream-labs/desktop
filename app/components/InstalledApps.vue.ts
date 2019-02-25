@@ -21,7 +21,7 @@ export default class InstalledApps extends Vue {
   }
 
   reload(appId: string) {
-    this.platformAppsService.reloadApp(appId);
+    this.platformAppsService.refreshApp(appId);
   }
 
   toggleEnable(app: ILoadedApp) {

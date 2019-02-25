@@ -27,7 +27,7 @@ export class AppModule extends Module {
   constructor() {
     super();
     this.navigationService.navigated.subscribe(nav => {
-      if (nav.currentPage === 'PlatformAppContainer') {
+      if (nav.currentPage === 'PlatformAppMainPage') {
         if (this.callbacks[nav.params.appId]) {
           const data: INavigation = {};
 

@@ -10,7 +10,7 @@ export type TAppPage =
   | 'PatchNotes'
   | 'Chatbot'
   | 'DesignSystem'
-  | 'PlatformAppContainer'
+  | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'Help';
 

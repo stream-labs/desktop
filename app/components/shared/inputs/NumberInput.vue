@@ -4,19 +4,20 @@
     data-role="input"
     data-type="number"
     :data-name="options.name"
-    :class="{ 'full-width': options.fullWidth }"
+    :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   >
     <input
         type="text"
         ref="input"
         :placeholder="options.placeholder"
-        :value="value"
+        :value="displayValue"
         @input="handleInput($event.target.value)"
         @mousewheel="onMouseWheelHandler"
         :name="uuid"
         v-validate="validate"
+        :disabled="options.disabled"
     />
-    <div v-if="options.isInteger" class="arrows" @mousewheel="onMouseWheelHandler">
+    <div v-if="options.isInteger" class="arrows">
       <div class="arrow arrow-up" @click="increment">
         <i class="fa fa-chevron-up"></i>
       </div>
@@ -24,9 +25,6 @@
         <i class="fa fa-chevron-down"></i>
       </div>
     </div>
-    <span class="input-error" v-show="errors.first(uuid)">
-      {{ errors.first(uuid) }}
-    </span>
   </span>
 </template>
 
@@ -38,11 +36,6 @@
   .number-input {
     position: relative;
     display: block;
-
-    .input-error {
-      position: absolute;
-      white-space: nowrap;
-    }
 
     .arrows {
       .absolute(0, 8px, 0, auto);
@@ -81,5 +74,13 @@
 
   .number-input.full-width {
     width: 100%;
+  }
+
+  .number-input.disabled {
+    opacity: 0.5;
+
+    input {
+      cursor: not-allowed;
+    }
   }
 </style>

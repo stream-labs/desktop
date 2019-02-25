@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ILoadedApp } from '../..';
 
 export enum EApiPermissions {
@@ -13,18 +13,23 @@ export enum EApiPermissions {
   Hotkeys = 'slobs.hotkeys',
 }
 
-export interface IWebviewTransform {
+/**
+ * Explains the location that a browser view is
+ * current mounted, for the purposes of drawing
+ * displays.
+ */
+export interface IBrowserViewTransform {
   pos: IVec2;
   size: IVec2;
-  visible: boolean;
+  mounted: boolean;
+  electronWindowId: number;
+  slobsWindowId: string;
 }
 
 export interface IApiContext {
   app: ILoadedApp;
   webContentsId: number;
-  electronWindowId: number;
-  slobsWindowId: string;
-  webviewTransform: Observable<IWebviewTransform>;
+  pageTransform: BehaviorSubject<IBrowserViewTransform>;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;

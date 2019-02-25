@@ -110,10 +110,10 @@ export class SceneTransitionsModule extends Module {
         throw new Error('Invalid file specified, you must provide a video file.');
       }
 
-      if (!this.platformAppAssetsService.hasAsset(appId, originalUrl)) {
-        // TODO: avoid mutation
-        options.url = await this.platformAppAssetsService.addPlatformAppAsset(appId, originalUrl);
-      }
+      // TODO: avoid mutation
+      options.url = this.platformAppAssetsService.hasAsset(appId, originalUrl)
+        ? (await this.platformAppAssetsService.getAssetDiskInfo(appId, originalUrl)).filePath
+        : await this.platformAppAssetsService.addPlatformAppAsset(appId, originalUrl);
 
       const { shouldLock = false, name, ...settings } = options;
 

@@ -35,6 +35,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   get metadata() {
     return {
       loading: this.loading,
+      disabled: this.value.enabled === false,
       placeholder: this.placeholder,
       allowEmpty: this.allowEmpty,
       internalSearch: this.internalSearch,

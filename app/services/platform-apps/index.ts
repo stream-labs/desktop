@@ -1,21 +1,21 @@
 import { mutation, StatefulService } from 'services/stateful-service';
+import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-import { EApiPermissions, IWebviewTransform } from './api/modules/module';
-import { PlatformAppsApi } from './api';
+import { EApiPermissions } from './api/modules/module';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
-import electron from 'electron';
 import { DevServer } from './dev-server';
-import url from 'url';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { compact, trim, without } from 'lodash';
-import uuid from 'uuid/v4';
+import { trim, without } from 'lodash';
+import { PlatformContainerManager } from './container-manager';
+import ExecuteInCurrentWindow from 'util/execute-in-current-window';
+import { NavigationService } from 'services/navigation';
 
 const DEV_PORT = 8081;
 
@@ -130,6 +130,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   @Inject() videoService: VideoService;
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() navigationService: NavigationService;
 
   static initialState: IPlatformAppServiceState = {
     devMode: false,
@@ -138,18 +139,18 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   };
 
   appLoad = new Subject<ILoadedApp>();
-  appReload = new Subject<string>();
   appUnload = new Subject<string>();
+
+  /**
+   * Signals all listening app sources that the provided
+   * app id should be refreshed to pick up changes.
+   */
+  sourceRefresh = new Subject<string>();
 
   private unpackedLocalStorageKey = 'PlatformAppsUnpacked';
   private disabledLocalStorageKey = 'PlatformAppsDisabled';
 
-  // Lazy initialize the API
-  private _apiManager: PlatformAppsApi;
-  private get apiManager() {
-    if (!this._apiManager) this._apiManager = new PlatformAppsApi();
-    return this._apiManager;
-  }
+  @lazyModule(PlatformContainerManager) private containerManager: PlatformContainerManager;
 
   private devServer: DevServer;
 
@@ -158,8 +159,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    */
   async initialize() {
     this.userService.userLogin.subscribe(async () => {
-      this.unloadApps();
-      this.installProductionApps();
+      this.unloadAllApps();
+      this.loadProductionApps();
       this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
@@ -168,13 +169,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 
-    this.installProductionApps();
+    this.loadProductionApps();
     this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
 
     if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
       if (data.appPath && data.appToken) {
-        this.installUnpackedApp(data.appPath, data.appToken);
+        this.loadUnpackedApp(data.appPath, data.appToken);
       }
     }
   }
@@ -199,21 +200,20 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   /**
-   * Install production apps
+   * Load production apps
    */
-  async installProductionApps() {
+  async loadProductionApps() {
     const productionApps = await this.fetchProductionApps();
-
     const disabledApps = this.getDisabledAppsFromStorage();
 
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
 
       const unpackedVersionLoaded = this.state.loadedApps.find(
-        loadedApp => loadedApp.id === app.id_hash,
+        loadedApp => loadedApp.id === app.id_hash && loadedApp.unpacked,
       );
 
-      this.addApp({
+      this.loadApp({
         id: app.id_hash,
         manifest: app.manifest,
         unpacked: false,
@@ -241,9 +241,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   /**
-   * For now, there can only be 1 unpacked app at a time
+   * Loads an unpacked app.
+   * There can only be 1 unpacked app at a time.
    */
-  async installUnpackedApp(appPath: string, appToken: string) {
+  async loadUnpackedApp(appPath: string, appToken: string) {
     const id = await this.getAppIdFromServer(appToken);
 
     if (id == null) {
@@ -279,7 +280,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       this.SET_PROD_APP_ENABLED(id, false);
     }
 
-    this.addApp({
+    this.loadApp({
       id,
       manifest,
       appPath,
@@ -300,17 +301,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  addApp(app: ILoadedApp) {
+  loadApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    if (
-      this.state.loadedApps.find(
-        loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked,
-      )
-    ) {
-      return;
-    }
 
-    this.ADD_APP(app);
+    this.LOAD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
       localStorage.setItem(
@@ -321,6 +315,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         }),
       );
     }
+
+    if (app.enabled) this.containerManager.registerApp(app);
     this.appLoad.next(this.getApp(id));
   }
 
@@ -411,12 +407,17 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  unloadApps() {
+  unloadAllApps() {
     this.state.loadedApps.forEach(app => this.unloadApp(app));
   }
 
   unloadApp(app: ILoadedApp) {
-    this.REMOVE_APP(app.id);
+    // Shut down running containers
+    this.containerManager.unregisterApp(app);
+
+    this.navigateToEditorIfOnPage(app.id);
+
+    this.UNLOAD_APP(app.id);
     if (app.unpacked) {
       localStorage.removeItem(this.unpackedLocalStorageKey);
       if (this.devServer) {
@@ -427,34 +428,29 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.appUnload.next(app.id);
   }
 
-  async reloadApp(appId: string) {
+  /**
+   * Refreshes an app.  For unpacked apps, this will pick up new changes
+   * on disk. For production apps, this will trigger a refresh of all runniing
+   * sources and containers, which can be useful for fixing minor issues.
+   * @param appId The id of the app to refresh
+   */
+  async refreshApp(appId: string) {
     const app = this.getApp(appId);
 
-    if (!app.unpacked) {
-      this.appReload.next(appId);
-      return;
-    }
-    const manifestPath = path.join(app.appPath, 'manifest.json');
+    // For unpacked apps, we need to fully reload them,
+    // since they may contain manifest.json changes.
+    if (app.unpacked) {
+      const error = await this.loadUnpackedApp(app.appPath, app.appToken);
 
-    if (!(await this.fileExists(manifestPath))) {
-      this.unloadApp(app);
-      return 'Error: manifest.json is missing!';
-    }
-
-    const manifest = JSON.parse(await this.loadManifestFromDisk(manifestPath));
-
-    try {
-      await this.validateManifest(manifest, app.appPath);
-    } catch (e) {
-      this.unloadApps();
-      return e.message;
+      if (error) return error;
+    } else {
+      this.containerManager.refreshContainers(app);
     }
 
-    this.UPDATE_APP_MANIFEST(appId, manifest);
-    this.appReload.next(appId);
+    this.sourceRefresh.next(appId);
   }
 
-  getAppIdFromServer(appToken: string): Promise<string> {
+  private getAppIdFromServer(appToken: string): Promise<string> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/app_id?app_token=${appToken}`,
@@ -492,149 +488,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  exposeAppApi(
-    appId: string,
-    webContentsId: number,
-    electronWindowId: number,
-    slobsWindowId: string,
-    transformSubjectId: string,
-  ) {
-    const app = this.getApp(appId);
-    const api = this.apiManager.getApi(
-      app,
-      webContentsId,
-      electronWindowId,
-      slobsWindowId,
-      this.getTransformSubject(transformSubjectId),
-    );
-
-    // Namespace under v1 for now.  Eventually we may want to add
-    // a v2 API.
-    this.guestApiService.exposeApi(webContentsId, { v1: api });
-  }
-
-  sessionsInitialized: Dictionary<boolean> = {};
-
-  /**
-   * Returns a session partition id for the app id.
-   * These are non-persistent for now
-   */
-  getAppPartition(appId: string) {
-    const app = this.getApp(appId);
-    const userId = this.userService.platformId;
-    const partition = `platformApp-${appId}-${userId}`;
-
-    if (!this.sessionsInitialized[partition]) {
-      const session = electron.remote.session.fromPartition(partition);
-      const frameUrls: string[] = [];
-      let mainFrame = '';
-
-      session.webRequest.onBeforeRequest((details, cb) => {
-        const parsed = url.parse(details.url);
-
-        if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
-
-        if (parsed.hostname === 'cvp.twitch.tv' && (details.resourceType = 'script')) {
-          cb({});
-          return;
-        }
-
-        if (details.resourceType === 'subFrame') {
-          // Subframes from other origins are allowed to load scripts.  The same origin
-          // policy will prevent them from accessing the parent window.
-          if (parsed.hostname !== mainFrame) {
-            frameUrls.push(details.url);
-            cb({});
-            return;
-          }
-        }
-
-        if (details['referrer'] && frameUrls.includes(details['referrer'])) {
-          cb({});
-          return;
-        }
-
-        if (details.resourceType === 'script') {
-          const scriptWhitelist = [
-            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
-            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
-          ];
-
-          const scriptDomainWhitelist = [
-            'www.googletagmanager.com',
-            'www.google-analytics.com',
-            'widget.intercom.io',
-            'js.intercomcdn.com',
-          ];
-
-          const parsed = url.parse(details.url);
-
-          if (scriptWhitelist.includes(details.url)) {
-            cb({});
-            return;
-          }
-
-          if (scriptDomainWhitelist.includes(parsed.hostname)) {
-            cb({});
-            return;
-          }
-
-          if (details.url.startsWith(app.appUrl)) {
-            cb({});
-            return;
-          }
-
-          if (parsed.host === `localhost:${DEV_PORT}`) {
-            cb({});
-            return;
-          }
-
-          // Let through all chrome dev tools requests
-          if (parsed.protocol === 'chrome-devtools:') {
-            cb({});
-            return;
-          }
-
-          // Cancel all other script requests.
-          cb({ cancel: true });
-          return;
-        }
-
-        // Let through all other requests (XHR, assets, etc)
-        cb({});
-      });
-
-      this.sessionsInitialized[partition] = true;
-    }
-
-    return partition;
-  }
-
-  getPageUrlForSlot(appId: string, slot: EAppPageSlot) {
-    const app = this.getApp(appId);
-    const page = app.manifest.pages.find(page => page.slot === slot);
-    if (!page) return null;
-
-    return this.getPageUrl(appId, page.file);
-  }
-
-  isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
-    const app = this.getApp(appId);
-    if (!app) return false;
-
-    const page = app.manifest.pages.find(page => page.slot === slot);
-    if (!page) return false;
-
-    return !!page.persistent;
-  }
-
   getPageUrlForSource(appId: string, appSourceId: string, settings = '') {
     const app = this.getApp(appId);
 
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
-    let url = this.getPageUrl(appId, source.file);
+    let url = this.containerManager.getPageUrl(app, source.file);
 
     if (settings) {
       url = `${url}&settings=${encodeURIComponent(settings)}`;
@@ -645,24 +505,31 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return url;
   }
 
-  getPageUrl(appId: string, page: string) {
-    const app = this.getApp(appId);
-    const url = this.getAssetUrl(appId, page);
-    return `${url}?app_token=${app.appToken}`;
-  }
-
   getAssetUrl(appId: string, asset: string) {
     const app = this.getApp(appId);
-    let url: string;
+    if (!app) return null;
 
-    if (app.unpacked) {
-      const trimmed = trim(app.manifest.buildPath, '/ ');
-      url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
-    } else {
-      url = compact([app.appUrl, asset]).join('/');
-    }
+    return this.containerManager.getAssetUrl(app, asset);
+  }
 
-    return url;
+  mountContainer(
+    appId: string,
+    slot: EAppPageSlot,
+    electronWindowId: number,
+    slobsWindowId: string,
+  ) {
+    const app = this.getApp(appId);
+    if (!app) return null;
+
+    return this.containerManager.mountContainer(app, slot, electronWindowId, slobsWindowId);
+  }
+
+  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
+    return this.containerManager.setContainerBounds(containerId, pos, size);
+  }
+
+  unmountContainer(containerId: number, electronWindowId: number) {
+    this.containerManager.unmountContainer(containerId, electronWindowId);
   }
 
   getAppSourceSize(appId: string, sourceId: string) {
@@ -706,6 +573,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
+  @ExecuteInCurrentWindow()
   getApp(appId: string): ILoadedApp {
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod
@@ -748,13 +616,17 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (app.enabled === enabling) return;
 
     if (enabling) {
+      this.containerManager.registerApp(app);
       this.appLoad.next(app);
       localStorage.setItem(
         this.disabledLocalStorageKey,
         JSON.stringify(without(this.getDisabledAppsFromStorage(), app.id)),
       );
     } else {
+      this.containerManager.unregisterApp(app);
       this.appUnload.next(appId);
+      this.navigateToEditorIfOnPage(app.id);
+
       localStorage.setItem(
         this.disabledLocalStorageKey,
         JSON.stringify(this.getDisabledAppsFromStorage().concat([app.id])),
@@ -763,41 +635,26 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.SET_PROD_APP_ENABLED(appId, enabling);
   }
 
-  /* These functions exist primary to work around our n window
-   * system because rxjs subjects are not serializable
-   */
-
-  transformSubjects: Dictionary<BehaviorSubject<IWebviewTransform>> = {};
-
-  createTransformSubject(initial: IWebviewTransform) {
-    const id = uuid();
-    this.transformSubjects[id] = new BehaviorSubject(initial);
-    return id;
+  private navigateToEditorIfOnPage(appId: string) {
+    if (
+      this.navigationService.state.currentPage === 'PlatformAppMainPage' &&
+      this.navigationService.state.params &&
+      this.navigationService.state.params.appId === appId
+    ) {
+      this.navigationService.navigate('Studio');
+    }
   }
 
-  getTransformSubject(id: string) {
-    return this.transformSubjects[id];
-  }
-
-  removeTransformSubject(id: string) {
-    delete this.transformSubjects[id];
-  }
-
-  nextTransformSubject(id: string, value: IWebviewTransform) {
-    this.transformSubjects[id].next(value);
-  }
-
-  /**
-   * Replace for now
-   * @param app the app
-   */
   @mutation()
-  private ADD_APP(app: ILoadedApp) {
+  private LOAD_APP(app: ILoadedApp) {
+    this.state.loadedApps = this.state.loadedApps.filter(
+      a => a.id !== app.id || a.unpacked !== app.unpacked,
+    );
     this.state.loadedApps.push(app);
   }
 
   @mutation()
-  private REMOVE_APP(appId: string) {
+  private UNLOAD_APP(appId: string) {
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod
     // generally we want to do actions with enabled one first
@@ -806,15 +663,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     } else {
       this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
     }
-  }
-
-  @mutation()
-  private UPDATE_APP_MANIFEST(appId: string, manifest: IAppManifest) {
-    this.state.loadedApps.forEach(app => {
-      if (app.id === appId) {
-        app.manifest = manifest;
-      }
-    });
   }
 
   @mutation()

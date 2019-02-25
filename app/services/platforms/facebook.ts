@@ -188,7 +188,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchPrefillData() {
-    if (!this.state.activePage) return;
+    if (!this.state.activePage || !this.state.activePage.id) return;
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
       'fields=status,stream_url,title,description';
@@ -263,7 +263,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   @requiresToken()
-  searchGames(searchString: string): Promise<IGame[]> {
+  async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return;
     const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`;
     const headers = this.getHeaders();

@@ -4097,10 +4097,9 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@2.0.14:
-  version "2.0.14"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.14.tgz#fad6766645e7c0cd10b4ae822d3167959735a870"
-  integrity sha512-8HLVZuscZxVhoMUL6RlF5kMcwGUAMWw5HNwrEmRgzZyBIBbdCO4aMo9z0qknnPTUDROz8xXZFNhFvBXDu61g5Q==
+"electron@https://github.com/stream-labs/electron/releases/download/2.0.16-streamlabs/electron-2.0.16-streamlabs.tgz":
+  version "2.0.16-streamlabs"
+  resolved "https://github.com/stream-labs/electron/releases/download/2.0.16-streamlabs/electron-2.0.16-streamlabs.tgz#5131098ff0121938b366193cb9a7034d48472755"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -8033,9 +8032,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-multitrack-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.0-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-multitrack-iojs-v2.0.8.tar.gz#9a79eb3bbc84a1212906d8f922fbf66ee39ce474"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.0-iojs-v2.0.8.tar.gz#b9d830c7678f582810ac87a095d304053d7629ff"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

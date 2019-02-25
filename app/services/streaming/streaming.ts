@@ -378,11 +378,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           console.error('Error fetching stream encoder info: ', e);
         }
 
-        this.usageStatisticsService.recordEvent('stream_start', {
+        const eventMetadata: Dictionary<any> = {
           ...streamEncoderInfo,
           game,
-          useOptimizedProfile: this.videoEncodingOptimizationService.state.useOptimizedProfile,
-        });
+        };
+
+        if (this.videoEncodingOptimizationService.state.useOptimizedProfile) {
+          eventMetadata.useOptimizedProfile = true;
+        }
+
+        this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);

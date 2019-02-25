@@ -187,9 +187,19 @@ export class AppService extends StatefulService<IAppState> {
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
       this.START_LOADING();
-      this.windowsService.closeChildWindow();
+
+      // The scene collections window is the only one we don't close when
+      // switching scene collections, because it results in poor UX.
+      if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
+        this.windowsService.closeChildWindow();
+      }
       this.windowsService.closeAllOneOffs();
-      this.sceneCollectionsService.disableAutoSave();
+
+      // This is kind of ugly, but it gives the browser time to paint before
+      // we do long blocking operations with OBS.
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      await this.sceneCollectionsService.disableAutoSave();
     }
 
     let error: Error = null;

@@ -1,10 +1,7 @@
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
+import { TextInput, TextAreaInput, ListInput, NumberInput } from 'components/shared/inputs/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
