@@ -32,7 +32,7 @@
 <script lang="ts" src="./Informations.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import "../../styles/_colors";
 
 .informations {
   display: flex;
@@ -46,9 +46,7 @@
 }
 
 .information-list-item {
-  &:not(:last-child) {
-    border-bottom: 1px solid @border;
-  }
+  border-bottom: 1px solid @border;
 }
 
 .information-link {

@@ -7,6 +7,7 @@ import { $t } from 'services/i18n';
 import { InformationsService } from 'services/informations';
 import ModalLayout from 'components/ModalLayout.vue';
 import { shell } from 'electron';
+import moment from 'moment';
 
 const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
@@ -36,8 +37,7 @@ export default class Informations extends Vue {
   }
 
   format(unixtime: number) {
-    const date = new Date(unixtime);
-    return `${date.getFullYear()}-${('0'+(date.getMonth()+1)).slice(-2)}-${('0'+date.getDate()).slice(-2)}`;
+    return moment(unixtime).format('YYYY-MM-DD');
   }
 
   shouldShowNewLabel(unixtime: number) {
