@@ -44,7 +44,10 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
   render(h: Function) {
     return (
       <span
-        class={cx(styles.textInput, { [styles.fullWidth]: this.metadata.fullWidth })}
+        class={cx(styles.textInput, {
+          [styles.fullWidth]: this.metadata.fullWidth,
+          [styles.disabled]: this.metadata.disabled,
+        })}
         data-role="input"
         data-type="text"
         data-name={this.options.name}

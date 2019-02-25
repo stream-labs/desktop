@@ -4571,10 +4571,6 @@ extsprintf@^1.2.0:
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
 
-"facemask-plugin@https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.3.tar.gz":
-  version "0.8.3"
-  resolved "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.3.tar.gz#14eee4340d21f8f6bef913dc77c3b55eb5e7a2d2"
-
 fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
@@ -8036,9 +8032,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.0-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-iojs-v2.0.8.tar.gz#cfec7b6470dc6f14dd23429be530954e0768644b"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.0-iojs-v2.0.8.tar.gz#b9d830c7678f582810ac87a095d304053d7629ff"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

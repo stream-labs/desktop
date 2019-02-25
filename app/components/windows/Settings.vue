@@ -69,6 +69,10 @@
       width: 100%;
     }
 
+    .bitmask-input > div {
+      width: auto;
+    }
+
     .input-label {
       label {
         margin-bottom: 8px;

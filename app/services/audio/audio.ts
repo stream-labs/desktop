@@ -352,6 +352,8 @@ export class AudioSource implements IAudioSourceApi {
         type: 'OBS_PROPERTY_INT',
         visible: true,
         enabled: true,
+        minVal: -950,
+        maxVal: 20000,
       },
 
       <IObsListInput<obs.EMonitoringType>>{

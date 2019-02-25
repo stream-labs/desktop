@@ -4,7 +4,7 @@
     data-role="input"
     data-type="number"
     :data-name="options.name"
-    :class="{ 'full-width': options.fullWidth }"
+    :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   >
     <input
         type="text"
@@ -15,6 +15,7 @@
         @mousewheel="onMouseWheelHandler"
         :name="uuid"
         v-validate="validate"
+        :disabled="options.disabled"
     />
     <div v-if="options.isInteger" class="arrows">
       <div class="arrow arrow-up" @click="increment">
@@ -35,11 +36,6 @@
   .number-input {
     position: relative;
     display: block;
-
-    .input-error {
-      position: absolute;
-      white-space: nowrap;
-    }
 
     .arrows {
       .absolute(0, 8px, 0, auto);
@@ -78,5 +74,13 @@
 
   .number-input.full-width {
     width: 100%;
+  }
+
+  .number-input.disabled {
+    opacity: 0.5;
+
+    input {
+      cursor: not-allowed;
+    }
   }
 </style>
