@@ -111,9 +111,6 @@
   }
 
   .back-icon {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
     transition: none !important;
     color: inherit;
     transition-delay: 0s;
