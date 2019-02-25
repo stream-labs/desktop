@@ -37,7 +37,7 @@ export default class Informations extends Vue {
 
   format(unixtime: number) {
     const date = new Date(unixtime);
-    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    return `${date.getFullYear()}-${('0'+(date.getMonth()+1)).slice(-2)}-${('0'+date.getDate()).slice(-2)}`;
   }
 
   shouldShowNewLabel(unixtime: number) {

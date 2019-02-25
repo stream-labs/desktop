@@ -40,7 +40,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0 2px;
+  padding: 0 2px 2px;
   color: @text-primary;
   background-color: @bg-primary;
 }
