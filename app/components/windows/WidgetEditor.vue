@@ -2,7 +2,7 @@
 <modal-layout v-if="widget.previewSourceId">
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
-      <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
+      <generic-form :value="topProperties" @input="onPropsInputHandler"/>
       <div v-if="apiSettings.testers" class="button button--action test-button">
         <test-widgets :testers="apiSettings.testers" />
       </div>
