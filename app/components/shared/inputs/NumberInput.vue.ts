@@ -43,7 +43,10 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   }
 
   constrainValue(value: string) {
-    if (this.timeout) clearTimeout(this.timeout);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
 
     if (this.options.min !== void 0 && Number(value) < this.options.min) {
       this.timeout = window.setTimeout(() => this.updateValue(`${this.options.min}`), 1000);
