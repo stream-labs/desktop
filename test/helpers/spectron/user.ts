@@ -13,6 +13,7 @@ interface ITestUser {
   updated: string; // time of the last request for this user
   platforms: {
     // tokens for platforms
+    username: string; // Mixer use username as an id for API requests
     type: TPlatform; // twitch, youtube, etc..
     id: string; // platform userId
     token: string; // platform token
