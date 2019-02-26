@@ -9,7 +9,6 @@ test('Set tip-jar settings', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
-  await logIn(t);
   await addSource(t, 'The Jar', '__The Jar', false);
   const martiniGlass = '[src="https://cdn.streamlabs.com/static/tip-jar/jars/glass-martini.png"]';
   const activeMartiniGlass =
