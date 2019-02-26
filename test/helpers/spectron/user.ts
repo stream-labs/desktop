@@ -18,6 +18,7 @@ interface ITestUser {
     token: string; // platform token
     apiToken: string; // Streamlabs API token
     widgetToken: string; // needs for widgets showing
+    channelId?: string; // for the Mixer and Facebook only
   }[];
 }
 
@@ -136,10 +137,11 @@ async function reserveUserFromPool(token: string, platformType: TPlatform): Prom
     widgetToken: platform.widgetToken,
     apiToken: platform.apiToken,
     platform: {
+      username: platform.username,
       type: platformType,
       id: platform.id,
       token: platform.token,
-      username: user.name,
+      channelId: platform.channelId,
     },
   };
 }
