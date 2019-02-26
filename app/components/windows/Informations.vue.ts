@@ -46,7 +46,7 @@ export default class Informations extends Vue {
 
   handleAnchorClick(event: MouseEvent) {
     event.preventDefault();
-    const url = (event.target as HTMLAnchorElement).href;
+    const url = (event.currentTarget as HTMLAnchorElement).href;
     try {
       const parsed = new URL(url);
       if (parsed.protocol.match(/https?/)) {

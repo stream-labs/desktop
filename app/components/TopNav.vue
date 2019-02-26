@@ -34,9 +34,8 @@
       <a
         @click="openInformations"
         class="link">
-        <i class="icon-notification" />
-        <span class="unseen-label" v-if="hasUnseenInformation">お知らせ</span>
-        <span v-else>お知らせ</span>
+        <i class="icon-notification" :class="{'isUnseen': hasUnseenInformation}" />
+        <span>お知らせ</span>
       </a>
     </div>
   </div>
@@ -122,21 +121,23 @@
   }
 }
 
-.unseen-label {
+.icon-notification {
   position: relative;
 
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -12px;
-    bottom: 2px;
-    width: 9px;
-    height: 9px;
-    background-color: @accent-hover;
-    border-radius: 100%;
-    border: 1px solid @bg-tertiary;
-  }
+   &.isUnseen {
+     &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      right: -2px;
+      bottom: -1px;
+      width: 9px;
+      height: 9px;
+      background-color: @accent-hover;
+      border-radius: 100%;
+      border: 1px solid @bg-tertiary;
+    }
+   }
 }
 
 </style>
