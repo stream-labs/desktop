@@ -126,6 +126,10 @@
       .input-body {
         margin-left: 0;
       }
+
+      .input-footer {
+        display: none;
+      }
     }
   }
 
@@ -250,7 +254,7 @@
     width: 20%;
     height: calc(~"100% - 66px");
     position: absolute;
-    bottom: 0;
+    bottom: 8px;
     left: 0;
     border: 1px solid @day-border;
     background-color: @day-bg;
