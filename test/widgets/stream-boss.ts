@@ -6,7 +6,7 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Set stream-boss health', async t => {
+test('Set stream-boss health ', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
