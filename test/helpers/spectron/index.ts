@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { releaseUserInPool } from './user';
+import { getUserName, releaseUserInPool } from './user';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -192,7 +192,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
 
     await checkErrorsInLogFile(t);
-    if (!testPassed) failedTests.push(testName);
+    if (!testPassed) {
+      failedTests.push(testName);
+      const userName = getUserName();
+      if (userName) console.log(`Test failed for the account: ${userName}`);
+    }
   });
 
   test.after.always(async t => {
