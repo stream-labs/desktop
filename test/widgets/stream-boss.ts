@@ -98,7 +98,7 @@ test('Stream Boss Manage Visual Settings', async t => {
 
 async function testStreamBoss(t: any) {
   const client = t.context.app.client;
-  if (!(await logIn(t, 'twitch', 'slobstestuser@gmail.com'))) return;
+  if (!(await logIn(t, 'twitch', 'slobstestuser3@gmail.com'))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Visual Settings');
