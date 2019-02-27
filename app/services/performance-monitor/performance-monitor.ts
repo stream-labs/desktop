@@ -5,7 +5,7 @@ import { NotificationsService, ENotificationType } from 'services/notifications'
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs';
-import { JsonrpcService } from '../jsonrpc';
+import { JsonrpcService } from '../api/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 
