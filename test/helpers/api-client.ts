@@ -295,7 +295,7 @@ export class ApiClient {
     constraint: (event: TEvent) => boolean,
   ): Promise<TEvent> {
     return new Promise((resolve, reject) => {
-      const receivedEvents: any[] = [];
+      const receivedEvents: any[] = []; // record all received events here just for logging
       const subscr = this.eventReceived.subscribe(event => {
         receivedEvents.push(event);
         if (!constraint(event)) return;

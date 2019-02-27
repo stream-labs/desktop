@@ -38,7 +38,7 @@ export async function logOut(t: TExecutionContext) {
 export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
-  email?: string,
+  email?: string, // if not set, pick a random user's account from user-pool
 ): Promise<boolean> {
   const app = t.context.app;
   let authInfo: IPlatformAuth;
@@ -126,7 +126,7 @@ async function reserveUserFromPool(
   while (attempts--) {
     try {
       let urlPath = 'reserve';
-      if (email) urlPath += `/${email}`;
+      if (email) urlPath += `/${email}`; // request a specific user if 'email' is set
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {

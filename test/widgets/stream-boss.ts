@@ -6,7 +6,7 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Set stream-boss health ', async t => {
+test('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
@@ -95,38 +95,3 @@ test('Stream Boss Manage Visual Settings', async t => {
   await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes('visual-settings-form', testSet2));
 });
-
-async function testStreamBoss(t: any) {
-  const client = t.context.app.client;
-  if (!(await logIn(t))) return;
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
-
-  await client.click('li=Visual Settings');
-
-  const formMonkey = new FormMonkey(t);
-
-  const testSet1 = {
-    text_color: '#FF0000',
-    bar_text_color: '#FF0000',
-    bar_color: '#FF0000',
-    bar_bg_color: '#FF0000',
-    font: 'Sacramento',
-  };
-  await formMonkey.fill('visual-settings-form', testSet1);
-  await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet1));
-
-  const testSet2 = {
-    text_color: '#FFFFFF',
-    bar_text_color: '#FFFFFF',
-    bar_color: '#FFFFFF',
-    bar_bg_color: '#46E65A',
-    font: 'Roboto',
-  };
-  await formMonkey.fill('visual-settings-form', testSet2);
-  await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet2));
-}
-
-let i = 10
-while (i--) test('StreamBoss' + i, async t => await testStreamBoss(t));

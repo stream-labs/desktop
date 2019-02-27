@@ -11,8 +11,7 @@ install:
   - yarn compile:ci
 
 test_script:
-  yarn test --match="StreamBoss*"
-  # - yarn test-flaky
+  - yarn test-flaky
   # - yarn screentest
   # - 7z a screentest.zip test-dist\screentest\*
   # - ps: $env:warning_ico = ":warning:"
