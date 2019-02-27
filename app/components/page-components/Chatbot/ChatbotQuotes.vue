@@ -30,15 +30,15 @@
     />
     <span>{{ $t('Click add quote to get started.') }}</span>
   </div>
-  <div v-else class="padding--10">
+  <div v-else class="padding--10 margin-horizontal--10">
     <table>
       <thead>
         <tr>
-          <th> {{ $t("id") }} </th>
-          <th> {{ $t("quote") }} </th>
-          <th> {{ $t("added by") }} </th>
-          <th> {{ $t("game") }} </th>
-          <th> {{ $t("date") }} </th>
+          <th> {{ $t("Id") }} </th>
+          <th> {{ $t("Quote") }} </th>
+          <th> {{ $t("Added By") }} </th>
+          <th> {{ $t("Game") }} </th>
+          <th> {{ $t("Date") }} </th>
           <th></th>
         </tr>
       </thead>
@@ -54,8 +54,8 @@
           <td> {{ formatDate(quote.created_at) || '-' }} </td>
           <td>
             <div class="align-items--inline">
-              <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5"/>
-              <i @click="onDeleteQuoteHandler(quote)" class="icon-trash padding--5"/>
+              <i @click="onDeleteQuoteHandler(quote)" class="icon-trash padding--5 cursor--pointer"/>
+              <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5 cursor--pointer"/>
             </div>
           </td>
         </tr>
@@ -68,6 +68,14 @@
       @change="fetchQuotes"
     />
   </div>
+  <!-- Modals -->
+  <ChatbotGenericModalWindow
+    :name="DELETE_MODAL"
+    @yes="onYesHandler"
+    @no="onNoHandler"
+    :header="$t('Are you sure you want to delete Quote %{number}?',{number: selectedQuote ? selectedQuote.custom_id : ''})"
+    :message="$t('Once deleted it can not be recovered.')"
+  />
 </div>
 </template>
 

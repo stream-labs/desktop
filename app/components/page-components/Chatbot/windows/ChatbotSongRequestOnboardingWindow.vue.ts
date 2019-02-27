@@ -22,17 +22,19 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
   settings: any = null;
 
   async mounted() {
-    await this.chatbotApiService.fetchSongRequestPreferencesData();
-    this.settings = cloneDeep(this.chatbotApiService.state.songRequestPreferencesResponse.settings);
+    await this.chatbotApiService.SongRequest.fetchSongRequestPreferencesData();
+    this.settings = cloneDeep(
+      this.chatbotApiService.SongRequest.state.songRequestPreferencesResponse.settings,
+    );
   }
 
   async onToggleNextHandler() {
     if (this.step === 1) {
-      await this.chatbotApiService.updateSongRequestPreferencesData({ settings: this.settings });
+      await this.chatbotApiService.SongRequest.updateSongRequestPreferencesData({
+        settings: this.settings,
+      });
       this.step++;
-    } else {
-      this.chatbotCommonService.closeChildWindow();
-    }
+    } else this.chatbotApiService.Common.closeChildWindow();
   }
 
   onTogglePrevHandler() {
@@ -76,7 +78,6 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
         {
           title: $t('Add Song Request Widget'),
           subtitle: $t('step 2'),
-          // tslint:disable-next-line:max-line-length
           backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-step2--${backgroundUrlSuffix}.png`),
           description: $t(
             'You will need to add the Chatbot widget to your scene to hear audio. ' +
@@ -86,7 +87,6 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
         {
           title: $t('Go To Recent Events'),
           subtitle: $t('step 3'),
-          // tslint:disable-next-line:max-line-length
           backgroundUrl: require(`../../../../../media/images/chatbot/chatbot-songrequest-step3--${backgroundUrlSuffix}.png`),
           description: $t('You can manage your queued media from your recent events.'),
         },

@@ -4,7 +4,18 @@ import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 
-type TCommandSlug = 'commands' | 'link-protection' | 'giveaway';
+type TCommandSlug =
+  | 'commands'
+  | 'link-protection'
+  | 'giveaway'
+  | 'loyalty'
+  | 'queue'
+  | 'songrequest'
+  | 'heist'
+  | 'poll'
+  | 'betting'
+  | 'misc'
+  | 'gamble';
 
 @Component({
   components: {
@@ -14,10 +25,21 @@ type TCommandSlug = 'commands' | 'link-protection' | 'giveaway';
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
-  v1CommandSlugs: TCommandSlug[] = ['commands', 'link-protection', 'giveaway'];
+  v1CommandSlugs: TCommandSlug[] = [
+    'commands',
+    'link-protection',
+    'giveaway',
+    'loyalty',
+    'queue',
+    'heist',
+    'poll',
+    'betting',
+    'misc',
+    'gamble',
+  ];
 
   get commandSlugs() {
-    return this.chatbotApiService.state.defaultCommandsResponse;
+    return this.chatbotApiService.Commands.state.defaultCommandsResponse;
   }
 
   matchesQuery(name: string, command: IDefaultCommand) {
@@ -29,12 +51,12 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   mounted() {
-    this.chatbotApiService.fetchDefaultCommands();
+    this.chatbotApiService.Commands.fetchDefaultCommands();
   }
 
   onResetDefaultCommandsHandler() {
     if (confirm($t('Are you sure you want to reset default commands?'))) {
-      this.chatbotApiService.resetDefaultCommands();
+      this.chatbotApiService.Commands.resetDefaultCommands();
     }
   }
 
@@ -43,11 +65,11 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       ...this.commandSlugs[slugName][commandName],
       enabled: isEnabled,
     };
-    this.chatbotApiService.updateDefaultCommand(slugName, commandName, updatedCommand);
+    this.chatbotApiService.Commands.updateDefaultCommand(slugName, commandName, updatedCommand);
   }
 
   onOpenCommandWindowHandler(slugName: string, commandName: string, command: IDefaultCommand) {
-    this.chatbotCommonService.openDefaultCommandWindow({
+    this.chatbotApiService.Common.openDefaultCommandWindow({
       ...command,
       slugName,
       commandName,

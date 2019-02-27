@@ -1,28 +1,23 @@
 <template>
-<ModalLayout
-  :showControls="false"
-  :customControls="true"
-  :title="$t('Link Protection Preferences')"
->
-  <div slot="fixed">
-    <div class="row">
-      <div class="small-6 columns position--relative window-tab">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
-      </div>
-      <div class="small-6 columns position--relative window-tab">
-        <div class="window-toggle__wrapper">
-          <div @click="onToggleLinkProtectionWindowHandler">
-            <span> {{ $t('Edit Command') }} </span>
-            <i class="fas fa-chevron-right window-toggle__icon"></i>
+  <ModalLayout :showControls="false" :customControls="true">
+    <div slot="fixed">
+      <div class="row">
+        <div class="small-6 columns position--relative window-tab">
+          <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
+        </div>
+        <div class="small-6 columns position--relative window-tab">
+          <div class="window-toggle__wrapper">
+            <div @click="onToggleLinkProtectionWindowHandler">
+              <span>{{ $t('Edit Command') }}</span>
+              <i class="fas fa-chevron-right window-toggle__icon"></i>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div slot="content" class="chatbot-link-protection__container">
-    <div>
-      <transition name='fade' mode="out-in" appear>
-        <validated-form ref="form" v-if="selectedTab === 'general' && linkProtection">
+    <div slot="content" class="chatbot-link-protection__container">
+      <div>
+        <validated-form ref="form" v-show="selectedTab === 'general' && linkProtection">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
@@ -40,24 +35,24 @@
             </div>
           </div>
           <VFormGroup
-            :title="$t('Permit Duration (Value in Seconds)')"
+            :title="$t('Permit Duration')"
             v-model="linkProtection.general.permit.duration"
             :metadata="metadata.link.general.permit.duration"
           />
           <VFormGroup
             v-if="linkProtection.general.punishment.type === 'Timeout'"
-            :title="$t('Punishment Duration (Value in Seconds)')"
+            :title="$t('Punishment Duration')"
             v-model="linkProtection.general.punishment.duration"
             :metadata="metadata.link.general.punishment.duration"
           />
           <VFormGroup
-            :title="$t('Punishment Response (Line breaks will be ignored)')"
+            :title="$t('Punishment Response')"
             v-model="linkProtection.general.message"
             :metadata="metadata.link.general.message"
           />
         </validated-form>
         <ChatbotLinkProtectionList
-          v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
+          v-show="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
           :title="selectedTab === 'whitelist' ? $t('Add to whitelist') : $t('Add to blacklist')"
           :type="selectedTab"
           v-model="linkProtection[selectedTab]"
@@ -75,37 +70,23 @@
             :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />
-        </div> -->
-      </transition>
+        </div>-->
+      </div>
     </div>
-  </div>
-  <div slot="controls" class="flex flex--space-between">
-    <button
-      class="button button--default"
-      @click="onResetHandler">
-      {{ $t('Reset') }}
-    </button>
-    <div>
-      <button
-        class="button button--default"
-        @click="onCancelHandler">
-        {{ $t('Cancel') }}
-      </button>
-      <button
-        class="button button--action"
-        @click="onSaveHandler"
-      >
-        {{ $t("Save") }}
-      </button>
+    <div slot="controls" class="flex flex--space-between">
+      <button class="button button--default" @click="onResetHandler">{{ $t('Reset') }}</button>
+      <div>
+        <button class="button button--default" @click="onCancelHandler">{{ $t('Cancel') }}</button>
+        <button class="button button--action" @click="onSaveHandler">{{ $t("Save") }}</button>
+      </div>
     </div>
-  </div>
-</ModalLayout>
+  </ModalLayout>
 </template>
 
 <script lang="ts" src="./ChatbotLinkProtectionWindow.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../../styles/index";
+@import '../../../../styles/index';
 .window-tab {
   &:first-child {
     padding-right: 0;
@@ -120,7 +101,7 @@
   z-index: 1;
   width: 100%;
   padding: 15px;
-  height: 54px;
+  height: 48px;
   border-bottom: 1px solid @day-border;
   cursor: pointer;
   text-align: right;

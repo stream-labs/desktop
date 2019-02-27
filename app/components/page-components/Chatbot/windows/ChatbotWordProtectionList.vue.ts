@@ -1,17 +1,19 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
 import {
-  EInputType,
   IInputMetadata,
   IListMetadata,
   INumberMetadata,
+  EInputType,
   ITextMetadata,
-} from '../../../shared/inputs';
+} from 'components/shared/inputs/index';
 
 import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
+import { metadata } from 'components/widgets/inputs';
 
 @Component({
   components: { ValidatedForm },
@@ -36,29 +38,28 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
 
   get metadata() {
     return {
-      text: {
+      text: metadata.text({
         required: true,
-        type: EInputType.text,
         placeholder: 'Add a link to add to list',
-      },
+        max: 450,
+      }),
       punishment: {
-        duration: {
-          type: EInputType.number,
+        duration: metadata.number({
           required: true,
           placeholder: 'Punishment Duration (Value in Seconds)',
           min: 0,
-        },
-        type: {
+          max: 86400,
+          isInteger: true,
+        }),
+        type: metadata.list({
           required: true,
-          type: EInputType.list,
           options: this.chatbotPunishments,
-        },
+        }),
       },
-      is_regex: {
+      is_regex: metadata.bool({
         required: true,
-        type: EInputType.bool,
         title: 'This word / phrase contains a regular expression.',
-      },
+      }),
     };
   }
 
@@ -86,6 +87,12 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     const newListItemArray = this.value.slice(0);
     newListItemArray.splice(index, 1);
     this.$emit('input', newListItemArray);
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onAddNewItemHandler() {

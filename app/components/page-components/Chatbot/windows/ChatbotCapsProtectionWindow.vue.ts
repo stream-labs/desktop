@@ -1,8 +1,9 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm },
@@ -35,16 +36,20 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('caps-protection');
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService
-      .updateCapsProtection({
-        enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection,
-      })
-      .then(() => {
-        this.chatbotCommonService.closeChildWindow();
-      });
+    this.chatbotApiService.ModTools.updateCapsProtection({
+      enabled: this.capsProtectionResponse.enabled,
+      settings: this.capsProtection,
+    }).then(() => {
+      this.chatbotApiService.Common.closeChildWindow();
+    });
   }
 }

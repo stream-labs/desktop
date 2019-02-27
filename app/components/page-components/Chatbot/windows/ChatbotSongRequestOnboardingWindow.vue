@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Enabling Song Request')"
 >
   <div slot="fixed" class="onboarding-header__container">
     <div v-if="step === 1">

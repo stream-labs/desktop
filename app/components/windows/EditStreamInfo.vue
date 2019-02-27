@@ -134,6 +134,10 @@
   text-decoration: underline;
 }
 
+.description-link {
+  text-decoration: underline;
+}
+
 .edit-stream-info-option-desc {
   height: 20px;
   line-height: 20px;
