@@ -134,9 +134,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  async function stopApp() {
+  async function stopApp(t: TExecutionContext) {
     try {
       await context.app.stop();
+      await checkErrorsInLogFile(t);
       await new Promise(resolve => {
         rimraf(context.cacheDir, resolve);
       });
@@ -185,13 +186,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp();
+        await stopApp(t);
+      } else {
+        await checkErrorsInLogFile(t);
       }
     } catch (e) {
       testPassed = false;
     }
 
-    await checkErrorsInLogFile(t);
     if (!testPassed) {
       failedTests.push(testName);
       const userName = getUserName();
@@ -201,7 +203,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (appIsRunning) {
-      await stopApp();
+      await stopApp(t);
       if (!testPassed) failedTests.push(testName);
     }
 
