@@ -7,8 +7,10 @@
   height: 16px;
   .cursor--pointer();
 }
+
 .toggleinput__track {
-  .transition;
+  .transition();
+
   background-color: @light-3;
   border-radius: 20px;
   width: 100%;
@@ -17,6 +19,7 @@
 
 .toggleinput__handle {
   .transition();
+
   position: absolute;
   width: 12px;
   height: 12px;
@@ -24,11 +27,12 @@
   top: 2px;
   left: 2px;
   background-color: @white;
-
 }
+
 :global(.night-theme) {
   .toggleinput__track {
-    .transition;
+    .transition();
+
     background-color: @dark-5;
     border-radius: 20px;
     width: 100%;

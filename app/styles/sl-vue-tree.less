@@ -1,6 +1,7 @@
 .sl-vue-tree-toggle {
-  width: 16px!important;
   .margin-right();
+
+  width: 16px !important;
   display: inline-block;
 
   i {
@@ -10,16 +11,18 @@
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  background-color: @day-section!important;
-  border: 0!important;
-  color: @day-paragraph!important;
-  .radius()!important;
+  .radius() !important;
+
+  background-color: @day-section !important;
+  border: 0 !important;
+  color: @day-paragraph !important;
 }
 
-.sl-vue-tree-selected>.sl-vue-tree-node-item {
-  background-color: @light-3!important;
-  color: @day-title!important;
+.sl-vue-tree-selected > .sl-vue-tree-node-item {
   .weight(@medium);
+
+  background-color: @light-3 !important;
+  color: @day-title !important;
 }
 
 .sl-vue-tree-root > .sl-vue-tree-nodes-list {
@@ -27,14 +30,15 @@
 }
 
 .sl-vue-tree-node-item {
-  color: @day-paragraph!important;
-  border: 0!important;
-  height: auto;
-  margin-top: 0;
   .padding-h-sides(2)!important;
   .transition();
+
+  color: @day-paragraph !important;
+  border: 0 !important;
+  height: auto;
+  margin-top: 0;
   cursor: pointer;
-  line-height: 32px!important;
+  line-height: 32px !important;
 
   &:hover {
     color: @day-paragraph;
@@ -46,45 +50,45 @@
 }
 
 .sl-vue-tree-cursor {
-  border: 0!important;
+  border: 0 !important;
   background-color: @day-input-border;
   z-index: 10;
 }
 
 .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-  background-color: @light-3!important;
+  background-color: @light-3 !important;
 }
 
 // sl-vue-tree styles within a window
 .modal-layout {
   .sl-vue-tree.sl-vue-tree-root {
-    background-color: transparent!important;
+    background-color: transparent !important;
     border: 0;
   }
 
   .sl-vue-tree-node-item {
     border: 0;
-    padding: 0!important;
+    padding: 0 !important;
   }
 
-  .sl-vue-tree-selected>.sl-vue-tree-node-item {
-    background-color: transparent!important;
+  .sl-vue-tree-selected > .sl-vue-tree-node-item {
+    background-color: transparent !important;
   }
 }
 
 .night-theme {
   .sl-vue-tree.sl-vue-tree-root {
-    background-color: @night-section!important;
-    color: @icon!important;
+    background-color: @night-section !important;
+    color: @icon !important;
   }
 
-  .sl-vue-tree-selected>.sl-vue-tree-node-item {
-    background-color: @night-hover!important;
-    color: @white!important;
+  .sl-vue-tree-selected > .sl-vue-tree-node-item {
+    background-color: @night-hover !important;
+    color: @white !important;
   }
 
   .sl-vue-tree-node-item {
-    color: @night-paragraph!important;
+    color: @night-paragraph !important;
   }
 
   .sl-vue-tree-toggle {
@@ -94,22 +98,22 @@
   }
 
   .sl-vue-tree-cursor {
-    border: 0!important;
+    border: 0 !important;
     background-color: @night-border;
   }
 
   .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-    background-color: @night-hover!important;
+    background-color: @night-hover !important;
   }
 
   // sl-vue-tree styles within a window
   &.modal-layout {
     .sl-vue-tree.sl-vue-tree-root {
-      background-color: transparent!important;
+      background-color: transparent !important;
     }
 
-    .sl-vue-tree-selected>.sl-vue-tree-node-item {
-      background-color: transparent!important;
+    .sl-vue-tree-selected > .sl-vue-tree-node-item {
+      background-color: transparent !important;
     }
   }
 }

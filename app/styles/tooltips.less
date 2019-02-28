@@ -3,7 +3,7 @@
 .tooltip-trigger {
   color: @icon;
   margin: 0 10px;
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .tooltip {
@@ -13,16 +13,17 @@
   border: 0;
   padding: 0;
 
-  &:before {
+  &::before {
     border: 0;
   }
 }
 
 .tooltip .tooltip-inner {
-  background: @white;
   .border();
   .day-shadow();
   .radius();
+
+  background: @white;
   padding: 8px 10px 7px;
   font-size: 12px;
   color: @day-paragraph;
@@ -100,13 +101,13 @@
 .tooltip[aria-hidden='true'] {
   visibility: hidden;
   opacity: 0;
-  transition: opacity .15s, visibility .15s;
+  transition: opacity 0.15s, visibility 0.15s;
 }
 
 .tooltip[aria-hidden='false'] {
   visibility: visible;
   opacity: 1;
-  transition: opacity .15s;
+  transition: opacity 0.15s;
 }
 
 .night-theme {

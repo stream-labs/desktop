@@ -36,6 +36,10 @@
     "tslint": {
       "enabled": true,
       "config": "tslint.json"
+    },
+    "stylelint": {
+      "enabled": true,
+      "config": ".stylelintrc"
     }
   },
   "exclude_patterns": [

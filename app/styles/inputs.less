@@ -1,5 +1,6 @@
 .input-container {
   .margin-bottom(2);
+
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -45,18 +46,21 @@
 .input-wrapper--search {
   position: relative;
 
-  &:after {
-    content: '\f002';
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
+  &::after {
     .absolute(@top: 0, @right: 8px, @bottom: 0);
+
+    content: '\f002';
+    font-family: "Font Awesome 5 Free", sans-serif;
+    font-weight: 900;
     line-height: 32px;
   }
 }
 
 .input-wrapper.disabled {
   opacity: 0.5;
-  div, input {
+
+  div,
+  input {
     cursor: not-allowed;
   }
 }
@@ -70,12 +74,13 @@ input[type=number],
 input[type=password],
 textarea,
 textarea[type=text] {
+  .radius();
+
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
   font-size: 14px;
   color: @day-paragraph;
-  .radius();
   box-shadow: none;
   height: 32px;
   padding: 0 @spacing;
@@ -105,12 +110,24 @@ textarea[type=text] {
 textarea,
 textarea[type=text] {
   .padding();
+
   line-height: 20px;
 }
 
-
 .multiselect {
   min-height: 32px;
+
+  .multiselect__input,
+  .multiselect__single {
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+
+    &:hover,
+    &:focus {
+      background: @day-dropdown-bg;
+      border-color: @day-dropdown-border;
+    }
+  }
 }
 
 .multiselect__input {
@@ -129,8 +146,8 @@ textarea[type=text] {
   position: relative;
   min-width: 220px;
 
-  &:before {
-    font-family: "Font Awesome 5 Free";
+  &::before {
+    font-family: "Font Awesome 5 Free", sans-serif;
     font-weight: 900;
     content: '\f078';
     border: none;
@@ -150,20 +167,6 @@ textarea[type=text] {
 
   input[type="text"] {
     cursor: pointer;
-  }
-}
-
-.multiselect {
-  .multiselect__input,
-  .multiselect__single {
-    background: @day-dropdown-bg;
-    border-color: @day-dropdown-border;
-
-    &:hover,
-    &:focus {
-      background: @day-dropdown-bg;
-      border-color: @day-dropdown-border;
-    }
   }
 }
 
@@ -195,10 +198,11 @@ textarea[type=text] {
 }
 
 .multiselect__option {
+  .transition();
+
   padding: 4px @spacing;
   height: auto;
   min-height: 0;
-  .transition();
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -208,7 +212,7 @@ textarea[type=text] {
   text-overflow: ellipsis;
   overflow: hidden;
 
-  &:after {
+  &::after {
     display: none;
   }
 }
@@ -217,7 +221,7 @@ textarea[type=text] {
   background: @light-3;
   color: @day-title;
 
-  &:after {
+  &::after {
     display: none;
   }
 }
@@ -229,12 +233,12 @@ textarea[type=text] {
   &.multiselect__option--highlight {
     background: @light-3;
 
-    &:after {
+    &::after {
       display: none;
     }
   }
 
-  &:after {
+  &::after {
     display: none;
   }
 }
@@ -244,7 +248,7 @@ textarea[type=text] {
 }
 
 .multiselect--disabled {
-  opacity: .5;
+  opacity: 0.5;
 
   &:focus {
     outline: none;
@@ -295,10 +299,11 @@ textarea[type=text] {
   }
 
   .colorpicker__swatch {
+    .radius();
+
     position: absolute;
     top: 6px;
     right: @spacing;
-    .radius();
     border: 1px solid #ccc;
     width: 20px;
     height: 20px;
@@ -315,12 +320,8 @@ textarea[type=text] {
   }
 
   // hide alpha input
-  .vc-alpha {
-    display: none;
-  }
-  .vc-sketch-field > div:last-child {
-    display: none;
-  }
+  .vc-alpha { display: none; }
+  .vc-sketch-field > div:last-child { display: none; }
 
   .vc-sketch-presets {
     margin-right: -8px;
@@ -439,9 +440,10 @@ textarea[type=text] {
     }
 
     .colorpicker-menu {
-      background: @night-dropdown-bg!important;
-      border-color: @night-dropdown-border!important;
       .night-shadow() !important;
+
+      background: @night-dropdown-bg !important;
+      border-color: @night-dropdown-border !important;
     }
 
     .vue-color__editable-input__label {
