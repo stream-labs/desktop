@@ -1893,6 +1893,11 @@ babel-helper-get-function-arity@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
+babel-helper-vue-jsx-merge-props@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-2.0.0.tgz#a5eea94b03d7be4e61865a775263b17c61bb2a65"
+  integrity sha1-pe6pSwPXvk5hhlp3UmOxfGG7KmU=
+
 babel-loader@8.0.4:
   version "8.0.4"
   resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-8.0.4.tgz#7bbf20cbe4560629e2e41534147692d3fecbdce6"
