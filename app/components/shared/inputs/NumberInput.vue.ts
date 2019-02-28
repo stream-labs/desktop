@@ -21,7 +21,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     input: HTMLInputElement;
   };
 
-  displayValue: number | string = this.value;
+  displayValue: number | string = this.value || this.options.min || 0;
 
   timeout: number;
 
