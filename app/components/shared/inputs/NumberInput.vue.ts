@@ -25,45 +25,23 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
   timeout: number;
 
-  emitInput(value: string) {
+  async emitInput(value: string) {
     let formattedValue = value;
     if (isNaN(Number(formattedValue))) formattedValue = '0';
     if (formattedValue !== value) this.displayValue = formattedValue;
+    await this.$nextTick(); // VeeValidate requires UI to be updated before errors checking
     super.emitInput(Number(formattedValue));
   }
 
-  updateValue(value: string) {
-    let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
-    formattedValue = this.constrainValue(formattedValue);
+  private updateValue(value: string) {
+    const formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
     this.displayValue = formattedValue;
-    // TODO: Remove early return and re-implement proper validations
-    if (this.timeout) return;
     this.emitInput(formattedValue);
   }
 
-  updateDecimal(value: string) {
-    const formattedValue = this.constrainValue(value);
-    this.displayValue = formattedValue;
-    // TODO: Remove early return and re-implement proper validations
-    if (this.timeout) return;
-    this.emitInput(formattedValue);
-  }
-
-  constrainValue(value: string) {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
-
-    if (this.options.min !== void 0 && Number(value) < this.options.min) {
-      this.timeout = window.setTimeout(() => this.updateValue(`${this.options.min}`), 1000);
-    }
-
-    if (this.options.max !== void 0 && Number(value) > this.options.max) {
-      return String(this.options.max);
-    }
-
-    return value;
+  private updateDecimal(value: string) {
+    this.displayValue = value;
+    this.emitInput(value);
   }
 
   handleInput(value: string) {
@@ -77,11 +55,13 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
   increment() {
     if (this.options.disabled) return;
+    if (this.options.max !== void 0 && Number(this.displayValue) >= this.options.max) return;
     this.updateValue(String(Number(this.displayValue) + 1));
   }
 
   decrement() {
     if (this.options.disabled) return;
+    if (this.options.min !== void 0 && Number(this.displayValue) <= this.options.min) return;
     this.updateValue(String(Number(this.displayValue) - 1));
   }
 
