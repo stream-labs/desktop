@@ -178,6 +178,7 @@ export class FormMonkey {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     value = value.substr(1); // get rid of # character in value
     const inputSelector = `${selector} .vc-input__input`;
+    await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
     await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
   }
