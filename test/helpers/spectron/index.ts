@@ -4,6 +4,7 @@ import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { releaseUserInPool } from './user';
+import { sleep } from '../sleep'
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -30,6 +31,13 @@ export async function focusMain(t: any) {
 // Focuses the child window
 export async function focusChild(t: any) {
   await focusWindow(t, /windowId=child/);
+}
+
+// Focuses the Library webview
+export async function focusLibrary(t: any) {
+  // doesn't work without delay, probably need to wait until load
+  await sleep(2000);
+  await focusWindow(t, /streamlabs\.com\/library/);
 }
 
 interface ITestRunnerOptions {
