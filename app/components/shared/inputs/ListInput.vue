@@ -22,9 +22,6 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <template slot="singleLabel">
-      <span :style="options.labelStyle && options.labelStyle()">{{ currentMultiselectValue.title }}</span>
-    </template>
     <template slot="option" slot-scope="props">
       <span
         :data-option-value="props.option.value"

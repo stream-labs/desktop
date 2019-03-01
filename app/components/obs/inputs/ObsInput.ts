@@ -304,8 +304,6 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
 
-  setupConfigurableDefaults(obsSource, obsProps, obsSettings);
-
   if (!obsProps) return null;
   if (!obsProps.count()) return null;
 
@@ -448,42 +446,6 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   if (formInputs.length === 0) return;
 
   obsSource.update(settings);
-}
-
-/* Passing a properties and settings object here
- * prevents a copy and object creation which
- * also requires IPC. Highly recommended to
- * pass all parameters. */
-export function setupConfigurableDefaults(
-  configurable: obs.IConfigurable,
-  properties?: obs.IProperties,
-  settings?: obs.ISettings,
-) {
-  // tslint:disable-next-line:no-parameter-reassignment TODO
-  if (!settings) settings = configurable.settings;
-
-  // tslint:disable-next-line:no-parameter-reassignment
-  if (!properties) properties = configurable.properties;
-
-  const defaultSettings = {};
-
-  if (!properties) return;
-
-  let obsProp = properties.first();
-  do {
-    if (!isListProperty(obsProp)) continue;
-
-    const items = obsProp.details.items;
-
-    if (items.length === 0) continue;
-
-    /* If setting isn't set at all, set to first element. */
-    if (settings[obsProp.name] === void 0) {
-      defaultSettings[obsProp.name] = items[0].value;
-    }
-  } while ((obsProp = obsProp.next()));
-  const needUpdate = Object.keys(defaultSettings).length > 0;
-  if (needUpdate) configurable.update(defaultSettings);
 }
 
 export abstract class ObsInput<TValueType> extends Vue {

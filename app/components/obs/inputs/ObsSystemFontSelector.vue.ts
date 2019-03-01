@@ -1,11 +1,9 @@
-import _ from 'lodash';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { IObsFont, IObsInput, ObsInput } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 import fontManager from 'font-manager';
 import { EFontStyle } from 'obs-studio-node';
-import { CurryRightAll } from 'lodash-decorators';
 
 /**
  * @tutorial https://github.com/devongovett/font-manager
@@ -20,10 +18,6 @@ interface IFontDescriptor {
   italic: boolean;
   oblique: boolean;
   monospace: boolean;
-}
-
-interface IFontSelect extends HTMLElement {
-  value: IFontDescriptor;
 }
 
 @Component({
@@ -122,21 +116,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
       .map(font => ({ value: font.family, title: font.family }));
   }
 
-  labelStyle() {
-    if (!this.selectedFont) return;
-    return {
-      fontFamily: this.value.value.face,
-      fontStyle: this.selectedFont.italic ? 'italic' : 'normal',
-      fontWeight: this.selectedFont.weight,
-    };
-  }
-
   get familyMetadata() {
     return {
       options: this.fontFamilies,
       allowEmpty: false,
       disabled: this.value.enabled === false,
-      labelStyle: this.labelStyle,
       optionStyle: (val: string) => ({ fontFamily: val }),
     };
   }
@@ -146,7 +130,6 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
       options: this.stylesForFamily,
       allowEmpty: false,
       disabled: this.value.enabled === false,
-      labelStyle: this.labelStyle,
       optionStyle: (val: string) => {
         if (!this.selectedFont) return;
         const fontStyle = this.fonts.find(

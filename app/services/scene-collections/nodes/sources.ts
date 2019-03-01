@@ -4,7 +4,6 @@ import { SourcesService, TSourceType, TPropertiesManager } from 'services/source
 import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
-import * as fi from 'node-fontinfo';
 import { ScenesService } from 'services/scenes';
 
 interface ISchema {
