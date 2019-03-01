@@ -22,7 +22,7 @@ test('Installing a theme', async (t: any) => {
   // search a theme
   await formMonkey.setInputValue('input', OVERLAY_NAME);
   // the input field has a debounce search
-  await sleep(15000);
+  await sleep(2000);
   // wait items load
   await app.client.click('.market-item');
   // install overlay
