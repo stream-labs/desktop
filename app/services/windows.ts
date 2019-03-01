@@ -60,6 +60,16 @@ import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/wi
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
 import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
 import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
+import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
+import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
+import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
+import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
+import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
+import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
+import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
+import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
+import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
+import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -112,6 +122,7 @@ export function getComponents() {
     ChatbotDefaultCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
+    ChatbotGamblePreferencesWindow,
     ChatbotCapsProtectionWindow,
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
@@ -119,8 +130,17 @@ export function getComponents() {
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,
+    ChatbotCommandPreferencesWindow,
     ChatbotSongRequestPreferencesWindow,
     ChatbotSongRequestOnboardingWindow,
+    ChatbotLoyaltyWindow,
+    ChatbotLoyaltyAddAllWindow,
+    ChatbotLoyaltyPreferencesWindow,
+    ChatbotHeistPreferencesWindow,
+    ChatbotPollProfileWindow,
+    ChatbotPollPreferencesWindow,
+    ChatbotBettingProfileWindow,
+    ChatbotBettingPreferencesWindow,
   };
 }
 
@@ -201,7 +221,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
   showWindow(options: Partial<IWindowOptions>) {
     // Don't center the window if it's the same component
     // This prevents "snapping" behavior when navigating settings
-    if (options.componentName !== this.state.child.componentName) options.center = true;
+    if (options.componentName !== this.state.child.componentName) {
+      options.center = true;
+    }
 
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
@@ -321,7 +343,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
-    const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
+    const newOptions: IWindowOptions = {
+      ...DEFAULT_WINDOW_OPTIONS,
+      ...optionsPatch,
+    };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
 

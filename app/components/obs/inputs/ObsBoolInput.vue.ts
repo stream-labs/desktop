@@ -21,7 +21,7 @@ class ObsBoolInput extends ObsInput<IObsInput<boolean>> {
   }
 
   handleClick() {
-    if (this.value.enabled === false) return;
+    if (!this.value.enabled) return;
     this.emitInput({ ...this.value, value: !this.value.value });
   }
 }

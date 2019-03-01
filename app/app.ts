@@ -26,6 +26,7 @@ import electronLog from 'electron-log';
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+const isPreview = !!remote.process.env.SLOBS_PREVIEW;
 
 window['obs'] = window['require']('obs-studio-node');
 
@@ -65,7 +66,7 @@ if (
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
-    sampleRate: 0.1,
+    sampleRate: isPreview ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
@@ -104,7 +105,7 @@ if (
   };
 }
 
-require('./app.less');
+require('./app.g.less');
 
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);

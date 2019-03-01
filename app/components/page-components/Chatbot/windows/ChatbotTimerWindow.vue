@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="isEdit ? $t('Edit Timer') : $t('Add Timer')"
 >
   <div slot="content">
     <validated-form ref="form">
@@ -43,6 +42,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0"
     >
       {{ $t('Save') }}
     </button>

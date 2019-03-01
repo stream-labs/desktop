@@ -1,31 +1,39 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { ICustomCommand } from 'services/chatbot';
+import { ICustomCommand, DELETE_COMMAND_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
     ChatbotPagination,
+    ChatbotGenericModalWindow,
   },
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
+  selectedCommand: ICustomCommand = null;
+
+  get DELETE_COMMAND_MODAL() {
+    return DELETE_COMMAND_MODAL;
+  }
 
   get commands() {
-    return this.chatbotApiService.state.customCommandsResponse.data;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.current;
   }
 
   get totalPages() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination.total;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.total;
   }
 
   mounted() {
     this.fetchCommands(1);
+    this.chatbotApiService.Commands.fetchCommandPreferences();
   }
 
   @Watch('searchQuery')
@@ -35,23 +43,39 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   fetchCommands(page: number = this.currentPage, query?: string) {
-    this.chatbotApiService.fetchCustomCommands(page, query);
+    this.chatbotApiService.Commands.fetchCustomCommands(page, query);
   }
 
   onOpenCommandWindowHandler(command?: ICustomCommand) {
-    this.chatbotCommonService.openCustomCommandWindow(command);
+    this.chatbotApiService.Common.openCustomCommandWindow(command);
   }
 
   onDeleteCommandHandler(command: ICustomCommand) {
-    this.chatbotApiService.deleteCustomCommand(command.id);
+    this.selectedCommand = command;
+    this.chatbotApiService.Common.closeChatbotChildWindow();
+    this.$modal.show(DELETE_COMMAND_MODAL);
+  }
+
+  onYesHandler() {
+    if (this.selectedCommand) {
+      this.chatbotApiService.Commands.deleteCustomCommand(this.selectedCommand.id);
+    }
+  }
+
+  onNoHandler() {
+    this.selectedCommand = null;
   }
 
   onToggleEnableCommandHandler(commandId: string, index: number, isEnabled: boolean) {
     const commandToBeUpdated = this.commands[index];
 
-    this.chatbotApiService.updateCustomCommand(commandId, {
+    this.chatbotApiService.Commands.updateCustomCommand(commandId, {
       ...commandToBeUpdated,
       enabled: isEnabled,
     });
+  }
+
+  onOpenCommandPreferencesHandler() {
+    this.chatbotApiService.Common.openCommandPreferencesWindow();
   }
 }

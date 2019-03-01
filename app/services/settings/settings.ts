@@ -24,7 +24,8 @@ import {
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
-import { EDeviceType } from '../hardware';
+import { EDeviceType } from 'services/hardware';
+import { StreamingService } from 'services/streaming';
 
 export interface ISettingsState {
   General: {
@@ -85,6 +86,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamEncoderSettingsService: StreamEncoderSettingsService;
+  @Inject() private streamingService: StreamingService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -140,7 +142,6 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
-    if (categoryName === 'Audio') return this.getAudioSettingsFormData();
     let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
@@ -162,9 +163,11 @@ export class SettingsService extends StatefulService<ISettingsState>
       });
     }
 
+    if (categoryName === 'Audio') return this.getAudioSettingsFormData(settings[0]);
     // We hide the encoder preset and settings if the optimized ones are in used
     if (
       categoryName === 'Output' &&
+      !this.streamingService.isIdle &&
       this.videoEncodingOptimizationService.state.useOptimizedProfile
     ) {
       const encoder = obsEncoderToEncoder(
@@ -239,7 +242,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.setSettings(category, newSettings);
   }
 
-  private getAudioSettingsFormData(): ISettingsSubCategory[] {
+  private getAudioSettingsFormData(OBSsettings: ISettingsSubCategory): ISettingsSubCategory[] {
     const audioDevices = this.audioService.getDevices();
     const sourcesInChannels = this.sourcesService
       .getSources()
@@ -292,6 +295,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     return [
+      OBSsettings,
       {
         parameters,
         nameSubCategory: 'Untitled',
@@ -300,7 +304,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
-    if (categoryName === 'Audio') return this.setAudioSettings(settingsData);
+    if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
 
     const dataToSave = [];
 

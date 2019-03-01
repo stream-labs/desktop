@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import PlatformAppWebview from 'components/PlatformAppWebview.vue';
+import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import Util from 'services/utils';
@@ -9,7 +9,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { Subscription } from 'rxjs';
 
 @Component({
-  components: { PlatformAppWebview, ModalLayout },
+  components: { PlatformAppPageView, ModalLayout },
 })
 export default class PlatformAppPopOut extends Vue {
   @Inject() windowsService: WindowsService;

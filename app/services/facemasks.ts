@@ -44,8 +44,7 @@ interface IFacemask {
 
 interface IFacemaskSettings {
   enabled: boolean;
-  facemasks: IFacemask[];
-  audio_volume: number;
+  facemasks?: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
 }
@@ -84,7 +83,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   settings: IFacemaskSettings = {
     enabled: false,
     facemasks: [],
-    audio_volume: 50,
     duration: 10,
     device: {
       name: null,
@@ -115,17 +113,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   startup() {
-    if (this.checkForPlugin()) {
-      this.fetchFacemaskSettings()
-        .then(response => {
-          this.checkFacemaskSettings(response);
-        })
-        .catch(err => {
-          this.SET_ACTIVE(false);
-        });
-    } else {
-      this.notifyPluginMissing();
-    }
+    this.fetchFacemaskSettings()
+      .then(response => {
+        this.checkFacemaskSettings(response);
+      })
+      .catch(err => {
+        this.SET_ACTIVE(false);
+      });
   }
 
   activate() {
@@ -156,7 +150,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   notifyPluginMissing() {
-    this.SET_ACTIVE(false);
     const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
       type: 'warning',
       message: $t('Unable to find face mask plugin. You will not be able to use Face Masks'),
@@ -261,36 +254,44 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   checkFacemaskSettings(settings: IFacemaskSettings) {
     this.settings = settings;
-    if (settings.enabled) {
-      const uuids = settings.facemasks.map((mask: IFacemask) => {
-        return { uuid: mask.uuid, intro: mask.is_intro };
-      });
 
-      if (settings.device.name && settings.device.value) {
-        this.SET_DEVICE(settings.device.name, settings.device.value);
-        this.setupFilter();
-      } else {
-        this.SET_ACTIVE(false);
-      }
+    if (!settings.enabled) {
+      this.SET_ACTIVE(false);
+      return;
+    }
 
-      const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
-      const downloads = missingMasks.map(mask =>
-        this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
-      );
+    if (!this.checkForPlugin()) {
+      this.SET_ACTIVE(false);
+      this.notifyPluginMissing();
+      return;
+    }
 
-      this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+    const uuids = settings.facemasks.map((mask: IFacemask) => {
+      return { uuid: mask.uuid, intro: mask.is_intro };
+    });
 
-      Promise.all(downloads)
-        .then(responses => {
-          this.ensureModtimes(settings.facemasks);
-        })
-        .catch(err => {
-          console.log(err);
-          this.notifyFailure();
-        });
+    if (settings.device.name && settings.device.value) {
+      this.SET_DEVICE(settings.device.name, settings.device.value);
+      this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
     }
+
+    const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
+    const downloads = missingMasks.map(mask =>
+      this.downloadAndSaveModtime(mask.uuid, mask.intro, false),
+    );
+
+    this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+
+    Promise.all(downloads)
+      .then(responses => {
+        this.ensureModtimes(settings.facemasks);
+      })
+      .catch(err => {
+        console.log(err);
+        this.notifyFailure();
+      });
   }
 
   setDownloadProgress(downloads: string[]) {
@@ -321,6 +322,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.state.device;
   }
 
+  getEnabledStatus() {
+    return this.settings.enabled;
+  }
+
   fetchFacemaskSettings() {
     return this.formRequest('slobs/facemasks/settings');
   }
@@ -329,8 +334,27 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest(`slobs/facemasks/install/${uuid}`);
   }
 
+  updateFacemaskSettings(settingsData: IFacemaskSettings) {
+    return this.postFacemaskSettingsUpdate(settingsData).then(() => this.startup());
+  }
+
   fetchProfanityFilterSettings() {
     return this.formRequest('slobs/widget/settings?widget=donation_page');
+  }
+
+  postFacemaskSettingsUpdate(settingsData: IFacemaskSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
+    const headers = authorizedHeaders(this.apiToken);
+    headers.append('Content-Type', 'text/json');
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(settingsData),
+    });
+
+    return fetch(request).then(handleResponse);
   }
 
   setupFilter() {
@@ -396,9 +420,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return new Promise((resolve, reject) => {
       const asyncReads = missing.map(uuid => this.readFile(uuid));
       Promise.all(asyncReads)
-        .then(results => {
-          resolve();
-        })
+        .then(results => resolve())
         .catch(err => {
           this.notifyFailure();
           reject();
@@ -419,7 +441,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     );
 
     Promise.all(downloads)
-      .then(responses => {
+      .then(() => {
         this.activate();
       })
       .catch(err => {

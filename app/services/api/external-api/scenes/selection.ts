@@ -300,6 +300,14 @@ export class Selection implements ISceneItemActions {
   setContentCrop(): void {
     return this.selection.setContentCrop();
   }
+
+  scale(scale: IVec2, origin?: IVec2) {
+    return this.selection.scale(scale, origin);
+  }
+
+  scaleWithOffset(scale: IVec2, offset: IVec2) {
+    return this.selection.scale(scale, offset);
+  }
 }
 
 /**

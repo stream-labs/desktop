@@ -33,7 +33,7 @@ export default class AppsNav extends Vue {
 
   isSelectedApp(appId: string) {
     return (
-      this.page === 'PlatformAppContainer' && this.navigationService.state.params.appId === appId
+      this.page === 'PlatformAppMainPage' && this.navigationService.state.params.appId === appId
     );
   }
 
@@ -58,7 +58,7 @@ export default class AppsNav extends Vue {
   }
 
   refreshApp(appId: string) {
-    this.platformAppsService.reloadApp(appId);
+    this.platformAppsService.refreshApp(appId);
   }
 
   get page() {
@@ -66,7 +66,7 @@ export default class AppsNav extends Vue {
   }
 
   navigateApp(appId: string) {
-    this.navigationService.navigate('PlatformAppContainer', { appId });
+    this.navigationService.navigate('PlatformAppMainPage', { appId });
   }
 
   scrollLeft() {

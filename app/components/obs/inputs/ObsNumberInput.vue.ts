@@ -1,16 +1,15 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IObsInput, TObsType, ObsInput } from './ObsInput';
+import { IObsNumberInputValue, TObsType, ObsInput } from './ObsInput';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { NumberInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { HFormGroup, NumberInput },
+  components: { HFormGroup },
 })
-class ObsNumberInput extends ObsInput<IObsInput<number>> {
+class ObsNumberInput extends ObsInput<IObsNumberInputValue> {
   static obsType: TObsType[];
 
   @Prop()
-  value: IObsInput<number>;
+  value: IObsNumberInputValue;
 
   $refs: {
     input: HTMLInputElement;
@@ -18,7 +17,12 @@ class ObsNumberInput extends ObsInput<IObsInput<number>> {
 
   get metadata() {
     return {
+      type: 'number',
       disabled: this.value.enabled === false,
+      min: this.value.minVal,
+      max: this.value.maxVal,
+      title: this.value.description,
+      fullWidth: true,
     };
   }
 

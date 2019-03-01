@@ -12,13 +12,10 @@
   <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
 
   <div class="flex">
-    <Slider
+    <slider-input
       :value="audioSource.fader.deflection"
-      :min="0"
-      :max="1"
-      :interval="0.01"
       @input="onSliderChangeHandler"
-      tooltip="false"
+      :metadata="sliderMetadata"
     />
     <div class="controls">
       <i class="icon-button icon-audio"

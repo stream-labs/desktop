@@ -1,5 +1,5 @@
 <template>
-<div class="align-items--inline">
+<div class="align-items--inline margin--10">
   <ChatbotModule
     v-for="module in modules"
     :key="module.title"

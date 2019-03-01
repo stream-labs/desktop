@@ -3,6 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { releaseUserInPool } from './user';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -176,13 +177,21 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    const client = await getClient();
-    await client.unsubscribeAll();
-    await checkErrorsInLogFile(t);
-    if (options.restartAppAfterEachTest) {
-      client.disconnect();
-      await stopApp();
+    // wrap in try/catch for the situation when we have a crash
+    // so we still can read the logs after the crash
+    try {
+      const client = await getClient();
+      await client.unsubscribeAll();
+      await releaseUserInPool();
+      if (options.restartAppAfterEachTest) {
+        client.disconnect();
+        await stopApp();
+      }
+    } catch (e) {
+      testPassed = false;
     }
+
+    await checkErrorsInLogFile(t);
     if (!testPassed) failedTests.push(testName);
   });
 

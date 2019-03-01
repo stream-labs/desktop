@@ -2,13 +2,12 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="isEdit ? $t('Edit Quote') : $t('Add Quote')"
 >
   <div slot="content">
     <validated-form ref="form">
       <div>
         <VFormGroup
-          :title="$t('Quote (Line breaks will be ignored)')"
+          :title="$t('Quote')"
           type="textArea"
           v-model="newQuote.message"
           :metadata="metadata.message"
@@ -43,6 +42,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0"
     >
       {{ $t('Save') }}
     </button>

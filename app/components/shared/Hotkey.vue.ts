@@ -1,7 +1,6 @@
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { compact } from 'lodash';
-import { Hotkey, IBinding } from '../../services/hotkeys';
+import { IHotkey, IBinding } from 'services/hotkeys';
+import TsxComponent from 'components/tsx-component';
 
 /**
  * Represents a binding that has a unique key for CSS animations
@@ -11,12 +10,9 @@ interface IKeyedBinding {
   key: string;
 }
 
-@Component({
-  props: ['hotkey'],
-})
-export default class HotkeyComponent extends Vue {
-  @Prop()
-  hotkey: Hotkey;
+@Component({})
+export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
+  @Prop() hotkey: IHotkey;
 
   description = this.hotkey.description;
   bindings: IKeyedBinding[] = [];

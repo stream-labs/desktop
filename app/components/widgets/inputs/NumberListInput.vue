@@ -3,16 +3,16 @@
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
-    :options="multiselectOptions"
+    :options="options.options"
     track-by="value"
     :close-on-select="true"
     :placeholder="placeholder"
-    label="description"
+    label="title"
     :allow-empty="options.allowEmpty"
     @input="onInputHandler">
 
     <template slot="option" slot-scope="props">
-      <span :data-option-value="props.option.value">{{ props.option.description }}</span>
+      <span :data-option-value="props.option.value">{{ props.option.title }}</span>
     </template>
 
   </multiselect>

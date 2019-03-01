@@ -8,12 +8,12 @@
   :selectedId="selectedId"
 >
   <!-- Left Toolbar -->
-  <div slot="leftbar">
+  <div slot="leftbar" v-if="wData">
     <div class="left-accordion__button alert-button">
       <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
       <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
         <button
-          v-for="type in alertTypes"
+          v-for="type in alertTypes.filter(t => t !== 'facemasks')"
           class="button button--action"
           :key="type"
           @click="addAlert(type)"
@@ -25,38 +25,42 @@
     <div class="left-accordion__button" :class="{ active: selectedAlert === 'general' }" @click="selectAlertType('general')">
       {{ $t('Global Settings') }}
     </div>
-    <div v-for="alert in alertTypes" v-if="wData && wData.settings[alert]" :key="alert" style="position: relative;" >
+    <div v-for="alert in alertTypes" :key="alert" style="position: relative;" >
       <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
         <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
-      <div class="left-accordion__input">
-        <validated-form  @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
+      <div class="left-accordion__input" v-if="wData.settings[alert]">
+        <validated-form v-if="alert !== 'facemasks'" @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
+        <validated-form v-if="alert === 'facemasks'" @input="handleFacemaskInput()">
+          <toggle-input v-model="facemaskEnabled" />
+        </validated-form>
       </div>
-      <div
-        v-if="wData && selectedAlert === alert"
-        v-for="variation in wData.settings[alert].variations"
-        :key="variation.id"
-        @click="selectVariation(variation.id)"
-        class="variation-tile"
-        :class="{ active: selectedId === variation.id }"
-      >
-        <div class="variation-tile__image-box">
-          <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
-          <div class="variation-tile__name">
-            <input
-              type="text"
-              :value="variation.name"
-              :disabled="editingName !== variation.id"
-              :ref="`${variation.id}-name-input`"
-              @input="nameInputHandler($event.target.value)"
-              @blur="nameBlurHandler(variation.id)"
-            />
+      <div v-if="wData && selectedAlert === alert">
+        <div
+          v-for="variation in wData.settings[alert].variations"
+          :key="variation.id"
+          @click="selectVariation(variation.id)"
+          class="variation-tile"
+          :class="{ active: selectedId === variation.id }"
+        >
+          <div class="variation-tile__image-box">
+            <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
+            <div class="variation-tile__name">
+              <input
+                type="text"
+                :value="variation.name"
+                :disabled="editingName !== variation.id"
+                :ref="`${variation.id}-name-input`"
+                @input="nameInputHandler($event.target.value)"
+                @blur="nameBlurHandler(variation.id)"
+              />
+            </div>
           </div>
-        </div>
-        <div class="variation-tile__toolbar">
-          <i v-if="variation.deleteable" class="icon-trash" @click.stop="removeVariation(variation.id)" />
-          <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
+          <div class="variation-tile__toolbar">
+            <i v-if="variation.id !== 'default'" class="icon-trash" @click.stop="removeVariation(variation.id)" />
+            <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
+          </div>
         </div>
       </div>
     </div>
@@ -88,7 +92,7 @@
       <v-form-group v-model="selectedVariation.settings.text.color2" :metadata="metadata.secondaryColor" />
     </div>
   </validated-form>
-  <validated-form slot="media-properties" key="media-properties" @input="save()" v-if="selectedVariation">
+  <validated-form slot="media-properties" key="media-properties" @input="handleFacemaskInput()" v-if="selectedVariation">
     <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
     <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
     <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
@@ -112,7 +116,7 @@
       <v-form-group v-model="selectedVariation.settings.tts.security" :metadata="metadata.ttsSecurity" />
     </div>
   </validated-form>
-  <validated-form slot="animation-properties" key="animation-properties" @input="save()" v-if="selectedVariation">
+  <validated-form slot="animation-properties" key="animation-properties" @input="handleFacemaskInput()" v-if="selectedVariation">
     <v-form-group v-model="selectedVariation.settings.showAnimation" :metadata="metadata.showAnimation" />
     <v-form-group v-model="selectedVariation.settings.hideAnimation" :metadata="metadata.hideAnimation" />
     <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />

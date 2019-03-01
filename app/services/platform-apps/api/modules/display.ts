@@ -1,4 +1,4 @@
-import { apiMethod, EApiPermissions, IApiContext, Module } from './module';
+import { apiMethod, EApiPermissions, IApiContext, Module, IBrowserViewTransform } from './module';
 import { Display } from 'services/video';
 import uuid from 'uuid/v4';
 import electron from 'electron';
@@ -13,12 +13,10 @@ interface IDisplayCreateOptions {
 }
 
 interface IDisplayEntry {
-  position: IVec2;
-  size: IVec2;
-  webviewVisible: boolean;
-  webviewPosition: IVec2;
-  webviewSubscription?: Subscription;
+  tranformSubscription?: Subscription;
   display: Display;
+  displayId: string;
+  options: IDisplayCreateOptions;
 }
 
 export class DisplayModule extends Module {
@@ -31,29 +29,14 @@ export class DisplayModule extends Module {
   create(ctx: IApiContext, options: IDisplayCreateOptions) {
     const displayId = uuid();
 
-    const display = new Display(displayId, {
-      electronWindowId: ctx.electronWindowId,
-      slobsWindowId: ctx.slobsWindowId,
-      paddingColor: options.paddingColor,
-      paddingSize: options.paddingSize || 0,
-    });
-
-    display.resize(options.size.x, options.size.y);
-
     this.displays[displayId] = {
-      display,
-      position: options.position,
-      size: options.size,
-      webviewVisible: true,
-      webviewPosition: { x: 0, y: 0 },
+      displayId,
+      options,
+      display: null,
     };
 
-    this.displays[displayId].webviewSubscription = ctx.webviewTransform.subscribe(transform => {
-      const displayEntry = this.displays[displayId];
-      displayEntry.webviewVisible = transform.visible;
-      displayEntry.webviewPosition = transform.pos;
-
-      this.updateDisplay(displayEntry);
+    this.displays[displayId].tranformSubscription = ctx.pageTransform.subscribe(transform => {
+      this.updateDisplay(this.displays[displayId], transform);
     });
 
     electron.remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
@@ -67,16 +50,16 @@ export class DisplayModule extends Module {
   resize(ctx: IApiContext, displayId: string, size: IVec2) {
     const entry = this.getDisplayEntry(displayId);
 
-    entry.size = size;
-    this.updateDisplay(entry);
+    entry.options.size = size;
+    this.updateDisplay(entry, ctx.pageTransform.getValue());
   }
 
   @apiMethod()
   move(ctx: IApiContext, displayId: string, position: IVec2) {
     const entry = this.getDisplayEntry(displayId);
 
-    entry.position = position;
-    this.updateDisplay(entry);
+    entry.options.position = position;
+    this.updateDisplay(entry, ctx.pageTransform.getValue());
   }
 
   @apiMethod()
@@ -84,23 +67,61 @@ export class DisplayModule extends Module {
     this.destroyDisplay(displayId);
   }
 
-  private updateDisplay(displayEntry: IDisplayEntry) {
-    if (displayEntry.webviewVisible) {
-      displayEntry.display.resize(displayEntry.size.x, displayEntry.size.y);
-      displayEntry.display.move(
-        displayEntry.webviewPosition.x + displayEntry.position.x,
-        displayEntry.webviewPosition.y + displayEntry.position.y,
-      );
-    } else {
-      displayEntry.display.resize(0, 0);
+  private updateDisplay(displayEntry: IDisplayEntry, transform: IBrowserViewTransform) {
+    // The container isn't mounted, so get rid of any active displays and stop
+    if (!transform.mounted) {
+      if (displayEntry.display) this.removeDisplay(displayEntry);
+      return;
     }
+
+    // The display is mounted to the wrong window, destroy it
+    if (
+      displayEntry.display &&
+      displayEntry.display.electronWindowId !== transform.electronWindowId
+    ) {
+      this.removeDisplay(displayEntry);
+    }
+
+    // There is no active display, so create one
+    if (!displayEntry.display) {
+      // Create display
+      displayEntry.display = new Display(displayEntry.displayId, {
+        electronWindowId: transform.electronWindowId,
+        slobsWindowId: transform.slobsWindowId,
+        paddingColor: displayEntry.options.paddingColor,
+        paddingSize: displayEntry.options.paddingSize || 0,
+      });
+    }
+
+    // Move/Resize display
+    displayEntry.display.resize(displayEntry.options.size.x, displayEntry.options.size.y);
+    displayEntry.display.move(
+      transform.pos.x + displayEntry.options.position.x,
+      transform.pos.y + displayEntry.options.position.y,
+    );
+  }
+
+  /**
+   * Removes a display from an entry.  This should be used
+   * when the display currently exists from the context of
+   * the app, but the app is not currently being shown on
+   * any screen, so we want to destroy the display.
+   * @param entry The display entry
+   */
+  private removeDisplay(entry: IDisplayEntry) {
+    entry.display.destroy();
+    entry.display = null;
   }
 
   private destroyDisplay(displayId: string) {
     const displayEntry = this.getDisplayEntry(displayId);
 
-    displayEntry.webviewSubscription.unsubscribe();
-    displayEntry.display.destroy();
+    displayEntry.tranformSubscription.unsubscribe();
+
+    if (displayEntry.display) {
+      displayEntry.display.destroy();
+    }
+
     delete this.displays[displayId];
   }
 

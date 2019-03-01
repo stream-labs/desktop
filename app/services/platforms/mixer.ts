@@ -1,6 +1,13 @@
 import { Service } from '../service';
 import { StatefulService, mutation } from '../stateful-service';
-import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
+import {
+  IPlatformService,
+  IPlatformAuth,
+  IChannelInfo,
+  IGame,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
@@ -16,6 +23,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+
+  capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 800,
@@ -192,5 +201,12 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   beforeGoLive() {
     return Promise.resolve();
+  }
+
+  // TODO: dedup
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
   }
 }

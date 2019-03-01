@@ -4,8 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm.vue';
+import TsxComponent from 'components/tsx-component';
 
-export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
+export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends TsxComponent<{
+  metadata: TMetadataType;
+  value: TValueType;
+  title: string;
+}> {
   @Prop()
   readonly value: TValueType;
 
@@ -76,6 +81,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
       // so just remove it
       if (validations[key] === void 0) delete validations[key];
     });
+
     return validations;
   }
 

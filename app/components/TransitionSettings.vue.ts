@@ -3,15 +3,14 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
-import { TObsFormData, IObsInput } from 'components/obs/inputs/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
-import { $t } from 'services/i18n';
-import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
   components: {
     GenericForm,
-    VFormGroup,
+    HFormGroup,
     ...inputComponents,
   },
 })
@@ -34,16 +33,13 @@ export default class SceneTransitions extends Vue {
     return this.transitionsService.getTypes();
   }
 
-  get durationModel(): IObsInput<number> {
-    return {
-      description: $t('Duration'),
-      name: 'duration',
-      value: this.transition.duration,
-    };
+  get durationModel(): number {
+    return this.transitionsService.state.transitions.find(tran => tran.id === this.transitionId)
+      .duration;
   }
 
-  set durationModel(model: IObsInput<number>) {
-    this.transitionsService.setDuration(this.transitionId, model.value);
+  set durationModel(value: number) {
+    this.transitionsService.setDuration(this.transitionId, value);
   }
 
   get nameModel(): string {

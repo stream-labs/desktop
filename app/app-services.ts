@@ -53,7 +53,24 @@ export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
 export { UsageStatisticsService } from './services/usage-statistics';
-export { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
+export {
+  ChatbotApiService,
+  ChatbotBaseApiService,
+  ChatbotAlertsApiService,
+  ChatbotCommonService,
+  ChatbotSongRequestApiService,
+  ChatbotGambleApiService,
+  ChatbotCommandsApiService,
+  ChatbotTimerApiService,
+  ChatbotModToolsApiService,
+  ChatbotQuotesApiService,
+  ChatbotQueueApiService,
+  ChatbotHeistApiService,
+  ChatbotLoyaltyApiService,
+  ChatbotPollApiService,
+  ChatbotBettingApiService,
+  ChatbotImporterApiService,
+} from 'services/chatbot';
 export { MediaGalleryService } from 'services/media-gallery';
 export { GuestApiService } from 'services/guest-api';
 export { MediaBackupService } from 'services/media-backup';

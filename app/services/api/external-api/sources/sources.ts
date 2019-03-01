@@ -6,8 +6,9 @@ import {
   TSourceType,
 } from 'services/sources';
 import { Inject } from 'util/injector';
-import { ISerializable, Singleton } from 'services/api/external-api';
+import { Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
+import { ISerializable } from '../../rpc-api';
 
 export interface ISourceAddOptions {
   channel?: number;

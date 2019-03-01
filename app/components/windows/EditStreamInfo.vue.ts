@@ -11,9 +11,8 @@ import { debounce } from 'lodash';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
@@ -21,6 +20,9 @@ import {
 } from 'services/video-encoding-optimizations';
 import { shell } from 'electron';
 import { IListOption } from '../shared/inputs';
+import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
+import { TwitchService } from 'services/platforms/twitch';
+import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
 
 @Component({
   components: {
@@ -28,6 +30,7 @@ import { IListOption } from '../shared/inputs';
     HFormGroup,
     BoolInput,
     ListInput,
+    TwitchTagsInput,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -35,9 +38,10 @@ export default class EditStreamInfo extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
-  @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() twitchService: TwitchService;
+  @Inject() i18nService: I18nService;
 
   // UI State Flags
   searchingGames = false;
@@ -73,6 +77,12 @@ export default class EditStreamInfo extends Vue {
 
   searchProfilesPending = false;
 
+  allTwitchTags: TTwitchTag[] = null;
+
+  twitchTags: TTwitchTagWithLabel[] = null;
+
+  hasUpdateTagsPermission: boolean = true;
+
   get useOptimizedProfile() {
     return this.videoEncodingOptimizationService.state.useOptimizedProfile;
   }
@@ -83,6 +93,18 @@ export default class EditStreamInfo extends Vue {
 
   async created() {
     this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
+
+    this.streamInfoService.streamInfoChanged.subscribe(() => {
+      if (this.isTwitch && this.streamInfoService.state.channelInfo) {
+        if (!this.allTwitchTags && !this.twitchTags) {
+          this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
+          this.twitchTags = prepareOptions(
+            this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
+            this.streamInfoService.state.channelInfo.tags,
+          );
+        }
+      }
+    });
 
     if (this.streamInfoService.state.channelInfo) {
       this.populatingModels = true;
@@ -102,6 +124,18 @@ export default class EditStreamInfo extends Vue {
     } else {
       // If the stream info pre-fetch failed, we should try again now
       this.refreshStreamInfo();
+    }
+
+    if (this.isTwitch && this.streamInfoService.state.channelInfo) {
+      this.twitchService
+        .hasScope('user:edit:broadcast')
+        .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
+
+      this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
+      this.twitchTags = prepareOptions(
+        this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
+        this.streamInfoService.state.channelInfo.tags,
+      );
     }
   }
 
@@ -180,7 +214,12 @@ export default class EditStreamInfo extends Vue {
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
     this.streamInfoService
-      .setStreamInfo(this.streamTitleModel, this.streamDescriptionModel, this.gameModel)
+      .setStreamInfo(
+        this.streamTitleModel,
+        this.streamDescriptionModel,
+        this.gameModel,
+        this.isTwitch && this.twitchTags && this.twitchTags.length ? this.twitchTags : undefined,
+      )
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -246,7 +285,7 @@ export default class EditStreamInfo extends Vue {
           this.$toasted.show(e.error.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 1000,
+            duration: 50 * e.error.message.length,
             singleton: true,
           });
         });
@@ -262,7 +301,6 @@ export default class EditStreamInfo extends Vue {
 
   goLive() {
     this.streamingService.toggleStreaming();
-    this.navigationService.navigate('Live');
     this.windowsService.closeChildWindow();
   }
 
@@ -275,6 +313,10 @@ export default class EditStreamInfo extends Vue {
     this.streamInfoService.refreshStreamInfo().then(() => {
       if (this.streamInfoService.state.channelInfo) this.populateModels();
     });
+  }
+
+  setTags(tags: TTwitchTagWithLabel[]) {
+    this.twitchTags = tags;
   }
 
   get isTwitch() {

@@ -162,6 +162,8 @@ export interface ISceneItemActions {
   centerOnScreen(): void;
   rotate(deg: number): void;
   remove(): void;
+  scale(scale: IVec2, origin: IVec2): void;
+  scaleWithOffset(scale: IVec2, offset: IVec2): void;
 
   /**
    * only for scene sources
@@ -177,6 +179,7 @@ export interface ISceneItemApi extends ISceneItem, ISceneItemActions, ISceneNode
    */
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
+  setScale(scale: IVec2, origin: IVec2): void;
 }
 
 export type TSceneNodeType = 'item' | 'folder';

@@ -13,6 +13,13 @@ import {
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
 
+export interface ISerializable {
+  // really wish to have something like
+  // `type TSerializable = number | string | boolean | null | Dictionary<TSerializable> | Array<TSerializable>;`
+  // instead of `any` here
+  getModel(): any;
+}
+
 /**
  * A base class for implementing serializable JSON-RPC API
  * with supporting of Promises and Subscriptions

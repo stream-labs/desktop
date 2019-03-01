@@ -132,14 +132,19 @@ async function checkChance(info, version) {
  * application we're using. The base url should
  * always have an endpoint of `/latest-updater.exe`
  * that points to the updater executable or at
- * least redirects to it. */
+ * least redirects to it. Except for a preview version 
+ * where preview-updater.exe name will be used */
 async function fetchUpdater(info, progress) {
+    let updater_name = 'latest-updater.exe';
+    if(process.env.SLOBS_PREVIEW) {
+        updater_name = 'preview-updater.exe';
+    }
     const reqInfo = {
         baseUrl: info.baseUrl,
-        uri: '/latest-updater.exe'
+        uri: `/${updater_name}`
     };
 
-    const updaterPath = path.resolve(info.tempDir, 'latest-updater.exe');
+    const updaterPath = path.resolve(info.tempDir, updater_name);
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
@@ -237,9 +242,7 @@ async function entry(info) {
 
     const latestVersion = await getVersion(info);
 
-    /* Latest version doesn't necessarily need
-    * to be greater than the current version!
-    * If it's different, update to latest. */
+    /* Latest version need to be greater than the current version! */
     if (!latestVersion) {
         log.info('Failed to fetch latest version!');
         return false;
