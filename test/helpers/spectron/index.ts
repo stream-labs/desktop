@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { sleep } from '../sleep';
+import { releaseUserInPool } from './user';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -32,18 +32,10 @@ export async function focusChild(t: any) {
   await focusWindow(t, /windowId=child/);
 }
 
-// Focuses the Library webview
-export async function focusLibrary(t: any) {
-  // doesn't work without delay, probably need to wait until load
-  await sleep(2000);
-  await focusWindow(t, /streamlabs\.com\/library/);
-}
-
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
   appArgs?: string;
-
   afterStartCb?(t: any): Promise<any>;
 
   /**
@@ -57,7 +49,7 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true
+  restartAppAfterEachTest: true,
 };
 
 export interface ITestContext {
@@ -81,39 +73,29 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
     app = t.context.app = new Application({
-                                            path: path.join(__dirname,
-                                                            '..',
-                                                            '..',
-                                                            '..',
-                                                            '..',
-                                                            'node_modules',
-                                                            '.bin',
-                                                            'electron.cmd'),
-                                            args: [
-                                              '--require',
-                                              path.join(__dirname, 'context-menu-injected.js'),
-                                              '--require',
-                                              path.join(__dirname, 'dialog-injected.js'),
-                                              options.appArgs ? options.appArgs : '',
-                                              '.'
-                                            ],
-                                            env: {
-                                              NODE_ENV: 'test',
-                                              SLOBS_CACHE_DIR: t.context.cacheDir
-                                            },
-                                            webdriverOptions: {
-                                              // most of deprecation warning encourage us to use WebdriverIO actions API
-                                              // however the documentation for this API looks very poor, it provides only one example:
-                                              // http://webdriver.io/api/protocol/actions.html
-                                              // disable deprecation warning and waiting for better docs now
-                                              deprecationWarnings: false,
-                                              windowTypes: ['webview']
-                                            }
-                                          });
+      path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+      args: [
+        '--require',
+        path.join(__dirname, 'context-menu-injected.js'),
+        '--require',
+        path.join(__dirname, 'dialog-injected.js'),
+        options.appArgs ? options.appArgs : '',
+        '.',
+      ],
+      env: {
+        NODE_ENV: 'test',
+        SLOBS_CACHE_DIR: t.context.cacheDir,
+      },
+      webdriverOptions: {
+        // most of deprecation warning encourage us to use WebdriverIO actions API
+        // however the documentation for this API looks very poor, it provides only one example:
+        // http://webdriver.io/api/protocol/actions.html
+        // disable deprecation warning and waiting for better docs now
+        deprecationWarnings: false,
+      },
+    });
 
-    if (options.beforeAppStartCb) {
-      await options.beforeAppStartCb(t);
-    }
+    if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
     await t.context.app.start();
 
@@ -134,8 +116,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (await t.context.app.client.isExisting('button=Start Fresh')) {
         await t.context.app.client.click('button=Start Fresh');
       }
-    }
-    else {
+    } else {
       // Wait for the connect screen before moving on
       await t.context.app.client.isExisting('button=Twitch');
     }
@@ -159,8 +140,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await new Promise(resolve => {
         rimraf(context.cacheDir, resolve);
       });
-    }
-    catch (e) {
+    } catch (e) {
       // TODO: find the reason why some tests are failing here
       testPassed = false;
     }
@@ -172,17 +152,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
-    if (!fs.existsSync(filePath)) {
-      return;
-    }
+    if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
       .split('\n')
       .filter((record: string) => record.match(/\[error\]/));
     fs.unlinkSync(filePath);
-    if (!errors.length) {
-      return;
-    }
+    if (!errors.length) return;
     t.fail();
     testPassed = false;
     console.log('The log-file has errors');
@@ -193,9 +169,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) {
-      await startApp(t);
-    }
+    if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
 
   test.afterEach(async t => {
@@ -208,32 +182,26 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       const client = await getClient();
       await client.unsubscribeAll();
+      await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp();
       }
-    }
-    catch (e) {
+    } catch (e) {
       testPassed = false;
     }
 
     await checkErrorsInLogFile(t);
-    if (!testPassed) {
-      failedTests.push(testName);
-    }
+    if (!testPassed) failedTests.push(testName);
   });
 
   test.after.always(async t => {
     if (appIsRunning) {
       await stopApp();
-      if (!testPassed) {
-        failedTests.push(testName);
-      }
+      if (!testPassed) failedTests.push(testName);
     }
 
-    if (failedTests.length) {
-      saveFailedTestsToFile(failedTests);
-    }
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 }
 
