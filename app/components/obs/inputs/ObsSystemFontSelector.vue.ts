@@ -29,41 +29,9 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 
-  // CSS styles for a particular font
-  styleForFont(font: IFontDescriptor) {
-    let fontStyle = 'normal';
-
-    if (font.italic) {
-      fontStyle = 'italic';
-    }
-
-    return {
-      fontStyle,
-      fontFamily: font.family,
-      fontWeight: font.weight,
-    };
-  }
-
-  // Converts a list of fonts in the same family to
-  // a family object.
-  fontsToFamily(fonts: IFontDescriptor[]) {
-    if (fonts) {
-      return {
-        fonts,
-        family: fonts[0].family,
-      };
-    }
-
-    return { family: '', fonts: [] };
-  }
-
   setFamily(family: string) {
-    // When a new family is selected, we have to select a
-    // default style.  This will be "Regular" if it exists.
-    // Otherwise, it will be the first family on the list.
-
+    // Select a default style for the family, preferably "Regular"
     const regular = this.fonts.find(font => font.style === 'Regular' && font.family === family);
-
     const fontForStyle = regular || this.fonts.find(font => font.family === family);
 
     this.setFont({
@@ -94,14 +62,14 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     // Stops slider component from eagerly setting value on component load
     if (args.size === this.value.value.size) return;
 
+    // Path has to not exist for system fonts to properly toggle with Google fonts
     const fontObj = { ...this.value.value, ...args, path: '' };
     this.emitInput({ ...this.value, value: fontObj });
   }
 
   get selectedFont() {
-    return this.fonts.find(
-      font => this.value.value.face === font.family && this.value.value.style === font.style,
-    );
+    const { face, style } = this.value.value;
+    return this.fonts.find(font => face === font.family && style === font.style);
   }
 
   get stylesForFamily() {
