@@ -3,6 +3,7 @@ import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi } from '../../external-api';
 import { ISourceModel, Source, SourcesService } from '../sources/sources';
 import { ISceneNode, SceneNode } from './scene-node';
+import { AnchorPoint, AnchorPositions } from '../../../../util/ScalableRectangle';
 
 export interface ISceneItem extends ISceneItemSettings, ISceneNode {
   sceneItemId: string;
@@ -132,6 +133,10 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
 
   remove(): void {
     return this.sceneItem.remove();
+  }
+
+  setScale(newScaleModel: IVec2, origin?: IVec2) {
+    return this.sceneItem.setScale(newScaleModel, origin);
   }
 
   /**
