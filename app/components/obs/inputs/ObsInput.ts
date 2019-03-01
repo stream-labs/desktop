@@ -91,6 +91,7 @@ export interface IObsFont {
   flags?: number;
   size?: number;
   path?: string;
+  style?: string;
 }
 
 export interface IGoogleFont {

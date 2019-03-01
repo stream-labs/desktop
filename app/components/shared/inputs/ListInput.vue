@@ -22,8 +22,16 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
+    <template slot="singleLabel">
+      <span :style="options.labelStyle && options.labelStyle()">{{ currentMultiselectValue.title }}</span>
+    </template>
     <template slot="option" slot-scope="props">
-      <span :data-option-value="props.option.value">{{ props.option.title }}</span>
+      <span
+        :data-option-value="props.option.value"
+        :style="options.optionStyle && options.optionStyle(props.option.value)"
+      >
+        {{ props.option.title }}
+      </span>
     </template>
 
     <template v-if="options.noResult" slot="noResult">
