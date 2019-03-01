@@ -54,15 +54,20 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   }
 
   increment() {
-    if (this.options.disabled) return;
-    if (this.options.max !== void 0 && Number(this.displayValue) >= this.options.max) return;
-    this.updateValue(String(Number(this.displayValue) + 1));
+    this.adjust(1);
   }
 
   decrement() {
+    this.adjust(-1);
+  }
+
+  private adjust(val: number) {
     if (this.options.disabled) return;
-    if (this.options.min !== void 0 && Number(this.displayValue) <= this.options.min) return;
-    this.updateValue(String(Number(this.displayValue) - 1));
+    const newVal = Number(this.displayValue) + val;
+    const min = this.options.min !== void 0 ? this.options.min : -Infinity;
+    const max = this.options.max !== void 0 ? this.options.max : Infinity;
+    if (newVal < min || newVal > max) return;
+    this.updateValue(String(newVal));
   }
 
   onMouseWheelHandler(event: WheelEvent) {

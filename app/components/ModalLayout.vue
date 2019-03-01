@@ -14,7 +14,7 @@
     </div>
     <div v-if="showControls" class="modal-layout-controls">
       <button v-if="showCancel" class="button button--default" @click="cancel">{{ $t('Cancel') }}</button>
-      <button v-if="showDone" class="button button--action" @click="done">{{ $t('Done') }}</button>
+      <button v-if="showDone" :disabled="disableDone" class="button button--action" @click="done">{{ $t('Done') }}</button>
     </div>
     <div v-if="customControls" class="modal-layout-controls">
       <slot name="controls"/>

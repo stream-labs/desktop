@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   :title="windowTitle"
-  :show-done="!hasErrors"
+  :disable-done="hasErrors"
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200">
