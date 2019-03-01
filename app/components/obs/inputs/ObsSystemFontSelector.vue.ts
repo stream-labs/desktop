@@ -94,7 +94,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     // Stops slider component from eagerly setting value on component load
     if (args.size === this.value.value.size) return;
 
-    const fontObj = { ...this.value.value, ...args };
+    const fontObj = { ...this.value.value, ...args, path: '' };
     this.emitInput({ ...this.value, value: fontObj });
   }
 
