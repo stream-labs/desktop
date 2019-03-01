@@ -120,7 +120,6 @@ document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
   const storePromise = createStore();
-  const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const i18nService: I18nService = I18nService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
@@ -132,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (Utils.isChildWindow()) {
       ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
     }
-    servicesManager.listenMessages();
   }
 
   storePromise.then(async store => {

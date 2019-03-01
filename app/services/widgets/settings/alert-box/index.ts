@@ -196,7 +196,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private varifySetting(setting: any): IAlertBoxSetting {
-    const { show_message, enabled, variations, showResubMessage, ...rest } = setting;
+    const { show_message, enabled, showResubMessage, ...rest } = setting;
+    const variations = setting.variations || [];
     const defaultVariation = this.reshapeVariation(rest);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),
@@ -211,6 +212,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       setting.image_href === '/images/gallery/default.gif'
         ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
         : setting.image_href;
+    const constrainedDuration =
+      Math.floor(setting.alert_duration / 1000) <= 300
+        ? Math.floor(setting.alert_duration / 1000)
+        : 300;
     return {
       condition: null,
       conditionData: null,
@@ -223,7 +228,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         customHtmlEnabled: setting.custom_html_enabled,
         customJs: setting.custom_js,
         customJson: setting.custom_json,
-        duration: Math.floor(setting.alert_duration / 1000),
+        duration: constrainedDuration,
         hideAnimation: setting.hide_animation,
         image: { href: imgHref },
         layout: setting.layout,

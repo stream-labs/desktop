@@ -10,7 +10,7 @@ import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { Service } from 'services/stateful-service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
-import { JsonrpcService } from 'services/jsonrpc/jsonrpc';
+import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';

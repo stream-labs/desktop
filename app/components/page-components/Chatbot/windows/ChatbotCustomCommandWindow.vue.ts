@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Watch, Vue } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { cloneDeep } from 'lodash';
@@ -6,14 +6,15 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { $t } from 'services/i18n';
 
-import { IChatbotErrorResponse, ICustomCommand } from 'services/chatbot';
+import { ICustomCommand, IChatbotErrorResponse } from 'services/chatbot';
 
 import {
   EInputType,
   IListMetadata,
   INumberMetadata,
   ITextMetadata,
-} from 'components/shared/inputs';
+} from 'components/shared/inputs/index';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -27,12 +28,15 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   };
 
   newCommand: ICustomCommand = {
-    command: null,
-    response: null,
+    command: '',
+    response: '',
     response_type: 'Chat',
     permission: {
       level: 1,
       info: {},
+    },
+    cost: {
+      base: 0,
     },
     cooldowns: {
       global: 0,
@@ -68,61 +72,107 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   }
 
   get customCommandToUpdate() {
-    return this.chatbotCommonService.state.customCommandToUpdate;
+    return this.chatbotApiService.Common.state.customCommandToUpdate;
+  }
+
+  @Watch('newCommand', { immediate: true, deep: true })
+  @debounce(1)
+  onCommandChanged(value: ICustomCommand, oldValue: ICustomCommand) {
+    if (oldValue) {
+      this.newCommand.command = value.command.replace(/ +/g, '');
+    }
   }
 
   // metadata
   commandMetadata: ITextMetadata = {
     required: true,
     type: EInputType.text,
+    title: $t('Command'),
     placeholder: $t('Enter the text string which will trigger the response'),
     tooltip: $t('Enter a word used to trigger a response'),
+    min: 2,
+    max: 25,
+    uuid: $t('Command'),
   };
   responseMetadata: ITextMetadata = {
     required: true,
+    title: $t('Response'),
     type: EInputType.textArea,
     placeholder: $t('The phrase that will appear after a user enters the command'),
+    max: 450,
+    uuid: $t('Response'),
+    blockReturn: true,
   };
 
-  get permissionMetadata(): IListMetadata<number> {
-    return {
+  get permissionMetadata() {
+    const permissionMetadata: IListMetadata<number> = {
       required: true,
+      title: $t('Permission'),
       type: EInputType.list,
       options: this.chatbotPermissions,
     };
+
+    return permissionMetadata;
   }
 
-  get replyTypeMetadata(): IListMetadata<string> {
-    return {
+  get replyTypeMetadata() {
+    const replyTypeMetadata: IListMetadata<string> = {
       required: true,
+      title: $t('Reply In'),
       type: EInputType.list,
       options: this.chatbotResponseTypes,
     };
+
+    return replyTypeMetadata;
   }
 
-  get cooldownsMetadata(): INumberMetadata {
-    return {
+  get cooldownsMetadata() {
+    const timerMetadata: INumberMetadata = {
       type: EInputType.number,
-      placeholder: $t('Cooldown (Value in Seconds)'),
+      title: $t('Cooldown'),
+      placeholder: $t('Cooldown'),
+      tooltip: $t('Value in seconds'),
       min: 0,
+      max: 86400,
+      isInteger: true,
     };
+    return timerMetadata;
+  }
+
+  get costMetaData() {
+    const timerMetadata: INumberMetadata = {
+      type: EInputType.number,
+      title: $t('Cost'),
+      placeholder: $t('Cost'),
+      min: 0,
+      max: 1000000,
+      isInteger: true,
+    };
+    return timerMetadata;
   }
 
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.isEdit) {
-      this.chatbotApiService
-        .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)
-        .catch(this.onErrorHandler);
+      this.chatbotApiService.Commands.updateCustomCommand(
+        this.customCommandToUpdate.id,
+        this.newCommand,
+      ).catch(this.onErrorHandler);
       return;
     }
 
-    this.chatbotApiService.createCustomCommand(this.newCommand).catch(this.onErrorHandler);
+    this.chatbotApiService.Commands.createCustomCommand(this.newCommand).catch(this.onErrorHandler);
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {

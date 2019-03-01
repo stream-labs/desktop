@@ -1,8 +1,15 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { INumberMetadata } from './index';
 
-@Component({})
+@Component({
+  watch: {
+    value(value) {
+      // @ts-ignore
+      this.handleInput(value);
+    },
+  },
+})
 export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
   @Prop()
   readonly value: number | string; // the string type is for empty field
@@ -27,20 +34,36 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
   updateValue(value: string) {
     let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
-    if (this.timeout) clearTimeout(this.timeout);
+    formattedValue = this.constrainValue(formattedValue);
+    this.displayValue = formattedValue;
+    // TODO: Remove early return and re-implement proper validations
+    if (this.timeout) return;
+    this.emitInput(formattedValue);
+  }
+
+  updateDecimal(value: string) {
+    const formattedValue = this.constrainValue(value);
+    this.displayValue = formattedValue;
+    // TODO: Remove early return and re-implement proper validations
+    if (this.timeout) return;
+    this.emitInput(formattedValue);
+  }
+
+  constrainValue(value: string) {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
 
     if (this.options.min !== void 0 && Number(value) < this.options.min) {
       this.timeout = window.setTimeout(() => this.updateValue(`${this.options.min}`), 1000);
-      // TODO: Remove early return and re-implement proper validations
-      return;
     }
 
     if (this.options.max !== void 0 && Number(value) > this.options.max) {
-      formattedValue = String(this.options.max);
+      return String(this.options.max);
     }
 
-    this.displayValue = formattedValue;
-    this.emitInput(formattedValue);
+    return value;
   }
 
   handleInput(value: string) {
@@ -48,22 +71,25 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     if (this.options.isInteger) {
       this.updateValue(value);
     } else {
-      this.emitInput(value);
+      this.updateDecimal(value);
     }
   }
 
   increment() {
+    if (this.options.disabled) return;
     this.updateValue(String(Number(this.displayValue) + 1));
   }
 
   decrement() {
+    if (this.options.disabled) return;
     this.updateValue(String(Number(this.displayValue) - 1));
   }
 
   onMouseWheelHandler(event: WheelEvent) {
     const canChange =
       (event.target !== this.$refs.input || this.$refs.input === document.activeElement) &&
-      this.options.isInteger;
+      this.options.isInteger &&
+      !this.options.disabled;
     if (!canChange) return;
     if (event.deltaY > 0) this.decrement();
     else this.increment();

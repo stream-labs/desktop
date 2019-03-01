@@ -76,7 +76,10 @@ export class MediaGalleryService extends Service {
 
   async fetchGalleryInfo(): Promise<IMediaGalleryInfo> {
     const [files, limits] = await Promise.all([this.fetchFiles(), this.fetchFileLimits()]);
-    const totalUsage = files.reduce((size: number, file: IMediaGalleryFile) => size + file.size, 0);
+    const totalUsage = files.reduce(
+      (size: number, file: IMediaGalleryFile) => size + Number(file.size),
+      0,
+    );
     return { files, totalUsage, ...limits };
   }
 

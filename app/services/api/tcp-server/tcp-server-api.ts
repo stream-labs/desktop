@@ -1,4 +1,4 @@
-import { ISettingsSubCategory } from '../settings';
+import { ISettingsSubCategory } from '../../settings/index';
 
 export interface ITcpServersSettings {
   token: string;

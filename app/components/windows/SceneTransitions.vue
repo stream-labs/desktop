@@ -134,6 +134,8 @@
 
 .transition-settings-modal {
   padding: 20px;
+  overflow-y: auto;
+  height: 480px;
 }
 
 .connection-settings-modal {

@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.11.15",
+  "version": "0.12.0-preview.2",
   "main": "main.js",
   "engines": {
     "node": ">= 8 < 12",
@@ -30,7 +30,8 @@
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
-    "commit": "commit"
+    "commit": "commit",
+    "postinstall": "scripts/facemask-plugin-move.bat"
   },
   "prettier": {
     "singleQuote": true,
@@ -101,10 +102,11 @@
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz",
     "electron-log": "^2.2.17",
     "electron-window-state": "5.0.3",
+    "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.3.tar.gz",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-iojs-v2.0.8.tar.gz",
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.2-iojs-v2.0.8.tar.gz",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",

@@ -12,10 +12,10 @@ import { IChatbotModule } from 'services/chatbot';
 })
 export default class ChatbotModTools extends ChatbotBase {
   mounted() {
-    this.chatbotApiService.fetchCapsProtection();
-    this.chatbotApiService.fetchSymbolProtection();
-    this.chatbotApiService.fetchLinkProtection();
-    this.chatbotApiService.fetchWordProtection();
+    this.chatbotApiService.ModTools.fetchCapsProtection();
+    this.chatbotApiService.ModTools.fetchSymbolProtection();
+    this.chatbotApiService.ModTools.fetchLinkProtection();
+    this.chatbotApiService.ModTools.fetchWordProtection();
   }
 
   get modules(): IChatbotModule[] {
@@ -27,10 +27,10 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-caps--${backgroundUrlSuffix}.png`),
         enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openCapsProtectionWindow();
+          this.chatbotApiService.Common.openCapsProtectionWindow();
         },
         onToggleEnabled: () => {
-          this.chatbotApiService.updateCapsProtection({
+          this.chatbotApiService.ModTools.updateCapsProtection({
             ...this.capsProtection,
             enabled: !this.capsProtectionCurrentlyEnabled,
           });
@@ -42,10 +42,10 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-symbol--${backgroundUrlSuffix}.png`),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openSymbolProtectionWindow();
+          this.chatbotApiService.Common.openSymbolProtectionWindow();
         },
         onToggleEnabled: () => {
-          this.chatbotApiService.updateSymbolProtection({
+          this.chatbotApiService.ModTools.updateSymbolProtection({
             ...this.symbolProtection,
             enabled: !this.symbolProtectionCurrentlyEnabled,
           });
@@ -59,10 +59,10 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-link--${backgroundUrlSuffix}.png`),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openLinkProtectionWindow();
+          this.chatbotApiService.Common.openLinkProtectionWindow();
         },
         onToggleEnabled: () => {
-          this.chatbotApiService.updateLinkProtection({
+          this.chatbotApiService.ModTools.updateLinkProtection({
             ...this.linkProtection,
             enabled: !this.linkProtectionCurrentlyEnabled,
           });
@@ -74,10 +74,10 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-word--${backgroundUrlSuffix}.png`),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openWordProtectionWindow();
+          this.chatbotApiService.Common.openWordProtectionWindow();
         },
         onToggleEnabled: () => {
-          this.chatbotApiService.updateWordProtection({
+          this.chatbotApiService.ModTools.updateWordProtection({
             ...this.wordProtection,
             enabled: !this.wordProtectionCurrentlyEnabled,
           });
@@ -87,34 +87,34 @@ export default class ChatbotModTools extends ChatbotBase {
   }
 
   get capsProtection() {
-    return this.chatbotApiService.state.capsProtectionResponse;
+    return this.chatbotApiService.ModTools.state.capsProtectionResponse;
   }
 
   get symbolProtection() {
-    return this.chatbotApiService.state.symbolProtectionResponse;
+    return this.chatbotApiService.ModTools.state.symbolProtectionResponse;
   }
 
   get linkProtection() {
-    return this.chatbotApiService.state.linkProtectionResponse;
+    return this.chatbotApiService.ModTools.state.linkProtectionResponse;
   }
 
   get wordProtection() {
-    return this.chatbotApiService.state.wordProtectionResponse;
+    return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
   get capsProtectionCurrentlyEnabled() {
-    return this.capsProtection.enabled;
+    return this.capsProtection.enabled === true;
   }
 
   get symbolProtectionCurrentlyEnabled() {
-    return this.symbolProtection.enabled;
+    return this.symbolProtection.enabled === true;
   }
 
   get linkProtectionCurrentlyEnabled() {
-    return this.linkProtection.enabled;
+    return this.linkProtection.enabled === true;
   }
 
   get wordProtectionCurrentlyEnabled() {
-    return this.wordProtection.enabled;
+    return this.wordProtection.enabled === true;
   }
 }

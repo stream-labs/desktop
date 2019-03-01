@@ -3,7 +3,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Media Share Preferences')"
 >
   <div slot="fixed">
     <div class="row">
@@ -23,8 +22,8 @@
   <div slot="content" class="chatbot-song-request__container">
     <validated-form ref="form">
       <div v-if="songRequestData">
-        <transition name='fade' mode="out-in" appear>
-          <div v-if="selectedTab === 'general' && !!songRequestData.general">
+
+          <div v-show="selectedTab === 'general' && !!songRequestData.general">
             <VFormGroup
               :title="$t('Max Duration (Value in Seconds)')"
               v-model="songRequestData.general.max_duration"
@@ -36,7 +35,7 @@
               :metadata="metadata.general.filter_level"
             />
           </div>
-          <div v-else>
+          <div v-show="selectedTab === 'blacklist'">
             <table v-if="songRequestBannedMedia.length > 0">
               <thead>
                 <tr>
@@ -69,7 +68,6 @@
               {{ $t('No items in list. Add new.') }}
             </div>
           </div>
-        </transition>
       </div>
     </validated-form>
   </div>
@@ -83,6 +81,7 @@
       <button
         class="button button--action"
         @click="onSaveHandler"
+        :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
       </button>
@@ -114,7 +113,7 @@
   z-index: 1;
   width: 100%;
   padding: 15px;
-  height: 54px;
+  height: 48px;
   border-bottom: 1px solid @day-border;
   cursor: pointer;
   text-align: right;

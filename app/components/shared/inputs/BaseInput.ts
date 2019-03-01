@@ -81,6 +81,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
       // so just remove it
       if (validations[key] === void 0) delete validations[key];
     });
+
     return validations;
   }
 

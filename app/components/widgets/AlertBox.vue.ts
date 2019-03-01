@@ -9,6 +9,7 @@ import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { Inject } from 'util/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import { FacemasksService } from 'services/facemasks';
 
 const alertNameMap = () => ({
   bits: $t('Bits'),
@@ -33,6 +34,7 @@ const alertNameMap = () => ({
   stars: $t('Stars'),
   support: $t('Support'),
   likes: $t('Likes'),
+  facemasks: $t('Facemask Donations'),
 });
 
 const triggerAmountMap = {
@@ -66,6 +68,7 @@ const HAS_DONOR_MESSAGE = [
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
+  @Inject() facemasksService: FacemasksService;
 
   $refs: { [key: string]: HTMLElement };
 
@@ -94,6 +97,8 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   selectedId = 'default';
   editingName: string = null;
   languages: any[] = [];
+
+  facemaskEnabled = this.facemasksService.getEnabledStatus();
 
   get metadata() {
     return this.service.getMetadata(this.selectedAlert, this.languages);
@@ -202,5 +207,19 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   nameBlurHandler(id: string) {
     this.save();
     this.editingName = null;
+  }
+
+  handleFacemaskInput() {
+    if (this.selectedAlert === 'facemasks') {
+      const { duration } = this.selectedVariation.settings;
+      this.facemasksService
+        .updateFacemaskSettings({
+          duration,
+          enabled: this.facemaskEnabled,
+          device: this.facemasksService.getEnabledDevice(),
+        })
+        .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
+    }
+    this.save();
   }
 }

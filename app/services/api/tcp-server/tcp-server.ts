@@ -1,21 +1,21 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
-import { ServicesManager } from '../../services-manager';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
-import { ISettingsSubCategory } from 'services/settings';
+import { ISettingsSubCategory } from 'services/settings/index';
 import { mutation } from 'services/stateful-service';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../../util/injector';
 import {
   JsonrpcService,
   E_JSON_RPC_ERROR,
   IJsonRpcEvent,
   IJsonRpcRequest,
   IJsonRpcResponse,
-} from 'services/jsonrpc';
+} from 'services/api/jsonrpc/index';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
-import { UsageStatisticsService } from '../usage-statistics';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { ExternalApiService } from '../external-api';
 
 const net = require('net');
 
@@ -45,6 +45,9 @@ interface IServer {
 
 const TCP_PORT = 28194;
 
+/**
+ * A transport layer for TCP and Websockets communications with internal API
+ */
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {
@@ -62,7 +65,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
-  private servicesManager: ServicesManager = ServicesManager.instance;
+  @Inject() private externalApiService: ExternalApiService;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
   private servers: IServer[] = [];
@@ -73,7 +76,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   init() {
     super.init();
-    this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
+    this.externalApiService.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
   }
 
   listen() {
@@ -349,7 +352,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         // some requests have to be handled by TcpServerService
         if (this.hadleTcpServerDirectives(client, request)) return;
 
-        const response = this.servicesManager.executeServiceRequest(request);
+        const response = this.externalApiService.executeServiceRequest(request);
 
         // if response is subscription then add this subscription to client
         if (response.result && response.result._type === 'SUBSCRIPTION') {
@@ -430,7 +433,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // handle unsubscribing by clearing client subscriptions
     if (
       request.method === 'unsubscribe' &&
-      this.servicesManager.subscriptions[request.params.resource]
+      this.externalApiService.subscriptions[request.params.resource]
     ) {
       const subscriptionInd = client.subscriptions.indexOf(request.params.resource);
       if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);

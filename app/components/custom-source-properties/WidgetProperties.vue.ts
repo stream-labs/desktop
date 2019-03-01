@@ -3,7 +3,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
 import { WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
-import { ChatbotCommonService } from 'services/chatbot';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
@@ -15,7 +14,6 @@ export default class WidgetProperties extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
-  @Inject() chatbotCommonService: ChatbotCommonService;
 
   get isLoggedIn() {
     return this.userService.isLoggedIn();

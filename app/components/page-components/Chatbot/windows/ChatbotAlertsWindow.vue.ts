@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import { Component } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import NavItem from 'components/shared/NavItem.vue';
@@ -70,12 +69,12 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   onDoneHandler() {
-    this.chatbotCommonService.closeChildWindow();
+    this.chatbotApiService.Common.closeChildWindow();
   }
 
   onResetHandler() {
     if (confirm($t('Are you sure you want to reset chatbot notifications preferences?'))) {
-      this.chatbotApiService.resetSettings('chat-notifications');
+      this.chatbotApiService.Alerts.resetSettings();
     }
   }
 

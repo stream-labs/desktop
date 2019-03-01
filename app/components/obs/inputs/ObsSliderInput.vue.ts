@@ -1,10 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, ObsInput, IObsSliderInputValue } from './ObsInput';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { SliderInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { HFormGroup, SliderInput },
+  components: { HFormGroup },
 })
 class ObsSliderInput extends ObsInput<IObsSliderInputValue> {
   static obsType: TObsType;
@@ -17,6 +16,8 @@ class ObsSliderInput extends ObsInput<IObsSliderInputValue> {
 
   get metadata() {
     return {
+      type: 'slider',
+      title: this.value.showDescription !== false ? this.value.description : undefined,
       disabled: this.value.enabled === false,
       max: this.value.maxVal,
       min: this.value.minVal,

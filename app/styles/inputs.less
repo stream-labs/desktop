@@ -54,6 +54,13 @@
   }
 }
 
+.input-wrapper.disabled {
+  opacity: 0.5;
+  div, input {
+    cursor: not-allowed;
+  }
+}
+
 .input--search {
   padding: 0 30px 0 8px;
 }
@@ -61,7 +68,8 @@
 input[type=text],
 input[type=number],
 input[type=password],
-textarea {
+textarea,
+textarea[type=text] {
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
@@ -94,7 +102,8 @@ textarea {
   }
 }
 
-textarea {
+textarea,
+textarea[type=text] {
   .padding();
   line-height: 20px;
 }

@@ -21,7 +21,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
-import { TcpServerService } from 'services/tcp-server';
+import { TcpServerService } from 'services/api/tcp-server';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,

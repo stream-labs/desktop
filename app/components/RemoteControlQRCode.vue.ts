@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
 import { Inject } from '../util/injector';
-import { ITcpServerServiceApi } from 'services/tcp-server';
+import { ITcpServerServiceApi } from 'services/api/tcp-server';
 import { HostsService } from 'services/hosts';
 
 interface IQRCodeData {
