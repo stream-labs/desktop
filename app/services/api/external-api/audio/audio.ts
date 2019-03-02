@@ -20,6 +20,18 @@ export class AudioService {
   getSources(): AudioSource[] {
     return this.audioService.getSources().map(source => this.getSource(source.sourceId));
   }
+
+  getSourcesForCurrentScene(): AudioSource[] {
+    return this.audioService
+      .getSourcesForCurrentScene()
+      .map(source => this.getSource(source.sourceId));
+  }
+
+  getSourcesForScene(sceneId: string): AudioSource[] {
+    return this.audioService
+      .getSourcesForScene(sceneId)
+      .map(source => this.getSource(source.sourceId));
+  }
 }
 
 export interface IFader {
@@ -62,5 +74,13 @@ export class AudioSource implements ISerializable {
       muted: this.audioSource.muted,
       mixerHidden: this.audioSource.mixerHidden,
     };
+  }
+
+  setDeflection(deflection: number) {
+    return this.audioSource.setDeflection(deflection);
+  }
+
+  setMuted(muted: boolean) {
+    return this.audioSource.setMuted(muted);
   }
 }
