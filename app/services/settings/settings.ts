@@ -1,4 +1,4 @@
-import { invert, cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { StatefulService, mutation } from 'services/stateful-service';
 import {
   inputValuesToObsValues,

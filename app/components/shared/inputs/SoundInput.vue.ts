@@ -1,4 +1,3 @@
-import { shell } from 'electron';
 import Component from 'vue-class-component';
 import { Inject } from 'util/injector';
 import { Prop } from 'vue-property-decorator';

@@ -1,7 +1,6 @@
 import { StatefulService, mutation } from '../stateful-service';
 import {
   IPlatformService,
-  IPlatformAuth,
   IChannelInfo,
   IGame,
   TPlatformCapability,
