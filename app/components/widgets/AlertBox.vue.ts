@@ -127,7 +127,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
       { value: 'animation', label: $t('Animation') },
     ];
     if (HAS_DONOR_MESSAGE.includes(this.selectedAlert)) {
-      baseItems.push({ value: 'message', label: $t('Donor Message') });
+      baseItems.push({
+        value: 'message',
+        label: this.selectedAlert === 'subs' ? $t('Resub Message') : $t('Donor Message'),
+      });
     }
     if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId !== 'default') {
       baseItems.push({ value: 'alert', label: $t('Alert Settings') });
