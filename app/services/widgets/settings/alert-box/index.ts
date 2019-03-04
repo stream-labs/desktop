@@ -380,8 +380,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
-      settingsObj.show_resub_message = settings.subs.showResubMessage;
     });
+    settingsObj.show_resub_message = settings.subs && settings.subs.showResubMessage;
     return settingsObj;
   }
 }
