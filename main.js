@@ -53,7 +53,8 @@ const releaseChannel = (() => {
 ////////////////////////////////////////////////////////////////////////////////
 
 (function setupLogger() {
-  // default logs path is %USERPROFILE%\AppData\Roaming\<app name>\log.log
+  // save logs to the cache directory
+  path.join(app.getPath('userData'), 'log.log');
   electronLog.transports.file.level = 'info';
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
