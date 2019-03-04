@@ -26,14 +26,10 @@
       <span
         :data-option-value="props.option.value"
         :style="options.optionStyle && options.optionStyle(props.option.value)"
-      >
-        {{ props.option.title }}
-      </span>
+      >{{ props.option.title }}</span>
     </template>
 
-    <template v-if="options.noResult" slot="noResult">
-      {{ options.noResult }}
-    </template>
+    <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
 
   </multiselect>
   <div v-if="selectedOption && selectedOption.description" class="description">
