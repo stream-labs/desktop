@@ -23,6 +23,7 @@ class ObsNumberInput extends ObsInput<IObsNumberInputValue> {
       max: this.value.maxVal,
       title: this.value.description,
       fullWidth: true,
+      required: true,
     };
   }
 
