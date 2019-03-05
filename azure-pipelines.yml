@@ -26,4 +26,6 @@ steps:
 
 - bash: 'yarn test-flaky'
   displayName: 'Run Tests'
+  env:
+    SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
 
