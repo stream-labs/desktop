@@ -55,7 +55,6 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   internalSearch?: boolean;
   allowCustom?: Function;
   noResult?: string;
-  optionStyle?: Function;
 }
 
 export interface ITextMetadata extends IInputMetadata {

@@ -22,12 +22,11 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <template slot="option" slot-scope="props">
-      <span
-        :data-option-value="props.option.value"
-        :style="options.optionStyle && options.optionStyle(props.option.value)"
-      >{{ props.option.title }}</span>
-    </template>
+    <span :data-option-value="props.option.value">
+      <template v-slot:option="props">
+        <slot name="item" v-bind:option="props.option">{{ props.option.title }}</slot>
+      </template>
+    </span>
 
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
 

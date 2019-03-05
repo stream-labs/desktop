@@ -5,7 +5,11 @@
         <label>{{$t('Font Family')}}</label>
       </div>
       <div class="input-wrapper">
-        <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily" />
+        <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily">
+          <template v-slot:item="{ option }">
+            <span :style="familyOptionStyle(option.value)">{{ option.title }}</span>
+          </template>
+        </list-input>
       </div>
     </div>
     <div class="input-container">
@@ -13,7 +17,11 @@
         <label>{{$t('Font Style')}}</label>
       </div>
       <div class="input-wrapper">
-        <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle" />
+        <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle">
+          <template v-slot:item="{ option }">
+            <span :style="styleOptionStyle(option.value)">{{ option.title }}</span>
+          </template>
+        </list-input>
       </div>
     </div>
     <font-size-selector :value="value.value.size" @input="setSize" />
