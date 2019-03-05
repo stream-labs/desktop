@@ -47,11 +47,6 @@
       "git add"
     ]
   },
-  "config": {
-    "commitizen": {
-      "path": "@commitlint/prompt"
-    }
-  },
   "build": {
     "appId": "com.streamlabs.slobs",
     "productName": "Streamlabs OBS",
@@ -123,8 +118,6 @@
     "@babel/preset-env": "7.1.6",
     "@commitlint/cli": "7.2.1",
     "@commitlint/config-conventional": "7.1.2",
-    "@commitlint/prompt": "7.5.0",
-    "@commitlint/prompt-cli": "7.5.0",
     "@sentry/browser": "4.4.1",
     "@types/archiver": "2.1.2",
     "@types/classnames": "^2.2.7",
@@ -147,7 +140,7 @@
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "circular-dependency-plugin": "3.0.0",
     "classnames": "^2.2.6",
-    "commitizen": "3.0.4",
+    "commitizen": "3.0.7",
     "cross-spawn": "6.0.5",
     "css-element-queries": "1.0.2",
     "css-loader": "2.1.0",
@@ -192,7 +185,7 @@
     "tslint-config-prettier": "1.14.0",
     "tslint-loader": "3.6.0",
     "tslint-plugin-prettier": "2.0.1",
-    "typedoc": "0.11.1",
+    "typedoc": "0.14.2",
     "typescript": "3.2.1",
     "unzip-stream": "0.3.0",
     "urijs": "1.19.1",
