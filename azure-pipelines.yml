@@ -28,4 +28,5 @@ steps:
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+    CI: true
 
