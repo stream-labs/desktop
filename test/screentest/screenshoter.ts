@@ -3,17 +3,16 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { focusChild } from '../helpers/spectron/index';
+import { focusChild } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
-import { IAudioServiceApi } from '../../app/services/audio/audio-api';
-import { WindowsService } from "../../app/services/windows";
+import { IAudioServiceApi } from '../../app/services/audio';
+import { WindowsService } from '../../app/services/windows';
 
 const fs = require('fs');
 const CONFIG = getConfig();
 let configs: Dictionary<any>[];
 
 let branchName: string;
-
 
 export async function applyConfig(t: any, config: Dictionary<any>) {
   const api = await getClient();
@@ -22,17 +21,13 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
   customizationService.setNightMode(config.nightMode);
 
   if (config.resolution) {
-    t.context.app.browserWindow.setSize(
-      config.resolution.width, config.resolution.height
-    );
+    t.context.app.browserWindow.setSize(config.resolution.width, config.resolution.height);
   }
 
   await sleep(400);
 }
 
-
 export async function makeScreenshots(t: any, options: IScreentestOptions) {
-
   const api = await getClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
@@ -46,7 +41,6 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
   // main window title may contain different project version
   windowService.updateMainWindowOptions({ title: 'Streamlabs OBS - screentest' });
 
-
   if (options.window === 'child') {
     await focusChild(t);
   }
@@ -58,10 +52,9 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
     const config = configs[configInd];
 
     for (const paramName in config) {
-      if (
-        CONFIG.configs[paramName].window &&
-        CONFIG.configs[paramName].window !== options.window
-      ) delete config[paramName];
+      if (CONFIG.configs[paramName].window && CONFIG.configs[paramName].window !== options.window) {
+        delete config[paramName];
+      }
     }
 
     const configStr = JSON.stringify(config);
@@ -75,7 +68,6 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
       fs.writeFileSync(`${CONFIG.dist}/${branchName}/${imageFileName}`, imageBuffer);
     });
   }
-
 }
 
 interface IScreentestOptions {
@@ -83,7 +75,6 @@ interface IScreentestOptions {
 }
 
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
-
   const currentBranchFile = `${CONFIG.dist}/current-branch.txt`;
   if (fs.existsSync(currentBranchFile)) {
     branchName = fs.readFileSync(currentBranchFile).toString();
@@ -99,4 +90,3 @@ export function useScreentest(options: IScreentestOptions = { window: 'main' }) 
     await makeScreenshots(t, options);
   });
 }
-

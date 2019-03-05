@@ -45,7 +45,7 @@
   display: inline-block;
   margin: 10px;
   width: 300px;
-  .radius();
+  .radius(2);
   background-color: @day-secondary;
 
   &.chatbot-module__container--coming-soon {

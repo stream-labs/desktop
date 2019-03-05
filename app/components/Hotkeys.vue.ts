@@ -4,13 +4,12 @@ import { Inject } from '../util/injector';
 import { HotkeysService } from '../services/hotkeys';
 import { ScenesService } from '../services/scenes';
 import { SourcesService } from '../services/sources';
-import HotkeyGroup from './HotkeyGroup.vue';
+import HotkeyGroup from './HotkeyGroup';
 
 @Component({
-  components: { HotkeyGroup }
+  components: { HotkeyGroup },
 })
 export default class Hotkeys extends Vue {
-
   @Inject()
   sourcesService: SourcesService;
 
@@ -35,5 +34,4 @@ export default class Hotkeys extends Vue {
   get sources() {
     return this.sourcesService.sources;
   }
-
 }

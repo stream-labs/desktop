@@ -8,9 +8,9 @@ import { MediaGalleryService } from 'services/media-gallery';
 import { TextInput } from './inputs';
 
 @Component({
-  components: { TextInput }
+  components: { TextInput },
 })
-export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMetadata>{
+export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMetadata> {
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() readonly value: string;
   @Prop() readonly metadata: IMediaGalleryMetadata;
@@ -30,7 +30,7 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   }
 
   clearImage() {
-    this.emitInput(this.metadata.clearImage);
+    this.emitInput(this.metadata.clearImage || '');
   }
 
   previewImage() {

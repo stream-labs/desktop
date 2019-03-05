@@ -6,7 +6,6 @@ import { Component } from 'vue-property-decorator';
 
 @Component({})
 export default class PerformanceMetricsSoftware extends Vue {
-
   @Inject()
   streamingService: StreamingService;
 
@@ -20,5 +19,4 @@ export default class PerformanceMetricsSoftware extends Vue {
   get frameRate() {
     return this.performanceService.state.frameRate.toFixed(2);
   }
-
 }

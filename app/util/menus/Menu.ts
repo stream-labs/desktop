@@ -4,7 +4,6 @@ import electron from 'electron';
 const { remote } = electron;
 
 export class Menu {
-
   menu: Electron.Menu;
 
   constructor() {
@@ -12,7 +11,7 @@ export class Menu {
   }
 
   popup() {
-    this.menu.popup({ window: remote.getCurrentWindow() });
+    this.menu.popup({ browserWindow: remote.getCurrentWindow() });
   }
 
   append(options: Electron.MenuItemConstructorOptions) {
@@ -25,5 +24,4 @@ export class Menu {
     });
     (this.menu as any).destroy();
   }
-
 }

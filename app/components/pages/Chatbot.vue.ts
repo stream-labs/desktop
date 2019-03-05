@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import NavItem from 'components/shared/NavItem.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import ChatbotModules from 'components/page-components/Chatbot/ChatbotModules.vue';
@@ -12,8 +12,11 @@ import ChatbotQuotes from 'components/page-components/Chatbot/ChatbotQuotes.vue'
 import ChatbotQueue from 'components/page-components/Chatbot/ChatbotQueue.vue';
 import { ChatbotApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
-import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
+import ToggleInput from 'components/shared/inputs/ToggleInput';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
+import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
+import ChatbotPoll from 'components/page-components/Chatbot/ChatbotPoll.vue';
+import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vue';
 
 @Component({
   components: {
@@ -28,8 +31,11 @@ import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBann
     ChatbotQuotes,
     ChatbotQueue,
     ToggleInput,
-    ChatbotBanner
-  }
+    ChatbotBanner,
+    ChatbotLoyalty,
+    ChatbotPoll,
+    ChatbotBetting,
+  },
 })
 export default class Chatbot extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
@@ -42,16 +48,16 @@ export default class Chatbot extends Vue {
       children: [
         { title: 'Custom Commands' },
         { title: 'Default Commands' },
-        { title: 'Variables' }
-      ]
+        { title: 'Variables' },
+      ],
     },
     { title: 'Timers', enabled: true },
     { title: 'Mod Tools', enabled: true },
-    { title: 'Quotes', enabled: false },
-    { title: 'Queue', enabled: false },
-    { title: 'Currency', enabled: false },
-    { title: 'Poll', enabled: false },
-    { title: 'Betting', enabled: false }
+    { title: 'Quotes', enabled: true },
+    { title: 'Queue', enabled: true },
+    { title: 'Loyalty', enabled: true },
+    { title: 'Poll', enabled: true },
+    { title: 'Betting', enabled: true },
   ];
 
   //
@@ -64,9 +70,9 @@ export default class Chatbot extends Vue {
     'Mod Tools': 'fas fa-ban',
     Quotes: 'fas fa-quote-left',
     Queue: 'fas fa-list-ul',
-    Currency: 'fas fa-dollar-sign',
+    Loyalty: 'fas fa-dollar-sign',
     Poll: 'icon-suggestions',
-    Betting: 'fas fa-money-bill-wave'
+    Betting: 'fas fa-money-bill-wave',
   };
 
   selectedTab = 'Modules';
@@ -75,23 +81,22 @@ export default class Chatbot extends Vue {
   enabled = false;
 
   get globallyEnabled() {
-    return this.chatbotApiService.state.globallyEnabled;
+    return this.chatbotApiService.Base.state.globallyEnabled;
   }
 
-  onToggleEnableChatbotHandler() {
-    this.chatbotApiService.toggleEnableChatbot();
+  async onToggleEnableChatbotHandler() {
+    await this.chatbotApiService.Base.toggleEnableChatbot();
   }
 
   mounted() {
-
-    this.chatbotApiService
-      .logIn()
+    this.chatbotApiService.Base.logIn()
       .then(response => {
         this.authenticated = true;
       })
       .catch(err => {
         alert('Error authorizing you into chatbot');
       });
+
+    this.onToggleEnableChatbotHandler = this.onToggleEnableChatbotHandler.bind(this);
   }
 }
-

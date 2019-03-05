@@ -5,7 +5,6 @@ import { OnboardingService } from '../../../services/onboarding';
 
 @Component({})
 export default class OptimizeA extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
@@ -16,5 +15,4 @@ export default class OptimizeA extends Vue {
   skip() {
     this.onboardingService.skip();
   }
-
 }

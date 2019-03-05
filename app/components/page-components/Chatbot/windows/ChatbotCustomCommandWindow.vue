@@ -2,23 +2,22 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="isEdit ? $t('Edit Command') : $t('Add Command')"
 >
   <div slot="fixed">
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     </Tabs>
   </div>
   <div slot="content" class="chatbot-add-command__container">
-    <transition name='fade' mode="out-in" appear>
+
       <validated-form ref="form">
-        <div v-if="selectedTab === 'general'">
+        <div v-show="selectedTab === 'general'">
           <VFormGroup
             :title="$t('Command')"
             v-model="newCommand.command"
             :metadata="commandMetadata"
           />
           <VFormGroup
-            :title="$t('Response (Line breaks will be ignored)')"
+            :title="$t('Response')"
             v-model="newCommand.response"
             :metadata="responseMetadata"
           />
@@ -39,27 +38,35 @@
             </div>
           </div>
         </div>
-        <div v-if="selectedTab === 'advanced'">
+        <div v-show="selectedTab === 'advanced'">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
-                :title="$t('Global Command Cooldown (Value in Seconds)')"
+                :title="$t('Global Command Cooldown')"
                 v-model="newCommand.cooldowns.global"
                 :metadata="cooldownsMetadata"
               />
             </div>
             <div class="small-6 columns">
               <VFormGroup
-                :title="$t('User Command Cooldown (Value in Seconds)')"
+                :title="$t('User Command Cooldown')"
                 v-model="newCommand.cooldowns.user"
                 :metadata="cooldownsMetadata"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="small-6 columns">
+              <VFormGroup
+                :title="$t('Cost')"
+                v-model="newCommand.cost.base"
+                :metadata="costMetaData"
               />
             </div>
           </div>
           <ChatbotAliases v-model="newCommand.aliases" />
         </div>
       </validated-form>
-    </transition>
   </div>
   <div slot="controls">
     <button
@@ -70,6 +77,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0"
     >
       {{ $t("Save") }}
     </button>
@@ -79,7 +87,7 @@
 
 <script lang="ts" src="./ChatbotCustomCommandWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 .chatbot-add-command__container {
   padding-top: 45px;
 }

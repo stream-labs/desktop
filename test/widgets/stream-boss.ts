@@ -1,18 +1,15 @@
 import { test, useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
-import { logIn, blankSlate } from '../helpers/spectron/user';
+import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
-
 
 useSpectron({ appArgs: '--nosync' });
 
 test('Set stream-boss health', async t => {
-
-  if (!await logIn(t)) return;
+  if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
-  await logIn(t);
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   const setButtonSelector = 'button=Set Stream Boss Health';
@@ -27,13 +24,11 @@ test('Set stream-boss health', async t => {
   await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
 
   t.pass();
-
 });
-
 
 test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
-  if (!await logIn(t)) return;
+  if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Manage Battle');
@@ -43,11 +38,11 @@ test('Stream Boss Manage Battle settings', async t => {
   const testSet1 = {
     boss_heal: false,
     fade_time: 5,
-    skin: 'noimage',
+    skin: 'noimg',
     follow_multiplier: 1,
     bit_multiplier: 2,
     sub_multiplier: 3,
-    donation_multiplier: 4
+    donation_multiplier: 4,
   };
 
   await formMonkey.fill('manage-battle-form', testSet1);
@@ -61,7 +56,7 @@ test('Stream Boss Manage Battle settings', async t => {
     follow_multiplier: 5,
     bit_multiplier: 1,
     sub_multiplier: 300,
-    donation_multiplier: 200
+    donation_multiplier: 200,
   };
 
   await formMonkey.fill('manage-battle-form', testSet2);
@@ -69,10 +64,9 @@ test('Stream Boss Manage Battle settings', async t => {
   t.true(await formMonkey.includes('manage-battle-form', testSet2));
 });
 
-
 test('Stream Boss Manage Visual Settings', async t => {
   const client = t.context.app.client;
-  if (!await logIn(t)) return;
+  if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Visual Settings');
@@ -84,7 +78,7 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_text_color: '#FF0000',
     bar_color: '#FF0000',
     bar_bg_color: '#FF0000',
-    font: 'Sacramento'
+    font: 'Sacramento',
   };
   await formMonkey.fill('visual-settings-form', testSet1);
   await waitForWidgetSettingsSync(t);
@@ -95,7 +89,7 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_text_color: '#FFFFFF',
     bar_color: '#FFFFFF',
     bar_bg_color: '#46E65A',
-    font: 'Roboto'
+    font: 'Roboto',
   };
   await formMonkey.fill('visual-settings-form', testSet2);
   await waitForWidgetSettingsSync(t);

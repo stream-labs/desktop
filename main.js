@@ -53,7 +53,8 @@ const releaseChannel = (() => {
 ////////////////////////////////////////////////////////////////////////////////
 
 (function setupLogger() {
-  // default logs path is %USERPROFILE%\AppData\Roaming\<app name>\log.log
+  // save logs to the cache directory
+  path.join(app.getPath('userData'), 'log.log');
   electronLog.transports.file.level = 'info';
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
@@ -137,10 +138,10 @@ function startApp() {
     crashReporter.start({
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
+      ignoreSystemCrashHandler: true,
       submitURL:
-        'https://streamlabs.sp.backtrace.io:6098/post?' +
-        'format=minidump&' +
-        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+        'https://sentry.io/api/1283430/minidump/' +
+        '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
       extra: {
         version: pjson.version,
         processType: 'main'
@@ -289,7 +290,7 @@ function startApp() {
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
     // setTimeout(() => {
-    //   openDevTools();
+      //openDevTools();
     // }, 10 * 1000);
   }
 }
@@ -297,6 +298,11 @@ function startApp() {
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 

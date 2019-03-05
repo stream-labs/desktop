@@ -1,26 +1,24 @@
-import { Component, Prop } from 'vue-property-decorator';
-import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue'
+import { Component, Prop, Watch } from 'vue-property-decorator';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
 import {
   IInputMetadata,
-  ITextMetadata,
   IListMetadata,
   INumberMetadata,
-  EInputType
+  EInputType,
+  ITextMetadata,
 } from 'components/shared/inputs/index';
 
-import {
-  IWordProtectionBlackListItem,
-  NEW_WORD_PROTECTION_LIST_MODAL_ID
-} from 'services/chatbot';
+import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
+import { metadata } from 'components/widgets/inputs';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotLinkProtectionList extends ChatbotBase {
-
   $refs: {
     form: ValidatedForm;
   };
@@ -33,45 +31,36 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     is_regex: false,
     punishment: {
       duration: 10,
-      type: 'Purge'
-    }
+      type: 'Purge',
+    },
   };
   editIndex: number = -1;
 
   get metadata() {
-    let metadata: {
-      text: ITextMetadata;
-      punishment: {
-        duration: INumberMetadata;
-        type: IListMetadata<string>;
-      };
-      is_regex: IInputMetadata;
-    } = {
-      text: {
+    return {
+      text: metadata.text({
         required: true,
-        type: EInputType.text,
-        placeholder: 'Add a link to add to list'
-      },
+        placeholder: 'Add a link to add to list',
+        max: 450,
+      }),
       punishment: {
-        duration: {
-          type: EInputType.number,
+        duration: metadata.number({
           required: true,
           placeholder: 'Punishment Duration (Value in Seconds)',
-          min: 0
-        },
-        type: {
+          min: 0,
+          max: 86400,
+          isInteger: true,
+        }),
+        type: metadata.list({
           required: true,
-          type: EInputType.list,
-          options: this.chatbotPunishments
-        }
+          options: this.chatbotPunishments,
+        }),
       },
-      is_regex: {
+      is_regex: metadata.bool({
         required: true,
-        type: EInputType.bool,
-        title: 'This word / phrase contains a regular expression.'
-      }
+        title: 'This word / phrase contains a regular expression.',
+      }),
     };
-    return metadata;
   }
 
   get NEW_WORD_PROTECTION_LIST_MODAL_ID() {
@@ -86,10 +75,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     );
   }
 
-  onAddingNewItemHandler(
-    editedItem?: IWordProtectionBlackListItem,
-    index: number = -1
-  ) {
+  onAddingNewItemHandler(editedItem?: IWordProtectionBlackListItem, index: number = -1) {
     if (editedItem) {
       this.newListItem = editedItem;
     }
@@ -98,15 +84,21 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   }
 
   onDeleteAliasHandler(index: number) {
-    let newListItemArray = this.value.slice(0);
+    const newListItemArray = this.value.slice(0);
     newListItemArray.splice(index, 1);
     this.$emit('input', newListItemArray);
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onAddNewItemHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    let newListItemArray = this.value.slice(0);
+    const newListItemArray = this.value.slice(0);
 
     if (this.editIndex > -1) {
       // editing existing item
@@ -120,8 +112,8 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
       is_regex: false,
       punishment: {
         duration: 10,
-        type: 'Purge'
-      }
+        type: 'Purge',
+      },
     };
     this.editIndex = -1;
     this.onCancelNewItemModalHandler();

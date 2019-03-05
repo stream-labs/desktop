@@ -4,7 +4,7 @@
   <div class="flex">
     <div class="source-name">{{ audioSource.source.name }}</div>
     <div class="db-value">
-      <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
+      <div v-if="audioSource.fader.deflection === 0">-Inf dB</div>
       <div v-if="audioSource.fader.deflection !== 0">{{ audioSource.fader.db.toFixed(1) }} dB</div>
     </div>
   </div>
@@ -12,13 +12,10 @@
   <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
 
   <div class="flex">
-    <Slider
+    <slider-input
       :value="audioSource.fader.deflection"
-      :min="0"
-      :max="1"
-      :interval="0.01"
       @input="onSliderChangeHandler"
-      tooltip="false"
+      :metadata="sliderMetadata"
     />
     <div class="controls">
       <i class="icon-button icon-audio"

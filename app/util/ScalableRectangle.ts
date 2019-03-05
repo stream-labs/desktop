@@ -1,4 +1,6 @@
 import { get, set, invert } from 'lodash';
+import { Rect } from './rect';
+import { v2, Vec2 } from './vec2';
 
 // This class is used for simplifying math that deals
 // with rectangles that can be scaled, including
@@ -13,17 +15,17 @@ export enum AnchorPoint {
   SouthWest,
   West,
   NorthWest,
-  Center
+  Center,
 }
 
 export enum CenteringAxis {
   X,
   Y,
-  Both
+  Both,
 }
 
 // Positions on a positive unit grid
-const AnchorPositions = {
+export const AnchorPositions = {
   [AnchorPoint.North]: { x: 0.5, y: 0 },
   [AnchorPoint.NorthEast]: { x: 1, y: 0 },
   [AnchorPoint.East]: { x: 1, y: 0.5 },
@@ -32,29 +34,19 @@ const AnchorPositions = {
   [AnchorPoint.SouthWest]: { x: 0, y: 1 },
   [AnchorPoint.West]: { x: 0, y: 0.5 },
   [AnchorPoint.NorthWest]: { x: 0, y: 0 },
-  [AnchorPoint.Center]: { x: 0.5, y: 0.5 }
+  [AnchorPoint.Center]: { x: 0.5, y: 0.5 },
 };
 
-
-export class ScalableRectangle implements IScalableRectangle {
-
-  x: number;
-  y: number;
+export class ScalableRectangle extends Rect implements IScalableRectangle {
   scaleX: number;
   scaleY: number;
-  width: number;
-  height: number;
   crop: ICrop;
   rotation: number;
 
-  private anchor: AnchorPoint;
-
+  private origin: Vec2;
 
   constructor(options: IScalableRectangle) {
-    this.x = options.x;
-    this.y = options.y;
-    this.width = options.width;
-    this.height = options.height;
+    super(options);
     this.scaleX = options.scaleX || 1.0;
     this.scaleY = options.scaleY || 1.0;
 
@@ -63,72 +55,68 @@ export class ScalableRectangle implements IScalableRectangle {
       bottom: 0,
       left: 0,
       right: 0,
-      ...options.crop
+      ...options.crop,
     };
 
     this.rotation = options.rotation || 0;
-
-    this.anchor = AnchorPoint.NorthWest;
+    this.origin = v2(AnchorPositions[AnchorPoint.NorthWest]);
   }
-
 
   get croppedWidth() {
     return this.width - this.crop.left - this.crop.right;
   }
 
-
   get croppedHeight() {
     return this.height - this.crop.top - this.crop.bottom;
   }
-
 
   get scaledWidth() {
     return this.scaleX * this.croppedWidth;
   }
 
-
   get scaledHeight() {
     return this.scaleY * this.croppedHeight;
   }
 
-
   get aspectRatio() {
-    return this.width / this.height;
+    return this.getAspectRatio();
   }
-
 
   get scaledAspectRatio() {
     return this.scaledWidth / this.scaledHeight;
   }
 
-
   setAnchor(anchor: AnchorPoint) {
     // We need to calculate the distance to the new anchor point
-    const currentPosition = AnchorPositions[this.anchor];
-    const newPosition = AnchorPositions[anchor];
+    this.setOrigin(AnchorPositions[anchor]);
+  }
 
-    const deltaX = newPosition.x - currentPosition.x;
-    const deltaY = newPosition.y - currentPosition.y;
+  setOrigin(newOriginModel: IVec2) {
+    // We need to calculate the distance to the new origin point
+    const currentPosition = this.origin;
+    const newOrigin = v2(newOriginModel);
+    const delta = newOrigin.sub(currentPosition);
+    const newPosition = this.getPosition().add(
+      delta.multiply(v2(this.scaledWidth, this.scaledHeight)),
+    );
 
-    this.x += deltaX * this.scaledWidth;
-    this.y += deltaY * this.scaledHeight;
-
-    this.anchor = anchor;
+    this.setPosition(newPosition);
+    this.origin = newOrigin;
   }
 
   /**
    * Adjust width, height, position, and crop to make this appear
-  * like an unrotated object to the rest of the code.
-  * Note that this only works on 90 degree increments of rotation.
-  * @returns a function to undo the operation.
-  */
+   * like an unrotated object to the rest of the code.
+   * Note that this only works on 90 degree increments of rotation.
+   * @returns a function to undo the operation.
+   */
   private zeroRotation() {
     // A set a fields to map values
     const mapFields: Dictionary<string> = {};
 
     // This is where the anchor point would actually be if this
     // were a zero rotated object
-    let anchor = AnchorPoint.NorthWest;
+    let origin = AnchorPositions[AnchorPoint.NorthWest];
 
     if (this.rotation === 90) {
       mapFields['width'] = 'height';
@@ -139,13 +127,13 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.top';
       mapFields['crop.bottom'] = 'crop.right';
       mapFields['crop.left'] = 'crop.bottom';
-      anchor = AnchorPoint.NorthEast;
+      origin = AnchorPositions[AnchorPoint.NorthEast];
     } else if (this.rotation === 180) {
       mapFields['crop.top'] = 'crop.bottom';
       mapFields['crop.right'] = 'crop.left';
       mapFields['crop.bottom'] = 'crop.top';
       mapFields['crop.left'] = 'crop.right';
-      anchor = AnchorPoint.SouthEast;
+      origin = AnchorPositions[AnchorPoint.SouthEast];
     } else if (this.rotation === 270) {
       mapFields['width'] = 'height';
       mapFields['height'] = 'width';
@@ -155,12 +143,12 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.bottom';
       mapFields['crop.bottom'] = 'crop.left';
       mapFields['crop.left'] = 'crop.top';
-      anchor = AnchorPoint.SouthWest;
+      origin = AnchorPositions[AnchorPoint.SouthWest];
     }
 
     this.mapFields(mapFields);
 
-    this.anchor = anchor;
+    this.origin = v2(origin);
 
     // Return the anchor to the NW, since the editor code assumes
     // that all rectangles are anchored from the NW
@@ -172,11 +160,10 @@ export class ScalableRectangle implements IScalableRectangle {
     // Return a function to undo these operations in the reverse order
     return () => {
       this.rotation = rotation;
-      this.setAnchor(anchor);
+      this.setOrigin(origin);
       this.mapFields(invert(mapFields));
     };
   }
-
 
   private mapFields(fields: Dictionary<string>) {
     const currentValues: any = {};
@@ -190,20 +177,28 @@ export class ScalableRectangle implements IScalableRectangle {
     });
   }
 
-
   /**
    * Executes the function with a specific anchor point, after
    * which it is returned to its original anchor point.
    */
   withAnchor(anchor: AnchorPoint, fun: Function) {
-    const oldAnchor = this.anchor;
-    this.setAnchor(anchor);
+    this.withOrigin(AnchorPositions[anchor], fun);
+  }
+
+  /**
+   * Executes the function with a specific origin point, after
+   * which it is returned to its original origin point.
+   * Origin {x: 0, y: 0} is top-left corner
+   * Origin {x: 1, y: 1} is bottom-right corner
+   */
+  withOrigin(origin: IVec2, fun: Function) {
+    const oldOrigin = this.origin;
+    this.setOrigin(origin);
 
     fun();
 
-    this.setAnchor(oldAnchor);
+    this.setOrigin(oldOrigin);
   }
-
 
   /**
    * Normalizes this rectangle into a rectangle that does not
@@ -226,7 +221,6 @@ export class ScalableRectangle implements IScalableRectangle {
     };
   }
 
-
   /**
    * This is a convenience method that will run the passed
    * function in a normalized environment, and then return
@@ -240,7 +234,6 @@ export class ScalableRectangle implements IScalableRectangle {
     denormalize();
   }
 
-
   flipX() {
     this.scaleX *= -1;
     this.x -= this.scaledWidth;
@@ -249,7 +242,6 @@ export class ScalableRectangle implements IScalableRectangle {
     this.crop.left = this.crop.right;
     this.crop.right = leftCrop;
   }
-
 
   flipY() {
     this.scaleY *= -1;
@@ -260,21 +252,21 @@ export class ScalableRectangle implements IScalableRectangle {
     this.crop.bottom = topCrop;
   }
 
-
   /**
    * Stretches this rectangle across the provided
    * rectangle.  Aspect ratio may not be preserved.
    */
   stretchAcross(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      this.x = rect.x;
-      this.y = rect.y;
-      this.scaleX = rect.scaledWidth / this.croppedWidth;
-      this.scaleY = rect.scaledHeight / this.croppedHeight;
-    }));
+    this.normalized(() =>
+      rect.normalized(() => {
+        this.x = rect.x;
+        this.y = rect.y;
+        this.scaleX = rect.scaledWidth / this.croppedWidth;
+        this.scaleY = rect.scaledHeight / this.croppedHeight;
+      }),
+    );
   }
-
 
   /**
    * Fits this rectangle inside the provided rectangle
@@ -282,19 +274,20 @@ export class ScalableRectangle implements IScalableRectangle {
    */
   fitTo(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      if (this.aspectRatio > rect.scaledAspectRatio) {
-        this.scaleX = rect.scaledWidth / this.croppedWidth;
-        this.scaleY = this.scaleX;
-      } else {
-        this.scaleY = rect.scaledHeight / this.croppedHeight;
-        this.scaleX = this.scaleY;
-      }
+    this.normalized(() =>
+      rect.normalized(() => {
+        if (this.aspectRatio > rect.scaledAspectRatio) {
+          this.scaleX = rect.scaledWidth / this.croppedWidth;
+          this.scaleY = this.scaleX;
+        } else {
+          this.scaleY = rect.scaledHeight / this.croppedHeight;
+          this.scaleX = this.scaleY;
+        }
 
-      this.centerOn(rect);
-    }));
+        this.centerOn(rect);
+      }),
+    );
   }
-
 
   /**
    * Centers this rectangle on the provided rectangle
@@ -302,24 +295,25 @@ export class ScalableRectangle implements IScalableRectangle {
    */
   centerOn(rect: ScalableRectangle, axis?: CenteringAxis) {
     // Normalize both rectangles for this operation
-    this.normalized(() => rect.normalized(() => {
-      // Anchor both rectangles in the axis center
-      this.withAnchor(AnchorPoint.Center, () => {
-        rect.withAnchor(AnchorPoint.Center, () => {
-          switch (axis) {
-            case CenteringAxis.X:
-              this.x = rect.x;
-              break;
-            case CenteringAxis.Y:
-              this.y = rect.y;
-              break;
-            default:
-              this.x = rect.x;
-              this.y = rect.y;
-          }
+    this.normalized(() =>
+      rect.normalized(() => {
+        // Anchor both rectangles in the axis center
+        this.withAnchor(AnchorPoint.Center, () => {
+          rect.withAnchor(AnchorPoint.Center, () => {
+            switch (axis) {
+              case CenteringAxis.X:
+                this.x = rect.x;
+                break;
+              case CenteringAxis.Y:
+                this.y = rect.y;
+                break;
+              default:
+                this.x = rect.x;
+                this.y = rect.y;
+            }
+          });
         });
-      });
-    }));
+      }),
+    );
   }
-
 }

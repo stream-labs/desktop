@@ -10,7 +10,7 @@ export type TAppPage =
   | 'PatchNotes'
   | 'Chatbot'
   | 'DesignSystem'
-  | 'PlatformAppContainer'
+  | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'Help';
 
@@ -22,7 +22,7 @@ interface INavigationState {
 export class NavigationService extends StatefulService<INavigationState> {
   static initialState: INavigationState = {
     currentPage: 'Studio',
-    params: {}
+    params: {},
   };
 
   navigated = new Subject<INavigationState>();

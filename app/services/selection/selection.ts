@@ -1,14 +1,17 @@
 import { uniq } from 'lodash';
 import electron from 'electron';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, ServiceHelper, StatefulService } from 'services/stateful-service';
 import {
+  IPartialTransform,
+  ISceneItem,
+  ISceneItemNode,
+  ISceneItemSettings,
   Scene,
   SceneItem,
+  SceneItemFolder,
   ScenesService,
-  ISceneItem,
-  ISceneItemSettings,
-  IPartialTransform,
-  TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
+  TSceneNode,
+  TSceneNodeModel,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { Inject } from '../../util/injector';
@@ -17,20 +20,17 @@ import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from '.
 import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
-import { CenteringAxis } from 'util/ScalableRectangle';
-
+import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
+import { Rect } from '../../util/rect';
 
 /**
  * represents selection of active scene and provide shortcuts
  */
-export class SelectionService
-  extends StatefulService<ISelectionState>
-  implements ISelectionServiceApi
-{
-
+export class SelectionService extends StatefulService<ISelectionState>
+  implements ISelectionServiceApi {
   static initialState: ISelectionState = {
     selectedIds: [],
-    lastSelectedId: ''
+    lastSelectedId: '',
   };
 
   updated = new Subject<ISelectionState>();
@@ -59,7 +59,7 @@ export class SelectionService
   getIds: () => string[];
   getInvertedIds: () => string[];
   getInverted: () => TSceneNode[];
-  getBoundingRect: () => IRectangle;
+  getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
   getSize: () => number;
@@ -73,13 +73,14 @@ export class SelectionService
   getRootNodes: () => TSceneNode[];
   getSources: () => Source[];
 
-
   // SCENE_ITEM METHODS
 
   setSettings: (settings: Partial<ISceneItemSettings>) => void;
   setVisibility: (isVisible: boolean) => void;
   setTransform: (transform: IPartialTransform) => void;
   resetTransform: () => void;
+  scale: (scale: IVec2, origin?: IVec2) => void;
+  scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -102,17 +103,23 @@ export class SelectionService
     if (!lastSelected) return;
 
     const name = lastSelected.name;
+    const selectionLength = this.getSelection().getIds.call(this).length;
+    const message =
+      selectionLength > 1
+        ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
+        : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
+
     electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {
+        message,
         type: 'warning',
-        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
-        buttons: [$t('Cancel'), $t('OK')]
+        buttons: [$t('Cancel'), $t('OK')],
       },
       ok => {
         if (!ok) return;
         return this.getSelection().remove.call(this);
-      }
+      },
     );
   }
 
@@ -143,22 +150,19 @@ export class SelectionService
     this.getSelection().select.call(this, items);
 
     const scene = this.getScene();
-    const activeObsIds = this.getItems()
-      .map(sceneItem => sceneItem.obsSceneItemId);
+    const activeObsIds = this.getItems().map(sceneItem => sceneItem.obsSceneItemId);
 
     // tell OBS which sceneItems are selected
-    scene.getObsScene().getItems().forEach(obsSceneItem => {
-      if (activeObsIds.includes(obsSceneItem.id)) {
-        obsSceneItem.selected = true;
-      } else {
-        obsSceneItem.selected = false;
-      }
-    });
+    scene
+      .getObsScene()
+      .getItems()
+      .forEach(obsSceneItem => {
+        obsSceneItem.selected = activeObsIds.includes(obsSceneItem.id);
+      });
 
     this.updated.next(this.state);
     return this;
   }
-
 
   /**
    * @override Selection.getScene
@@ -189,14 +193,13 @@ export class SelectionService
  */
 @ServiceHelper()
 export class Selection implements ISelection {
-
   @Inject() private scenesService: ScenesService;
 
   _resourceId: string;
 
   private state: ISelectionState = {
     selectedIds: [],
-    lastSelectedId: ''
+    lastSelectedId: '',
   };
 
   constructor(public sceneId: string, itemsList: TNodesList = []) {
@@ -220,7 +223,6 @@ export class Selection implements ISelection {
     ids = uniq(ids);
     const scene = this.getScene();
 
-
     // omit ids that are not presented on the scene
     // and select the all nested items of selected folders
     const selectedIds: string[] = [];
@@ -229,7 +231,7 @@ export class Selection implements ISelection {
       if (!node) return;
       selectedIds.push(id);
       if (node.sceneNodeType !== 'folder') return;
-      selectedIds.push(...((node as SceneItemFolder).getNestedNodesIds()));
+      selectedIds.push(...(node as SceneItemFolder).getNestedNodesIds());
     });
 
     this.setState({ selectedIds });
@@ -238,7 +240,7 @@ export class Selection implements ISelection {
       this.setState({ lastSelectedId: selectedIds[selectedIds.length - 1] });
     }
 
-    this._resourceId = 'Selection' + JSON.stringify([this.sceneId, this.state.selectedIds]);
+    this._resourceId = `Selection${JSON.stringify([this.sceneId, this.state.selectedIds])}`;
 
     return this;
   }
@@ -303,7 +305,6 @@ export class Selection implements ISelection {
     return !isNotFolderChild;
   }
 
-
   getVisualItems(): SceneItem[] {
     return this.getItems().filter(item => item.isVisualSource);
   }
@@ -317,9 +318,11 @@ export class Selection implements ISelection {
 
   getInvertedIds(): string[] {
     const selectedIds = this.getIds();
-    return this.getScene().getNodesIds().filter(id => {
-      return !selectedIds.includes(id);
-    });
+    return this.getScene()
+      .getNodesIds()
+      .filter(id => {
+        return !selectedIds.includes(id);
+      });
   }
 
   getLastSelected(): TSceneNode {
@@ -334,7 +337,7 @@ export class Selection implements ISelection {
     return this.state.selectedIds.length;
   }
 
-  getBoundingRect(): IRectangle {
+  getBoundingRect(): Rect {
     const items = this.getVisualItems();
     if (!items.length) return null;
 
@@ -344,20 +347,19 @@ export class Selection implements ISelection {
     let maxBottom = -Infinity;
 
     items.forEach(item => {
-      const rect = item.getRectangle();
-      rect.normalize();
+      const rect = item.getBoundingRect();
       minTop = Math.min(minTop, rect.y);
       minLeft = Math.min(minLeft, rect.x);
       maxRight = Math.max(maxRight, rect.x + rect.width);
       maxBottom = Math.max(maxBottom, rect.y + rect.height);
     });
 
-    return {
+    return new Rect({
       x: minLeft,
       y: minTop,
       width: maxRight - minLeft,
-      height: maxBottom - minTop
-    };
+      height: maxBottom - minTop,
+    });
   }
 
   getInverted(): TSceneNode[] {
@@ -372,14 +374,17 @@ export class Selection implements ISelection {
   }
 
   isSelected(sceneNode: string | TSceneNodeModel) {
-    const itemId = (typeof sceneNode === 'string') ?
-      sceneNode :
-      (sceneNode as ISceneItem).sceneItemId;
+    const itemId =
+      typeof sceneNode === 'string' ? sceneNode : (sceneNode as ISceneItem).sceneItemId;
     return this.getIds().includes(itemId);
   }
 
   selectAll(): Selection {
-    this.select(this.getScene().getNodes().map(node => node.id));
+    this.select(
+      this.getScene()
+        .getNodes()
+        .map(node => node.id),
+    );
     return this;
   }
 
@@ -391,6 +396,7 @@ export class Selection implements ISelection {
     let insertedNode: TSceneNode;
 
     const sourcesMap: Dictionary<Source> = {};
+    // TODO: we're updating this, but we don't seem to ever use it
     const notDuplicatedSources: Source[] = [];
     if (duplicateSources) {
       this.getSources().forEach(source => {
@@ -403,7 +409,6 @@ export class Selection implements ISelection {
       });
     }
 
-
     // copy items and folders structure
     this.getNodes().forEach(sceneNode => {
       if (sceneNode.isFolder()) {
@@ -412,9 +417,9 @@ export class Selection implements ISelection {
         insertedNodes.push(insertedNode);
       } else if (sceneNode.isItem()) {
         insertedNode = scene.addSource(
-          sourcesMap[sceneNode.sourceId] ?
-            sourcesMap[sceneNode.sourceId].sourceId :
-            sceneNode.sourceId
+          sourcesMap[sceneNode.sourceId]
+            ? sourcesMap[sceneNode.sourceId].sourceId
+            : sceneNode.sourceId,
         );
         insertedNode.setSettings(sceneNode.getSettings());
         insertedNodes.push(insertedNode);
@@ -425,10 +430,7 @@ export class Selection implements ISelection {
         insertedNode.setParent(newParentId);
       }
 
-      if (
-        prevInsertedNode &&
-        (prevInsertedNode.parentId === newParentId)
-      ) {
+      if (prevInsertedNode && prevInsertedNode.parentId === newParentId) {
         insertedNode.placeAfter(prevInsertedNode.id);
       }
 
@@ -439,10 +441,11 @@ export class Selection implements ISelection {
   }
 
   moveTo(sceneId: string, folderId?: string): TSceneNode[] {
-
     if (this.sceneId === sceneId) {
       if (!folderId) return;
-      this.getRootNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
+      this.getRootNodes()
+        .reverse()
+        .forEach(sceneNode => sceneNode.setParent(folderId));
     } else {
       const insertedItems = this.copyTo(sceneId, folderId);
       this.remove();
@@ -507,19 +510,17 @@ export class Selection implements ISelection {
         return this.getScene().getFolder(closestParentId);
       }
     }
-
   }
 
   canGroupIntoFolder(): boolean {
     const selectedNodes = this.getRootNodes();
     const nodesFolders = selectedNodes.map(node => node.parentId || null);
     const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
-    const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
-    return canGroupIntoFolder;
+    return selectedNodes.length > 1 && nodesHaveTheSameParent;
   }
 
-
   getSources(): Source[] {
+    // TODO: we're never updating sourceIds, the condition below will always fail
     const sourcesIds: string[] = [];
     const sources: Source[] = [];
     this.getItems().forEach(item => {
@@ -546,6 +547,23 @@ export class Selection implements ISelection {
 
   resetTransform() {
     this.getItems().forEach(item => item.resetTransform());
+  }
+
+  /**
+   * Scale items.
+   * Origin is the center point of scaling relative to the bounding-box of the selection
+   * Where origin = [0, 0] - is top-left corner and [1, 1] is the bottom right corner of the selection
+   */
+  scale(scale: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
+    const originPos = this.getBoundingRect().getOffsetFromOrigin(origin);
+    this.getItems().forEach(item => item.scaleWithOffset(scale, originPos));
+  }
+
+  /**
+   * same as .scale() but use absolute `offset` point instead of a relative `origin` point
+   */
+  scaleWithOffset(scale: IVec2, offset: IVec2) {
+    this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
   }
 
   flipY() {
@@ -584,7 +602,6 @@ export class Selection implements ISelection {
     this.getItems().forEach(item => item.setContentCrop());
   }
 
-
   remove() {
     this.getNodes().forEach(node => node.remove());
   }
@@ -610,7 +627,9 @@ export class Selection implements ISelection {
   }
 
   placeAfter(sceneNodeId: string) {
-    this.getRootNodes().reverse().forEach(node => node.placeAfter(sceneNodeId));
+    this.getRootNodes()
+      .reverse()
+      .forEach(node => node.placeAfter(sceneNodeId));
   }
 
   placeBefore(sceneNodeId: string) {
@@ -618,7 +637,9 @@ export class Selection implements ISelection {
   }
 
   setParent(sceneNodeId: string) {
-    this.getRootNodes().reverse().forEach(node => node.setParent(sceneNodeId));
+    this.getRootNodes()
+      .reverse()
+      .forEach(node => node.setParent(sceneNodeId));
   }
 
   /**
@@ -628,7 +649,6 @@ export class Selection implements ISelection {
     if (!itemsList) return [];
 
     if (Array.isArray(itemsList)) {
-
       if (!itemsList.length) {
         return [];
       }
@@ -637,7 +657,6 @@ export class Selection implements ISelection {
         return itemsList as string[];
       }
       return (itemsList as ISceneItemNode[]).map(item => item.id);
-
     }
 
     if (typeof itemsList === 'string') {

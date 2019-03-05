@@ -1,27 +1,27 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop, Inject } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
   IChatAlertsResponse,
   IAlertMessage,
   ChatbotAlertType,
-  NEW_ALERT_MODAL_ID
+  NEW_ALERT_MODAL_ID,
 } from 'services/chatbot';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   get chatAlerts() {
-    return this.chatbotApiService.state.chatAlertsResponse;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse;
   }
 
   get chatAlertsEnabled() {
-    return this.chatbotApiService.state.chatAlertsResponse.enabled;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse.enabled;
   }
 
   get alertTypes() {
     const { streamlabs, twitch, mixer, youtube } = this.chatAlerts.settings;
 
-    const platform = this.chatbotApiService.userService.platform.type;
+    const platform = this.chatbotApiService.Base.userService.platform.type;
 
     let alertTypes;
 
@@ -29,31 +29,30 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       case 'twitch': {
         alertTypes = {
           ...streamlabs,
-          ...twitch
+          ...twitch,
         };
         break;
       }
       case 'mixer': {
         alertTypes = {
           ...streamlabs,
-          ...mixer
+          ...mixer,
         };
         break;
       }
       case 'youtube': {
         alertTypes = {
           ...streamlabs,
-          ...youtube
+          ...youtube,
         };
         break;
       }
-      default:{
+      default: {
         alertTypes = {
-          ...streamlabs
+          ...streamlabs,
         };
         break;
       }
-
     }
 
     return alertTypes;
@@ -61,7 +60,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   platformForAlertType(type: ChatbotAlertType) {
     if (type === 'tip') return 'streamlabs';
-    return this.chatbotApiService.userService.platform.type;
+    return this.chatbotApiService.Base.userService.platform.type;
   }
 
   // preparing data to send to service
@@ -71,18 +70,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     type: ChatbotAlertType,
     index: number,
     updatedAlert: IAlertMessage,
-    tier?: string
+    tier?: string,
   ) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
     newAlertsObject.settings[platform][type].messages.splice(index, 1);
     if (updatedAlert) {
-      newAlertsObject.settings[platform][type].messages.splice(
-        index,
-        0,
-        updatedAlert
-      );
+      newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
     }
 
     this.updateChatAlerts(newAlertsObject);
@@ -94,8 +89,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
-    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
-      .settings[platform][type].enabled;
+    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts.settings[platform][type]
+      .enabled;
 
     this.updateChatAlerts(newAlertsObject);
   }
@@ -113,6 +108,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // calls to service methods
   updateChatAlerts(newAlertsObject: IChatAlertsResponse) {
-    return this.chatbotApiService.updateChatAlerts(newAlertsObject);
+    return this.chatbotApiService.Alerts.updateChatAlerts(newAlertsObject);
   }
 }

@@ -20,6 +20,7 @@ const zlib = require('zlib');
 const cp = require('child_process');
 const semver = require('semver');
 const { BrowserWindow } = require('electron');
+const log = require('electron-log');
 const prequest = util.promisify(request);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -51,7 +52,7 @@ async function mkdirMaybe(directory) {
 }
 
 async function ensureDir(dirPath) {
-    const directories = dirPath.split(path.sep)
+    const directories = dirPath.split(path.sep);
 
     let directory = directories[0];
 
@@ -63,14 +64,14 @@ async function ensureDir(dirPath) {
 
 async function getPreviousRoll(cacheFile, version) {
     return new Promise((resolve, reject) => {
-        fs.readFile(cacheFile, (err, data) => {
+        fs.readFile(cacheFile, 'utf8', (err, data) => {
             if (err) {
-                console.log("Roll cache not found!");
+                log.info("Roll cache not found!");
                 resolve(0);
                 return;
             }
 
-            let roll = parseInt(data);
+            let roll = parseInt(data.toString(), 10);
 
             if (!roll) {
                 roll = 0;
@@ -90,7 +91,7 @@ async function checkChance(info, version) {
     const response = await prequest(reqInfo);
 
     if (response.statusCode !== 200) {
-        console.log(`No chance file found! Assuming 100...`);
+        log.info(`No chance file found! Assuming 100...`);
         return true;
     }
 
@@ -98,7 +99,7 @@ async function checkChance(info, version) {
     const body = JSON.parse(response.body);
     const chance = body.chance;
 
-    console.log(`Chance to update is ${chance}...`);
+    log.info(`Chance to update is ${chance}...`);
 
     /* Check for a cached roll. Caching the roll prevents incorrect
      * chance in the case we change the percentage chance to update. */
@@ -121,13 +122,9 @@ async function checkChance(info, version) {
         await writeFile(rollCache, `${roll}`);
     }
 
-    console.log(`You rolled ${roll}`);
+    log.info(`You rolled ${roll}`);
 
-    if (roll <= chance) {
-        return true;
-    }
-
-    return false;
+    return roll <= chance;
 }
 
 /* Note that latest-updater.exe never changes
@@ -135,14 +132,19 @@ async function checkChance(info, version) {
  * application we're using. The base url should
  * always have an endpoint of `/latest-updater.exe`
  * that points to the updater executable or at
- * least redirects to it. */
+ * least redirects to it. Except for a preview version 
+ * where preview-updater.exe name will be used */
 async function fetchUpdater(info, progress) {
+    let updater_name = 'latest-updater.exe';
+    if(process.env.SLOBS_PREVIEW) {
+        updater_name = 'preview-updater.exe';
+    }
     const reqInfo = {
         baseUrl: info.baseUrl,
-        uri: '/latest-updater.exe'
+        uri: `/${updater_name}`
     };
 
-    const updaterPath = path.resolve(info.tempDir, 'latest-updater.exe');
+    const updaterPath = path.resolve(info.tempDir, updater_name);
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
@@ -161,7 +163,7 @@ async function fetchUpdater(info, progress) {
             accum += chunk.length;
             progress((accum / contentLength) * 100);
         });
-    }
+    };
 
     return new Promise((resolve, reject) => {
         const outPipe = request(reqInfo)
@@ -183,12 +185,12 @@ async function getVersion(info) {
         baseUrl: info.baseUrl,
         uri: `/${info.versionFileName}`,
         json: true
-    }
+    };
 
     let response = await prequest(reqInfo);
 
-    if (response.statusCode != 200) {
-        console.log(
+    if (response.statusCode !== 200) {
+        log.info(
             `Failed to fetch version information ` +
             `- ${response.statusCode}`
         );
@@ -233,39 +235,37 @@ async function entry(info) {
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
     } catch (error) {
-        console.log('Error when spawning status window!');
+        log.info('Error when spawning status window!');
         if (statusWindow) statusWindow.close();
         statusWindow = null;
     }
 
     const latestVersion = await getVersion(info);
 
-    /* Latest version doesn't necessarily need
-    * to be greater than the current version!
-    * If it's different, update to latest. */
+    /* Latest version need to be greater than the current version! */
     if (!latestVersion) {
-        console.log('Failed to fetch latest version!');
+        log.info('Failed to fetch latest version!');
         return false;
     }
 
     if (semver.eq(info.version, latestVersion)) {
-        console.log('Already latest version!');
+        log.info('Already latest version!');
         return false;
     }
 
     if (semver.gt(info.version, latestVersion)) {
-        console.log('Latest version is less than current version!');
+        log.info('Latest version is less than current version!');
         return false;
     }
 
     if (!await checkChance(info, latestVersion)) {
-        console.log('Failed the chance lottery. Better luck next time!');
+        log.info('Failed the chance lottery. Better luck next time!');
         return false;
     }
 
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
-    ensureDir(info.tempDir);
+    await ensureDir(info.tempDir);
 
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
@@ -291,19 +291,37 @@ async function entry(info) {
 
     if (statusWindow) {
         updaterArgs.push('-p');
-        updaterArgs.push(statusWindow.webContents.getOSProcessId());
+        updaterArgs.push(statusWindow.webContents.getOSProcessId().toString());
     }
 
-    console.log(updaterArgs);
+    const updaterStartCommand = `start \"\"  \"${updaterPath}\" `
 
-    cp.spawn(`${updaterPath}`, updaterArgs, {
+    log.info(updaterArgs);
+
+    const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
         cwd: info.tempDir,
-        detached: true,
-        stdio: 'ignore',
+        detached: false,
         shell: true
     });
 
-    return true;
+    log.info('updater process ' + `pid ${update_spawned.pid}`);
+
+    //make promises for app exit , error , data and some timeout
+    const primiseExit = new Promise(resolve => {
+        update_spawned.on('exit', resolve);
+    });
+
+    const primiseError = new Promise(resolve => {
+        update_spawned.on('error', resolve);
+    });
+
+    //wait for something to happen
+    const promise = await Promise.race([primiseError, primiseExit]);
+    log.info('Updater spawn promise ' + `result \"${promise}\"`);
+
+    update_spawned.unref();
+
+    return `${promise}` === "0";
 }
 
 module.exports = async (info) => {
@@ -311,8 +329,8 @@ module.exports = async (info) => {
         destroyStatusWindow();
         return Promise.resolve(status);
     }).catch((error) => {
-        console.log(error);
+        log.info(error);
         destroyStatusWindow();
         return Promise.resolve(false);
     });
-}
+};

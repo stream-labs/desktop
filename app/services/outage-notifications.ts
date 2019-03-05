@@ -1,7 +1,7 @@
 import { Service } from 'services/service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { Inject } from 'util/injector';
-import { JsonrpcService, IJsonRpcRequest } from 'services/jsonrpc';
+import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import electron from 'electron';
 
 interface IOutageNotification {
@@ -49,22 +49,22 @@ export class OutageNotificationsService extends Service {
 
     action = this.jsonrpcService.createRequest(
       Service.getResourceId(this.notificationsService),
-      'showNotifications'
+      'showNotifications',
     );
 
     if (url) {
       action = this.jsonrpcService.createRequest(
         Service.getResourceId(this),
         'openBrowserWindow',
-        url
+        url,
       );
     }
 
     return this.notificationsService.push({
+      action,
       message,
       type: ENotificationType.WARNING,
       lifeTime: -1,
-      action
     });
   }
 
@@ -120,5 +120,4 @@ export class OutageNotificationsService extends Service {
   private get messageUrl() {
     return `https://s3-us-west-2.amazonaws.com/${S3_BUCKET}/${S3_KEY}`;
   }
-
 }

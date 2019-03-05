@@ -1,6 +1,7 @@
 <template>
 <modal-layout
   :title="windowTitle"
+  :disable-done="hasErrors"
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200">
@@ -11,7 +12,7 @@
       :is="propertiesManagerUI"
       :source="source"
       @update="refresh" />
-    <GenericForm v-model="properties" @input="onInputHandler"/>
+    <GenericForm v-model="properties" @input="onInputHandler" @validate="onValidateHandler"/>
   </div>
 </modal-layout>
 </template>

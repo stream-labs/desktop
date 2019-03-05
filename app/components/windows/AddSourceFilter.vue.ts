@@ -4,16 +4,14 @@ import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
 import { SourceFiltersService } from '../../services/source-filters';
 
-import * as inputComponents from 'components/obs/inputs';
 import ModalLayout from '../ModalLayout.vue';
 import { $t } from 'services/i18n';
-
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
-  components: { ModalLayout, ...inputComponents }
+  components: { ModalLayout, VFormGroup },
 })
 export default class AddSourceFilter extends Vue {
-
   @Inject()
   windowsService: WindowsService;
 
@@ -30,15 +28,11 @@ export default class AddSourceFilter extends Vue {
   }
 
   done() {
-    const name = this.form.name.value;
+    const name = this.form.name;
     this.error = this.validateName(name);
     if (this.error) return;
 
-    this.filtersService.add(
-      this.sourceId,
-      this.form.type.value,
-      name
-    );
+    this.filtersService.add(this.sourceId, this.form.type, name);
 
     this.filtersService.showSourceFilters(this.sourceId, name);
   }
@@ -55,11 +49,16 @@ export default class AddSourceFilter extends Vue {
     return '';
   }
 
-  setTypeAsName() {
-    const name = this.availableTypes.find(({ type }) => {
-      return type === this.form.type.value;
-    }).description;
-    this.form.name.value = this.filtersService.suggestName(this.sourceId, name);
+  get typeOptions() {
+    return this.filtersService
+      .getTypesForSource(this.sourceId)
+      .map(filterType => ({ title: filterType.description, value: filterType.type }));
   }
 
+  setTypeAsName() {
+    const name = this.availableTypes.find(({ type }) => {
+      return type === this.form.type;
+    }).description;
+    this.form.name = this.filtersService.suggestName(this.sourceId, name);
+  }
 }

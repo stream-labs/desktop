@@ -6,20 +6,19 @@ import { Component, Prop } from 'vue-property-decorator';
  */
 @Component({})
 export default class ResizeBar extends Vue {
-
-  @Prop({default: 'left'})
+  @Prop({ default: 'left' })
   position: 'left' | 'right' | 'top'; // TODO: bottom if needed
 
-  @Prop({default: 0})
+  @Prop({ default: 0 })
   value: number;
 
-  @Prop({default: -Infinity})
+  @Prop({ default: -Infinity })
   min: number;
 
-  @Prop({default: Infinity})
+  @Prop({ default: Infinity })
   max: number;
 
-  @Prop({default: false})
+  @Prop({ default: false })
   reverse: number;
 
   active = false;
@@ -40,11 +39,13 @@ export default class ResizeBar extends Vue {
     this.active = true;
     const mouseMoveListener = (event: MouseEvent) => this.onMouseMoveHandler(event);
     this.$root.$el.addEventListener('mousemove', mouseMoveListener);
-    this.$root.$el.addEventListener('mouseup', (event) => {
+    this.$root.$el.addEventListener(
+      'mouseup',
+      (event: MouseEvent) => {
         this.$root.$el.removeEventListener('mousemove', mouseMoveListener);
-        this.stopMouseTracking(event)
+        this.stopMouseTracking(event);
       },
-      { once: true}
+      { once: true },
     );
     this.$emit('onresizestart', event);
   }
@@ -80,8 +81,8 @@ export default class ResizeBar extends Vue {
   }
 
   private updateTransform() {
-    this.transform = ['left', 'right'].includes(this.position) ?
-      `translateX(${this.barOffset}px)` :
-      `translateY(${this.barOffset}px)`;
+    this.transform = ['left', 'right'].includes(this.position)
+      ? `translateX(${this.barOffset}px)`
+      : `translateY(${this.barOffset}px)`;
   }
 }

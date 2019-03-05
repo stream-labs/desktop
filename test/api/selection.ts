@@ -4,8 +4,9 @@ import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
 import { ICustomizationServiceApi } from '../../app/services/customization';
-import { SceneBuilder } from "../helpers/scene-builder";
+import { SceneBuilder } from '../helpers/scene-builder';
 import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -20,8 +21,8 @@ async function afterStart() {
   selectionService = client.getResource('SelectionService');
   sceneBuilder = new SceneBuilder(client);
   scene = sceneBuilder.scene;
-  getNode = (name) => scene.getNodeByName(name);
-  getNodeId = (name) => scene.getNodeByName(name).id;
+  getNode = name => scene.getNodeByName(name);
+  getNodeId = name => scene.getNodeByName(name).id;
 }
 
 test('Selection', async t => {
@@ -68,7 +69,6 @@ test('Selection', async t => {
 
 });
 
-
 test('Selection actions', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
@@ -86,7 +86,6 @@ test('Selection actions', async t => {
   t.is(color1.visible, false);
   t.is(color2.visible, false);
   t.is(color3.visible, true);
-
 });
 
 test('Invalid selection', async t => {
@@ -104,8 +103,6 @@ test('Invalid selection', async t => {
   // ids must be only from active scene
   selection.select([colorSource.sceneItemId, colorFromAnotherScene.sceneItemId]);
   t.deepEqual(selection.getIds(), [colorSource.sceneItemId]);
-
-
 });
 
 test('Place after', async t => {
@@ -120,14 +117,15 @@ test('Place after', async t => {
   selectionService.select([getNodeId('Item1'), getNodeId('Folder1')]);
   selectionService.placeAfter(getNodeId('Item4'));
 
-  t.true(sceneBuilder.isEqualTo(`
+  t.true(
+    sceneBuilder.isEqualTo(`
     Item4:
     Item1:
     Folder1
       Item2:
       Item3:
-  `));
-
+  `),
+  );
 });
 
 test('Place after folder with deep nesting', async t => {
@@ -142,16 +140,16 @@ test('Place after folder with deep nesting', async t => {
   selectionService.select(getNodeId('Folder1'));
   selectionService.placeAfter(getNodeId('Item4'));
 
-  t.true(sceneBuilder.isEqualTo(`
+  t.true(
+    sceneBuilder.isEqualTo(`
     Item4:
     Folder1
       Item1:
       Folder2
         Item2:
-  `));
-
+  `),
+  );
 });
-
 
 test('Place before', async t => {
   sceneBuilder.build(`
@@ -165,16 +163,16 @@ test('Place before', async t => {
   selectionService.select([getNodeId('Item2'), getNodeId('Folder1')]);
   selectionService.placeBefore(getNodeId('Item1'));
 
-  t.true(sceneBuilder.isEqualTo(`
+  t.true(
+    sceneBuilder.isEqualTo(`
     Item2:
     Folder1
       Item3:
       Item4:
     Item1:
-  `));
-
+  `),
+  );
 });
-
 
 test('Set parent', async t => {
   sceneBuilder.build(`
@@ -188,13 +186,86 @@ test('Set parent', async t => {
   selectionService.select([getNodeId('Folder2'), getNodeId('Item3')]);
   selectionService.setParent(getNodeId('Folder1'));
 
-  t.true(sceneBuilder.isEqualTo(`
+  t.true(
+    sceneBuilder.isEqualTo(`
     Folder1
       Folder2
         Item1:
         Item2:
       Item3:
-  `));
-
+  `),
+  );
 });
 
+
+test('Scale', async t => {
+
+  // create and select 2 400x400 color sources
+  sceneBuilder.build(`
+      Item1: color_source
+      Item2: color_source
+  `);
+
+  // TODO: find a reason why this test fails without `sleep` here
+  await sleep(1000);
+
+  selectionService.select([getNodeId('Item1'), getNodeId('Item2')]);
+  const item1 = scene.getItem(getNodeId('Item1'));
+  const item2 = scene.getItem(getNodeId('Item2'));
+
+  // set the item2 position into the bottom right corner of item 2
+  item2.setTransform({ position: { x: 400, y: 400 }});
+
+  // reduce the size of item2 by 2x
+  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0});
+
+  // check what everything is going well at this point
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 400,
+    y: 400
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.5,
+    y: 0.5
+  });
+
+  // reduce the size of selected items by 2x, use the NorthWest anchor
+  selectionService.scale({x: 0.5, y: 0.5}, { x: 0, y: 0});
+  t.deepEqual(item1.getModel().transform.position, {
+    x: 0,
+    y: 0
+  });
+  t.deepEqual(item1.getModel().transform.scale, {
+    x: 0.5,
+    y: 0.5
+  });
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 200,
+    y: 200
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.25,
+    y: 0.25
+  });
+
+  // reduce the size of selected items by 2x, use the East anchor
+  // scale only X coordinate
+  selectionService.scale({x: 0.5, y: 1}, { x: 1, y: 0.5});
+  t.deepEqual(item1.getModel().transform.position, {
+    x: 150,
+    y: 0
+  });
+  t.deepEqual(item1.getModel().transform.scale, {
+    x: 0.25,
+    y: 0.5
+  });
+  t.deepEqual(item2.getModel().transform.position, {
+    x: 250,
+    y: 200
+  });
+  t.deepEqual(item2.getModel().transform.scale, {
+    x: 0.125,
+    y: 0.25
+  });
+
+});

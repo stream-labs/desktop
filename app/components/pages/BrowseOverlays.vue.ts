@@ -5,18 +5,12 @@ import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
-import {
-  IDownloadProgress,
-  OverlaysPersistenceService
-} from 'services/scene-collections/overlays';
+import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { Service } from 'services/stateful-service';
-import {
-  NotificationsService,
-  ENotificationType
-} from 'services/notifications';
-import { JsonrpcService } from 'services/jsonrpc/jsonrpc';
+import { NotificationsService, ENotificationType } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
@@ -47,7 +41,7 @@ export default class BrowseOverlays extends Vue {
     this.$refs.overlaysWebview.addEventListener('did-finish-load', () => {
       this.guestApiService.exposeApi(this.$refs.overlaysWebview.getWebContents().id, {
         installOverlay: this.installOverlay,
-        installWidgets: this.installWidgets
+        installWidgets: this.installWidgets,
       });
     });
 
@@ -65,7 +59,7 @@ export default class BrowseOverlays extends Vue {
   async installOverlay(
     url: string,
     name: string,
-    progressCallback?: (progress: IDownloadProgress) => void
+    progressCallback?: (progress: IDownloadProgress) => void,
   ) {
     const host = new urlLib.URL(url).hostname;
     const trustedHosts = ['cdn.streamlabs.com'];
@@ -75,18 +69,11 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.sceneCollectionsService.installOverlay(
-      url,
-      name,
-      progressCallback
-    );
+    await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
     this.navigationService.navigate('Studio');
   }
 
-  async installWidgets(
-    urls: string[],
-    progressCallback?: (progress: IDownloadProgress) => void
-  ) {
+  async installWidgets(urls: string[], progressCallback?: (progress: IDownloadProgress) => void) {
     for (const url of urls) {
       const host = new urlLib.URL(url).hostname;
       const trustedHosts = ['cdn.streamlabs.com'];
@@ -96,14 +83,8 @@ export default class BrowseOverlays extends Vue {
         return;
       }
 
-      const path = await this.overlaysPersistenceService.downloadOverlay(
-        url,
-        progressCallback
-      );
-      await this.widgetsService.loadWidgetFile(
-        path,
-        this.scenesService.activeSceneId
-      );
+      const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+      await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
     }
 
     this.navigationService.navigate('Studio');
@@ -117,8 +98,8 @@ export default class BrowseOverlays extends Vue {
         Service.getResourceId(this.navigationService),
         'navigate',
         'Dashboard',
-        { subPage: 'widgetthemes' }
-      )
+        { subPage: 'widgetthemes' },
+      ),
     });
   }
 

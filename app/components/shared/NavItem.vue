@@ -1,7 +1,7 @@
 <template>
 <li
   class="nav-item"
-  :class="{ active: to === value, disabled: enabled == false, 'nav-item--child': isSubItem }"
+  :class="{ active: to === value, disabled: enabled === false, 'nav-item--child': isSubItem }"
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>

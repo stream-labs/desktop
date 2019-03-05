@@ -5,17 +5,13 @@ import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 
-
-
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
-
 
 test('Editor without sources', async t => {
   const client = await getClient();
   t.pass();
 });
-
 
 test('Editor with sources', async t => {
   const client = await getClient();
@@ -29,7 +25,6 @@ test('Editor with sources', async t => {
   t.pass();
 });
 
-
 test('Editor with the big amount of sources and scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
@@ -42,7 +37,10 @@ test('Editor with the big amount of sources and scenes', async t => {
   }
 
   while (sourcesCount--) {
-    scenesService.activeScene.createAndAddSource(`My source with a long name ${sourcesCount}`, 'color_source');
+    scenesService.activeScene.createAndAddSource(
+      `My source with a long name ${sourcesCount}`,
+      'color_source',
+    );
   }
 
   t.pass();

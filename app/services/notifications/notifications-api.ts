@@ -1,12 +1,12 @@
 import { TIssueCode } from 'services/troubleshooter';
-import { IJsonRpcRequest } from 'services/jsonrpc';
+import { IJsonRpcRequest } from 'services/api/jsonrpc';
 import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export enum ENotificationType {
   INFO = 'INFO',
   WARNING = 'WARNING',
-  SUCCESS = 'SUCCESS'
+  SUCCESS = 'SUCCESS',
 }
 
 export interface INotificationsSettings {
@@ -28,7 +28,6 @@ export interface INotificationOptions {
   showTime?: boolean;
 }
 
-
 export interface INotification extends INotificationOptions {
   id: number;
   type: ENotificationType;
@@ -39,7 +38,6 @@ export interface INotification extends INotificationOptions {
   lifeTime: number;
   showTime: boolean;
 }
-
 
 export interface INotificationsServiceApi {
   notificationPushed: Observable<INotification>;

@@ -1,10 +1,11 @@
 <template>
-  <div class="row">
-    <div class="col-xs-4">
-      {{ options.title }}
+  <div class="row alignable-input">
+    <div class="input-label">
+      <label>
+        {{ options.title }}
+      </label>
     </div>
-    <div class="col-xs-8">
-
+    <div class="input-body">
       <div class="input-container input-container--no-margin">
         <form-input
           :value="value"
@@ -19,7 +20,7 @@
         </div>
       </div>
 
-      <div class="input-footer">
+      <div class="input-footer" v-if="options.description || inputErrors.length">
         <div class="whisper" v-if="options.description && !inputErrors.length">
           {{ options.description }}
         </div>
@@ -39,7 +40,14 @@
   @import "../../../styles/index";
 
   .row {
+    display: flex;
+    margin: 0;
     .margin-bottom(1);
+  }
+
+  .input-body {
+    width: 70%;
+    margin-left: auto;
   }
 
   .input-container {
@@ -48,8 +56,6 @@
     width: 100%;
     justify-content: flex-start;
   }
-
-
 
   .slots {
     width: 100%;

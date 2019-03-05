@@ -1,27 +1,28 @@
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import {
-  ICapsProtectionResponse,
-  ISymbolProtectionResponse,
-  ILinkProtectionResponse,
-  IWordProtectionResponse,
-  ICapsProtectionData,
-  ISymbolProtectionData,
-  ILinkProtectionData,
-  IWordProtectionData,
   ChatbotSettingSlug,
+  ICapsProtectionData,
+  ICapsProtectionResponse,
+  ILinkProtectionData,
+  ILinkProtectionResponse,
+  ISymbolProtectionData,
+  ISymbolProtectionResponse,
+  IWordProtectionData,
+  IWordProtectionResponse,
 } from 'services/chatbot';
 
 import {
   EInputType,
   IListMetadata,
-  ITextMetadata,
   INumberMetadata,
   ISliderMetadata,
-  IInputMetadata
+  IInputMetadata,
+  ITextMetadata,
 } from 'components/shared/inputs/index';
+import { debounce } from 'lodash-decorators';
 
 interface IChatbotPunishmentMetadata {
   type: IListMetadata<string>;
@@ -57,7 +58,7 @@ interface ICapsProtectionMetadata {
 interface ISymbolProtectionMetadata {
   general: IProtectionGeneralMetadata;
   advanced: IProtectionAdvancedMetadata;
-};
+}
 
 interface ILinkProtectionCommandsMetadata {
   permit: {
@@ -66,11 +67,11 @@ interface ILinkProtectionCommandsMetadata {
     response: ITextMetadata;
     response_type: IListMetadata<string>;
     new_alias: ITextMetadata;
-  }
+  };
 }
 
 interface ILinkProtectionMetadata {
-  commands: ILinkProtectionCommandsMetadata,
+  commands: ILinkProtectionCommandsMetadata;
   general: IProtectionGeneralMetadata;
   new_whitelist_item: ITextMetadata;
   new_blacklist_item: ITextMetadata;
@@ -96,10 +97,84 @@ interface IProtectionMetadata {
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
-  capsProtection: ICapsProtectionData = null;
-  symbolProtection: ISymbolProtectionData = null;
-  linkProtection: ILinkProtectionData = null;
-  wordProtection: IWordProtectionData = null;
+  capsProtection: ICapsProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50,
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+  };
+  symbolProtection: ISymbolProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50,
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+  };
+  linkProtection: ILinkProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    blacklist: [],
+    commands: {},
+    whitelist: [],
+  };
+  wordProtection: IWordProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    blacklist: [],
+  };
 
   mounted() {
     this.capsProtection = cloneDeep(this.capsProtectionResponse.settings);
@@ -109,19 +184,19 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   get capsProtectionResponse() {
-    return this.chatbotApiService.state.capsProtectionResponse;
+    return this.chatbotApiService.ModTools.state.capsProtectionResponse;
   }
 
   get symbolProtectionResponse() {
-    return this.chatbotApiService.state.symbolProtectionResponse;
+    return this.chatbotApiService.ModTools.state.symbolProtectionResponse;
   }
 
   get linkProtectionResponse() {
-    return this.chatbotApiService.state.linkProtectionResponse;
+    return this.chatbotApiService.ModTools.state.linkProtectionResponse;
   }
 
   get wordProtectionResponse() {
-    return this.chatbotApiService.state.wordProtectionResponse;
+    return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
@@ -129,7 +204,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       message: {
         caps: $t('The phrase that will appear after a viewer enters too many capitalized letters'),
         symbol: $t('The phrase that will appear after a viewer enters too many symbols'),
-        links: $t('The phrase that will appear after a viewer enters blacklisted links')
+        links: $t('The phrase that will appear after a viewer enters blacklisted links'),
       },
       minimum: {
         caps: $t('Set the number of capitalized letters before the system starts to detect'),
@@ -147,55 +222,61 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // metadata
-  generalMetadata(protectionType: string) {
-    const generalMetadata: IProtectionGeneralMetadata = {
+  generalMetadata(protectionType: string): IProtectionGeneralMetadata {
+    return {
       punishment: {
         type: {
           type: EInputType.list,
           required: true,
-          options: this.chatbotPunishments
+          options: this.chatbotPunishments,
         },
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Punishment Duration (Value in Seconds)'),
-          min: 0
-        }
+          placeholder: $t('Punishment Duration'),
+          tooltip: $t('Value in Seconds'),
+          min: 0,
+          max: 86400,
+        },
       },
       permit: {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Permission Duration (Value in Seconds)'),
-        }
+          placeholder: $t('Permission Duration'),
+          tooltip: $t('Value in Seconds'),
+          min: 1,
+          max: 86400,
+        },
       },
       excluded: {
         level: {
           required: true,
           options: this.chatbotAutopermitOptions,
           type: EInputType.list,
-          tooltip: $t('Set a user group that will not be punished')
-        }
+          tooltip: $t('Set a user group that will not be punished'),
+        },
       },
       message: {
         required: true,
         type: EInputType.textArea,
-        placeholder: this.placeholder(protectionType, 'message')
-      }
+        placeholder: this.placeholder(protectionType, 'message'),
+        uuid: $t('Message'),
+        max: 450,
+        blockReturn: true,
+      },
     };
-
-    return generalMetadata;
   }
 
-  advancedMetadata(protectionType: string) {
-    const advancedMetadata: IProtectionAdvancedMetadata = {
+  advancedMetadata(protectionType: string): IProtectionAdvancedMetadata {
+    return {
       minimum: {
         required: true,
         type: EInputType.number,
         placeholder: this.placeholder(protectionType, 'minimum'),
         min: 0,
         max: 500,
-        tooltip: this.placeholder(protectionType, 'minimum')
+        tooltip: this.placeholder(protectionType, 'minimum'),
       },
       maximum: {
         required: true,
@@ -203,56 +284,56 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: this.placeholder(protectionType, 'maximum'),
         min: 0,
         max: 500,
-        tooltip: this.placeholder(protectionType, 'maximum')
+        tooltip: this.placeholder(protectionType, 'maximum'),
       },
       percent: {
         required: true,
         type: EInputType.slider,
         min: 0,
         max: 100,
-        tooltip: this.placeholder(protectionType, 'percent')
-      }
+        tooltip: this.placeholder(protectionType, 'percent'),
+      },
     };
-    return advancedMetadata;
   }
 
   get linkCommandsMetadata() {
-    let linkCommandsMetadata: ILinkProtectionCommandsMetadata = {
+    const linkCommandsMetadata: ILinkProtectionCommandsMetadata = {
       permit: {
         command: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Command phrase'
+          placeholder: 'Command phrase',
         },
         description: {
           required: true,
           type: EInputType.textArea,
-          placeholder: 'Command description'
+          placeholder: 'Command description',
         },
         response: {
           required: true,
           type: EInputType.textArea,
-          placeholder: 'Message in chat'
+          placeholder: 'Message in chat',
         },
         response_type: {
-          options: this.chatbotResponseTypes
+          options: this.chatbotResponseTypes,
         },
         new_alias: {
           required: false,
           type: EInputType.text,
-          placeholder: 'New Command Alias'
-        }
-      }
+          placeholder: 'New Command Alias',
+        },
+      },
     };
+
     return linkCommandsMetadata;
   }
 
   get wordBlacklistItemMetadata() {
-    let wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
+    const wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
       text: {
         required: true,
         type: EInputType.text,
-        placeholder: 'word to protect'
+        placeholder: 'word to protect',
       },
       is_regex: {
         required: true,
@@ -262,28 +343,29 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         type: {
           required: true,
           type: EInputType.list,
-          options: this.chatbotPunishments
+          options: this.chatbotPunishments,
         },
         duration: {
           required: true,
           type: EInputType.number,
           placeholder: 'Punishment Duration (Value in Seconds)',
-          min: 0
-        }
-      }
+          min: 0,
+        },
+      },
     };
+
     return wordBlacklistItemMetadata;
   }
 
-  get metadata() {
-    const metadata: IProtectionMetadata = {
+  get metadata(): IProtectionMetadata {
+    return {
       caps: {
         general: this.generalMetadata('caps'),
-        advanced: this.advancedMetadata('caps')
+        advanced: this.advancedMetadata('caps'),
       },
       symbol: {
         general: this.generalMetadata('symbol'),
-        advanced: this.advancedMetadata('symbol')
+        advanced: this.advancedMetadata('symbol'),
       },
       link: {
         commands: this.linkCommandsMetadata,
@@ -291,31 +373,31 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         new_whitelist_item: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Link to whitelist'
+          placeholder: 'Link to whitelist',
         },
         new_blacklist_item: {
           required: true,
           type: EInputType.text,
-          placeholder: 'Link to blacklist'
-        }
+          placeholder: 'Link to blacklist',
+        },
       },
       word: {
         general: this.generalMetadata('words'),
-        new_blacklist_item: this.wordBlacklistItemMetadata
-      }
+        new_blacklist_item: this.wordBlacklistItemMetadata,
+      },
     };
-    return metadata;
   }
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
-      this.chatbotApiService.resetSettings(slug)
-        .then((response: (
-          ICapsProtectionResponse |
-          ISymbolProtectionResponse |
-          ILinkProtectionResponse |
-          IWordProtectionResponse
-        )) => {
+      this.chatbotApiService.ModTools.resetSettings(slug).then(
+        (
+          response:
+            | ICapsProtectionResponse
+            | ISymbolProtectionResponse
+            | ILinkProtectionResponse
+            | IWordProtectionResponse,
+        ) => {
           switch (slug) {
             case 'caps-protection':
               this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
@@ -332,7 +414,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
             default:
               break;
           }
-        })
+        },
+      );
     }
   }
 }

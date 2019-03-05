@@ -1,22 +1,23 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import GenericFormGroups from './obs/inputs/GenericFormGroups.vue';
-import ObsTextInput from './obs/inputs/ObsTextInput.vue';
-import { ITcpServerServiceApi, ITcpServersSettings } from 'services/tcp-server';
+import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
+import { ITcpServerServiceApi, ITcpServersSettings } from 'services/api/tcp-server';
 import { ISettingsSubCategory } from 'services/settings';
 import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
 import { PlatformAppsService } from 'services/platform-apps';
+import { TextInput } from 'components/shared/inputs/inputs';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
   components: {
     GenericFormGroups,
-    ObsTextInput,
-    AppPlatformDeveloperSettings
-  }
+    VFormGroup,
+    TextInput,
+    AppPlatformDeveloperSettings,
+  },
 })
 export default class DeveloperSettings extends Vue {
-
   @Inject() tcpServerService: ITcpServerServiceApi;
   @Inject() platformAppsService: PlatformAppsService;
 
@@ -29,11 +30,7 @@ export default class DeveloperSettings extends Vue {
   }
 
   get tokenInput() {
-    return {
-      description: 'API Token',
-      value: this.tcpServerService.state.token,
-      masked: true
-    };
+    return this.tcpServerService.state.token;
   }
 
   generateToken() {
@@ -53,7 +50,6 @@ export default class DeveloperSettings extends Vue {
     this.settingsFormData = this.getApiSettingsFormData();
   }
 
-
   save(settingsData: ISettingsSubCategory[]) {
     const settings: Partial<ITcpServersSettings> = {};
     settingsData.forEach(subCategory => {
@@ -69,5 +65,4 @@ export default class DeveloperSettings extends Vue {
   private getApiSettingsFormData(): ISettingsSubCategory[] {
     return this.tcpServerService.getApiSettingsFormData();
   }
-
 }

@@ -30,14 +30,11 @@ export default class PlatformAppStore extends Vue {
       if (Utils.isDevMode()) {
         this.$refs.appStoreWebview.openDevTools();
       }
-      this.guestApiService.exposeApi(
-        this.$refs.appStoreWebview.getWebContents().id,
-        {
-          reloadProductionApps: this.reloadProductionApps,
-          openLinkInBrowser: this.openLinkInBrowser,
-          onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler
-        }
-      );
+      this.guestApiService.exposeApi(this.$refs.appStoreWebview.getWebContents().id, {
+        reloadProductionApps: this.reloadProductionApps,
+        openLinkInBrowser: this.openLinkInBrowser,
+        onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
+      });
     });
   }
 
@@ -50,7 +47,7 @@ export default class PlatformAppStore extends Vue {
   }
 
   async reloadProductionApps() {
-    this.platformAppsService.installProductionApps();
+    this.platformAppsService.loadProductionApps();
   }
 
   get loggedIn() {

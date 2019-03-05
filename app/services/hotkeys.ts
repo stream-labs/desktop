@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import { defer } from 'lodash';
 import { $t } from 'services/i18n';
+import * as obs from '../../obs-api';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -24,8 +25,28 @@ function getTransitionsService(): TransitionsService {
   return TransitionsService.instance;
 }
 
-type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
+const isAudio = (sourceId: string) => {
+  const source = getSourcesService().getSource(sourceId);
 
+  return source ? source.audio : false;
+};
+
+const isGameCapture = (sourceId: string) => {
+  const source = getSourcesService().getSource(sourceId);
+
+  return source ? source.type === 'game_capture' : false;
+};
+
+/**
+ * Process a hotkey by sending it directly to OBS backend
+ *
+ * @param isKeyDown Whether the key was pressed or released
+ */
+const processObsHotkey = (isKeyDown: boolean) => (itemId: string, hotkeyId: number): void => {
+  obs.NodeObs.OBS_API_ProcessHotkeyStatus(hotkeyId, isKeyDown);
+};
+
+type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
 
 /**
  * Represents the key bound to a hotkey action
@@ -40,20 +61,165 @@ export interface IBinding {
   };
 }
 
-
 interface IHotkeyAction {
   name: string;
   description(entityId: string): string;
-  down(entityId: string): void;
+
+  down(entityId: string, hotkeyId?: number): void;
+
   isActive?(entityId: string): boolean;
   shouldApply?(entityId: string): boolean;
-  up?(entityId: string): void;
+
+  up?(entityId: string, hotkeyId?: number): void;
 
   // These are injected dynamically
   downHandler?(): void;
   upHandler?(): void;
 }
 
+type HotkeyGroup = {
+  [actionName: string]: IHotkeyAction;
+};
+
+const GENERAL_ACTIONS: HotkeyGroup = {
+  TOGGLE_START_STREAMING: {
+    name: 'TOGGLE_START_STREAMING',
+    description: () => $t('Start Streaming'),
+    down: () => getStreamingService().toggleStreaming(),
+    isActive: () => {
+      const streamingService = getStreamingService();
+      return streamingService.isStreaming;
+    },
+  },
+  TOGGLE_STOP_STREAMING: {
+    name: 'TOGGLE_STOP_STREAMING',
+    description: () => $t('Stop Streaming'),
+    down: () => {
+      const streamingService = getStreamingService();
+      streamingService.toggleStreaming();
+    },
+    isActive: () => {
+      const streamingService = getStreamingService();
+      return !streamingService.isStreaming;
+    },
+  },
+  TOGGLE_START_RECORDING: {
+    name: 'TOGGLE_START_RECORDING',
+    description: () => $t('Start Recording'),
+    down: () => getStreamingService().toggleRecording(),
+    isActive: () => getStreamingService().isRecording,
+  },
+  TOGGLE_STOP_RECORDING: {
+    name: 'TOGGLE_STOP_RECORDING',
+    description: () => $t('Stop Recording'),
+    down: () => getStreamingService().toggleRecording(),
+    isActive: () => !getStreamingService().isRecording,
+  },
+  ENABLE_STUDIO_MODE: {
+    name: 'ENABLE_STUDIO_MODE',
+    description: () => $t('Enable Studio Mode'),
+    down: () => getTransitionsService().enableStudioMode(),
+    isActive: () => getTransitionsService().state.studioMode,
+  },
+  DISABLE_STUDIO_MODE: {
+    name: 'DISABLE_STUDIO_MODE',
+    description: () => $t('Disable Studio Mode'),
+    down: () => getTransitionsService().disableStudioMode(),
+    isActive: () => !getTransitionsService().state.studioMode,
+  },
+  TRANSITION_STUDIO_MODE: {
+    name: 'TRANSITION_STUDIO_MODE',
+    description: () => $t('Transition (Studio Mode)'),
+    down: () => getTransitionsService().executeStudioModeTransition(),
+  },
+  SAVE_REPLAY: {
+    name: 'SAVE_REPLAY',
+    description: () => $t('Save Replay'),
+    down: () => getStreamingService().saveReplay(),
+  },
+};
+
+const SOURCE_ACTIONS: HotkeyGroup = {
+  TOGGLE_MUTE: {
+    name: 'TOGGLE_MUTE',
+    description: () => $t('Mute'),
+    down: sourceId => getSourcesService().setMuted(sourceId, true),
+    isActive: sourceId => getSourcesService().getSource(sourceId).muted,
+    shouldApply: isAudio,
+  },
+  TOGGLE_UNMUTE: {
+    name: 'TOGGLE_UNMUTE',
+    description: () => $t('Unmute'),
+    down: sourceId => getSourcesService().setMuted(sourceId, false),
+    isActive: sourceId => !getSourcesService().getSource(sourceId).muted,
+    shouldApply: isAudio,
+  },
+  PUSH_TO_MUTE: {
+    name: 'PUSH_TO_MUTE',
+    description: () => $t('Push to Mute'),
+    down: sourceId => getSourcesService().setMuted(sourceId, true),
+    up: sourceId => getSourcesService().setMuted(sourceId, false),
+    shouldApply: isAudio,
+  },
+  PUSH_TO_TALK: {
+    name: 'PUSH_TO_TALK',
+    description: () => $t('Push to Talk'),
+    down: sourceId => getSourcesService().setMuted(sourceId, false),
+    up: sourceId => getSourcesService().setMuted(sourceId, true),
+    shouldApply: isAudio,
+  },
+  GAME_CAPTURE_HOTKEY_START: {
+    name: 'GAME_CAPTURE_HOTKEY_START',
+    description: () => $t('Capture Foreground Window'),
+    up: processObsHotkey(false),
+    down: processObsHotkey(true),
+    shouldApply: isGameCapture,
+  },
+  GAME_CAPTURE_HOTKEY_STOP: {
+    name: 'GAME_CAPTURE_HOTKEY_STOP',
+    description: () => $t('Deactivate Capture'),
+    up: processObsHotkey(false),
+    down: processObsHotkey(true),
+    shouldApply: isGameCapture,
+  },
+};
+
+const SCENE_ACTIONS: HotkeyGroup = {
+  SWITCH_TO_SCENE: {
+    name: 'SWITCH_TO_SCENE',
+    description: () => $t('Switch to scene'),
+    down: sceneId => getScenesService().makeSceneActive(sceneId),
+  },
+};
+
+const SCENE_ITEM_ACTIONS: HotkeyGroup = {
+  TOGGLE_SOURCE_VISIBILITY_SHOW: {
+    name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    isActive: sceneItemId => getScenesService().getSceneItem(sceneItemId).visible,
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
+  },
+  TOGGLE_SOURCE_VISIBILITY_HIDE: {
+    name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Hide %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+  },
+};
 
 /**
  * All possible hotkeys should be defined in this object.
@@ -62,126 +228,14 @@ interface IHotkeyAction {
  *
  * WARNING: Changing the name of existing hotkey actions
  * will cause people to lose their saved keybindings. The
-* name shouldn't really change after it is added.
-*/
-const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
-  GENERAL: [
-    {
-      name: 'TOGGLE_START_STREAMING',
-      description: () => $t('Start Streaming'),
-      down: () => getStreamingService().toggleStreaming(),
-      isActive: () => {
-        const streamingService = getStreamingService();
-        return streamingService.isStreaming;
-      }
-    },
-    {
-      name: 'TOGGLE_STOP_STREAMING',
-      description: () => $t('Stop Streaming'),
-      down: () => {
-        const streamingService = getStreamingService();
-        streamingService.toggleStreaming();
-      },
-      isActive: () => {
-        const streamingService = getStreamingService();
-        return !streamingService.isStreaming;
-      }
-    },
-    {
-      name: 'TOGGLE_START_RECORDING',
-      description: () => $t('Start Recording'),
-      down: () => getStreamingService().toggleRecording(),
-      isActive: () => getStreamingService().isRecording
-    },
-    {
-      name: 'TOGGLE_STOP_RECORDING',
-      description: () => $t('Stop Recording'),
-      down: () => getStreamingService().toggleRecording(),
-      isActive: () => !getStreamingService().isRecording
-    },
-    {
-      name: 'ENABLE_STUDIO_MODE',
-      description: () => $t('Enable Studio Mode'),
-      down: () => getTransitionsService().enableStudioMode(),
-      isActive: () => getTransitionsService().state.studioMode
-    },
-    {
-      name: 'DISABLE_STUDIO_MODE',
-      description: () => $t('Disable Studio Mode'),
-      down: () => getTransitionsService().disableStudioMode(),
-      isActive: () => !getTransitionsService().state.studioMode
-    },
-    {
-      name: 'TRANSITION_STUDIO_MODE',
-      description: () => $t('Transition (Studio Mode)'),
-      down: () => getTransitionsService().executeStudioModeTransition()
-    }
-  ],
-
-  SCENE: [
-    {
-      name: 'SWITCH_TO_SCENE',
-      description: () => $t('Switch to scene'),
-      down: (sceneId) => getScenesService().makeSceneActive(sceneId)
-    }
-  ],
-
-  SCENE_ITEM: [
-    {
-      name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
-      description: (sceneItemId) => {
-        const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
-      },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(true)
-    },
-
-    {
-      name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
-      description: (sceneItemId) => {
-        const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return $t('Hide %{sourcename}', { sourcename: sceneItem.source.name });
-      },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(false)
-    }
-  ],
-
-  SOURCE: [
-    {
-      name: 'TOGGLE_MUTE',
-      description: () => $t('Mute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    },
-    {
-      name: 'TOGGLE_UNMUTE',
-      description: () => $t('Unmute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    },
-    {
-      name: 'PUSH_TO_MUTE',
-      description: () => $t('Push to Mute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    },
-    {
-      name: 'PUSH_TO_TALK',
-      description: () => $t('Push to Talk'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    }
-  ]
+ * name shouldn't really change after it is added.
+ */
+const ACTIONS: HotkeyGroup = {
+  ...GENERAL_ACTIONS,
+  ...SOURCE_ACTIONS,
+  ...SCENE_ACTIONS,
+  ...SCENE_ITEM_ACTIONS,
 };
-
 
 /**
  * Represents a serialized Hotkey
@@ -189,9 +243,12 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
 export interface IHotkey {
   actionName: string;
   bindings: IBinding[];
+  description?: string;
+  resourceId?: string;
   sceneId?: string;
   sourceId?: string;
   sceneItemId?: string;
+  hotkeyId?: number;
 }
 
 /**
@@ -204,16 +261,21 @@ export interface IHotkeysSet {
   scenes: Dictionary<IHotkey[]>;
 }
 
-
 interface IHotkeysServiceState {
   hotkeys: IHotkey[]; // only bound hotkeys are stored
 }
 
+type OBSHotkey = {
+  ObjectName: string;
+  ObjectType: obs.EHotkeyObjectType;
+  HotkeyName: string;
+  HotkeyDesc: string;
+  HotkeyId: number;
+};
 
 export class HotkeysService extends StatefulService<IHotkeysServiceState> {
-
   static initialState: IHotkeysServiceState = {
-    hotkeys: []
+    hotkeys: [],
   };
 
   @Inject()
@@ -230,7 +292,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
    */
   private registeredHotkeys: Hotkey[];
 
-
   init() {
     this.scenesService.sceneAdded.subscribe(() => this.invalidate());
     this.scenesService.sceneRemoved.subscribe(() => this.invalidate());
@@ -240,11 +301,9 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.sourcesService.sourceRemoved.subscribe(() => this.invalidate());
   }
 
-
   addHotkey(hotkeyModel: IHotkey) {
     this.ADD_HOTKEY(hotkeyModel);
   }
-
 
   private invalidate() {
     this.registeredHotkeys = null;
@@ -252,52 +311,70 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   private updateRegisteredHotkeys() {
     const hotkeys: IHotkey[] = [];
+    /*
+     * Since we're hybrid at this point, track already-added hotkeys so OBS
+     * hotkeys don't duplicate them
+     */
+    const addedHotkeys = new Set<string>();
 
-    HOTKEY_ACTIONS.GENERAL.forEach(action => {
+    Object.values(GENERAL_ACTIONS).forEach(action => {
       hotkeys.push({
         actionName: action.name,
-        bindings: []
+        bindings: [],
       });
+      addedHotkeys.add(action.name);
     });
 
-
     this.scenesService.scenes.forEach(scene => {
+      Object.values(SCENE_ACTIONS).forEach(action => {
+        hotkeys.push({
+          actionName: action.name,
+          bindings: [],
+          sceneId: scene.id,
+        });
+        addedHotkeys.add(`${action.name}-${scene.id}`);
+      });
+
       scene.getItems().forEach(sceneItem => {
-        HOTKEY_ACTIONS.SCENE_ITEM.forEach(action => {
+        Object.values(SCENE_ITEM_ACTIONS).forEach(action => {
           hotkeys.push({
             actionName: action.name,
             bindings: [],
-            sceneItemId: sceneItem.sceneItemId
+            sceneItemId: sceneItem.sceneItemId,
           });
-        });
-      });
-
-      HOTKEY_ACTIONS.SCENE.forEach(action => {
-        hotkeys.push({
-          actionName: action.name,
-          bindings: [],
-          sceneId: scene.id
+          addedHotkeys.add(`${action.name}-${sceneItem.sceneItemId}`);
         });
       });
     });
 
+    const obsHotkeys: OBSHotkey[] = obs.NodeObs.OBS_API_QueryHotkeys();
 
-    this.sourcesService.getSources().forEach(source => {
-      HOTKEY_ACTIONS.SOURCE.forEach(action => {
-        hotkeys.push({
-          actionName: action.name,
-          bindings: [],
-          sourceId: source.sourceId
-        });
+    obsHotkeys
+      .filter(hotkey => this.isSupportedHotkey(hotkey))
+      .forEach(hotkey => {
+        const action = this.getActionForHotkey(hotkey);
+
+        if (action && action.name) {
+          const key = `${action.name}-${hotkey.ObjectName}`;
+
+          if (!addedHotkeys.has(key)) {
+            hotkeys.push({
+              sourceId: hotkey.ObjectName,
+              actionName: action.name,
+              bindings: [] as IBinding[],
+              hotkeyId: hotkey.HotkeyId,
+            });
+            addedHotkeys.add(key);
+          }
+        }
       });
-    });
 
     // Set up bindings from saved hotkeys
     // This is a slow O(n^2) process, and may need to
     // be optimized later.
     this.state.hotkeys.forEach(savedHotkey => {
       const hotkey = hotkeys.find(blankHotkey => {
-        return this.getHotkey(blankHotkey).isSameHotkey(savedHotkey);
+        return this.getHotkey(blankHotkey).equals(savedHotkey);
       });
       if (hotkey) hotkey.bindings = [].concat(savedHotkey.bindings);
     });
@@ -305,20 +382,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.registeredHotkeys = hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel));
   }
 
-
   getHotkey(obj: IHotkey): Hotkey {
     return new Hotkey(obj);
   }
-
 
   getHotkeys(): Hotkey[] {
     if (!this.registeredHotkeys) this.updateRegisteredHotkeys();
     return this.registeredHotkeys.filter(hotkey => hotkey.shouldApply);
   }
 
-
   getHotkeysSet(): IHotkeysSet {
-
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
@@ -335,44 +408,40 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return {
       general: this.getGeneralHotkeys(),
       sources: sourcesHotkeys,
-      scenes: scenesHotkeys
+      scenes: scenesHotkeys,
     };
   }
-
 
   clearAllHotkeys() {
     this.applyHotkeySet({
       general: [],
       sources: {},
-      scenes: {}
+      scenes: {},
     });
   }
-
 
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
     Object.keys(hotkeySet.scenes).forEach(sceneId => hotkeys.push(...hotkeySet.scenes[sceneId]));
-    Object.keys(hotkeySet.sources).forEach(sourceId => hotkeys.push(...hotkeySet.sources[sourceId]));
+    Object.keys(hotkeySet.sources).forEach(sourceId =>
+      hotkeys.push(...hotkeySet.sources[sourceId]),
+    );
     this.setHotkeys(hotkeys);
     this.bindHotkeys();
   }
-
 
   getGeneralHotkeys(): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.type === 'GENERAL');
   }
 
-
   getSourceHotkeys(sourceId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sourceId === sourceId);
   }
 
-
   getSceneHotkeys(sceneId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneId === sceneId);
   }
-
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
@@ -380,16 +449,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 
-
   getSceneItemHotkeys(sceneItemId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneItemId === sceneItemId);
   }
 
-
   unregisterAll() {
     this.keyListenerService.unregisterAll();
   }
-
 
   private setHotkeys(hotkeys: IHotkey[]) {
     this.CLEAR_HOTKEYS();
@@ -398,7 +464,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
     this.invalidate();
   }
-
 
   bindHotkeys() {
     this.unregisterAll();
@@ -428,7 +493,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler()),
       });
     });
 
@@ -438,27 +503,50 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeyup',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler()),
       });
     });
   }
-
 
   @mutation()
   private ADD_HOTKEY(hotkeyObj: IHotkey) {
     this.state.hotkeys.push(hotkeyObj);
   }
 
-
   @mutation()
   private SET_BINDINGS(hotkeyInd: number, bindings: IBinding[]) {
     this.state.hotkeys[hotkeyInd].bindings = bindings;
   }
 
-
   @mutation()
   private CLEAR_HOTKEYS() {
     this.state.hotkeys = [];
+  }
+
+  private isSupportedHotkey(hotkey: OBSHotkey) {
+    if (hotkey.ObjectType !== obs.EHotkeyObjectType.Source) {
+      return false;
+    }
+
+    const action = this.getActionForHotkey(hotkey);
+
+    return action && action.name && idPropFor(hotkey);
+  }
+
+  private getActionForHotkey(hotkey: OBSHotkey): IHotkeyAction {
+    const action = getActionFromName(hotkey.HotkeyName);
+
+    // Return the action immediately if there's a 1-1 mapping
+    if (action && action.name) {
+      return action;
+    }
+
+    // Otherwise prefix the hotkey name with its source type
+    const source = this.sourcesService.getSource(hotkey.ObjectName);
+
+    if (source) {
+      return ACTIONS[`${source.type.toUpperCase()}_${hotkey.HotkeyName}`];
+    }
   }
 }
 
@@ -480,8 +568,7 @@ export class Hotkey implements IHotkey {
 
   @Inject() private hotkeysService: HotkeysService;
 
-  private hotkeyModel: IHotkey;
-
+  private readonly hotkeyModel: IHotkey;
 
   constructor(hotkeyModel: IHotkey) {
     Object.assign(this, hotkeyModel);
@@ -493,7 +580,7 @@ export class Hotkey implements IHotkey {
       this.type = 'SCENE_ITEM';
     } else if (this.sceneId) {
       this.type = 'SCENE';
-    } else  {
+    } else {
       this.type = 'GENERAL';
     }
 
@@ -504,24 +591,21 @@ export class Hotkey implements IHotkey {
     this.shouldApply = this.action.shouldApply(entityId);
   }
 
-
-  isSameHotkey(other: IHotkey) {
-    return (this.actionName === other.actionName) &&
-      (this.sceneId === other.sceneId) &&
-      (this.sourceId === other.sourceId) &&
-      (this.sceneItemId === other.sceneItemId);
+  equals(other: IHotkey) {
+    return (
+      this.actionName === other.actionName &&
+      this.sceneId === other.sceneId &&
+      this.sourceId === other.sourceId &&
+      this.sceneItemId === other.sceneItemId
+    );
   }
-
 
   getModel(): IHotkey {
     return { ...this.hotkeyModel };
   }
 
-
   private getAction(entityId: string): IHotkeyAction {
-    const action = { ...HOTKEY_ACTIONS[this.type].find(action => {
-      return action.name === this.actionName;
-    }) };
+    const action = getActionFromName(this.actionName);
 
     const { up, down } = action;
 
@@ -529,21 +613,56 @@ export class Hotkey implements IHotkey {
     if (!action.isActive) action.isActive = () => false;
     if (!action.shouldApply) action.shouldApply = () => true;
 
-
     // We defer the actions until after we've decided whether
     // or not to execute each action.
     if (up) {
       action.upHandler = () => {
-        if (!action.isActive(entityId)) defer(() => up(entityId));
+        if (!action.isActive(entityId)) {
+          defer(() => up(entityId, this.hotkeyModel.hotkeyId));
+        }
       };
     }
 
     if (down) {
       action.downHandler = () => {
-        if (!action.isActive(entityId)) defer(() => down(entityId));
+        if (!action.isActive(entityId)) {
+          defer(() => down(entityId, this.hotkeyModel.hotkeyId));
+        }
       };
     }
 
     return action;
   }
 }
+
+const getMigrationMapping = (actionName: string) => {
+  return {
+    MUTE: 'TOGGLE_MUTE',
+    UNMUTE: 'TOGGLE_UNMUTE',
+  }[normalizeActionName(actionName)];
+};
+
+const getActionFromName = (actionName: string) => ({
+  ...(ACTIONS[actionName] || ACTIONS[getMigrationMapping(actionName)]),
+});
+
+const isSceneItem = (hotkey: OBSHotkey) => !!getScenesService().getSceneItem(hotkey.ObjectName);
+
+const isSource = (hotkey: OBSHotkey) => !!getSourcesService().getSource(hotkey.ObjectName);
+
+const isScene = (hotkey: OBSHotkey) => !!getScenesService().getScene(hotkey.ObjectName);
+
+const idPropFor = (hotkey: OBSHotkey) => {
+  if (isSource(hotkey)) {
+    return 'sourceId';
+    // tslint:disable-next-line:no-else-after-return false positive
+  } else if (isScene(hotkey)) {
+    return 'sceneId';
+  } else if (isSceneItem(hotkey)) {
+    return 'sceneItemId';
+  } else {
+    return null;
+  }
+};
+
+const normalizeActionName = (actionName: string) => actionName.split('.')[0];

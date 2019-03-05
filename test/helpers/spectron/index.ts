@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { sleep } from '../sleep';
+import { releaseUserInPool } from './user';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -11,7 +11,6 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
-
 
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
@@ -23,12 +22,10 @@ async function focusWindow(t: any, regex: RegExp) {
   }
 }
 
-
 // Focuses the main window
 export async function focusMain(t: any) {
   await focusWindow(t, /windowId=main$/);
 }
-
 
 // Focuses the child window
 export async function focusChild(t: any) {
@@ -52,26 +49,29 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true
+  restartAppAfterEachTest: true,
 };
 
 export interface ITestContext {
-  cacheDir: string,
-  app: Application
+  cacheDir: string;
+  app: Application;
 }
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
+  // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
   let context: any = null;
   let app: any;
   let testPassed = false;
+  let testName = '';
   const failedTests: string[] = [];
+  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   async function startApp(t: TExecutionContext) {
-    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    t.context.cacheDir = cacheDir;
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -80,19 +80,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
         options.appArgs ? options.appArgs : '',
-        '.'
+        '.',
       ],
       env: {
         NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir
+        SLOBS_CACHE_DIR: t.context.cacheDir,
       },
       webdriverOptions: {
         // most of deprecation warning encourage us to use WebdriverIO actions API
         // however the documentation for this API looks very poor, it provides only one example:
         // http://webdriver.io/api/protocol/actions.html
         // disable deprecation warning and waiting for better docs now
-        deprecationWarnings: false
-      }
+        deprecationWarnings: false,
+      },
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -135,14 +135,38 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   async function stopApp() {
-    await context.app.stop();
-    await new Promise((resolve) => {
-      rimraf(context.cacheDir, resolve);
-    });
+    try {
+      await context.app.stop();
+      await new Promise(resolve => {
+        rimraf(context.cacheDir, resolve);
+      });
+    } catch (e) {
+      // TODO: find the reason why some tests are failing here
+      testPassed = false;
+    }
     appIsRunning = false;
   }
 
-  test.beforeEach(async t  => {
+  /**
+   * test should be considered as failed if it writes exceptions in to the log file
+   */
+  async function checkErrorsInLogFile(t: TExecutionContext) {
+    const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    if (!fs.existsSync(filePath)) return;
+    const logs = fs.readFileSync(filePath).toString();
+    const errors = logs
+      .split('\n')
+      .filter((record: string) => record.match(/\[error\]/));
+    fs.unlinkSync(filePath);
+    if (!errors.length) return;
+    t.fail();
+    testPassed = false;
+    console.log('The log-file has errors');
+    console.log(logs);
+  }
+
+  test.beforeEach(async t => {
+    testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -153,30 +177,38 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    const testName = t.title.replace('afterEach.always hook for ', '');
+    // wrap in try/catch for the situation when we have a crash
+    // so we still can read the logs after the crash
+    try {
+      const client = await getClient();
+      await client.unsubscribeAll();
+      await releaseUserInPool();
+      if (options.restartAppAfterEachTest) {
+        client.disconnect();
+        await stopApp();
+      }
+    } catch (e) {
+      testPassed = false;
+    }
+
+    await checkErrorsInLogFile(t);
     if (!testPassed) failedTests.push(testName);
-
-    const client = await getClient();
-    await client.unsubscribeAll();
-    if (options.restartAppAfterEachTest) {
-      client.disconnect();
-    }
-
-    if (options.restartAppAfterEachTest) {
-      await stopApp();
-    }
-
   });
 
   test.after.always(async t => {
-    if (appIsRunning) await stopApp();
-    if (failedTests) saveFailedTestsToFile(failedTests);
+    if (appIsRunning) {
+      await stopApp();
+      if (!testPassed) failedTests.push(testName);
+    }
+
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
   const filePath = 'test-dist/failed-tests.json';
   if (fs.existsSync(filePath)) {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
     failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
   }
   fs.writeFileSync(filePath, JSON.stringify(failedTests));

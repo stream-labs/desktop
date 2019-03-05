@@ -4,11 +4,9 @@ import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import { AppService } from 'services/app';
-import electron from 'electron';
 
 @Component({})
 export default class ModalLayout extends Vue {
-
   contentStyle: Object = {};
   fixedStyle: Object = {};
 
@@ -23,6 +21,17 @@ export default class ModalLayout extends Vue {
   // If controls are shown, whether or not to show the
   // cancel button.
   @Prop({ default: true }) showCancel: boolean;
+
+  // If controls are shown, whether or not to show the
+  // Done button.
+  @Prop({ default: true }) showDone: boolean;
+
+  // Disable done button.
+  @Prop({ default: false }) disableDone: boolean;
+
+  // If tabs are shown, whether or not to fix
+  // the margin.
+  @Prop({ default: false }) containsTabs: boolean;
 
   // Will be called when "done" is clicked if controls
   // are enabled
@@ -45,17 +54,16 @@ export default class ModalLayout extends Vue {
   @Prop({ default: false })
   customControls: boolean;
 
-
   created() {
     const contentStyle = {
       padding: '16px',
-      overflowY: 'auto'
+      overflowY: 'auto',
     };
 
     Object.assign(contentStyle, this.contentStyles);
 
     const fixedStyle = {
-      height: (this.fixedSectionHeight || 0).toString() + 'px'
+      height: `${this.fixedSectionHeight || 0}px`,
     };
 
     this.contentStyle = contentStyle;
@@ -85,5 +93,4 @@ export default class ModalLayout extends Vue {
   get loading() {
     return this.appService.state.loading;
   }
-
 }

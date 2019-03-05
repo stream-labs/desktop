@@ -1,5 +1,5 @@
+import { BehaviorSubject } from 'rxjs';
 import { ILoadedApp } from '../..';
-import { Observable } from 'rxjs';
 
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',
@@ -7,23 +7,29 @@ export enum EApiPermissions {
   Streaming = 'slobs.streaming',
   Authorization = 'slobs.authorization',
   SceneCollections = 'slobs.scene-collections',
+  SceneTransitions = 'slobs.scene-transitions',
   ExternalLinks = 'slobs.external-links',
   Notifications = 'slobs.notifications',
-  Hotkeys = 'slobs.hotkeys'
+  Hotkeys = 'slobs.hotkeys',
 }
 
-export interface IWebviewTransform {
+/**
+ * Explains the location that a browser view is
+ * current mounted, for the purposes of drawing
+ * displays.
+ */
+export interface IBrowserViewTransform {
   pos: IVec2;
   size: IVec2;
-  visible: boolean;
+  mounted: boolean;
+  electronWindowId: number;
+  slobsWindowId: string;
 }
 
 export interface IApiContext {
   app: ILoadedApp;
   webContentsId: number;
-  electronWindowId: number;
-  slobsWindowId: string;
-  webviewTransform: Observable<IWebviewTransform>;
+  pageTransform: BehaviorSubject<IBrowserViewTransform>;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;
@@ -31,8 +37,7 @@ export type TApiModule = Dictionary<TApiHandler>;
 
 export function apiMethod() {
   return (target: Module, methodName: string, descriptor: PropertyDescriptor) => {
-
-    const klass = (target.constructor as typeof Module);
+    const klass = target.constructor as typeof Module;
     klass.apiMethods = klass.apiMethods || [];
     klass.apiMethods.push(methodName);
     return descriptor;
@@ -41,8 +46,7 @@ export function apiMethod() {
 
 export function apiEvent() {
   return (target: Module, methodName: string) => {
-
-    const klass = (target.constructor as typeof Module);
+    const klass = target.constructor as typeof Module;
     klass.apiEvents = klass.apiEvents || [];
     klass.apiEvents.push(methodName);
   };
@@ -52,13 +56,12 @@ export class NotImplementedError extends Error {
   constructor() {
     super(
       'This function is not yet implemented.  It you are interested in ' +
-      'using it, please reach out to the Streamlabs dev team.  Thanks!'
+        'using it, please reach out to the Streamlabs dev team.  Thanks!',
     );
   }
 }
 
 export abstract class Module {
-
   /**
    * The top level name of this module
    */
@@ -84,6 +87,7 @@ export abstract class Module {
   /**
    * Takes a patch object and validates it against the required keys.
    * @param requiredKeys keys required in the original object
+   * @param patch An object containing the changes to apply
    */
   validatePatch(requiredKeys: string[], patch: Dictionary<any>) {
     requiredKeys.forEach(key => {
@@ -92,5 +96,4 @@ export abstract class Module {
       }
     });
   }
-
 }

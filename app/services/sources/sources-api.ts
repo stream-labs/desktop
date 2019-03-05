@@ -52,7 +52,7 @@ export interface ISourcesServiceApi {
     name: string,
     type: TSourceType,
     settings?: Dictionary<any>,
-    options?: ISourceAddOptions
+    options?: ISourceAddOptions,
   ): ISourceApi;
   removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
@@ -75,7 +75,6 @@ export interface ISourcesServiceApi {
   sourceRemoved: Observable<ISource>;
 }
 
-
 export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>> {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
@@ -86,33 +85,28 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
 }
 
 export type TSourceType =
-  'image_source' |
-  'color_source' |
-  'browser_source' |
-  'slideshow' |
-  'ffmpeg_source' |
-  'text_gdiplus' |
-  'text_ft2_source' |
-  'monitor_capture' |
-  'window_capture' |
-  'game_capture' |
-  'dshow_input' |
-  'wasapi_input_capture' |
-  'wasapi_output_capture' |
-  'decklink-input' |
-  'scene' |
-  'ndi_source' |
-  'openvr_capture' |
-  'liv_capture' |
-  'ovrstream_dc_source'
-  ;
+  | 'image_source'
+  | 'color_source'
+  | 'browser_source'
+  | 'slideshow'
+  | 'ffmpeg_source'
+  | 'text_gdiplus'
+  | 'text_ft2_source'
+  | 'monitor_capture'
+  | 'window_capture'
+  | 'game_capture'
+  | 'dshow_input'
+  | 'wasapi_input_capture'
+  | 'wasapi_output_capture'
+  | 'decklink-input'
+  | 'scene'
+  | 'ndi_source'
+  | 'openvr_capture'
+  | 'liv_capture'
+  | 'ovrstream_dc_source';
 
 // Register new properties managers here
-export type TPropertiesManager =
-  | 'default'
-  | 'widget'
-  | 'streamlabels'
-  | 'platformApp';
+export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;

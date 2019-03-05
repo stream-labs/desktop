@@ -5,26 +5,21 @@ import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-import {
-  IQuotePreferencesGeneralSettings
-} from 'services/chatbot';
+import { IQuotePreferencesGeneralSettings } from 'services/chatbot';
 
-import {
-  EInputType
-} from 'components/shared/inputs/index';
+import { EInputType } from 'components/shared/inputs/index';
 
 @Component({
-  components: { ValidatedForm }
+  components: { ValidatedForm },
 })
 export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
-
   $refs: {
     form: ValidatedForm;
   };
 
   generalSettings: IQuotePreferencesGeneralSettings = {
-    date_format: null
-  }
+    date_format: null,
+  };
 
   // metadata
   get metadata() {
@@ -32,13 +27,13 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
       date_format: metadataHelper.text({
         type: EInputType.text,
         required: true,
-        placeholder: $t('Date Format')
-      })
-    }
+        placeholder: $t('Date Format'),
+      }),
+    };
   }
 
   get quotePreferences() {
-    return this.chatbotApiService.state.quotePreferencesResponse;
+    return this.chatbotApiService.Quotes.state.quotePreferencesResponse;
   }
 
   mounted() {
@@ -50,7 +45,6 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     const newPreferences = cloneDeep(this.quotePreferences);
     newPreferences.settings.general = this.generalSettings;
-    this.chatbotApiService.updateQuotePreferences(newPreferences);
+    this.chatbotApiService.Quotes.updateQuotePreferences(newPreferences);
   }
-
 }

@@ -5,12 +5,11 @@ import { NotificationsService, ENotificationType } from 'services/notifications'
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs';
-import { JsonrpcService } from '../jsonrpc/jsonrpc';
+import { JsonrpcService } from '../api/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 
 const INTERVAL = 2 * 60 * 1000;
-
 
 interface IMonitorState {
   framesLagged: number;
@@ -27,14 +26,12 @@ interface IMonitorState {
  * send a notification to the use that something's wrong
  */
 export class PerformanceMonitorService extends StatefulService<IMonitorState> {
-
   static initialState: IMonitorState = {
     framesLagged: 0,
     framesRendered: 0,
     framesSkipped: 0,
-    framesEncoded: 0
+    framesEncoded: 0,
   };
-
 
   @Inject() private notificationsService: NotificationsService;
   @Inject() private performanceService: PerformanceService;
@@ -45,7 +42,6 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   private intervalId: number = null;
   private droppedFramesRecords: number[] = [];
   private droppedFramesSubscr: Subscription = null;
-
 
   start() {
     if (this.intervalId) return;
@@ -59,7 +55,6 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     });
   }
 
-
   stop() {
     this.performanceService.stop();
     clearInterval(this.intervalId);
@@ -72,8 +67,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.VideoFactory.getGlobal().skippedFrames,
-      framesEncoded: obs.VideoFactory.getGlobal().totalFrames
+      framesSkipped: obs.Video.skippedFrames,
+      framesEncoded: obs.Video.encodedFrames,
     };
 
     const {
@@ -82,7 +77,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       laggedEnabled,
       laggedThreshold,
       droppedEnabled,
-      droppedThreshold
+      droppedThreshold,
     } = this.troubleshooterService.getSettings();
 
     if (skippedEnabled && currentStats.framesEncoded !== 0) {
@@ -107,8 +102,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
 
     if (droppedEnabled && this.droppedFramesRecords.length) {
       const droppedFramesFactor =
-        this.droppedFramesRecords.reduce((a, b) => a + b) /
-        this.droppedFramesRecords.length;
+        this.droppedFramesRecords.reduce((a, b) => a + b) / this.droppedFramesRecords.length;
       this.droppedFramesRecords = [];
       if (droppedFramesFactor >= droppedThreshold) {
         this.pushDroppedFramesNotify(droppedFramesFactor);
@@ -121,60 +115,57 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   private pushSkippedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_SKIPPED';
     this.notificationsService.push({
-      type: ENotificationType.WARNING,
       code,
+      type: ENotificationType.WARNING,
       data: factor,
       lifeTime: -1,
       showTime: true,
-      message: $t('Skipped frames detected:') +  Math.round(factor * 100) + '%',
+      // tslint:disable-next-line:prefer-template
+      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '%',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
-        code
-      )
+        code,
+      ),
     });
   }
-
 
   private pushLaggedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_LAGGED';
     this.notificationsService.push({
-      type: ENotificationType.WARNING,
       code,
+      type: ENotificationType.WARNING,
       data: factor,
       lifeTime: -1,
       showTime: true,
-      message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
+      message: `Lagged frames detected: ${Math.round(factor * 100)}%`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
-        code
-      )
+        code,
+      ),
     });
   }
-
 
   private pushDroppedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_DROPPED';
     this.notificationsService.push({
-      type: ENotificationType.WARNING,
       code,
+      type: ENotificationType.WARNING,
       data: factor,
       lifeTime: -1,
       showTime: true,
-      message: `Dropped frames detected: ${ Math.round(factor * 100)}%`,
+      message: `Dropped frames detected: ${Math.round(factor * 100)}%`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
-        code
-      )
+        code,
+      ),
     });
   }
-
 
   @mutation()
   private SET_STATE(stats: IMonitorState) {
     this.state = stats;
   }
-
 }

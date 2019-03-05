@@ -7,9 +7,8 @@
     <div class="spinner-spacer" />
   </div>
   <component
-    v-for="(component, index) in components"
+    v-for="(component, index) in componentsToRender"
     :key="`${component.name}-${index}`"
-    v-if="component.name"
     v-show="component.isShown"
     :is="component.name"/>
 </div>

@@ -2,7 +2,7 @@
 <modal-layout v-if="widget.previewSourceId">
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
-      <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
+      <generic-form :value="topProperties" @input="onPropsInputHandler"/>
       <div v-if="apiSettings.testers" class="button button--action test-button">
         <test-widgets :testers="apiSettings.testers" />
       </div>
@@ -73,25 +73,26 @@
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
               key="html"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'html' }"
+              :value="wData"
+              :metadata="{ type: 'html', selectedId, selectedAlert }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
               key="css"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'css' }"
+              :value="wData"
+              :metadata="{ type: 'css', selectedId, selectedAlert }"
             />
             <code-editor
               v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
               key="js"
-              :value="selectedVariation || wData"
-              :metadata="{ type: 'js' }"
+              :value="wData"
+              :metadata="{ type: 'js', selectedId, selectedAlert }"
             />
             <custom-fields-editor
               v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
               key="customFields"
-              :value="selectedVariation || wData"
+              :value="wData"
+              :metadata="{ selectedId, selectedAlert }"
             />
           </div>
           </div>
@@ -118,15 +119,17 @@
   }
 
   .top-settings {
-    .input-container {
-      margin-bottom: 0;
-      width: auto;
+    .row.alignable-input {
+      width: 80px;
       flex-direction: column;
-      .margin-right(2);
-      .margin-bottom(2);
-    }
-    .int-input{
-      width: 60px;
+
+      .input-body {
+        margin-left: 0;
+      }
+
+      .input-footer {
+        display: none;
+      }
     }
   }
 
@@ -163,7 +166,7 @@
     display: flex;
     align-items: center;
 
-    > div {
+    > div, form {
       display: flex;
       align-items: center;
     }
@@ -251,7 +254,7 @@
     width: 20%;
     height: calc(~"100% - 66px");
     position: absolute;
-    bottom: 0;
+    bottom: 8px;
     left: 0;
     border: 1px solid @day-border;
     background-color: @day-bg;

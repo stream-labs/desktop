@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
 import { Inject } from '../util/injector';
-import { ITcpServerServiceApi } from 'services/tcp-server';
+import { ITcpServerServiceApi } from 'services/api/tcp-server';
 import { HostsService } from 'services/hosts';
 
 interface IQRCodeData {
@@ -14,10 +14,9 @@ interface IQRCodeData {
 }
 
 @Component({
-  components: { qrcode }
+  components: { qrcode },
 })
 export default class RemoteControlQRCodeVue extends Vue {
-
   qrcodeIsVisible = false;
   detailsIsVisible = false;
   private updateNetworkInterval = 0;
@@ -29,7 +28,7 @@ export default class RemoteControlQRCodeVue extends Vue {
     token: '',
     port: 0,
     addresses: [],
-    version: ''
+    version: '',
   };
 
   mounted() {
@@ -43,19 +42,18 @@ export default class RemoteControlQRCodeVue extends Vue {
 
   updateQrcodeData() {
     const settings = this.tcpServerService.state;
-    const addresses = this.tcpServerService.getIPAddresses()
+    const addresses = this.tcpServerService
+      .getIPAddresses()
       .filter(address => !address.internal)
       .map(address => address.address);
 
-
     this.qrcodeData = {
+      addresses,
       token: settings.token,
       port: settings.websockets.port,
-      addresses,
-      version: remote.process.env.SLOBS_VERSION
+      version: remote.process.env.SLOBS_VERSION,
     };
   }
-
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';

@@ -10,41 +10,49 @@ async function getNthLabelId(t: TExecutionContext, label: string, index: number)
 export async function setFormInput(t: TExecutionContext, label: string, value: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
-  await t.context.app.client
-    .elementIdElement(id, '../..')
-    .setValue('input', value);
+  await t.context.app.client.elementIdElement(id, '../..').setValue('input', value);
 }
 
 export async function getFormInput(t: TExecutionContext, label: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
-  return t.context.app.client
-    .elementIdElement(id, '../..')
-    .getValue('input');
+  return t.context.app.client.elementIdElement(id, '../..').getValue('input');
 }
 
 export async function clickFormInput(t: TExecutionContext, label: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
-  await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click('input');
+  await t.context.app.client.elementIdElement(id, '../..').click('input');
 }
 
-export async function setFormDropdown(t: TExecutionContext, label: string, value: string, index = 0) {
+export async function setFormDropdown(
+  t: TExecutionContext,
+  label: string,
+  value: string,
+  index = 0,
+) {
   const id = await getNthLabelId(t, label, index);
 
-  await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click('.multiselect');
+  await t.context.app.client.elementIdElement(id, '../..').click('.multiselect');
 
-  await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click(`li=${value}`);
+  await t.context.app.client.elementIdElement(id, '../..').click(`li=${value}`);
+}
+
+export async function getDropdownOptions(t: TExecutionContext, selector: string) {
+  const els = await t.context.app.client.execute((selector: string) => {
+    return Array.from(document.querySelectorAll(selector)).map(el => el.textContent);
+  }, selector);
+
+  return els.value;
 }
 
 // Percent is a value between 0 and 1
-export async function setSliderPercent(t: TExecutionContext, label: string, percent: number, index = 0) {
+export async function setSliderPercent(
+  t: TExecutionContext,
+  label: string,
+  percent: number,
+  index = 0,
+) {
   const id = await getNthLabelId(t, label, index);
 
   const width = await t.context.app.client

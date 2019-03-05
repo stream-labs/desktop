@@ -27,6 +27,18 @@
         <span>REC</span>
       </button>
     </div>
+    <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
+      <button class="button button--default replay-button" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
+    </div>
+    <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
+      <button class="button button--soft-warning" @click="toggleReplayBuffer">{{ $t('Stop') }}</button>
+      <button class="button button--default" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping">
+        {{ $t('Save Replay') }}
+      </button>
+    </div>
+    <div class="nav-item" v-if="canSchedule">
+      <button class="button button--default" @click="openScheduleStream" >{{ $t('Schedule Stream')}}</button>
+    </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
     </div>
@@ -132,13 +144,36 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 2px 0px rgba(252, 62, 63, 0.6);
+    box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
   }
   70% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0.6);
   }
   100% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0);
+  }
+}
+
+.replay-button {
+  font-size: 12px;
+}
+
+.replay-button-group {
+  font-size: 0;
+  white-space: nowrap;
+
+  >button {
+    font-size: 12px;
+  }
+
+  >button:nth-child(1) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  >button:nth-child(2) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 }
 

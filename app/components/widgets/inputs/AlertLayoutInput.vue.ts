@@ -6,7 +6,7 @@ import ImagePickerInput from '../../shared/inputs/ImagePickerInput.vue';
 import { CustomizationService } from 'services/customization';
 
 @Component({
-  components: { ImagePickerInput }
+  components: { ImagePickerInput },
 })
 export default class AlertLayoutInput extends BaseInput<string, IListMetadata<string>> {
   @Inject() customizationService: CustomizationService;
@@ -21,9 +21,18 @@ export default class AlertLayoutInput extends BaseInput<string, IListMetadata<st
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
     return [
-      { description: require(`../../../../media/images/alert-box/layout-bottom-${nightMode}.png`), value: 'above'},
-      { description: require(`../../../../media/images/alert-box/layout-over-${nightMode}.png`), value: 'banner'},
-      { description: require(`../../../../media/images/alert-box/layout-side-${nightMode}.png`), value: 'side' }
+      {
+        description: require(`../../../../media/images/alert-box/layout-bottom-${nightMode}.png`),
+        value: 'above',
+      },
+      {
+        description: require(`../../../../media/images/alert-box/layout-over-${nightMode}.png`),
+        value: 'banner',
+      },
+      {
+        description: require(`../../../../media/images/alert-box/layout-side-${nightMode}.png`),
+        value: 'side',
+      },
     ];
   }
 

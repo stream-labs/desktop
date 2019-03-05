@@ -2,15 +2,11 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
-import * as inputComponents from 'components/obs/inputs';
-import { IObsListInput } from 'components/obs/inputs/ObsInput';
 import { ScenesService } from 'services/scenes';
-import { $t } from 'services/i18n';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 @Component({
-  components: {
-    ...inputComponents
-  }
+  components: { VFormGroup },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
@@ -18,49 +14,28 @@ export default class SceneTransitions extends Vue {
 
   @Prop() connectionId: string;
 
-  get fromSceneModel(): IObsListInput<string> {
-    return {
-      description: $t('Beginning Scene'),
-      name: 'from',
-      value: this.connection.fromSceneId,
-      options: this.sceneOptions
-    };
+  get fromSceneModel(): string {
+    return this.connection.fromSceneId;
   }
 
-  set fromSceneModel(model: IObsListInput<string>) {
-    this.transitionsService.updateConnection(this.connectionId, {
-      fromSceneId: model.value
-    });
+  set fromSceneModel(value: string) {
+    this.transitionsService.updateConnection(this.connectionId, { fromSceneId: value });
   }
 
-  get toSceneModel(): IObsListInput<string> {
-    return {
-      description: $t('Ending Scene'),
-      name: 'to',
-      value: this.connection.toSceneId,
-      options: this.sceneOptions
-    };
+  get toSceneModel(): string {
+    return this.connection.toSceneId;
   }
 
-  set toSceneModel(model: IObsListInput<string>) {
-    this.transitionsService.updateConnection(this.connectionId, {
-      toSceneId: model.value
-    });
+  set toSceneModel(value: string) {
+    this.transitionsService.updateConnection(this.connectionId, { toSceneId: value });
   }
 
-  get transitionModel(): IObsListInput<string> {
-    return {
-      description: $t('Scene Transition'),
-      name: 'transition',
-      value: this.connection.transitionId,
-      options: this.transitionOptions
-    };
+  get transitionModel(): string {
+    return this.connection.transitionId;
   }
 
-  set transitionModel(model: IObsListInput<string>) {
-    this.transitionsService.updateConnection(this.connectionId, {
-      transitionId: model.value
-    });
+  set transitionModel(value: string) {
+    this.transitionsService.updateConnection(this.connectionId, { transitionId: value });
   }
 
   get connection() {
@@ -68,21 +43,13 @@ export default class SceneTransitions extends Vue {
   }
 
   get sceneOptions() {
-    return this.scenesService.scenes.map(scene => {
-      return {
-        description: scene.name,
-        value: scene.id
-      };
-    });
+    return this.scenesService.scenes.map(scene => ({ title: scene.name, value: scene.id }));
   }
 
   get transitionOptions() {
-    return this.transitionsService.state.transitions.map(transition => {
-      return {
-        description: transition.name,
-        value: transition.id
-      };
-    });
+    return this.transitionsService.state.transitions.map(transition => ({
+      title: transition.name,
+      value: transition.id,
+    }));
   }
-
 }

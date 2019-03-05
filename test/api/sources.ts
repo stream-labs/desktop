@@ -4,9 +4,7 @@ import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../app/services/sources/sources-api';
 
-
 useSpectron({ restartAppAfterEachTest: false });
-
 
 test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
@@ -34,8 +32,6 @@ test('Creating, fetching and removing sources', async t => {
   t.deepEqual(sceneItemNames, []);
 });
 
-
-
 test('Source events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
@@ -46,25 +42,23 @@ test('Source events', async t => {
   sourcesService.sourceRemoved.subscribe(() => void 0);
   sourcesService.sourceUpdated.subscribe(() => void 0);
 
-
+  // check `sourceUpdated` event after `createSource` call
   const source1 = sourcesService.createSource('audio1', 'wasapi_output_capture');
   eventData = await client.fetchNextEvent();
-
   t.is(eventData.name, 'audio1');
 
+  // check `sourceUpdated` event after `createAndAddSource` call
   const item2 = scenesService.activeScene.createAndAddSource('audio2', 'wasapi_output_capture');
   eventData = await client.fetchNextEvent();
-
   t.is(eventData.name, 'audio2');
 
+  // check `sourceRemoved` event
   item2.remove();
   eventData = await client.fetchNextEvent();
-
   t.is(eventData.name, 'audio2');
 
+  // check `sourceUpdated` event when renaming a source
   source1.setName('audio3');
   eventData = await client.fetchNextEvent();
-
   t.is(eventData.name, 'audio3');
-
 });

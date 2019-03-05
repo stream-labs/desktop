@@ -4,7 +4,7 @@ import { getClient } from '../helpers/api-client';
 import {
   IStreamingServiceApi,
   EStreamingState,
-  ERecordingState
+  ERecordingState,
 } from '../../app/services/streaming/streaming-api';
 import { ISettingsServiceApi } from '../../app/services/settings';
 

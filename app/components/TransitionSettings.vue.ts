@@ -3,57 +3,51 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
-import { TObsFormData, IObsListInput, IObsInput } from 'components/obs/inputs/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
-import { $t } from 'services/i18n';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
   components: {
     GenericForm,
-    ...inputComponents
-  }
+    HFormGroup,
+    ...inputComponents,
+  },
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
 
   @Prop() transitionId: string;
 
-  get typeModel(): IObsListInput<ETransitionType> {
-    return {
-      description: $t('Type'),
-      name: 'type',
-      value: this.transition.type,
-      options: this.transitionsService.getTypes()
-    };
+  get typeModel(): ETransitionType {
+    return this.transitionsService.state.transitions.find(tran => tran.id === this.transitionId)
+      .type;
   }
 
-  set typeModel(model: IObsListInput<ETransitionType>) {
-    this.transitionsService.changeTransitionType(this.transitionId, model.value);
+  set typeModel(value: ETransitionType) {
+    this.transitionsService.changeTransitionType(this.transitionId, value);
     this.properties = this.transitionsService.getPropertiesFormData(this.transitionId);
   }
 
-  get durationModel(): IObsInput<number> {
-    return {
-      description: $t('Duration'),
-      name: 'duration',
-      value: this.transition.duration
-    };
+  get typeOptions() {
+    return this.transitionsService.getTypes();
   }
 
-  set durationModel(model: IObsInput<number>) {
-    this.transitionsService.setDuration(this.transitionId, model.value);
+  get durationModel(): number {
+    return this.transitionsService.state.transitions.find(tran => tran.id === this.transitionId)
+      .duration;
   }
 
-  get nameModel(): IObsInput<string> {
-    return {
-      description: $t('Name'),
-      name: 'name',
-      value: this.transition.name
-    };
+  set durationModel(value: number) {
+    this.transitionsService.setDuration(this.transitionId, value);
   }
 
-  set nameModel(name: IObsInput<string>) {
-    this.transitionsService.renameTransition(this.transitionId, name.value);
+  get nameModel(): string {
+    return this.transition.name;
+  }
+
+  set nameModel(name: string) {
+    this.transitionsService.renameTransition(this.transitionId, name);
   }
 
   get transition() {

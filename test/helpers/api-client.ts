@@ -1,4 +1,4 @@
-import { IJsonRpcRequest } from '../../app/services/jsonrpc';
+import { IJsonRpcRequest } from '../../app/services/api/jsonrpc';
 import { Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 
@@ -6,17 +6,15 @@ const net = require('net');
 const { spawnSync } = require('child_process');
 const snp = require('node-win32-np');
 
-
 const PIPE_NAME = 'slobs';
-const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
+const PIPE_PATH = `\\\\.\\pipe\\${PIPE_NAME}`;
 const PROMISE_TIMEOUT = 20000;
 
 let clientInstance: ApiClient = null;
 
-export type TConnectionStatus = 'disconnected'|'pending'|'connected';
+export type TConnectionStatus = 'disconnected' | 'pending' | 'connected';
 
 export class ApiClient {
-
   eventReceived = new Subject<any>();
 
   private nextRequestId = 1;
@@ -32,7 +30,6 @@ export class ApiClient {
    */
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
-
   /**
    * if result of calling a service method is promise -
    * we create a linked promise and keep it callbacks here until
@@ -40,12 +37,10 @@ export class ApiClient {
    */
   private promises: Dictionary<Function[]> = {};
 
-
   // set to 'true' for debugging
   logsEnabled = false;
 
   constructor() {
-
     this.socket.on('connect', () => {
       this.log('connected');
       this.connectionStatus = 'connected';
@@ -79,52 +74,46 @@ export class ApiClient {
     });
   }
 
-
   disconnect() {
     this.socket.end();
     this.resolveConnection = null;
     this.rejectConnection = null;
   }
 
-
   getConnectionStatus(): TConnectionStatus {
     return this.connectionStatus;
   }
-
 
   log(...messages: string[]) {
     if (this.logsEnabled) console.log(...messages);
   }
 
-
   async request(resourceId: string, methodName: string, ...args: any[]) {
-
     if (this.connectionStatus === 'disconnected') {
       await this.connect();
     }
 
     const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
-      jsonrpc: '2.0',
       id,
+      jsonrpc: '2.0',
       method: methodName,
-      params: { resource: resourceId, args }
+      params: { args, resource: resourceId },
     };
     return this.sendMessage(requestBody);
   }
 
-
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
     const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
-      jsonrpc: '2.0',
       id,
+      jsonrpc: '2.0',
       method: methodName,
-      params: { resource: resourceId, args }
+      params: { args, resource: resourceId },
     };
 
     const response = this.sendMessageSync(requestBody);
-    const parsedResponse = JSON.parse(response.toString())
+    const parsedResponse = JSON.parse(response.toString());
 
     if (parsedResponse.error) {
       throw parsedResponse.error;
@@ -132,7 +121,6 @@ export class ApiClient {
 
     return parsedResponse.result;
   }
-
 
   sendMessage(message: string | Object) {
     let requestBody: IJsonRpcRequest = message as IJsonRpcRequest;
@@ -148,12 +136,12 @@ export class ApiClient {
 
     return new Promise((resolve, reject) => {
       this.requests[requestBody.id] = {
-        body: requestBody,
         resolve,
         reject,
-        completed: false
+        body: requestBody,
+        completed: false,
       };
-      const rawMessage = JSON.stringify(requestBody) + '\n';
+      const rawMessage = `${JSON.stringify(requestBody)}\n`;
       this.log('Sent:', rawMessage);
       this.socket.write(rawMessage);
     });
@@ -171,7 +159,7 @@ export class ApiClient {
 
     if (!requestBody.id) throw 'id is required';
 
-    const rawMessage = JSON.stringify(requestBody) + '\n';
+    const rawMessage = `${JSON.stringify(requestBody)}\n`;
     this.log('Sent:', rawMessage);
 
     const client = new snp.Client(PIPE_PATH);
@@ -186,71 +174,70 @@ export class ApiClient {
   }
 
   onMessageHandler(data: ArrayBuffer) {
-    data.toString().split('\n').forEach(rawMessage => {
-      if (!rawMessage) return;
-      const message = JSON.parse(rawMessage);
-      const request = this.requests[message.id];
+    data
+      .toString()
+      .split('\n')
+      .forEach(rawMessage => {
+        if (!rawMessage) return;
+        const message = JSON.parse(rawMessage);
+        const request = this.requests[message.id];
 
-      if (request) {
-        if (message.error) {
-          request.reject(message.error);
-        } else {
-          request.resolve(message.result);
-        }
-        delete this.requests[message.id];
-      }
-
-      const result = message.result;
-      if (!result) return;
-
-      if (result._type === 'EVENT') {
-        if (result.emitter === 'STREAM') {
-          const eventSubject = this.subscriptions[message.result.resourceId];
-          this.eventReceived.next(result.data);
-          if (eventSubject) eventSubject.next(result.data);
-
-        } else if (result.emitter === 'PROMISE') {
-
-          // case when listenAllSubscriptions = true
-          if (!this.promises[result.resourceId]) return;
-
-          const [resolve, reject] = this.promises[result.resourceId];
-          if (result.isRejected) {
-            reject(result.data);
+        if (request) {
+          if (message.error) {
+            request.reject(message.error);
           } else {
-            resolve(result.data);
+            request.resolve(message.result);
+          }
+          delete this.requests[message.id];
+        }
+
+        const result = message.result;
+        if (!result) return;
+
+        if (result._type === 'EVENT') {
+          if (result.emitter === 'STREAM') {
+            const eventSubject = this.subscriptions[message.result.resourceId];
+            this.eventReceived.next(result.data);
+            if (eventSubject) eventSubject.next(result.data);
+          } else if (result.emitter === 'PROMISE') {
+            // case when listenAllSubscriptions = true
+            if (!this.promises[result.resourceId]) return;
+
+            const [resolve, reject] = this.promises[result.resourceId];
+            if (result.isRejected) {
+              reject(result.data);
+            } else {
+              resolve(result.data);
+            }
           }
         }
-      }
-    });
-
+      });
   }
-
 
   unsubscribe(subscriptionId: string) {
     delete this.subscriptions[subscriptionId];
     return this.request(subscriptionId, 'unsubscribe');
   }
 
-
   unsubscribeAll() {
     return Promise.all(
-      Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId))
+      Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId)),
     );
   }
 
-
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
-
     const handleRequest = (resourceId: string, property: string, ...args: any[]): any => {
-
       const result = this.requestSync(resourceId, property as string, ...args);
 
       if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
         return new Promise((resolve, reject) => {
           this.promises[result.resourceId] = [resolve, reject];
-          setTimeout(() => reject(`promise timeout for ${resourceId}.${property}`), PROMISE_TIMEOUT);
+          setTimeout(
+            () => reject(`promise timeout for ${resourceId}.${property}`),
+            PROMISE_TIMEOUT,
+          );
         });
+        // tslint:disable-next-line:no-else-after-return
       } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
         if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
@@ -258,7 +245,6 @@ export class ApiClient {
       } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
       } else {
-
         // result can contain helpers-objects
 
         if (Array.isArray(result)) {
@@ -272,14 +258,10 @@ export class ApiClient {
 
         return result;
       }
-
     };
 
     return new Proxy(resourceModel, {
-
       get: (target, property: string, receiver) => {
-
-
         if (resourceModel[property] !== void 0) return resourceModel[property];
 
         const resourceScheme = this.getResourceScheme(resourceId);
@@ -291,11 +273,9 @@ export class ApiClient {
         return (...args: any[]) => {
           return handleRequest(resourceId, property as string, ...args);
         };
-
-      }
+      },
     }) as TResourceType;
   }
-
 
   fetchNextEvent(): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -304,7 +284,16 @@ export class ApiClient {
     });
   }
 
-  waitForEvent<TEvent extends Dictionary<any>>(constraint: (event: TEvent) => boolean): Promise<TEvent> {
+  /**
+   * Wait for API event
+   * Skip events if constraint returned a false value
+   * @example
+   *  // wait for event that has a `fader` property
+   *  const event = await client.waitForEvent((event: any) => !!event.fader)
+   */
+  waitForEvent<TEvent extends Dictionary<any>>(
+    constraint: (event: TEvent) => boolean,
+  ): Promise<TEvent> {
     return new Promise((resolve, reject) => {
       const subscr = this.eventReceived.subscribe(event => {
         if (!constraint(event)) return;
@@ -315,32 +304,29 @@ export class ApiClient {
       // stop waiting on timeout
       setTimeout(() => {
         subscr.unsubscribe();
-        reject('Promise timeout')
+        reject('Promise timeout');
       }, PROMISE_TIMEOUT);
     });
   }
 
-
   private getResourceTypeName(resourceId: string): string {
     return resourceId.split('[')[0];
   }
-
 
   private getResourceScheme(resourceId: string): Dictionary<string> {
     const resourceTypeName = this.getResourceTypeName(resourceId);
 
     if (!this.resourceSchemes[resourceTypeName]) {
       this.resourceSchemes[resourceTypeName] = this.requestSync(
-        'ServicesManager',
+        'ExternalApiService',
         'getResourceScheme',
-        resourceId
+        resourceId,
       );
     }
 
     return this.resourceSchemes[resourceTypeName];
   }
 }
-
 
 export async function getClient() {
   if (!clientInstance) clientInstance = new ApiClient();

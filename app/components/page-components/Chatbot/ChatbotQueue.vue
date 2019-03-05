@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="queue-content">
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <div class="flex">
@@ -37,9 +37,9 @@
     </div>
   </div>
   <!-- Lists -->
-  <div class="row width--100 max-width--100 margin--none">
+  <div class="list-container row width--100 max-width--100 margin--none">
     <div class="col-sm-12 col-md-7 padding--10">
-      <ChatbotQueueList type="entry"/>
+      <ChatbotQueueList ref="entrylist" type="entry"/>
     </div>
     <div class="col-sm-12 col-md-5 padding--10">
       <ChatbotQueueList type="picked"/>
@@ -52,6 +52,14 @@
 
 <style lang="less" scoped>
 @import "../../../styles/index";
+.queue-content {
+  height: 100%;
+  width: 100%;
+}
+
+.list-container {
+  height: ~"calc(100% - 72px)"; ;
+}
 
 .queue-settings__button {
   .padding-left();

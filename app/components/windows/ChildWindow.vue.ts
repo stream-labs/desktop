@@ -5,18 +5,20 @@ import { Inject } from 'util/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import TitleBar from '../TitleBar.vue';
+import { AppService } from 'services/app';
 
 @Component({
   components: {
     TitleBar,
-    ...getComponents()
-  }
+    ...getComponents(),
+  },
 })
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private appService: AppService;
 
-  components: { name: string; isShown: boolean; title: string; }[] = [];
+  components: { name: string; isShown: boolean; title: string }[] = [];
   private refreshingTimeout = 0;
 
   mounted() {
@@ -37,6 +39,14 @@ export default class ChildWindow extends Vue {
 
   get currentComponent() {
     return this.components[this.components.length - 1];
+  }
+
+  get componentsToRender() {
+    return this.components.filter(c => c.name && !this.appLoading);
+  }
+
+  get appLoading() {
+    return this.appService.state.loading;
   }
 
   clearComponentStack() {

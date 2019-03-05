@@ -2,66 +2,38 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
-import {
-  PlatformAppsService,
-  EAppPageSlot,
-  ILoadedApp
-} from 'services/platform-apps';
+import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';
+import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 Vue.use(VueResize);
 
-@Component({})
+/**
+ * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
+ */
+const DEFAULT_SCROLL_DELTA = 250;
+
+@Component({
+  components: { HScroll },
+})
 export default class AppsNav extends Vue {
   @Inject()
   platformAppsService: PlatformAppsService;
   @Inject()
   navigationService: NavigationService;
 
-  $refs: {
-    app_tabs: HTMLDivElement;
+  scrollModel: IHScrollModel = {
+    canScroll: false,
+    canScrollLeft: false,
+    canScrollRight: false,
   };
 
-  isMounted = false;
-
-  appTabsContainer: HTMLDivElement = null;
-  canScroll = false;
-  hasNext = false;
-  hasPrev = false;
-
-  private scrollIncrement = 100;
-
-  mounted() {
-    this.isMounted = true;
-    this.appTabsContainer = this.$refs.app_tabs;
-  }
-
-  scrollLeft() {
-    this.appTabsContainer.scrollLeft =
-      this.appTabsContainer.scrollLeft - this.scrollIncrement;
-  }
-
-  scrollRight() {
-    this.appTabsContainer.scrollLeft =
-      this.appTabsContainer.scrollLeft + this.scrollIncrement;
-  }
-
-  handleResize() {
-    if (!this.isMounted) return false;
-
-    this.canScroll =
-      this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
-    this.hasPrev = this.appTabsContainer.scrollLeft > 0;
-    let scrollRight =
-      this.appTabsContainer.scrollWidth -
-      (this.appTabsContainer.scrollLeft + this.appTabsContainer.clientWidth);
-
-    this.hasNext = scrollRight > 0;
-  }
+  $refs: {
+    scroll: HScroll;
+  };
 
   isSelectedApp(appId: string) {
     return (
-      this.page === 'PlatformAppContainer' &&
-      this.navigationService.state.params.appId === appId
+      this.page === 'PlatformAppMainPage' && this.navigationService.state.params.appId === appId
     );
   }
 
@@ -74,9 +46,7 @@ export default class AppsNav extends Vue {
   }
 
   isPopOutAllowed(app: ILoadedApp) {
-    const topNavPage = app.manifest.pages.find(
-      page => page.slot === EAppPageSlot.TopNav
-    );
+    const topNavPage = app.manifest.pages.find(page => page.slot === EAppPageSlot.TopNav);
     if (!topNavPage) return false;
 
     // Default result is true
@@ -88,7 +58,7 @@ export default class AppsNav extends Vue {
   }
 
   refreshApp(appId: string) {
-    this.platformAppsService.reloadApp(appId);
+    this.platformAppsService.refreshApp(appId);
   }
 
   get page() {
@@ -96,6 +66,18 @@ export default class AppsNav extends Vue {
   }
 
   navigateApp(appId: string) {
-    this.navigationService.navigate('PlatformAppContainer', { appId });
+    this.navigationService.navigate('PlatformAppMainPage', { appId });
+  }
+
+  scrollLeft() {
+    this.scrollNav(-DEFAULT_SCROLL_DELTA);
+  }
+
+  scrollRight() {
+    this.scrollNav(DEFAULT_SCROLL_DELTA);
+  }
+
+  private scrollNav(horizontal: number) {
+    this.$refs.scroll.scrollBy(horizontal, 0, true);
   }
 }

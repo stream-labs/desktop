@@ -1,10 +1,10 @@
 import uuid from 'uuid/v4';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { getResource, Inject } from 'util/injector';
+import { Inject } from 'util/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -12,8 +12,8 @@ import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { StreamInfoService } from 'services/stream-info';
 import { track } from 'services/usage-statistics';
-import { IpcServerService } from 'services/ipc-server';
-import { TcpServerService } from 'services/tcp-server';
+import { IpcServerService } from 'services/api/ipc-server';
+import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
 import { PerformanceMonitorService } from 'services/performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -22,6 +22,7 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import * as obs from '../../../obs-api';
+import { EVideoCodes } from 'obs-studio-node/module';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
@@ -29,6 +30,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { $t } from '../i18n';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -56,7 +58,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: electron.remote.process.argv
+    argv: electron.remote.process.argv,
   };
 
   private autosaveInterval: number;
@@ -77,7 +79,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
-
   private pid = require('process').pid;
 
   @track('app_start')
@@ -88,7 +89,21 @@ export class AppService extends StatefulService<IAppState> {
     await this.obsUserPluginsService.initialize();
 
     // Initialize OBS
-    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
+    const apiResult = obs.NodeObs.OBS_API_initAPI(
+      'en-US',
+      electron.remote.process.env.SLOBS_IPC_USERDATA,
+      electron.remote.process.env.SLOBS_VERSION,
+    );
+
+    if (apiResult !== EVideoCodes.Success) {
+      const message = apiInitErrorResultToMessage(apiResult);
+      showDialog(message);
+
+      crashHandler.unregisterProcess(this.pid);
+      electron.ipcRenderer.send('shutdownComplete');
+
+      return;
+    }
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -104,7 +119,7 @@ export class AppService extends StatefulService<IAppState> {
     // the apps to already be in place when their sources are created.
     await this.platformAppsService.initialize();
 
-    await this.sceneCollectionsService.initialize()
+    await this.sceneCollectionsService.initialize();
 
     const onboarded = this.onboardingService.startOnboardingIfRequired();
 
@@ -113,14 +128,17 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    this.facemasksService;
+    // Eager load services
+    const _ = [
+      this.facemasksService,
 
-    this.incrementalRolloutService;
-    this.shortcutsService;
-    this.streamlabelsService;
+      this.incrementalRolloutService,
+      this.shortcutsService,
+      this.streamlabelsService,
 
-    // Pre-fetch stream info
-    this.streamInfoService;
+      // Pre-fetch stream info
+      this.streamInfoService,
+    ];
 
     this.performanceMonitorService.start();
 
@@ -129,7 +147,8 @@ export class AppService extends StatefulService<IAppState> {
 
     this.patchNotesService.showPatchNotesIfRequired(onboarded);
     this.announcementsService.updateBanner();
-    this.outageNotificationsService;
+
+    const _outageService = this.outageNotificationsService;
 
     this.crashReporterService.endStartup();
 
@@ -154,7 +173,6 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       obs.NodeObs.OBS_service_removeCallback();
-      obs.NodeObs.OBS_API_destroyOBS_API();
       obs.IPC.disconnect();
       this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
@@ -168,12 +186,21 @@ export class AppService extends StatefulService<IAppState> {
    * @see RunInLoadingMode decorator
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
-
     if (!this.state.loading) {
       this.START_LOADING();
-      this.windowsService.closeChildWindow();
+
+      // The scene collections window is the only one we don't close when
+      // switching scene collections, because it results in poor UX.
+      if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
+        this.windowsService.closeChildWindow();
+      }
       this.windowsService.closeAllOneOffs();
-      this.sceneCollectionsService.disableAutoSave();
+
+      // This is kind of ugly, but it gives the browser time to paint before
+      // we do long blocking operations with OBS.
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      await this.sceneCollectionsService.disableAutoSave();
     }
 
     let error: Error = null;
@@ -211,7 +238,6 @@ export class AppService extends StatefulService<IAppState> {
     return returningValue;
   }
 
-
   @mutation()
   private START_LOADING() {
     this.state.loading = true;
@@ -227,3 +253,21 @@ export class AppService extends StatefulService<IAppState> {
     this.state.argv = argv;
   }
 }
+
+export const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
+  switch (resultCode) {
+    case EVideoCodes.NotSupported: {
+      return $t('OBSInit.NotSupportedError');
+    }
+    case EVideoCodes.ModuleNotFound: {
+      return $t('OBSInit.ModuleNotFoundError');
+    }
+    default: {
+      return $t('OBSInit.UnknownError');
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+};

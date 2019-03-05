@@ -4,8 +4,9 @@ import _ from 'lodash';
 import electron from 'electron';
 import { getModule, StatefulService } from '../services/stateful-service';
 import { ServicesManager } from '../services-manager';
-import { IMutation } from 'services/jsonrpc';
+import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
+import { InternalApiService } from 'services/api/internal-api';
 
 Vue.use(Vuex);
 
@@ -14,15 +15,15 @@ const { ipcRenderer, remote } = electron;
 const debug = process.env.NODE_ENV !== 'production';
 
 const mutations = {
+  // tslint:disable-next-line:function-name
   BULK_LOAD_STATE(state: any, data: any) {
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
-  }
+  },
 };
 
-const actions = {
-};
+const actions = {};
 
 const plugins: any[] = [];
 
@@ -37,16 +38,15 @@ const storeReady = new Promise<Store<any>>(resolve => {
 // IPC with the main process.
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
-    const servicesManager: ServicesManager = ServicesManager.instance;
+    const internalApiService: InternalApiService = InternalApiService.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
-
       const mutationToSend: IMutation = {
         type: mutation.type,
-        payload: mutation.payload
+        payload: mutation.payload,
       };
 
-      if (servicesManager.isMutationBufferingEnabled()) {
-        servicesManager.addMutationToBuffer(mutationToSend);
+      if (internalApiService.isMutationBufferingEnabled()) {
+        internalApiService.addMutationToBuffer(mutationToSend);
       } else {
         ipcRenderer.send('vuex-mutation', mutationToSend);
       }
@@ -63,7 +63,7 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
       state,
-      __vuexSyncIgnore: true
+      __vuexSyncIgnore: true,
     });
 
     // child window can't receive mutations until BULK_LOAD_STATE event
@@ -80,7 +80,6 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.send('vuex-register');
 });
 
-
 let store: Store<any> = null;
 
 export function createStore(): Promise<Store<any>> {
@@ -92,13 +91,13 @@ export function createStore(): Promise<Store<any>> {
   });
 
   store = new Vuex.Store({
-    modules: {
-      ...statefulServiceModules
-    },
     plugins,
     mutations,
     actions,
-    strict: debug
+    modules: {
+      ...statefulServiceModules,
+    },
+    strict: debug,
   });
 
   StatefulService.setupVuexStore(store);
@@ -109,7 +108,10 @@ export function createStore(): Promise<Store<any>> {
 }
 
 export function commitMutation(mutation: IMutation) {
-  store.commit(mutation.type, Object.assign({}, mutation.payload, {
-    __vuexSyncIgnore: true
-  }));
+  store.commit(
+    mutation.type,
+    Object.assign({}, mutation.payload, {
+      __vuexSyncIgnore: true,
+    }),
+  );
 }

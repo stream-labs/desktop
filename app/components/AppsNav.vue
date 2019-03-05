@@ -1,22 +1,13 @@
 <template>
 <div class="apps-nav-wrapper">
+
   <div class="apps-nav">
-    <div
-      v-if="hasPrev"
-      @click="scrollLeft"
-      class="apps-nav-control flex has-prev">
-      <i class="icon-down icon-left"></i>
-      <span>...</span>
-    </div>
-    <div
-      ref="app_tabs"
+
+    <h-scroll
+      @change="(model) => scrollModel = model"
+      ref="scroll"
       class="apps-tab__container"
-      :class="{
-        'has-next': hasNext,
-        'has-prev': hasPrev
-      }"
     >
-      <resize-observer @notify="handleResize"></resize-observer>
       <span
         v-for="(app, index) in topNavApps"
         :key="index"
@@ -35,15 +26,21 @@
             class="app-tab-icon icon-pop-out-1"></i>
         </span>
       </span>
+    </h-scroll>
+
+
+    <div class="left" v-if="scrollModel.canScrollLeft" @click="scrollLeft" >
+      <i class="icon-down icon-left"></i>
     </div>
-    <div
-      v-if="hasNext"
-      @click="scrollRight"
-      class="apps-nav-control flex has-next">
-      <span>...</span>
+
+    <div class="right" v-if="scrollModel.canScrollRight" @click="scrollRight">
       <i class="icon-down icon-right"></i>
     </div>
+
   </div>
+
+
+
 </div>
 </template>
 
@@ -62,7 +59,6 @@
   flex-direction: row;
   align-items: center;
   .padding-h-sides();
-  position: relative;
   max-width: none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
@@ -74,6 +70,11 @@
   bottom: 0;
   right: 0;
   left: 0;
+
+  &:hover {
+    // show arrows
+    .left, .right { opacity: 1}
+  }
 }
 
 .apps-tab__container {
@@ -81,34 +82,11 @@
   overflow-x: auto;
   white-space: nowrap;
   overflow-y: hidden;
-
-  &.has-prev {
-    .margin-left();
-  }
-
-  &.has-next {
-    .margin-right();
-  }
 }
 
 .apps-nav-control {
   cursor: pointer;
   position: relative;
-
-  &.has-prev {
-    .margin-left();
-
-    i {
-      .margin-right();
-    }
-  }
-  &.has-next {
-    .margin-right();
-
-    i {
-      .margin-left();
-    }
-  }
 }
 
 .apps-tab__container::-webkit-scrollbar {
@@ -132,6 +110,27 @@
   margin-left: 4px;
 }
 
+.left {
+  transition: opacity @transition-time;
+  .absolute(0, auto, 0, 0);
+  padding-top: 8px;
+  width: 20px;
+  background-image: linear-gradient(to right, @day-primary 80% , transparent);
+  z-index: 1;
+  opacity: 0;
+}
+
+.right {
+  transition: opacity @transition-time;
+  .absolute(0, 0, 0, auto);
+  padding-top: 8px;
+  width: 20px;
+  background-image: linear-gradient(to left, @day-primary 80%, transparent);
+  z-index: 1;
+  text-align: right;
+  opacity: 0;
+}
+
 .night-theme {
   .apps-nav {
     background-color: @night-primary;
@@ -144,5 +143,12 @@
       color: @night-title;
     }
   }
+  .left {
+    background-image: linear-gradient(to right, @night-primary 80%, transparent);
+  }
+  .right {
+    background-image: linear-gradient(to left, @night-primary 80%, transparent);
+  }
 }
+
 </style>

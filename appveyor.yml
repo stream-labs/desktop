@@ -1,8 +1,9 @@
 build: off
 
 install:
-  - ps: Install-Product node 8 x64
+  - ps: Install-Product node 10 x64
   - yarn install --frozen-lockfile --check-files
+  - yarn lint
   - yarn compile:ci
 
 test_script:
