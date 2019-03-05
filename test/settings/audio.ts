@@ -5,7 +5,7 @@ import { FormMonkey } from '../helpers/form-monkey';
 
 useSpectron();
 
-test('audio settings', async t => {
+test('Populates audio settings', async t => {
   const { app } = t.context;
   const form = new FormMonkey(t);
   const assertOptions = createOptionsAssertion(t, form);
@@ -54,5 +54,4 @@ const createOptionsAssertion = (t: TExecutionContext, form: FormMonkey) => async
 };
 
 // The trailing space is apparently required for all of these options
-
 const addSpaces = (x: string) => `${x} `;
