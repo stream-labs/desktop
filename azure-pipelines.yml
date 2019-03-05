@@ -15,9 +15,15 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    yarn install --frozen-lockfile --check-files
-    yarn lint
-    yarn compile:ci
-    yarn test-flaky
-  displayName: 'yarn install, compile, and test'
+- bash: yarn install --frozen-lockfile --check-files
+  displayName: 'Install Dependencies'
+
+- bash: 'yarn lint'
+  displayName: 'TSLint'
+
+- bash: 'yarn compile:ci'
+  displayName: 'Compile Assets'
+
+- bash: 'yarn test-flaky'
+  displayName: 'Run Tests'
+
