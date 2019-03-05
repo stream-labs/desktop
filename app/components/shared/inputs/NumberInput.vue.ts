@@ -21,8 +21,9 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
     input: HTMLInputElement;
   };
 
-  defaultDisplayValue = this.options.min < 0 || this.options.min == null ? 0 : this.options.min;
-  displayValue: number | string = this.value == null ? this.defaultDisplayValue : this.value;
+  defaultDisplayValue =
+    this.options.min < 0 || this.options.min == null ? '0' : String(this.options.min);
+  displayValue: string = this.value == null ? this.defaultDisplayValue : String(this.value);
 
   timeout: number;
 
