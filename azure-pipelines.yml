@@ -29,4 +29,5 @@ steps:
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
     CI: true
+    BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
 
