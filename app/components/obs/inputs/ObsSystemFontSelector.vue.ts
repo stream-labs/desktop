@@ -1,7 +1,6 @@
-import _ from 'lodash';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { IObsFont, IObsInput, ObsInput } from './ObsInput';
-import { Multiselect } from 'vue-multiselect';
+import { ListInput } from 'components/shared/inputs/inputs';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 import fontManager from 'font-manager';
 import { EFontStyle } from 'obs-studio-node';
@@ -21,12 +20,8 @@ interface IFontDescriptor {
   monospace: boolean;
 }
 
-interface IFontSelect extends HTMLElement {
-  value: IFontDescriptor;
-}
-
 @Component({
-  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector },
+  components: { ListInput, FontSizeSelector: ObsFontSizeSelector },
 })
 export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>> {
   @Prop()
@@ -34,60 +29,15 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 
-  $refs: {
-    family: HTMLInputElement;
-    font: IFontSelect;
-    size: HTMLInputElement;
-  };
-
-  // CSS styles for a particular font
-  styleForFont(font: IFontDescriptor) {
-    let fontStyle = 'normal';
-
-    if (font.italic) {
-      fontStyle = 'italic';
-    }
-
-    return {
-      fontStyle,
-      fontFamily: font.family,
-      fontWeight: font.weight,
-    };
-  }
-
-  // Converts a list of fonts in the same family to
-  // a family object.
-  fontsToFamily(fonts: IFontDescriptor[]) {
-    if (fonts) {
-      return {
-        fonts,
-        family: fonts[0].family,
-      };
-    }
-
-    return { family: '', fonts: [] };
-  }
-
-  setFamily(family: { family: string; fonts: IFontDescriptor[] }) {
-    // When a new family is selected, we have to select a
-    // default style.  This will be "Regular" if it exists.
-    // Otherwise, it will be the first family on the list.
-
-    let selectedFont: IFontDescriptor;
-
-    const regular = _.find(family.fonts, font => {
-      return font.style === 'Regular';
-    });
-
-    if (regular) {
-      selectedFont = regular;
-    } else {
-      selectedFont = family.fonts[0];
-    }
+  setFamily(family: string) {
+    // Select a default style for the family, preferably "Regular"
+    const regular = this.fonts.find(font => font.style === 'Regular' && font.family === family);
+    const fontForStyle = regular || this.fonts.find(font => font.family === family);
 
     this.setFont({
-      face: family.family,
-      flags: this.getFlagsFromFont(selectedFont),
+      face: family,
+      flags: this.getFlagsFromFont(fontForStyle),
+      style: fontForStyle.style,
     });
   }
 
@@ -99,85 +49,67 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     );
   }
 
-  setStyle(font: IFontDescriptor) {
-    this.setFont({ flags: this.getFlagsFromFont(font) });
+  setStyle(style: string) {
+    const font = this.fonts.find(f => f.style === style && f.family === this.selectedFont.family);
+    this.setFont({ flags: this.getFlagsFromFont(font), style: font.style });
   }
 
   setSize(size: string) {
     this.setFont({ size: Number(size) });
   }
 
-  // Generic function for setting the current font.
-  // Values that are left blank will be filled with
-  // the currently selected value.
   setFont(args: IObsFont) {
     // Stops slider component from eagerly setting value on component load
     if (args.size === this.value.value.size) return;
-    const fontObj = { ...args };
 
-    // If we want to properly apply a system font, path must be null
-    fontObj.path = '';
-
-    // Apply current values for parameters that were not passed
-    if (fontObj.face === void 0) fontObj.face = this.value.value.face;
-    if (fontObj.size === void 0) fontObj.size = this.value.value.size;
-    if (fontObj.flags === void 0) fontObj.flags = this.getFlagsFromFont(this.$refs.font.value);
-
+    // Path has to not exist for system fonts to properly toggle with Google fonts
+    const fontObj = { ...this.value.value, ...args, path: '' };
     this.emitInput({ ...this.value, value: fontObj });
   }
 
-  restyleSelects() {
-    this.restyleSelect(this.$refs.family);
-    this.restyleSelect(this.$refs.font);
-  }
-
-  // This is a hack to make the vue-multiselect components
-  // show the currently selected value in the appropriate font
-  restyleSelect(select: any) {
-    if (!this.selectedFont) return;
-
-    const input = select.$refs.search;
-    input.style['font-family'] = this.selectedFont.family;
-
-    if (this.selectedFont.italic) {
-      input.style['font-style'] = 'italic';
-    } else {
-      input.style['font-style'] = 'normal';
-    }
-
-    input.style['font-weight'] = this.selectedFont.weight;
-  }
-
-  mounted() {
-    this.restyleSelects();
-  }
-
-  @Watch('selectedFont')
-  selectedFontChangeHandler() {
-    this.restyleSelects();
-  }
-
-  get selectedFamily() {
-    return this.fontsToFamily(this.fontsByFamily[this.value.value.face]);
-  }
-
   get selectedFont() {
-    return _.find(
-      this.selectedFamily.fonts,
-      font => this.value.value.flags === this.getFlagsFromFont(font),
-    );
+    const { face, style } = this.value.value;
+    return this.fonts.find(font => face === font.family && style === font.style);
   }
 
-  get fontsByFamily() {
-    return _.groupBy(this.fonts, 'family');
+  get stylesForFamily() {
+    return this.fonts
+      .filter(font => font.family === this.value.value.face)
+      .map(font => ({ value: font.style, title: font.style }));
   }
 
   get fontFamilies() {
-    return _.sortBy(
-      _.map(this.fontsByFamily, fonts => {
-        return this.fontsToFamily(fonts);
-      }),
-      'family',
-    );
+    return this.fonts
+      .filter((font, idx, self) => self.findIndex(f => f.family === font.family) === idx)
+      .map(font => ({ value: font.family, title: font.family }));
+  }
+
+  get familyMetadata() {
+    return {
+      options: this.fontFamilies,
+      allowEmpty: false,
+      disabled: this.value.enabled === false,
+      optionStyle: (val: string) => ({ fontFamily: val }),
+    };
+  }
+
+  get styleMetadata() {
+    return {
+      options: this.stylesForFamily,
+      allowEmpty: false,
+      disabled: this.value.enabled === false,
+      optionStyle: (val: string) => {
+        if (!this.selectedFont) return;
+        const fontStyle = this.fonts.find(
+          font => font.family === this.selectedFont.family && font.style === val,
+        );
+        if (!fontStyle) return;
+        return {
+          fontFamily: this.selectedFont.family,
+          fontStyle: fontStyle.italic ? 'italic' : 'regular',
+          fontWeight: fontStyle.weight,
+        };
+      },
+    };
   }
 }
