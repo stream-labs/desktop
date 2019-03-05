@@ -36,7 +36,6 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
 
   get currentMultiselectValue() {
     const options = this.options.options;
-
     let option = options.find((opt: IListOption<string>) => this.value === opt.value);
 
     if (this.value && this.options.allowCustom) {
