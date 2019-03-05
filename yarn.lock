@@ -710,6 +710,13 @@
   dependencies:
     babel-runtime "6.26.0"
 
+"@commitlint/execute-rule@^7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/execute-rule/-/execute-rule-7.5.0.tgz#c9cfbab71eb962e1c46e78d76375e32754ab1e38"
+  integrity sha512-K66aoly8mxSHmBA/Y8bKSPPcCAR4GpJEsvHaLDYOG7GsyChu8NgCD53L8GUqPW8lBCWwnmCiSL+RlOkNHJ0Gag==
+  dependencies:
+    babel-runtime "6.26.0"
+
 "@commitlint/format@^7.2.1":
   version "7.2.1"
   resolved "https://registry.yarnpkg.com/@commitlint/format/-/format-7.2.1.tgz#7d8b25002792d6481f0f8f9614736e43106749c1"
@@ -751,6 +758,18 @@
     lodash.topairs "4.3.0"
     resolve-from "4.0.0"
 
+"@commitlint/load@^7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/load/-/load-7.5.0.tgz#2b225b97d631c2235d8b2084bc2fefb4d4d66719"
+  integrity sha512-fhBER/rzPsteM6zq5qqMiOi+A2bHKCE/0PKmOzYgaqTKcG9c1SsOle9phPemW85to8Gxd2YgUOVLsZkCMltLtA==
+  dependencies:
+    "@commitlint/execute-rule" "^7.5.0"
+    "@commitlint/resolve-extends" "^7.5.0"
+    babel-runtime "^6.23.0"
+    cosmiconfig "^4.0.0"
+    lodash "4.17.11"
+    resolve-from "^4.0.0"
+
 "@commitlint/message@^7.1.2":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@commitlint/message/-/message-7.1.2.tgz#b8e7ed3914896f8490b5897c4f6b8923105b55fd"
@@ -764,31 +783,26 @@
     conventional-changelog-angular "^1.3.3"
     conventional-commits-parser "^2.1.0"
 
-"@commitlint/prompt-cli@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@commitlint/prompt-cli/-/prompt-cli-7.2.1.tgz#3658c6301765674b96e1e837337c35bb3d67bff1"
-  integrity sha512-aNLZtP9PC+bp7WFFWgPJn4e4pEov6OlLRBj5D7jCEjOZGK/Q0WwAiAkuG7oSoazVNSpK+g5/zBeC44aQ254TPw==
+"@commitlint/prompt-cli@7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/prompt-cli/-/prompt-cli-7.5.0.tgz#41e9da364039fe41928d8dcbdaa8491ebf924ad3"
+  integrity sha512-uTk/p6PUjFO2hyLsKsU4f1de2q33OtJyqEYk7LTkLMx2oyio+BYjNc4s3RgB7sUm6Mjbpmyn0COuNOe08AEA2A==
   dependencies:
-    "@commitlint/prompt" "^7.2.1"
+    "@commitlint/prompt" "^7.5.0"
     execa "0.9.0"
-    meow "3.7.0"
+    string-to-stream "1.1.1"
 
-"@commitlint/prompt@7.2.1", "@commitlint/prompt@^7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@commitlint/prompt/-/prompt-7.2.1.tgz#513ab300ce3a2a7eb9fe06d6e60b097f2313223c"
-  integrity sha512-d1/wJi96IXLzlOOTlCBF8T2u2LjKt5ZRj2rjUZfrbL4plqj2R/VlgkOF/QEbKNRfwlTQ4gudMNmCTQunUHhUAQ==
+"@commitlint/prompt@7.5.0", "@commitlint/prompt@^7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/prompt/-/prompt-7.5.0.tgz#4bac62152478acc25951dde42bd0d9f2ee5c3340"
+  integrity sha512-eGzXGRgpqSb4ibjWXT5jNslYwr0ULHtv1+DgcQY8/g/TLCRFQ1DNLBMVEZKJ9oFmNc+l4ioF9diQ7Cb0HfVr3w==
   dependencies:
-    "@commitlint/load" "^7.2.1"
+    "@commitlint/load" "^7.5.0"
     babel-runtime "^6.23.0"
     chalk "^2.0.0"
-    lodash.camelcase "4.3.0"
-    lodash.kebabcase "4.1.1"
-    lodash.snakecase "4.1.1"
-    lodash.startcase "4.4.0"
-    lodash.topairs "4.3.0"
-    lodash.upperfirst "4.3.1"
+    lodash "4.17.11"
     throat "^4.1.0"
-    vorpal "^1.10.0"
+    vorpal "^1.12.0"
 
 "@commitlint/read@^7.1.2":
   version "7.1.2"
@@ -809,6 +823,17 @@
     lodash.merge "4.6.1"
     lodash.omit "4.5.0"
     require-uncached "^1.0.3"
+    resolve-from "^4.0.0"
+    resolve-global "^0.1.0"
+
+"@commitlint/resolve-extends@^7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/resolve-extends/-/resolve-extends-7.5.0.tgz#d95a3058e83ddbaef5e3045835b9a3a1fba3422c"
+  integrity sha512-FRIyPuqGvGa03OT4VgOHakizcw8YR5rdm77JsZff1rSnpxk6i+025I6qMeHqCIr5FaVIA0kR3FlC+MJFUs165A==
+  dependencies:
+    babel-runtime "6.26.0"
+    import-fresh "^3.0.0"
+    lodash "4.17.11"
     resolve-from "^4.0.0"
     resolve-global "^0.1.0"
 
@@ -2372,6 +2397,11 @@ callsites@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-2.0.0.tgz#06eb84f00eea413da86affefacbffb36093b3c50"
   integrity sha1-BuuE8A7qQT2oav/vrL/7Ngk7PFA=
+
+callsites@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.0.0.tgz#fb7eb569b72ad7a45812f93fd9430a3e410b3dd3"
+  integrity sha512-tWnkwu9YEq2uzlBDI4RcLn8jrFvF9AOi8PxDNU3hZZjJcjkcRAq3vCI+vZcg1SuxISDYe86k9VZFwAxDiJGoAw==
 
 camelcase-keys@^2.0.0:
   version "2.1.0"
@@ -4990,6 +5020,14 @@ import-fresh@^2.0.0:
     caller-path "^2.0.0"
     resolve-from "^3.0.0"
 
+import-fresh@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/import-fresh/-/import-fresh-3.0.0.tgz#a3d897f420cab0e671236897f75bc14b4885c390"
+  integrity sha512-pOnA9tfM3Uwics+SaBLCNyZZZbK+4PTu0OPZtLlMIrv17EdBoC15S9Kn8ckJ9TZTyKb3ywNE5y1yeDxxGA7nTQ==
+  dependencies:
+    parent-module "^1.0.0"
+    resolve-from "^4.0.0"
+
 import-lazy@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/import-lazy/-/import-lazy-2.1.0.tgz#05698e3d45c88e8d7e9d92cb0584e77f096f3e43"
@@ -6310,22 +6348,6 @@ memory-fs@^0.4.0, memory-fs@~0.4.1:
     errno "^0.1.3"
     readable-stream "^2.0.1"
 
-meow@3.7.0, meow@^3.1.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
-  integrity sha1-cstmi0JSKCkKu/qFaJJYcwioAfs=
-  dependencies:
-    camelcase-keys "^2.0.0"
-    decamelize "^1.1.2"
-    loud-rejection "^1.0.0"
-    map-obj "^1.0.1"
-    minimist "^1.1.3"
-    normalize-package-data "^2.3.4"
-    object-assign "^4.0.1"
-    read-pkg-up "^1.0.1"
-    redent "^1.0.0"
-    trim-newlines "^1.0.0"
-
 meow@5.0.0, meow@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/meow/-/meow-5.0.0.tgz#dfc73d63a9afc714a5e371760eb5c88b91078aa4"
@@ -6340,6 +6362,22 @@ meow@5.0.0, meow@^5.0.0:
     redent "^2.0.0"
     trim-newlines "^2.0.0"
     yargs-parser "^10.0.0"
+
+meow@^3.1.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
+  integrity sha1-cstmi0JSKCkKu/qFaJJYcwioAfs=
+  dependencies:
+    camelcase-keys "^2.0.0"
+    decamelize "^1.1.2"
+    loud-rejection "^1.0.0"
+    map-obj "^1.0.1"
+    minimist "^1.1.3"
+    normalize-package-data "^2.3.4"
+    object-assign "^4.0.1"
+    read-pkg-up "^1.0.1"
+    redent "^1.0.0"
+    trim-newlines "^1.0.0"
 
 meow@^4.0.0:
   version "4.0.1"
@@ -7035,6 +7073,13 @@ parallel-transform@^1.1.0:
     cyclist "~0.2.2"
     inherits "^2.0.3"
     readable-stream "^2.1.5"
+
+parent-module@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parent-module/-/parent-module-1.0.0.tgz#df250bdc5391f4a085fb589dad761f5ad6b865b5"
+  integrity sha512-8Mf5juOMmiE4FcmzYc4IaiS9L3+9paz2KOiXzkRviCP6aDmN49Hz6EMWz0lGNp9pX80GvvAuLADtyGfW/Em3TA==
+  dependencies:
+    callsites "^3.0.0"
 
 parse-asn1@^5.0.0:
   version "5.0.0"
@@ -8710,6 +8755,14 @@ string-argv@^0.0.2:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.0.2.tgz#dac30408690c21f3c3630a3ff3a05877bdcbd736"
   integrity sha1-2sMECGkMIfPDYwo/86BYd73L1zY=
 
+string-to-stream@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/string-to-stream/-/string-to-stream-1.1.1.tgz#aba78f73e70661b130ee3e1c0192be4fef6cb599"
+  integrity sha512-QySF2+3Rwq0SdO3s7BAp4x+c3qsClpPQ6abAmb0DGViiSBAkT5kL6JT2iyzEVP+T1SmzHrQD1TwlP9QAHCc+Sw==
+  dependencies:
+    inherits "^2.0.1"
+    readable-stream "^2.1.0"
+
 string-width@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-1.0.2.tgz#118bdf5b8cdc51a2a7e70d211e07e2b0b9b107d3"
@@ -9523,7 +9576,7 @@ url-parse-lax@^1.0.0:
   dependencies:
     prepend-http "^1.0.1"
 
-url-parse@1.4.4, url-parse@^1.1.8, url-parse@^1.4.3:
+url-parse@^1.1.8, url-parse@^1.4.3:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.4.tgz#cac1556e95faa0303691fec5cf9d5a1bc34648f8"
   integrity sha512-/92DTTorg4JjktLNLe6GPS2/RvAd/RGr6LuktmWSMLEOa6rjnlrFXNgSbSmkNvCoL2T028A0a1JaJLzRMlFoHg==
@@ -9654,7 +9707,7 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vorpal@^1.10.0:
+vorpal@^1.12.0:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/vorpal/-/vorpal-1.12.0.tgz#4be7b2a4e48f8fcfc9cf3648c419d311c522159d"
   integrity sha1-S+eypOSPj8/JzzZIxBnTEcUiFZ0=
