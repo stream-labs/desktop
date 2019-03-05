@@ -89,7 +89,23 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
       options: this.fontFamilies,
       allowEmpty: false,
       disabled: this.value.enabled === false,
-      optionStyle: (val: string) => ({ fontFamily: val }),
+    };
+  }
+
+  familyOptionStyle(val: string) {
+    return { fontFamily: val };
+  }
+
+  styleOptionStyle(val: string) {
+    if (!this.selectedFont) return;
+    const fontStyle = this.fonts.find(
+      font => font.family === this.selectedFont.family && font.style === val,
+    );
+    if (!fontStyle) return;
+    return {
+      fontFamily: this.selectedFont.family,
+      fontStyle: fontStyle.italic ? 'italic' : 'regular',
+      fontWeight: fontStyle.weight,
     };
   }
 
@@ -98,18 +114,6 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
       options: this.stylesForFamily,
       allowEmpty: false,
       disabled: this.value.enabled === false,
-      optionStyle: (val: string) => {
-        if (!this.selectedFont) return;
-        const fontStyle = this.fonts.find(
-          font => font.family === this.selectedFont.family && font.style === val,
-        );
-        if (!fontStyle) return;
-        return {
-          fontFamily: this.selectedFont.family,
-          fontStyle: fontStyle.italic ? 'italic' : 'regular',
-          fontWeight: fontStyle.weight,
-        };
-      },
     };
   }
 }
