@@ -6,7 +6,7 @@
       </div>
       <div class="input-wrapper">
         <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily">
-          <template v-slot:item="{ option }">
+          <template slot="item" slot-scope="{ option }">
             <span :style="familyOptionStyle(option.value)">{{ option.title }}</span>
           </template>
         </list-input>
@@ -18,7 +18,7 @@
       </div>
       <div class="input-wrapper">
         <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle">
-          <template v-slot:item="{ option }">
+          <template slot="item" slot-scope="{ option }">
             <span :style="styleOptionStyle(option.value)">{{ option.title }}</span>
           </template>
         </list-input>
