@@ -119,6 +119,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
+      'Game Overlay',
       'Scene Collections',
       'Notifications',
       'Appearance',

@@ -4,7 +4,7 @@ import { defer } from 'lodash';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Inject } from 'util/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation } from 'services/stateful-service';
+import { mutation, Service } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
@@ -27,6 +27,16 @@ import { NavigationService } from './navigation';
 interface IUserServiceState {
   auth?: IPlatformAuth;
 }
+
+export type LoginLifecycleOptions = {
+  init: () => Promise<void>;
+  destroy: () => Promise<void>;
+  context: Service;
+};
+
+export type LoginLifecycle = {
+  destroy: () => Promise<void>;
+};
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
@@ -424,6 +434,55 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
       'RecentEvents',
     );
+  }
+
+  /**
+   * Abstracts a common pattern of performing an action if the user is logged in, listening for user
+   * login events to perform that action at the point the user logs in, and doing cleanup on logout.
+   *
+   * @param init A function to be performed immediately if the user is logged in, and on every login
+   * @param destroy A function to be performed when the user logs out
+   * @param context `this` binding
+   * @returns An object with a `destroy` method that will perform cleanup (including un-subscribing
+   * from login events), typically invoked on a Service's `destroyed` method.
+   * @example
+   * class ChatService extends Service {
+   *   @Inject() userService: UserService;
+   *
+   *   init() {
+   *     this.lifecycle = this.userService.withLifecycle({
+   *       init: this.initChat,
+   *       destroy: this.deinitChat,
+   *       context: this,
+   *     })
+   *   }
+   *
+   *   async initChat() { ... }
+   *   async deinitChat() { ... }
+   *
+   *   async destroyed() {
+   *     this.lifecycle.destroy();
+   *   }
+   * }
+   */
+  async withLifecycle({ init, destroy, context }: LoginLifecycleOptions): Promise<LoginLifecycle> {
+    const doInit = init.bind(context);
+    const doDestroy = destroy.bind(context);
+
+    const userLoginSubscription = this.userLogin.subscribe(() => doInit());
+    const userLogoutSubscription = this.userLogout.subscribe(() => doDestroy());
+
+    if (this.isLoggedIn()) {
+      await doInit();
+    }
+
+    return {
+      destroy: async () => {
+        userLoginSubscription.unsubscribe();
+        userLogoutSubscription.unsubscribe();
+        await doDestroy();
+      },
+    } as LoginLifecycle;
   }
 }
 

@@ -1,24 +1,24 @@
 <template>
-  <div id="mainWrapper" class="modal-layout" :class="theme">
-    <div class="ModalLayout-fixed" :style="fixedStyle">
-      <slot name="fixed"/>
-    </div>
+  <div id="mainWrapper" class="modal-layout" :class="wrapperClassNames">
+    <div class="ModalLayout-fixed" :style="fixedStyle"><slot name="fixed" /></div>
     <div
       :class="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
       :style="contentStyle"
     >
-      <slot name="content" v-if="!loading"/>
+      <slot name="content" v-if="!loading" />
       <div class="spinner-container" v-else>
-        <i class="fa fa-spinner fa-pulse modal-layout-spinner"/>
+        <i class="fa fa-spinner fa-pulse modal-layout-spinner" />
       </div>
     </div>
     <div v-if="showControls" class="modal-layout-controls">
-      <button v-if="showCancel" class="button button--default" @click="cancel">{{ $t('Cancel') }}</button>
-      <button v-if="showDone" :disabled="disableDone" class="button button--action" @click="done">{{ $t('Done') }}</button>
+      <button v-if="showCancel" class="button button--default" @click="cancel">
+        {{ $t('Cancel') }}
+      </button>
+      <button v-if="showDone" :disabled="disableDone" class="button button--action" @click="done">
+        {{ $t('Done') }}
+      </button>
     </div>
-    <div v-if="customControls" class="modal-layout-controls">
-      <slot name="controls"/>
-    </div>
+    <div v-if="customControls" class="modal-layout-controls"><slot name="controls" /></div>
   </div>
 </template>
 
@@ -28,11 +28,15 @@
 @import '../styles/index';
 
 .modal-layout {
-  height: calc(~'100% - 30px'); // Compensate for titlebar living in ChildWindow
+  height: 100%;
   display: flex;
   flex-direction: column;
   color: var(--paragraph);
   background-color: var(--background);
+}
+
+.modal-layout.has-titlebar {
+  height: calc(~'100% - 30px'); // Compensate for titlebar living in ChildWindow
 }
 
 .modal-layout--w-side-menu {

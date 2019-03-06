@@ -17,6 +17,7 @@ import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import RemoteControlSettings from 'components/RemoteControlSettings.vue';
 import LanguageSettings from 'components/LanguageSettings.vue';
+import GameOverlaySettings from 'components/GameOverlaySettings.vue';
 
 @Component({
   components: {
@@ -34,6 +35,7 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     ExperimentalSettings,
     LanguageSettings,
     InstalledApps,
+    GameOverlaySettings,
   },
 })
 export default class Settings extends Vue {
@@ -51,6 +53,7 @@ export default class Settings extends Vue {
     Video: 'fas fa-film',
     Audio: 'icon-audio',
     Hotkeys: 'icon-settings',
+    'Game Overlay': 'icon-full-screen',
     Advanced: 'fas fa-cogs',
     Developer: 'far fa-file-code',
     'Scene Collections': 'icon-themes',

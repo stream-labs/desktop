@@ -19,3 +19,5 @@ plugins/
 yarn-error.log
 .opt-in
 .env
+# @streamlabs/game-overlay creates this file at the root
+settings.cfg

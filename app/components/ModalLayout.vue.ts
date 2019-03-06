@@ -54,6 +54,9 @@ export default class ModalLayout extends Vue {
   @Prop({ default: false })
   customControls: boolean;
 
+  @Prop({ default: true })
+  hasTitleBar: boolean;
+
   created() {
     const contentStyle = {
       padding: '16px',
@@ -70,7 +73,11 @@ export default class ModalLayout extends Vue {
     this.fixedStyle = fixedStyle;
   }
 
-  get theme() {
+  get wrapperClassNames() {
+    if (this.hasTitleBar) {
+      return [this.customizationService.currentTheme, 'has-titlebar'].join(' ');
+    }
+
     return this.customizationService.currentTheme;
   }
 
