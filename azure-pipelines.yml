@@ -7,7 +7,7 @@ trigger:
 - staging
 
 pool:
-  vmImage: 'windows-2019'
+  name: Default
 
 steps:
 - task: NodeTool@0
