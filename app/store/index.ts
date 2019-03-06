@@ -28,6 +28,7 @@ const actions = {};
 const plugins: any[] = [];
 
 let makeStoreReady: Function;
+let storeCanReceiveMutations = Util.isMainWindow();
 
 const storeReady = new Promise<Store<any>>(resolve => {
   makeStoreReady = resolve;
@@ -64,12 +65,16 @@ plugins.push((store: Store<any>) => {
       state,
       __vuexSyncIgnore: true,
     });
+
+    // child window can't receive mutations until BULK_LOAD_STATE event
+    storeCanReceiveMutations = true;
+
     makeStoreReady(store);
   });
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutation: any) => {
-    commitMutation(mutation);
+    if (storeCanReceiveMutations) commitMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');

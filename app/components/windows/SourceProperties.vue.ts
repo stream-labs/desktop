@@ -13,6 +13,7 @@ import PlatformAppProperties from 'components/custom-source-properties/PlatformA
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
+import { ErrorField } from 'vee-validate';
 
 @Component({
   components: {
@@ -34,6 +35,7 @@ export default class SourceProperties extends Vue {
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
+  hasErrors = false;
 
   sourcesSubscription: Subscription;
 
@@ -79,5 +81,9 @@ export default class SourceProperties extends Vue {
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
     return source ? $t('Properties for %{sourceName}', { sourceName: source.name }) : '';
+  }
+
+  onValidateHandler(errors: ErrorField[]) {
+    this.hasErrors = !!errors.length;
   }
 }

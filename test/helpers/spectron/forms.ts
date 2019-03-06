@@ -38,6 +38,14 @@ export async function setFormDropdown(
   await t.context.app.client.elementIdElement(id, '../..').click(`li=${value}`);
 }
 
+export async function getDropdownOptions(t: TExecutionContext, selector: string) {
+  const els = await t.context.app.client.execute((selector: string) => {
+    return Array.from(document.querySelectorAll(selector)).map(el => el.textContent);
+  }, selector);
+
+  return els.value;
+}
+
 // Percent is a value between 0 and 1
 export async function setSliderPercent(
   t: TExecutionContext,

@@ -119,34 +119,32 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
-  const storePromise = createStore();
-  const windowsService: WindowsService = WindowsService.instance;
-  const i18nService: I18nService = I18nService.instance;
-  const windowId = Utils.getCurrentUrlParams().windowId;
-
-  if (Utils.isMainWindow()) {
-    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-    AppService.instance.load();
-  } else {
-    if (Utils.isChildWindow()) {
-      ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+  createStore().then(async store => {
+    // handle closeWindow event from the main process
+    const windowsService: WindowsService = WindowsService.instance;
+    if (Utils.isMainWindow()) {
+      ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+      AppService.instance.load();
+    } else {
+      if (Utils.isChildWindow()) {
+        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
     }
-  }
 
-  storePromise.then(async store => {
+    // setup VueI18n plugin
     Vue.use(VueI18n);
-
-    await i18nService.load();
-
+    const i18nService: I18nService = I18nService.instance;
+    await i18nService.load(); // load translations from a disk
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
       silentTranslationWarn: true,
     });
-
     I18nService.setVuei18nInstance(i18n);
 
+    // create a root Vue component
+    const windowId = Utils.getCurrentUrlParams().windowId;
     const vm = new Vue({
       i18n,
       store,
