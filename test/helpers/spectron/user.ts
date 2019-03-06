@@ -1,6 +1,7 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
+import get = Reflect.get;
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -37,6 +38,7 @@ export async function logOut(t: TExecutionContext) {
 export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
+  email?: string, // if not set, pick a random user's account from user-pool
 ): Promise<boolean> {
   const app = t.context.app;
   let authInfo: IPlatformAuth;
@@ -44,7 +46,7 @@ export async function logIn(
   if (userName) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform);
+    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
   } else {
     authInfo = getAuthInfoFromEnv();
     if (!authInfo) {
@@ -112,14 +114,20 @@ function getAuthInfoFromEnv(): IPlatformAuth {
 /**
  * Fetch credentials from slobs-users-pool service, and reserve these credentials
  */
-async function reserveUserFromPool(token: string, platformType: TPlatform): Promise<IPlatformAuth> {
+async function reserveUserFromPool(
+  token: string,
+  platformType: TPlatform,
+  email = '',
+): Promise<IPlatformAuth> {
   // try to get a user account from users-pool service
   // give it several attempts
   let user: ITestUser;
   let attempts = 3;
   while (attempts--) {
     try {
-      user = await requestUserPool('reserve');
+      let urlPath = 'reserve';
+      if (email) urlPath += `/${email}`; // request a specific user if 'email' is set
+      user = await requestUserPool(urlPath);
       break;
     } catch (e) {
       console.log(e);
@@ -165,4 +173,8 @@ async function requestUserPool(path: string): Promise<any> {
       },
     );
   });
+}
+
+export function getUserName(): string {
+  return userName;
 }
