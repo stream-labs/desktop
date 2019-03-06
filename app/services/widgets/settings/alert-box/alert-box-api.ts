@@ -32,6 +32,7 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   raid_raider_minimum: number;
   recent_events_donation_min_amount: number;
   recent_events_host_min_viewer_count: number;
+  fanfunding_alert_min_amount: number;
 }
 
 // ALERT VARIATION

@@ -4,7 +4,6 @@ import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import {
   IAlertBoxApiSettings,
-  IAlertBoxMixerSettings,
   IAlertBoxSetting,
   IAlertBoxSettings,
   IAlertBoxVariation,
@@ -188,6 +187,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       // These settings are handled differently and purposely dropped on the floor in reshapeVariation
       newSettings.bits_alert_min_amount = settings.bits_alert_min_amount;
       newSettings.donation_alert_min_amount = settings.donation_alert_min_amount;
+      newSettings.fanfunding_alert_min_amount = settings.fanfunding_alert_min_amount;
       newSettings.host_viewer_minimum = settings.host_viewer_minimum;
       newSettings.raid_raider_minimum = settings.raid_raider_minimum;
     });
