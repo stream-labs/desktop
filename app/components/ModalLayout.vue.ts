@@ -4,7 +4,6 @@ import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import { AppService } from 'services/app';
-import electron from 'electron';
 
 @Component({})
 export default class ModalLayout extends Vue {
@@ -22,6 +21,13 @@ export default class ModalLayout extends Vue {
   // If controls are shown, whether or not to show the
   // cancel button.
   @Prop({ default: true }) showCancel: boolean;
+
+  // If controls are shown, whether or not to show the
+  // Done button.
+  @Prop({ default: true }) showDone: boolean;
+
+  // Disable done button.
+  @Prop({ default: false }) disableDone: boolean;
 
   // If tabs are shown, whether or not to fix
   // the margin.
