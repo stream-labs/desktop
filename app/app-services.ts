@@ -110,3 +110,5 @@ export { MediaShareService } from 'services/widgets/settings/media-share';
 export { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+
+export { GameOverlayService } from 'services/game-overlay';

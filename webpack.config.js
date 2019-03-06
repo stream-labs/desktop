@@ -49,7 +49,8 @@ module.exports = {
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")',
     'request': 'require("request")',
-    'archiver': 'require("archiver")'
+    'archiver': 'require("archiver")',
+    '@streamlabs/game-overlay': 'require("@streamlabs/game-overlay")'
   },
 
   module: {
