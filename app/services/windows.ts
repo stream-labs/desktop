@@ -1,7 +1,7 @@
 /* tslint:disable:max-line-length */
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';

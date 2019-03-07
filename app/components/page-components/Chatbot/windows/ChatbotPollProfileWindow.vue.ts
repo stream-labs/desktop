@@ -1,14 +1,8 @@
 import { Component, Watch } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
-import * as _ from 'lodash';
-import {
-  IChatbotErrorResponse,
-  IPollOption,
-  IPollProfile,
-  IBettingProfile,
-  IBettingOption,
-} from 'services/chatbot';
+import { IChatbotErrorResponse, IPollOption, IPollProfile, IBettingOption } from 'services/chatbot';
 import { EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
@@ -78,7 +72,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   mounted() {
     // if editing existing custom command
     if (this.isEdit) {
-      this.newProfile = _.cloneDeep(this.profileToUpdate);
+      this.newProfile = cloneDeep(this.profileToUpdate);
     }
   }
 
@@ -135,7 +129,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
         parameter: null,
       };
     } else {
-      this.selectedOption = _.cloneDeep(option);
+      this.selectedOption = cloneDeep(option);
     }
 
     this.selectedIndex = index;
@@ -143,7 +137,7 @@ export default class ChatbotPollProfileWindow extends ChatbotWindowsBase {
   }
 
   onAddedHandler(option: IPollOption | IBettingOption = null, index: number = -1) {
-    const dupeIndex = _.findIndex(this.newProfile.options, x => {
+    const dupeIndex = this.newProfile.options.findIndex(x => {
       return (
         x.name.toLowerCase() === option.name.toLowerCase() ||
         x.parameter.toLowerCase() === option.parameter.toLowerCase()

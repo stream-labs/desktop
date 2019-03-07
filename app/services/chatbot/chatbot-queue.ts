@@ -1,11 +1,12 @@
 import Vue from 'vue';
+import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import io from 'socket.io-client';
 import { ChatbotBaseApiService } from './chatbot-base';
-import * as _ from 'lodash';
 
 import {
   IChatbotAPIPostResponse,
@@ -14,7 +15,6 @@ import {
   IQueueEntriesResponse,
   IQueuePickedResponse,
   IQueuedUser,
-  IQueueTotalResponse,
   IQueueLeaveData,
 } from './chatbot-interfaces';
 
@@ -234,8 +234,8 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   @mutation()
   private APPEND_QUEUE_PICKED(response: IQueuePickedResponse) {
     if (response.data.length !== 0) {
-      this.state.queueEntriesResponse.data = _.uniqBy(
-        _.concat(this.state.queueEntriesResponse.data, response.data),
+      this.state.queueEntriesResponse.data = uniqBy(
+        this.state.queueEntriesResponse.data.concat(response.data),
         x => x.id,
       );
 
@@ -248,8 +248,8 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   @mutation()
   private APPEND_QUEUE_ENTRIES(response: IQueueEntriesResponse) {
     if (response.data.length !== 0) {
-      this.state.queueEntriesResponse.data = _.uniqBy(
-        _.concat(this.state.queueEntriesResponse.data, response.data),
+      this.state.queueEntriesResponse.data = uniqBy(
+        this.state.queueEntriesResponse.data.concat(response.data),
         x => x.id,
       );
 
@@ -261,10 +261,11 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
 
   @mutation()
   private ADD_QUEUE_ENTRY(response: IQueuedUser) {
-    const lastItem = _.last(this.state.queueEntriesResponse.data);
+    const data = this.state.queueEntriesResponse.data;
+    const lastItem = data[data.length - 1];
 
     if (!lastItem || lastItem.custom_id + 1 === response.custom_id) {
-      const clone = _.cloneDeep(this.state.queueEntriesResponse.data);
+      const clone = cloneDeep(this.state.queueEntriesResponse.data);
       clone.push(response);
       this.state.queueEntriesResponse.data = clone;
     }
@@ -272,12 +273,12 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
 
   @mutation()
   private PICK_QUEUE_ENTRY(response: IQueuedUser) {
-    const index = _.findIndex(this.state.queueEntriesResponse.data, x => {
+    const index = this.state.queueEntriesResponse.data.findIndex(x => {
       return x.id === response.id;
     });
 
     if (index !== -1) {
-      const tempData = _.cloneDeep(this.state.queueEntriesResponse.data);
+      const tempData = cloneDeep(this.state.queueEntriesResponse.data);
 
       for (let i = index; i < this.state.queueEntriesResponse.data.length; ++i) {
         tempData[i].custom_id--;
@@ -294,12 +295,10 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
   @mutation()
   private REMOVE_QUEUE_ENTRY(response: IQueueLeaveData) {
     //  Remove Entry
-    const indexEntry = _.findIndex(this.state.queueEntriesResponse.data, x => {
-      return x.id === response.id;
-    });
+    const indexEntry = this.state.queueEntriesResponse.data.findIndex(x => x.id === response.id);
 
     if (indexEntry !== -1) {
-      const tempData = _.cloneDeep(this.state.queueEntriesResponse.data);
+      const tempData = cloneDeep(this.state.queueEntriesResponse.data);
 
       for (let i = indexEntry; i < this.state.queueEntriesResponse.data.length; ++i) {
         tempData[i].custom_id--;
@@ -311,9 +310,7 @@ export class ChatbotQueueApiService extends PersistentStatefulService<
     }
 
     //  Remove Picked user
-    const indexPicked = _.findIndex(this.state.queuePickedResponse.data, x => {
-      return x.id === response.id;
-    });
+    const indexPicked = this.state.queuePickedResponse.data.findIndex(x => x.id === response.id);
 
     if (indexPicked !== -1) {
       this.state.queuePickedResponse.data.splice(indexPicked, 1);

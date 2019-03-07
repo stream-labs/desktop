@@ -1,7 +1,4 @@
 // Utility functions for working with frame rate values
-
-import _ from 'lodash';
-
 export default {
 
   rationalToFrameInterval(rational) {
@@ -25,7 +22,7 @@ export default {
   // Returns common FPS values which are valid in at least
   // one of the given FPS ranges.
   simpleFPSValuesForRanges(ranges) {
-    return _.filter(this.commonFPSValues(), value => {
+    return this.commonFPSValues().filter(value => {
       return !!(_.find(ranges, range => {
         return this.rateInRange(value, range.min, range.max);
       }));
