@@ -204,20 +204,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.setSettings({ locked });
   }
 
-  loadAttributes() {
-    const { position, scale, visible, crop, rotation } = this.getObsSceneItem();
-    this.UPDATE({
-      visible,
-      sceneItemId: this.sceneItemId,
-      transform: {
-        position,
-        scale,
-        crop,
-        rotation,
-      },
-    });
-  }
-
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
