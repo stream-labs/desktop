@@ -32,7 +32,8 @@
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
     "commit": "commit",
-    "postinstall": "scripts/facemask-plugin-move.bat"
+    "postinstall": "scripts/facemask-plugin-move.bat",
+    "signbinaries": "node scripts/sign-binaries.js"
   },
   "prettier": {
     "singleQuote": true,
@@ -96,7 +97,7 @@
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "backtrace-node": "^0.7.3",
-    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.26/iojs-v2.0.8-crash-handler.tar.gz",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.27/iojs-v2.0.8-crash-handler.tar.gz",
     "electron-log": "^2.2.17",
     "electron-window-state": "5.0.3",
     "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.4.tar.gz",
@@ -107,6 +108,7 @@
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
+    "signtool": "^1.0.0",
     "socket.io-client": "2.1.1",
     "uuid": "^3.0.1",
     "vue-resize": "^0.4.4"
