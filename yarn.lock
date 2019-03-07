@@ -2947,9 +2947,9 @@ cosmiconfig@^5.0.6:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz":
-  version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz#9c4c40b0f37f1378964c018752ba50161700d74a"
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.26/iojs-v2.0.8-crash-handler.tar.gz":
+  version "0.0.0"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.26/iojs-v2.0.8-crash-handler.tar.gz#5e86d5141451162ae5387ccf89d6e92b61e998c5"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -3956,9 +3956,9 @@ extsprintf@^1.2.0:
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
 
-"facemask-plugin@https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.3.tar.gz":
+"facemask-plugin@https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.4.tar.gz":
   version "0.8.3"
-  resolved "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.3.tar.gz#14eee4340d21f8f6bef913dc77c3b55eb5e7a2d2"
+  resolved "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.4.tar.gz#bdfb4c37e23829aeeb6241c58982d1f7b504a154"
 
 fast-deep-equal@^1.0.0:
   version "1.1.0"
@@ -4507,7 +4507,7 @@ grapheme-splitter@^1.0.2:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-handlebars@4.1.0, handlebars@^4.0.6:
+handlebars@^4.0.6:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.1.0.tgz#0d6a6f34ff1f63cecec8423aa4169827bf787c3a"
   integrity sha512-l2jRuU1NAWK6AW5qqcTATWQJvNPEwkM7NEKSiv/gqOsoSQbVoWyqVEY5GS+XPQ88zLNmqASRpzfdm8d79hJS+w==
@@ -6521,9 +6521,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.5-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.6-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.5-iojs-v2.0.8.tar.gz#7158cdf6bc2fec0ae82309989ce324982d70dfcb"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.6-iojs-v2.0.8.tar.gz#3986b7a836a4eba7451910a915dfba8b4b5c61cd"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
