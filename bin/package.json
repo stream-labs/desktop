@@ -4,7 +4,9 @@
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "signtool": "^1.0.0"
+  },
   "devDependencies": {
     "7zip-bin": "2.4.1",
     "aws-sdk": "2.344.0",
