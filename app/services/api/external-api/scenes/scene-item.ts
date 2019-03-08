@@ -1,6 +1,6 @@
 import { ServiceHelper } from 'services/stateful-service';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
-import { InjectFromExternalApi } from '../../external-api';
+import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { ISourceModel, Source, SourcesService } from '../sources/sources';
 import { ISceneNode, SceneNode } from './scene-node';
 import { AnchorPoint, AnchorPositions } from '../../../../util/ScalableRectangle';
@@ -61,11 +61,10 @@ export interface ISceneItemActions {
  */
 @ServiceHelper()
 export class SceneItem extends SceneNode implements ISceneItemActions {
-  private sceneItem: InternalSceneItem;
-
+  @Fallback() private sceneItem: InternalSceneItem;
   @InjectFromExternalApi() private sourcesService: SourcesService;
 
-  constructor(public sceneId: string, public nodeId: string) {
+  constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
     this.sceneItem = this.internalScenesService.getSceneItem(this.nodeId);
   }

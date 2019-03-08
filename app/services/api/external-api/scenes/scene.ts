@@ -1,5 +1,5 @@
 import { ServiceHelper } from 'services/stateful-service';
-import { InjectFromExternalApi } from '../../external-api';
+import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { Source, SourcesService } from '../sources/sources';
 import { Inject } from '../../../../util/injector';
 import { Scene as InternalScene, ScenesService as InternalScenesService } from 'services/scenes';
@@ -20,8 +20,10 @@ export interface IScene {
 export class Scene {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
-  @Inject('ScenesService') private internalScenesService: InternalScenesService;
+  @Inject('ScenesService')
+  private internalScenesService: InternalScenesService;
 
+  @Fallback()
   private scene: InternalScene;
 
   constructor(private sceneId: string) {
@@ -49,9 +51,9 @@ export class Scene {
   }
 
   getItem(sceneItemId: string): SceneItem {
-    const folder = this.scene.getItem(sceneItemId);
-    if (!folder) return null;
-    return folder ? new SceneItem(folder.sceneId, folder.id) : null;
+    const item = this.scene.getItem(sceneItemId);
+    if (!item) return null;
+    return item ? new SceneItem(item.sceneId, item.id, item.sourceId) : null;
   }
 
   getFolder(sceneFolderId: string): SceneItemFolder {
@@ -133,9 +135,9 @@ export class Scene {
   /**
    * removes all nodes from the scene
    */
-  clear(): void {
-    return this.scene.clear();
-  }
+  // clear(): void {
+  //   return this.scene.clear();
+  // }
 
   removeFolder(folderId: string): void {
     return this.removeFolder(folderId);

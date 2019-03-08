@@ -4,7 +4,7 @@ import {
   SceneItemNode as InternalSceneNode,
   ScenesService as InternalScenesService,
 } from 'services/scenes';
-import { InjectFromExternalApi } from '../../external-api';
+import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { ScenesService } from './scenes';
 import { Scene } from './scene';
 import { SceneItemFolder } from './scene-folder';
@@ -26,8 +26,8 @@ export interface ISceneNode {
 export abstract class SceneNode {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
+  @Fallback() protected sceneNode: InternalSceneNode;
   protected scene: InternalScene;
-  protected sceneNode: InternalSceneNode;
 
   constructor(public sceneId: string, public nodeId: string) {
     this.scene = this.internalScenesService.getScene(sceneId);

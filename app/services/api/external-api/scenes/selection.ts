@@ -1,4 +1,4 @@
-import { InjectFromExternalApi, Singleton } from '../../external-api';
+import { Fallback, InjectFromExternalApi, Singleton } from '../../external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
@@ -315,7 +315,9 @@ export class Selection implements ISceneItemActions {
  */
 @Singleton()
 export class SelectionService extends Selection {
-  @Inject('SelectionService') internalSelectionService: InternalSelectionService;
+  @Fallback()
+  @Inject('SelectionService')
+  internalSelectionService: InternalSelectionService;
 
   get selection() {
     return this.internalSelectionService;

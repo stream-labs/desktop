@@ -1,6 +1,6 @@
 import { ServiceHelper } from '../../../stateful-service';
 import { SceneItemFolder as InternalSceneItemFolder } from '../../../scenes';
-import { InjectFromExternalApi } from '../../external-api';
+import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { SourcesService } from '../sources/sources';
 import { SceneItem } from './scene-item';
 import { ISceneNode, SceneNode } from './scene-node';
@@ -14,7 +14,7 @@ export interface ISceneItemFolder extends ISceneNode {
  */
 @ServiceHelper()
 export class SceneItemFolder extends SceneNode {
-  private sceneFolder: InternalSceneItemFolder;
+  @Fallback() private sceneFolder: InternalSceneItemFolder;
 
   @InjectFromExternalApi() private sourcesService: SourcesService;
 
