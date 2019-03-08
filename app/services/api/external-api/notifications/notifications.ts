@@ -1,7 +1,7 @@
 import { NotificationsService as InternalNotificationsService } from 'services/notifications';
 import { Inject } from 'util/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
-import { IJsonRpcRequest } from '../../jsonrpc';
+import { IJsonRpcRequest } from 'services/api/jsonrpc';
 
 enum ENotificationType {
   INFO = 'INFO',
