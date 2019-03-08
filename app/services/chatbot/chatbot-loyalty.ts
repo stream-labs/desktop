@@ -1,10 +1,10 @@
 import Vue from 'vue';
+import startCase from 'lodash/startCase';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import { ChatbotBaseApiService } from './chatbot-base';
-import * as _ from 'lodash';
 
 import {
   IChatbotAPIPutResponse,
@@ -115,7 +115,7 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
     return this.chatbotBaseApiService
       .api('POST', 'loyalty/add-to-all', {
         amount,
-        platform: _.startCase(this.chatbotBaseApiService.userService.platform.type),
+        platform: startCase(this.chatbotBaseApiService.userService.platform.type),
       })
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {

@@ -3,7 +3,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { IMediaShareBan } from 'services/widgets/settings/media-share';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 

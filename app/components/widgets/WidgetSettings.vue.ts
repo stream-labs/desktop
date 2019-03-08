@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from '../../util/injector';
 import { WindowsService } from 'services/windows';
 import { IWidgetData, IWidgetsServiceApi, WidgetSettingsService } from 'services/widgets';
