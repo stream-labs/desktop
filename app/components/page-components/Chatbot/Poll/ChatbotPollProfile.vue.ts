@@ -1,8 +1,9 @@
-import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
+import orderBy from 'lodash/orderBy';
+import map from 'lodash/map';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { IPollProfile, DELETE_MODAL, ChatbotSettingSlug, IBettingProfile } from 'services/chatbot';
 import moment from 'moment';
-import * as _ from 'lodash';
 import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue';
 import ChatbotVoteTracker from './ChatbotVoteTracker.vue';
 
@@ -18,7 +19,7 @@ export default class ChatbotPollProfile extends ChatbotBase {
   }
 
   get options() {
-    return _.map(this.profile.options, 'name').join(', ');
+    return map(this.profile.options, 'name').join(', ');
   }
 
   get timeRemaining() {
@@ -74,11 +75,11 @@ export default class ChatbotPollProfile extends ChatbotBase {
   get topThreeOptions() {
     if (this.type === 'poll') {
       const active = this.chatbotApiService.Poll.state.activePollResponse;
-      return _.orderBy(active.settings.options.slice(0, 5), 'votes', 'desc');
+      return orderBy(active.settings.options.slice(0, 5), 'votes', 'desc');
     }
 
     const active = this.chatbotApiService.Betting.state.activeBettingResponse;
-    return _.orderBy(active.settings.options.slice(0, 5), 'bets', 'desc');
+    return orderBy(active.settings.options.slice(0, 5), 'bets', 'desc');
   }
 
   onEditProfileHandler() {

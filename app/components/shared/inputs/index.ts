@@ -1,7 +1,7 @@
 import * as inputs from './inputs';
 import { Validator } from 'vee-validate';
 import { $t } from 'services/i18n';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 export const inputComponents = inputs;
 

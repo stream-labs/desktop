@@ -17,7 +17,7 @@ import { mutation, ServiceHelper, StatefulService } from '../stateful-service';
 import { WidgetSource } from './widget-source';
 import { InitAfter } from '../../util/service-observer';
 import Vue from 'vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
 
 @ServiceHelper()

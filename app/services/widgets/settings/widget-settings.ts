@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { HostsService } from 'services/hosts';
 import { Inject } from '../../../util/injector';
 import { UserService } from 'services/user';

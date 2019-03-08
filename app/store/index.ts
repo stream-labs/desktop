@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
-import _ from 'lodash';
+import each from 'lodash/each';
 import electron from 'electron';
 import { getModule, StatefulService } from '../services/stateful-service';
 import { ServicesManager } from '../services-manager';
@@ -17,7 +17,7 @@ const debug = process.env.NODE_ENV !== 'production';
 const mutations = {
   // tslint:disable-next-line:function-name
   BULK_LOAD_STATE(state: any, data: any) {
-    _.each(data.state, (value, key) => {
+    each(data.state, (value, key) => {
       state[key] = value;
     });
   },

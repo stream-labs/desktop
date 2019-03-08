@@ -6,7 +6,6 @@ import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import * as _ from 'lodash';
 import {
   ChatbotApiService,
   ChatbotPermissionsEnums,
@@ -38,7 +37,7 @@ export default class ChatbotBase extends Vue {
   }
 
   get chatbotPermissions() {
-    const keys = _.difference(Object.keys(ChatbotPermissionsEnums), ['None']);
+    const keys = Object.keys(ChatbotPermissionsEnums).filter(key => key !== 'None');
 
     const permissions = keys.reduce((a: IListOption<number>[], b: string) => {
       if (typeof ChatbotPermissionsEnums[b] === 'number') {
