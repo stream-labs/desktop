@@ -135,7 +135,6 @@ export class SceneBuilder {
   }
 
   build(scetch: string): ISceneBuilderNode[] {
-    console.log('scene', this.scene.name, this.scene['_fallback'].name);
     this.scene.clear();
     const nodes = this.parse(scetch);
     return this.buildNodes(nodes);
