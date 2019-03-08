@@ -29,10 +29,6 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
     const val = this.options.blockReturn
       ? event.target.value.replace(/(\r\n|\r|\n)/g, '')
       : event.target.value;
-    const pos = event.target.selectionStart;
-    if (val !== this.value) {
-      this.$nextTick(() => (event.target.selectionEnd = pos));
-    }
     this.emitInput(val);
   }
 }
