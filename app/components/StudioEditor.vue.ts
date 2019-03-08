@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import _ from 'lodash';
+import clamp from 'lodash/clamp';
 import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'util/injector';
 import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
@@ -226,7 +226,9 @@ export default class StudioEditor extends Vue {
       this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
-      const sourcesInPriorityOrder = _.compact(this.activeSources.concat(this.sceneItems));
+      const sourcesInPriorityOrder = this.activeSources
+        .concat(this.sceneItems)
+        .filter(item => item);
 
       const overSource = sourcesInPriorityOrder.find(source => {
         return this.isOverSource(event, source);
@@ -262,28 +264,28 @@ export default class StudioEditor extends Vue {
           case AnchorPoint.East: {
             const croppableWidth = rect.width - rect.crop.right - 2;
             const distance = croppableWidth * rect.scaleX - (rect.x - x);
-            rect.crop.left = Math.round(_.clamp(distance / rect.scaleX, 0, croppableWidth));
+            rect.crop.left = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
 
           case AnchorPoint.West: {
             const croppableWidth = rect.width - rect.crop.left - 2;
             const distance = croppableWidth * rect.scaleX + (rect.x - x);
-            rect.crop.right = Math.round(_.clamp(distance / rect.scaleX, 0, croppableWidth));
+            rect.crop.right = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
 
           case AnchorPoint.South: {
             const croppableHeight = rect.height - rect.crop.bottom - 2;
             const distance = croppableHeight * rect.scaleY - (rect.y - y);
-            rect.crop.top = Math.round(_.clamp(distance / rect.scaleY, 0, croppableHeight));
+            rect.crop.top = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
 
           case AnchorPoint.North: {
             const croppableHeight = rect.height - rect.crop.top - 2;
             const distance = croppableHeight * rect.scaleY + (rect.y - y);
-            rect.crop.bottom = Math.round(_.clamp(distance / rect.scaleY, 0, croppableHeight));
+            rect.crop.bottom = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
         }
@@ -437,7 +439,7 @@ export default class StudioEditor extends Vue {
   // of the active source's resize regions.
   isOverResize(event: MouseEvent) {
     if (this.activeSources.length > 0) {
-      return _.find(this.resizeRegions, region => {
+      return this.resizeRegions.find(region => {
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
     }

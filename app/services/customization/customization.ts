@@ -15,9 +15,6 @@ import {
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
-const LIVEDOCK_MIN_SIZE = 0.15;
-const LIVEDOCK_MAX_SIZE = 0.5;
-
 /**
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
@@ -31,7 +28,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     leftDock: false,
     hideViewerCount: false,
     livedockCollapsed: true,
-    previewSize: 300,
+    previewWidth: 300,
     livedockSize: 0,
     bottomdockSize: 240,
     performanceMode: false,

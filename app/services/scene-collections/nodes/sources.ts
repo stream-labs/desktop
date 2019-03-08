@@ -1,11 +1,9 @@
 import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
-import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
-import * as fi from 'node-fontinfo';
 import { ScenesService } from 'services/scenes';
 
 interface ISchema {
@@ -46,7 +44,6 @@ export interface ISourceInfo {
 export class SourcesNode extends Node<ISchema, {}> {
   schemaVersion = 3;
 
-  @Inject() private fontLibraryService: FontLibraryService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
   @Inject() private scenesService: ScenesService;
@@ -140,45 +137,6 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-  checkTextSourceValidity(item: ISourceInfo) {
-    if (item.type !== 'text_gdiplus') {
-      return;
-    }
-
-    const settings = item.settings;
-
-    if (settings['font']['face'] && settings['font']['flags'] != null) {
-      return;
-    }
-
-    /* Defaults */
-    settings['font']['face'] = 'Arial';
-    settings['font']['flags'] = 0;
-
-    /* This should never happen */
-    if (!settings.custom_font) {
-      const source = this.sourcesService.getSource(item.id);
-      source.updateSettings({ font: settings.font });
-      return;
-    }
-
-    const fontInfo = fi.getFontInfo(settings.custom_font);
-
-    if (!fontInfo) {
-      const source = this.sourcesService.getSource(item.id);
-      source.updateSettings({ font: settings.font });
-      return;
-    }
-
-    settings['font']['face'] = fontInfo.family_name;
-
-    settings['font']['flags'] =
-      (fontInfo.italic ? obs.EFontStyle.Italic : 0) | (fontInfo.bold ? obs.EFontStyle.Bold : 0);
-
-    const source = this.sourcesService.getSource(item.id);
-    source.updateSettings({ font: settings.font });
-  }
-
   /**
    * Do some data sanitizing
    */
@@ -246,8 +204,6 @@ export class SourcesNode extends Node<ISchema, {}> {
         });
         this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
-
-      this.checkTextSourceValidity(sourceInfo);
 
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));

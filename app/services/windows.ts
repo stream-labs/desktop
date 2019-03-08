@@ -1,7 +1,7 @@
 /* tslint:disable:max-line-length */
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
@@ -30,6 +30,7 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs';
+import { debounce } from 'lodash-decorators';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -211,6 +212,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
+  @debounce(500)
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     const bounds = window.getBounds();

@@ -194,19 +194,13 @@
 
 .source-info {
   .padding(2);
-  border-bottom: 1px solid @day-border;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: row;
   flex: 0 0 225px;
   height: 225px;
   align-items: flex-start;
-}
-
-.night-theme {
-  .source-info {
-    border-color: @night-border;
-    background-color: @night-primary;
-  }
 }
 </style>
 
@@ -266,7 +260,7 @@ h2 {
   .transition();
   padding: 4px 8px;
   margin-top: 8px;
-  background-color: @day-section;
+  background-color: var(--section);
   width: 49%;
   .radius();
   white-space: nowrap;
@@ -277,9 +271,9 @@ h2 {
 
   &:hover,
   &.source--active {
-    color: @day-title;
+    color: var(--title);
     .weight(@medium);
-    background-color: @light-3;
+    background-color: var(--button);
   }
 
   > div {
@@ -301,7 +295,7 @@ h2 {
 }
 
 .source-info__media {
-  .radius;
+  .radius();
   overflow: hidden;
   text-align: center;
   .padding-left(2);
@@ -335,17 +329,6 @@ h2 {
 }
 
 .night-theme {
-  .source {
-    background: @night-hover;
-    border-color: @night-hover;
-
-    &:hover,
-    &.source--active {
-      color: @night-title;
-      background: @night-secondary;
-    }
-  }
-
   .source__demo--day {
     display: none;
   }

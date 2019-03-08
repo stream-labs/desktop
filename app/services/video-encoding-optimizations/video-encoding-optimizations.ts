@@ -6,7 +6,7 @@ import {
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
 import { IEncoderProfile } from './definitions';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { camelize, handleErrors } from '../../util/requests';
 import { UrlService } from '../hosts';
 import { mutation } from 'services/stateful-service';

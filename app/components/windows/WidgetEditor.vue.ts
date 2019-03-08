@@ -12,7 +12,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import TestWidgets from 'components/TestWidgets.vue';
 import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, IWidgetsServiceApi } from 'services/widgets';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
