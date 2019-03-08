@@ -1,7 +1,6 @@
 import { Component, Watch } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { $t } from 'services/i18n';
-import * as _ from 'lodash';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { IGamblePreferencesResponse } from 'services/chatbot';
@@ -88,7 +87,7 @@ export default class ChatbotGamblePreferencesWindow extends ChatbotWindowsBase {
   }
 
   mounted() {
-    this.newGamblePreferences = _.cloneDeep(this.gamblePreferences);
+    this.newGamblePreferences = cloneDeep(this.gamblePreferences);
   }
 
   @Watch('errors.items.length')

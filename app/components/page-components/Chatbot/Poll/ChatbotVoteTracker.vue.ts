@@ -1,7 +1,7 @@
-import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
+import sumBy from 'lodash/sumBy';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { IPollOption, ChatbotSettingSlug, IBettingOption } from 'services/chatbot';
-import * as _ from 'lodash';
 
 @Component({})
 export default class ChatbotVoteTracker extends ChatbotBase {
@@ -53,9 +53,9 @@ export default class ChatbotVoteTracker extends ChatbotBase {
 
   get total() {
     if (this.type === 'poll') {
-      return _.sumBy(this.activeSettings.options, 'votes');
+      return sumBy(this.activeSettings.options, 'votes');
     }
-    return _.sumBy(this.activeSettings.options, 'bets');
+    return sumBy(this.activeSettings.options, 'bets');
   }
 
   get settings() {

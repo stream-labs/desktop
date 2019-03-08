@@ -1,12 +1,8 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
-import { cloneDeep } from 'lodash';
-import {
-  IObsListOption,
-  setupConfigurableDefaults,
-  TObsValue,
-} from 'components/obs/inputs/ObsInput';
+import cloneDeep from 'lodash/cloneDeep';
+import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
@@ -189,7 +185,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type: managerType,
     };
 
-    if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
 
     if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);

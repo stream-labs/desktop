@@ -4,7 +4,6 @@ import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import { ChatbotBaseApiService } from './chatbot-base';
-import * as _ from 'lodash';
 import * as moment from 'moment';
 import io from 'socket.io-client';
 

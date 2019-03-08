@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';

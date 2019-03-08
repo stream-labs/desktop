@@ -7,7 +7,7 @@ import { IChatbotErrorResponse, ILoyaltyPreferencesResponse } from 'services/cha
 import { ITextMetadata, INumberMetadata, EInputType } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { debounce } from 'lodash-decorators';
 import ChatbotLoyaltyImporter from '../Importer/ChatbotLoyaltyImporter.vue';
 

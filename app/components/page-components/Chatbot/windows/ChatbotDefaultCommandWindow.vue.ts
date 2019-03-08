@@ -1,6 +1,6 @@
 import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { ITab } from 'components/Tabs.vue';
 import { IDefaultCommand } from 'services/chatbot';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
