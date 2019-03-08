@@ -29,24 +29,24 @@
 }
 
 .button--default {
-  background-color: @day-button;
-  color: @day-paragraph;
+  background-color: var(--button);
+  color: var(--paragraph);
 
   &:hover {
-    background-color: darken(@day-button, 2%);
-    color: @day-title;
+    background-color: var(--button-hover);
+    color: var(--title)
   }
 
   &:focus {
-    background-color: @day-button;
-    color: @day-title;
+    background-color: var(--button);
+    color: var(--title);
   }
 
   &.is-disabled,
   &:disabled {
     &:hover {
-      background-color: @day-button;
-      color: @day-title;
+      background-color: var(--button);
+      color: var(--title);
     }
   }
 }
@@ -224,29 +224,6 @@
 }
 
 .night-theme {
-  .button--default {
-    background-color: @dark-5;
-    border-color: @dark-5;
-    color: @light-1;
-
-    &:hover {
-      color: @light-1;
-    }
-
-    &:focus {
-      background-color: @dark-5;
-      color: @light-1;
-    }
-
-    &.is-disabled,
-    &:disabled {
-      &:hover {
-        background-color: @dark-5;
-        color: @light-1;
-      }
-    }
-  }
-
   .button--trans {
     color: @light-4;
     background-color: transparent;

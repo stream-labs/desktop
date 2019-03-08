@@ -25,8 +25,8 @@
   height: 60px;
   display: flex;
   align-items: center;
-  color: @night-paragraph;
-  background-color: @navy-secondary;
+  color: var(--paragraph);
+  background-color: var(--link-active);
 
   &.stacked {
     flex-direction: column;

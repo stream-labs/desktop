@@ -1,5 +1,5 @@
 table {
-  color: @day-paragraph;
+  color: var(--paragraph);
 
   thead {
     background: transparent;
@@ -12,7 +12,7 @@ table {
 
     tr {
       &:nth-child(odd) {
-        background-color: @light-2;
+        background-color: var(--solid-input);
         border: 0;
       }
 
@@ -60,7 +60,7 @@ table {
   }
 
   th {
-    color: @light-5;
+    color: var(--midtone);
     .weight(@medium);
     font-size: 12px;
   }
@@ -68,39 +68,4 @@ table {
 
 .table__controls {
   text-align: right;
-}
-
-.night-theme {
-  table {
-    color: @night-paragraph;
-  }
-
-  tbody {
-    background-color: transparent;
-
-    tr {
-      border: 0;
-
-      &:nth-child(odd) {
-        background-color: @dark-4;
-        border-color: transparent;
-
-        td {
-          border: 0;
-        }
-      }
-
-      &:nth-child(even) {
-        background-color: transparent;
-      }
-
-      td {
-        border: 0;
-
-        a {
-          color: @white;
-        }
-      }
-    }
-  }
 }

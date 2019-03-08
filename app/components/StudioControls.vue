@@ -54,23 +54,14 @@
 }
 
 .studio-controls__label {
+  color: var(--title);
   margin-bottom: 0;
 }
 
 .studio-controls-selector {
-  background: @day-section;
+  background: var(--section);
   .radius();
   flex-grow: 1;
   overflow-y: auto;
-}
-
-.night-theme {
-  .studio-controls-selector {
-    background: @night-section;
-  }
-
-  .studio-controls__label {
-    color: @white;
-  }
 }
 </style>

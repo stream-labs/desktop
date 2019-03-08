@@ -27,10 +27,10 @@
   padding: 10px;
   width: 100%;
   height: 200px;
-  color: @white;
+  color: var(--paragraph);
   list-style: none;
   overflow: auto;
   .radius();
-  background: @night-section;
+  background: var(--section);
 }
 </style>

@@ -67,7 +67,7 @@
 }
 
 .chatbot-profile__timer {
-  background-color: @light-3;
+  background-color: var(--button);
   height: 40px;
 
   .chatbot-profile__timer__container {
@@ -91,7 +91,7 @@
   margin: 10px;
   width: 300px;
   .radius(2);
-  background-color: @day-secondary;
+  background-color: var(--section);
 
   .chatbot-profile__header {
     .flex();
@@ -138,7 +138,7 @@
   .chatbot-profile__body {
     .padding--10();
     .flex();
-    color: @day-paragraph;
+    color: var(--paragraph);
     height: 200px;
     .flex--column();
     .flex--space-between();
@@ -158,25 +158,6 @@
     .chatbot-profile__action {
       .align-items--inline;
     }
-  }
-}
-
-.night-theme {
-  .chatbot-profile__container {
-    background-color: @night-accent-light;
-  }
-
-  h3,
-  p {
-    color: white;
-  }
-
-  .chatbot-profile__body {
-    color: @night-paragraph;
-  }
-
-  .chatbot-profile__timer {
-    background-color: @dark-2;
   }
 }
 </style>

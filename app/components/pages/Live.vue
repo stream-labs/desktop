@@ -79,7 +79,7 @@
 .sizer-container {
   width: 100%;
   .radius();
-  background-color: @day-section;
+  background-color: var(--section);
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -145,7 +145,7 @@
 .sizer-container {
   width: 100%;
   .radius();
-  background-color: @day-secondary;
+  background-color: var(--section);
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -205,15 +205,6 @@
 }
 
 .night-theme {
-  .mission-control-container {
-    border-color: @night-secondary;
-  }
-
-  .output-container {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
-
   .live-display-placeholder {
     background: @navy-secondary;
     border-color: @navy-secondary;
@@ -225,11 +216,6 @@
 
   .live-display-placeholder__img--night {
     display: block;
-  }
-
-  .sizer-container {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
   }
 }
 </style>

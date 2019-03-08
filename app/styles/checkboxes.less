@@ -21,7 +21,7 @@
     padding-left: 28px;
     outline: 0;
     .transition();
-    color: @day-paragraph;
+    color: var(--paragraph);
     .weight(@normal);
 
     &:before {
@@ -37,7 +37,7 @@
       transition: border .1s ease,opacity .1s ease,box-shadow .1s ease,-webkit-transform .1s ease;
       transition: border .1s ease,opacity .1s ease,transform .1s ease,box-shadow .1s ease;
       transition: border .1s ease,opacity .1s ease,transform .1s ease,box-shadow .1s ease,-webkit-transform .1s ease;
-      border: 1px solid @day-input-border;
+      border: 1px solid var(--input-border);
     }
   }
 
@@ -56,7 +56,7 @@
   }
 
   input:checked~label {
-    color: @day-title;
+    color: var(--title);
 
     &:before {
       border-color: @teal;
@@ -105,22 +105,6 @@
       .checkbox {
         margin-bottom: 0;
       }
-    }
-  }
-}
-
-.night {
-  .checkbox {
-    label {
-      color: @night-paragraph;
-
-      &:before {
-        border-color: @night-input-border;
-      }
-    }
-
-    input:checked~label {
-      color: @night-title;
     }
   }
 }

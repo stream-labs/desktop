@@ -19,13 +19,13 @@
 }
 
 .tooltip .tooltip-inner {
-  background: @white;
+  background: var(--background);
   .border();
-  .day-shadow();
+  .shadow();
   .radius();
   padding: 8px 10px 7px;
   font-size: 12px;
-  color: @day-paragraph;
+  color: var(--paragraph);
 }
 
 .tooltip .tooltip-arrow {
@@ -34,7 +34,7 @@
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: @day-border;
+  border-color: var(--border);
 }
 
 .tooltip[x-placement^="top"] {
@@ -107,17 +107,4 @@
   visibility: visible;
   opacity: 1;
   transition: opacity .15s;
-}
-
-.night-theme {
-  .tooltip .tooltip-inner {
-    background-color: @night-section-alt;
-    border-color: @night-section-alt;
-    color: @white;
-    .night-shadow();
-  }
-
-  .tooltip-arrow {
-    border-color: @night-section-alt;
-  }
 }

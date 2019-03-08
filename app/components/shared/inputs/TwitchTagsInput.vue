@@ -72,75 +72,41 @@ table.sp-table {
   }
 }
 
-.night-theme {
-  .sp-base.sp-inputs {
-    background-color: @night-dropdown-bg !important;
-    border-color: @night-dropdown-border !important;
-  }
-
-  & + .v-dropdown-container {
-    background-color: @night-dropdown-bg;
-    border-color: @night-dropdown-border;
-    color: @night-paragraph;
-
-    .sp-table {
-      color: @night-paragraph;
-      background-color: @night-dropdown-bg;
-    }
-
-    .sp-search .sp-search-input {
-      background: @night-input-bg;
-      color: @night-paragraph;
-      border-color: @night-input-border;
-    }
-
-    .sp-result-area,
-    .sp-search {
-      background-color: @night-dropdown-bg;
-      border-color: @night-dropdown-border;
-    }
-
-    tbody tr:nth-child(odd) {
-      background-color: darken(@night-dropdown-bg, 4%);
-    }
-  }
+.sp-base.sp-inputs {
+  background: var(--dropdown-bg) !important;
+  border-color: var(--dropdown-border) !important;
 }
 
-.day-theme {
-  .sp-base.sp-inputs {
-    background: @light-2 !important;
-    border-color: @light-2 !important;
+& + .v-dropdown-container {
+  background-color: var(--dropdown-bg);
+  border-color: var(--dropdown-border);
+  color: var(--paragraph);
+
+  .sp-table {
+    color: var(--paragraph);
   }
 
-  & + .v-dropdown-container {
-    background-color: @light-2;
-    border-color: @light-2;
-    color: @day-paragraph;
+  .sp-search .sp-search-input {
+    background: var(--input-bg);
+    color: var(--paragraph);
+    border-color: var(--input-border);
+  }
 
-    .sp-table {
-      color: @day-paragraph;
-    }
+  .sp-result-area,
+  .sp-search,
+  .night-theme .sp-result-area,
+  .night-theme .sp-search {
+    background-color: var(--dropdown-bg) !important;
+    border-color: var(--input-border) !important;
+  }
 
-    .sp-search .sp-search-input {
-      background: @day-input-bg;
-      color: @day-paragraph;
-      border-color: @day-input-border;
-    }
-
-    .sp-result-area,
-    .sp-search {
-      background-color: @day-dropdown-bg;
-      border-color: @day-dropdown-border;
-    }
-
-    tbody tr:nth-child(odd) {
-      background-color: darken(@day-dropdown-bg, 4%);
-    }
+  tbody tr:nth-child(odd) {
+    background-color: var(--dropdown-alt-bg);
   }
 }
 
 .sp-selected-tag {
-  background-color: @primary !important;
+  background-color: @teal !important;
   box-shadow: none !important;
   border: none !important;
 }
@@ -201,10 +167,10 @@ table.sp-table {
 }
 
 .sp-iconfont.sp-icon-close {
-  color: @night-accent-light !important;
+  color: var(--link) !important;
 
   &:hover {
-    color: @night-accent-light !important;
+    color: var(--link-active) !important;
   }
 }
 
@@ -240,7 +206,7 @@ table.sp-table {
 div.sp-result-area table.sp-table tbody tr.sp-over td {
   &:nth-child(1),
   &:nth-child(2) {
-    background-color: @primary !important;
+    background-color: @teal !important;
   }
 }
 

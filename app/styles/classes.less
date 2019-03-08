@@ -50,7 +50,7 @@
 .section {
   .padding(2);
   .margin-bottom(3);
-  background: @day-section;
+  background: var(--section);
   .radius();
 
   .button {
@@ -64,7 +64,7 @@
 }
 
 .section-title__icon {
-  background-color: @light-3;
+  background-color: var(--background);
   color: @icon;
   .radius();
   .margin-right();
@@ -92,14 +92,4 @@
 // wrap
 .nowrap {
   white-space: nowrap;
-}
-
-.night-theme {
-  .section {
-    background: @night-section;
-  }
-
-  .section-title__icon {
-    background-color: @dark-3;
-  }
 }
