@@ -1,7 +1,8 @@
-import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
+import { throttle } from 'lodash-decorators';
+import sumBy from 'lodash/sumBy';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotVoteTracker from './ChatbotVoteTracker.vue';
-import * as _ from 'lodash';
 import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue';
 import { ChatbotSettingSlug } from 'services/chatbot';
 
@@ -22,8 +23,7 @@ export default class ChatbotActivePoll extends ChatbotBase {
   get isCancelable() {
     if (this.type === 'poll') {
       return (
-        _.sumBy(this.chatbotApiService.Poll.state.activePollResponse.settings.options, 'votes') ===
-        0
+        sumBy(this.chatbotApiService.Poll.state.activePollResponse.settings.options, 'votes') === 0
       );
     }
     return this.chatbotApiService.Betting.state.activeBettingResponse.status !== 'Picked';
@@ -38,13 +38,13 @@ export default class ChatbotActivePoll extends ChatbotBase {
 
   get total() {
     if (this.type === 'poll') {
-      return _.sumBy(this.active.settings.options, 'votes');
+      return sumBy(this.active.settings.options, 'votes');
     }
-    return _.sumBy(this.active.settings.options, 'bets');
+    return sumBy(this.active.settings.options, 'bets');
   }
 
   get loyalty() {
-    return _.sumBy(this.active.settings.options, 'loyalty');
+    return sumBy(this.active.settings.options, 'loyalty');
   }
 
   get active() {
@@ -65,12 +65,7 @@ export default class ChatbotActivePoll extends ChatbotBase {
     return this.chatbotApiService.Betting.state.timeRemaining;
   }
 
-  mounted() {
-    this.onToggleStateHandler = _.throttle(this.onToggleStateHandler, 1000);
-    this.onCancelHandler = _.throttle(this.onCancelHandler, 1000);
-    this.onCompleteHandler = _.throttle(this.onCompleteHandler, 1000);
-  }
-
+  @throttle(1000)
   onToggleStateHandler() {
     if (this.type === 'poll') {
       this.togglePoll();
@@ -95,11 +90,13 @@ export default class ChatbotActivePoll extends ChatbotBase {
     }
   }
 
+  @throttle(1000)
   onCancelHandler() {
     this.$modal.show(this.CANCEL_MODAL);
     this.chatbotApiService.Common.closeChatbotChildWindow();
   }
 
+  @throttle(1000)
   onCompleteHandler() {
     if (this.type === 'poll') {
       this.chatbotApiService.Poll.completePoll();

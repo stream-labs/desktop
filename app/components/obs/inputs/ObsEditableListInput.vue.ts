@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import electron from 'electron';
+import cloneDeep from 'lodash/cloneDeep';
 import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsEditableListInputValue, ObsInput, TObsType } from './ObsInput';
@@ -47,7 +47,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   handleRemove() {
-    this.setList(_.without(this.list, this.activeItem));
+    this.setList(this.list.filter(item => item !== this.activeItem));
   }
 
   handleEdit() {
@@ -62,7 +62,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
     });
 
     if (files) {
-      const activeIndex = _.indexOf(this.list, this.activeItem);
+      const activeIndex = this.list.indexOf(this.activeItem);
 
       this.list[activeIndex] = files[0];
 
@@ -101,7 +101,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
 
   get list(): string[] {
     const items = this.value.value || [];
-    return _.cloneDeep(items.map(item => item.value));
+    return cloneDeep(items.map(item => item.value));
   }
 }
 

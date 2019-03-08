@@ -2,47 +2,26 @@
   <div>
     <div class="input-container">
       <div class="input-label">
-        <label>Font Family</label>
+        <label>{{$t('Font Family')}}</label>
       </div>
       <div class="input-wrapper">
-        <multiselect
-          ref="family"
-          class="multiselect--font"
-          :value="selectedFamily"
-          :options="fontFamilies"
-          :allow-empty="false"
-          track-by="family"
-          label="family"
-          @input="setFamily">
-          <template slot="option" slot-scope="props">
-            <span :style="{ fontFamily: props.option.family }">
-              {{ props.option.family }}
-            </span>
+        <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily">
+          <template slot="item" slot-scope="{ option }">
+            <span :style="familyOptionStyle(option.value)">{{ option.title }}</span>
           </template>
-        </multiselect>
+        </list-input>
       </div>
     </div>
     <div class="input-container">
       <div class="input-label">
-        <label>Font Style</label>
+        <label>{{$t('Font Style')}}</label>
       </div>
       <div class="input-wrapper">
-        <multiselect
-          ref="font"
-          class="multiselect--font"
-          :value="selectedFont"
-          :options="selectedFamily.fonts"
-          :allow-empty="false"
-          track-by="style"
-          label="style"
-          @input="setStyle">
-          <template slot="option" slot-scope="props">
-            <span
-              :style="styleForFont(props.option)">
-              {{ props.option.style }}
-            </span>
+        <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle">
+          <template slot="item" slot-scope="{ option }">
+            <span :style="styleOptionStyle(option.value)">{{ option.title }}</span>
           </template>
-        </multiselect>
+        </list-input>
       </div>
     </div>
     <font-size-selector :value="value.value.size" @input="setSize" />

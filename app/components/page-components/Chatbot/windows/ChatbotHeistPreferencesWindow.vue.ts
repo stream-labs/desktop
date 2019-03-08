@@ -1,7 +1,7 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import Vue from 'vue';
 import { IHeistPreferencesResponse } from 'services/chatbot';

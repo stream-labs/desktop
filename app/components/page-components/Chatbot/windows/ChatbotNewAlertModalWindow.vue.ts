@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import { TextInput, TextAreaInput, ListInput, NumberInput } from 'components/shared/inputs/inputs';

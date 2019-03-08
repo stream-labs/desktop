@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
-import _ from 'lodash';
+import each from 'lodash/each';
 import electron from 'electron';
 import { getModule, StatefulService } from '../services/stateful-service';
 import { ServicesManager } from '../services-manager';
@@ -17,7 +17,7 @@ const debug = process.env.NODE_ENV !== 'production';
 const mutations = {
   // tslint:disable-next-line:function-name
   BULK_LOAD_STATE(state: any, data: any) {
-    _.each(data.state, (value, key) => {
+    each(data.state, (value, key) => {
       state[key] = value;
     });
   },
@@ -28,6 +28,7 @@ const actions = {};
 const plugins: any[] = [];
 
 let makeStoreReady: Function;
+let storeCanReceiveMutations = Util.isMainWindow();
 
 const storeReady = new Promise<Store<any>>(resolve => {
   makeStoreReady = resolve;
@@ -64,12 +65,16 @@ plugins.push((store: Store<any>) => {
       state,
       __vuexSyncIgnore: true,
     });
+
+    // child window can't receive mutations until BULK_LOAD_STATE event
+    storeCanReceiveMutations = true;
+
     makeStoreReady(store);
   });
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutation: any) => {
-    commitMutation(mutation);
+    if (storeCanReceiveMutations) commitMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');

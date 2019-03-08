@@ -2,10 +2,11 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 /**
- * This component can be added to any block as a resize control
+ * This component can be added to any element as a resize control
  */
 @Component({})
 export default class ResizeBar extends Vue {
+  // the side of the external container to stick ResizeBar to
   @Prop({ default: 'left' })
   position: 'left' | 'right' | 'top'; // TODO: bottom if needed
 
@@ -18,11 +19,14 @@ export default class ResizeBar extends Vue {
   @Prop({ default: Infinity })
   max: number;
 
+  // by default ResizeBar increases the value when move to bottom/right
+  // and decreases when move to left/top
+  // change this option to reverse this behavior
   @Prop({ default: false })
   reverse: number;
 
-  active = false;
-  transform = '';
+  active = false; // true when it's dragging
+  transform = ''; // css-transform prop ResizeBar
 
   private barOffset = 0;
   private mouseOffset = 0;

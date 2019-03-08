@@ -1,0 +1,28 @@
+trigger:
+- staging
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- bash: yarn install --frozen-lockfile --check-files
+  displayName: 'Install Dependencies'
+
+- bash: 'yarn lint'
+  displayName: 'TSLint'
+
+- bash: 'yarn compile:ci'
+  displayName: 'Compile Assets'
+
+- bash: 'yarn test-flaky'
+  displayName: 'Run Tests'
+  env:
+    SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+    CI: true
+    BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+    SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
