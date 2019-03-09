@@ -14,7 +14,6 @@ export function Singleton() {
 }
 
 /**
-<<<<<<< HEAD
  * Dependency-Injector for external-API modules
  * @see Inject
  */
@@ -33,8 +32,6 @@ export function InjectFromExternalApi(serviceName?: string) {
 }
 
 /**
-=======
->>>>>>> staging
  * External API for usage outside of SLOBS application
  * for stuff like remote-control, StreamDeck and other 3rd-party services
  * This API is documented and must not have breaking changes
