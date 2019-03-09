@@ -3,14 +3,16 @@ import {
   AudioService as InternalAudioService,
 } from 'services/audio';
 import { Inject } from 'util/injector';
-import { Singleton } from 'services/api/external-api';
+import { Fallback, Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISerializable } from '../../rpc-api';
 import * as obs from '../../../../../obs-api';
 
 @Singleton()
 export class AudioService {
-  @Inject() protected audioService: InternalAudioService;
+  @Fallback()
+  @Inject()
+  protected audioService: InternalAudioService;
 
   getSource(sourceId: string): AudioSource {
     const source = this.audioService.getSource(sourceId);
@@ -54,7 +56,7 @@ export interface IAudioSourceModel {
 @ServiceHelper()
 export class AudioSource implements ISerializable {
   @Inject() private audioService: InternalAudioService;
-  private audioSource: InternalAudioSource;
+  @Fallback() private audioSource: InternalAudioSource;
 
   constructor(private sourceId: string) {
     this.audioSource = this.audioService.getSource(sourceId);
