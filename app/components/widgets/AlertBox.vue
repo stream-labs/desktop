@@ -163,7 +163,7 @@
 }
 
 .left-accordion__button.active {
-  background-color: @teal-light-opac;
+  background-color: var(--section);
 }
 
 .add-alert-button {

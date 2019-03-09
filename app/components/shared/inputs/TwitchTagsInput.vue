@@ -74,12 +74,12 @@ table.sp-table {
 
 .sp-base.sp-inputs {
   background: var(--dropdown-bg) !important;
-  border-color: var(--dropdown-border) !important;
+  border-color: var(--input-border) !important;
 }
 
-& + .v-dropdown-container {
-  background-color: var(--dropdown-bg);
-  border-color: var(--dropdown-border);
+.v-dropdown-container {
+  background-color: var(--dropdown-bg) !important;
+  border: none !important;
   color: var(--paragraph);
 
   .sp-table {
@@ -92,10 +92,12 @@ table.sp-table {
     border-color: var(--input-border);
   }
 
+  .sp-search-input:focus {
+    background: var(--input-bg) !important;
+  }
+
   .sp-result-area,
-  .sp-search,
-  .night-theme .sp-result-area,
-  .night-theme .sp-search {
+  .sp-search {
     background-color: var(--dropdown-bg) !important;
     border-color: var(--input-border) !important;
   }
