@@ -34,41 +34,41 @@ interface ISceneCollectionSchema {
 export class SceneCollectionsService {
   @Fallback()
   @Inject()
-  protected sceneCollectionService: InternalSceneCollectionsService;
+  protected sceneCollectionsService: InternalSceneCollectionsService;
 
   get activeCollection(): ISceneCollectionsManifestEntry {
-    return this.sceneCollectionService.activeCollection;
+    return this.sceneCollectionsService.activeCollection;
   }
 
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
-    return this.sceneCollectionService.fetchSceneCollectionsSchema();
+    return this.sceneCollectionsService.fetchSceneCollectionsSchema();
   }
 
   create(options: ISceneCollectionCreateOptions): Promise<ISceneCollectionsManifestEntry> {
-    return this.sceneCollectionService.create(options);
+    return this.sceneCollectionsService.create(options);
   }
 
   load(id: string) {
-    return this.sceneCollectionService.load(id);
+    return this.sceneCollectionsService.load(id);
   }
 
   get collectionAdded(): Observable<ISceneCollectionsManifestEntry> {
-    return this.sceneCollectionService.collectionAdded;
+    return this.sceneCollectionsService.collectionAdded;
   }
 
   get collectionRemoved(): Observable<ISceneCollectionsManifestEntry> {
-    return this.sceneCollectionService.collectionRemoved;
+    return this.sceneCollectionsService.collectionRemoved;
   }
 
   get collectionSwitched(): Observable<ISceneCollectionsManifestEntry> {
-    return this.sceneCollectionService.collectionSwitched;
+    return this.sceneCollectionsService.collectionSwitched;
   }
 
   get collectionUpdated(): Observable<ISceneCollectionsManifestEntry> {
-    return this.sceneCollectionService.collectionUpdated;
+    return this.sceneCollectionsService.collectionUpdated;
   }
 
   get collections(): ISceneCollectionsManifestEntry[] {
-    return this.sceneCollectionService.collections;
+    return this.sceneCollectionsService.collections;
   }
 }
