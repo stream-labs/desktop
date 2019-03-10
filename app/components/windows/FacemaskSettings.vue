@@ -18,17 +18,17 @@
         </h-form-group>
       </div>
       <div class="row">
-        <h-form-group :title="$t('Alert Duration')">
-          <slider-input v-model="durationModel" :metadata="{min: 8, max: 60}"/>
-        </h-form-group>
-      </div>
-      <div class="row">
         <h-form-group :title="$t('Video Device')">
           <list-input
             @input="onVideoInputSelect"
             v-model="videoInputModel"
             :metadata="videoInputMetadata"
           />
+        </h-form-group>
+      </div>
+      <div class="row">
+        <h-form-group :title="$t('Device Status')">
+          <span>{{videoDeviceReady ? 'Ready' : 'Not Ready'}}</span>
         </h-form-group>
       </div>
       <div class="row">
@@ -41,6 +41,16 @@
         </h-form-group>
       </div>
       <div class="row">
+        <h-form-group :title="$t('Donation URL')">
+          <p>https://streamlabs.com/{{username}}/masks</p>
+        </h-form-group>
+      </div>
+      <div class="row">
+        <h-form-group :title="$t('Donation Alert Duration')">
+          <slider-input v-model="durationModel" :metadata="{min: 8, max: 60}"/>
+        </h-form-group>
+      </div>
+      <div class="row">
         <h-form-group :title="$t('Sub Masks')">
           <toggle-input
             v-model="subsEnabledModel"
@@ -50,7 +60,7 @@
         </h-form-group>
       </div>
       <div class="row">
-        <h-form-group :title="$t('T2 Sub Masks')">
+        <h-form-group :title="$t('T2 Sub Masks') + ' ' + t2SelectionCount + '/3'">
           <item-grid>
             <virtual-item
               v-for="(mask) in t2AvailableMasks"
@@ -64,7 +74,7 @@
         </h-form-group>
       </div>
       <div class="row">
-        <h-form-group :title="$t('T3 Sub Masks')">
+        <h-form-group :title="$t('T3 Sub Masks')  + ' ' + t3SelectionCount + '/3'">
           <item-grid>
             <virtual-item
               v-for="(mask) in t3AvailableMasks"
@@ -75,6 +85,24 @@
               @click="clickMask(mask, t3AvailableMasks)"
             ></virtual-item>
           </item-grid>
+        </h-form-group>
+      </div>
+      <div class="row">
+        <h-form-group :title="$t('Bits Masks')">
+          <toggle-input
+            v-model="bitsEnabledModel"
+            name="bitsEnabled"
+            :metadata="{ title: $t('Enable Bits Masks') }"
+          />
+        </h-form-group>
+      </div>
+       <div class="row">
+        <h-form-group :title="$t('Bits Price')">
+          <list-input
+            @input="onBitsPriceSelect"
+            v-model="bitsPriceModel"
+            :metadata="bitsPricingMetadata"
+          />
         </h-form-group>
       </div>
     </div>
