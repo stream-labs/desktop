@@ -54,6 +54,9 @@ interface IFacemaskSettings {
   donations_enabled: boolean;
   subs_enabled: boolean;
   extension_enabled: boolean;
+  bits_enabled: boolean;
+  bits_price: number;
+  pricing_options: number[];
   primary_platform: string;
   t2masks: IFacemask[];
   t3masks: IFacemask[];
@@ -62,6 +65,7 @@ interface IFacemaskSettings {
   facemasks: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
+  username: string;
 }
 
 interface IUserFacemaskSettings {
@@ -82,6 +86,13 @@ interface IFacemaskDonation {
   facemask: string;
 }
 
+interface IFacemaskSubscription {
+  eventId: string;
+  facemask: string;
+  user_id: number;
+  subscriber_id: number;
+}
+
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -96,6 +107,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   socketConnectionActive = false;
 
   registeredDonations = {};
+  registeredSubscriptions = {};
+  registeredBits = {};
 
   downloadProgress = {};
 
@@ -109,6 +122,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       donations_enabled: false,
       subs_enabled: false,
       extension_enabled: false,
+      bits_enabled: false,
+      bits_price: 500,
+      pricing_options: [200, 500, 1000, 2000, 10000],
       primary_platform: 'twitch_account',
       t2masks: [],
       t3masks: [],
@@ -116,6 +132,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       userT3masks: [],
       facemasks: [],
       duration: 10,
+      username: null,
       device: {
         name: null,
         value: null,
@@ -202,22 +219,57 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.registeredDonations[donation.eventId] = donation.facemask;
   }
 
+  registerSubscriptionEvent(subscription: IFacemaskSubscription) {
+    this.registeredSubscriptions[subscription.eventId] = subscription.facemask;
+  }
+
   playDonationEvent(donation: IFacemaskDonation) {
     if (this.registeredDonations[donation.eventId] && this.facemaskFilter) {
+      const uuid = this.registeredDonations[donation.eventId];
       delete this.registeredDonations[donation.eventId];
-      this.trigger(donation.facemask);
+      this.trigger(uuid);
+    }
+  }
+
+  playSubscriptionEvent(subscription: IFacemaskSubscription) {
+    if (this.registeredSubscriptions[subscription.eventId] && this.facemaskFilter) {
+      delete this.registeredSubscriptions[subscription.eventId];
+      this.trigger(subscription.facemask);
     }
   }
 
   onSocketEvent(event: TSocketEvent) {
     if (event.type === 'facemaskdonation') {
+      console.log('getting donation', event);
       this.registerDonationEvent({
         facemask: event.message[0].facemask,
         eventId: event.message[0]._id,
       });
     }
-    if (event.type === 'alertPlaying' && event.message.facemask) {
+
+    if (event.type === 'subscription') {
+      console.log('getting sub', event);
+    }
+
+    if (event.type === 'bits') {
+      console.log('getting bits', event);
+    }
+
+    if (
+      event.type === 'alertPlaying' &&
+      event.message.type === 'donation' &&
+      event.message.facemask
+    ) {
+      console.log('playing donation', event);
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
+    }
+
+    if (event.type === 'alertPlaying' && event.message.type === 'subscription') {
+      console.log('playing sub', event);
+    }
+
+    if (event.type === 'alertPlaying' && event.message.type === 'bits') {
+      console.log('playing bits', event);
     }
   }
 
@@ -225,11 +277,14 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     if (this.active && event.type === 'dshow_input') {
       this.setupFilter();
     }
+    if (this.active && event.type === 'browser_source') {
+      this.checkForAlertBox();
+    }
   }
 
-  trigger(mask: string) {
+  trigger(uuid: string) {
     this.updateFilter({
-      Mask: `${mask}.json`,
+      Mask: `${uuid}.json`,
       alertActivate: true,
     });
     setTimeout(() => {
@@ -275,6 +330,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           return enabledDeviceId === (device.value as string);
         })
       : false;
+    console.log("woooooo");
+    console.log(availableDeviceSelected);
+
     return this.state.settings.enabled && availableDeviceSelected;
   }
 
@@ -292,13 +350,24 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       return;
     }
 
-    const uuids = settings.facemasks.map((mask: IFacemask) => {
+    this.checkForAlertBox();
+
+    let uuids = settings.facemasks.map((mask: IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
 
+    const t3 = settings.t3masks.map((mask: IFacemask) => {
+      return { uuid: mask.uuid, intro: mask.is_intro };
+    });
+
+    const t2 = settings.t2masks.map((mask: IFacemask) => {
+      return { uuid: mask.uuid, intro: mask.is_intro };
+    });
+
+    uuids = uuids.concat(t3).concat(t2);
+
     if (settings.device.name && settings.device.value) {
       this.SET_DEVICE(settings.device.name, settings.device.value);
-      this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
     }
@@ -390,16 +459,30 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  // fetchInstallUpdate(uuid: string) {
-  //   return this.formRequest(`slobs/facemasks/install/${uuid}`);
-  // }
+  checkForAlertBox() {
+    let alertBox = false;
+    const sources = this.sourcesService.getSources();
 
-  fetchProfanityFilterSettings() {
-    return this.formRequest('slobs/widget/settings?widget=donation_page');
+    console.log("WTF");
+    console.log(sources);
+
+    const browserSources = sources.filter(source => {
+      return source.type === 'browser_source';
+    });
+
+    console.log(browserSources);
+
+    browserSources.forEach(source => {
+      const browserSource = this.sourcesService.getSourceById(source.sourceId);
+      console.log(browserSource);
+      console.log();
+    });
   }
 
   setupFilter() {
     const sources = this.sourcesService.getSources();
+    console.log(sources);
+    console.log("WHAI");
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';
