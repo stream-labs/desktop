@@ -13,7 +13,8 @@ export type TSocketEvent =
   | IFollowSocketEvent
   | ISubscriptionSocketEvent
   | IAlertPlayingSocketEvent
-  | IAlertProfileChanged;
+  | IAlertProfileChanged
+  | IBitsSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -55,11 +56,20 @@ interface ISubscriptionSocketEvent {
   }[];
 }
 
+interface IBitsSocketEvent {
+  type: 'bits';
+  message: {
+    name: string;
+  }[];
+}
+
 interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
     facemask?: string;
     _id: string;
+    type: string;
+    payload?: any;
   };
 }
 
@@ -112,6 +122,7 @@ export class WebsocketService extends Service {
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
         this.socket.on('event', (e: any) => {
+          console.log(e);
           this.socketEvent.next(e);
         });
       });
