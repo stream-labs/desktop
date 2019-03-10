@@ -41,6 +41,8 @@ export default class FacemaskSettings extends Vue {
   enabledModel = this.facemasksService.state.settings.enabled;
   donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;
   subsEnabledModel = this.facemasksService.state.settings.subs_enabled;
+  bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
+  bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
   videoInputModel = this.facemasksService.state.device.value;
   userT2masks = this.facemasksService.state.settings.userT2masks;
@@ -73,12 +75,33 @@ export default class FacemaskSettings extends Vue {
     };
   });
 
+  pricingOptions = this.facemasksService.state.settings.pricing_options.map(option => {
+    return {
+      title: option,
+      value: option,
+    };
+  });
+
+  get t3SelectionCount(): number {
+    return this.t3AvailableMasks.filter(mask => {
+      return mask.selected;
+    }).length;
+  }
+
+  get t2SelectionCount(): number {
+    return this.t2AvailableMasks.filter(mask => {
+      return mask.selected;
+    }).length;
+  }
+
   async handleSubmit() {
     this.updatingInfo = true;
     const newSettings = {
       enabled: this.enabledModel,
       donations_enabled: this.donationsEnabledModel,
       subs_enabled: this.subsEnabledModel,
+      bits_enabled: this.bitsEnabledModel,
+      bits_price: this.bitsPriceModel,
       duration: this.durationModel,
       userT2masks: this.formatMaskSelections(this.t2AvailableMasks),
       userT3masks: this.formatMaskSelections(this.t3AvailableMasks),
@@ -117,6 +140,7 @@ export default class FacemaskSettings extends Vue {
     } else if (!mask.selected) {
       if (this.validateSelectedMaskCount(options)) {
         mask.selected = true;
+        this.facemasksService.trigger(mask.uuid);
       }
     }
   }
@@ -132,6 +156,10 @@ export default class FacemaskSettings extends Vue {
     console.log(webcam);
   }
 
+  onBitsPriceSelect(price: number) {
+    console.log(price);
+  }
+
   get videoInputMetadata() {
     return {
       internalSearch: false,
@@ -140,11 +168,27 @@ export default class FacemaskSettings extends Vue {
     };
   }
 
+  get bitsPricingMetadata() {
+    return {
+      internalSearch: false,
+      allowEmpty: true,
+      options: this.pricingOptions,
+    };
+  }
+
   get facemasksEnabled() {
     return this.facemasksService.state.settings.enabled;
   }
 
+  get username() {
+    return this.facemasksService.state.settings.username;
+  }
+
   get downloadProgress() {
     return this.facemasksService.state.downloadProgress * 100;
+  }
+
+  get videoDeviceReady() {
+    return this.facemasksService.getDeviceStatus();
   }
 }
