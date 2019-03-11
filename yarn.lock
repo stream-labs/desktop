@@ -3365,9 +3365,9 @@ cosmiconfig@^5.0.6:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.25-remove-signature/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.25/iojs-v2.0.8-crash-handler.tar.gz#9c4c40b0f37f1378964c018752ba50161700d74a"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.25-remove-signature/iojs-v2.0.8-crash-handler.tar.gz#eab683afb258a68eb7c5172acf48916e01a7fc46"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -8032,9 +8032,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-remove-signature-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-iojs-v2.0.8.tar.gz#cfec7b6470dc6f14dd23429be530954e0768644b"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.3.98-remove-signature-iojs-v2.0.8.tar.gz#261add4fc96a7cb69bf4ab19993ae1d743525289"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
