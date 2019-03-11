@@ -1,6 +1,7 @@
 .sl-vue-tree-toggle {
-  width: 16px!important;
   .margin-right();
+
+  width: 16px !important;
   display: inline-block;
 
   i {
@@ -10,16 +11,18 @@
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  background-color: var(--section)!important;
-  border: 0!important;
-  color: var(--paragraph)!important;
-  .radius()!important;
+  .radius() !important;
+
+  background-color: var(--section) !important;
+  border: 0 !important;
+  color: var(--paragraph) !important;
 }
 
-.sl-vue-tree-selected>.sl-vue-tree-node-item {
-  background-color: var(--button)!important;
-  color: var(--title)!important;
+.sl-vue-tree-selected > .sl-vue-tree-node-item {
   .weight(@medium);
+
+  background-color: var(--button) !important;
+  color: var(--title) !important;
 }
 
 .sl-vue-tree-root > .sl-vue-tree-nodes-list {
@@ -27,14 +30,15 @@
 }
 
 .sl-vue-tree-node-item {
-  color: var(--paragraph)!important;
-  border: 0!important;
+  .padding-h-sides(2) !important;
+  .transition();
+
+  color: var(--paragraph) !important;
+  border: 0 !important;
   height: auto;
   margin-top: 0;
-  .padding-h-sides(2)!important;
-  .transition();
   cursor: pointer;
-  line-height: 32px!important;
+  line-height: 32px !important;
 
   &:hover {
     color: var(--paragraph);
@@ -46,28 +50,28 @@
 }
 
 .sl-vue-tree-cursor {
-  border: 0!important;
+  border: 0 !important;
   background-color: var(--input-border);
   z-index: 10;
 }
 
 .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-  background-color: var(--button)!important;
+  background-color: var(--button) !important;
 }
 
 // sl-vue-tree styles within a window
 .modal-layout {
   .sl-vue-tree.sl-vue-tree-root {
-    background-color: transparent!important;
+    background-color: transparent !important;
     border: 0;
   }
 
   .sl-vue-tree-node-item {
     border: 0;
-    padding: 0!important;
+    padding: 0 !important;
   }
 
-  .sl-vue-tree-selected>.sl-vue-tree-node-item {
-    background-color: transparent!important;
+  .sl-vue-tree-selected > .sl-vue-tree-node-item {
+    background-color: transparent !important;
   }
 }

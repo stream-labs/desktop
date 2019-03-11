@@ -23,7 +23,6 @@
   justify-content: flex-end;
 }
 
-
 .flex--align-start {
   align-items: flex-start;
 }
@@ -50,8 +49,9 @@
 .section {
   .padding(2);
   .margin-bottom(3);
-  background: var(--section);
   .radius();
+
+  background: var(--section);
 
   .button {
     .margin-right(2);
@@ -64,10 +64,11 @@
 }
 
 .section-title__icon {
-  background-color: var(--background);
-  color: @icon;
   .radius();
   .margin-right();
+
+  background-color: var(--background);
+  color: @icon;
   font-size: 10px;
   padding: 4px;
   vertical-align: text-bottom;
