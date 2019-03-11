@@ -1,13 +1,13 @@
 import { createSetupFunction } from 'util/test-setup';
 const setup = createSetupFunction();
 
+jest.mock('services/stateful-service');
+jest.mock('util/injector');
+jest.mock('services/settings', () => ({}));
+jest.mock('services/customization', () => ({}));
+
 beforeEach(() => {
   jest.resetModules();
-
-  jest.mock('services/stateful-service');
-  jest.mock('util/injector');
-  jest.mock('services/settings', () => ({}));
-  jest.mock('services/customization', () => ({}));
 });
 
 test('get instance', () => {

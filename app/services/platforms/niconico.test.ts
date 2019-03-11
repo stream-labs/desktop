@@ -1,4 +1,3 @@
-import { sleep } from 'util/sleep';
 import { createSetupFunction } from 'util/test-setup';
 
 const setup = createSetupFunction({
@@ -15,18 +14,18 @@ const setup = createSetupFunction({
   },
 });
 
+jest.mock('services/stateful-service');
+jest.mock('util/injector');
+jest.mock('services/streaming', () => ({}));
+jest.mock('services/user', () => ({}));
+jest.mock('services/settings', () => ({}));
+jest.mock('services/windows', () => ({}));
+jest.mock('util/sleep', () => ({
+  sleep: () => jest.requireActual('util/sleep').sleep(0),
+}));
+
 beforeEach(() => {
   jest.resetModules();
-
-  jest.mock('services/stateful-service');
-  jest.mock('util/injector');
-  jest.mock('services/streaming', () => ({}));
-  jest.mock('services/user', () => ({}));
-  jest.mock('services/settings', () => ({}));
-  jest.mock('services/windows', () => ({}));
-  jest.mock('util/sleep', () => ({
-    sleep: () => sleep(0),
-  }));
 });
 
 test('get instance', () => {
