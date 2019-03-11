@@ -190,8 +190,6 @@ async function runScript() {
   // for releasing.
   checkEnv('AWS_ACCESS_KEY_ID');
   checkEnv('AWS_SECRET_ACCESS_KEY');
-  checkEnv('CSC_LINK');
-  checkEnv('CSC_KEY_PASSWORD');
   checkEnv('SENTRY_AUTH_TOKEN');
 
   /* Technically speaking, we allow any number of
