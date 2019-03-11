@@ -83,7 +83,7 @@
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-          <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
+          <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
               class="live-dock-chat-apps__popout icon-pop-out-1"
@@ -262,10 +262,6 @@
 
 .live-dock-platform-tools {
   .flex();
-}
-
-.live-dock-chat-apps__list-input {
-  .margin-right();
 }
 
 .live-dock-chat-apps__popout {
