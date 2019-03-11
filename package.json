@@ -21,7 +21,7 @@
     "release": "yarn install --cwd bin && node bin/mini-release.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
-    "test:unit": "jest",
+    "test:unit": "jest --silent",
     "lint": "tslint -p . -c tslint.json",
     "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
