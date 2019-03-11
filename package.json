@@ -30,7 +30,8 @@
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
-    "commit": "commit"
+    "commit": "commit",
+    "signbinaries": "yarn install --cwd bin && node bin/sign-binaries.js"
   },
   "prettier": {
     "singleQuote": true,
@@ -82,6 +83,7 @@
       "include": "installer.nsh"
     },
     "win": {
+      "certificateSubjectName": "Streamlabs (General Workings, Inc.)",
       "rfc3161TimeStampServer": "http://timestamp.digicert.com"
     }
   },
