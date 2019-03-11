@@ -1,7 +1,6 @@
 import * as electron from 'electron';
 import { EStreamingState, ERecordingState } from './streaming-api';
 
-import * as fetchMock from 'fetch-mock';
 import { createSetupFunction } from 'util/test-setup';
 
 jest.mock('services/stateful-service');
