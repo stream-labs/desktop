@@ -274,6 +274,9 @@ async function runScript() {
   info('Installing fresh packages...');
   executeCmd('yarn install');
 
+  info('Signing binaries...');
+  executeCmd('yarn signbinaries');
+
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
