@@ -1,130 +1,44 @@
-import test from 'ava';
-import * as Proxyquire from 'proxyquire';
-import * as sinon from 'sinon';
-import { merge } from 'lodash';
+import { createSetupFunction } from 'util/test-setup';
+const setup = createSetupFunction();
 
-const proxyquire = Proxyquire.noCallThru();
+beforeEach(() => {
+  jest.resetModules();
 
-function noop() {}
-
-function noopDecorator() {
-  return function() {};
-}
-
-function identity<T>(x: T): T {
-  return x;
-}
-
-function createInject(mockServices = {}) {
-  return function Inject(serviceName?: string) {
-    return function (target: Object, key: string) {
-      Object.defineProperty(target, key, {
-        get() {
-          const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);
-          const serviceInstance = mockServices[name];
-          if (!serviceInstance) throw new Error(`no mock defined for "${name}"`);
-          return serviceInstance;
-        }
-      });
-    };
-  };
-}
-
-function getStub({injectees = {}, stubs = {}}) {
-  return merge({
-    'services/stateful-service': {
-      mutation: noopDecorator,
-      '@noCallThru': false
-    },
-    'util/injector': {
-      Inject: createInject(injectees)
-    },
-    'services/obs-api': {},
-    'services/settings': {},
-    'services/customization': {},
-    'vue': {},
-    'electron': {}
-  }, stubs);
-}
-
-const createInjectees = ({
-  pollingPerformanceStatistics = true,
-} = {}) => ({
-  CustomizationService: {
-    pollingPerformanceStatistics
-  }
+  jest.mock('services/stateful-service');
+  jest.mock('util/injector');
+  jest.mock('services/settings', () => ({}));
+  jest.mock('services/customization', () => ({}));
 });
 
-const createStubs = ({
-  OBS_API_getPerformanceStatistics = noop,
-} = {}) => ({
-  'services/obs-api': {
+test('get instance', () => {
+  jest.doMock('services/obs-api', () => ({}));
+  setup();
+  const { PerformanceService } = require('./performance');
+  expect(PerformanceService.instance).toBeInstanceOf(PerformanceService);
+});
+
+test('getStatisticsでpollingPerformanceStatisticsがtrueの場合', () => {
+  jest.doMock('services/obs-api', () => ({
+    nodeObs: { OBS_API_getPerformanceStatistics: jest.fn().mockReturnValue('obs result') },
+  }));
+  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: true } } });
+
+  const { PerformanceService } = require('./performance');
+  const { instance } = PerformanceService;
+  expect(instance.getStatistics()).toBe('obs result');
+});
+
+test('getStatisticsでpollingPerformanceStatisticsがfalseの場合', () => {
+  const OBS_API_getPerformanceStatistics = jest.fn();
+  jest.doMock('services/obs-api', () => ({
     nodeObs: {
-      OBS_API_getPerformanceStatistics
-    }
-  }
-});
-
-function getModule(injectees = createInjectees(), stubs = createStubs()) {
-  return proxyquire('./performance', getStub({injectees, stubs}));
-}
-
-function setupStatefulService(state = {}) {
-  require('services/stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity, state });
-}
-
-test.beforeEach('setIntervalをstub化', t => {
-  const setInterval = sinon.stub();
-  (global as any).setInterval = setInterval;
-  t.context.setInterval = setInterval;
-});
-
-test.afterEach.always('setIntervalをrestore', t => {
-  delete (global as any).setInterval;
-});
-
-test('get instance', t => {
-  setupStatefulService()
-  const m = getModule();
-  t.truthy(m.PerformanceService.instance, 'インスタンスが取れる');
-});
-
-test('getStatisticsでpollingPerformanceStatisticsがtrueの場合', t => {
-  setupStatefulService();
-
-  const OBS_API_getPerformanceStatistics = sinon.stub().returns('obs result');
-  const pollingPerformanceStatistics = true;
-
-  const m = getModule(createInjectees({
-    pollingPerformanceStatistics
-  }), createStubs({
-    OBS_API_getPerformanceStatistics
+      OBS_API_getPerformanceStatistics,
+    },
   }));
+  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: false } } });
 
-  const { instance } = m.PerformanceService;
-  const result = instance.getStatistics();
-
-  t.true(OBS_API_getPerformanceStatistics.calledOnce, 'OBSのAPIを呼んでいる');
-  t.is('obs result', result, 'OBSのAPIを呼んだ結果が返ってくる');
-});
-
-test('getStatisticsでpollingPerformanceStatisticsがfalseの場合', t => {
-  setupStatefulService();
-
-  const OBS_API_getPerformanceStatistics = sinon.stub().returns('obs result');
-  const pollingPerformanceStatistics = false;
-
-  const m = getModule(createInjectees({
-    pollingPerformanceStatistics
-  }), createStubs({
-    OBS_API_getPerformanceStatistics
-  }));
-
-  const { instance } = m.PerformanceService;
-  const result = instance.getStatistics();
-
-  t.true(OBS_API_getPerformanceStatistics.notCalled, 'OBSのAPIを呼ばない');
-  t.deepEqual({}, result, '空のオブジェクトが返ってくる');
+  const { PerformanceService } = require('./performance');
+  const { instance } = PerformanceService;
+  expect(instance.getStatistics()).toEqual({});
+  expect(OBS_API_getPerformanceStatistics).not.toHaveBeenCalled();
 });
