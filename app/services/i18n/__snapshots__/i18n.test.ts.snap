@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`load 1`] = `
+Object {
+  "en-US": "English",
+  "ja-JP": "日本語",
+}
+`;
