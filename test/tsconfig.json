@@ -19,7 +19,8 @@
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
     "downlevelIteration": true,
-    "baseUrl": "../app"
+    "baseUrl": "../app",
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules"
