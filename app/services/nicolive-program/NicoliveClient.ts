@@ -1,5 +1,5 @@
-import { remote } from 'electron';
-const {BrowserWindow} = remote;
+import { remote, ipcRenderer } from 'electron';
+const { BrowserWindow } = remote;
 
 export enum CreateResult {
   CREATED = 'CREATED',
@@ -162,6 +162,7 @@ export class NicoliveClient {
           win.close();
         }
       });
+      ipcRenderer.send('window-preventNewWindow', win.id);
       win.loadURL('https://live2.nicovideo.jp/create');
     });
   }
@@ -180,6 +181,7 @@ export class NicoliveClient {
           win.close();
         }
       });
+      ipcRenderer.send('window-preventNewWindow', win.id);
       win.loadURL(`https://live2.nicovideo.jp/edit/${programID}`);
     });
   }

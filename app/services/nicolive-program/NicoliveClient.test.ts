@@ -140,8 +140,7 @@ function setupMock() {
     loadURL(url: string) {
       this.url = url;
       for (const cb of this.webContentsCallbacks) {
-        // 雑
-        cb(null, url);
+        cb({ preventDefault() {} }, url);
       }
     }
     close = jest.fn().mockImplementation(() => {
@@ -164,8 +163,11 @@ function setupMock() {
   };
   jest.doMock('electron', () => ({
     remote: {
-      BrowserWindow
-    }
+      BrowserWindow,
+    },
+    ipcRenderer: {
+      send() {}
+    },
   }));
 
   return wrapper;
