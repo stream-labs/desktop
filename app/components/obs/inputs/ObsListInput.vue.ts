@@ -12,7 +12,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop()
   value: IObsListInput<TObsValue>;
 
-  @Prop({ default: false })
+  @Prop({ default: true })
   allowEmpty: boolean;
 
   @Prop({ default: true })
