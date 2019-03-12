@@ -33,7 +33,8 @@
 @import "../../../styles/index";
 
 .editable-list__list {
-  background: @day-input-bg;
+  background: var(--input-bg);
+  border-color: var(--input-border);
   border: 0;
 }
 
@@ -41,12 +42,5 @@
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
-}
-
-.night-theme {
-  .editable-list__list {
-    border-color: @night-secondary;
-    background: @night-secondary;
-  }
 }
 </style>

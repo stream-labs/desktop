@@ -86,13 +86,13 @@
 
   i {
     margin-left: 5px;
-    color: @red;
+    color: var(--warning);
   }
 
   span {
     padding-left: 5px;
     margin-right: 10px;
-    color: @red;
+    color: var(--warning);
   }
 
   .alert-button {
@@ -121,7 +121,7 @@
 
   span {
     font-size: 10px;
-    color: @red;
+    color: var(--warning);
   }
 
   &:hover {
@@ -130,7 +130,7 @@
 
   &.active {
     animation: pulse 2.5s linear infinite;
-    background-color: @red;
+    background-color: var(--warning);
 
     span {
       color: @white;

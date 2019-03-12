@@ -187,7 +187,7 @@
 @import "../../styles/index";
 
 .streamlabel-token {
-  color: @teal;
+  color: var(--teal);
 }
 
 .streamlabel-preview {

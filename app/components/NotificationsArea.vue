@@ -72,17 +72,17 @@
 
   &.info {
     background-color: fade(@grey, 15%);
-    color: @icon;
+    color: var(--icon);
   }
 
   &.warning {
     background-color: fade(@red, 20%);
-    color: @red;
+    color: var(--warning);
   }
 
   &.success {
     background-color: fade(@teal, 20%);
-    color: @teal;
+    color: var(--teal);
   }
 
   &.has-action {
@@ -112,10 +112,10 @@
 }
 
 .notifications__counter--warning {
-  color: @red;
+  color: var(--warning);
 
   .fa {
-    color: @red;
+    color: var(--warning);
   }
 }
 

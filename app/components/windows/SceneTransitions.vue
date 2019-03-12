@@ -147,7 +147,7 @@
 }
 
 .transition-default {
-  color: @teal;
+  color: var(--teal);
 }
 
 .transition-default-selector {
@@ -171,10 +171,10 @@
 }
 
 .transition-redundant {
-  color: @yellow;
+  color: var(--new);
 
   &:hover {
-    color: @yellow;
+    color: var(--new);
   }
 }
 

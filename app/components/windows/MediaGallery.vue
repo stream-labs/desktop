@@ -123,8 +123,8 @@
 
   &:hover {
     background-color: @teal-light-opac;
-    color: @teal;
-    border-color: @teal;
+    color: var(--teal);
+    border-color: var(--teal);
     cursor: pointer;
   }
 }
@@ -193,7 +193,7 @@
     margin-right: 8px;
 
     &:hover {
-      color: @teal;
+      color: var(--teal);
       cursor: pointer;
     }
   }
@@ -226,7 +226,7 @@
 }
 
 .drag-overlay {
-  border: 1px solid @yellow;
+  border: 1px solid var(--new);
   background: rgba(255, 200, 0, 0.15);
   z-index: 100000;
   box-sizing: border-box;
@@ -287,7 +287,7 @@
   }
 
   &.selected {
-    border-color: @teal;
+    border-color: var(--teal);
     background-color: @teal-light-opac;
   }
 }

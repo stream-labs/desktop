@@ -98,23 +98,24 @@
   .timer {
     box-shadow: none;
     font-size: 14px;
-    background: @day-dropdown-bg;
+    background: var(--dropdown-bg);
     font-family: 'Roboto';
-    border: 1px solid @day-dropdown-border;
+    border: 1px solid var(--input-border);
     position: relative;
     display: flex;
     justify-content: flex-start;
     width: 90px;
     height: 32px;
     line-height: 32px;
+    color: var(--paragraph);
     .padding-h-sides();
     .radius();
 
     &:active,
     &:focus {
       box-shadow: none;
-      border-color: @day-dropdown-border;
-      background-color: @day-dropdown-bg;
+      border-color: var(--input-border);
+      background-color: var(--dropdown-bg);
       outline: none;
     }
 
@@ -192,25 +193,5 @@
   .timer-footer {
     display: flex;
     justify-content: space-around;
-  }
-
-  .night-theme {
-    .timer {
-      border-color: @night-dropdown-border;
-      box-shadow: none;
-      background: @night-dropdown-bg;
-      color: @white;
-
-      &:active,
-      &:focus {
-        border-color: @night-dropdown-border;
-        box-shadow: none;
-        background: @night-dropdown-bg;
-      }
-    }
-
-    .active {
-      background: @dark-2;
-    }
   }
 </style>

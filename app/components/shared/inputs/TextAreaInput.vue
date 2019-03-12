@@ -25,11 +25,8 @@
   width: 100%;
 }
 
-.night-theme {
-  .text-area:focus {
-    background-color: @night-hover;
-    border-color: @teal-light-opac;
-  }
+.text-area:focus {
+  background-color: var(--hover);
 }
 </style>
 

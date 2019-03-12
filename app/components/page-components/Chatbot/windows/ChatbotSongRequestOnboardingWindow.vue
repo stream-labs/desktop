@@ -75,7 +75,7 @@
   .flex();
   .flex--column();
   .flex--space-between();
-  background-color: @day-secondary;
+  background-color: var(--section);
 
   .onboarding-section__image {
     height: 120px;
@@ -86,12 +86,6 @@
 
   .onboarding-section__label {
     text-transform: uppercase;
-  }
-}
-
-.night-theme {
-  .onboarding-section {
-    background-color: @night-accent-light;
   }
 }
 </style>
