@@ -5,9 +5,9 @@
       v-for="(flag, index) in flags"
       :key="index"
       :value="flag"
-      :disabled="value.enabled == false"
       @input="value => onChangeHandler(index, !!value)"
       :title="index + 1"
+      :metadata="{ disabled: this.enabled === false }"
     />
   </div>
 </h-form-group>
