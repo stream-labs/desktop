@@ -15,7 +15,7 @@ export type ProgramSchedules =
         status: 'reserved' | 'test' | 'onAir' | 'end';
       }[];
       meta: {
-        statusCode: 200;
+        status: 200;
         errorCode: 'OK';
       };
     }
@@ -204,28 +204,38 @@ export type Communities =
         status: 200;
       };
       data: {
-        // 使用しそうなものだけ雑に抜粋
-        id: number;
-        name: string;
-        description: 'string';
-        status: 'open' | 'closed';
-        thumbnail_url: {
-          normal: string;
-          small: string;
-        };
-        thumbnails: {
-          '1024x1024': string;
-          '512x512': string;
-          '256x256': string;
-          '128x128': string;
-          '64x64': string;
-        };
-      }[];
+        communities: {
+          // 使用しそうなものだけ雑に抜粋
+          id: number;
+          name: string;
+          description: 'string';
+          status: 'open' | 'closed';
+          thumbnailUrl: {
+            normal: string;
+            small: string;
+          };
+          thumbnails: {
+            '1024x1024': string;
+            '512x512': string;
+            '256x256': string;
+            '128x128': string;
+            '64x64': string;
+          };
+        }[];
+        errors: {
+          id: string
+          meta: {
+            status: number;
+            errorCode: string;
+            errorMessage: string;
+          }
+        }[];
+      };
     }
   | {
       meta: {
         status: number;
-        'error-code': string;
-        'error-message': string;
+        errorCode: string;
+        errorMessage: string;
       };
     };
