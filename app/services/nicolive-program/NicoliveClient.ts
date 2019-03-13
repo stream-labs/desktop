@@ -4,10 +4,11 @@ import {
   ProgramInfo,
   Segment,
   Extension,
-  OperatorComment,
   Statistics,
   NicoadStatistics,
   Communities,
+  CommonErrorResponse,
+  Community,
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -24,6 +25,29 @@ export enum EditResult {
 
 interface HeaderSeed {
   [key: string]: string;
+}
+
+type SucceededResult<T> = {
+  ok: true;
+  value: T;
+};
+
+/**
+ * JSONで結果が返ってくることまでを信用したEitherのようなもの
+ * @example
+ * declare var result: WrappedResult<number>;
+ * if (isOk(result)) result.value; // number
+ * else result.value // CommonErrorResponse
+ */
+type WrappedResult<T> =
+  | SucceededResult<T>
+  | {
+      ok: false;
+      value: CommonErrorResponse;
+    };
+
+export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> {
+  return result.ok === true;
 }
 
 export class NicoliveClient {
@@ -58,53 +82,78 @@ export class NicoliveClient {
     };
   }
 
-  private async get(url: string | URL, options: RequestInit = {}) {
-    const res = await fetch(url.toString(), NicoliveClient.createRequest('GET', options));
-    return res.json();
+  static async wrapResult<ResultType>(res: Response): Promise<WrappedResult<ResultType>> {
+    const obj = await res.json();
+    if (res.ok) {
+      return {
+        ok: true,
+        value: obj.data as ResultType,
+      };
+    }
+
+    return {
+      ok: false,
+      value: obj as CommonErrorResponse,
+    };
   }
 
-  private async post(url: string | URL, options: RequestInit = {}) {
-    const res = await fetch(url.toString(), NicoliveClient.createRequest('POST', options));
-    return res.json();
+  private get(url: string | URL, options: RequestInit = {}): Promise<Response> {
+    return fetch(url.toString(), NicoliveClient.createRequest('GET', options));
   }
 
-  private async put(url: string | URL, options: RequestInit = {}) {
-    const res = await fetch(url.toString(), NicoliveClient.createRequest('PUT', options));
-    return res.json();
+  private post(url: string | URL, options: RequestInit = {}): Promise<Response> {
+    return fetch(url.toString(), NicoliveClient.createRequest('POST', options));
+  }
+
+  private put(url: string | URL, options: RequestInit = {}): Promise<Response> {
+    return fetch(url.toString(), NicoliveClient.createRequest('PUT', options));
   }
 
   /** ユーザごとの番組スケジュールを取得 */
-  async fetchProgramSchedules(headers?: HeaderSeed): Promise<ProgramSchedules> {
-    return this.get(`${NicoliveClient.live2BaseURL}/unama/tool/v1/program_schedules`, { headers });
+  async fetchProgramSchedules(headers?: HeaderSeed): Promise<WrappedResult<ProgramSchedules['data']>> {
+    const res = await this.get(`${NicoliveClient.live2BaseURL}/unama/tool/v1/program_schedules`, { headers });
+    return NicoliveClient.wrapResult<ProgramSchedules['data']>(res);
   }
 
   /** 番組情報を取得 */
-  async fetchProgram(programID: string, headers?: HeaderSeed): Promise<ProgramInfo> {
-    return this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/programinfo`, { headers });
+  async fetchProgram(programID: string, headers?: HeaderSeed): Promise<WrappedResult<ProgramInfo['data']>> {
+    const res = await this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/programinfo`, { headers });
+
+    return NicoliveClient.wrapResult<ProgramInfo['data']>(res);
   }
 
   /** 番組を開始 */
-  async startProgram(programID: string, headers?: HeaderSeed): Promise<Segment> {
-    return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
+  async startProgram(programID: string, headers?: HeaderSeed): Promise<WrappedResult<Segment['data']>> {
+    const res = await this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: 'on_air' }),
     });
+
+    return NicoliveClient.wrapResult<Segment['data']>(res);
   }
 
   /** 番組を終了 */
-  async endProgram(programID: string, headers?: HeaderSeed): Promise<Segment> {
-    return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
+  async endProgram(programID: string, headers?: HeaderSeed): Promise<WrappedResult<Segment['data']>> {
+    const res = await this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: 'end' }),
     });
+
+    return NicoliveClient.wrapResult<Segment['data']>(res);
   }
 
   /** 番組を延長 */
-  async extendProgram(programID: string, minutes: number = 30, headers?: HeaderSeed): Promise<Extension> {
-    return this.post(`${NicoliveClient.live2BaseURL}/watch/${programID}/extension`, {
+  async extendProgram(
+    programID: string,
+    minutes: number = 30,
+    headers?: HeaderSeed
+  ): Promise<WrappedResult<Extension['data']>> {
+    const res = await this.post(`${NicoliveClient.live2BaseURL}/watch/${programID}/extension`, {
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ minutes }),
     });
+
+    return NicoliveClient.wrapResult<Extension['data']>(res);
   }
 
   /** 運営コメントを送信 */
@@ -112,16 +161,20 @@ export class NicoliveClient {
     programID: string,
     { text, isPermanent }: { text: string; isPermanent?: boolean },
     headers?: HeaderSeed
-  ): Promise<OperatorComment> {
-    return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`, {
+  ): Promise<WrappedResult<void>> {
+    const res = await this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`, {
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, isPermanent }),
     });
+
+    return NicoliveClient.wrapResult<void>(res);
   }
 
   /** 統計情報（視聴者とコメント数）を取得 */
-  async fetchStatistics(programID: string, headers?: HeaderSeed): Promise<Statistics> {
-    return this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/statistics`, { headers });
+  async fetchStatistics(programID: string, headers?: HeaderSeed): Promise<WrappedResult<Statistics['data']>> {
+    const res = await this.get(`${NicoliveClient.live2BaseURL}/watch/${programID}/statistics`, { headers });
+
+    return NicoliveClient.wrapResult<Statistics['data']>(res);
   }
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
@@ -129,13 +182,18 @@ export class NicoliveClient {
    * ニコニ広告ptとギフトptを取得
    * 放送開始前は404になる
    **/
-  async fetchNicoadStatistics(programID: string, headers?: HeaderSeed): Promise<NicoadStatistics> {
-    return this.get(`${NicoliveClient.nicoadBaseURL}/v1/live/statusarea/${programID}`, { headers });
+  async fetchNicoadStatistics(
+    programID: string,
+    headers?: HeaderSeed
+  ): Promise<WrappedResult<NicoadStatistics['data']>> {
+    const res = await this.get(`${NicoliveClient.nicoadBaseURL}/v1/live/statusarea/${programID}`, { headers });
+
+    return NicoliveClient.wrapResult<NicoadStatistics['data']>(res);
   }
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
   /** コミュニティ情報を取得 */
-  async fetchCommunity(communityId: string, headers?: HeaderSeed): Promise<Communities> {
+  async fetchCommunity(communityId: string, headers?: HeaderSeed): Promise<WrappedResult<Community>> {
     const url = new URL(`${NicoliveClient.publicBaseURL}/v1/communities.json`);
     const params = {
       communityIds: communityId,
@@ -144,12 +202,40 @@ export class NicoliveClient {
       url.searchParams.append(key, value);
     }
 
-    return this.get(url, {
+    const res = await this.get(url, {
       headers: {
         ...headers,
         'X-Frontend-Id': NicoliveClient.frontendID.toString(10),
       },
     });
+
+    const obj = await res.json();
+    if (res.ok) {
+      const data = obj.data as Communities['data'];
+      const communities = data.communities || [];
+      const errors = data.errors || [];
+
+      const community = communities.find(c => c.id === communityId);
+      if (community) {
+        return {
+          ok: true,
+          value: community,
+        };
+      }
+
+      const error = errors.find(e => e.id === communityId);
+      if (error) {
+        return {
+          ok: false,
+          value: errors[0] as CommonErrorResponse,
+        };
+      }
+    }
+
+    return {
+      ok: false,
+      value: obj as CommonErrorResponse,
+    };
   }
 
   /** 番組作成画面を開いて結果を返す */
