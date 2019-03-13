@@ -7,7 +7,7 @@
       :value="flag"
       @input="value => onChangeHandler(index, !!value)"
       :title="index + 1"
-      :metadata="{ disabled: this.enabled === false }"
+      :metadata="{ disabled: value.enabled === false }"
     />
   </div>
 </h-form-group>
