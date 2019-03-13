@@ -79,7 +79,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
   protected init() {
-    console.log('BINDING CALLBACK');
     obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
       this.handleSourceCallback(objs),
     );
@@ -388,12 +387,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     objs.forEach(info => {
       const source = this.getSource(info.name);
 
-      if (!source) {
-        console.log('SOURCE DOES NOT EXIST', info.name);
-        return;
-      }
-
-      console.log('Updating Source:', source.name, source.sourceId, info.width, info.height);
+      // This is probably a transition or something else we don't care about
+      if (!source) return;
 
       if (source.width !== info.width || source.height !== info.height) {
         const size = { id: source.sourceId, width: info.width, height: info.height };
