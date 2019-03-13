@@ -48,6 +48,13 @@ export const PROPERTIES_MANAGER_TYPES = {
   replay: ReplayManager,
 };
 
+interface IObsSourceCallbackInfo {
+  name: string;
+  width: number;
+  height: number;
+  flags: number;
+}
+
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},
@@ -73,7 +80,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
   protected init() {
-    setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
+    obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
+      this.handleSourceCallback(objs),
+    );
 
     this.scenesService.itemRemoved.subscribe(sceneSourceModel =>
       this.onSceneItemRemovedHandler(sceneSourceModel),
@@ -375,29 +384,23 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-  requestSourceSizes() {
-    const activeScene = this.scenesService.activeScene;
-    if (activeScene) {
-      const activeItems = activeScene.getItems();
-      const sourcesNames: string[] = [];
+  private handleSourceCallback(objs: IObsSourceCallbackInfo[]) {
+    objs.forEach(info => {
+      const source = this.getSource(info.name);
 
-      activeItems.forEach(activeItem => {
-        sourcesNames.push(activeItem.sourceId);
-      });
+      if (!source) {
+        console.log('SOURCE DOES NOT EXIST', info.name);
+        return;
+      }
 
-      const sizes: obs.ISourceSize[] = obs.getSourcesSize(sourcesNames);
-      sizes.forEach(update => {
-        const source = this.getSource(update.name);
+      console.log('Updating Source:', source.name, source.sourceId, info.width, info.height);
 
-        if (!source) return;
-
-        if (source.width !== update.width || source.height !== update.height) {
-          const size = { id: source.sourceId, width: update.width, height: update.height };
-          this.UPDATE_SOURCE(size);
-        }
-        this.updateSourceFlags(source, update.outputFlags);
-      });
-    }
+      if (source.width !== info.width || source.height !== info.height) {
+        const size = { id: source.sourceId, width: info.width, height: info.height };
+        this.UPDATE_SOURCE(size);
+      }
+      this.updateSourceFlags(source, info.flags);
+    });
   }
 
   private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
