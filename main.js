@@ -474,6 +474,28 @@ ipcMain.on('window-allowClose', (event, id) => {
 });
 
 /**
+ * 番組作成・編集画面からログアウトを封じる処理
+ * rendererプロセスからは遷移前に止められないのでここに実装がある
+ * @see https://github.com/electron/electron/pull/11679#issuecomment-359180722
+ **/
+function preventLogout(e, url) {
+  const urlObj = new URL(url);
+  const isLogout = (
+    /^https?:$/.test(urlObj.protocol) &&
+    /^live2?\.nicovideo\.jp$/.test(urlObj.hostname) &&
+    /^\/logout$/.test(urlObj.pathname)
+  );
+  if (isLogout) {
+    e.preventDefault();
+  }
+}
+
+ipcMain.on('window-preventLogout', (event, id) => {
+  const window = BrowserWindow.fromId(id);
+  window.webContents.on('will-navigate', preventLogout);
+});
+
+/**
  * 番組作成・編集画面からの新ウィンドウ表示を封じる処理
  * rendererプロセスからは処理を止められないのでここに実装がある
  * @see https://github.com/electron/electron/pull/11679#issuecomment-359180722

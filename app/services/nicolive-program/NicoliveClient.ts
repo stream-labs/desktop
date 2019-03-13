@@ -169,6 +169,7 @@ export class NicoliveClient {
           win.close();
         }
       });
+      ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
       win.loadURL('https://live2.nicovideo.jp/create');
     });
@@ -188,6 +189,7 @@ export class NicoliveClient {
           win.close();
         }
       });
+      ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
       win.loadURL(`https://live2.nicovideo.jp/edit/${programID}`);
     });
