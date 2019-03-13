@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';

@@ -10,7 +10,6 @@ import Vue from 'vue';
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
-import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';

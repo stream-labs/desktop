@@ -1,5 +1,5 @@
 import { ArrayNode } from '../array-node';
-import { SceneItem, Scene, TSceneNode, TSceneNodeType, ScenesService } from 'services/scenes';
+import { SceneItem, Scene, TSceneNode, ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { SourcesService } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';

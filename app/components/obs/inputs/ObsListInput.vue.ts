@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
+import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
