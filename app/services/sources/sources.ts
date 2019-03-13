@@ -34,7 +34,6 @@ import { HardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 
-const SOURCES_UPDATE_INTERVAL = 1000;
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
@@ -80,6 +79,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
   protected init() {
+    console.log('BINDING CALLBACK');
     obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
       this.handleSourceCallback(objs),
     );

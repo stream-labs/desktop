@@ -180,6 +180,10 @@ export class SourcesNode extends Node<ISchema, {}> {
       };
     });
 
+    this.sourcesService;
+
+    console.log('ABOUT TO CREATE SOURCES IN OBS');
+
     const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
 
