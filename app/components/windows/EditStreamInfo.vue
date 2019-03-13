@@ -70,7 +70,10 @@
           <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
           <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
         </div>
-        <div v-if="selectedProfile">
+        <div
+          v-if="selectedProfile"
+          :class="{ profile: true, 'profile-default': selectedProfile.game === 'DEFAULT' }"
+        >
           <h-form-group
             v-if="isTwitch || isYoutube"
             :metadata="{
