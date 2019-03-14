@@ -10301,15 +10301,10 @@ vue-tsx-support@^2.2.2:
   resolved "https://registry.yarnpkg.com/vue-tsx-support/-/vue-tsx-support-2.2.2.tgz#318f6dd25e5f1ee451a7bc5bcb4669eb7810460c"
   integrity sha512-VykX5OnMYUCyJje7Ke2cVMk0c22eCzuyCQjchRsMpRg72SLZ0eDicT4oTZTJRGAHJ/7TDV+Pwtnpt+LHVr62jg==
 
-vue@2.5.21:
+vue@2.5.21, vue@^2.5.11, vue@^2.5.21:
   version "2.5.21"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.21.tgz#3d33dcd03bb813912ce894a8303ab553699c4a85"
   integrity sha512-Aejvyyfhn0zjVeLvXd70h4hrE4zZDx1wfZqia6ekkobLmUZ+vNFQer53B4fu0EjWBSiqApxPejzkO1Znt3joxQ==
-
-vue@^2.5.11, vue@^2.5.21:
-  version "2.5.22"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.22.tgz#3bf88041af08b8539c37b268b70ca79245e9cc30"
-  integrity sha512-pxY3ZHlXNJMFQbkjEgGVMaMMkSV1ONpz+4qB55kZuJzyJOhn6MSy/YZdzhdnumegNzVTL/Dn3Pp4UrVBYt1j/g==
 
 vuedraggable@2.8.5:
   version "2.8.5"
