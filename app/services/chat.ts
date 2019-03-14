@@ -52,8 +52,8 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).removeBrowserView(this.chatView);
+    // @ts-ignore: this method was added in our fork
+    win.removeBrowserView(this.chatView);
   }
 
   private initChat() {
@@ -75,7 +75,8 @@ export class ChatService extends Service {
   }
 
   private deinitChat() {
-    (this.chatView as any).destroy();
+    // @ts-ignore: typings are incorrect
+    this.chatView.destroy();
     this.chatView = null;
   }
 
@@ -98,8 +99,8 @@ export class ChatService extends Service {
   }
 
   private bindWindowListener() {
-    this.chatView.webContents.on('new-window', e => {
-      const parsedUrl = url.parse(e['url']);
+    this.chatView.webContents.on('new-window', evt => {
+      const parsedUrl = url.parse(evt['url']);
       const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
@@ -122,7 +123,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
         } else {
-          electron.remote.shell.openExternal(e['url']);
+          electron.remote.shell.openExternal(evt['url']);
         }
       }
     });
@@ -160,6 +161,7 @@ export class ChatService extends Service {
           true,
         );
       }
+
       if (settings.enableFFZEmotes && this.userService.platform.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
           `
@@ -180,10 +182,7 @@ export class ChatService extends Service {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
     }
 
-    if (changed.enableBTTVEmotes != null) {
-      this.refreshChat();
-    }
-    if (changed.enableFFZEmotes != null) {
+    if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
       this.refreshChat();
     }
   }
