@@ -206,7 +206,7 @@ export type Communities =
       data: {
         communities: {
           // 使用しそうなものだけ雑に抜粋
-          id: number;
+          id: string;
           name: string;
           description: 'string';
           status: 'open' | 'closed';
