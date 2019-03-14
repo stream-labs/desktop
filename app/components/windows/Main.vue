@@ -3,6 +3,9 @@
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>
+  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
+    <custom-loader></custom-loader>
+  </div>
   <div
     class="main-contents"
     :class="{
@@ -15,9 +18,6 @@
 
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
-      <div v-if="showLoadingSpinner" class="main-loading">
-        <custom-loader></custom-loader>
-      </div>
 
       <component
         class="main-page-container"
@@ -52,6 +52,7 @@
 .main {
   display: flex;
   flex-direction: column;
+  position: relative;
   height: 100%;
 }
 
@@ -91,10 +92,25 @@
 }
 
 .main-loading {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  top: 34px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999999999;
+  background-color: var(--background);
+  transition: opacity 0.5s ease-out, top 0.5s step-start, z-index 0.5s step-start;
+
+  // Loader component is a fixed element that obscures the top bar
+  /deep/ .s-loader__bg {
+    top: 34px;
+  }
+}
+
+.main-loading.hidden {
+  opacity: 0;
+  top: 9999999px;
+  z-index: -9999999;
+  transition-timing-function: ease-out, step-end, step-end;
 }
 </style>

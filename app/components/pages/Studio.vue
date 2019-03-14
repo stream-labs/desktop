@@ -3,8 +3,10 @@
   <div class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
-      class="studio-display-container"
-      :class="{ stacked }">
+      class="studio-display-container hidden"
+      :class="{ stacked }"
+      ref="studioDisplayContainer"
+    >
       <studio-editor v-if="previewEnabled" class="studio-output-display" />
       <div v-if="studioMode" class="studio-mode-display-container">
         <display class="studio-mode-display" :paddingSize="10" />
@@ -49,6 +51,10 @@
   }
 }
 
+.studio-display-container.hidden {
+  display: none;
+}
+
 .studio-mode-display-container {
   flex-grow: 1;
   position: relative;
@@ -70,7 +76,7 @@
     max-width: 50%;
     .button {
       margin-top: 20px;
-      display: block
+      display: block;
     }
   }
 }

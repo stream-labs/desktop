@@ -25,7 +25,7 @@ import { UserService } from 'services/user';
 import { WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import CustomLoader from '../CustomLoader.vue';
+import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';

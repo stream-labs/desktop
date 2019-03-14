@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';
 import StudioEditor from 'components/StudioEditor.vue';
 import StudioControls from 'components/StudioControls.vue';
@@ -7,7 +7,7 @@ import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
-import { ScenesService } from 'services/scenes';
+import { AppService } from 'services/app';
 
 @Component({
   components: {
@@ -20,10 +20,11 @@ import { ScenesService } from 'services/scenes';
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() private scenesService: ScenesService;
+  @Inject() appService: AppService;
 
   $refs: {
     studioModeContainer: HTMLDivElement;
+    studioDisplayContainer: HTMLDivElement;
   };
 
   stacked = false;
@@ -38,10 +39,25 @@ export default class Studio extends Vue {
         this.stacked = rect.width / rect.height <= 16 / 9;
       }
     }, 1000);
+
+    this.showDisplay();
   }
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
+  }
+
+  get appLoading() {
+    return this.appService.state.loading;
+  }
+
+  showDisplay() {
+    // Hide the display until loading animation is finished
+    if (this.appLoading) {
+      requestAnimationFrame(this.showDisplay);
+    } else {
+      this.$refs.studioDisplayContainer.classList.toggle('hidden');
+    }
   }
 
   get previewEnabled() {
