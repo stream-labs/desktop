@@ -22,7 +22,7 @@
 
   <transition name="slide-fade">
     <div
-      :style="liveDockStyles"
+      v-if="!collapsed"
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
@@ -93,7 +93,7 @@
             />
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
+        <chat v-if="!applicationLoading" />
         <PlatformAppPageView
           v-if="selectedChat !== 'default' && !collapsed"
           class="live-dock-platform-app-webview"
