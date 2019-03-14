@@ -47,8 +47,8 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
     if ((isNaN(parsedValue) && isString(value)) || (isString(value) && value === '')) {
       // preview only, when there is no input or just a negative symbol.
       this.localValue = value.trim() !== '-' ? '' : value;
-    } else if (value != null && !isNaN(value)) {
-      // Otherwise use the provided number value.
+    } else if (value != null && !isNaN(value) && this.localValue !== parsedValue) {
+      // Otherwise use the provided number value if it has changed
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
