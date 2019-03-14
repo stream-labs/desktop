@@ -23,7 +23,6 @@ import {
   ISceneItem,
   ISceneItemApi,
   ISceneItemInfo,
-  TSceneNodeType,
 } from './index';
 import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';

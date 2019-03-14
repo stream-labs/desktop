@@ -1,11 +1,4 @@
-import {
-  Module,
-  EApiPermissions,
-  apiMethod,
-  apiEvent,
-  NotImplementedError,
-  IApiContext,
-} from './module';
+import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';

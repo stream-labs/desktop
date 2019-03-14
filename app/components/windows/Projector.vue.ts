@@ -7,7 +7,6 @@ import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
-import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 
 @Component({

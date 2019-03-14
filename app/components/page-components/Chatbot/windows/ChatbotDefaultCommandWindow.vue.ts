@@ -7,8 +7,7 @@ import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAli
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
-import { IListMetadata, ITextMetadata, EInputType } from 'components/shared/inputs/index';
+import { IListMetadata, EInputType } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
 
 @Component({

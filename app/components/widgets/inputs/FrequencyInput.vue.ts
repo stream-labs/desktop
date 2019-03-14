@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputMetadata, IListOption } from '../../shared/inputs';
+import { IInputMetadata } from '../../shared/inputs';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { $t } from 'services/i18n';

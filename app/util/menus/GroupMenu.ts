@@ -1,4 +1,3 @@
-import { uniq } from 'lodash';
 import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
