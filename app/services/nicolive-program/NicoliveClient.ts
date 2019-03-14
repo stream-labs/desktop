@@ -86,7 +86,7 @@ export class NicoliveClient {
   /** 番組を開始 */
   async startProgram(programID: string, headers?: HeaderSeed): Promise<Segment> {
     return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: 'on_air' }),
     });
   }
@@ -94,7 +94,7 @@ export class NicoliveClient {
   /** 番組を終了 */
   async endProgram(programID: string, headers?: HeaderSeed): Promise<Segment> {
     return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/segment`, {
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: 'end' }),
     });
   }
@@ -102,7 +102,7 @@ export class NicoliveClient {
   /** 番組を延長 */
   async extendProgram(programID: string, minutes: number = 30, headers?: HeaderSeed): Promise<Extension> {
     return this.post(`${NicoliveClient.live2BaseURL}/watch/${programID}/extension`, {
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ minutes }),
     });
   }
@@ -114,7 +114,7 @@ export class NicoliveClient {
     headers?: HeaderSeed
   ): Promise<OperatorComment> {
     return this.put(`${NicoliveClient.live2BaseURL}/watch/${programID}/operator_comment`, {
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, isPermanent }),
     });
   }
