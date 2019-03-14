@@ -175,8 +175,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       propertiesManagerType: managerType,
     });
     const source = this.getSource(id);
-    const muted = obsInput.muted;
-    this.UPDATE_SOURCE({ id, muted });
+    this.UPDATE_SOURCE({ id, muted: false });
     this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];

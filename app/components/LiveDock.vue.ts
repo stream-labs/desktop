@@ -16,6 +16,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
+import { ChatService } from 'services/chat';
 
 @Component({
   components: {
@@ -33,6 +34,7 @@ export default class LiveDock extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() appService: AppService;
+  @Inject() chatService: ChatService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -40,10 +42,6 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
   canAnimate = false;
-
-  $refs: {
-    chat: Chat;
-  };
 
   slot = EAppPageSlot.Chat;
 
@@ -64,13 +62,6 @@ export default class LiveDock extends Vue {
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
-
-  get liveDockStyles() {
-    return {
-      position: this.collapsed ? 'absolute' : 'static',
-      left: this.collapsed ? '10000px' : 'auto',
-    };
-  }
 
   mounted() {
     const width = this.customizationService.state.livedockSize;
@@ -202,7 +193,7 @@ export default class LiveDock extends Vue {
       this.platformAppsService.refreshApp(this.selectedChat);
       return;
     }
-    this.$refs.chat.refresh();
+    this.chatService.refreshChat();
   }
 
   get hasChatApps() {
@@ -254,17 +245,6 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
-  }
-
-  get defaultChatStyles() {
-    if (this.selectedChat === 'default') {
-      return {};
-    }
-
-    return {
-      position: 'absolute',
-      top: '-10000px',
-    };
   }
 
   onResizeStartHandler() {
