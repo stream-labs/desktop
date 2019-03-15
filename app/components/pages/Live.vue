@@ -97,7 +97,6 @@
 
 .live-preview-container {
   flex: 0 0 auto;
-  max-width: 60vw;
 }
 
 .live-display-wrapper {
