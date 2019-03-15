@@ -17,12 +17,13 @@
     />
     <div
       class="flex__item studio-controls"
+      ref="studioControls"
       :style="{ flex: '0 0 ' + (height) + 'px' }">
       <scene-selector class="studio-controls-panel" />
 
       <mixer class="studio-controls-panel" />
 
-      <div class="live-preview-container">
+      <div class="live-preview-container" :style="{ flex: '1 1 ' + displayWidth + 'px', maxWidth: displayWidth + 'px' }">
         <div class="studio-controls-top">
           <h4 class="studio-controls__label">
             {{ $t('Preview') }}
@@ -41,7 +42,7 @@
           </div>
         </div>
 
-        <div class="live-display-wrapper" :style="{ width: displayWidth + 'px' }">
+        <div class="live-display-wrapper">
           <display class="live-display" :drawUI="false" v-if="previewEnabled" />
           <div class="live-display-placeholder" v-else>
             <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
@@ -86,7 +87,7 @@
 }
 
 .studio-controls-panel {
-  flex-basis: 50%;
+  flex-grow: 1;
   padding-left: 0;
   .padding-right(2);
 }

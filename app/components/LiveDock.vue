@@ -13,13 +13,6 @@
     }" />
   </div>
 
-  <resize-bar
-    v-if="!collapsed"
-    :position="onLeft ? 'right' : 'left'"
-    @onresizestart="onResizeStartHandler"
-    @onresizestop="onResizeStopHandler"
-  />
-
   <transition name="slide-fade">
     <div
       v-if="!collapsed"
@@ -82,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+      <div class="live-dock-chat" v-if="!hideChat && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i

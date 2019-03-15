@@ -13,7 +13,6 @@ import { $t } from 'services/i18n';
 import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
-import ResizeBar from 'components/shared/ResizeBar.vue';
 import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
@@ -23,7 +22,6 @@ import { ChatService } from 'services/chat';
     Chat,
     ListInput,
     PlatformAppPageView,
-    ResizeBar,
     Tabs,
   },
 })
@@ -64,18 +62,12 @@ export default class LiveDock extends Vue {
   controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
 
   mounted() {
-    const width = this.customizationService.state.livedockSize;
-    if (width < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
       }
-      this.updateWidth();
     }, 100);
   }
 
@@ -196,6 +188,13 @@ export default class LiveDock extends Vue {
     this.chatService.refreshChat();
   }
 
+  get hideChat() {
+    // previewEnabled is poorly named.  It really just means stuff
+    // we disable while resizing.  It should not be in the customization
+    // service.  This is lazy.
+    return !this.customizationService.previewEnabled;
+  }
+
   get hasChatApps() {
     return this.chatApps.length > 0;
   }
@@ -245,49 +244,5 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
-  }
-
-  onResizeStartHandler() {
-    this.customizationService.setSettings({ previewEnabled: false });
-  }
-
-  onResizeStopHandler(offset: number) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    offset = this.onLeft ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + offset);
-    setTimeout(() => {
-      this.customizationService.setSettings({
-        previewEnabled: true,
-      });
-    }, 500);
-  }
-
-  setWidth(width: number) {
-    this.customizationService.setSettings({
-      livedockSize: this.validateWidth(width),
-    });
-  }
-
-  validateWidth(width: number): number {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 860;
-    const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    width = Math.max(minWidth, width);
-    // tslint:disable-next-line:no-parameter-reassignment
-    width = Math.min(maxWidth, width);
-    return width;
-  }
-
-  updateWidth() {
-    const width = this.customizationService.state.livedockSize;
-    if (width !== this.validateWidth(width)) this.setWidth(width);
-  }
-
-  resetWidth() {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const defaultWidth = appRect.width * 0.28;
-    this.setWidth(defaultWidth);
   }
 }

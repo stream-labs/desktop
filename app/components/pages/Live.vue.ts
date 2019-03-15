@@ -30,6 +30,7 @@ export default class Live extends Vue {
 
   $refs: {
     webview: Electron.WebviewTag;
+    studioControls: HTMLDivElement;
   };
 
   enablePreviewTooltip = $t('Enable the preview stream');
@@ -83,8 +84,11 @@ export default class Live extends Vue {
     this.customizationService.setSettings({ bottomdockSize: value });
   }
 
+  get dockSize() {
+    return this.customizationService.state.livedockSize;
+  }
+
   get displayWidth() {
-    // 29 is about the height of the "Preview" label
     return (16 / 9) * (this.height - 29);
   }
 
