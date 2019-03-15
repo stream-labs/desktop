@@ -5,21 +5,19 @@
     <div class="flex__item mission-control-container">
       <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
     </div>
-
+    <resize-bar
+      class="flex__item live-page-resizer"
+      position="top"
+      v-model="height"
+      @onresizestop="onResizeStopHandler()"
+      @onresizestart="onResizeStartHandler()"
+      :max="maxHeight"
+      :min="minHeight"
+      :reverse="true"
+    />
     <div
       class="flex__item studio-controls"
       :style="{ flex: '0 0 ' + (height) + 'px' }">
-      <resize-bar
-        position="top"
-        v-model="height"
-        @onresizestop="onResizeStopHandler()"
-        @onresizestart="onResizeStartHandler()"
-        :max="maxHeight"
-        :min="minHeight"
-        :reverse="true"
-      />
-
-
       <scene-selector class="studio-controls-panel" />
 
       <mixer class="studio-controls-panel" />
@@ -73,7 +71,6 @@
 
 .mission-control-container {
   flex: 1;
-  .margin-bottom(2);
   .radius();
   overflow: hidden;
   position: relative;
@@ -95,9 +92,8 @@
   .padding-right(2);
 }
 
-.sizer-items {
-  bottom: 8px;
-  right: 8px;
+.live-page-resizer {
+  margin: 4px 0;
 }
 
 .live-preview-container {
