@@ -17,7 +17,6 @@
     />
     <div
       class="flex__item studio-controls"
-      ref="studioControls"
       :style="{ flex: '0 0 ' + (height) + 'px' }">
       <scene-selector class="studio-controls-panel" />
 

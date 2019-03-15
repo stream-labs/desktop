@@ -30,7 +30,6 @@ export default class Live extends Vue {
 
   $refs: {
     webview: Electron.WebviewTag;
-    studioControls: HTMLDivElement;
   };
 
   enablePreviewTooltip = $t('Enable the preview stream');
