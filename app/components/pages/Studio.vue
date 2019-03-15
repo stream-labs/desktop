@@ -27,7 +27,7 @@
     :min="minHeight"
     :reverse="true"
   />
-  <studio-controls :height="height" />
+  <studio-controls :style="{height: height + 'px'}" />
 </div>
 </template>
 
