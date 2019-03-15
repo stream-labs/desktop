@@ -107,8 +107,7 @@ export default class Main extends Vue {
   }
 
   get renderDock() {
-    // TODO: Include hasLiveDock check?  Not sure what that is for
-    return this.isLoggedIn && !this.isOnboarding;
+    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
   }
 
   get dockCollapsed() {

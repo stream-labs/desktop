@@ -48,7 +48,7 @@
 
   &.left {
     width: 10px;
-    margin-left: -4px;
+    margin-left: -5px;
     cursor: col-resize;
 
     .resize-line {

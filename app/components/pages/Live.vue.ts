@@ -83,10 +83,6 @@ export default class Live extends Vue {
     this.customizationService.setSettings({ bottomdockSize: value });
   }
 
-  get dockSize() {
-    return this.customizationService.state.livedockSize;
-  }
-
   get displayWidth() {
     return (16 / 9) * (this.height - 29);
   }
