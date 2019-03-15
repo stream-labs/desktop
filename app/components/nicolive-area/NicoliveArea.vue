@@ -22,6 +22,7 @@
           <li>コメント数: {{ comments }}</li>
           <li>ニコニ広告pt: {{ adPoint }}</li>
           <li>ギフトpt: {{ giftPoint }}</li>
+          <li>{{ format(programCurrentTime) }} / {{ format(programTotalTime) }}</li>
         </ul>
       </div>
       <div>

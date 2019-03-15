@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 
@@ -184,5 +184,45 @@ export default class NicolivePanelRoot extends Vue {
 
   get autoExtentionEnabled() {
     return this.nicoliveProgramService.state.autoExtentionEnabled;
+  }
+
+  currentTime: number = 0;
+  updateCurrrentTime() {
+    this.currentTime = Math.floor(Date.now() / 1000);
+  }
+
+  get programCurrentTime(): number {
+    return this.currentTime - this.programStartTime;
+  }
+
+  get programTotalTime(): number {
+    return this.programEndTime - this.programStartTime;
+  }
+
+  format(timeInSeconds: number): string {
+    const absTime = Math.abs(timeInSeconds);
+    const s = absTime % 60;
+    const m = Math.floor(absTime / 60) % 60;
+    const h = Math.floor(absTime / 3600);
+    const sign = Math.sign(timeInSeconds) > 0 ? '' : '-';
+    const ss = s.toString(10).padStart(2, '0');
+    const mm = m.toString(10).padStart(2, '0');
+    const hh = h.toString(10).padStart(2, '0');
+    return `${sign}${hh}:${mm}:${ss}`;
+  }
+
+  @Watch('programStatus')
+  onStatusChange(newValue: string, oldValue: string) {
+    if (newValue === 'end') clearInterval(this.timeTimer);
+    else if (oldValue === 'end') this.startTimer();
+  }
+
+  startTimer() {
+    this.timeTimer = (setInterval(() => this.updateCurrrentTime(), 1000) as any) as number;
+  }
+
+  timeTimer: number = 0;
+  mounted() {
+    this.startTimer();
   }
 }
