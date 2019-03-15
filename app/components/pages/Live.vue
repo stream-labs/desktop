@@ -23,7 +23,7 @@
 
       <mixer class="studio-controls-panel" />
 
-      <div class="live-preview-container" :style="{ flex: '1 1 ' + displayWidth + 'px', maxWidth: displayWidth + 'px' }">
+      <div class="live-preview-container" :style="{ flex: '0 1 ' + displayWidth + 'px' }">
         <div class="studio-controls-top">
           <h4 class="studio-controls__label">
             {{ $t('Preview') }}
