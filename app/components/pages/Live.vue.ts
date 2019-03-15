@@ -56,14 +56,6 @@ export default class Live extends Vue {
     this.userService.popoutRecentEvents();
   }
 
-  get previewWidth() {
-    return this.customizationService.state.previewWidth;
-  }
-
-  set previewWidth(previewWidth: number) {
-    this.customizationService.setSettings({ previewWidth });
-  }
-
   get previewEnabled() {
     return (
       this.customizationService.state.livePreviewEnabled &&

@@ -24,46 +24,33 @@
 
       <mixer class="studio-controls-panel" />
 
-      <div
-        class="live-preview-container"
-        :style="{ width: previewWidth + 'px' }">
-        <resize-bar
-          position="left"
-          v-model="previewWidth"
-          @onresizestop="onResizeStopHandler()"
-          @onresizestart="onResizeStartHandler()"
-          :min="275"
-          :max="600"
-          :reverse="true"
-        />
-
-        <div class="live-preview-container__content">
-          <div class="studio-controls-top">
-            <h4 class="studio-controls__label">
-              {{ $t('Preview') }}
-            </h4>
-            <div v-if="!performanceModeEnabled">
-              <i
-                v-if="previewEnabled"
-                class="icon-view icon-button icon-button--lg"
-                @click="previewEnabled = false"
-                v-tooltip="disablePreviewTooltip"/>
-              <i
-                v-if="!previewEnabled"
-                class="icon-hide icon-button icon-button--lg"
-                @click="previewEnabled = true"
-                v-tooltip="enablePreviewTooltip"/>
-            </div>
+      <div class="live-preview-container">
+        <div class="studio-controls-top">
+          <h4 class="studio-controls__label">
+            {{ $t('Preview') }}
+          </h4>
+          <div v-if="!performanceModeEnabled">
+            <i
+              v-if="previewEnabled"
+              class="icon-view icon-button icon-button--lg"
+              @click="previewEnabled = false"
+              v-tooltip="disablePreviewTooltip"/>
+            <i
+              v-if="!previewEnabled"
+              class="icon-hide icon-button icon-button--lg"
+              @click="previewEnabled = true"
+              v-tooltip="enablePreviewTooltip"/>
           </div>
+        </div>
 
-          <div class="live-display-wrapper sizer-container">
-            <display class="live-display" :drawUI="false" v-if="previewEnabled" />
-            <div class="live-display-placeholder" v-else>
-              <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-              <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-              <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
-              <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
-            </div>
+        <div class="live-display-wrapper">
+          <img class="live-sizer-image" src="../../../media/images/16x9dummy.png" />
+          <display class="live-display" :drawUI="false" v-if="previewEnabled" />
+          <div class="live-display-placeholder" v-else>
+            <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
+            <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
+            <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
+            <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
           </div>
         </div>
       </div>
@@ -73,40 +60,6 @@
 </template>
 
 <script lang="ts" src="./Live.vue.ts"></script>
-
-<style lang="less">
-@import '../../styles/index';
-.sizer-container {
-  width: 100%;
-  .radius();
-  background-color: @day-section;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  position: relative;
-  .border();
-  border-top: 0;
-  height: calc(~'100% - 29px');
-}
-
-.sizer-items {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  width: 120px;
-
-  .fa {
-    opacity: 0.4;
-    font-size: 12px;
-  }
-}
-
-.sizer {
-  width: 100px;
-  margin: 0 12px;
-  height: auto;
-}
-</style>
 
 <style lang="less" scoped>
 @import '../../styles/index';
@@ -142,52 +95,51 @@
   .padding-right(2);
 }
 
-.sizer-container {
-  width: 100%;
-  .radius();
-  background-color: @day-secondary;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  position: relative;
-  .border();
-  border-top: 0;
-  height: calc(~'100% - 29px');
-}
-
 .sizer-items {
   bottom: 8px;
   right: 8px;
 }
 
 .live-preview-container {
-  width: 300px;
   flex: 0 0 auto;
-  position: relative;
-}
-
-.live-preview-container__content {
-  height: 100%;
+  max-width: 60vw;
 }
 
 .live-display-wrapper {
-  width: 100%;
+  .radius();
+  background-color: @day-section;
+  position: relative;
+  .border();
+  border-top: 0;
+  height: calc(~'100% - 29px');
+}
+
+.live-sizer-image {
+  display: block;
+  width: auto;
+  height: 100%;
+  opacity: 0;
 }
 
 .live-display {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .live-display-placeholder {
-  height: 100%;
-}
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-.live-display-placeholder {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   span {
     color: @grey;
@@ -227,7 +179,7 @@
     display: block;
   }
 
-  .sizer-container {
+  .live-display-wrapper {
     background-color: @night-secondary;
     border-color: @night-secondary;
   }
