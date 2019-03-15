@@ -41,8 +41,7 @@
           </div>
         </div>
 
-        <div class="live-display-wrapper">
-          <img class="live-sizer-image" src="../../../media/images/16x9dummy.png" />
+        <div class="live-display-wrapper" :style="{ width: displayWidth + 'px' }">
           <display class="live-display" :drawUI="false" v-if="previewEnabled" />
           <div class="live-display-placeholder" v-else>
             <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
@@ -110,28 +109,8 @@
   height: calc(~'100% - 29px');
 }
 
-.live-sizer-image {
-  display: block;
-  width: auto;
-  height: 100%;
-  opacity: 0;
-}
-
-.live-display {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
 .live-display-placeholder {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

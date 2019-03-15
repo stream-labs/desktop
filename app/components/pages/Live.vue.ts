@@ -9,7 +9,6 @@ import { CustomizationService } from 'services/customization';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
-import { Debounce } from 'lodash-decorators';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 
 Vue.use(VTooltip);
@@ -84,8 +83,13 @@ export default class Live extends Vue {
     this.customizationService.setSettings({ bottomdockSize: value });
   }
 
+  get displayWidth() {
+    // 29 is about the height of the "Preview" label
+    return (16 / 9) * (this.height - 29);
+  }
+
   get maxHeight() {
-    return this.$root.$el.getBoundingClientRect().height;
+    return this.$root.$el.getBoundingClientRect().height - 400;
   }
 
   get minHeight() {
@@ -96,7 +100,6 @@ export default class Live extends Vue {
     this.customizationService.setSettings({ previewEnabled: false });
   }
 
-  @Debounce(500) // the preview window is flickering to much without debouncing
   onResizeStopHandler() {
     this.customizationService.setSettings({ previewEnabled: true });
   }
