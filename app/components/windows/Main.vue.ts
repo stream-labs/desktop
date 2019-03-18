@@ -110,7 +110,7 @@ export default class Main extends Vue {
     return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
   }
 
-  get dockCollapsed() {
+  get isDockCollapsed() {
     return this.customizationService.state.livedockCollapsed;
   }
 

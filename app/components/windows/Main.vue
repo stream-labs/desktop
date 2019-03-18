@@ -11,7 +11,7 @@
     <div class="live-dock-wrapper" v-if="renderDock && leftDock">
       <live-dock :onLeft="true" />
       <resize-bar
-        v-if="!dockCollapsed"
+        v-if="!isDockCollapsed"
         class="live-dock-resize-bar live-dock-resize-bar--left"
         position="right"
         @onresizestart="onResizeStartHandler"
@@ -38,7 +38,7 @@
 
     <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
       <resize-bar
-        v-if="!dockCollapsed"
+        v-if="!isDockCollapsed"
         class="live-dock-resize-bar"
         position="left"
         @onresizestart="onResizeStartHandler"
