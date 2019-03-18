@@ -58,6 +58,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     for (const s of schedules) {
       // ユーザー生放送以外は無視
       if (!s.socialGroupId.startsWith('co')) continue;
+      if (s.status === 'end') continue;
 
       // 一番近い予約放送を選ぶ
       if (!nearestReservedProgram || s.testBeginAt < nearestReservedProgram.testBeginAt) {
@@ -177,25 +178,19 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async startProgram(): Promise<void> {
     const result = await this.client.startProgram(this.state.programID);
-    if (isOk(result)) {
-      const endTime = result.value.end_time;
-      const startTime = result.value.start_time;
-      this.setState({ status: 'onAir', endTime, startTime });
-      return;
-    }
+    if (!isOk(result)) throw result.value;
 
-    throw result.value;
+    const endTime = result.value.end_time;
+    const startTime = result.value.start_time;
+    this.setState({ status: 'onAir', endTime, startTime });
   }
 
   async endProgram(): Promise<void> {
     const result = await this.client.endProgram(this.state.programID);
-    if (isOk(result)) {
-      const endTime = result.value.end_time;
-      this.setState({ status: 'end', endTime });
-      return;
-    }
+    if (!isOk(result)) throw result.value;
 
-    throw result.value;
+    const endTime = result.value.end_time;
+    this.setState({ status: 'end', endTime });
   }
 
   toggleAutoExtension() {
@@ -205,35 +200,30 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async extendProgram(): Promise<void> {
     const result = await this.client.extendProgram(this.state.programID);
-    if (isOk(result)) {
-      this.setState({
-        endTime: result.value.end_time,
-      });
-      return;
-    }
+    if (!isOk(result)) throw result.value;
 
-    throw result.value;
+    const endTime = result.value.end_time;
+    this.setState({ endTime });
   }
 
   private statsTimer: number = 0;
   refreshStatisticsPolling(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    const onInitialize = !prevState;
-    const hasNextProgram = Boolean(nextState.programID);
-    const programUpdated = onInitialize || prevState.programID !== nextState.programID;
-    const nextStatusIsOnAir = nextState.status === 'onAir';
-    const statusUpdated = onInitialize || prevState.status !== nextState.status;
+    const programUpdated = !prevState || prevState.programID !== nextState.programID;
 
-    if (hasNextProgram && nextStatusIsOnAir && (programUpdated || statusUpdated)) {
+    const prev = prevState && prevState.status === 'onAir';
+    const next = nextState && nextState.status === 'onAir';
+
+    if ((!prev && next) || (next && programUpdated)) {
       clearInterval(this.statsTimer);
       this.updateStatistics(nextState.programID); // run and forget
       this.statsTimer = window.setInterval((id: string) => this.updateStatistics(id), 60 * 1000, nextState.programID);
-    } else if (!nextStatusIsOnAir) {
+    } else if (prev && !next) {
       clearInterval(this.statsTimer);
     }
   }
 
-  updateStatistics(programID: string): void {
-    this.client
+  updateStatistics(programID: string): Promise<any> {
+    const stats = this.client
       .fetchStatistics(programID)
       .then(res => {
         if (isOk(res)) {
@@ -244,7 +234,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         }
       })
       .catch(() => null);
-    this.client
+    const adStats = this.client
       .fetchNicoadStatistics(programID)
       .then(res => {
         if (isOk(res)) {
@@ -255,6 +245,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         }
       })
       .catch(() => null);
+
+    // return for testing
+    return Promise.all([stats, adStats]);
   }
 
   async sendOperatorComment(text: string, isPermanent: boolean): Promise<void> {
@@ -270,39 +263,42 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   };
   private refreshProgramTimer = 0;
   refreshProgramStatusTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    const now = Date.now();
-    const onInitialize = !prevState;
-    const statusUpdated = onInitialize || prevState.status !== nextState.status;
+    const programUpdated = !prevState || prevState.programID !== nextState.programID;
+    const statusUpdated = !prevState || prevState.status !== nextState.status;
 
-    const status = nextState.status;
     /** 放送状態が変化しなかった前提で、放送状態が次に変化するであろう時刻 */
-    const prevTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[status]];
-    const nextTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[status]];
+    const prevTargetTime: number = prevState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
+    const nextTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
+    const targetTimeUpdated = !statusUpdated && prevTargetTime !== nextTargetTime;
 
-    // 次に放送状態が変化する予定の時刻（より少し後）に放送情報を更新するタイマーを仕込む
-    if (statusUpdated || prevTargetTime !== nextTargetTime) {
+    const prev = prevState && prevState.status !== 'end';
+    const next = nextState && nextState.status !== 'end';
+
+    if (next && (!prev || programUpdated || statusUpdated || targetTimeUpdated)) {
+      const now = Date.now();
+
+      // 次に放送状態が変化する予定の時刻（より少し後）に放送情報を更新するタイマーを仕込む
       clearTimeout(this.refreshProgramTimer);
       this.refreshProgramTimer = window.setTimeout(() => {
         this.refreshProgram();
       }, (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now);
-      return;
+    } else if (prev && !next) {
+      clearTimeout(this.refreshProgramTimer);
     }
   }
 
   private autoExtensionTimer = 0;
   refreshAutoExtensionTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
     const now = Date.now();
-    const onInitialize = !prevState;
-    const endTimeUpdated = onInitialize || prevState.endTime !== nextState.endTime;
+    const endTimeUpdated = !prevState || prevState.endTime !== nextState.endTime;
 
     /** 更新前の状態でタイマーが動作しているべきか */
-    const prev =
-      !onInitialize && prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
+    const prev = prevState && prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
     /** 更新後の状態でタイマーが動作しているべきか */
     const next = nextState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(nextState);
 
     // 動作すべき状態になる OR 終了時刻が変わったら再設定
-    if ((!prev && next) || (next && endTimeUpdated)) {
+    if ((next && !prev) || (next && endTimeUpdated)) {
       clearTimeout(this.autoExtensionTimer);
       const timeout = (nextState.endTime - 5 * 60) * 1000 - now;
       // 5分前をすでに過ぎていたら即延長
