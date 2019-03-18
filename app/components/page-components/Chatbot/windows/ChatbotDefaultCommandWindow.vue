@@ -216,24 +216,17 @@
 }
 
 .window-toggle__wrapper {
-  background-color: @day-primary;
+  background-color: var(--background);
   z-index: 1;
   width: 100%;
   padding: 15px;
   height: 48px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--dropdown-border);
   cursor: pointer;
   text-align: right;
 
   .window-toggle__icon {
     .margin-left();
-  }
-}
-
-.night-theme {
-  .window-toggle__wrapper {
-    background-color: @night-primary;
-    border-color: @night-border;
   }
 }
 </style>

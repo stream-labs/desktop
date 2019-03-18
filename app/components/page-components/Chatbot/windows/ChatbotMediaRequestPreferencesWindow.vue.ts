@@ -9,7 +9,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { ISongRequestData } from 'services/chatbot';
 import { debounce } from 'lodash-decorators';
-
+import os from 'os';
 // general tab is all from chatbot api directly
 // banned item is from media share api sl.com
 @Component({
@@ -22,12 +22,14 @@ export default class ChatbotMediaRequestPreferencesWindow extends ChatbotWindows
     form: ValidatedForm;
   };
 
-  securityDescription = $t(`This slider helps you filter shared media before it can be submitted.\r\n
-    1: No security\r\n
-    2: 65%+ rating, 5k+ views\r\n
-    3: 75%+ rating, 40k+ views\r\n
-    4: 80%+ rating, 300k+ views\r\n
-    5: 85%+ rating, 900k+ views`);
+  securityDescription = $t(
+    `This slider helps you filter shared media before it can be submitted.${os.EOL}
+    1: No security${os.EOL}
+    2: 65%+ rating, 5k+ views${os.EOL}
+    3: 75%+ rating, 40k+ views${os.EOL}
+    4: 80%+ rating, 300k+ views${os.EOL}
+    5: 85%+ rating, 900k+ views`,
+  );
   selectedTab: string = 'general';
 
   mediaRequestData: ISongRequestData = null;

@@ -88,7 +88,9 @@ export default class ChatbotLoyalty extends ChatbotBase {
   }
 
   onDeleteHandler() {
-    this.chatbotApiService.Loyalty.delete(this.loyaltyToDelete.id);
+    if (this.loyaltyToDelete) {
+      this.chatbotApiService.Loyalty.delete(this.loyaltyToDelete.id);
+    }
   }
 
   onCancelHandler() {}

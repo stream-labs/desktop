@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
-import { mapValues, pickBy, keys } from 'lodash';
+import { mapValues, pickBy } from 'lodash';
 
 type TCommandSlug =
   | 'commands'
@@ -61,7 +61,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       );
     });
     const remaining = pickBy(filteredCommands, (section, slug: TCommandSlug) => {
-      return keys(section).length !== 0 && this.v1CommandSlugs.indexOf(slug) > -1;
+      return Object.keys(section).length !== 0 && this.v1CommandSlugs.indexOf(slug) > -1;
     });
     return remaining;
   }

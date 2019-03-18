@@ -91,7 +91,7 @@
         :warn="true"
         @reset="onResetHandler"
         @cancel="onCancelHandler"
-        :title="$t('Reset Loyalty Database')"
+        :header="$t('Reset Loyalty Database')"
         :message="$t('Are you sure you want to reset your entire Loyalty database? This action is irreversible.')"
       />
       <ChatbotGenericModalWindow
@@ -99,8 +99,8 @@
         :warn="true"
         @ok="onDeleteHandler"
         @cancel="onCancelHandler"
-        :title="loyaltyToDelete ?  $t(`Delete ${loyaltyToDelete.viewer.name}'s Loyalty`) : ''"
-        :message="loyaltyToDelete ?$t(`Are you sure you want to delete ${loyaltyToDelete.viewer.name}'s loyalty? This action is irreversible`) : ''"
+        :header="loyaltyToDelete ?  $t('Delete {name}\'s Loyalty',{name: loyaltyToDelete.viewer.name}) : ''"
+        :message="loyaltyToDelete ?$t('Are you sure you want to delete {name}\'s loyalty? This action is irreversible',{name: loyaltyToDelete.viewer.name}) : ''"
       />
     </div>
   </transition>

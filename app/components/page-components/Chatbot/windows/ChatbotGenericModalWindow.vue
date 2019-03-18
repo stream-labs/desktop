@@ -1,5 +1,5 @@
 <template>
-  <modal :name="name" :height="'auto'" :maxHeight="600">
+  <modal :name="name" height="auto" :maxHeight="600">
     <div class="new-alert-modal">
       <div class="new-alert-modal__header" v-if="title">
         <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico">
@@ -51,7 +51,7 @@
 <style lang="less" scoped>
 @import '../../../../styles/index';
 .modal-layout-controls {
-  background-color: @day-section;
+  background-color: var(--section);
   .padding-v-sides();
   .padding-h-sides(2);
   .text-align(@right);
@@ -67,19 +67,13 @@
   box-shadow: 0 10px 10px rgba(1, 2, 2, 0.15);
 }
 
-.night-theme {
-  .modal-layout-controls {
-    background-color: @night-section;
-  }
-}
-
 .new-alert-modal {
   .new-alert-modal__header {
     display: flex;
     flex-direction: row;
     align-items: center;
     height: 30px;
-    border-bottom: 1px solid @day-border;
+    border-bottom: 1px solid var(--dropdown-border);
 
     .new-alert-modal__header__icon {
       padding-left: 10px;
@@ -98,8 +92,8 @@
   }
 
   .new-alert-modal__controls {
-    background-color: @day-secondary;
-    border-top: 1px solid @day-border;
+    background-color: var(--background);
+    border-top: 1px solid var(--dropdown-border);
     padding: 10px 20px;
     text-align: right;
     flex-shrink: 0;
@@ -111,16 +105,4 @@
   }
 }
 
-.night-theme {
-  .new-alert-modal {
-    .new-alert-modal__header {
-      border-bottom: 1px solid @night-border;
-    }
-
-    .new-alert-modal__controls {
-      border-top-color: @night-border;
-      background-color: @night-primary;
-    }
-  }
-}
 </style>
