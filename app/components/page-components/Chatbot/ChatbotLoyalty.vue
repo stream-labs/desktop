@@ -18,10 +18,16 @@
     <div class="loyalty-content" v-else>
       <!-- batch actions -->
       <div class="flex flex--space-between padding--10">
-        <button
-          @click="onOpenLoyaltyAddWllHandler()"
-          class="button button--action margin--10"
-        >{{ $t('Add Points to All Viewers') }}</button>
+        <div class="flex flex--center">
+          <button
+            @click="onOpenLoyaltyAddallHandler()"
+            class="button button--action margin--10"
+          >{{ $t('Add Points to All Viewers') }}</button>
+          <button
+            @click="openResetLoyaltyHandler()"
+            class="button button--soft-warning margin--10"
+          >{{ $t('Reset Loyalty Database') }}</button>
+        </div>
         <div class="flex flex--center">
           <div @click="onOpenLoyaltyPreferencesHandler()" class="loyalty-settings__button">
             <i class="icon-settings"></i>
@@ -59,7 +65,8 @@
               <td>{{ (data.time / 60).toFixed(2) }}</td>
               <td>
                 <div class="align-items--inline">
-                  <i @click="onOpenLoyaltyWindowHandler(data)" class="icon-edit padding--5"/>
+                  <i @click="onOpenLoyaltyDeleteHandler(data)" class="icon-trash padding--5 cursor--pointer"/>
+                  <i @click="onOpenLoyaltyWindowHandler(data)" class="icon-edit padding--5 cursor--pointer"/>
                 </div>
               </td>
             </tr>
@@ -79,6 +86,22 @@
         @cancel="onCancelHandler"
         :message="$t('Amount')"
       />
+      <ChatbotGenericModalWindow
+        :name="CLEAR_LOYALTY_MODAL"
+        :warn="true"
+        @reset="onResetHandler"
+        @cancel="onCancelHandler"
+        :title="$t('Reset Loyalty Database')"
+        :message="$t('Are you sure you want to reset your entire Loyalty database? This action is irreversible.')"
+      />
+      <ChatbotGenericModalWindow
+        :name="DELETE_LOYALTY_MODAL"
+        :warn="true"
+        @ok="onDeleteHandler"
+        @cancel="onCancelHandler"
+        :title="loyaltyToDelete ?  $t(`Delete ${loyaltyToDelete.viewer.name}'s Loyalty`) : ''"
+        :message="loyaltyToDelete ?$t(`Are you sure you want to delete ${loyaltyToDelete.viewer.name}'s loyalty? This action is irreversible`) : ''"
+      />
     </div>
   </transition>
 </template>
@@ -96,7 +119,6 @@
   .flex--column();
   .flex--center();
   .padding-vertical--20;
-
 }
 
 .chatbot-empty-placeholder__container {

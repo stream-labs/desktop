@@ -7,7 +7,7 @@ export * from './chatbot-timers';
 export * from './chatbot-mod-tools';
 export * from './chatbot-queue';
 export * from './chatbot-quotes';
-export * from './chatbot-songrequest';
+export * from './chatbot-mediarequest';
 export * from './chatbot-loyalty';
 export * from './chatbot';
 export * from './chatbot-heist';

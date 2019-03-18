@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
+import { mapValues, pickBy, keys } from 'lodash';
 
 type TCommandSlug =
   | 'commands'
@@ -10,12 +11,13 @@ type TCommandSlug =
   | 'giveaway'
   | 'loyalty'
   | 'queue'
-  | 'songrequest'
+  | 'media-share'
   | 'heist'
   | 'poll'
   | 'betting'
   | 'misc'
-  | 'gamble';
+  | 'gamble'
+  | 'quotes';
 
 @Component({
   components: {
@@ -36,10 +38,32 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     'betting',
     'misc',
     'gamble',
+    'media-share',
+    'quotes',
   ];
 
   get commandSlugs() {
     return this.chatbotApiService.Commands.state.defaultCommandsResponse;
+  }
+
+  get filteredSlugs() {
+    const filteredCommands = mapValues(this.commandSlugs, (section, slug) => {
+      return pickBy(
+        mapValues(section, (command, key) => {
+          const found = command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1;
+          return found && ['!skip', '!wrongvideo'].indexOf(command.command) === -1
+            ? command
+            : undefined;
+        }),
+        (x, y) => {
+          return x !== undefined;
+        },
+      );
+    });
+    const remaining = pickBy(filteredCommands, (section, slug: TCommandSlug) => {
+      return keys(section).length !== 0 && this.v1CommandSlugs.indexOf(slug) > -1;
+    });
+    return remaining;
   }
 
   matchesQuery(name: string, command: IDefaultCommand) {

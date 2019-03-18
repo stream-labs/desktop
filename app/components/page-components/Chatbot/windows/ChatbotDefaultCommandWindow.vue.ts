@@ -225,6 +225,14 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         uuid: $t('Banned Response'),
         blockReturn: true,
       }),
+      ticket_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t('The phrase that will appear when a ticket giveaway is started.'),
+        max: 450,
+        uuid: $t('Ticket Response'),
+        blockReturn: true,
+      }),
       music_response: metadataHelper.text({
         required: true,
         type: EInputType.textArea,

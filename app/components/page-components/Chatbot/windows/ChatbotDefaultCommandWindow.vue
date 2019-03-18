@@ -61,6 +61,12 @@
             v-model="editedCommand.response"
             :metadata="metadata.response"
           />
+           <VFormGroup
+            v-if="defaultCommandToUpdate.ticket_response"
+            :title="$t('Ticket Response')"
+            v-model="editedCommand.ticket_response"
+            :metadata="metadata.ticket_response"
+          />
           <VFormGroup
             v-if="defaultCommandToUpdate.success_response"
             :title="$t('Success Response')"

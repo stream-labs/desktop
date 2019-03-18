@@ -2,7 +2,7 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
-import { ILoyaltyData } from 'services/chatbot';
+import { ILoyaltyData, IChatbotLoyalty } from 'services/chatbot';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
@@ -13,6 +13,7 @@ import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 })
 export default class ChatbotLoyalty extends ChatbotBase {
   searchQuery = '';
+  loyaltyToDelete: IChatbotLoyalty = null;
 
   mounted() {
     this.fetchLoyalty(1);
@@ -27,13 +28,24 @@ export default class ChatbotLoyalty extends ChatbotBase {
     return 'add-loyalty';
   }
 
+  get CLEAR_LOYALTY_MODAL() {
+    return 'clear-loyalty';
+  }
+
+  get DELETE_LOYALTY_MODAL() {
+    return 'delete-loyalty';
+  }
+
   onOpenLoyaltyPreferencesHandler() {
     this.chatbotApiService.Common.openLoyaltyPreferencesWindow();
   }
 
-  onOpenLoyaltyAddWllHandler() {
+  onOpenLoyaltyAddallHandler() {
     this.$modal.show(this.ADD_LOYALTY_MODAL);
-    // this.chatbotApiService.Common.openLoyaltyAddAllWindow();
+  }
+
+  openResetLoyaltyHandler() {
+    this.$modal.show(this.CLEAR_LOYALTY_MODAL);
   }
 
   onEnableLoyaltyHandler() {
@@ -42,8 +54,13 @@ export default class ChatbotLoyalty extends ChatbotBase {
     this.chatbotApiService.Loyalty.updateLoyaltyPreferences(newSettings, false);
   }
 
-  onOpenLoyaltyWindowHandler(loyalty?: ILoyaltyData) {
+  onOpenLoyaltyWindowHandler(loyalty?: IChatbotLoyalty) {
     this.chatbotApiService.Common.openLoyaltyWindow(loyalty);
+  }
+
+  onOpenLoyaltyDeleteHandler(loyalty: IChatbotLoyalty) {
+    this.loyaltyToDelete = loyalty;
+    this.$modal.show(this.DELETE_LOYALTY_MODAL);
   }
 
   get totalPages() {
@@ -64,6 +81,14 @@ export default class ChatbotLoyalty extends ChatbotBase {
 
   onOkHandler(value: number) {
     this.chatbotApiService.Loyalty.addToAll(value);
+  }
+
+  onResetHandler() {
+    this.chatbotApiService.Loyalty.clear();
+  }
+
+  onDeleteHandler() {
+    this.chatbotApiService.Loyalty.delete(this.loyaltyToDelete.id);
   }
 
   onCancelHandler() {}

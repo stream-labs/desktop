@@ -24,7 +24,7 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   openBlacklist() {
-    this.chatbotCommonService.openSongRequestPreferencesWindow();
+    this.chatbotCommonService.openMediaRequestPreferencesWindow();
   }
 
   pricePerSecTooltip = $t(

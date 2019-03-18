@@ -1,58 +1,55 @@
 <template>
-<modal
-  :name="name"
-  :height="'auto'"
-  :maxHeight="600"
->
-  <div class="new-alert-modal">
-    <div class="new-alert-modal__header" v-if="title">
-      <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico" />
-      <div class="new-alert-modal__header__title">{{ title.split('_').join(' ') }}</div>
-    </div>
-    <validated-form ref="form">
-      <div class="new-alert-modal__body">
-        <div v-if="isInputModal">
-          <VFormGroup
-            :title="$t(message)"
-            v-model="value"
-            :metadata="valueMetaData"
-          />
-        </div>
-        <div v-else>
-          <h2 v-if="header">{{ $t(header) }}</h2>
-          <p v-if="message">{{ $t(message) }}</p>
-        </div>
+  <modal :name="name" :height="'auto'" :maxHeight="600">
+    <div class="new-alert-modal">
+      <div class="new-alert-modal__header" v-if="title">
+        <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico">
+        <div class="new-alert-modal__header__title">{{ title.split('_').join(' ') }}</div>
       </div>
-    </validated-form>
-    <div class="modal-layout-controls">
-      <button v-if="hasCancelListener"
-        class="button button--default"
-        @click="onEmitHandler('cancel')">
-        {{ $t('Cancel') }}
-      </button>
-      <button v-if="hasNoListener"
-        class="button button--default"
-        @click="onEmitHandler('no')">
-        {{ $t('No') }}
-      </button>
-      <button v-if="hasOkListener"
-        class="button button--action"
-        @click="onEmitHandler('ok')">
-        {{ $t('Ok') }}
-      </button>
-      <button v-if="hasYesListener"
-        class="button button--action"
-        @click="onEmitHandler('yes')">
-        {{ $t('Yes') }}
-      </button> 
+      <validated-form ref="form">
+        <div class="new-alert-modal__body">
+          <div v-if="isInputModal">
+            <VFormGroup :title="$t(message)" v-model="value" :metadata="valueMetaData"/>
+          </div>
+          <div v-else>
+            <h2 v-if="header">{{ $t(header) }}</h2>
+            <p v-if="message">{{ $t(message) }}</p>
+          </div>
+        </div>
+      </validated-form>
+      <div class="modal-layout-controls">
+        <button
+          v-if="hasCancelListener"
+          class="button button--default"
+          @click="onEmitHandler('cancel')"
+        >{{ $t('Cancel') }}</button>
+        <button
+          v-if="hasNoListener"
+          class="button button--default"
+          @click="onEmitHandler('no')"
+        >{{ $t('No') }}</button>
+        <button
+          v-if="hasOkListener"
+          :class="warn ?  'button button--soft-warning' : 'button button--action'"
+          @click="onEmitHandler('ok')"
+        >{{ $t('Ok') }}</button>
+        <button
+          v-if="hasYesListener"
+          :class="warn ?  'button button--soft-warning' : 'button button--action' "
+          @click="onEmitHandler('yes')"
+        >{{ $t('Yes') }}</button>
+        <button
+          v-if="hasResetListener"
+          :class="warn ?  'button button--soft-warning' : 'button button--action' "
+          @click="onEmitHandler('reset')"
+        >{{ $t('Confirm Reset') }}</button>
+      </div>
     </div>
-  </div>
-</modal>
+  </modal>
 </template>
 <script lang="ts" src="./ChatbotGenericModalWindow.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../../styles/index";
+@import '../../../../styles/index';
 .modal-layout-controls {
   background-color: @day-section;
   .padding-v-sides();
@@ -67,7 +64,7 @@
 }
 
 .v--modal {
-  box-shadow: 0 10px 10px rgba(1,2,2,.15);
+  box-shadow: 0 10px 10px rgba(1, 2, 2, 0.15);
 }
 
 .night-theme {
@@ -114,7 +111,6 @@
   }
 }
 
-
 .night-theme {
   .new-alert-modal {
     .new-alert-modal__header {
@@ -126,8 +122,5 @@
       background-color: @night-primary;
     }
   }
-
 }
-
-
 </style>

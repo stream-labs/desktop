@@ -17,8 +17,7 @@
     <!-- slugs -->
     <CollapsibleSection
       class="margin--20"
-      v-for="(commands, slugName, index) in commandSlugs"
-      v-if="v1CommandSlugs.indexOf(slugName) > -1"
+      v-for="(commands, slugName, index) in filteredSlugs"
       :title="$t(slugName)"
       :key="index"
     >
@@ -36,7 +35,6 @@
           <tr
             v-for="(command, commandName, index) in commands"
             :key="index"
-            v-if="matchesQuery(commandName, command)"
           >
             <td>{{ command.command }}</td>
             <td>{{ $t(command.description) }}</td>
