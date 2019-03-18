@@ -304,14 +304,20 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     // 動作すべき状態になる OR 終了時刻が変わったら再設定
     if ((!prev && next) || (next && endTimeUpdated)) {
       clearTimeout(this.autoExtensionTimer);
-      this.autoExtensionTimer = window.setTimeout(() => {
+      const timeout = (nextState.endTime - 5 * 60) * 1000 - now;
+      // 5分前をすでに過ぎていたら即延長
+      if (timeout <= 0) {
         this.extendProgram();
-      }, (nextState.endTime - 5 * 60) * 1000 - now);
-      console.log(
-        '自動延長タイマーが（再）設定されました ',
-        Math.floor(((nextState.endTime - 5 * 60) * 1000 - now) / 1000),
-        '秒後に自動延長します'
-      );
+      } else {
+        this.autoExtensionTimer = window.setTimeout(() => {
+          this.extendProgram();
+        }, timeout);
+        console.log(
+          '自動延長タイマーが（再）設定されました ',
+          Math.floor(((nextState.endTime - 5 * 60) * 1000 - now) / 1000),
+          '秒後に自動延長します'
+        );
+      }
       return;
     }
 
