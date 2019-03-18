@@ -46,6 +46,7 @@ interface IFollowSocketEvent {
   type: 'follow';
   message: {
     name: string;
+    _id: string;
   }[];
 }
 
@@ -53,6 +54,9 @@ interface ISubscriptionSocketEvent {
   type: 'subscription';
   message: {
     name: string;
+    subscriber_twitch_id?: string;
+    sub_plan?: string;
+    _id: string;
   }[];
 }
 
@@ -60,6 +64,10 @@ interface IBitsSocketEvent {
   type: 'bits';
   message: {
     name: string;
+    data: {
+      facemask?: string;
+      fm_id?: string;
+    }
   }[];
 }
 
@@ -69,8 +77,19 @@ interface IAlertPlayingSocketEvent {
     facemask?: string;
     _id: string;
     type: string;
-    payload?: any;
+    payload?: ISubscriptionPayload;
+    data: {
+      facemask?: string;
+      fm_id?: string;
+    };
+    subscriber_twitch_id?: string;
+    sub_plan?: string;
+    name?: string;
   };
+}
+
+interface ISubscriptionPayload {
+  _id: string;
 }
 
 interface IAlertProfileChanged {
@@ -122,7 +141,6 @@ export class WebsocketService extends Service {
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
         this.socket.on('event', (e: any) => {
-          console.log(e);
           this.socketEvent.next(e);
         });
       });
