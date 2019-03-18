@@ -31,6 +31,7 @@ import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
+import { RunInLoadingMode } from './app-decorators';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -82,8 +83,8 @@ export class AppService extends StatefulService<IAppState> {
   private pid = require('process').pid;
 
   @track('app_start')
+  @RunInLoadingMode()
   async load() {
-    this.START_LOADING();
     crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
@@ -152,7 +153,6 @@ export class AppService extends StatefulService<IAppState> {
 
     this.crashReporterService.endStartup();
 
-    this.FINISH_LOADING();
     this.protocolLinksService.start(this.state.argv);
   }
 
