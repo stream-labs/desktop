@@ -51,18 +51,6 @@ export default class NicolivePanelRoot extends Vue {
     }
   }
 
-  async refreshProgram() {
-    try {
-      this.isFetching = true;
-      return await this.nicoliveProgramService.fetchProgram();
-    } catch (e) {
-      // TODO
-      console.warn(e);
-    } finally {
-      this.isFetching = false;
-    }
-  }
-
   isEditing: boolean = false;
   async editProgram() {
     try {
