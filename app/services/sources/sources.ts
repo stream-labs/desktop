@@ -339,6 +339,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
+      { description: 'VLC Source', value: 'vlc_source' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

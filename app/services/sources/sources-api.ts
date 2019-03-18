@@ -103,7 +103,8 @@ export type TSourceType =
   | 'ndi_source'
   | 'openvr_capture'
   | 'liv_capture'
-  | 'ovrstream_dc_source';
+  | 'ovrstream_dc_source'
+  | 'vlc_source';
 
 // Register new properties managers here
 export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
