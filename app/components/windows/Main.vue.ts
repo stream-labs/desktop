@@ -31,6 +31,7 @@ import DesignSystem from '../pages/DesignSystem.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
+import ResizeBar from 'components/shared/ResizeBar.vue';
 
 @Component({
   components: {
@@ -52,6 +53,7 @@ import electron from 'electron';
     PlatformAppMainPage,
     PlatformAppStore,
     Help,
+    ResizeBar,
   },
 })
 export default class Main extends Vue {
@@ -64,6 +66,12 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
 
   mounted() {
+    const dockWidth = this.customizationService.state.livedockSize;
+    if (dockWidth < 1) {
+      // migrate from old percentage value to the pixel value
+      this.resetWidth();
+    }
+
     electron.remote.getCurrentWindow().show();
     this.handleResize();
   }
@@ -98,10 +106,15 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
-  mainContentsRight = false;
+  get renderDock() {
+    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
+  }
+
+  get isDockCollapsed() {
+    return this.customizationService.state.livedockCollapsed;
+  }
 
   get leftDock() {
-    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -159,5 +172,47 @@ export default class Main extends Vue {
 
   handleResize() {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
+  }
+
+  onResizeStartHandler() {
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  onResizeStopHandler(offset: number) {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    offset = this.leftDock ? offset : -offset;
+    this.setWidth(this.customizationService.state.livedockSize + offset);
+    this.customizationService.setSettings({
+      previewEnabled: true,
+    });
+  }
+
+  setWidth(width: number) {
+    this.customizationService.setSettings({
+      livedockSize: this.validateWidth(width),
+    });
+  }
+
+  validateWidth(width: number): number {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const minEditorWidth = 860;
+    const minWidth = 290;
+    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    width = Math.max(minWidth, width);
+    // tslint:disable-next-line:no-parameter-reassignment
+    width = Math.min(maxWidth, width);
+    return width;
+  }
+
+  updateWidth() {
+    const width = this.customizationService.state.livedockSize;
+    if (width !== this.validateWidth(width)) this.setWidth(width);
+  }
+
+  resetWidth() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const defaultWidth = appRect.width * 0.28;
+    this.setWidth(defaultWidth);
   }
 }

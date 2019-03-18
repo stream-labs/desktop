@@ -9,9 +9,18 @@
   <div
     class="main-contents"
     :class="{
-      'main-contents--right': isLoggedIn && leftDock && !isOnboarding && hasLiveDock,
-      'main-contents--left': isLoggedIn && !leftDock && !isOnboarding && hasLiveDock }">
-    <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
+      'main-contents--right': renderDock && leftDock && hasLiveDock,
+      'main-contents--left': renderDock && !leftDock && hasLiveDock }">
+    <div class="live-dock-wrapper" v-if="renderDock && leftDock">
+      <live-dock :onLeft="true" />
+      <resize-bar
+        v-if="!isDockCollapsed"
+        class="live-dock-resize-bar live-dock-resize-bar--left"
+        position="right"
+        @onresizestart="onResizeStartHandler"
+        @onresizestop="onResizeStopHandler"
+      />
+    </div>
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
@@ -27,7 +36,16 @@
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 
-    <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
+    <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
+      <resize-bar
+        v-if="!isDockCollapsed"
+        class="live-dock-resize-bar"
+        position="left"
+        @onresizestart="onResizeStartHandler"
+        @onresizestop="onResizeStopHandler"
+      />
+      <live-dock class="live-dock" />
+    </div>
   </div>
 </div>
 </template>
@@ -112,5 +130,23 @@
   top: 9999999px;
   z-index: -9999999;
   transition-timing-function: ease-out, step-end, step-end;
+}
+
+.live-dock {
+  height: 100%;
+}
+
+.live-dock-wrapper {
+  position: relative;
+}
+
+.live-dock-resize-bar {
+  position: absolute;
+  height: 100%;
+}
+
+.live-dock-resize-bar--left {
+  top: 0;
+  right: 0;
 }
 </style>

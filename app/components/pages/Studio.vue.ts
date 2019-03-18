@@ -8,6 +8,7 @@ import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import { AppService } from 'services/app';
+import ResizeBar from 'components/shared/ResizeBar.vue';
 
 @Component({
   components: {
@@ -15,12 +16,13 @@ import { AppService } from 'services/app';
     StudioControls,
     Display,
     StudioModeControls,
+    ResizeBar,
   },
 })
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() appService: AppService;
+  @Inject() private appService: AppService;
 
   $refs: {
     studioModeContainer: HTMLDivElement;
@@ -78,5 +80,29 @@ export default class Studio extends Vue {
 
   enablePreview() {
     this.customizationService.setSettings({ performanceMode: false });
+  }
+
+  get height() {
+    return this.customizationService.state.bottomdockSize;
+  }
+
+  set height(value) {
+    this.customizationService.setSettings({ bottomdockSize: value });
+  }
+
+  get maxHeight() {
+    return this.$root.$el.getBoundingClientRect().height - 400;
+  }
+
+  get minHeight() {
+    return 50;
+  }
+
+  onResizeStartHandler() {
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  onResizeStopHandler() {
+    this.customizationService.setSettings({ previewEnabled: true });
   }
 }

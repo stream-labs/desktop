@@ -63,8 +63,8 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   get isSongRequestCommand() {
     return (
-      this.defaultCommandToUpdate.slugName === 'songrequest' &&
-      this.defaultCommandToUpdate.commandName === 'songrequest'
+      this.defaultCommandToUpdate.slugName === 'media-share' &&
+      this.defaultCommandToUpdate.commandName === 'request'
     );
   }
 
@@ -223,6 +223,14 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear when the user requested a banned song'),
         max: 450,
         uuid: $t('Banned Response'),
+        blockReturn: true,
+      }),
+      ticket_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t('The phrase that will appear when a ticket giveaway is started.'),
+        max: 450,
+        uuid: $t('Ticket Response'),
         blockReturn: true,
       }),
       music_response: metadataHelper.text({

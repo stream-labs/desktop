@@ -316,6 +316,10 @@
     overflow-y: auto;
     width: 100%;
     min-width: 260px;
+
+    @media (max-width: 1024px) {
+      min-width: 0;
+    }
   }
 
   .subsection__content.custom {

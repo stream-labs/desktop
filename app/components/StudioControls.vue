@@ -1,14 +1,5 @@
 <template>
-<div class="studio-controls row expanded" :style="{height: height + 'px'}">
-  <resize-bar
-    position="top"
-    v-model="height"
-    @onresizestop="onResizeStopHandler()"
-    @onresizestart="onResizeStartHandler()"
-    :max="maxHeight"
-    :min="minHeight"
-    :reverse="true"
-  />
+<div class="studio-controls row expanded">
   <scene-selector class="studio-controls-panel small-4 columns" />
   <source-selector class="studio-controls-panel small-4 columns" />
   <mixer class="studio-controls-panel small-4 columns" />
@@ -23,7 +14,6 @@
 .studio-controls {
   height: 240px;
   width: 100%;
-  .padding-v-sides(2);
   .padding-h-sides();
   margin: 0;
 }
