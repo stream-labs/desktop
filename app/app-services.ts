@@ -58,7 +58,7 @@ export {
   ChatbotBaseApiService,
   ChatbotAlertsApiService,
   ChatbotCommonService,
-  ChatbotSongRequestApiService,
+  ChatbotMediaRequestApiService,
   ChatbotGambleApiService,
   ChatbotCommandsApiService,
   ChatbotTimerApiService,

@@ -283,13 +283,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openSongRequestPreferencesWindow() {
+  openMediaRequestPreferencesWindow() {
     this.windowsService.showWindow({
-      componentName: 'ChatbotSongRequestPreferencesWindow',
-      title: $t('Chatbot Song Request Preferences'),
+      componentName: 'ChatbotMediaRequestPreferencesWindow',
+      title: $t('Chatbot Media Share Preferences'),
       size: {
         width: 650,
-        height: 500,
+        height: 600,
       },
     });
   }

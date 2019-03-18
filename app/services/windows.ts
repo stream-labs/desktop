@@ -59,8 +59,7 @@ import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/wind
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
-import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
+import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
 import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
 import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
 import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
@@ -132,8 +131,7 @@ export function getComponents() {
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,
     ChatbotCommandPreferencesWindow,
-    ChatbotSongRequestPreferencesWindow,
-    ChatbotSongRequestOnboardingWindow,
+    ChatbotMediaRequestPreferencesWindow,
     ChatbotLoyaltyWindow,
     ChatbotLoyaltyAddAllWindow,
     ChatbotLoyaltyPreferencesWindow,

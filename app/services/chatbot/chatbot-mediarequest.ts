@@ -16,23 +16,18 @@ import {
 } from './chatbot-interfaces';
 
 // state
-interface IChatbotSongRequestApiServiceState {
-  songRequestPreferencesResponse: ISongRequestPreferencesResponse;
-  songRequestResponse: ISongRequestResponse;
+interface IChatbotMediaRequestApiServiceState {
+  mediaRequestResponse: ISongRequestResponse;
 }
 
-export class ChatbotSongRequestApiService extends PersistentStatefulService<
-  IChatbotSongRequestApiServiceState
+export class ChatbotMediaRequestApiService extends PersistentStatefulService<
+  IChatbotMediaRequestApiServiceState
 > {
   @Inject() mediaShareService: MediaShareService;
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
 
-  static defaultState: IChatbotSongRequestApiServiceState = {
-    songRequestPreferencesResponse: {
-      banned_media: [],
-      settings: null,
-    },
-    songRequestResponse: {
+  static defaultState: IChatbotMediaRequestApiServiceState = {
+    mediaRequestResponse: {
       enabled: false,
       settings: null,
     },
@@ -41,15 +36,9 @@ export class ChatbotSongRequestApiService extends PersistentStatefulService<
   //
   // GET requests
   //
-  fetchSongRequestPreferencesData() {
-    return this.mediaShareService.fetchData().then((response: IMediaShareData) => {
-      this.UPDATE_SONG_REQUEST_PREFERENCES(response as ISongRequestPreferencesResponse);
-    });
-  }
-
   fetchSongRequest() {
     return this.chatbotBaseApiService
-      .api('GET', 'settings/songrequest', {})
+      .api('GET', 'settings/media-share', {})
       .then((response: ISongRequestResponse) => {
         this.UPDATE_SONG_REQUEST(response);
       });
@@ -69,7 +58,7 @@ export class ChatbotSongRequestApiService extends PersistentStatefulService<
 
   updateSongRequest(data: ISongRequestResponse) {
     return this.chatbotBaseApiService
-      .api('POST', 'settings/songrequest', data)
+      .api('POST', 'settings/media-share', data)
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchSongRequest();
@@ -81,12 +70,7 @@ export class ChatbotSongRequestApiService extends PersistentStatefulService<
   // Mutations
   //
   @mutation()
-  private UPDATE_SONG_REQUEST_PREFERENCES(response: ISongRequestPreferencesResponse) {
-    Vue.set(this.state, 'songRequestPreferencesResponse', response);
-  }
-
-  @mutation()
   private UPDATE_SONG_REQUEST(response: ISongRequestResponse) {
-    Vue.set(this.state, 'songRequestResponse', response);
+    Vue.set(this.state, 'mediaRequestResponse', response);
   }
 }
