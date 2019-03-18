@@ -6,7 +6,7 @@ type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
 interface INicoliveProgramState {
   programID: string;
-  status: string;
+  status: 'reserved' | 'test' | 'onAir' | 'end';
   title: string;
   description: string;
   endTime: number;
@@ -27,7 +27,7 @@ interface INicoliveProgramState {
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
   static initialState: INicoliveProgramState = {
     programID: '',
-    status: '',
+    status: 'end',
     title: '',
     description: '',
     endTime: 0,
@@ -79,6 +79,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   private setState(partialState: Partial<INicoliveProgramState>) {
     const nextState = { ...this.state, ...partialState };
     this.refreshStatisticsPolling(this.state, nextState);
+    this.refreshProgramStatusTimer(this.state, nextState);
     this.SET_STATE(nextState);
   }
 
@@ -260,5 +261,32 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   async sendOperatorComment(text: string, isPermanent: boolean): Promise<void> {
     const result = await this.client.sendOperatorComment(this.state.programID, { text, isPermanent });
     if (!isOk(result)) throw result.value;
+  }
+
+  static TIMER_PADDING_SECONDS = 3;
+  static REFRESH_TARGET_TIME_TABLE = {
+    reserved: 'testStartTime',
+    test: 'startTime',
+    onAir: 'endTime',
+  };
+  private refreshProgramTimer = 0;
+  refreshProgramStatusTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+    const now = Date.now();
+    const onInitialize = !prevState;
+    const statusUpdated = onInitialize || prevState.status !== nextState.status;
+
+    const status = nextState.status;
+    /** 放送状態が変化しなかった前提で、放送状態が次に変化するであろう時刻 */
+    const prevTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[status]];
+    const nextTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[status]];
+
+    // 次に放送状態が変化する予定の時刻（より少し後）に放送情報を更新するタイマーを仕込む
+    if (statusUpdated || prevTargetTime !== nextTargetTime) {
+      clearTimeout(this.refreshProgramTimer);
+      this.refreshProgramTimer = window.setTimeout(() => {
+        this.refreshProgram();
+      }, (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now);
+      return;
+    }
   }
 }
