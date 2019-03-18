@@ -1,7 +1,7 @@
 import {
-  IStreamEncoderSettings,
   SettingsService,
-  StreamEncoderSettingsService,
+  OutputSettingsService,
+  IStreamingEncoderSettings,
 } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
@@ -60,7 +60,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
   @Inject() private settingsService: SettingsService;
   @Inject() private streamingService: StreamingService;
-  @Inject() private streamEncoderSettingsService: StreamEncoderSettingsService;
+  @Inject() private OutputSettingsService: OutputSettingsService;
   @Inject() private urlService: UrlService;
 
   init() {
@@ -77,7 +77,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
    * returns profiles according to the current encoder settings
    */
   async fetchOptimizedProfile(game: string): Promise<IEncoderProfile> {
-    const settings = this.streamEncoderSettingsService.getSettings();
+    const settings = this.OutputSettingsService.getSettings().streaming;
     const profiles = await this.fetchAvailableGameProfiles(game);
 
     const filteredProfiles = profiles.filter(profile => {
@@ -152,24 +152,29 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       video: cloneDeep(this.settingsService.getSettingsFormData('Video')),
     };
     this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
-    const currentSettings = this.streamEncoderSettingsService.getSettings();
-    const newSettings: Partial<IStreamEncoderSettings> = {
+    const currentSettings = this.OutputSettingsService.getSettings();
+    const newStreamingSettings: Partial<IStreamingEncoderSettings> = {
       encoder: encoderProfile.encoder,
-      mode: 'Advanced',
       encoderOptions: encoderProfile.options,
       preset: encoderProfile.presetOut,
       rescaleOutput: false, // prevent using the rescaled resolution from encoder settings
-      bitrate: currentSettings.bitrate,
+      bitrate: currentSettings.streaming.bitrate,
     };
 
-    if (!currentSettings.hasCustomResolution) {
+    if (!currentSettings.streaming.hasCustomResolution) {
       // change the resolution only if user didn't set a custom one
-      newSettings.outputResolution = encoderProfile.resolutionOut;
+      newStreamingSettings.outputResolution = encoderProfile.resolutionOut;
     }
 
-    console.log('Apply encoder settings', newSettings);
+    console.log('Apply encoder settings', newStreamingSettings);
 
-    this.streamEncoderSettingsService.setSettings(newSettings);
+    this.OutputSettingsService.setSettings({
+      mode: 'Advanced',
+      streaming: newStreamingSettings,
+      // if current mode is Simple we need to pass recording settings as well to the Advanced mode
+      recording: currentSettings.recording,
+    });
+
     this.isUsingEncodingOptimizations = true;
   }
 
@@ -189,7 +194,9 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
   }
 
   private restorePreviousValues() {
-    this.streamEncoderSettingsService.setSettings({ encoderOptions: '' }); // clear encoderOptions settings
+    // clear encoderOptions settings
+    this.OutputSettingsService.setSettings({ streaming: { encoderOptions: '' } });
+
     this.settingsService.setSettings('Output', this.previousSettings.output);
     this.settingsService.setSettings('Video', this.previousSettings.video);
   }

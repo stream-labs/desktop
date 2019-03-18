@@ -1,6 +1,6 @@
 import { invert } from 'lodash';
 import { Service } from 'services/service';
-import { SettingsService } from 'services/settings';
+import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';
 
 export enum EEncoder {
@@ -19,6 +19,15 @@ enum EObsEncoder {
   amd_amf_h264 = 'amd_amf_h264',
   qsv = 'qsv',
   obs_qsv11 = 'obs_qsv11',
+}
+
+enum EFileFormat {
+  flv = 'flv',
+  mp4 = 'mp4',
+  mov = 'mov',
+  mkv = 'mkv',
+  ts = 'ts',
+  m3u8 = 'm3u8',
 }
 
 export const QUALITY_ORDER = [
@@ -52,17 +61,38 @@ export const QUALITY_ORDER = [
   'quality',
 ];
 
-export interface IStreamEncoderSettings {
-  mode: 'Simple' | 'Advanced';
-  encoder: EEncoder;
-  bitrate: number;
+export interface IOutputSettings {
+  mode: TOutputSettingsMode;
   inputResolution: string;
+  streaming: IStreamingEncoderSettings;
+  recording: IRecordingEncoderSettings;
+}
+
+interface IOutputSettingsPatch {
+  mode?: TOutputSettingsMode;
+  streaming?: Partial<IStreamingEncoderSettings>;
+  recording?: Partial<IRecordingEncoderSettings>;
+}
+
+export interface IEncoderSettings {
+  encoder: EEncoder;
   outputResolution: string;
+}
+
+export interface IRecordingEncoderSettings extends IEncoderSettings {
+  path: string;
+  format: EFileFormat;
+}
+
+export interface IStreamingEncoderSettings extends IEncoderSettings {
   preset: string;
-  encoderOptions: string;
+  bitrate: number;
   rescaleOutput: boolean;
   hasCustomResolution: boolean;
+  encoderOptions: string;
 }
+
+type TOutputSettingsMode = 'Simple' | 'Advanced';
 
 const simpleEncoderToAnvancedEncoderMap = {
   x264: 'obs_x264',
@@ -93,20 +123,49 @@ export function obsEncoderToEncoder(obsEncoder: EObsEncoder): EEncoder {
   return encoder as EEncoder;
 }
 
-export class StreamEncoderSettingsService extends Service {
+export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
 
   /**
-   * Returns some information about the user's streaming settings.
-   * This is used in aggregate to improve our optimized video encoding.
-   *
-   * P.S. Settings needs a refactor... badly
+   * returns unified settings for the Streaming and Recording encoder
+   * independently of selected mode
    */
-  getSettings(): IStreamEncoderSettings {
+  getSettings(): IOutputSettings {
     const output = this.settingsService.getSettingsFormData('Output');
     const video = this.settingsService.getSettingsFormData('Video');
+    const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
+      output,
+      'Untitled',
+      'Mode',
+    );
 
-    const mode = this.settingsService.findSettingValue(output, 'Untitled', 'Mode');
+    const inputResolution: string = this.settingsService.findSettingValue(
+      video,
+      'Untitled',
+      'Base',
+    );
+
+    const streaming = this.getStreamingEncoderSettings(output, video);
+    const recording = this.getRecordingEncoderSettings(output, video, mode);
+
+    return {
+      mode,
+      inputResolution,
+      streaming,
+      recording,
+    };
+  }
+
+  private getStreamingEncoderSettings(
+    output: ISettingsSubCategory[],
+    video: ISettingsSubCategory[],
+  ): IStreamingEncoderSettings {
+    /**
+     * Returns some information about the user's streaming settings.
+     * This is used in aggregate to improve our optimized video encoding.
+     *
+     * P.S. Settings needs a refactor... badly
+     */
     const encoder = obsEncoderToEncoder(
       this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') ||
         this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder'),
@@ -132,11 +191,6 @@ export class StreamEncoderSettingsService extends Service {
     const bitrate: number =
       this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') ||
       this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate');
-    const inputResolution: string = this.settingsService.findSettingValue(
-      video,
-      'Untitled',
-      'Base',
-    );
     const outputResolution: string =
       this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') ||
       this.settingsService.findSettingValue(video, 'Untitled', 'Output');
@@ -152,11 +206,9 @@ export class StreamEncoderSettingsService extends Service {
     const hasCustomResolution = !resolutions.includes(outputResolution);
 
     return {
-      mode,
       encoder,
-      preset, // in some cases OBS returns \r at the end of the string
+      preset,
       bitrate,
-      inputResolution,
       outputResolution,
       encoderOptions,
       rescaleOutput,
@@ -164,16 +216,61 @@ export class StreamEncoderSettingsService extends Service {
     };
   }
 
+  private getRecordingEncoderSettings(
+    output: ISettingsSubCategory[],
+    video: ISettingsSubCategory[],
+    mode: TOutputSettingsMode,
+  ): IRecordingEncoderSettings {
+    const path =
+      mode === 'Simple'
+        ? this.settingsService.findSettingValue(output, 'Recording', 'FilePath')
+        : this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
+
+    const format = this.settingsService.findValidListValue(
+      output,
+      'Recording',
+      'RecFormat',
+    ) as EFileFormat;
+
+    const encoder = obsEncoderToEncoder(
+      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder'),
+    ) as EEncoder;
+
+    const outputResolution: string =
+      this.settingsService.findSettingValue(output, 'Recording', 'RecRescaleRes') ||
+      this.settingsService.findSettingValue(video, 'Untitled', 'Output');
+
+    return {
+      path,
+      format,
+      encoder,
+      outputResolution,
+    };
+  }
+
   /**
    * This method helps to simplify tuning the encoder's settings
+   * This method can patch ONLY Advanced settings
    */
-  setSettings(settingsPatch: Partial<IStreamEncoderSettings>) {
+  setSettings(settingsPatch: IOutputSettingsPatch) {
     if (settingsPatch.mode) {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
     }
-
     const currentSettings = this.getSettings();
 
+    if (settingsPatch.streaming) {
+      this.setStreamingEncoderSettings(currentSettings, settingsPatch.streaming);
+    }
+
+    if (settingsPatch.recording) {
+      this.setRecordingEncoderSettings(currentSettings, settingsPatch.recording);
+    }
+  }
+
+  private setStreamingEncoderSettings(
+    currentSettings: IOutputSettings,
+    settingsPatch: Partial<IStreamingEncoderSettings>,
+  ) {
     if (settingsPatch.encoder) {
       if (currentSettings.mode === 'Advanced') {
         this.settingsService.setSettingValue(
@@ -190,7 +287,7 @@ export class StreamEncoderSettingsService extends Service {
       }
     }
 
-    const encoder = settingsPatch.encoder || currentSettings.encoder;
+    const encoder = settingsPatch.encoder || currentSettings.streaming.encoder;
 
     if (settingsPatch.outputResolution) {
       this.settingsService.setSettingValue('Video', 'Output', settingsPatch.outputResolution);
@@ -222,6 +319,32 @@ export class StreamEncoderSettingsService extends Service {
       } else {
         this.settingsService.setSettingValue('Output', 'VBitrate', settingsPatch.bitrate);
       }
+    }
+  }
+
+  private setRecordingEncoderSettings(
+    currentSettings: IOutputSettings,
+    settingsPatch: Partial<IRecordingEncoderSettings>,
+  ) {
+    const mode = currentSettings.mode;
+    if (settingsPatch.format) {
+      this.settingsService.setSettingValue('Output', 'RecFormat', settingsPatch.format);
+    }
+
+    if (settingsPatch.path) {
+      this.settingsService.setSettingValue(
+        'Output',
+        mode === 'Simple' ? 'FilePath' : 'RecFilePath',
+        settingsPatch.path,
+      );
+    }
+
+    if (settingsPatch.encoder) {
+      this.settingsService.setSettingValue(
+        'Output',
+        'RecEncoder',
+        simpleEncoderToAdvancedEncoder(settingsPatch.encoder),
+      );
     }
   }
 }
