@@ -257,7 +257,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   static TIMER_PADDING_SECONDS = 3;
   static REFRESH_TARGET_TIME_TABLE = {
-    reserved: 'testStartTime',
+    reserved: 'startTime',
     test: 'startTime',
     onAir: 'endTime',
   };

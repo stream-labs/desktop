@@ -389,6 +389,12 @@ describe('refreshStatisticsPolling', () => {
       result: 'NOOP',
     },
     {
+      name: '予約状態から放送中状態になったらタイマーを更新する',
+      prev: { status: 'reserved', programID: 'lv1' },
+      next: { status: 'onAir', programID: 'lv1' },
+      result: 'REFRESH',
+    },
+    {
       name: 'テスト状態から放送中状態になったらタイマーを更新する',
       prev: { status: 'test', programID: 'lv1' },
       next: { status: 'onAir', programID: 'lv1' },
@@ -401,10 +407,28 @@ describe('refreshStatisticsPolling', () => {
       result: 'STOP',
     },
     {
+      name: '放送中状態から別番組の予約状態になったらタイマーを止める',
+      prev: { status: 'onAir', programID: 'lv1' },
+      next: { status: 'reserved', programID: 'lv2' },
+      result: 'STOP',
+    },
+    {
+      name: '放送中状態から別番組の放送中状態になったらタイマーを止める',
+      prev: { status: 'onAir', programID: 'lv1' },
+      next: { status: 'test', programID: 'lv2' },
+      result: 'STOP',
+    },
+    {
       name: '放送中状態から別番組の放送中状態になったらタイマーを更新する',
       prev: { status: 'onAir', programID: 'lv1' },
       next: { status: 'onAir', programID: 'lv2' },
       result: 'REFRESH',
+    },
+    {
+      name: '放送中状態から別番組の終了状態になったらタイマーを止める',
+      prev: { status: 'onAir', programID: 'lv1' },
+      next: { status: 'end', programID: 'lv2' },
+      result: 'STOP',
     },
   ];
 
@@ -537,9 +561,9 @@ describe('refreshProgramStatusTimer', () => {
       result: 'REFRESH',
     },
     {
-      name: '予約状態からテスト状態になったらタイマーを更新する',
+      name: '予約状態から放送中状態になったらタイマーを更新する',
       prev: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'REFRESH',
     },
     {

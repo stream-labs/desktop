@@ -7,7 +7,8 @@
     <template v-else>
       <div><button @click="fetchProgram" :disabled="isFetching">番組取得</button></div>
       <div><button @click="editProgram" :disabled="isEditing">番組編集</button></div>
-      <div v-if="programStatus === 'test'"><button @click="startProgram" :disabled="isStarting">番組開始</button></div>
+      <div v-if="programStatus === 'reserved'">番組開始まであと {{ format(-programCurrentTime) }}</div>
+      <div v-else-if="programStatus === 'test'"><button @click="startProgram" :disabled="isStarting">番組開始</button></div>
       <div v-else-if="programStatus === 'onAir'"><button @click="endProgram" :disabled="isEnding">番組終了</button></div>
       <div v-else><button @click="createProgram" :disabled="isCreating">番組作成</button></div>
       <div><button @click="toggleAutoExtension">自動延長を{{ autoExtensionEnabled ? 'OFF' : 'ON' }}にする</button></div>
