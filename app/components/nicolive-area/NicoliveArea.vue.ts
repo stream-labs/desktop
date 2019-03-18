@@ -210,7 +210,7 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   get isProgramExtendable() {
-    return this.nicoliveProgramService.isProgramExtendable;
+    return this.nicoliveProgramService.isProgramExtendable && this.programEndTime - this.currentTime > 60;
   }
 
   get autoExtensionEnabled() {
