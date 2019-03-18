@@ -99,8 +99,8 @@ export class ChatService extends Service {
   }
 
   private bindWindowListener() {
-    this.chatView.webContents.on('new-window', evt => {
-      const parsedUrl = url.parse(evt['url']);
+    this.chatView.webContents.on('new-window', (evt, targetUrl) => {
+      const parsedUrl = url.parse(targetUrl);
       const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
@@ -123,7 +123,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
         } else {
-          electron.remote.shell.openExternal(evt['url']);
+          electron.remote.shell.openExternal(targetUrl);
         }
       }
     });
