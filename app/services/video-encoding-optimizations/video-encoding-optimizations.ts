@@ -60,7 +60,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
   @Inject() private settingsService: SettingsService;
   @Inject() private streamingService: StreamingService;
-  @Inject() private OutputSettingsService: OutputSettingsService;
+  @Inject() private outputSettingsService: OutputSettingsService;
   @Inject() private urlService: UrlService;
 
   init() {
@@ -77,7 +77,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
    * returns profiles according to the current encoder settings
    */
   async fetchOptimizedProfile(game: string): Promise<IEncoderProfile> {
-    const settings = this.OutputSettingsService.getSettings().streaming;
+    const settings = this.outputSettingsService.getSettings().streaming;
     const profiles = await this.fetchAvailableGameProfiles(game);
 
     const filteredProfiles = profiles.filter(profile => {
@@ -152,7 +152,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       video: cloneDeep(this.settingsService.getSettingsFormData('Video')),
     };
     this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
-    const currentSettings = this.OutputSettingsService.getSettings();
+    const currentSettings = this.outputSettingsService.getSettings();
     const newStreamingSettings: Partial<IStreamingEncoderSettings> = {
       encoder: encoderProfile.encoder,
       encoderOptions: encoderProfile.options,
@@ -168,7 +168,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
     console.log('Apply encoder settings', newStreamingSettings);
 
-    this.OutputSettingsService.setSettings({
+    this.outputSettingsService.setSettings({
       mode: 'Advanced',
       streaming: newStreamingSettings,
       // if current mode is Simple we need to pass recording settings as well to the Advanced mode
@@ -195,7 +195,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
   private restorePreviousValues() {
     // clear encoderOptions settings
-    this.OutputSettingsService.setSettings({ streaming: { encoderOptions: '' } });
+    this.outputSettingsService.setSettings({ streaming: { encoderOptions: '' } });
 
     this.settingsService.setSettings('Output', this.previousSettings.output);
     this.settingsService.setSettings('Video', this.previousSettings.video);
