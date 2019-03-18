@@ -19,7 +19,6 @@ interface INicoliveProgramState {
   comments: number;
   adPoint: number;
   giftPoint: number;
-  extendable: boolean;
   /** TODO: 永続化 */
   autoExtensionEnabled: boolean;
 }
@@ -40,7 +39,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     comments: 0,
     adPoint: 0,
     giftPoint: 0,
-    extendable: true,
     autoExtensionEnabled: false,
   };
 
@@ -74,6 +72,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   get hasProgram(): boolean {
     return Boolean(this.state.programID);
+  }
+
+  static isProgramExtendable(state: INicoliveProgramState): boolean {
+    return state && state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
+  }
+
+  get isProgramExtendable(): boolean {
+    return NicoliveProgramService.isProgramExtendable(this.state);
   }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
@@ -141,7 +147,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       communityID: socialGroupId,
       communityName: community.name,
       communitySymbol: community.thumbnailUrl.small,
-      extendable: true,
     });
   }
 
@@ -206,12 +211,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         endTime: result.value.end_time,
       });
       return;
-    }
-
-    if (result.value.meta.status === 400) {
-      this.setState({
-        extendable: false,
-      });
     }
 
     throw result.value;
@@ -298,9 +297,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const endTimeUpdated = onInitialize || prevState.endTime !== nextState.endTime;
 
     /** 更新前の状態でタイマーが動作しているべきか */
-    const prev = onInitialize ? false : prevState.autoExtensionEnabled && prevState.status === 'onAir';
+    const prev =
+      !onInitialize && prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
     /** 更新後の状態でタイマーが動作しているべきか */
-    const next = nextState.autoExtensionEnabled && nextState.status === 'onAir';
+    const next = nextState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(nextState);
 
     // 動作すべき状態になる OR 終了時刻が変わったら再設定
     if ((!prev && next) || (next && endTimeUpdated)) {

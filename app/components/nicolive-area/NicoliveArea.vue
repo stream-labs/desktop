@@ -12,7 +12,13 @@
       <div v-else-if="programStatus === 'onAir'"><button @click="endProgram">番組終了</button></div>
       <div v-else><button @click="createProgram">番組作成</button></div>
       <div><button @click="toggleAutoExtension">自動延長を{{ autoExtensionEnabled ? 'OFF' : 'ON' }}にする</button></div>
-      <div><button @click="extendProgram">延長する</button></div>
+      <div>
+        <button @click="extendProgram" :disabled="isExtending || !isProgramExtendable">
+          <template v-if="isExtending">延長中です……</template>
+          <template v-else-if="isProgramExtendable">延長する</template>
+          <template v-else>延長できません</template>
+        </button>
+      </div>
       <div>
         <h1>{{programTitle}}</h1>
         <div>status: {{ programStatus }}</div>
