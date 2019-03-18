@@ -66,6 +66,7 @@ interface IFacemaskSettings {
   duration: number;
   device: IInputDeviceSelection;
   username: string;
+  twitch_id?: number;
 }
 
 interface IUserFacemaskSettings {
@@ -86,11 +87,19 @@ interface IFacemaskDonation {
   facemask: string;
 }
 
-interface IFacemaskSubscription {
+interface IFacemaskBits {
   eventId: string;
   facemask: string;
-  user_id: number;
-  subscriber_id: number;
+}
+
+interface IFacemaskSubscription {
+  name: string;
+  subscriberId: string;
+  subPlan: string;
+}
+
+interface IFacemaskSelection {
+  uuid: string;
 }
 
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
@@ -219,8 +228,55 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.registeredDonations[donation.eventId] = donation.facemask;
   }
 
+  registerBitsEvent(bits: IFacemaskBits) {
+    this.registeredBits[bits.eventId] = bits.facemask;
+  }
+
   registerSubscriptionEvent(subscription: IFacemaskSubscription) {
-    this.registeredSubscriptions[subscription.eventId] = subscription.facemask;
+    const eventKey = subscription.name + subscription.subPlan;
+    if (subscription.subPlan !== '2000' && subscription.subPlan !== '3000') {
+      return;
+    }
+
+    // Pick Eligible Mask at Random
+    if (!subscription.subscriberId) {
+      this.registeredSubscriptions[eventKey] = this.selectRandomMaskForSub(subscription);
+    }
+
+    this.registeredSubscriptions[eventKey] = this.fetchViewerMaskSelection(subscription);
+  }
+
+  fetchViewerMaskSelection(sub: IFacemaskSubscription) {
+    const endpoint = 'slobs/facemasks/subscription';
+    const data = {
+      twitch_id: this.state.settings.twitch_id,
+      subscriber_twitch_id: sub.subscriberId,
+      tier: sub.subPlan,
+    };
+    const postData = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    };
+    console.log('fetching this bullshit');
+
+    return this.formRequest(endpoint, postData);
+  }
+
+  selectRandomMaskForSub(sub: IFacemaskSubscription): Promise<{ uuid: string }> {
+    return new Promise(resolve => {
+      let availableMasks: string[] = [];
+
+      if (sub.subPlan === '2000') {
+        availableMasks = this.state.settings.userT2masks;
+      }
+
+      if (sub.subPlan === '3000') {
+        availableMasks = this.state.settings.userT2masks.concat(this.state.settings.userT3masks);
+      }
+
+      resolve({ uuid: availableMasks[Math.floor(Math.random() * availableMasks.length)] });
+    });
   }
 
   playDonationEvent(donation: IFacemaskDonation) {
@@ -231,10 +287,29 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
+  playBitsEvent(bits: IFacemaskBits) {
+    console.log('playing', bits);
+    if (this.registeredBits[bits.eventId] && this.facemaskFilter) {
+      const uuid = this.registeredBits[bits.eventId];
+      delete this.registeredBits[bits.eventId];
+      this.trigger(uuid);
+    }
+  }
+
   playSubscriptionEvent(subscription: IFacemaskSubscription) {
-    if (this.registeredSubscriptions[subscription.eventId] && this.facemaskFilter) {
-      delete this.registeredSubscriptions[subscription.eventId];
-      this.trigger(subscription.facemask);
+    const eventKey = subscription.name + subscription.subPlan;
+    if (this.registeredSubscriptions[eventKey] && this.facemaskFilter) {
+      const uuidPromise = this.registeredSubscriptions[eventKey];
+      delete this.registeredSubscriptions[eventKey];
+      uuidPromise.then((response: IFacemaskSelection) => {
+        if (response.uuid) {
+          this.trigger(response.uuid);
+        } else {
+          this.selectRandomMaskForSub(subscription).then(result => {
+            this.trigger(result.uuid);
+          });
+        }
+      });
     }
   }
 
@@ -249,10 +324,21 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
     if (event.type === 'subscription') {
       console.log('getting sub', event);
+      this.registerSubscriptionEvent({
+        subscriberId: event.message[0].subscriber_twitch_id
+          ? event.message[0].subscriber_twitch_id
+          : null,
+        subPlan: event.message[0].sub_plan,
+        name: event.message[0].name,
+      });
     }
 
     if (event.type === 'bits') {
       console.log('getting bits', event);
+      this.registerBitsEvent({
+        facemask: event.message[0].data.facemask,
+        eventId: event.message[0].data.fm_id,
+      });
     }
 
     if (
@@ -266,10 +352,21 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
     if (event.type === 'alertPlaying' && event.message.type === 'subscription') {
       console.log('playing sub', event);
+      this.playSubscriptionEvent({
+        subscriberId: event.message.subscriber_twitch_id
+          ? event.message[0].subscriber_twitch_id
+          : null,
+        subPlan: event.message.sub_plan,
+        name: event.message.name,
+      });
     }
 
     if (event.type === 'alertPlaying' && event.message.type === 'bits') {
       console.log('playing bits', event);
+      this.playBitsEvent({
+        facemask: event.message.data.facemask,
+        eventId: event.message.data.fm_id,
+      });
     }
   }
 
@@ -330,8 +427,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           return enabledDeviceId === (device.value as string);
         })
       : false;
-    console.log("woooooo");
-    console.log(availableDeviceSelected);
 
     return this.state.settings.enabled && availableDeviceSelected;
   }
@@ -463,26 +558,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     let alertBox = false;
     const sources = this.sourcesService.getSources();
 
-    console.log("WTF");
-    console.log(sources);
-
     const browserSources = sources.filter(source => {
       return source.type === 'browser_source';
     });
 
-    console.log(browserSources);
-
     browserSources.forEach(source => {
       const browserSource = this.sourcesService.getSourceById(source.sourceId);
-      console.log(browserSource);
-      console.log();
     });
   }
 
   setupFilter() {
     const sources = this.sourcesService.getSources();
-    console.log(sources);
-    console.log("WHAI");
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';
@@ -733,6 +819,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   // }
 
   private formRequest(endpoint: string, options: any = {}) {
+    console.log('innnis bish');
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken, options.headers);
     const url = `https://${host}/api/v5/${endpoint}`;
