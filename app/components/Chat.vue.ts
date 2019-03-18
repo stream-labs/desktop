@@ -29,6 +29,8 @@ export default class Chat extends Vue {
   }
 
   checkResize() {
+    if (!this.$refs.chat) return;
+
     const rect = this.$refs.chat.getBoundingClientRect();
 
     if (this.currentPosition == null || this.currentSize == null || this.rectChanged(rect)) {
