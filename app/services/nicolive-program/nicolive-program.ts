@@ -49,9 +49,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
    */
   static findSuitableProgram(schedules: Schedules): null | Schedule {
     // テスト中・放送中の番組があればそれで確定
-    const now = Math.floor(Date.now() / 1000);
     const currentProgram = schedules.find(
-      s => s.socialGroupId.startsWith('co') && s.testBeginAt <= now && now < s.onAirEndAt
+      s => s.socialGroupId.startsWith('co') && (s.status === 'test' || s.status === 'onAir')
     );
     if (currentProgram) return currentProgram;
 
