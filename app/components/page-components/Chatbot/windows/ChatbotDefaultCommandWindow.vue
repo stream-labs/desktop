@@ -19,8 +19,8 @@
               <span>{{ $t('Queue Settings') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
-            <div @click="onToggleSongRequestWindowHandler" v-if="isSongRequestCommand">
-              <span>{{ $t('Song Request Preferences') }}</span>
+            <div @click="onToggleMediaRequestWindowHandler" v-if="isSongRequestCommand">
+              <span>{{ $t('Media Share Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
             <div @click="onToggleLoyaltyPreferencesWindowHandler" v-if="isLoyaltyCommand">

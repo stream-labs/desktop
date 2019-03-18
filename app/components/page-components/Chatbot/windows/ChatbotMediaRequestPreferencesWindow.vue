@@ -1,7 +1,15 @@
 
 <template>
   <ModalLayout :showControls="false" :customControls="true">
-    <div slot="content">
+    <div slot="fixed">
+      <div class="window-toggle__wrapper">
+        <div @click="onToggleMediaRequestWindowHandler">
+          <span>{{ $t('Edit Primary Command') }}</span>
+          <i class="fas fa-chevron-right window-toggle__icon"></i>
+        </div>
+      </div>
+    </div>
+    <div slot="content" class="settings-container">
       <validated-form ref="form">
         <div v-if="mediaRequestData">
           <VFormGroup
@@ -66,6 +74,9 @@
   .flex--column();
   .flex--center();
   .padding-vertical--20;
+}
+.settings-container {
+  margin-top: 45px;
 }
 .window-toggle__wrapper {
   background-color: @day-primary;

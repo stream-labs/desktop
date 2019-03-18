@@ -184,7 +184,7 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
-  onToggleSongRequestWindowHandler() {
+  onToggleMediaRequestWindowHandler() {
     switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotApiService.Common.openMediaRequestPreferencesWindow();
