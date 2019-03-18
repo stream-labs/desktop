@@ -3,7 +3,8 @@ import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
-import { mapValues, pickBy } from 'lodash';
+import pickBy from 'lodash/pickBy';
+import mapValues from 'lodash/mapValues';
 
 type TCommandSlug =
   | 'commands'
