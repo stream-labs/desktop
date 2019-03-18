@@ -1,6 +1,9 @@
 import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
+import { ProgramSchedules } from './ResponseTypes';
 
+type Schedules = ProgramSchedules['data'];
+type Schedule = Schedules[0];
 interface INicoliveProgramState {
   programID: string;
   status: string;
@@ -8,6 +11,7 @@ interface INicoliveProgramState {
   description: string;
   endTime: number;
   startTime: number;
+  testStartTime: number;
   communityID: string;
   communityName: string;
   communitySymbol: string;
@@ -28,6 +32,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     description: '',
     endTime: 0,
     startTime: 0,
+    testStartTime: 0,
     communityID: '',
     communityName: '',
     communitySymbol: '',
@@ -38,6 +43,32 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     extendable: true,
     autoExtentionEnabled: false,
   };
+
+  /**
+   * 番組スケジュールから表示すべき番組を選ぶ
+   * 1. テスト中または放送中の番組があればその番組を返す
+   * 2. 予約番組があるなら最も近い予約番組を返す
+   */
+  static findSuitableProgram(schedules: Schedules): null | Schedule {
+    // テスト中・放送中の番組があればそれで確定
+    const now = Math.floor(Date.now() / 1000);
+    const currentProgram = schedules.find(
+      s => s.socialGroupId.startsWith('co') && s.testBeginAt <= now && now < s.onAirEndAt
+    );
+    if (currentProgram) return currentProgram;
+
+    let nearestReservedProgram: null | Schedule = null;
+    for (const s of schedules) {
+      // ユーザー生放送以外は無視
+      if (!s.socialGroupId.startsWith('co')) continue;
+
+      // 一番近い予約放送を選ぶ
+      if (!nearestReservedProgram || s.testBeginAt < nearestReservedProgram.testBeginAt) {
+        nearestReservedProgram = s;
+      }
+    }
+    return nearestReservedProgram;
+  }
 
   client: NicoliveClient = new NicoliveClient();
 
@@ -71,8 +102,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       throw schedulesResponse.value;
     }
 
-    // TODO: select suitable program
-    const programSchedule = schedulesResponse.value[0];
+    const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
 
     if (!programSchedule) {
       if (this.state) {
@@ -104,6 +134,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       title: program.title,
       description: program.description,
       startTime: program.beginAt,
+      testStartTime: programSchedule.testBeginAt,
       endTime: program.endAt,
       communityID: socialGroupId,
       communityName: community.name,
