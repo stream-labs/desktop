@@ -244,8 +244,12 @@ export default class NicolivePanelRoot extends Vue {
 
   @Watch('programStatus')
   onStatusChange(newValue: string, oldValue: string) {
-    if (newValue === 'end') clearInterval(this.timeTimer);
-    else if (oldValue === 'end') this.startTimer();
+    if (newValue === 'end') {
+      clearInterval(this.timeTimer);
+    } else if (oldValue === 'end') {
+      clearInterval(this.timeTimer);
+      this.startTimer();
+    }
   }
 
   startTimer() {
