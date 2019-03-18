@@ -213,8 +213,8 @@ export default class NicolivePanelRoot extends Vue {
     return this.nicoliveProgramService.state.extendable;
   }
 
-  get autoExtentionEnabled() {
-    return this.nicoliveProgramService.state.autoExtentionEnabled;
+  get autoExtensionEnabled() {
+    return this.nicoliveProgramService.state.autoExtensionEnabled;
   }
 
   currentTime: number = 0;

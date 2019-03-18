@@ -21,7 +21,7 @@ interface INicoliveProgramState {
   giftPoint: number;
   extendable: boolean;
   /** TODO: 永続化 */
-  autoExtentionEnabled: boolean;
+  autoExtensionEnabled: boolean;
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
@@ -41,7 +41,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     adPoint: 0,
     giftPoint: 0,
     extendable: true,
-    autoExtentionEnabled: false,
+    autoExtensionEnabled: false,
   };
 
   /**
@@ -80,6 +80,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const nextState = { ...this.state, ...partialState };
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
+    this.refreshAutoExtensionTimer(this.state, nextState);
     this.SET_STATE(nextState);
   }
 
@@ -194,8 +195,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   toggleAutoExtension() {
-    const autoExtentionEnabled = !this.state.autoExtentionEnabled;
-    this.setState({ autoExtentionEnabled });
+    const autoExtensionEnabled = !this.state.autoExtensionEnabled;
+    this.setState({ autoExtensionEnabled });
   }
 
   async extendProgram(): Promise<void> {
@@ -287,6 +288,38 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         this.refreshProgram();
       }, (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now);
       return;
+    }
+  }
+
+  private autoExtensionTimer = 0;
+  refreshAutoExtensionTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+    const now = Date.now();
+    const onInitialize = !prevState;
+    const endTimeUpdated = onInitialize || prevState.endTime !== nextState.endTime;
+
+    /** 更新前の状態でタイマーが動作しているべきか */
+    const prev = onInitialize ? false : prevState.autoExtensionEnabled && prevState.status === 'onAir';
+    /** 更新後の状態でタイマーが動作しているべきか */
+    const next = nextState.autoExtensionEnabled && nextState.status === 'onAir';
+
+    // 動作すべき状態になる OR 終了時刻が変わったら再設定
+    if ((!prev && next) || (next && endTimeUpdated)) {
+      clearTimeout(this.autoExtensionTimer);
+      this.autoExtensionTimer = window.setTimeout(() => {
+        this.extendProgram();
+      }, (nextState.endTime - 5 * 60) * 1000 - now);
+      console.log(
+        '自動延長タイマーが（再）設定されました ',
+        Math.floor(((nextState.endTime - 5 * 60) * 1000 - now) / 1000),
+        '秒後に自動延長します'
+      );
+      return;
+    }
+
+    // 動作すべきでない状態になるなら解除
+    if (prev && !next) {
+      clearTimeout(this.autoExtensionTimer);
+      console.log('自動延長タイマーが解除されました');
     }
   }
 }
