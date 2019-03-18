@@ -9,7 +9,6 @@ export interface ICustomizationServiceState {
   hideViewerCount: boolean;
   folderSelection: boolean;
   livedockCollapsed: boolean;
-  previewWidth: number;
   livedockSize: number;
   bottomdockSize: number;
   performanceMode: boolean;

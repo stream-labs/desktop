@@ -26,6 +26,7 @@ export default class Chat extends Vue {
 
   destroyed() {
     this.chatService.unmountChat(electron.remote.getCurrentWindow().id);
+    clearInterval(this.resizeInterval);
   }
 
   checkResize() {
