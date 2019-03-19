@@ -20,20 +20,9 @@ import electron from 'electron';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { $t } from 'services/i18n';
 import { throttle } from 'lodash-decorators';
-import {
-  IFacemasksServiceState,
-  IFacemaskMetadata,
-  IInputDeviceSelection,
-  IFacemask,
-  IFacemaskSettings,
-  IUserFacemaskSettings,
-  IFacemaskDonation,
-  IFacemaskBits,
-  IFacemaskSubscription,
-  IFacemaskSelection,
-} from './definitions';
+import * as Interfaces from './definitions';
 
-export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
+export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() websocketService: WebsocketService;
@@ -51,7 +40,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   registeredBits = {};
   downloadProgress = {};
 
-  static defaultState: IFacemasksServiceState = {
+  static defaultState: Interfaces.IFacemasksServiceState = {
     device: { name: null, value: null },
     modtimeMap: {},
     active: false,
@@ -156,15 +145,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.sourcesService.sourceAdded.subscribe(e => this.onSourceAdded(e));
   }
 
-  registerDonationEvent(donation: IFacemaskDonation) {
+  registerDonationEvent(donation: Interfaces.IFacemaskDonation) {
     this.registeredDonations[donation.eventId] = donation.facemask;
   }
 
-  registerBitsEvent(bits: IFacemaskBits) {
+  registerBitsEvent(bits: Interfaces.IFacemaskBits) {
     this.registeredBits[bits.eventId] = bits.facemask;
   }
 
-  registerSubscriptionEvent(subscription: IFacemaskSubscription) {
+  registerSubscriptionEvent(subscription: Interfaces.IFacemaskSubscription) {
     const eventKey = subscription.name + subscription.subPlan;
     if (subscription.subPlan !== '2000' && subscription.subPlan !== '3000') {
       return;
@@ -178,7 +167,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.registeredSubscriptions[eventKey] = this.fetchViewerMaskSelection(subscription);
   }
 
-  fetchViewerMaskSelection(sub: IFacemaskSubscription) {
+  fetchViewerMaskSelection(sub: Interfaces.IFacemaskSubscription) {
     const endpoint = 'slobs/facemasks/subscription';
     const data = {
       twitch_id: this.state.settings.twitch_id,
@@ -194,7 +183,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest(endpoint, postData);
   }
 
-  selectRandomMaskForSub(sub: IFacemaskSubscription): Promise<{ uuid: string }> {
+  selectRandomMaskForSub(sub: Interfaces.IFacemaskSubscription): Promise<{ uuid: string }> {
     return new Promise(resolve => {
       let availableMasks: string[] = [];
 
@@ -216,7 +205,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
-  playDonationEvent(donation: IFacemaskDonation) {
+  playDonationEvent(donation: Interfaces.IFacemaskDonation) {
     if (this.registeredDonations[donation.eventId] && this.facemaskFilter) {
       const uuid = this.registeredDonations[donation.eventId];
       delete this.registeredDonations[donation.eventId];
@@ -224,7 +213,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  playBitsEvent(bits: IFacemaskBits) {
+  playBitsEvent(bits: Interfaces.IFacemaskBits) {
     if (this.registeredBits[bits.eventId] && this.facemaskFilter) {
       const uuid = this.registeredBits[bits.eventId];
       delete this.registeredBits[bits.eventId];
@@ -232,12 +221,12 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  playSubscriptionEvent(subscription: IFacemaskSubscription) {
+  playSubscriptionEvent(subscription: Interfaces.IFacemaskSubscription) {
     const eventKey = subscription.name + subscription.subPlan;
     if (this.registeredSubscriptions[eventKey] && this.facemaskFilter) {
       const uuidPromise = this.registeredSubscriptions[eventKey];
       delete this.registeredSubscriptions[eventKey];
-      uuidPromise.then((response: IFacemaskSelection) => {
+      uuidPromise.then((response: Interfaces.IFacemaskSelection) => {
         if (response.uuid) {
           this.trigger(response.uuid, this.state.settings.sub_duration);
         } else {
@@ -254,17 +243,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   shouldQueueSubscriptionEvents() {
-    return (
-      this.state.settings.subs_enabled &&
-      this.state.settings.extension_enabled
-    );
+    return this.state.settings.subs_enabled && this.state.settings.extension_enabled;
   }
 
   shouldQueueBitsEvents() {
-    return (
-      this.state.settings.bits_enabled &&
-      this.state.settings.extension_enabled
-    );
+    return this.state.settings.bits_enabled && this.state.settings.extension_enabled;
   }
 
   onSocketEvent(event: TSocketEvent) {
@@ -344,7 +327,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   getInputDevicesList() {
     const dummy = obs.InputFactory.create('dshow_input', 'fake tmp dshow device', {});
     const properties = dummy.properties.get('video_device_id') as obs.IListProperty;
-    const devices = properties.details.items as IInputDeviceSelection[];
+    const devices = properties.details.items as Interfaces.IInputDeviceSelection[];
     dummy.release();
     devices.forEach(device => {
       device.selected = false;
@@ -378,7 +361,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.state.settings.enabled && availableDeviceSelected;
   }
 
-  checkFacemaskSettings(settings: IFacemaskSettings) {
+  checkFacemaskSettings(settings: Interfaces.IFacemaskSettings) {
     this.SET_SETTINGS(settings);
 
     if (!settings.enabled) {
@@ -392,15 +375,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       return;
     }
 
-    let uuids = settings.facemasks.map((mask: IFacemask) => {
+    let uuids = settings.facemasks.map((mask: Interfaces.IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
 
-    const t3 = settings.t3masks.map((mask: IFacemask) => {
+    const t3 = settings.t3masks.map((mask: Interfaces.IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
 
-    const t2 = settings.t2masks.map((mask: IFacemask) => {
+    const t2 = settings.t2masks.map((mask: Interfaces.IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
 
@@ -488,7 +471,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.formRequest('slobs/facemasks/settings');
   }
 
-  async updateFacemaskSettings(settings: IUserFacemaskSettings) {
+  async updateFacemaskSettings(settings: Interfaces.IUserFacemaskSettings) {
     const endpoint = 'slobs/facemasks/settings';
     const postData = {
       method: 'POST',
@@ -553,7 +536,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  ensureModtimes(data: IFacemask[]) {
+  ensureModtimes(data: Interfaces.IFacemask[]) {
     const requiredModtimes = data.map(mask => mask.uuid);
     const availableModtimes = Object.keys(this.state.modtimeMap);
     const missingModtimes = requiredModtimes.filter(uuid => !availableModtimes.includes(uuid));
@@ -574,7 +557,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
-  updateMasks(data: IFacemask[]) {
+  updateMasks(data: Interfaces.IFacemask[]) {
     const needsUpdate = data.reduce((result, mask) => {
       if (this.state.modtimeMap[mask.uuid].modtime < mask.modtime - 3600) {
         result.push({ uuid: mask.uuid, intro: mask.is_intro });
@@ -669,7 +652,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
         writeStream.on('finish', () => {
           try {
-            const data = JSON.parse(fileContent) as IFacemask;
+            const data = JSON.parse(fileContent) as Interfaces.IFacemask;
             this.downloadProgress[uuid] = 1;
             this.updateDownloadProgress();
             resolve(data.modtime);
@@ -718,7 +701,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   @mutation()
-  private SET_SETTINGS(settings: IFacemaskSettings) {
+  private SET_SETTINGS(settings: Interfaces.IFacemaskSettings) {
     this.state.settings = settings;
   }
 
