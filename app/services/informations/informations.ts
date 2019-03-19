@@ -57,6 +57,9 @@ export class InformationsService extends StatefulService<IInformationsState> {
     informations: [],
   };
 
+  static parseXml = parseXml;
+  static pluckItems = pluckItems;
+
   get fetching() {
     return this.state.fetching;
   }
@@ -78,7 +81,7 @@ export class InformationsService extends StatefulService<IInformationsState> {
       return await fetch(this.hostsService.niconicoNAirInformationsFeed, { cache: 'no-cache' })
         .then(handleErrors)
         .then(response => response.text())
-        .then(parseXml);
+        .then(InformationsService.parseXml);
     } finally {
       this.SET_FETCHING(false);
     }
@@ -88,7 +91,7 @@ export class InformationsService extends StatefulService<IInformationsState> {
     this.SET_HAS_ERROR(false);
     try {
       const feedResult = await this.fetchFeed();
-      const informations = pluckItems(feedResult);
+      const informations = InformationsService.pluckItems(feedResult);
       this.SET_INFORMATIONS(informations);
     } catch(e) {
       console.error(e);
