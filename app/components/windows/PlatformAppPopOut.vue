@@ -3,7 +3,7 @@
   :title="title"
   :content-styles="{ padding: 0 }"
   :show-controls="false">
-  <PlatformAppWebview
+  <PlatformAppPageView
     slot="content"
     :appId="appId"
     :pageSlot="pageSlot" />

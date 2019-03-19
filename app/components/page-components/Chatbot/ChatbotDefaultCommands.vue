@@ -5,22 +5,19 @@
       <button
         @click="onResetDefaultCommandsHandler"
         class="chatbot__button--reset button button--default margin--10"
-      >
-        {{ $t('Reset Commands') }}
-      </button>
+      >{{ $t('Reset Commands') }}</button>
       <input
         v-model="searchQuery"
         type="text"
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
-      />
+      >
     </div>
 
     <!-- slugs -->
     <CollapsibleSection
       class="margin--20"
-      v-for="(commands, slugName, index) in commandSlugs"
-      v-if="v1CommandSlugs.indexOf(slugName) > -1"
+      v-for="(commands, slugName, index) in filteredSlugs"
       :title="$t(slugName)"
       :key="index"
     >
@@ -28,9 +25,9 @@
       <table>
         <thead>
           <tr>
-            <th> {{ $t('Command') }} </th>
-            <th> {{ $t('Description') }} </th>
-            <th> {{ $t('Static Permission') }} </th>
+            <th>{{ $t('Command') }}</th>
+            <th>{{ $t('Description') }}</th>
+            <th>{{ $t('Permission') }}</th>
             <th></th>
           </tr>
         </thead>
@@ -38,11 +35,13 @@
           <tr
             v-for="(command, commandName, index) in commands"
             :key="index"
-            v-if="matchesQuery(commandName, command)"
           >
-            <td> {{ command.command }} </td>
-            <td> {{ $t(command.description) }} </td>
-            <td> {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) : '-' }} </td>
+            <td>{{ command.command }}</td>
+            <td>{{ $t(command.description) }}</td>
+            <td>
+              {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) :
+              (command.permission ?$t(chatbotPermissionsEnums[command.permission.level]) : '-') }}
+            </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput
@@ -66,36 +65,43 @@
 <script lang='ts' src="./ChatbotDefaultCommands.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
+table {
+  table-layout: fixed;
+  width: 100%;
 
-table tr {
+  tr {
+    th:first-child,
+    td:first-child {
+      white-space: nowrap; /*keep text on one line */
+      overflow: hidden; /*prevent text from being shown outside the border */
+      text-overflow: ellipsis; /*cut off text with an ellipsis*/
+      width: 150px;
+    }
 
-  td:first-child {
-    width: 300px;
-  }
+    td:nth-child(3),
+    th:nth-child(3) {
+      width: 125px;
+      .text-align--right;
+    }
 
-  td:nth-child(3),
-  th:nth-child(3) {
-    width: 200px;
-    .text-align--right;
-  }
-  td:last-child {
-    width: 100px;
-    .align-items--inline;
-    .text-align(@right);
-    .padding-right();
-    color: @white;
+    th:last-child,
+    td:last-child {
+      width: 100px;
+      .align-items--inline;
+      .text-align(@right);
+      .padding-right();
+      color: @white;
 
-    .icon-edit {
-      font-size: 10px;
-      .icon-hover();
+      .icon-edit {
+        font-size: 10px;
+        .icon-hover();
+      }
     }
   }
 }
 
-
 .night-theme {
-
   tbody tr {
     border: 2px solid transparent;
     .transition();

@@ -6,44 +6,46 @@
   <div
     class="main-contents"
     :class="{
-      'main-contents--right': isLoggedIn && leftDock && !isOnboarding && hasLiveDock,
-      'main-contents--left': isLoggedIn && !leftDock && !isOnboarding && hasLiveDock }">
-    <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
+      'main-contents--right': renderDock && leftDock && hasLiveDock,
+      'main-contents--left': renderDock && !leftDock && hasLiveDock }">
+    <div class="live-dock-wrapper" v-if="renderDock && leftDock">
+      <live-dock :onLeft="true" />
+      <resize-bar
+        v-if="!isDockCollapsed"
+        class="live-dock-resize-bar live-dock-resize-bar--left"
+        position="right"
+        @onresizestart="onResizeStartHandler"
+        @onresizestop="onResizeStopHandler"
+      />
+    </div>
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
 
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
-      <div v-if="shouldLockContent" class="main-loading">
+      <div v-if="showLoadingSpinner" class="main-loading">
         <custom-loader></custom-loader>
       </div>
 
-      <!--
-        The style tag on this element is a hack to prevent a visual glitch when switching back to editor.
-        It shouldn't technically be necessary, but if it is removed, the editor component renders
-        in first, followed by the persistent app webview being removed a split-second later.  This
-        causes the display to be rendered small, and then snaps up to its full size, which is jarring.
-      -->
-      <PlatformAppWebview
-        class="main-page-container"
-        v-for="app in platformApps"
-        :key="app.id"
-        v-if="(page !== 'Onboarding') && (((page === 'PlatformAppContainer') && (params.appId === app.id)) || isAppPersistent(app.id))"
-        :appId="app.id"
-        :pageSlot="appPageSlot"
-        :poppedOut="isAppPoppedOut(app.id)"
-        :style="{ position: isAppVisible(app.id) ? 'inherit' : 'absolute' }"
-        :visible="isAppVisible(app.id)" />
       <component
         class="main-page-container"
-        v-if="page !== 'PlatformAppContainer' && !shouldLockContent"
+        v-if="!showLoadingSpinner"
         :is="page"
         :params="params"/>
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 
-    <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
+    <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
+      <resize-bar
+        v-if="!isDockCollapsed"
+        class="live-dock-resize-bar"
+        position="left"
+        @onresizestart="onResizeStartHandler"
+        @onresizestop="onResizeStopHandler"
+      />
+      <live-dock class="live-dock" />
+    </div>
   </div>
 </div>
 </template>
@@ -112,5 +114,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.live-dock {
+  height: 100%;
+}
+
+.live-dock-wrapper {
+  position: relative;
+}
+
+.live-dock-resize-bar {
+  position: absolute;
+  height: 100%;
+}
+
+.live-dock-resize-bar--left {
+  top: 0;
+  right: 0;
 }
 </style>

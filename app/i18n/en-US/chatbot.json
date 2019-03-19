@@ -1,0 +1,11 @@
+{
+  "Are you sure you want to delete %{name} ?": "Are you sure you want to delete %{name} ?",
+  "Once deleted it can not be recovered.": "Once deleted it can not be recovered.",
+  "Are you sure you want to remove %{name}?": "Are you sure you want to remove %{name}?",
+  "Are you sure you want to delete Quote %{number}?": "Are you sure you want to delete Quote %{number}?",
+  "{amount} Votes | {percent}": "{amount} Votes | {percent}",
+  "{name} ({command})": "{name} ({command})",
+  "{loyalty} Loyalty | {amount} Bets | {percent}": "{loyalty} Loyalty | {amount} Bets | {percent}",
+  "Delete {name}'s Loyalty": "Delete {name}'s Loyalty",
+  "Are you sure you want to delete {name}'s loyalty? This action is irreversible": "Are you sure you want to delete {name}'s loyalty? This action is irreversible"
+}

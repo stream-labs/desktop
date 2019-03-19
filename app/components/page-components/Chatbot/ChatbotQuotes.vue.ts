@@ -1,34 +1,41 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IQuote } from 'services/chatbot/chatbot-interfaces';
+import { IQuote, DELETE_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import moment from 'moment';
+import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 
 @Component({
   components: {
     ChatbotPagination,
+    ChatbotGenericModalWindow,
   },
 })
 export default class ChatbotQuotes extends ChatbotBase {
-  searchQuery = '';
+  searchQuery: string = '';
+  selectedQuote: IQuote = null;
 
   get quotes() {
-    return this.chatbotApiService.state.quotesResponse.data;
+    return this.chatbotApiService.Quotes.state.quotesResponse.data;
   }
 
   get currentPage(): number {
-    return this.chatbotApiService.state.quotesResponse.pagination.current;
+    return this.chatbotApiService.Quotes.state.quotesResponse.pagination.current;
   }
 
   get totalPages(): number {
-    return this.chatbotApiService.state.quotesResponse.pagination.total;
+    return this.chatbotApiService.Quotes.state.quotesResponse.pagination.total;
+  }
+
+  get DELETE_MODAL() {
+    return `${DELETE_MODAL}-quote`;
   }
 
   mounted() {
     // get list of quotes
     this.fetchQuotes(1);
-    this.chatbotApiService.fetchQuotePreferences();
+    this.chatbotApiService.Quotes.fetchQuotePreferences();
   }
 
   @Watch('searchQuery')
@@ -38,11 +45,11 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   get quotePreferences() {
-    return this.chatbotApiService.state.quotePreferencesResponse;
+    return this.chatbotApiService.Quotes.state.quotePreferencesResponse;
   }
 
   fetchQuotes(page = this.currentPage, query = this.searchQuery) {
-    this.chatbotApiService.fetchQuotes(page, query);
+    this.chatbotApiService.Quotes.fetchQuotes(page, query);
   }
 
   formatDate(dateString: string) {
@@ -50,14 +57,26 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   onOpenQuoteWindowHandler(quote?: IQuote) {
-    this.chatbotCommonService.openQuoteWindow(quote);
+    this.chatbotApiService.Common.openQuoteWindow(quote);
   }
 
   onOpenQuotePreferencesHandler() {
-    this.chatbotCommonService.openQuotePreferencesWindow();
+    this.chatbotApiService.Common.openQuotePreferencesWindow();
   }
 
   onDeleteQuoteHandler(quote?: IQuote) {
-    this.chatbotApiService.deleteQuote(quote.id);
+    this.selectedQuote = quote;
+    this.chatbotApiService.Common.closeChatbotChildWindow();
+    this.$modal.show(this.DELETE_MODAL);
+  }
+
+  onYesHandler() {
+    if (this.selectedQuote) {
+      this.chatbotApiService.Quotes.deleteQuote(this.selectedQuote.id);
+    }
+  }
+
+  onNoHandler() {
+    this.selectedQuote = null;
   }
 }

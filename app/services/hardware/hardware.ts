@@ -48,9 +48,18 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
   private fetchDevices(): IHardwareServiceState {
     const devices: IDevice[] = [];
     const dshowDevices: IDevice[] = [];
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid());
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid());
-    const obsVideoInput = obs.InputFactory.create('dshow_input', uuid());
+
+    // Avoid initializing any devices by passing a device id that doesn't exist
+    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid(), {
+      device_id: 'does_not_exist',
+    });
+    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid(), {
+      device_id: 'does_not_exist',
+    });
+    const obsVideoInput = obs.InputFactory.create('dshow_input', uuid(), {
+      audio_device_id: 'does_not_exist',
+      video_device_id: 'does_not_exist',
+    });
 
     (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
       (item: { name: string; value: string }) => {

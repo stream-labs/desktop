@@ -6,25 +6,23 @@ import { Inject } from '../util/injector';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
-import Slider from './shared/Slider.vue';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { $t } from 'services/i18n';
-import PlatformAppWebview from 'components/PlatformAppWebview.vue';
+import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
-import { metadata as metadataHelper } from 'components/widgets/inputs';
-import ResizeBar from 'components/shared/ResizeBar.vue';
 import { AppService } from 'services/app';
+import Tabs, { ITab } from 'components/Tabs.vue';
+import { ChatService } from 'services/chat';
 
 @Component({
   components: {
     Chat,
-    Slider,
     ListInput,
-    PlatformAppWebview,
-    ResizeBar,
+    PlatformAppPageView,
+    Tabs,
   },
 })
 export default class LiveDock extends Vue {
@@ -34,6 +32,7 @@ export default class LiveDock extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() appService: AppService;
+  @Inject() chatService: ChatService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -42,38 +41,33 @@ export default class LiveDock extends Vue {
   elapsedInterval: number;
   canAnimate = false;
 
-  $refs: {
-    chat: Chat;
-  };
-
   slot = EAppPageSlot.Chat;
 
-  selectedChat = 'default';
+  // Safe getter/setter prevents getting stuck on the chat
+  // for an app that was unloaded.
+  underlyingSelectedChat = 'default';
+
+  get selectedChat() {
+    return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
+      ? this.underlyingSelectedChat
+      : 'default';
+  }
+
+  set selectedChat(val: string) {
+    this.underlyingSelectedChat = val;
+  }
 
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
 
-  get liveDockStyles() {
-    return {
-      position: this.collapsed ? 'absolute' : 'static',
-      left: this.collapsed ? '10000px' : 'auto',
-    };
-  }
-
   mounted() {
-    const width = this.customizationService.state.livedockSize;
-    if (width < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
       }
-      this.updateWidth();
     }, 100);
   }
 
@@ -188,10 +182,17 @@ export default class LiveDock extends Vue {
 
   refreshChat() {
     if (!this.showDefaultPlatformChat) {
-      this.platformAppsService.reloadApp(this.selectedChat);
+      this.platformAppsService.refreshApp(this.selectedChat);
       return;
     }
-    this.$refs.chat.refresh();
+    this.chatService.refreshChat();
+  }
+
+  get hideChat() {
+    // previewEnabled is poorly named.  It really just means stuff
+    // we disable while resizing.  It should not be in the customization
+    // service.  This is lazy.
+    return !this.customizationService.previewEnabled;
   }
 
   get hasChatApps() {
@@ -210,22 +211,22 @@ export default class LiveDock extends Vue {
     });
   }
 
-  get chatAppsListMetadata() {
-    const options = [
+  get chatTabs(): ITab[] {
+    return [
       {
-        title: this.userService.platform.type as string,
+        name: this.userService.platform.type.toString(),
         value: 'default',
       },
-    ];
-    this.chatApps
-      .filter(app => !app.poppedOutSlots.includes(this.slot))
-      .forEach(chatApp => {
-        options.push({
-          title: chatApp.manifest.name,
-          value: chatApp.id,
-        });
-      });
-    return metadataHelper.list({ options });
+    ].concat(
+      this.chatApps
+        .filter(app => !app.poppedOutSlots.includes(this.slot))
+        .map(app => {
+          return {
+            name: app.manifest.name,
+            value: app.id,
+          };
+        }),
+    );
   }
 
   get isPopOutAllowed() {
@@ -243,68 +244,5 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
-  }
-
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.Chat);
-  }
-
-  isAppVisible(appId: string) {
-    return this.selectedChat === appId;
-  }
-
-  get defaultChatStyles() {
-    if (this.selectedChat === 'default') {
-      return {};
-    }
-
-    return {
-      position: 'absolute',
-      top: '-10000px',
-    };
-  }
-
-  onResizeStartHandler() {
-    this.customizationService.setSettings({ previewEnabled: false });
-  }
-
-  onResizeStopHandler(offset: number) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    offset = this.onLeft ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + offset);
-    setTimeout(() => {
-      this.customizationService.setSettings({
-        previewEnabled: true,
-      });
-    }, 500);
-  }
-
-  setWidth(width: number) {
-    this.customizationService.setSettings({
-      livedockSize: this.validateWidth(width),
-    });
-  }
-
-  validateWidth(width: number): number {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 860;
-    const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    width = Math.max(minWidth, width);
-    // tslint:disable-next-line:no-parameter-reassignment
-    width = Math.min(maxWidth, width);
-    return width;
-  }
-
-  updateWidth() {
-    const width = this.customizationService.state.livedockSize;
-    if (width !== this.validateWidth(width)) this.setWidth(width);
-  }
-
-  resetWidth() {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const defaultWidth = appRect.width * 0.28;
-    this.setWidth(defaultWidth);
   }
 }

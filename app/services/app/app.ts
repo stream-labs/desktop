@@ -12,8 +12,8 @@ import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { StreamInfoService } from 'services/stream-info';
 import { track } from 'services/usage-statistics';
-import { IpcServerService } from 'services/ipc-server';
-import { TcpServerService } from 'services/tcp-server';
+import { IpcServerService } from 'services/api/ipc-server';
+import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
 import { PerformanceMonitorService } from 'services/performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -31,6 +31,7 @@ import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
+import { RunInLoadingMode } from './app-decorators';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -82,8 +83,8 @@ export class AppService extends StatefulService<IAppState> {
   private pid = require('process').pid;
 
   @track('app_start')
+  @RunInLoadingMode()
   async load() {
-    this.START_LOADING();
     crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
@@ -92,6 +93,7 @@ export class AppService extends StatefulService<IAppState> {
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
       electron.remote.process.env.SLOBS_IPC_USERDATA,
+      electron.remote.process.env.SLOBS_VERSION,
     );
 
     if (apiResult !== EVideoCodes.Success) {
@@ -151,7 +153,6 @@ export class AppService extends StatefulService<IAppState> {
 
     this.crashReporterService.endStartup();
 
-    this.FINISH_LOADING();
     this.protocolLinksService.start(this.state.argv);
   }
 
@@ -171,8 +172,8 @@ export class AppService extends StatefulService<IAppState> {
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
+      obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
-      obs.NodeObs.OBS_API_destroyOBS_API();
       obs.IPC.disconnect();
       this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
@@ -188,9 +189,19 @@ export class AppService extends StatefulService<IAppState> {
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
       this.START_LOADING();
-      this.windowsService.closeChildWindow();
+
+      // The scene collections window is the only one we don't close when
+      // switching scene collections, because it results in poor UX.
+      if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
+        this.windowsService.closeChildWindow();
+      }
       this.windowsService.closeAllOneOffs();
-      this.sceneCollectionsService.disableAutoSave();
+
+      // This is kind of ugly, but it gives the browser time to paint before
+      // we do long blocking operations with OBS.
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      await this.sceneCollectionsService.disableAutoSave();
     }
 
     let error: Error = null;

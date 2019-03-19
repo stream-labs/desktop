@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
-import { EFontStyle } from 'obs-studio-node';
 
 export interface IFamilyWithStyle {
   family: IFontFamily;

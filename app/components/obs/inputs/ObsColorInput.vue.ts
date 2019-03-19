@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { Component, Watch, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { debounce } from 'lodash-decorators';
 import { TObsType, IObsInput, ObsInput } from './ObsInput';
 import Utils from '../../../services/utils';
@@ -29,7 +28,7 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
 
   @debounce(500)
   setValue(rgba: IColor) {
-    if (!_.isEqual(rgba, this.obsColor)) {
+    if (!Object.keys(rgba).every(key => rgba[key] === this.obsColor[key])) {
       const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, Math.round(255 * rgba.a));
       this.emitInput({ ...this.value, value: intColor });
     }
@@ -41,7 +40,7 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
 
   get hexAlpha() {
     const alpha = this.obsColor.a;
-    return _.padStart(Math.floor(alpha * 255).toString(16), 2, '0');
+    return `00${Math.floor(alpha * 255).toString(16)}`;
   }
 
   get hexColor() {

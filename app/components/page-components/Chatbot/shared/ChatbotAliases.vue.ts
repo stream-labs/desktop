@@ -1,6 +1,8 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { ITextMetadata } from 'components/shared/inputs';
+
+import { ITextMetadata } from 'components/shared/inputs/index';
+import { debounce } from 'lodash-decorators';
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
@@ -24,8 +26,12 @@ export default class ChatbotAliases extends ChatbotBase {
     );
   }
 
-  get containsSpaces() {
-    return this.newAlias && this.newAlias.indexOf(' ') > -1;
+  @Watch('newAlias', { immediate: true, deep: true })
+  @debounce(1)
+  onCommandChanged(value: string, oldValue: string) {
+    if (oldValue) {
+      this.newAlias = value.replace(/ +/g, '');
+    }
   }
 
   onAddAliasHandler() {

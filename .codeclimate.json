@@ -5,12 +5,47 @@
       "config": {
         "threshold": 500
       }
+    },
+    "similar-code": {
+      "config": {
+        "threshold": 75
+      }
+    },
+    "identical-code": {
+      "config": {
+        "threshold": 100
+      }
+    },
+    "method-complexity": {
+      "config": {
+        "threshold": 10
+      }
+    },
+    "method-lines": {
+      "config": {
+        "threshold": 30
+      }
+    },
+    "method-count": {
+      "config": {
+        "threshold": 30
+      }
     }
   },
   "plugins": {
     "tslint": {
       "enabled": true,
-      "config": "tslint.json"
+      "config": "tslint.json",
+      "checks": {
+        "prettier": {
+          "enabled": false
+        }
+      }
+    },
+    "stylelint": {
+      "enabled": true,
+      "config": ".stylelintrc",
+      "exclude_patterns": ["**/*.vue", "docs/"]
     }
   },
   "exclude_patterns": [
@@ -19,6 +54,7 @@
     "scripts/",
     "vendor/",
     "**/*.d.ts",
-    "app/services/streamlabels/definitions.ts"
+    "app/services/streamlabels/definitions.ts",
+    "**/*-api.ts"
   ]
 }

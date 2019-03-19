@@ -102,11 +102,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * @see {ADD_ASSET}
    */
   async addPlatformAppAsset(appId: string, assetUrl: string) {
-    const originalUrl = this.platformAppsService.getAssetUrl(appId, assetUrl);
-
-    const assetsDir = await this.getAssetsTargetDirectory(appId);
-    const filePath = path.join(assetsDir, path.basename(originalUrl));
-
+    const { originalUrl, filePath } = await this.getAssetDiskInfo(appId, assetUrl);
     await downloadFileAlt(originalUrl, filePath);
 
     const checksum = await getChecksum(filePath);
@@ -114,6 +110,15 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
     this.ADD_ASSET(appId, assetUrl, checksum);
 
     return filePath;
+  }
+
+  async getAssetDiskInfo(appId: string, assetUrl: string) {
+    const originalUrl = this.platformAppsService.getAssetUrl(appId, assetUrl);
+
+    const assetsDir = await this.getAssetsTargetDirectory(appId);
+    const filePath = path.join(assetsDir, path.basename(originalUrl));
+
+    return { originalUrl, filePath };
   }
 
   /**

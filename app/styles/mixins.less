@@ -1,5 +1,10 @@
 // Positioning
-.absolute (@top: auto, @right: auto, @bottom: auto, @left: auto) {
+.absolute(
+@top: auto,
+@right: auto,
+@bottom: auto,
+@left: auto
+) {
   display: block;
   position: absolute;
   top: @top;
@@ -56,7 +61,7 @@
 .aspect-ratio(@width, @height) {
   position: relative;
 
-  &:before {
+  &::before {
     display: block;
     content: "";
     width: 100%;
@@ -218,6 +223,9 @@
   margin: 10px 0;
 }
 
+.margin-horizontal--10 {
+  margin: 0 10px;
+}
 
 // widths
 .width--100 {
@@ -269,7 +277,6 @@
   justify-content: space-around;
 }
 
-
 // text align
 .text-align--right {
   text-align: right !important;
@@ -287,13 +294,11 @@
   }
 }
 
-
 .align-items--top {
   & > * {
     vertical-align: top;
   }
 }
-
 
 // Shadows
 .day-shadow() {
@@ -326,7 +331,6 @@
   text-transform: @capitalize;
 }
 
-
 // overflows
 
 .overflow--auto {
@@ -342,7 +346,7 @@
 }
 
 .letter-spacing() {
-  letter-spacing: .6px;
+  letter-spacing: 0.6px;
 }
 
 .position--relative {

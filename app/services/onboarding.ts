@@ -2,7 +2,6 @@ import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
-import electron from 'electron';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 type TOnboardingStep =
@@ -107,16 +106,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() brandDeviceService: BrandDeviceService;
-
-  init() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
-    electron.ipcRenderer.on('testing-fakeAuth', () => {
-      this.COMPLETE_STEP('Connect');
-      this.SET_CURRENT_STEP('ObsImport');
-    });
-  }
 
   @mutation()
   SET_CURRENT_STEP(step: TOnboardingStep) {

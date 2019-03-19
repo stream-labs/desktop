@@ -1,7 +1,7 @@
 /* tslint:disable:max-line-length */
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
@@ -31,6 +31,7 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs';
+import { debounce } from 'lodash-decorators';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -59,8 +60,17 @@ import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/wind
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
-import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
+import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
+import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
+import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
+import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
+import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
+import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
+import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
+import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
+import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
+import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
+import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -114,6 +124,7 @@ export function getComponents() {
     ChatbotDefaultCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
+    ChatbotGamblePreferencesWindow,
     ChatbotCapsProtectionWindow,
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
@@ -121,8 +132,16 @@ export function getComponents() {
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,
-    ChatbotSongRequestPreferencesWindow,
-    ChatbotSongRequestOnboardingWindow,
+    ChatbotCommandPreferencesWindow,
+    ChatbotMediaRequestPreferencesWindow,
+    ChatbotLoyaltyWindow,
+    ChatbotLoyaltyAddAllWindow,
+    ChatbotLoyaltyPreferencesWindow,
+    ChatbotHeistPreferencesWindow,
+    ChatbotPollProfileWindow,
+    ChatbotPollPreferencesWindow,
+    ChatbotBettingProfileWindow,
+    ChatbotBettingPreferencesWindow,
   };
 }
 
@@ -193,6 +212,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
+  @debounce(500)
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     const bounds = window.getBounds();
@@ -203,7 +223,29 @@ export class WindowsService extends StatefulService<IWindowsState> {
   showWindow(options: Partial<IWindowOptions>) {
     // Don't center the window if it's the same component
     // This prevents "snapping" behavior when navigating settings
-    if (options.componentName !== this.state.child.componentName) options.center = true;
+    if (options.componentName !== this.state.child.componentName) {
+      options.center = true;
+    }
+
+    /*
+     * Override `options.size` when what is passed in is bigger than the current display.
+     * We do not do this on CI since it runs at 1024x768 and it break tests that aren't easy
+     * to workaround.
+     */
+    if (options.size && !remote.process.env.CI) {
+      const { width: screenWidth, height: screenHeight } = electron.screen.getDisplayMatching(
+        this.windows.main.getBounds(),
+      ).workAreaSize;
+
+      const SCREEN_PERCENT = 0.75;
+
+      if (options.size.width > screenWidth || options.size.height > screenHeight) {
+        options.size = {
+          width: screenWidth * SCREEN_PERCENT,
+          height: screenHeight * SCREEN_PERCENT,
+        };
+      }
+    }
 
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
@@ -323,7 +365,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
-    const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
+    const newOptions: IWindowOptions = {
+      ...DEFAULT_WINDOW_OPTIONS,
+      ...optionsPatch,
+    };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
 

@@ -10,7 +10,7 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';

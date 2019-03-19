@@ -5,8 +5,9 @@ import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
+import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';
 
 @Component({})
@@ -16,6 +17,7 @@ export default class PlatformAppStore extends Vue {
   @Inject() platformAppStoreService: PlatformAppStoreService;
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
+  @Inject() navigationService: NavigationService;
 
   @Prop() params: {
     appId?: string;
@@ -34,6 +36,7 @@ export default class PlatformAppStore extends Vue {
         reloadProductionApps: this.reloadProductionApps,
         openLinkInBrowser: this.openLinkInBrowser,
         onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
+        navigateToApp: this.navigateToApp,
       });
     });
   }
@@ -47,7 +50,7 @@ export default class PlatformAppStore extends Vue {
   }
 
   async reloadProductionApps() {
-    this.platformAppsService.installProductionApps();
+    this.platformAppsService.loadProductionApps();
   }
 
   get loggedIn() {
@@ -56,5 +59,9 @@ export default class PlatformAppStore extends Vue {
 
   get appStoreUrl() {
     return this.userService.appStoreUrl(this.params.appId);
+  }
+
+  async navigateToApp(appId: string) {
+    this.navigationService.navigate('PlatformAppMainPage', { appId });
   }
 }

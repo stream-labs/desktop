@@ -12,41 +12,55 @@ import ChatbotQueueList from 'components/page-components/Chatbot/Queue/ChatbotQu
 export default class ChatbotQueue extends ChatbotBase {
   queueTitle = 'The Current Game';
 
+  $refs: {
+    entrylist: ChatbotQueueList;
+  };
+
   async mounted() {
-    await this.chatbotApiService.logInToSocket(['queue']);
-    await this.chatbotApiService.fetchQueueState();
+    await this.chatbotApiService.Base.logInToSocket(['queue']);
+    await this.chatbotApiService.Queue.fetchQueueState();
 
-    this.chatbotApiService.connectToQueueSocketChannels();
-    this.chatbotApiService.fetchQueueEntries();
-    this.chatbotApiService.fetchQueuePicked();
-    this.chatbotApiService.fetchQueuePreferences();
+    if (!this.chatbotApiService.Queue.isConnected()) {
+      this.chatbotApiService.Queue.fetchQueueEntries();
+      this.chatbotApiService.Queue.fetchQueuePicked();
+    }
 
-    this.queueTitle = this.chatbotApiService.state.queueStateResponse.title;
+    this.chatbotApiService.Queue.connectSocket();
+
+    this.chatbotApiService.Queue.fetchQueuePreferences();
+
+    this.queueTitle = this.chatbotApiService.Queue.state.queueStateResponse.title;
+  }
+
+  destroyed() {
+    this.chatbotApiService.Queue.disconnectSocket();
   }
 
   get noUsersInList() {
-    return this.chatbotApiService.state.queueEntriesResponse.data.length === 0;
+    return this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0;
   }
 
   onOpenQueuePreferencesHandler() {
-    this.chatbotCommonService.openQueuePreferencesWindow();
+    this.chatbotApiService.Common.openQueuePreferencesWindow();
   }
 
   onToggleQueueOpenHandler() {
     if (this.queueIsOpen) {
-      this.chatbotApiService.closeQueue();
+      this.chatbotApiService.Queue.closeQueue();
       return;
     }
 
     if (!this.queueTitle) return;
-    this.chatbotApiService.openQueue(this.queueTitle);
+    this.chatbotApiService.Queue.openQueue(this.queueTitle);
   }
 
   onPickRandomEntryHandler() {
-    this.chatbotApiService.pickQueueEntryRandom();
+    this.chatbotApiService.Queue.pickQueueEntryRandom().then(() => {
+      this.$refs.entrylist.loadNewEntries();
+    });
   }
 
   get queueIsOpen() {
-    return this.chatbotApiService.state.queueStateResponse.status === 'Open';
+    return this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open';
   }
 }

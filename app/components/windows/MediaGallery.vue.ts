@@ -199,6 +199,7 @@ export default class MediaGallery extends Vue {
   }
 
   async upload(filepaths: string[]) {
+    if (!filepaths || !filepaths.length) return;
     this.setBusy($t('Uploading...'));
     this.galleryInfo = await this.mediaGalleryService.upload(filepaths);
     this.setNotBusy();

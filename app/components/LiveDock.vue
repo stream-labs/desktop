@@ -13,16 +13,9 @@
     }" />
   </div>
 
-  <resize-bar
-    v-if="!collapsed"
-    :position="onLeft ? 'right' : 'left'"
-    @onresizestart="onResizeStartHandler"
-    @onresizestop="onResizeStopHandler"
-  />
-
   <transition name="slide-fade">
     <div
-      :style="liveDockStyles"
+      v-if="!collapsed"
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
@@ -76,35 +69,30 @@
           </a>
         </div>
         <div class="flex">
-          <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
-            <i
-              class="live-dock-chat-apps__popout icon-pop-out-1"
-              v-tooltip.left="$t('Pop out to new window')"
-              v-if="isPopOutAllowed"
-              @click="popOut"
-            />
-            <list-input
-              v-model="selectedChat"
-              :metadata="chatAppsListMetadata"
-            />
-          </div>
           <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
             {{ $t('Refresh Chat') }}
           </a>
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+      <div class="live-dock-chat" v-if="!hideChat && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+          <div v-if="hasChatApps" class="flex">
+            <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
+            <i
+              class="live-dock-chat-apps__popout icon-pop-out-1"
+              v-tooltip.left="$t('Pop out to new window')"
+              v-if="isPopOutAllowed"
+              @click="popOut"
+            />
+          </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
-        <PlatformAppWebview
-          v-for="app in chatApps"
-          v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
-          :key="app.id"
+        <chat v-if="!applicationLoading && selectedChat === 'default'" />
+        <PlatformAppPageView
+          v-if="selectedChat !== 'default'"
           class="live-dock-platform-app-webview"
-          :appId="app.id"
+          :appId="selectedChat"
           :pageSlot="slot"
-          :visible="isAppVisible(app.id)"
+          :key="selectedChat"
         />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
@@ -230,9 +218,9 @@
 }
 
 .live-dock-chat {
-  flex-grow: 1;
-  position: relative;
   .flex();
+  .flex--column();
+  .flex--grow();
 }
 
 .live-dock-chat--offline {
@@ -267,10 +255,6 @@
 
 .live-dock-platform-tools {
   .flex();
-}
-
-.live-dock-chat-apps__list-input {
-  .margin-right();
 }
 
 .live-dock-chat-apps__popout {

@@ -10,7 +10,6 @@ import Vue from 'vue';
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
-import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
@@ -26,16 +25,19 @@ import electronLog from 'electron-log';
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+const isPreview = !!remote.process.env.SLOBS_PREVIEW;
 
-window['obs'] = window['require']('obs-studio-node');
+if (Utils.isMainWindow()) {
+  window['obs'] = window['require']('obs-studio-node');
 
-{
-  // Set up things for IPC
-  // Connect to the IPC Server
-  window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
-  document.addEventListener('close', e => {
-    window['obs'].IPC.disconnect();
-  });
+  {
+    // Set up things for IPC
+    // Connect to the IPC Server
+    window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
+    document.addEventListener('close', e => {
+      window['obs'].IPC.disconnect();
+    });
+  }
 }
 
 // This is the development DSN
@@ -65,7 +67,7 @@ if (
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
-    sampleRate: 0.1,
+    sampleRate: isPreview ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
@@ -118,36 +120,32 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
-  const storePromise = createStore();
-  const servicesManager: ServicesManager = ServicesManager.instance;
-  const windowsService: WindowsService = WindowsService.instance;
-  const i18nService: I18nService = I18nService.instance;
-  const windowId = Utils.getCurrentUrlParams().windowId;
-
-  if (Utils.isMainWindow()) {
-    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-    AppService.instance.load();
-  } else {
-    if (Utils.isChildWindow()) {
-      ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+  createStore().then(async store => {
+    // handle closeWindow event from the main process
+    const windowsService: WindowsService = WindowsService.instance;
+    if (Utils.isMainWindow()) {
+      ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+      AppService.instance.load();
+    } else {
+      if (Utils.isChildWindow()) {
+        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
     }
-    servicesManager.listenMessages();
-  }
 
-  storePromise.then(async store => {
+    // setup VueI18n plugin
     Vue.use(VueI18n);
-
-    await i18nService.load();
-
+    const i18nService: I18nService = I18nService.instance;
+    await i18nService.load(); // load translations from a disk
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
       silentTranslationWarn: true,
     });
-
     I18nService.setVuei18nInstance(i18n);
 
+    // create a root Vue component
+    const windowId = Utils.getCurrentUrlParams().windowId;
     const vm = new Vue({
       i18n,
       store,

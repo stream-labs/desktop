@@ -25,8 +25,8 @@ body {
 :not(input):not(textarea),
 :not(input):not(textarea)::after,
 :not(input):not(textarea)::before {
-    -webkit-user-select: none;
-    user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .main {
@@ -45,36 +45,40 @@ body {
 
 // Type
 h1 {
-  font-family: 'Roboto';
-  font-size: 20px;
   .weight(@bold);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
   text-transform: capitalize;
   color: @day-title;
   margin-bottom: 24px;
 }
 
 h2 {
-  font-family: 'Roboto';
-  font-size: 16px;
   .weight(@medium);
+  .margin-bottom(3);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
   text-transform: capitalize;
   color: @day-title;
-  .margin-bottom(3);
 }
 
 h3 {
-  font-family: 'Roboto';
-  font-size: 14px;
   .weight(@medium);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
   color: @day-title;
 }
 
 h4 {
-  font-family: 'Roboto';
   .text-transform();
-  font-size: 14px;
   .weight(@medium);
   .margin-bottom(2);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
   color: @day-title;
 }
 
@@ -84,20 +88,22 @@ label {
 }
 
 .label--essential {
-  background: @secondary;
   .radius();
   .weight(@medium);
+  .margin-left();
+
+  background: @secondary;
   font-size: 12px;
   color: @white;
   padding: 0 4px;
-  .margin-left();
-  line-height: 16px
+  line-height: 16px;
 }
 
 a,
 .link {
   .transition();
   .weight(@medium);
+
   color: @day-link;
   text-decoration: none;
   display: flex;
@@ -115,6 +121,7 @@ a,
   .fa,
   i {
     .margin-right();
+
     font-size: 14px;
     color: @icon;
   }
@@ -122,6 +129,7 @@ a,
 
 .link--capitalize() {
   .link();
+
   text-transform: capitalize;
 }
 
@@ -130,9 +138,10 @@ a,
 }
 
 .link--uppercase {
-  .link;
+  .link();
+  .letter-spacing();
+
   text-transform: uppercase;
-  .letter-spacing;
   font-size: 12px;
 }
 
@@ -187,15 +196,16 @@ a,
   position: relative;
 
   input[type=text] {
+    .radius();
+    .transition();
+
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
     color: @grey;
-    .radius;
-    .transition;
 
     &:focus {
-      background: rgba(255,255,255,.14);
+      background: rgba(255, 255, 255, 0.14);
       outline: none;
       box-shadow: none;
     }
@@ -218,7 +228,7 @@ a,
     &:active {
       background: transparent;
       color: @white;
-      border-bottom: 1px solid rgba(255,255,255,.14);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
     }
   }
 
@@ -291,21 +301,22 @@ a,
   &.disabled {
     opacity: 0.5;
 
-    &.checkbox input:checked~label,
-    &.checkbox input~label {
-      &:before {
+    &.checkbox input:checked ~ label,
+    &.checkbox input ~ label {
+      &::before {
         border-color: @day-input-border;
         background: transparent;
       }
 
-      &:after {color: @day-paragraph}
+      &::after { color: @day-paragraph; }
     }
   }
 }
 
 // Make select boxes look similar to input boxes
 select {
-  .radius;
+  .radius();
+
   height: 34px;
 }
 
@@ -330,7 +341,7 @@ select {
 // Vue transitions
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .slide-fade-enter,
@@ -340,13 +351,12 @@ select {
 }
 
 .fade-enter-active {
-  transition: all .4s ease;
+  transition: all 0.4s ease;
 }
 
 .fade-leave-active {
-  transition: all .2s ease;
+  transition: all 0.2s ease;
 }
-
 
 .fade-enter,
 .fade-leave-to {
@@ -392,6 +402,7 @@ select {
 
   .v--modal {
     background-color: @night-bg;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 
   .v--modal-overlay {
@@ -420,16 +431,16 @@ select {
   }
 
   ::placeholder {
-    opacity: .4;
+    opacity: 0.4;
   }
 
   .checkbox {
-    input:checked~label {
+    input:checked ~ label {
       color: @white;
     }
 
     label {
-      &:before {
+      &::before {
         background: transparent;
         border-color: @teal-light-opac;
       }
@@ -454,6 +465,18 @@ select {
 
   .tab-button {
     color: @night-link;
+
+    &.is-active,
+    &.active,
+    &:hover {
+      color: @night-link-active;
+      border-bottom-color: @white;
+
+      .fa,
+      i {
+        color: @night-link-active;
+      }
+    }
   }
 
   .slide-open__menu {
@@ -467,20 +490,6 @@ select {
       .fa,
       i {
         color: @white;
-      }
-    }
-  }
-
-  .tab-button{
-    &.is-active,
-    &.active,
-    &:hover {
-      color: @night-link-active;
-      border-bottom-color: @white;
-
-      .fa,
-      i {
-        color: @night-link-active;
       }
     }
   }

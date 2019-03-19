@@ -1,4 +1,4 @@
-import { IJsonRpcRequest } from '../../app/services/jsonrpc';
+import { IJsonRpcRequest } from '../../app/services/api/jsonrpc';
 import { Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 
@@ -295,7 +295,9 @@ export class ApiClient {
     constraint: (event: TEvent) => boolean,
   ): Promise<TEvent> {
     return new Promise((resolve, reject) => {
+      const receivedEvents: any[] = []; // record all received events here just for logging
       const subscr = this.eventReceived.subscribe(event => {
+        receivedEvents.push(event);
         if (!constraint(event)) return;
         subscr.unsubscribe();
         resolve(event);
@@ -304,7 +306,9 @@ export class ApiClient {
       // stop waiting on timeout
       setTimeout(() => {
         subscr.unsubscribe();
-        reject('Promise timeout');
+        let errorMessage = `Did not receive the event in ${PROMISE_TIMEOUT}ms`;
+        errorMessage += `\n received events:\n ${JSON.stringify(receivedEvents)}`;
+        reject(errorMessage);
       }, PROMISE_TIMEOUT);
     });
   }
@@ -318,7 +322,7 @@ export class ApiClient {
 
     if (!this.resourceSchemes[resourceTypeName]) {
       this.resourceSchemes[resourceTypeName] = this.requestSync(
-        'ServicesManager',
+        'ExternalApiService',
         'getResourceScheme',
         resourceId,
       );

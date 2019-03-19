@@ -1,10 +1,7 @@
-import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
+import { TextInput, TextAreaInput, ListInput, NumberInput } from 'components/shared/inputs/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
@@ -12,8 +9,10 @@ import {
   IListMetadata,
   INumberMetadata,
   ITextMetadata,
-} from 'components/shared/inputs';
-import { ChatbotAlertType, IAlertMessage, NEW_ALERT_MODAL_ID } from 'services/chatbot';
+} from 'components/shared/inputs/index';
+
+import { IAlertMessage, NEW_ALERT_MODAL_ID, ChatbotAlertType } from 'services/chatbot';
+import { debounce } from 'lodash-decorators';
 
 interface INewAlertMetadata {
   follow: {
@@ -138,7 +137,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     if (this.selectedType === 'sponsor') {
       return `${this.isEdit ? 'Edit' : 'New'} Member Alert`;
     }
-
     return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
   }
 
@@ -151,11 +149,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get isTwitch() {
-    return this.chatbotApiService.userService.platform.type === 'twitch';
+    return this.chatbotApiService.Base.userService.platform.type === 'twitch';
   }
 
   get isYoutube() {
-    return this.chatbotApiService.userService.platform.type === 'youtube';
+    return this.chatbotApiService.Base.userService.platform.type === 'youtube';
   }
 
   get isFollower() {
@@ -219,11 +217,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             placeholder: $t('Number of months subscribed'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to subscriber'),
+            max: 450,
           },
           is_gifted: {
             required: true,
@@ -242,11 +242,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             min: 0,
             required: true,
             placeholder: $t('Minimum amount'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to donator'),
+            max: 450,
           },
         },
       },
@@ -257,11 +259,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.number,
             min: 0,
             placeholder: $t('Minimum viewer count'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to hosts'),
+            max: 450,
           },
         },
       },
@@ -272,11 +276,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.number,
             required: true,
             placeholder: $t('Minimum amount'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             required: true,
             type: EInputType.textArea,
             placeholder: $t('Message to raider'),
+            max: 450,
           },
         },
       },
@@ -287,11 +293,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             type: EInputType.number,
             min: 0,
             placeholder: $t('Minimum bit count'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             required: true,
             type: EInputType.textArea,
             placeholder: $t('Message to Bit donators'),
+            max: 450,
           },
         },
       },
@@ -309,11 +317,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             placeholder: $t('Number of months subscribed'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to subscriber'),
+            max: 450,
           },
         },
       },
@@ -323,11 +333,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             placeholder: $t('Minimum Amount'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to Super Chatter'),
+            max: 450,
           },
         },
       },
@@ -337,11 +349,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             type: EInputType.number,
             placeholder: $t('Minimum Amount'),
+            max: Number.MAX_SAFE_INTEGER,
           },
           message: {
             type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to Member'),
+            max: 450,
           },
         },
       },
@@ -423,6 +437,12 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   onCancelHandler() {
     this.$modal.hide(NEW_ALERT_MODAL_ID);
+  }
+
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
   }
 
   async onSubmit() {

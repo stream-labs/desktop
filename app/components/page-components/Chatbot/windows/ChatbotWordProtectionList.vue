@@ -89,6 +89,7 @@
         <button
           class="button button--action"
           @click="onAddNewItemHandler"
+          :disabled="errors.items.length > 0"
         >
           {{ $t('Done') }}
         </button>

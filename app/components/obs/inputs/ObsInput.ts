@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
 import * as obs from '../../../../obs-api';
@@ -91,6 +90,7 @@ export interface IObsFont {
   flags?: number;
   size?: number;
   path?: string;
+  style?: string;
 }
 
 export interface IGoogleFont {
@@ -113,7 +113,7 @@ export interface IElectronOpenDialogFilter {
 }
 
 function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
-  const filters = _.compact(filterStr.split(';;'));
+  const filters = filterStr.split(';;').filter(item => item);
 
   // Browser source uses *.*
   if (filterStr === '*.*') {
@@ -127,7 +127,7 @@ function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
 
   return filters.map(filter => {
     const match = filter.match(/^(.*)\((.*)\)$/);
-    const desc = _.trim(match[1]);
+    const desc = match[1].replace(/^\s+/, '').replace(/\s+$/, '');
     let types = match[2].split(' ');
 
     types = types.map(type => {
@@ -224,6 +224,13 @@ export function obsValuesToInputValues(
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
         prop.type = 'OBS_PROPERTY_SLIDER';
       }
+    } else if (obsProp.type === 'OBS_PROPERTY_BITMASK') {
+      prop = {
+        ...prop,
+        value: Number(prop.value),
+        showDescription: true,
+        size: 6,
+      } as IObsBitmaskInput;
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
       if (valueObject && valueObject.type === 'OBS_PATH_FILE') {
         prop = {
@@ -296,8 +303,6 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
 
-  setupConfigurableDefaults(obsSource, obsProps, obsSettings);
-
   if (!obsProps) return null;
   if (!obsProps.count()) return null;
 
@@ -346,7 +351,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     }
 
     const formItem: IObsInput<TObsValue> = {
-      value: obsSettings[obsProp.name],
+      value: obsProp.value,
       name: obsProp.name,
       description: $t(obsProp.description),
       enabled: obsProp.enabled,
@@ -440,42 +445,6 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   if (formInputs.length === 0) return;
 
   obsSource.update(settings);
-}
-
-/* Passing a properties and settings object here
- * prevents a copy and object creation which
- * also requires IPC. Highly recommended to
- * pass all parameters. */
-export function setupConfigurableDefaults(
-  configurable: obs.IConfigurable,
-  properties?: obs.IProperties,
-  settings?: obs.ISettings,
-) {
-  // tslint:disable-next-line:no-parameter-reassignment TODO
-  if (!settings) settings = configurable.settings;
-
-  // tslint:disable-next-line:no-parameter-reassignment
-  if (!properties) properties = configurable.properties;
-
-  const defaultSettings = {};
-
-  if (!properties) return;
-
-  let obsProp = properties.first();
-  do {
-    if (!isListProperty(obsProp)) continue;
-
-    const items = obsProp.details.items;
-
-    if (items.length === 0) continue;
-
-    /* If setting isn't set at all, set to first element. */
-    if (settings[obsProp.name] === void 0) {
-      defaultSettings[obsProp.name] = items[0].value;
-    }
-  } while ((obsProp = obsProp.next()));
-  const needUpdate = Object.keys(defaultSettings).length > 0;
-  if (needUpdate) configurable.update(defaultSettings);
 }
 
 export abstract class ObsInput<TValueType> extends Vue {

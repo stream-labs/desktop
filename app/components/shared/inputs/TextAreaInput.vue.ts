@@ -4,6 +4,9 @@ import { IInputMetadata } from './index';
 
 interface IWTextMetadata extends IInputMetadata {
   placeholder: string;
+  max: number;
+  min: number;
+  blockReturn: boolean;
 }
 
 @Component({})
@@ -13,4 +16,19 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
 
   @Prop({ default: () => ({}) })
   readonly metadata: IWTextMetadata;
+
+  getValidations() {
+    return {
+      ...super.getValidations(),
+      min: this.options.min,
+      max: this.options.max,
+    };
+  }
+
+  handleInput(event: { target: HTMLInputElement }) {
+    const val = this.options.blockReturn
+      ? event.target.value.replace(/(\r\n|\r|\n)/g, '')
+      : event.target.value;
+    this.emitInput(val);
+  }
 }

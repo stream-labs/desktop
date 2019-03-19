@@ -1,8 +1,9 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { ValidatedForm },
@@ -33,16 +34,20 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('symbol-protection');
   }
 
+  @Watch('errors.items.length')
+  @debounce(200)
+  async onErrorsChanged() {
+    await this.$refs.form.validateAndGetErrorsCount();
+  }
+
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService
-      .updateSymbolProtection({
-        enabled: this.symbolProtectionResponse.enabled,
-        settings: this.symbolProtection,
-      })
-      .then(() => {
-        this.chatbotCommonService.closeChildWindow();
-      });
+    this.chatbotApiService.ModTools.updateSymbolProtection({
+      enabled: this.symbolProtectionResponse.enabled,
+      settings: this.symbolProtection,
+    }).then(() => {
+      this.chatbotApiService.Common.closeChildWindow();
+    });
   }
 }

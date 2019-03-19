@@ -4,7 +4,7 @@ import TopNav from '../TopNav.vue';
 import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
@@ -28,9 +28,10 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
-import PlatformAppWebview from '../PlatformAppWebview.vue';
+import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
+import ResizeBar from 'components/shared/ResizeBar.vue';
 
 @Component({
   components: {
@@ -49,9 +50,10 @@ import electron from 'electron';
     NewsBanner,
     Chatbot,
     DesignSystem,
-    PlatformAppWebview,
+    PlatformAppMainPage,
     PlatformAppStore,
     Help,
+    ResizeBar,
   },
 })
 export default class Main extends Vue {
@@ -64,6 +66,12 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
 
   mounted() {
+    const dockWidth = this.customizationService.state.livedockSize;
+    if (dockWidth < 1) {
+      // migrate from old percentage value to the pixel value
+      this.resetWidth();
+    }
+
     electron.remote.getCurrentWindow().show();
     this.handleResize();
   }
@@ -88,14 +96,25 @@ export default class Main extends Vue {
     return this.appService.state.loading;
   }
 
+  get showLoadingSpinner() {
+    return (
+      this.appService.state.loading && this.page !== 'Onboarding' && this.page !== 'BrowseOverlays'
+    );
+  }
+
   get isLoggedIn() {
     return this.userService.isLoggedIn();
   }
 
-  mainContentsRight = false;
+  get renderDock() {
+    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
+  }
+
+  get isDockCollapsed() {
+    return this.customizationService.state.livedockCollapsed;
+  }
 
   get leftDock() {
-    this.mainContentsRight = this.customizationService.state.leftDock;
     return this.customizationService.state.leftDock;
   }
 
@@ -105,32 +124,6 @@ export default class Main extends Vue {
 
   get platformApps() {
     return this.platformAppsService.enabledApps;
-  }
-
-  isAppPersistent(appId: string) {
-    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
-  }
-
-  isAppPoppedOut(appId: string) {
-    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
-  }
-
-  isAppVisible(appId: string) {
-    return this.page === 'PlatformAppContainer' && this.params.appId === appId;
-  }
-
-  appPageSlot = EAppPageSlot.TopNav;
-
-  /**
-   * Only certain pages get locked out while the application
-   * is loading.  Other pages are OK to keep using.
-   */
-  get shouldLockContent() {
-    return (
-      this.applicationLoading &&
-      (this.navigationService.state.currentPage === 'Studio' ||
-        this.navigationService.state.currentPage === 'Live')
-    );
   }
 
   onDropHandler(event: DragEvent) {
@@ -179,5 +172,47 @@ export default class Main extends Vue {
 
   handleResize() {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
+  }
+
+  onResizeStartHandler() {
+    this.customizationService.setSettings({ previewEnabled: false });
+  }
+
+  onResizeStopHandler(offset: number) {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    offset = this.leftDock ? offset : -offset;
+    this.setWidth(this.customizationService.state.livedockSize + offset);
+    this.customizationService.setSettings({
+      previewEnabled: true,
+    });
+  }
+
+  setWidth(width: number) {
+    this.customizationService.setSettings({
+      livedockSize: this.validateWidth(width),
+    });
+  }
+
+  validateWidth(width: number): number {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const minEditorWidth = 860;
+    const minWidth = 290;
+    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    width = Math.max(minWidth, width);
+    // tslint:disable-next-line:no-parameter-reassignment
+    width = Math.min(maxWidth, width);
+    return width;
+  }
+
+  updateWidth() {
+    const width = this.customizationService.state.livedockSize;
+    if (width !== this.validateWidth(width)) this.setWidth(width);
+  }
+
+  resetWidth() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    const defaultWidth = appRect.width * 0.28;
+    this.setWidth(defaultWidth);
   }
 }

@@ -55,7 +55,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       console.warn('Error loading manifest file from disk');
     }
 
-    await this.flushManifestFile();
+    this.flushManifestFile();
   }
 
   /**
@@ -88,9 +88,9 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    * The manifest file is simply a copy of the Vuex state of this
    * service, persisted to disk.
    */
-  async flushManifestFile() {
+  flushManifestFile() {
     const data = JSON.stringify(this.state, null, 2);
-    await this.writeDataToCollectionFile('manifest', data);
+    this.writeDataToCollectionFile('manifest', data);
   }
 
   /**

@@ -136,10 +136,12 @@ export class DefaultManager extends PropertiesManager {
     const fontInfo = fi.getFontInfo(fontPath);
 
     if (!fontInfo) {
-      // Fall back to Arial
+      // Fallback to Arial
       newSettings['custom_font'] = null;
-      newSettings['font']['face'] = 'Arial';
-      newSettings['font']['flags'] = 0;
+      newSettings['font'] = {
+        face: 'Arial',
+        flags: 0,
+      };
       this.obsSource.update(newSettings);
       return;
     }

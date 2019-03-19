@@ -1,4 +1,4 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
@@ -44,13 +44,11 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   async onSaveHandler() {
     if (this.$refs.form && (await this.$refs.form.validateAndGetErrorsCount())) return;
 
-    this.chatbotApiService
-      .updateLinkProtection({
-        enabled: this.linkProtectionResponse.enabled,
-        settings: this.linkProtection,
-      })
-      .then(() => {
-        this.chatbotCommonService.closeChildWindow();
-      });
+    this.chatbotApiService.ModTools.updateLinkProtection({
+      enabled: this.linkProtectionResponse.enabled,
+      settings: this.linkProtection,
+    }).then(() => {
+      this.chatbotApiService.Common.closeChildWindow();
+    });
   }
 }

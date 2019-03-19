@@ -1,11 +1,13 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+
 import { IQuotePreferencesGeneralSettings } from 'services/chatbot';
-import { EInputType } from 'components/shared/inputs';
+
+import { EInputType } from 'components/shared/inputs/index';
 
 @Component({
   components: { ValidatedForm },
@@ -31,7 +33,7 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
   }
 
   get quotePreferences() {
-    return this.chatbotApiService.state.quotePreferencesResponse;
+    return this.chatbotApiService.Quotes.state.quotePreferencesResponse;
   }
 
   mounted() {
@@ -43,6 +45,6 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     const newPreferences = cloneDeep(this.quotePreferences);
     newPreferences.settings.general = this.generalSettings;
-    this.chatbotApiService.updateQuotePreferences(newPreferences);
+    this.chatbotApiService.Quotes.updateQuotePreferences(newPreferences);
   }
 }

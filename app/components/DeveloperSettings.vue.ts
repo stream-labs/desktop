@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
-import { ITcpServerServiceApi, ITcpServersSettings } from 'services/tcp-server';
+import { ITcpServerServiceApi, ITcpServersSettings } from 'services/api/tcp-server';
 import { ISettingsSubCategory } from 'services/settings';
 import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
 import { PlatformAppsService } from 'services/platform-apps';

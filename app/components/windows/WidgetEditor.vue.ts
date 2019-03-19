@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -12,7 +12,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import TestWidgets from 'components/TestWidgets.vue';
 import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, IWidgetsServiceApi } from 'services/widgets';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
@@ -170,6 +170,11 @@ export default class WidgetEditor extends Vue {
 
   updateCurrentSetting(value: string) {
     this.currentSetting = value;
+  }
+
+  @Watch('selectedAlert')
+  autoselectCurrentSetting() {
+    this.currentSetting = this.navItems[0].value;
   }
 
   toggleCustomCode(enabled: boolean) {

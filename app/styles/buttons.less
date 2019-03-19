@@ -1,15 +1,16 @@
 .button {
   .transition();
   .radius();
-  border: 1px solid transparent;
-  margin: 0;
   .weight(@medium);
-  font-family: 'Roboto';
   .text-transform();
-  height: 32px;
-  line-height: 30px;
   .padding-h-sides();
   .padding-v-sides(@0);
+
+  border: 1px solid transparent;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  height: 32px;
+  line-height: 30px;
 
   &:focus,
   &:visited {
@@ -114,6 +115,19 @@
   font-size: 15px;
 }
 
+.square-button {
+  .radius();
+  .transition();
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  color: @white;
+  font-size: 16px;
+}
+
 .button-container {
   display: flex;
   justify-content: flex-start;
@@ -133,18 +147,6 @@
     margin-right: 0;
     margin-left: 10px;
   }
-}
-
-.square-button {
-  .radius();
-  .transition();
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  height: 50px;
-  color: @white;
-  font-size: 16px;
 }
 
 .square-button--twitch,

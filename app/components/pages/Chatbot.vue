@@ -3,7 +3,7 @@
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span>
-          {{ globallyEnabled ? $t('Chatbot Enabled') : $t('Chatbot Disabled') }}
+          {{ globallyEnabled ? $t('Cloudbot Enabled') : $t('Cloudbot Disabled') }}
         </span>
         <ToggleInput
           :value="globallyEnabled"
@@ -46,6 +46,9 @@
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
         <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
         <ChatbotQueue v-if="selectedTab === 'Queue'"/>
+        <ChatbotLoyalty v-if="selectedTab === 'Loyalty'"/>
+        <ChatbotPoll v-if="selectedTab === 'Poll'" />
+        <ChatbotBetting v-if="selectedTab === 'Betting'" />
       </transition>
     </div>
   </div>
@@ -54,11 +57,10 @@
 <script lang='ts' src="./Chatbot.vue.ts"></script>
 
 <style lang='less' scoped>
-@import "../../styles/index";
-
+@import '../../styles/index';
 
 .chatbot__content {
-  width: calc(~"100% - 200px");
+  width: calc(~'100% - 200px');
 }
 .chatbot__side-menu {
   width: 200px;
@@ -67,7 +69,7 @@
 
   .chatbot__side-menu__global-toggle {
     padding: 20px;
-    background-color: #EAF9F5;
+    background-color: #eaf9f5;
     .weight(@bold);
   }
   .side-menu {

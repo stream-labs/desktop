@@ -9,7 +9,6 @@ export interface ICustomizationServiceState {
   hideViewerCount: boolean;
   folderSelection: boolean;
   livedockCollapsed: boolean;
-  previewSize: number;
   livedockSize: number;
   bottomdockSize: number;
   performanceMode: boolean;
@@ -18,6 +17,7 @@ export interface ICustomizationServiceState {
   enableBTTVEmotes: boolean;
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
+  navigateToLiveOnStreamStart: boolean;
   experimental: any;
 }
 

@@ -1,32 +1,31 @@
 <template>
-<div class="hotkey">
-  <div class="Hotkey-description">
-    {{ description }}
+  <div class="hotkey" :data-test-id="description.replace(/\s+/, '_')">
+    <div class="Hotkey-description">{{ description }}</div>
+    <div class="Hotkey-bindings">
+      <transition-group name="bindings" tag="div">
+        <div
+          v-for="(binding, index) in bindings"
+          :key="binding.key"
+          class="hotkey-bindings__binding"
+        >
+          <input
+            type="text"
+            class="Hotkey-input"
+            :value="getBindingString(binding.binding)"
+            @keydown="e => handleKeydown(e, index)"
+          />
+          <i class="Hotkey-control fa fa-plus" @click="addBinding(index);" />
+          <i class="Hotkey-control fa fa-minus" @click="removeBinding(index);" />
+        </div>
+      </transition-group>
+    </div>
   </div>
-  <div class="Hotkey-bindings">
-    <transition-group name="bindings" tag="div">
-      <div v-for="(binding, index) in bindings" :key="binding.key" class="hotkey-bindings__binding">
-        <input
-          type="text"
-          class="Hotkey-input"
-          :value="getBindingString(binding.binding)"
-          @keydown="e => handleKeydown(e, index)"/>
-        <i
-          class="Hotkey-control fa fa-plus"
-          @click="addBinding(index)"/>
-        <i
-          class="Hotkey-control fa fa-minus"
-          @click="removeBinding(index)"/>
-      </div>
-    </transition-group>
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./Hotkey.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .hotkey {
   display: flex;
@@ -50,7 +49,7 @@
   opacity: 0.6;
 
   &:hover {
-    opacity: 1.0;
+    opacity: 1;
   }
 }
 
@@ -59,7 +58,8 @@
   .transition();
 }
 
-.bindings-enter, .bindings-leave-to {
+.bindings-enter,
+.bindings-leave-to {
   opacity: 0;
   transform: scale(1, 0);
 }

@@ -1,5 +1,5 @@
-import { cloneDeep } from 'lodash';
-import { Component, Prop, Inject } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
   IChatAlertsResponse,
@@ -11,17 +11,17 @@ import {
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   get chatAlerts() {
-    return this.chatbotApiService.state.chatAlertsResponse;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse;
   }
 
   get chatAlertsEnabled() {
-    return this.chatbotApiService.state.chatAlertsResponse.enabled;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse.enabled;
   }
 
   get alertTypes() {
     const { streamlabs, twitch, mixer, youtube } = this.chatAlerts.settings;
 
-    const platform = this.chatbotApiService.userService.platform.type;
+    const platform = this.chatbotApiService.Base.userService.platform.type;
 
     let alertTypes;
 
@@ -60,7 +60,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   platformForAlertType(type: ChatbotAlertType) {
     if (type === 'tip') return 'streamlabs';
-    return this.chatbotApiService.userService.platform.type;
+    return this.chatbotApiService.Base.userService.platform.type;
   }
 
   // preparing data to send to service
@@ -108,6 +108,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // calls to service methods
   updateChatAlerts(newAlertsObject: IChatAlertsResponse) {
-    return this.chatbotApiService.updateChatAlerts(newAlertsObject);
+    return this.chatbotApiService.Alerts.updateChatAlerts(newAlertsObject);
   }
 }

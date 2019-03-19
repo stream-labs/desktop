@@ -10,7 +10,7 @@ import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { ScenesService } from 'services/scenes';
-import { IpcServerService } from 'services/ipc-server';
+import { IpcServerService } from 'services/api/ipc-server';
 import { AudioService } from 'services/audio';
 import { PrefabsService } from 'services/prefabs';
 import { UserService } from 'services/user';

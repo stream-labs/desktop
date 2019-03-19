@@ -4,8 +4,8 @@ import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
-import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
+import { ISourcesServiceApi } from '../../services/sources';
+import { WidgetsService } from '../../services/widgets';
 import { $t } from 'services/i18n';
 
 @Component({

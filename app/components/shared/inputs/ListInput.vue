@@ -1,5 +1,11 @@
 <template>
-<div class="list-input" data-role="input" data-type="list" :data-name="options.name">
+<div
+  class="list-input"
+  data-role="input"
+  data-type="list"
+  :data-name="options.name"
+  :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
+>
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
@@ -16,13 +22,11 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <template slot="option" slot-scope="props">
-      <span :data-option-value="props.option.value">{{ props.option.title }}</span>
-    </template>
+    <span slot="option" slot-scope="props" :data-option-value="props.option.value">
+      <slot name="item" :option="props.option">{{ props.option.title }}</slot>
+    </span>
 
-    <template v-if="options.noResult" slot="noResult">
-      {{ options.noResult }}
-    </template>
+    <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
 
   </multiselect>
   <div v-if="selectedOption && selectedOption.description" class="description">
@@ -35,6 +39,14 @@
 
 <style lang="less" scoped>
 @import "../../../styles/index";
+
+.list-input.full-width {
+  width: 100%;
+}
+
+.list-input.disabled {
+  cursor: not-allowed;
+}
 
 .description {
   margin-top: 6px;

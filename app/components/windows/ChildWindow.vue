@@ -7,9 +7,8 @@
     <div class="spinner-spacer" />
   </div>
   <component
-    v-for="(component, index) in components"
+    v-for="(component, index) in componentsToRender"
     :key="`${component.name}-${index}`"
-    v-if="component.name"
     v-show="component.isShown"
     :is="component.name"/>
 </div>
@@ -28,10 +27,14 @@
   height: 100%;
   width: 100%;
   z-index: -1;
-
-  background-color: @day-primary;
   font-size: 24px;
   text-align: center;
+}
+
+.blank-slate,
+.child-window-titlebar {
+  background-color: var(--background);
+  color: var(--paragraph);
 }
 
 .child-window-titlebar {
@@ -40,13 +43,5 @@
 
 .spinner-spacer {
   flex-grow: 1;
-}
-
-.night-theme {
-  .blank-slate,
-  .child-window-titlebar {
-    background-color: @night-primary;
-    color: @night-paragraph;
-  }
 }
 </style>

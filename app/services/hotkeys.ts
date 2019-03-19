@@ -243,6 +243,8 @@ const ACTIONS: HotkeyGroup = {
 export interface IHotkey {
   actionName: string;
   bindings: IBinding[];
+  description?: string;
+  resourceId?: string;
   sceneId?: string;
   sourceId?: string;
   sceneItemId?: string;

@@ -4,7 +4,6 @@ import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/stateful-service';
 import {
   IAlertBoxApiSettings,
-  IAlertBoxMixerSettings,
   IAlertBoxSetting,
   IAlertBoxSettings,
   IAlertBoxVariation,
@@ -188,6 +187,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       // These settings are handled differently and purposely dropped on the floor in reshapeVariation
       newSettings.bits_alert_min_amount = settings.bits_alert_min_amount;
       newSettings.donation_alert_min_amount = settings.donation_alert_min_amount;
+      newSettings.fanfunding_alert_min_amount = settings.fanfunding_alert_min_amount;
       newSettings.host_viewer_minimum = settings.host_viewer_minimum;
       newSettings.raid_raider_minimum = settings.raid_raider_minimum;
     });
@@ -196,7 +196,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   private varifySetting(setting: any): IAlertBoxSetting {
-    const { show_message, enabled, variations, showResubMessage, ...rest } = setting;
+    const { show_message, enabled, showResubMessage, ...rest } = setting;
+    const variations = setting.variations || [];
     const defaultVariation = this.reshapeVariation(rest);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),
@@ -211,6 +212,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       setting.image_href === '/images/gallery/default.gif'
         ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
         : setting.image_href;
+    const constrainedDuration =
+      Math.floor(setting.alert_duration / 1000) <= 300
+        ? Math.floor(setting.alert_duration / 1000)
+        : 300;
     return {
       condition: null,
       conditionData: null,
@@ -223,7 +228,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         customHtmlEnabled: setting.custom_html_enabled,
         customJs: setting.custom_js,
         customJson: setting.custom_json,
-        duration: Math.floor(setting.alert_duration / 1000),
+        duration: constrainedDuration,
         hideAnimation: setting.hide_animation,
         image: { href: imgHref },
         layout: setting.layout,
@@ -375,8 +380,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       } else if (prefix !== 'resub') {
         settingsObj[setting] = settings[setting];
       }
-      settingsObj.show_resub_message = settings.subs.showResubMessage;
     });
+    settingsObj.show_resub_message = settings.subs && settings.subs.showResubMessage;
     return settingsObj;
   }
 }

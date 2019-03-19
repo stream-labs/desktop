@@ -3,6 +3,8 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { getUserName, releaseUserInPool } from './user';
+import { sleep } from '../sleep';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -29,6 +31,13 @@ export async function focusMain(t: any) {
 // Focuses the child window
 export async function focusChild(t: any) {
   await focusWindow(t, /windowId=child/);
+}
+
+// Focuses the Library webview
+export async function focusLibrary(t: any) {
+  // doesn't work without delay, probably need to wait until load
+  await sleep(2000);
+  await focusWindow(t, /streamlabs\.com\/library/);
 }
 
 interface ITestRunnerOptions {
@@ -65,7 +74,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let context: any = null;
   let app: any;
   let testPassed = false;
+  let failMsg = '';
   let testName = '';
+  let logFileLastReadingPos = 0;
   const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
@@ -133,35 +144,37 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  async function stopApp() {
+  async function stopApp(t: TExecutionContext) {
     try {
       await context.app.stop();
-      await new Promise(resolve => {
-        rimraf(context.cacheDir, resolve);
-      });
     } catch (e) {
-      // TODO: find the reason why some tests are failing here
-      testPassed = false;
+      fail('Crash on shutdown');
     }
     appIsRunning = false;
+    await checkErrorsInLogFile();
+    logFileLastReadingPos = 0;
+    await new Promise(resolve => {
+      rimraf(context.cacheDir, resolve);
+    });
   }
 
   /**
    * test should be considered as failed if it writes exceptions in to the log file
    */
-  async function checkErrorsInLogFile(t: TExecutionContext) {
+  async function checkErrorsInLogFile() {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
+      .substr(logFileLastReadingPos)
       .split('\n')
       .filter((record: string) => record.match(/\[error\]/));
-    fs.unlinkSync(filePath);
+
+    // save the last reading position, to skip already read records next time
+    logFileLastReadingPos = logs.length - 1;
+
     if (!errors.length) return;
-    t.fail();
-    testPassed = false;
-    console.log('The log-file has errors');
-    console.log(logs);
+    fail(`The log-file has errors \n ${logs}`);
   }
 
   test.beforeEach(async t => {
@@ -181,27 +194,41 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       const client = await getClient();
       await client.unsubscribeAll();
+      await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp();
+        await stopApp(t);
+      } else {
+        await checkErrorsInLogFile();
       }
     } catch (e) {
       testPassed = false;
     }
 
-    await checkErrorsInLogFile(t);
-    if (!testPassed) failedTests.push(testName);
+    if (!testPassed) {
+      failedTests.push(testName);
+      const userName = getUserName();
+      if (userName) console.log(`Test failed for the account: ${userName}`);
+      t.fail(failMsg);
+    }
   });
 
   test.after.always(async t => {
     if (appIsRunning) {
-      await stopApp();
+      await stopApp(t);
       if (!testPassed) failedTests.push(testName);
     }
 
     if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
+
+  function fail(msg: string) {
+    testPassed = false;
+    failMsg = msg;
+  }
+
 }
+
 
 function saveFailedTestsToFile(failedTests: string[]) {
   const filePath = 'test-dist/failed-tests.json';

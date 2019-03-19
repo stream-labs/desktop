@@ -3,7 +3,6 @@ import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers/spectron/sources';
 import { logOut } from './helpers/spectron/user';
 
-
 useSpectron({ skipOnboarding: false, appArgs: '--nosync' });
 
 test('Adding some starter widgets', async t => {
@@ -25,6 +24,11 @@ test('Adding some starter widgets', async t => {
     widgetToken,
     platform
   });
+
+  // This will show up if there are scene collections to import
+  if (await t.context.app.client.isExisting('button=Continue')) {
+    await t.context.app.client.click('button=Continue');
+  }
 
   // This will only show up if OBS is installed
   if (await t.context.app.client.isExisting('button=Start Fresh')) {

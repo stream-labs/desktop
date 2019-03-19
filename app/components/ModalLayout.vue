@@ -1,44 +1,34 @@
 <template>
-<div id="mainWrapper" class="modal-layout" :class="{'night-theme': nightTheme}">
-  <div
-    class="ModalLayout-fixed"
-    :style="fixedStyle">
-    <slot name="fixed"/>
-  </div>
-  <div
-    class="modal-layout-content"
-    :style="contentStyle">
-    <slot name="content" v-if="!loading"/>
-    <div class="spinner-container" v-else>
-      <i class="fa fa-spinner fa-pulse modal-layout-spinner"/>
+  <div id="mainWrapper" class="modal-layout" :class="{'night-theme': nightTheme}">
+    <div class="ModalLayout-fixed" :style="fixedStyle">
+      <slot name="fixed"/>
+    </div>
+    <div
+      :class="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
+      :style="contentStyle"
+    >
+      <slot name="content" v-if="!loading"/>
+      <div class="spinner-container" v-else>
+        <i class="fa fa-spinner fa-pulse modal-layout-spinner"/>
+      </div>
+    </div>
+    <div v-if="showControls" class="modal-layout-controls">
+      <button v-if="showCancel" class="button button--default" @click="cancel">{{ $t('Cancel') }}</button>
+      <button v-if="showDone" :disabled="disableDone" class="button button--action" @click="done">{{ $t('Done') }}</button>
+    </div>
+    <div v-if="customControls" class="modal-layout-controls">
+      <slot name="controls"/>
     </div>
   </div>
-  <div v-if="showControls" class="modal-layout-controls">
-    <button
-      v-if="showCancel"
-      class="button button--default"
-      @click="cancel">
-      {{ $t('Cancel') }}
-    </button>
-    <button
-      class="button button--action"
-      @click="done">
-      {{ $t('Done') }}
-    </button>
-  </div>
-  <div v-if="customControls" class="modal-layout-controls">
-    <slot name="controls" />
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./ModalLayout.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .modal-layout {
-  height: calc(~"100% - 30px"); // Compensate for titlebar living in ChildWindow
+  height: calc(~'100% - 30px'); // Compensate for titlebar living in ChildWindow
   display: flex;
   flex-direction: column;
   color: @day-paragraph;
@@ -63,6 +53,19 @@
   position: relative;
   overflow-x: hidden;
   .padding(2);
+
+  & > * {
+    width: 100%;
+  }
+}
+
+.modal-layout-tab-content {
+  flex-grow: 1;
+  height: 100%;
+  display: flex;
+  position: relative;
+  overflow-x: hidden;
+  margin-top: 45px;
 
   & > * {
     width: 100%;

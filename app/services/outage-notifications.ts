@@ -1,7 +1,7 @@
 import { Service } from 'services/service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { Inject } from 'util/injector';
-import { JsonrpcService, IJsonRpcRequest } from 'services/jsonrpc';
+import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import electron from 'electron';
 
 interface IOutageNotification {

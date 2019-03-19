@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Chat Alert Preferences')"
 >
   <div slot="content" class="chatbot-alerts-window__container flex">
     <div class="chatbot-alerts-window__sidebar">
@@ -31,6 +30,7 @@
         <button
           class="button button--action"
           @click="onShowNewChatAlertWindowHandler"
+          :disabled="selectedTypeMessages.length >= 100"
         >
           {{ $t('add alert') }}
         </button>

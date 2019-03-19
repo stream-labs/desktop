@@ -1,12 +1,8 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
-import { cloneDeep } from 'lodash';
-import {
-  IObsListOption,
-  setupConfigurableDefaults,
-  TObsValue,
-} from 'components/obs/inputs/ObsInput';
+import cloneDeep from 'lodash/cloneDeep';
+import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
@@ -38,7 +34,6 @@ import { HardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 
-const SOURCES_UPDATE_INTERVAL = 1000;
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
 const AsyncFlag = obs.ESourceOutputFlags.Async;
@@ -51,6 +46,13 @@ export const PROPERTIES_MANAGER_TYPES = {
   platformApp: PlatformAppManager,
   replay: ReplayManager,
 };
+
+interface IObsSourceCallbackInfo {
+  name: string;
+  width: number;
+  height: number;
+  flags: number;
+}
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
@@ -77,7 +79,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
   protected init() {
-    setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
+    obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
+      this.handleSourceCallback(objs),
+    );
 
     this.scenesService.itemRemoved.subscribe(sceneSourceModel =>
       this.onSceneItemRemovedHandler(sceneSourceModel),
@@ -179,8 +183,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       propertiesManagerType: managerType,
     });
     const source = this.getSource(id);
-    const muted = obsInput.muted;
-    this.UPDATE_SOURCE({ id, muted });
+    this.UPDATE_SOURCE({ id, muted: false });
     this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
@@ -189,7 +192,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type: managerType,
     };
 
-    if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
 
     if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
@@ -337,6 +339,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
+      { description: 'VLC Source', value: 'vlc_source' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
@@ -380,29 +383,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-  requestSourceSizes() {
-    const activeScene = this.scenesService.activeScene;
-    if (activeScene) {
-      const activeItems = activeScene.getItems();
-      const sourcesNames: string[] = [];
+  private handleSourceCallback(objs: IObsSourceCallbackInfo[]) {
+    objs.forEach(info => {
+      const source = this.getSource(info.name);
 
-      activeItems.forEach(activeItem => {
-        sourcesNames.push(activeItem.sourceId);
-      });
+      // This is probably a transition or something else we don't care about
+      if (!source) return;
 
-      const sizes: obs.ISourceSize[] = obs.getSourcesSize(sourcesNames);
-      sizes.forEach(update => {
-        const source = this.getSource(update.name);
-
-        if (!source) return;
-
-        if (source.width !== update.width || source.height !== update.height) {
-          const size = { id: source.sourceId, width: update.width, height: update.height };
-          this.UPDATE_SOURCE(size);
-        }
-        this.updateSourceFlags(source, update.outputFlags);
-      });
-    }
+      if (source.width !== info.width || source.height !== info.height) {
+        const size = { id: source.sourceId, width: info.width, height: info.height };
+        this.UPDATE_SOURCE(size);
+      }
+      this.updateSourceFlags(source, info.flags);
+    });
   }
 
   private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
@@ -509,7 +502,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         });
 
         if (page && page.redirectPropertiesToTopNavSlot) {
-          this.navigationService.navigate('PlatformAppContainer', {
+          this.navigationService.navigate('PlatformAppMainPage', {
             appId: app.id,
             sourceId: source.sourceId,
           });
@@ -539,9 +532,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       title: $t('Add Source'),
       size: {
         width: 1200,
-        // TODO: CSS on this window is screwed up.  Window should expand naturally,
-        // We shouldn't have to perfectly size the window to the contents
-        height: 685,
+        height: 650,
       },
     });
   }

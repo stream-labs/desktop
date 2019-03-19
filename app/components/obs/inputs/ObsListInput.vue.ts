@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IObsListInput, IObsListOption, ObsInput, TObsValue } from './ObsInput';
+import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
@@ -12,7 +12,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop()
   value: IObsListInput<TObsValue>;
 
-  @Prop({ default: false })
+  @Prop({ default: true })
   allowEmpty: boolean;
 
   @Prop({ default: true })
@@ -35,6 +35,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   get metadata() {
     return {
       loading: this.loading,
+      disabled: this.value.enabled === false,
       placeholder: this.placeholder,
       allowEmpty: this.allowEmpty,
       internalSearch: this.internalSearch,

@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
@@ -16,12 +16,12 @@ import {
 
 import {
   EInputType,
-  IInputMetadata,
   IListMetadata,
   INumberMetadata,
   ISliderMetadata,
+  IInputMetadata,
   ITextMetadata,
-} from 'components/shared/inputs';
+} from 'components/shared/inputs/index';
 
 interface IChatbotPunishmentMetadata {
   type: IListMetadata<string>;
@@ -96,10 +96,84 @@ interface IProtectionMetadata {
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
-  capsProtection: ICapsProtectionData = null;
-  symbolProtection: ISymbolProtectionData = null;
-  linkProtection: ILinkProtectionData = null;
-  wordProtection: IWordProtectionData = null;
+  capsProtection: ICapsProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50,
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+  };
+  symbolProtection: ISymbolProtectionData = {
+    advanced: {
+      maximum: 8,
+      minimum: 8,
+      percent: 50,
+    },
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+  };
+  linkProtection: ILinkProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    blacklist: [],
+    commands: {},
+    whitelist: [],
+  };
+  wordProtection: IWordProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    blacklist: [],
+  };
 
   mounted() {
     this.capsProtection = cloneDeep(this.capsProtectionResponse.settings);
@@ -109,19 +183,19 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   get capsProtectionResponse() {
-    return this.chatbotApiService.state.capsProtectionResponse;
+    return this.chatbotApiService.ModTools.state.capsProtectionResponse;
   }
 
   get symbolProtectionResponse() {
-    return this.chatbotApiService.state.symbolProtectionResponse;
+    return this.chatbotApiService.ModTools.state.symbolProtectionResponse;
   }
 
   get linkProtectionResponse() {
-    return this.chatbotApiService.state.linkProtectionResponse;
+    return this.chatbotApiService.ModTools.state.linkProtectionResponse;
   }
 
   get wordProtectionResponse() {
-    return this.chatbotApiService.state.wordProtectionResponse;
+    return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
@@ -158,15 +232,20 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Punishment Duration (Value in Seconds)'),
+          placeholder: $t('Punishment Duration'),
+          tooltip: $t('Value in Seconds'),
           min: 0,
+          max: 86400,
         },
       },
       permit: {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Permission Duration (Value in Seconds)'),
+          placeholder: $t('Permission Duration'),
+          tooltip: $t('Value in Seconds'),
+          min: 1,
+          max: 86400,
         },
       },
       excluded: {
@@ -181,6 +260,9 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         required: true,
         type: EInputType.textArea,
         placeholder: this.placeholder(protectionType, 'message'),
+        uuid: $t('Message'),
+        max: 450,
+        blockReturn: true,
       },
     };
   }
@@ -213,8 +295,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     };
   }
 
-  get linkCommandsMetadata(): ILinkProtectionCommandsMetadata {
-    return {
+  get linkCommandsMetadata() {
+    const linkCommandsMetadata: ILinkProtectionCommandsMetadata = {
       permit: {
         command: {
           required: true,
@@ -241,10 +323,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
       },
     };
+
+    return linkCommandsMetadata;
   }
 
-  get wordBlacklistItemMetadata(): IWordProtectionBlacklistItem {
-    return {
+  get wordBlacklistItemMetadata() {
+    const wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
       text: {
         required: true,
         type: EInputType.text,
@@ -268,6 +352,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
       },
     };
+
+    return wordBlacklistItemMetadata;
   }
 
   get metadata(): IProtectionMetadata {
@@ -303,34 +389,32 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
-      this.chatbotApiService
-        .resetSettings(slug)
-        .then(
-          (
-            response:
-              | ICapsProtectionResponse
-              | ISymbolProtectionResponse
-              | ILinkProtectionResponse
-              | IWordProtectionResponse,
-          ) => {
-            switch (slug) {
-              case 'caps-protection':
-                this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
-                break;
-              case 'symbol-protection':
-                this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
-                break;
-              case 'link-protection':
-                this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
-                break;
-              case 'words-protection':
-                this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
-                break;
-              default:
-                break;
-            }
-          },
-        );
+      this.chatbotApiService.ModTools.resetSettings(slug).then(
+        (
+          response:
+            | ICapsProtectionResponse
+            | ISymbolProtectionResponse
+            | ILinkProtectionResponse
+            | IWordProtectionResponse,
+        ) => {
+          switch (slug) {
+            case 'caps-protection':
+              this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
+              break;
+            case 'symbol-protection':
+              this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
+              break;
+            case 'link-protection':
+              this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
+              break;
+            case 'words-protection':
+              this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
+              break;
+            default:
+              break;
+          }
+        },
+      );
     }
   }
 }

@@ -1,4 +1,6 @@
 import { get, set, invert } from 'lodash';
+import { Rect } from './rect';
+import { v2, Vec2 } from './vec2';
 
 // This class is used for simplifying math that deals
 // with rectangles that can be scaled, including
@@ -23,7 +25,7 @@ export enum CenteringAxis {
 }
 
 // Positions on a positive unit grid
-const AnchorPositions = {
+export const AnchorPositions = {
   [AnchorPoint.North]: { x: 0.5, y: 0 },
   [AnchorPoint.NorthEast]: { x: 1, y: 0 },
   [AnchorPoint.East]: { x: 1, y: 0.5 },
@@ -35,23 +37,16 @@ const AnchorPositions = {
   [AnchorPoint.Center]: { x: 0.5, y: 0.5 },
 };
 
-export class ScalableRectangle implements IScalableRectangle {
-  x: number;
-  y: number;
+export class ScalableRectangle extends Rect implements IScalableRectangle {
   scaleX: number;
   scaleY: number;
-  width: number;
-  height: number;
   crop: ICrop;
   rotation: number;
 
-  private anchor: AnchorPoint;
+  private origin: Vec2;
 
   constructor(options: IScalableRectangle) {
-    this.x = options.x;
-    this.y = options.y;
-    this.width = options.width;
-    this.height = options.height;
+    super(options);
     this.scaleX = options.scaleX || 1.0;
     this.scaleY = options.scaleY || 1.0;
 
@@ -64,8 +59,7 @@ export class ScalableRectangle implements IScalableRectangle {
     };
 
     this.rotation = options.rotation || 0;
-
-    this.anchor = AnchorPoint.NorthWest;
+    this.origin = v2(AnchorPositions[AnchorPoint.NorthWest]);
   }
 
   get croppedWidth() {
@@ -85,7 +79,7 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
   get aspectRatio() {
-    return this.width / this.height;
+    return this.getAspectRatio();
   }
 
   get scaledAspectRatio() {
@@ -94,16 +88,20 @@ export class ScalableRectangle implements IScalableRectangle {
 
   setAnchor(anchor: AnchorPoint) {
     // We need to calculate the distance to the new anchor point
-    const currentPosition = AnchorPositions[this.anchor];
-    const newPosition = AnchorPositions[anchor];
+    this.setOrigin(AnchorPositions[anchor]);
+  }
 
-    const deltaX = newPosition.x - currentPosition.x;
-    const deltaY = newPosition.y - currentPosition.y;
+  setOrigin(newOriginModel: IVec2) {
+    // We need to calculate the distance to the new origin point
+    const currentPosition = this.origin;
+    const newOrigin = v2(newOriginModel);
+    const delta = newOrigin.sub(currentPosition);
+    const newPosition = this.getPosition().add(
+      delta.multiply(v2(this.scaledWidth, this.scaledHeight)),
+    );
 
-    this.x += deltaX * this.scaledWidth;
-    this.y += deltaY * this.scaledHeight;
-
-    this.anchor = anchor;
+    this.setPosition(newPosition);
+    this.origin = newOrigin;
   }
 
   /**
@@ -118,7 +116,7 @@ export class ScalableRectangle implements IScalableRectangle {
 
     // This is where the anchor point would actually be if this
     // were a zero rotated object
-    let anchor = AnchorPoint.NorthWest;
+    let origin = AnchorPositions[AnchorPoint.NorthWest];
 
     if (this.rotation === 90) {
       mapFields['width'] = 'height';
@@ -129,13 +127,13 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.top';
       mapFields['crop.bottom'] = 'crop.right';
       mapFields['crop.left'] = 'crop.bottom';
-      anchor = AnchorPoint.NorthEast;
+      origin = AnchorPositions[AnchorPoint.NorthEast];
     } else if (this.rotation === 180) {
       mapFields['crop.top'] = 'crop.bottom';
       mapFields['crop.right'] = 'crop.left';
       mapFields['crop.bottom'] = 'crop.top';
       mapFields['crop.left'] = 'crop.right';
-      anchor = AnchorPoint.SouthEast;
+      origin = AnchorPositions[AnchorPoint.SouthEast];
     } else if (this.rotation === 270) {
       mapFields['width'] = 'height';
       mapFields['height'] = 'width';
@@ -145,12 +143,12 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.bottom';
       mapFields['crop.bottom'] = 'crop.left';
       mapFields['crop.left'] = 'crop.top';
-      anchor = AnchorPoint.SouthWest;
+      origin = AnchorPositions[AnchorPoint.SouthWest];
     }
 
     this.mapFields(mapFields);
 
-    this.anchor = anchor;
+    this.origin = v2(origin);
 
     // Return the anchor to the NW, since the editor code assumes
     // that all rectangles are anchored from the NW
@@ -162,7 +160,7 @@ export class ScalableRectangle implements IScalableRectangle {
     // Return a function to undo these operations in the reverse order
     return () => {
       this.rotation = rotation;
-      this.setAnchor(anchor);
+      this.setOrigin(origin);
       this.mapFields(invert(mapFields));
     };
   }
@@ -184,12 +182,22 @@ export class ScalableRectangle implements IScalableRectangle {
    * which it is returned to its original anchor point.
    */
   withAnchor(anchor: AnchorPoint, fun: Function) {
-    const oldAnchor = this.anchor;
-    this.setAnchor(anchor);
+    this.withOrigin(AnchorPositions[anchor], fun);
+  }
+
+  /**
+   * Executes the function with a specific origin point, after
+   * which it is returned to its original origin point.
+   * Origin {x: 0, y: 0} is top-left corner
+   * Origin {x: 1, y: 1} is bottom-right corner
+   */
+  withOrigin(origin: IVec2, fun: Function) {
+    const oldOrigin = this.origin;
+    this.setOrigin(origin);
 
     fun();
 
-    this.setAnchor(oldAnchor);
+    this.setOrigin(oldOrigin);
   }
 
   /**
