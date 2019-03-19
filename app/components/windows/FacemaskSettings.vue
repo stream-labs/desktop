@@ -20,15 +20,9 @@
       <div class="row">
         <h-form-group :title="$t('Video Device')">
           <list-input
-            @input="onVideoInputSelect"
             v-model="videoInputModel"
             :metadata="videoInputMetadata"
           />
-        </h-form-group>
-      </div>
-      <div class="row">
-        <h-form-group :title="$t('Device Status')">
-          <span>{{videoDeviceReady ? 'Ready' : 'Not Ready'}}</span>
         </h-form-group>
       </div>
       <div class="row">
@@ -42,7 +36,7 @@
       </div>
       <div class="row">
         <h-form-group :title="$t('Donation URL')">
-          <p>https://streamlabs.com/{{username}}/masks</p>
+          <a @click="openTipPage">https://streamlabs.com/{{username}}/masks</a>
         </h-form-group>
       </div>
       <div class="row">
@@ -50,8 +44,8 @@
           <slider-input v-model="durationModel" :metadata="{min: 8, max: 60}"/>
         </h-form-group>
       </div>
-      <div class="row">
-        <h-form-group :title="$t('Sub Masks')">
+      <div class="row" v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Subscriber Masks')">
           <toggle-input
             v-model="subsEnabledModel"
             name="subsEnabled"
@@ -59,35 +53,41 @@
           />
         </h-form-group>
       </div>
-      <div class="row">
-        <h-form-group :title="$t('T2 Sub Masks') + ' ' + t2SelectionCount + '/3'">
-          <item-grid>
-            <virtual-item
-              v-for="(mask) in t2AvailableMasks"
-              :key="mask.uuid"
-              :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
-              :name="mask.name"
-              :selected="mask.selected"
-              @click="clickMask(mask, t2AvailableMasks)"
-            ></virtual-item>
-          </item-grid>
+      <div class="row" v-if="showTwitchFeatures && showExtensionPromt">
+        <h-form-group :title="$t('Get the Extension')">
+          <div class="extension-warning">
+            <span>{{$t('The Streamlabs Face Masks extension is required for Subscription and Bits Masks')}}</span>
+            <a @click="openExtensionPage">{{extensionUrl}}</a>
+          </div>
         </h-form-group>
       </div>
-      <div class="row">
-        <h-form-group :title="$t('T3 Sub Masks')  + ' ' + t3SelectionCount + '/3'">
+      <div class="row"  v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Test T3  Masks')">
           <item-grid>
             <virtual-item
               v-for="(mask) in t3AvailableMasks"
               :key="mask.uuid"
               :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
               :name="mask.name"
-              :selected="mask.selected"
               @click="clickMask(mask, t3AvailableMasks)"
             ></virtual-item>
           </item-grid>
         </h-form-group>
       </div>
-      <div class="row">
+      <div class="row" v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Test T2 Masks')">
+          <item-grid>
+            <virtual-item
+              v-for="(mask) in t2AvailableMasks"
+              :key="mask.uuid"
+              :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
+              :name="mask.name"
+              @click="clickMask(mask, t2AvailableMasks)"
+            ></virtual-item>
+          </item-grid>
+        </h-form-group>
+      </div>
+      <div class="row" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Bits Masks')">
           <toggle-input
             v-model="bitsEnabledModel"
@@ -96,10 +96,9 @@
           />
         </h-form-group>
       </div>
-       <div class="row">
+      <div class="row last-item" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Bits Price')">
           <list-input
-            @input="onBitsPriceSelect"
             v-model="bitsPriceModel"
             :metadata="bitsPricingMetadata"
           />
@@ -122,10 +121,26 @@
 
 <script lang="ts" src="./FacemaskSettings.vue.ts"></script>
 <style lang="less" scoped>
+  @import '../../styles/index';
   .row {
     flex-wrap: nowrap;
     width: 100%;
     margin-left: 15px;
+    margin-bottom: 16px;
+  }
+
+  .extension-warning {
+    background-color: @purple;
+    color: @white;
+    border-radius: 4px;
+    padding: 6px;
+    a {
+      color: white;
+    }
+  }
+
+  .last-item {
+    margin-bottom: 50px;
   }
 
   .row > div {
