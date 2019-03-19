@@ -24,6 +24,8 @@ interface INicoliveProgramState {
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
+  client: NicoliveClient = new NicoliveClient();
+
   static initialState: INicoliveProgramState = {
     programID: '',
     status: 'end',
@@ -41,6 +43,19 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     giftPoint: 0,
     autoExtensionEnabled: false,
   };
+
+  private setState(partialState: Partial<INicoliveProgramState>) {
+    const nextState = { ...this.state, ...partialState };
+    this.refreshStatisticsPolling(this.state, nextState);
+    this.refreshProgramStatusTimer(this.state, nextState);
+    this.refreshAutoExtensionTimer(this.state, nextState);
+    this.SET_STATE(nextState);
+  }
+
+  @mutation()
+  private SET_STATE(nextState: INicoliveProgramState): void {
+    this.state = nextState;
+  }
 
   /**
    * 番組スケジュールから表示すべき番組を選ぶ
@@ -68,31 +83,16 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     return nearestReservedProgram;
   }
 
-  client: NicoliveClient = new NicoliveClient();
+  static isProgramExtendable(state: INicoliveProgramState): boolean {
+    return state && state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
+  }
 
   get hasProgram(): boolean {
     return Boolean(this.state.programID);
   }
 
-  static isProgramExtendable(state: INicoliveProgramState): boolean {
-    return state && state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
-  }
-
   get isProgramExtendable(): boolean {
     return NicoliveProgramService.isProgramExtendable(this.state);
-  }
-
-  private setState(partialState: Partial<INicoliveProgramState>) {
-    const nextState = { ...this.state, ...partialState };
-    this.refreshStatisticsPolling(this.state, nextState);
-    this.refreshProgramStatusTimer(this.state, nextState);
-    this.refreshAutoExtensionTimer(this.state, nextState);
-    this.SET_STATE(nextState);
-  }
-
-  @mutation()
-  private SET_STATE(nextState: INicoliveProgramState): void {
-    this.state = nextState;
   }
 
   async createProgram(): Promise<CreateResult> {
