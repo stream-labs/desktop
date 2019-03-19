@@ -14,7 +14,8 @@ export type TSocketEvent =
   | ISubscriptionSocketEvent
   | IAlertPlayingSocketEvent
   | IAlertProfileChanged
-  | IBitsSocketEvent;
+  | IBitsSocketEvent
+  | IFmExtEnabledSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -71,13 +72,19 @@ interface IBitsSocketEvent {
   }[];
 }
 
+interface IFmExtEnabledSocketEvent {
+  type: 'fm-ext-enabled';
+}
+
 interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
     facemask?: string;
     _id: string;
     type: string;
-    payload?: ISubscriptionPayload;
+    payload?: {
+      _id?: string;
+    };
     data: {
       facemask?: string;
       fm_id?: string;
@@ -86,10 +93,6 @@ interface IAlertPlayingSocketEvent {
     sub_plan?: string;
     name?: string;
   };
-}
-
-interface ISubscriptionPayload {
-  _id: string;
 }
 
 interface IAlertProfileChanged {
