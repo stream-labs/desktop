@@ -205,7 +205,7 @@
     "vue-loader": "14.1.1",
     "vue-multiselect": "https://github.com/stream-labs/vue-multiselect.git",
     "vue-popperjs": "1.6.3",
-    "vue-property-decorator": "7.0.0",
+    "vue-property-decorator": "7.3.0",
     "vue-resize": "^0.4.4",
     "vue-slider-component": "2.8.14",
     "vue-spinner": "1.0.3",

@@ -10338,14 +10338,7 @@ vue-popperjs@1.6.3:
   dependencies:
     popper.js "^1.14.3"
 
-vue-property-decorator@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-7.0.0.tgz#46f53dd741eb86c3af091bb0492400c450eebf19"
-  integrity sha512-Y+ZtO1eL8jTTLqOEljZLZyNeJaUiNbX5HgX1g0IM2cLPhx0VVIq5gLXKPrzAjIRWt06Udy+pPs0rBOajigKe+g==
-  dependencies:
-    vue-class-component "^6.2.0"
-
-vue-property-decorator@^7.0.0:
+vue-property-decorator@7.3.0, vue-property-decorator@^7.0.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-7.3.0.tgz#d50d67f0b0f1c814f9f2fba36d6eeccbcc62dbb6"
   integrity sha512-HarXfTQ/Nxm4s/APpAaGIGHq5ZzslApImQy8ZrtkfGamw8rUFAVgMS5C50/AQ80+wfw3Wpnf4bNzbmj75m/k2Q==
