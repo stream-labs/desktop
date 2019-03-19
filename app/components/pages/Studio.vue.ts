@@ -44,8 +44,8 @@ export default class Studio extends Vue {
     clearInterval(this.sizeCheckInterval);
   }
 
-  get previewEnabled() {
-    return this.customizationService.previewEnabled;
+  get displayEnabled() {
+    return !this.customizationService.state.resizingInProgress && !this.performanceMode;
   }
 
   get performanceMode() {
@@ -81,10 +81,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ previewEnabled: false });
+    this.customizationService.setSettings({ resizingInProgress: true });
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ previewEnabled: true });
+    this.customizationService.setSettings({ resizingInProgress: false });
   }
 }
