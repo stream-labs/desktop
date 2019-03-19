@@ -84,7 +84,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static isProgramExtendable(state: INicoliveProgramState): boolean {
-    return state && state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
+    return state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
   }
 
   get hasProgram(): boolean {
@@ -113,9 +113,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
 
     if (!programSchedule) {
-      if (this.state) {
-        this.setState({ status: 'end' });
-      }
+      this.setState({ status: 'end' });
       throw new Error('no suitable schedule');
     }
     const { nicoliveProgramId, socialGroupId } = programSchedule;
@@ -208,10 +206,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   private statsTimer: number = 0;
   refreshStatisticsPolling(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    const programUpdated = !prevState || prevState.programID !== nextState.programID;
+    const programUpdated = prevState.programID !== nextState.programID;
 
-    const prev = prevState && prevState.status === 'onAir';
-    const next = nextState && nextState.status === 'onAir';
+    const prev = prevState.status === 'onAir';
+    const next = nextState.status === 'onAir';
 
     if ((!prev && next) || (next && programUpdated)) {
       clearInterval(this.statsTimer);
@@ -263,16 +261,16 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   };
   private refreshProgramTimer = 0;
   refreshProgramStatusTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    const programUpdated = !prevState || prevState.programID !== nextState.programID;
-    const statusUpdated = !prevState || prevState.status !== nextState.status;
+    const programUpdated = prevState.programID !== nextState.programID;
+    const statusUpdated = prevState.status !== nextState.status;
 
     /** 放送状態が変化しなかった前提で、放送状態が次に変化するであろう時刻 */
     const prevTargetTime: number = prevState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
     const nextTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
     const targetTimeUpdated = !statusUpdated && prevTargetTime !== nextTargetTime;
 
-    const prev = prevState && prevState.status !== 'end';
-    const next = nextState && nextState.status !== 'end';
+    const prev = prevState.status !== 'end';
+    const next = nextState.status !== 'end';
 
     if (next && (!prev || programUpdated || statusUpdated || targetTimeUpdated)) {
       const now = Date.now();
@@ -290,10 +288,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   private autoExtensionTimer = 0;
   refreshAutoExtensionTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
     const now = Date.now();
-    const endTimeUpdated = !prevState || prevState.endTime !== nextState.endTime;
+    const endTimeUpdated = prevState.endTime !== nextState.endTime;
 
     /** 更新前の状態でタイマーが動作しているべきか */
-    const prev = prevState && prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
+    const prev = prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
     /** 更新後の状態でタイマーが動作しているべきか */
     const next = nextState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(nextState);
 
