@@ -58,23 +58,9 @@ export default class FacemaskSettings extends Vue {
   durationModel = this.facemasksService.state.settings.duration;
   videoInputModel = this.facemasksService.state.device.value;
 
-  t2AvailableMasks = this.facemasksService.state.settings.t2masks.map(t2mask => {
-    return {
-      uuid: t2mask.uuid,
-      type: t2mask.type,
-      tier: t2mask.tier,
-      name: t2mask.name,
-    };
-  });
+  t2AvailableMasks = this.facemasksService.state.settings.t2masks as IFacemaskSelection[];
 
-  t3AvailableMasks = this.facemasksService.state.settings.t3masks.map(t3mask => {
-    return {
-      uuid: t3mask.uuid,
-      type: t3mask.type,
-      tier: t3mask.tier,
-      name: t3mask.name,
-    };
-  });
+  t3AvailableMasks = this.facemasksService.state.settings.t3masks as IFacemaskSelection[];
 
   inputDevices = this.facemasksService.getInputDevicesList().map(device => {
     return {
