@@ -77,6 +77,7 @@ interface IOutputSettingsPatch {
 export interface IEncoderSettings {
   encoder: EEncoder;
   outputResolution: string;
+  bitrate: number;
 }
 
 export interface IRecordingEncoderSettings extends IEncoderSettings {
@@ -86,7 +87,6 @@ export interface IRecordingEncoderSettings extends IEncoderSettings {
 
 export interface IStreamingEncoderSettings extends IEncoderSettings {
   preset: string;
-  bitrate: number;
   rescaleOutput: boolean;
   hasCustomResolution: boolean;
   encoderOptions: string;
@@ -96,9 +96,11 @@ type TOutputSettingsMode = 'Simple' | 'Advanced';
 
 const simpleEncoderToAnvancedEncoderMap = {
   x264: 'obs_x264',
+  x264_lowcpu: 'obs_x264',
   qsv: 'obs_qsv11',
   nvenc: 'ffmpeg_nvenc',
   amd: 'amd_amf_h264',
+  jim_nvenc: 'jim_nvenc',
 };
 
 /**
@@ -146,7 +148,7 @@ export class OutputSettingsService extends Service {
     );
 
     const streaming = this.getStreamingEncoderSettings(output, video);
-    const recording = this.getRecordingEncoderSettings(output, video, mode);
+    const recording = this.getRecordingEncoderSettings(output, video, mode, streaming);
 
     return {
       mode,
@@ -220,6 +222,7 @@ export class OutputSettingsService extends Service {
     output: ISettingsSubCategory[],
     video: ISettingsSubCategory[],
     mode: TOutputSettingsMode,
+    streamingSettings: IStreamingEncoderSettings,
   ): IRecordingEncoderSettings {
     const path =
       mode === 'Simple'
@@ -232,7 +235,7 @@ export class OutputSettingsService extends Service {
       'RecFormat',
     ) as EFileFormat;
 
-    const encoder = obsEncoderToEncoder(
+    let encoder = obsEncoderToEncoder(
       this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder'),
     ) as EEncoder;
 
@@ -240,11 +243,37 @@ export class OutputSettingsService extends Service {
       this.settingsService.findSettingValue(output, 'Recording', 'RecRescaleRes') ||
       this.settingsService.findSettingValue(video, 'Untitled', 'Output');
 
+    const quality = this.settingsService.findValidListValue(output, 'Recording', 'RecQuality');
+
+    let bitrate: number;
+
+    if (mode === 'Simple') {
+      // convert Quality to Bitrate in the Simple mode
+      switch (quality) {
+        case 'Small':
+          bitrate = 15000;
+          break;
+        case 'HQ':
+          bitrate = 30000;
+          break;
+        case 'Lossless':
+          bitrate = 80000;
+          break;
+        case 'Stream':
+          bitrate = streamingSettings.bitrate;
+          encoder = streamingSettings.encoder;
+          break;
+      }
+    } else {
+      this.settingsService.findSettingValue(output, 'Recording', 'Recbitrate');
+    }
+
     return {
       path,
       format,
       encoder,
       outputResolution,
+      bitrate,
     };
   }
 
@@ -345,6 +374,10 @@ export class OutputSettingsService extends Service {
         'RecEncoder',
         simpleEncoderToAdvancedEncoder(settingsPatch.encoder),
       );
+    }
+
+    if (settingsPatch.bitrate) {
+      this.settingsService.setSettingValue('Output', 'Recbitrate', settingsPatch.bitrate);
     }
   }
 }
