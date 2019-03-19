@@ -13,10 +13,10 @@ export default class NicolivePanelRoot extends Vue {
   nicoliveProgramService: NicoliveProgramService;
 
   isCreating: boolean = false;
-  async createProgram() {
+  async createProgram(): Promise<void> {
     try {
       this.isCreating = true;
-      return await this.nicoliveProgramService.createProgram();
+      await this.nicoliveProgramService.createProgram();
     } catch (e) {
       // TODO
       console.warn(e);
@@ -26,10 +26,10 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   isFetching: boolean = false;
-  async fetchProgram() {
+  async fetchProgram(): Promise<void> {
     try {
       this.isFetching = true;
-      return await this.nicoliveProgramService.fetchProgram();
+      await this.nicoliveProgramService.fetchProgram();
     } catch (e) {
       console.warn(e);
       // TODO: 翻訳
@@ -52,10 +52,10 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   isEditing: boolean = false;
-  async editProgram() {
+  async editProgram(): Promise<void> {
     try {
       this.isEditing = true;
-      return await this.nicoliveProgramService.editProgram();
+      await this.nicoliveProgramService.editProgram();
     } catch (e) {
       // TODO
       console.warn(e);
@@ -65,10 +65,10 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   isStarting: boolean = false;
-  async startProgram() {
+  async startProgram(): Promise<void> {
     try {
       this.isStarting = true;
-      return await this.nicoliveProgramService.startProgram();
+      await this.nicoliveProgramService.startProgram();
     } catch (e) {
       // TODO
       console.warn(e);
@@ -78,7 +78,7 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   isEnding: boolean = false;
-  async endProgram() {
+  async endProgram(): Promise<void> {
     try {
       this.isEnding = true;
       const isOk = await new Promise(resolve => {
@@ -96,7 +96,7 @@ export default class NicolivePanelRoot extends Vue {
       });
 
       if (isOk) {
-        return await this.nicoliveProgramService.endProgram();
+        await this.nicoliveProgramService.endProgram();
       }
     } catch (e) {
       // TODO
@@ -107,10 +107,10 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   isExtending: boolean = false;
-  async extendProgram() {
+  async extendProgram(): Promise<void> {
     try {
       this.isExtending = true;
-      return await this.nicoliveProgramService.extendProgram();
+      await this.nicoliveProgramService.extendProgram();
     } catch (e) {
       // TODO
       console.warn(e);
@@ -119,13 +119,13 @@ export default class NicolivePanelRoot extends Vue {
     }
   }
 
-  toggleAutoExtension() {
+  toggleAutoExtension(): void {
     this.nicoliveProgramService.toggleAutoExtension();
   }
 
   isCommentSending: boolean = false;
   operatorCommentValue: string = '';
-  async sendOperatorComment(event: KeyboardEvent) {
+  async sendOperatorComment(event: KeyboardEvent): Promise<void> {
     const text = this.operatorCommentValue;
     const isPermanent = event.ctrlKey;
 
@@ -197,16 +197,16 @@ export default class NicolivePanelRoot extends Vue {
     return this.nicoliveProgramService.state.giftPoint;
   }
 
-  get isProgramExtendable() {
+  get isProgramExtendable(): boolean {
     return this.nicoliveProgramService.isProgramExtendable && this.programEndTime - this.currentTime > 60;
   }
 
-  get autoExtensionEnabled() {
+  get autoExtensionEnabled(): boolean {
     return this.nicoliveProgramService.state.autoExtensionEnabled;
   }
 
   currentTime: number = 0;
-  updateCurrrentTime() {
+  updateCurrrentTime(): void {
     this.currentTime = Math.floor(Date.now() / 1000);
   }
 
@@ -231,7 +231,7 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   @Watch('programStatus')
-  onStatusChange(newValue: string, oldValue: string) {
+  onStatusChange(newValue: string, oldValue: string): void {
     if (newValue === 'end') {
       clearInterval(this.timeTimer);
     } else if (oldValue === 'end') {
@@ -240,7 +240,7 @@ export default class NicolivePanelRoot extends Vue {
     }
   }
 
-  startTimer() {
+  startTimer(): void {
     this.timeTimer = (setInterval(() => this.updateCurrrentTime(), 1000) as any) as number;
   }
 

@@ -191,7 +191,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.setState({ status: 'end', endTime });
   }
 
-  toggleAutoExtension() {
+  toggleAutoExtension(): void {
     const autoExtensionEnabled = !this.state.autoExtensionEnabled;
     this.setState({ autoExtensionEnabled });
   }
