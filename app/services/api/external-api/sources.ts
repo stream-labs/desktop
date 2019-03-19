@@ -4,8 +4,8 @@ import { map } from 'rxjs/operators';
 import {
   ISource as IInternalSourceModel,
   Source as InternalSource,
-  SourcesService as InternalSourcesService, TPropertiesManager,
-  TSourceType
+  SourcesService as InternalSourcesService,
+  TSourceType,
 } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Singleton } from 'services/api/external-api';
