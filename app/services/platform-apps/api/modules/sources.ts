@@ -1,5 +1,5 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
-import { SourcesService, TSourceType, Source } from 'services/sources';
+import { SourcesService, TSourceType, Source, TPropertiesManager } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -21,6 +21,7 @@ interface ISource {
   id: string;
   name: string;
   type: TSourceType;
+  managerType: TPropertiesManager;
   flags: ISourceFlags;
   size: ISourceSize;
   appId?: string;
@@ -192,6 +193,7 @@ export class SourcesModule extends Module {
       id: source.sourceId,
       name: source.name,
       type: source.type,
+      managerType: source.propertiesManagerType,
       flags: {
         audio: source.audio,
         video: source.video,
