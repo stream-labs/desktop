@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from '../ModalLayout.vue';
@@ -20,6 +21,19 @@ interface IFacemaskSelection {
   name: string;
   selectionCount: number;
   selected: boolean;
+}
+
+interface IFormSettings {
+  enabled: boolean;
+  donations_enabled: boolean;
+  subs_enabled: boolean;
+  bits_enabled: boolean;
+  bits_price: number;
+  duration: number;
+  device: {
+    name: string;
+    value: string;
+  };
 }
 
 @Component({
@@ -45,8 +59,6 @@ export default class FacemaskSettings extends Vue {
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
   videoInputModel = this.facemasksService.state.device.value;
-  userT2masks = this.facemasksService.state.settings.userT2masks;
-  userT3masks = this.facemasksService.state.settings.userT3masks;
 
   t2AvailableMasks = this.facemasksService.state.settings.t2masks.map(mask => {
     return {
@@ -54,8 +66,7 @@ export default class FacemaskSettings extends Vue {
       type: mask.type,
       tier: mask.tier,
       name: mask.name,
-      selected: this.userT2masks.indexOf(mask.uuid) !== -1 ? true : false,
-    } as IFacemaskSelection;
+    };
   });
 
   t3AvailableMasks = this.facemasksService.state.settings.t3masks.map(mask => {
@@ -64,8 +75,7 @@ export default class FacemaskSettings extends Vue {
       type: mask.type,
       tier: mask.tier,
       name: mask.name,
-      selected: this.userT3masks.indexOf(mask.uuid) !== -1 ? true : false,
-    } as IFacemaskSelection;
+    };
   });
 
   inputDevices = this.facemasksService.getInputDevicesList().map(device => {
@@ -82,20 +92,9 @@ export default class FacemaskSettings extends Vue {
     };
   });
 
-  get t3SelectionCount(): number {
-    return this.t3AvailableMasks.filter(mask => {
-      return mask.selected;
-    }).length;
-  }
-
-  get t2SelectionCount(): number {
-    return this.t2AvailableMasks.filter(mask => {
-      return mask.selected;
-    }).length;
-  }
-
   async handleSubmit() {
     this.updatingInfo = true;
+
     const newSettings = {
       enabled: this.enabledModel,
       donations_enabled: this.donationsEnabledModel,
@@ -103,61 +102,99 @@ export default class FacemaskSettings extends Vue {
       bits_enabled: this.bitsEnabledModel,
       bits_price: this.bitsPriceModel,
       duration: this.durationModel,
-      userT2masks: this.formatMaskSelections(this.t2AvailableMasks),
-      userT3masks: this.formatMaskSelections(this.t3AvailableMasks),
       device: this.facemasksService.getInputDevicesList().filter(device => {
         return device.value === this.videoInputModel;
       })[0],
     };
+
+    const validatedSettings = this.validateSettings(newSettings);
+
+    if (validatedSettings.error) {
+      this.onFailHandler(validatedSettings.message);
+      return;
+    }
+
     try {
       await this.facemasksService.updateFacemaskSettings(newSettings);
       this.updatingInfo = false;
+      this.onSuccessHandler('Settings Updated');
     } catch (e) {
-      console.log(e);
+      this.onFailHandler('Request Failed');
+      this.updatingInfo = false;
     }
   }
 
-  formatMaskSelections(masks: IFacemaskSelection[]) {
-    return masks
-      .filter(mask => {
-        return mask.selected;
-      })
-      .map(mask => {
-        return {
-          uuid: mask.uuid,
-          tier: mask.tier,
-        };
-      });
+  validateSettings(settings: IFormSettings) {
+    let error = false;
+    let message = '';
+    const bitsPrices = this.facemasksService.state.settings.pricing_options;
+
+    if (!settings.enabled) {
+      return {
+        error,
+        message,
+      };
+    }
+
+    if (settings.bits_enabled && bitsPrices.indexOf(settings.bits_price) === -1) {
+      error = true;
+      message = 'Error: Please select a bits price';
+    }
+
+    if (!settings.device.value || !settings.device.name) {
+      error = true;
+      message = 'Error: Please select a video device';
+    }
+
+    return {
+      error,
+      message,
+    };
   }
 
   cancel() {
-    return;
+    this.facemasksService.closeSettings();
   }
 
-  clickMask(mask: IFacemaskSelection, options: IFacemaskSelection[]) {
-    if (mask.selected) {
-      mask.selected = false;
-    } else if (!mask.selected) {
-      if (this.validateSelectedMaskCount(options)) {
-        mask.selected = true;
-        this.facemasksService.trigger(mask.uuid);
-      }
-    }
+  clickMask(mask: IFacemaskSelection) {
+    this.facemasksService.trigger(mask.uuid, this.facemasksService.state.settings.sub_duration);
   }
 
-  validateSelectedMaskCount(masks: IFacemaskSelection[]) {
-    const length = masks.filter(mask => {
-      return mask.selected;
-    }).length;
-    return length < 3;
+  onFailHandler(msg: string) {
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 3000,
+      singleton: true,
+    });
   }
 
-  onVideoInputSelect(webcam: IInputDeviceSelection) {
-    console.log(webcam);
+  onSuccessHandler(msg: string) {
+    this.$toasted.show(msg, {
+      position: 'bottom-center',
+      className: 'toast-success',
+      duration: 3000,
+      singleton: true,
+    });
   }
 
-  onBitsPriceSelect(price: number) {
-    console.log(price);
+  openTipPage() {
+    electron.remote.shell.openExternal(`https://streamlabs.com/${this.username}/masks`);
+  }
+
+  openExtensionPage() {
+    electron.remote.shell.openExternal(this.extensionUrl);
+  }
+
+  get extensionUrl() {
+    return this.facemasksService.state.settings.extension_url;
+  }
+
+  get showExtensionPromt() {
+    return (
+      this.facemasksService.state.settings.subs_enabled &&
+      !this.facemasksService.state.settings.extension_enabled
+    );
   }
 
   get videoInputMetadata() {
@@ -190,5 +227,12 @@ export default class FacemaskSettings extends Vue {
 
   get videoDeviceReady() {
     return this.facemasksService.getDeviceStatus();
+  }
+
+  get showTwitchFeatures() {
+    return (
+      this.facemasksService.state.settings.extension &&
+      this.facemasksService.state.settings.partnered
+    );
   }
 }
