@@ -83,7 +83,7 @@
       <a
         @click="openFacemaskSettingsWindow"
         class="link">
-        <i class="icon-face-masks" v-tooltip.right="facemasksTooltip" /><span>{{ $t('Face Masks') }}</span>
+        <i class="icon-face-masks-3" v-tooltip.right="facemasksTooltip" /><span>{{ $t('Face Masks') }}</span>
       </a>
     </div>
     <div class="top-nav-item">
