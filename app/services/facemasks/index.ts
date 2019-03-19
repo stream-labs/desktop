@@ -12,7 +12,7 @@ import { WebsocketService, TSocketEvent, IAlertPlayingSocketEvent } from 'servic
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import * as obs from '../../obs-api';
+import * as obs from '../../../obs-api';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
@@ -20,91 +20,18 @@ import electron from 'electron';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { $t } from 'services/i18n';
 import { throttle } from 'lodash-decorators';
-
-interface IFacemasksServiceState {
-  device: IInputDeviceSelection;
-  modtimeMap: Dictionary<IFacemaskMetadata>;
-  active: boolean;
-  downloadProgress: number;
-  settings: IFacemaskSettings;
-}
-
-interface IFacemaskMetadata {
-  modtime: number;
-  intro: boolean;
-}
-
-interface IInputDeviceSelection {
-  name: string;
-  value: string;
-  selected?: boolean;
-}
-
-interface IFacemask {
-  modtime: number;
-  uuid: string;
-  is_intro: boolean;
-  type: string;
-  tier: number;
-  name: string;
-}
-
-interface IFacemaskSettings {
-  enabled: boolean;
-  donations_enabled: boolean;
-  subs_enabled: boolean;
-  extension_enabled: boolean;
-  bits_enabled: boolean;
-  bits_price: number;
-  pricing_options: number[];
-  primary_platform: string;
-  t2masks: IFacemask[];
-  t3masks: IFacemask[];
-  facemasks: IFacemask[];
-  duration: number;
-  sub_duration: number;
-  bits_duaration: number;
-  device: IInputDeviceSelection;
-  username: string;
-  twitch_id?: number;
-  partnered: boolean;
-  extension: boolean;
-  extension_url: string;
-}
-
-interface IUserFacemaskSettings {
-  enabled: boolean;
-  facemasks?: IFacemask[];
-  duration: number;
-  device: IInputDeviceSelection;
-}
-
-interface IFacemaskAlertMessage {
-  name: string;
-  formattedAmount: string;
-  facemask: string;
-  message: string;
-}
-
-interface IFacemaskDonation {
-  eventId: string;
-  facemask: string;
-}
-
-interface IFacemaskBits {
-  eventId: string;
-  facemask: string;
-}
-
-interface IFacemaskSubscription {
-  name: string;
-  subscriberId: string;
-  subPlan: string;
-}
-
-interface IFacemaskSelection {
-  uuid: string;
-}
+import {
+  IFacemasksServiceState,
+  IFacemaskMetadata,
+  IInputDeviceSelection,
+  IFacemask,
+  IFacemaskSettings,
+  IUserFacemaskSettings,
+  IFacemaskDonation,
+  IFacemaskBits,
+  IFacemaskSubscription,
+  IFacemaskSelection,
+} from './definitions';
 
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
   @Inject() userService: UserService;
@@ -122,7 +49,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   registeredDonations = {};
   registeredSubscriptions = {};
   registeredBits = {};
-
   downloadProgress = {};
 
   static defaultState: IFacemasksServiceState = {
@@ -244,7 +170,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       return;
     }
 
-    // Pick Eligible Mask at Random
+    // Pick Eligible Mask at random
     if (!subscription.subscriberId) {
       this.registeredSubscriptions[eventKey] = this.selectRandomMaskForSub(subscription);
     }
@@ -577,21 +503,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
-  postFacemaskSettingsUpdate(settingsData: IFacemaskSettings) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
-    const headers = authorizedHeaders(this.apiToken);
-    headers.append('Content-Type', 'text/json');
-
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify(settingsData),
-    });
-
-    return fetch(request).then(handleResponse);
-  }
-
   setupFilter() {
     const sources = this.sourcesService.getSources();
 
@@ -710,7 +621,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   enableMask(uuid: string) {
     this.downloadMask(uuid).then(modtime => {
       this.ADD_MODTIME(uuid, modtime, false);
-      // this.fetchInstallUpdate(uuid);
     });
   }
 
@@ -721,7 +631,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         .then(modtime => {
           if (modtime) {
             this.ADD_MODTIME(uuid, modtime, intro);
-            // this.fetchInstallUpdate(uuid);
           }
           resolve();
         })
@@ -735,7 +644,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   downloadMask(uuid: string, update = false): Promise<number> {
     const maskPath = this.libraryPath(uuid);
 
-    // Don't re-download the facemassk if we have already downloaded it unless it needs to be updated
+    // Don't re-download the facemask if we have already downloaded it unless it needs to be updated
     if (!update && fs.existsSync(maskPath)) {
       return Promise.resolve(null);
     }
