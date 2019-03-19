@@ -149,6 +149,8 @@ export interface IWindowOptions {
   size?: {
     width: number;
     height: number;
+    minWidth?: number;
+    minHeight?: number;
   };
   scaleFactor: number;
   isShown: boolean;
@@ -301,6 +303,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       frame: false,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
+      minWidth: options.size && options.size.minWidth,
+      minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
     }));
 
