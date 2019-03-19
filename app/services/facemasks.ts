@@ -60,13 +60,16 @@ interface IFacemaskSettings {
   primary_platform: string;
   t2masks: IFacemask[];
   t3masks: IFacemask[];
-  userT2masks: string[];
-  userT3masks: string[];
   facemasks: IFacemask[];
   duration: number;
+  sub_duration: number;
+  bits_duaration: number;
   device: IInputDeviceSelection;
   username: string;
   twitch_id?: number;
+  partnered: boolean;
+  extension: boolean;
+  extension_url: string;
 }
 
 interface IUserFacemaskSettings {
@@ -130,16 +133,19 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       enabled: false,
       donations_enabled: false,
       subs_enabled: false,
+      sub_duration: 8,
       extension_enabled: false,
       bits_enabled: false,
+      bits_duaration: 10,
       bits_price: 500,
       pricing_options: [200, 500, 1000, 2000, 10000],
       primary_platform: 'twitch_account',
+      partnered: false,
       t2masks: [],
       t3masks: [],
-      userT2masks: [],
-      userT3masks: [],
       facemasks: [],
+      extension: false,
+      extension_url: '',
       duration: 10,
       username: null,
       device: {
@@ -166,7 +172,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   startup() {
     this.fetchFacemaskSettings()
       .then(response => {
-        console.log(response);
         this.checkFacemaskSettings(response);
       })
       .catch(err => {
@@ -258,7 +263,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       body: JSON.stringify(data),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     };
-    console.log('fetching this bullshit');
 
     return this.formRequest(endpoint, postData);
   }
@@ -268,11 +272,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       let availableMasks: string[] = [];
 
       if (sub.subPlan === '2000') {
-        availableMasks = this.state.settings.userT2masks;
+        availableMasks = this.state.settings.t2masks.map(mask => {
+          return mask.uuid;
+        });
       }
 
       if (sub.subPlan === '3000') {
-        availableMasks = this.state.settings.userT2masks.concat(this.state.settings.userT3masks);
+        availableMasks = this.state.settings.t2masks
+          .concat(this.state.settings.t3masks)
+          .map(mask => {
+            return mask.uuid;
+          });
       }
 
       resolve({ uuid: availableMasks[Math.floor(Math.random() * availableMasks.length)] });
@@ -283,16 +293,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     if (this.registeredDonations[donation.eventId] && this.facemaskFilter) {
       const uuid = this.registeredDonations[donation.eventId];
       delete this.registeredDonations[donation.eventId];
-      this.trigger(uuid);
+      this.trigger(uuid, this.state.settings.duration);
     }
   }
 
   playBitsEvent(bits: IFacemaskBits) {
-    console.log('playing', bits);
     if (this.registeredBits[bits.eventId] && this.facemaskFilter) {
       const uuid = this.registeredBits[bits.eventId];
       delete this.registeredBits[bits.eventId];
-      this.trigger(uuid);
+      this.trigger(uuid, this.state.settings.bits_duaration);
     }
   }
 
@@ -303,10 +312,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       delete this.registeredSubscriptions[eventKey];
       uuidPromise.then((response: IFacemaskSelection) => {
         if (response.uuid) {
-          this.trigger(response.uuid);
+          this.trigger(response.uuid, this.state.settings.sub_duration);
         } else {
           this.selectRandomMaskForSub(subscription).then(result => {
-            this.trigger(result.uuid);
+            this.trigger(result.uuid, this.state.settings.sub_duration);
           });
         }
       });
@@ -314,16 +323,24 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   onSocketEvent(event: TSocketEvent) {
-    if (event.type === 'facemaskdonation') {
-      console.log('getting donation', event);
+    if (event.type === 'fm-ext-enabled') {
+      this.startup();
+      return;
+    }
+
+    if (event.type === 'facemaskdonation' && this.state.settings.donations_enabled) {
       this.registerDonationEvent({
         facemask: event.message[0].facemask,
         eventId: event.message[0]._id,
       });
+      return;
     }
 
-    if (event.type === 'subscription') {
-      console.log('getting sub', event);
+    if (
+      event.type === 'subscription' &&
+      this.state.settings.subs_enabled &&
+      this.state.settings.extension_enabled
+    ) {
       this.registerSubscriptionEvent({
         subscriberId: event.message[0].subscriber_twitch_id
           ? event.message[0].subscriber_twitch_id
@@ -331,14 +348,19 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         subPlan: event.message[0].sub_plan,
         name: event.message[0].name,
       });
+      return;
     }
 
-    if (event.type === 'bits') {
-      console.log('getting bits', event);
+    if (
+      event.type === 'bits' &&
+      this.state.settings.bits_enabled &&
+      this.state.settings.extension_enabled
+    ) {
       this.registerBitsEvent({
         facemask: event.message[0].data.facemask,
         eventId: event.message[0].data.fm_id,
       });
+      return;
     }
 
     if (
@@ -346,12 +368,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       event.message.type === 'donation' &&
       event.message.facemask
     ) {
-      console.log('playing donation', event);
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
+      return;
     }
 
     if (event.type === 'alertPlaying' && event.message.type === 'subscription') {
-      console.log('playing sub', event);
       this.playSubscriptionEvent({
         subscriberId: event.message.subscriber_twitch_id
           ? event.message[0].subscriber_twitch_id
@@ -359,14 +380,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         subPlan: event.message.sub_plan,
         name: event.message.name,
       });
+      return;
     }
 
     if (event.type === 'alertPlaying' && event.message.type === 'bits') {
-      console.log('playing bits', event);
       this.playBitsEvent({
         facemask: event.message.data.facemask,
         eventId: event.message.data.fm_id,
       });
+      return;
     }
   }
 
@@ -374,15 +396,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     if (this.active && event.type === 'dshow_input') {
       this.setupFilter();
     }
-    if (this.active && event.type === 'browser_source') {
-      this.checkForAlertBox();
-    }
   }
 
-  trigger(uuid: string) {
+  trigger(uuid: string, duration: number) {
     this.updateFilter({
       Mask: `${uuid}.json`,
       alertActivate: true,
+      alertDuration: duration,
     });
     setTimeout(() => {
       this.facemaskFilter.update({ alertActivate: false });
@@ -415,7 +435,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         }
       });
     }
-    console.log(devices);
     return devices;
   }
 
@@ -444,8 +463,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       this.notifyPluginMissing();
       return;
     }
-
-    this.checkForAlertBox();
 
     let uuids = settings.facemasks.map((mask: IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
@@ -550,21 +567,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       await this.formRequest(endpoint, postData);
       this.startup();
     } catch (e) {
-
+      throw e;
     }
-  }
-
-  checkForAlertBox() {
-    let alertBox = false;
-    const sources = this.sourcesService.getSources();
-
-    const browserSources = sources.filter(source => {
-      return source.type === 'browser_source';
-    });
-
-    browserSources.forEach(source => {
-      const browserSource = this.sourcesService.getSourceById(source.sourceId);
-    });
   }
 
   setupFilter() {
@@ -762,6 +766,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
+  closeSettings() {
+    this.windowsService.closeChildWindow();
+  }
+
   get active() {
     return this.state.active;
   }
@@ -788,7 +796,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   @mutation()
   private SET_DOWNLOAD_PROGRESS(progress: number) {
-    console.log(progress);
     this.state.downloadProgress = progress;
   }
 
@@ -810,16 +817,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return `${this.cdn}${uuid}.json`;
   }
 
-  // private formRequest(endpoint: string) {
-  //   const url = `https://${this.hostsService.streamlabs}/api/v5/${endpoint}`;
-  //   const headers = authorizedHeaders(this.apiToken);
-  //   const request = new Request(url, { headers });
-
-  //   return fetch(request).then(handleResponse);
-  // }
-
   private formRequest(endpoint: string, options: any = {}) {
-    console.log('innnis bish');
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken, options.headers);
     const url = `https://${host}/api/v5/${endpoint}`;
@@ -827,5 +825,4 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
     return fetch(request).then(handleResponse);
   }
-
 }
