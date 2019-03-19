@@ -7,25 +7,23 @@ const initialState = {
 };
 
 const schedules = {
-  ch: { nicoliveProgramId: 'lv1', socialGroupId: 'ch1', status: 'onAir', testBeginAt: 50, beginAt: 100, endAt: 150 },
-  onAir: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'onAir', testBeginAt: 50, beginAt: 100, endAt: 150 },
-  test: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'test', testBeginAt: 50, beginAt: 100, endAt: 150 },
-  end: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'end', testBeginAt: 50, beginAt: 100, endAt: 150 },
+  ch: { nicoliveProgramId: 'lv1', socialGroupId: 'ch1', status: 'onAir', onAirBeginAt: 100, onAirEndAt: 150 },
+  onAir: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'onAir', onAirBeginAt: 100, onAirEndAt: 150 },
+  test: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'test', onAirBeginAt: 100, onAirEndAt: 150 },
+  end: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'end', onAirBeginAt: 100, onAirEndAt: 150 },
   reserved1: {
     nicoliveProgramId: 'lv1',
     socialGroupId: 'co1',
     status: 'reserved',
-    testBeginAt: 100,
-    beginAt: 150,
-    endAt: 200,
+    onAirBeginAt: 150,
+    onAirEndAt: 200,
   },
   reserved2: {
     nicoliveProgramId: 'lv1',
     socialGroupId: 'co1',
     status: 'reserved',
-    testBeginAt: 200,
-    beginAt: 250,
-    endAt: 300,
+    onAirBeginAt: 250,
+    onAirEndAt: 300,
   },
 };
 
@@ -34,8 +32,8 @@ const programs = {
     status: schedules.onAir.status,
     title: '番組タイトル',
     description: '番組詳細情報',
-    beginAt: schedules.onAir.beginAt,
-    endAt: schedules.onAir.endAt,
+    beginAt: schedules.onAir.onAirBeginAt,
+    endAt: schedules.onAir.onAirEndAt,
   },
 };
 
@@ -179,7 +177,6 @@ Array [
     "programID": "lv1",
     "startTime": 100,
     "status": "onAir",
-    "testStartTime": 50,
     "title": "番組タイトル",
   },
 ]

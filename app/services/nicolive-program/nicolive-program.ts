@@ -11,7 +11,6 @@ interface INicoliveProgramState {
   description: string;
   endTime: number;
   startTime: number;
-  testStartTime: number;
   communityID: string;
   communityName: string;
   communitySymbol: string;
@@ -33,7 +32,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     description: '',
     endTime: 0,
     startTime: 0,
-    testStartTime: 0,
     communityID: '',
     communityName: '',
     communitySymbol: '',
@@ -76,7 +74,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       if (s.status === 'end') continue;
 
       // 一番近い予約放送を選ぶ
-      if (!nearestReservedProgram || s.testBeginAt < nearestReservedProgram.testBeginAt) {
+      if (!nearestReservedProgram || s.onAirBeginAt < nearestReservedProgram.onAirBeginAt) {
         nearestReservedProgram = s;
       }
     }
@@ -140,7 +138,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       title: program.title,
       description: program.description,
       startTime: program.beginAt,
-      testStartTime: programSchedule.testBeginAt,
       endTime: program.endAt,
       communityID: socialGroupId,
       communityName: community.name,
