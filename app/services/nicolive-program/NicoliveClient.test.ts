@@ -3,7 +3,7 @@ const { NicoliveClient } = require('./NicoliveClient');
 
 afterEach(() => {
   fetchMock.reset();
-})
+});
 
 test('constructor', () => {
   const client = new NicoliveClient();
@@ -27,9 +27,9 @@ const dummyBody = {
 const dummyErrorBody = {
   meta: {
     status: 404,
-    errorCode: 'NOT_FOUND'
-  }
-}
+    errorCode: 'NOT_FOUND',
+  },
+};
 
 test('wrapResultはレスポンスのdataを取り出す', async () => {
   fetchMock.get(dummyURL, dummyBody);
@@ -47,20 +47,26 @@ test('wrapResultは結果が200でないときレスポンス全体を返す', a
   expect(fetchMock.done()).toBe(true);
 });
 
-test('wrapResultはJSONが壊れていたらrejectする', async () => {
+test('wrapResultはbodyがJSONでなければ元のbodyを込めたオブジェクトをthrowする', async () => {
   fetchMock.get(dummyURL, 'invalid json');
   const res = await fetch(dummyURL);
 
-  await expect(NicoliveClient.wrapResult(res)).rejects.toThrow('invalid json response body');
+  await expect(NicoliveClient.wrapResult(res)).rejects.toMatchInlineSnapshot(`
+Object {
+  "body": "invalid json",
+  "status": 200,
+  "statusText": "OK",
+}
+`);
   expect(fetchMock.done()).toBe(true);
 });
 
 interface Suite {
-  name: string,
-  method: string,
-  base: string,
-  path: string,
-  args?: any[],
+  name: string;
+  method: string;
+  base: string;
+  path: string;
+  args?: any[];
 }
 const suites: Suite[] = [
   {
@@ -141,11 +147,11 @@ const dummyCommunities = {
     communities: [
       {
         id: communityID,
-      }
+      },
     ],
     errors: [] as any,
-  }
-}
+  },
+};
 
 test('fetchCommunityはコミュをひとつだけ返す', async () => {
   const client = new NicoliveClient();
@@ -154,6 +160,22 @@ test('fetchCommunityはコミュをひとつだけ返す', async () => {
   const result = await client.fetchCommunity(communityID);
 
   expect(result).toEqual({ ok: true, value: dummyCommunities.data.communities[0] });
+  expect(fetchMock.done()).toBe(true);
+});
+
+test('fetchCommunityはbodyがJSONでなければbodyを込めたオブジェクトをthrowする', async () => {
+  const client = new NicoliveClient();
+
+  fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, 'invalid json');
+  const result = client.fetchCommunity(communityID);
+
+  await expect(result).rejects.toMatchInlineSnapshot(`
+Object {
+  "body": "invalid json",
+  "status": 200,
+  "statusText": "OK",
+}
+`);
   expect(fetchMock.done()).toBe(true);
 });
 
@@ -166,8 +188,8 @@ function setupMock() {
     webContents = {
       on: (_event: string, callback: (ev: any, url: string) => any) => {
         this.webContentsCallbacks.push(callback);
-      }
-    }
+      },
+    };
     on(event: string, callback: (evt: any) => any) {
       this.callbacks.push(callback);
     }
@@ -191,7 +213,7 @@ function setupMock() {
   }
 
   let wrapper: {
-    browserWindow: BrowserWindow
+    browserWindow: BrowserWindow;
   } = {
     browserWindow: null,
   };
@@ -200,7 +222,7 @@ function setupMock() {
       BrowserWindow,
     },
     ipcRenderer: {
-      send() {}
+      send() {},
     },
   }));
 

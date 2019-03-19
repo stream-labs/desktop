@@ -83,7 +83,20 @@ export class NicoliveClient {
   }
 
   static async wrapResult<ResultType>(res: Response): Promise<WrappedResult<ResultType>> {
-    const obj = await res.json();
+    const body = await res.text();
+    let obj: any = null;
+    try {
+      obj = JSON.parse(body);
+    } catch(e) {
+      // bodyがJSONになってない異常失敗
+      throw {
+        status: res.status,
+        statusText: res.statusText,
+        body,
+      };
+    }
+
+    // 正常成功
     if (res.ok) {
       return {
         ok: true,
@@ -91,6 +104,7 @@ export class NicoliveClient {
       };
     }
 
+    // 正常失敗
     return {
       ok: false,
       value: obj as CommonErrorResponse,
@@ -209,7 +223,19 @@ export class NicoliveClient {
       },
     });
 
-    const obj = await res.json();
+    const body = await res.text()
+    let obj: any = null;
+    try {
+      obj = JSON.parse(body);
+    } catch (e) {
+      // bodyがJSONになってない異常失敗
+      throw {
+        status: res.status,
+        statusText: res.statusText,
+        body,
+      };
+    }
+
     if (res.ok) {
       const data = obj.data as Communities['data'];
       const communities = data.communities || [];
@@ -217,6 +243,7 @@ export class NicoliveClient {
 
       const community = communities.find(c => c.id === communityId);
       if (community) {
+        // 正常成功
         return {
           ok: true,
           value: community,
@@ -225,6 +252,7 @@ export class NicoliveClient {
 
       const error = errors.find(e => e.id === communityId);
       if (error) {
+        // 正常失敗
         return {
           ok: false,
           value: errors[0] as CommonErrorResponse,
@@ -232,6 +260,7 @@ export class NicoliveClient {
       }
     }
 
+    // 正常失敗
     return {
       ok: false,
       value: obj as CommonErrorResponse,
