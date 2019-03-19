@@ -1,24 +1,24 @@
 import Vue from 'vue';
-import { PersistentStatefulService } from './persistent-stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { UserService } from 'services/user';
-import { HostsService } from './hosts';
-import { SourcesService } from './sources';
+import { HostsService } from 'services/hosts';
+import { SourcesService } from 'services/sources';
 import { ISource } from 'services/sources/sources-api';
 import { Source } from 'services/sources/source';
-import { SourceFiltersService } from './source-filters';
+import { SourceFiltersService } from 'services/source-filters';
+import { mutation } from 'services/stateful-service';
 import { Inject } from 'util/injector';
+import { WebsocketService, TSocketEvent, IAlertPlayingSocketEvent } from 'services/websocket';
+import { StreamingService } from 'services/streaming';
+import { WindowsService } from 'services/windows';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation } from './stateful-service';
 import * as obs from '../../obs-api';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
-import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
-import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
-import { WindowsService } from 'services/windows';
 import { throttle } from 'lodash-decorators';
 
 interface IFacemasksServiceState {
@@ -323,73 +323,74 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
+  shouldQueueDonationEvents() {
+    return this.state.settings.donations_enabled;
+  }
+
+  shouldQueueSubscriptionEvents() {
+    return (
+      this.state.settings.subs_enabled &&
+      this.state.settings.extension_enabled
+    );
+  }
+
+  shouldQueueBitsEvents() {
+    return (
+      this.state.settings.bits_enabled &&
+      this.state.settings.extension_enabled
+    );
+  }
+
   onSocketEvent(event: TSocketEvent) {
     if (event.type === 'fm-ext-enabled') {
       this.startup();
-      return;
     }
 
-    if (event.type === 'facemaskdonation' && this.state.settings.donations_enabled) {
+    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents()) {
       this.registerDonationEvent({
         facemask: event.message[0].facemask,
         eventId: event.message[0]._id,
       });
-      return;
     }
 
-    if (
-      event.type === 'subscription' &&
-      this.state.settings.subs_enabled &&
-      this.state.settings.extension_enabled
-    ) {
+    if (event.type === 'subscription' && this.shouldQueueSubscriptionEvents()) {
       this.registerSubscriptionEvent({
-        subscriberId: event.message[0].subscriber_twitch_id
-          ? event.message[0].subscriber_twitch_id
-          : null,
+        subscriberId: event.message[0].subscriber_twitch_id,
         subPlan: event.message[0].sub_plan,
         name: event.message[0].name,
       });
-      return;
     }
 
-    if (
-      event.type === 'bits' &&
-      this.state.settings.bits_enabled &&
-      this.state.settings.extension_enabled
-    ) {
+    if (event.type === 'bits' && this.shouldQueueBitsEvents()) {
       this.registerBitsEvent({
         facemask: event.message[0].data.facemask,
         eventId: event.message[0].data.fm_id,
       });
-      return;
     }
 
-    if (
-      event.type === 'alertPlaying' &&
-      event.message.type === 'donation' &&
-      event.message.facemask
-    ) {
+    if (event.type === 'alertPlaying') {
+      this.onAlertPlayingSocketEvent(event);
+    }
+  }
+
+  onAlertPlayingSocketEvent(event: IAlertPlayingSocketEvent) {
+    if (event.message.type === 'donation' && event.message.facemask) {
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
-      return;
     }
 
-    if (event.type === 'alertPlaying' && event.message.type === 'subscription') {
+    if (event.message.type === 'subscription') {
       this.playSubscriptionEvent({
-        subscriberId: event.message.subscriber_twitch_id
-          ? event.message[0].subscriber_twitch_id
-          : null,
+        subscriberId: event.message.subscriber_twitch_id,
         subPlan: event.message.sub_plan,
         name: event.message.name,
       });
-      return;
     }
 
-    if (event.type === 'alertPlaying' && event.message.type === 'bits') {
+    if (event.message.type === 'bits') {
       this.playBitsEvent({
         facemask: event.message.data.facemask,
         eventId: event.message.data.fm_id,
       });
-      return;
     }
   }
 

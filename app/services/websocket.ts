@@ -76,7 +76,7 @@ interface IFmExtEnabledSocketEvent {
   type: 'fm-ext-enabled';
 }
 
-interface IAlertPlayingSocketEvent {
+export interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
     facemask?: string;
