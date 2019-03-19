@@ -255,13 +255,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         );
       }
     } else if (obj.content instanceof SceneSourceNode) {
-      // Add a new scene to scenesServices if this scene is not exist.
-      // It is not the best way to create a scene here instead of `./scenes.ts` file,
-      // but the other way requires to much refactoring
       const sceneId = obj.content.data.sceneId;
-      if (!this.scenesService.getScene(sceneId)) {
-        this.scenesService.createScene(obj.name, { sceneId });
-      }
       sceneItem = context.scene.addSource(sceneId, { select: false });
     }
 
