@@ -10213,12 +10213,7 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-vee-validate@2.1.0-beta.6:
-  version "2.1.0-beta.6"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.1.0-beta.6.tgz#df67af3b87f45f4c82c19783d782a8415cb375ce"
-  integrity sha512-ED14wmxA1RlRkBUWowiKg0aV+Z0VOt67KkW2xRuM2uWh46paUhbnHc+5VogF4KVVj1s0P/Ci/IQz1ZxfUSn7MQ==
-
-vee-validate@^2.1.7:
+vee-validate@2.2.0, vee-validate@^2.1.7:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.0.tgz#0dcb6251a50cde9a3a1e924c917cc3d0a543b661"
   integrity sha512-s72VQcl1DWTNQKQyHtUDcU536dIx/GYDnCObDj4AXDZtWnqM3rXbgp7FCT3D2q9HFKw7IykW9bVrClhPBeQnrw==
