@@ -1,8 +1,8 @@
-import electron from 'electron';
+import * as electron from 'electron';
 import VueI18n from 'vue-i18n';
-import { PersistentStatefulService } from '../persistent-stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
-import { Inject } from '../../util/injector';
+import { Inject } from 'util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { AppService } from 'services/app';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
@@ -101,8 +101,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         console.error(e);
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
-          `${locale}向けの辞書ファイル読み込みに失敗しました。\n` + 
-          `Failed to read the dictionary file for ${locale}.\n` + 
+          `${locale}向けの辞書ファイル読み込みに失敗しました。\n` +
+          `Failed to read the dictionary file for ${locale}.\n` +
           e.message
         );
       });
@@ -115,8 +115,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         console.error(e);
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
-          `${fallbackLocale}向けの辞書ファイル読み込みに失敗しました。\n` + 
-          `Failed to read the dictionary file for ${fallbackLocale}.\n` + 
+          `${fallbackLocale}向けの辞書ファイル読み込みに失敗しました。\n` +
+          `Failed to read the dictionary file for ${fallbackLocale}.\n` +
           e.message
         );
       });

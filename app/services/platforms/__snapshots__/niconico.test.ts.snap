@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`setupStreamSettingsで番組がひとつある場合 1`] = `
+Array [
+  "Stream",
+  Array [
+    Object {
+      "nameSubCategory": "Untitled",
+      "parameters": Array [
+        Object {
+          "name": "service",
+          "value": "niconico ニコニコ生放送",
+        },
+        Object {
+          "name": "server",
+          "value": "url1",
+        },
+        Object {
+          "name": "key",
+          "value": "key1",
+        },
+      ],
+    },
+  ],
+]
+`;
+
+exports[`setupStreamSettingsで番組が複数ある場合 2`] = `
+Array [
+  Object {
+    "componentName": "NicoliveProgramSelector",
+    "queryParams": Object {
+      "channelId1": Object {
+        "bitrate": "bitrate1",
+        "key": "key1",
+        "url": "url1",
+      },
+      "channelId2": Object {
+        "bitrate": "bitrate2",
+        "key": "key2",
+        "url": "url2",
+      },
+    },
+    "size": Object {
+      "height": 400,
+      "width": 700,
+    },
+  },
+]
+`;
+
+exports[`setupStreamSettingsで番組取得にリトライで成功する場合 1`] = `
+Array [
+  "Stream",
+  Array [
+    Object {
+      "nameSubCategory": "Untitled",
+      "parameters": Array [
+        Object {
+          "name": "service",
+          "value": "niconico ニコニコ生放送",
+        },
+        Object {
+          "name": "server",
+          "value": "url1",
+        },
+        Object {
+          "name": "key",
+          "value": "key1",
+        },
+      ],
+    },
+  ],
+]
+`;

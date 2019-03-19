@@ -1,33 +1,43 @@
-import test from 'ava';
-import * as Proxyquire from 'proxyquire';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { createSetupFunction } from 'util/test-setup';
 
-function noopDecorator() {
-  return function() {};
-}
+jest.mock('services/stateful-service');
+jest.mock('util/injector');
+jest.mock('../../../obs-api', () => ({
+  Global: {},
+}));
+jest.mock('services/app', () => ({}));
+jest.mock('components/shared/forms/Input', () => ({}));
 
-function identity<T>(x: T): T {
-  return x;
-}
-
-test('get instance', t => {
-  require('../stateful-service')
-    .StatefulService
-    .setupVuexStore({ watch: identity });
-
-  const m = Proxyquire.noCallThru()('./i18n', {
-    'services/stateful-service': {
-      mutation: noopDecorator,
-      '@noCallThru': false
+const setup = createSetupFunction({
+  injectee: {
+    FileManagerService: {
+      read(filename: string) {
+        return readFileSync(filename, 'utf-8');
+      },
+      resolve(filepath: string) {
+        return resolve(filepath);
+      },
     },
-    '../../util/injector': {
-      Inject: noopDecorator
-    },
-    '../../../obs-api': {
-      Global: {}
-    },
-    'services/app': {
-      AppService: {}
-    }
-  });
-  t.truthy(m.I18nService.instance);
+  },
+  state: {
+    I18nService: {},
+  },
+});
+
+test('get instance', () => {
+  setup();
+  const { I18nService } = require('./i18n');
+  expect(I18nService.instance).toBeInstanceOf(I18nService);
+});
+
+test('load', async () => {
+  setup();
+  const { I18nService } = require('./i18n');
+  const { instance } = I18nService;
+  await instance.load();
+  expect(instance.isLoaded).toBe(true);
+  expect(typeof instance.state.locale).toBe('string');
+  expect(instance.availableLocales).toMatchSnapshot();
 });
