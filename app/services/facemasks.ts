@@ -554,7 +554,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   getEnabledStatus() {
-    return this.settings.enabled;
+    return this.state.settings.enabled;
   }
 
   fetchFacemaskSettings() {
