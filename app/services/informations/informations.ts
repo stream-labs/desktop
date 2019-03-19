@@ -1,7 +1,5 @@
-import { Inject } from '../../util/injector';
-import { mutation } from '../stateful-service';
-import { StatefulService } from 'services/stateful-service';
-import { $t } from 'services/i18n';
+import { Inject } from 'util/injector';
+import { StatefulService, mutation } from 'services/stateful-service';
 import { HostsService } from 'services/hosts';
 import { parseString } from 'xml2js';
 import { handleErrors } from 'util/requests';
