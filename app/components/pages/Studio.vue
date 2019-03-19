@@ -4,6 +4,7 @@
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
       class="studio-display-container hidden"
+      ref="studioDisplayContainer"
       :class="{ stacked }">
       <studio-editor class="studio-output-display" />
       <div v-if="studioMode" class="studio-mode-display-container">

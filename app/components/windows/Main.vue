@@ -3,9 +3,6 @@
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>
-  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
-    <custom-loader></custom-loader>
-  </div>
   <div
     class="main-contents"
     :class="{
@@ -34,6 +31,9 @@
         :is="page"
         :params="params"/>
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
+      <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
+        <custom-loader></custom-loader>
+      </div>
     </div>
 
     <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
@@ -115,9 +115,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 999999999;
+  z-index: 999999;
   background-color: var(--background);
-  transition: opacity 0.5s ease-out, top 0.5s step-start, z-index 0.5s step-start;
+  transform: translate(0);
+  transition: opacity 0.5s ease-out, transform 0.5s step-start, z-index 0.5s step-start;
 
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
@@ -127,8 +128,8 @@
 
 .main-loading.hidden {
   opacity: 0;
-  top: 9999999px;
-  z-index: -9999999;
+  transform: translate(500%);
+  z-index: -999999;
   transition-timing-function: ease-out, step-end, step-end;
 }
 
