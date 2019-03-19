@@ -11,6 +11,7 @@ import { Inject } from 'util/injector';
 import { Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISerializable } from '../rpc-api';
+import Utils from '../../utils';
 
 export interface ISourceAddOptions {
   channel?: number;
@@ -115,7 +116,6 @@ interface ISourceModel {
 @ServiceHelper()
 export class Source implements ISourceModel, ISerializable {
   @Inject() private sourcesService: InternalSourcesService;
-  readonly sourceId: string;
   readonly id: string;
   readonly name: string;
   readonly type: TSourceType;
@@ -131,7 +131,7 @@ export class Source implements ISourceModel, ISerializable {
 
   private source: InternalSource;
 
-  constructor(sourceId: string) {
+  constructor(public readonly sourceId: string) {
     this.source = this.sourcesService.getSource(sourceId);
   }
 
