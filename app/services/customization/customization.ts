@@ -28,7 +28,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     leftDock: false,
     hideViewerCount: false,
     livedockCollapsed: true,
-    previewWidth: 300,
     livedockSize: 0,
     bottomdockSize: 240,
     performanceMode: false,

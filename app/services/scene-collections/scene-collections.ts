@@ -31,7 +31,7 @@ import {
 } from '.';
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs';
-import { TransitionsService, ETransitionType } from 'services/transitions';
+import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 

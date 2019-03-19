@@ -13,16 +13,9 @@
     }" />
   </div>
 
-  <resize-bar
-    v-if="!collapsed"
-    :position="onLeft ? 'right' : 'left'"
-    @onresizestart="onResizeStartHandler"
-    @onresizestop="onResizeStopHandler"
-  />
-
   <transition name="slide-fade">
     <div
-      :style="liveDockStyles"
+      v-if="!collapsed"
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
@@ -82,8 +75,8 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-          <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
+      <div class="live-dock-chat" v-if="!hideChat && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+          <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
               class="live-dock-chat-apps__popout icon-pop-out-1"
@@ -93,9 +86,9 @@
             />
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
+        <chat v-if="!applicationLoading && selectedChat === 'default'" />
         <PlatformAppPageView
-          v-if="selectedChat !== 'default' && !collapsed"
+          v-if="selectedChat !== 'default'"
           class="live-dock-platform-app-webview"
           :appId="selectedChat"
           :pageSlot="slot"
@@ -262,10 +255,6 @@
 
 .live-dock-platform-tools {
   .flex();
-}
-
-.live-dock-chat-apps__list-input {
-  .margin-right();
 }
 
 .live-dock-chat-apps__popout {

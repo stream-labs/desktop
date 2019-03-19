@@ -23,7 +23,6 @@ import {
   ISceneItem,
   ISceneItemApi,
   ISceneItemInfo,
-  TSceneNodeType,
 } from './index';
 import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
@@ -202,20 +201,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
   setLocked(locked: boolean) {
     this.setSettings({ locked });
-  }
-
-  loadAttributes() {
-    const { position, scale, visible, crop, rotation } = this.getObsSceneItem();
-    this.UPDATE({
-      visible,
-      sceneItemId: this.sceneItemId,
-      transform: {
-        position,
-        scale,
-        crop,
-        rotation,
-      },
-    });
   }
 
   loadItemAttributes(customSceneItem: ISceneItemInfo) {

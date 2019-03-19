@@ -59,8 +59,7 @@ import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/wind
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotSongRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
-import ChatbotSongRequestOnboardingWindow from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
+import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
 import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
 import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
 import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
@@ -132,8 +131,7 @@ export function getComponents() {
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,
     ChatbotCommandPreferencesWindow,
-    ChatbotSongRequestPreferencesWindow,
-    ChatbotSongRequestOnboardingWindow,
+    ChatbotMediaRequestPreferencesWindow,
     ChatbotLoyaltyWindow,
     ChatbotLoyaltyAddAllWindow,
     ChatbotLoyaltyPreferencesWindow,
@@ -151,6 +149,8 @@ export interface IWindowOptions {
   size?: {
     width: number;
     height: number;
+    minWidth?: number;
+    minHeight?: number;
   };
   scaleFactor: number;
   isShown: boolean;
@@ -227,6 +227,26 @@ export class WindowsService extends StatefulService<IWindowsState> {
       options.center = true;
     }
 
+    /*
+     * Override `options.size` when what is passed in is bigger than the current display.
+     * We do not do this on CI since it runs at 1024x768 and it break tests that aren't easy
+     * to workaround.
+     */
+    if (options.size && !remote.process.env.CI) {
+      const { width: screenWidth, height: screenHeight } = electron.screen.getDisplayMatching(
+        this.windows.main.getBounds(),
+      ).workAreaSize;
+
+      const SCREEN_PERCENT = 0.75;
+
+      if (options.size.width > screenWidth || options.size.height > screenHeight) {
+        options.size = {
+          width: screenWidth * SCREEN_PERCENT,
+          height: screenHeight * SCREEN_PERCENT,
+        };
+      }
+    }
+
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
   }
@@ -283,6 +303,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       frame: false,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
+      minWidth: options.size && options.size.minWidth,
+      minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
     }));
 
