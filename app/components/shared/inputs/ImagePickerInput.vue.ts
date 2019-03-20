@@ -9,4 +9,6 @@ export default class ImagePickerInput extends BaseInput<string, IListOption<stri
 
   @Prop({ default: {} })
   readonly metadata: IListOption<string>;
+
+  @Prop() readonly title: string;
 }

@@ -17,6 +17,9 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   @Prop()
   readonly metadata: INumberMetadata;
 
+  @Prop()
+  readonly title: string;
+
   $refs: {
     input: HTMLInputElement;
   };
