@@ -131,8 +131,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Attempts to flush the user's session to disk if it exists
    */
   flushUserSession() {
-    if (this.isLoggedIn() && this.state.auth.parition) {
-      electron.remote.session.fromPartition(this.state.auth.parition).flushStorageData();
+    if (this.isLoggedIn() && this.state.auth.partition) {
+      electron.remote.session.fromPartition(this.state.auth.partition).flushStorageData();
     }
   }
 
@@ -271,11 +271,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 
-    let session = electron.remote.session.defaultSession;
-
-    if (this.state.auth.parition) {
-      session = electron.remote.session.fromPartition(this.state.auth.parition);
-    }
+    const session = this.state.auth.partition
+      ? electron.remote.session.fromPartition(this.state.auth.partition)
+      : electron.remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
 
@@ -341,7 +339,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const parsed = this.parseAuthFromUrl(url);
 
       if (parsed) {
-        parsed.parition = partition;
+        parsed.partition = partition;
         authWindow.close();
         onAuthStart();
         await this.login(service, parsed);
