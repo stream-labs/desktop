@@ -139,6 +139,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         session.cookies.flushStore(resolve);
       });
     }
+
+    return Promise.resolve();
   }
 
   isLoggedIn() {

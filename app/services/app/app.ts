@@ -166,9 +166,8 @@ export class AppService extends StatefulService<IAppState> {
     this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
 
-    this.userService.flushUserSession();
-
     window.setTimeout(async () => {
+      await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
