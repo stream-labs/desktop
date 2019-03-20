@@ -210,7 +210,7 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    app.quit();
+    session.defaultSession.cookies.flushStore(() => app.quit());
   });
 
   // Pre-initialize the child window

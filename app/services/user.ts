@@ -130,10 +130,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   /**
    * Attempts to flush the user's session to disk if it exists
    */
-  flushUserSession() {
+  flushUserSession(): Promise<void> {
     if (this.isLoggedIn() && this.state.auth.partition) {
-      electron.remote.session.fromPartition(this.state.auth.partition).flushStorageData();
+      return new Promise(resolve => {
+        const session = electron.remote.session.fromPartition(this.state.auth.partition);
+
+        session.flushStorageData();
+        session.cookies.flushStore(resolve);
+      });
     }
+
+    return Promise.resolve();
   }
 
   isLoggedIn() {
