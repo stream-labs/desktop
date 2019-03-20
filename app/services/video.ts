@@ -57,15 +57,8 @@ export class Display {
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    if (this.sourceId) {
-      obs.NodeObs.OBS_content_createSourcePreviewDisplay(
-        electronWindow.getNativeWindowHandle(),
-        this.sourceId,
-        name,
-      );
-    } else {
-      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
-    }
+    this.videoService.createOBSDisplay(this.electronWindowId, name, this.sourceId);
+
     this.displayDestroyed = false;
 
     this.selectionSubscription = this.selectionService.updated.subscribe(state => {
@@ -73,18 +66,18 @@ export class Display {
     });
 
     if (options.paddingColor) {
-      obs.NodeObs.OBS_content_setPaddingColor(
+      this.videoService.setOBSDisplayPaddingColor(
         name,
         options.paddingColor.r,
         options.paddingColor.g,
         options.paddingColor.b,
       );
     } else {
-      obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+      this.videoService.setOBSDisplayPaddingColor(name, 11, 22, 28);
     }
 
     if (options.paddingSize != null) {
-      obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
+      this.videoService.setOBSDisplayPaddingSize(name, options.paddingSize);
     }
 
     this.outputRegionCallbacks = [];
@@ -133,13 +126,13 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    obs.NodeObs.OBS_content_moveDisplay(this.name, x, y);
+    this.videoService.moveOBSDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    obs.NodeObs.OBS_content_resizeDisplay(this.name, width, height);
+    this.videoService.resizeOBSDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
@@ -148,7 +141,7 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
-      obs.NodeObs.OBS_content_destroyDisplay(this.name);
+      this.videoService.destroyOBSDisplay(this.name);
       this.displayDestroyed = true;
     }
   }
@@ -164,8 +157,8 @@ export class Display {
   }
 
   refreshOutputRegion() {
-    const position = obs.NodeObs.OBS_content_getDisplayPreviewOffset(this.name);
-    const size = obs.NodeObs.OBS_content_getDisplayPreviewSize(this.name);
+    const position = this.videoService.getOBSDisplayPreviewOffset(this.name);
+    const size = this.videoService.getOBSDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -181,40 +174,21 @@ export class Display {
 
   setShoulddrawUI(drawUI: boolean) {
     this.drawingUI = drawUI;
-    obs.NodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
+    this.videoService.setOBSDisplayShouldDrawUI(this.name, drawUI);
   }
 
   switchGridlines(enabled: boolean) {
     // This function does nothing if we aren't drawing the UI
     if (!this.drawingUI) return;
-    obs.NodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
+    this.videoService.setOBSDisplayDrawGuideLines(this.name, enabled);
   }
 }
 
 export class VideoService extends Service {
-  @Inject()
-  settingsService: SettingsService;
-
-  activeDisplays: Dictionary<Display> = {};
+  @Inject() settingsService: SettingsService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
-
-    // Watch for changes to the base resolution.
-    // This seems super freaking hacky.
-    this.settingsService.store.watch(
-      state => {
-        return state.SettingsService.Video.Base;
-      },
-      () => {
-        // This gives the setting time to propagate
-        setTimeout(() => {
-          Object.values(this.activeDisplays).forEach(display => {
-            display.refreshOutputRegion();
-          });
-        }, 1000);
-      },
-    );
   }
 
   // Generates a random string:
@@ -256,5 +230,58 @@ export class VideoService extends Service {
       width,
       height,
     };
+  }
+
+  /**
+   * @warning DO NOT USE THIS METHOD. Use the Display class instead
+   */
+  createOBSDisplay(electronWindowId: number, name: string, sourceId?: string) {
+    const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
+
+    if (sourceId) {
+      obs.NodeObs.OBS_content_createSourcePreviewDisplay(
+        electronWindow.getNativeWindowHandle(),
+        sourceId,
+        name,
+      );
+    } else {
+      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
+    }
+  }
+
+  setOBSDisplayPaddingColor(name: string, r: number, g: number, b: number) {
+    obs.NodeObs.OBS_content_setPaddingColor(name, r, g, b);
+  }
+
+  setOBSDisplayPaddingSize(name: string, size: number) {
+    obs.NodeObs.OBS_content_setPaddingSize(name, size);
+  }
+
+  moveOBSDisplay(name: string, x: number, y: number) {
+    obs.NodeObs.OBS_content_moveDisplay(name, x, y);
+  }
+
+  resizeOBSDisplay(name: string, width: number, height: number) {
+    obs.NodeObs.OBS_content_resizeDisplay(name, width, height);
+  }
+
+  destroyOBSDisplay(name: string) {
+    obs.NodeObs.OBS_content_destroyDisplay(name);
+  }
+
+  getOBSDisplayPreviewOffset(name: string): IVec2 {
+    return obs.NodeObs.OBS_content_getDisplayPreviewOffset(name);
+  }
+
+  getOBSDisplayPreviewSize(name: string): { width: number; height: number } {
+    return obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
+  }
+
+  setOBSDisplayShouldDrawUI(name: string, drawUI: boolean) {
+    obs.NodeObs.OBS_content_setShouldDrawUI(name, drawUI);
+  }
+
+  setOBSDisplayDrawGuideLines(name: string, drawGuideLines: boolean) {
+    obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
   }
 }

@@ -32,6 +32,11 @@ export default class ChatbotGenericModalWindow extends Vue {
   @Prop()
   message: string;
 
+  @Prop({
+    default: false,
+  })
+  warn: boolean;
+
   @Prop()
   name: string;
 
@@ -62,6 +67,10 @@ export default class ChatbotGenericModalWindow extends Vue {
 
   get hasNoListener() {
     return this.$listeners && this.$listeners.no;
+  }
+
+  get hasResetListener() {
+    return this.$listeners && this.$listeners.reset;
   }
 
   onCancelHandler() {

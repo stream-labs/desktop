@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 interface IStreamInfoServiceState {
   fetching: boolean;

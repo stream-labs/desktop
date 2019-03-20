@@ -180,6 +180,10 @@ export class SourcesNode extends Node<ISchema, {}> {
       };
     });
 
+    // This ensures we have bound the source size callback
+    // before creating any sources in OBS.
+    this.sourcesService;
+
     const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
 
