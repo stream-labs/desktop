@@ -59,8 +59,11 @@ export class ChatService extends Service {
   private initChat() {
     if (this.chatView) return;
 
+    const partition = this.userService.state.auth.parition;
+
     this.chatView = new electron.remote.BrowserView({
       webPreferences: {
+        partition,
         nodeIntegration: false,
       },
     });

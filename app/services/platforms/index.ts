@@ -116,6 +116,12 @@ export interface IPlatformAuth {
     id: string;
     channelId?: string;
   };
+
+  /**
+   * Session partition used to separate cookies associated
+   * with this user login.
+   */
+  parition?: string;
 }
 
 export interface IUserInfo {
