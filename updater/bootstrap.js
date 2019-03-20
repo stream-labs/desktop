@@ -325,14 +325,16 @@ async function entry(info) {
     log.info('Updater spawn promise ' + `result \"${promise}\"`);
 
     update_spawned.unref();
-    
+
+    var can_close_slobs = false;
     var str = `${promise}`;
     if(str.lastIndexOf("Access is denied.", 0) === 0)
     {
-        return true;
+        can_close_slobs = true;
     } else {
-        return `${promise}` === "0";
+        can_close_slobs = `${promise}` === "0";
     }
+    return can_close_slobs;
 }
 
 module.exports = async (info) => {
