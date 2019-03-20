@@ -102,7 +102,7 @@
 .live-display-wrapper {
   max-width: 100%;
   .radius();
-  background-color: @day-section;
+  background-color: var(--section);
   position: relative;
   .border();
   border-top: 0;
