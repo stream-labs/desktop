@@ -31,9 +31,6 @@
         :is="page"
         :params="params"/>
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
-      <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
-        <custom-loader></custom-loader>
-      </div>
     </div>
 
     <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
@@ -46,6 +43,9 @@
       />
       <live-dock class="live-dock" />
     </div>
+  </div>
+  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
+    <custom-loader></custom-loader>
   </div>
 </div>
 </template>

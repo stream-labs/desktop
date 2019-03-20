@@ -24,10 +24,7 @@ export default class Studio extends Vue {
   @Inject() private transitionsService: TransitionsService;
   @Inject() private appService: AppService;
 
-  $refs: {
-    studioModeContainer: HTMLDivElement;
-    studioDisplayContainer: HTMLDivElement;
-  };
+  $refs: { studioModeContainer: HTMLDivElement };
 
   stacked = false;
 
@@ -58,12 +55,15 @@ export default class Studio extends Vue {
     if (this.appLoading) {
       requestAnimationFrame(this.showDisplay);
     } else {
-      this.$refs.studioDisplayContainer.classList.toggle('hidden');
+      setTimeout(
+        () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
+        500,
+      );
     }
   }
 
   get displayEnabled() {
-    return !this.customizationService.state.resizingInProgress && !this.performanceMode;
+    return !this.customizationService.state.hideStyleBlockingElements && !this.performanceMode;
   }
 
   get performanceMode() {
@@ -99,10 +99,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ resizingInProgress: true });
+    this.customizationService.setSettings({ hideStyleBlockingElements: true });
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ resizingInProgress: false });
+    this.customizationService.setSettings({ hideStyleBlockingElements: false });
   }
 }

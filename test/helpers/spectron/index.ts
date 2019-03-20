@@ -109,12 +109,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     await t.context.app.start();
 
+    // Disable CSS transitions while running tests to allow for eager test clicks
+    await t.context.app.webContents.executeJavaScript(`
+      const disableAnimationsEl = document.createElement('style');
+      disableAnimationsEl.textContent =
+        '*{ transition: none !important; transition-property: none !important; }';
+      document.head.appendChild(disableAnimationsEl);
+    `);
+
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
 
-    // await sleep(100000);
+    // await sleep(6000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
@@ -138,6 +146,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     context = t.context;
     appIsRunning = true;
+
+    await t.context.app.client.waitForVisible('.main-page-container');
 
     if (options.afterStartCb) {
       await options.afterStartCb(t);
@@ -226,9 +236,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     testPassed = false;
     failMsg = msg;
   }
-
 }
-
 
 function saveFailedTestsToFile(failedTests: string[]) {
   const filePath = 'test-dist/failed-tests.json';

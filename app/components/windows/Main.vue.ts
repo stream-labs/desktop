@@ -175,7 +175,7 @@ export default class Main extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ resizingInProgress: true });
+    this.customizationService.setSettings({ hideStyleBlockingElements: true });
   }
 
   onResizeStopHandler(offset: number) {
@@ -183,7 +183,7 @@ export default class Main extends Vue {
     offset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
     this.customizationService.setSettings({
-      resizingInProgress: false,
+      hideStyleBlockingElements: false,
     });
   }
 

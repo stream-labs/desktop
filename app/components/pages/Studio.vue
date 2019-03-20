@@ -3,8 +3,7 @@
   <div v-if="displayEnabled" class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
-      class="studio-display-container hidden"
-      ref="studioDisplayContainer"
+      class="studio-display-container"
       :class="{ stacked }">
       <studio-editor class="studio-output-display" />
       <div v-if="studioMode" class="studio-mode-display-container">
@@ -63,10 +62,6 @@
   &.stacked {
     flex-direction: column;
   }
-}
-
-.studio-display-container.hidden {
-  display: none;
 }
 
 .studio-mode-display-container {
