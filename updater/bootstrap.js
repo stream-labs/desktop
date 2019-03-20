@@ -306,22 +306,33 @@ async function entry(info) {
 
     log.info('updater process ' + `pid ${update_spawned.pid}`);
 
-    //make promises for app exit , error , data and some timeout
-    const primiseExit = new Promise(resolve => {
+    //make promises for app exit , error , dataerror
+    const promiseDataError = new Promise(resolve => {
+        update_spawned.stderr.on('data', resolve);
+    });
+    
+    const promiseExit = new Promise(resolve => {
         update_spawned.on('exit', resolve);
     });
 
-    const primiseError = new Promise(resolve => {
+    const promiseError = new Promise(resolve => {
         update_spawned.on('error', resolve);
     });
 
     //wait for something to happen
-    const promise = await Promise.race([primiseError, primiseExit]);
+    const promise = await Promise.race([promiseError, promiseExit, promiseDataError]);
+    
     log.info('Updater spawn promise ' + `result \"${promise}\"`);
 
     update_spawned.unref();
-
-    return `${promise}` === "0";
+    
+    var str = `${promise}`;
+    if(str.lastIndexOf("Access is denied.", 0) === 0)
+    {
+        return true;
+    } else {
+        return `${promise}` === "0";
+    }
 }
 
 module.exports = async (info) => {
