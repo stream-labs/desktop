@@ -476,8 +476,18 @@ ipcMain.on('streamlabels-writeFile', (e, info) => {
   });
 });
 
+/* The following 2 methods need to live in the main process
+   because events bound using the remote module are not
+   executed synchronously and therefore default actions
+   cannot be prevented. */
 ipcMain.on('webContents-preventNavigation', (e, id) => {
   webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
+  });
+});
+
+ipcMain.on('webContents-preventPopup', (e, id) => {
+  webContents.fromId(id).on('new-window', e => {
     e.preventDefault();
   });
 });

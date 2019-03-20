@@ -102,6 +102,8 @@ export class ChatService extends Service {
   }
 
   private bindWindowListener() {
+    electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
+
     this.chatView.webContents.on('new-window', (evt, targetUrl) => {
       const parsedUrl = url.parse(targetUrl);
       const protocol = parsedUrl.protocol;
