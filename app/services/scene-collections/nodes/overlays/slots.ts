@@ -1,5 +1,5 @@
 import { ArrayNode } from '../array-node';
-import { SceneItem, Scene, TSceneNode, TSceneNodeType, ScenesService } from 'services/scenes';
+import { SceneItem, Scene, TSceneNode, ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { SourcesService } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
@@ -177,9 +177,14 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       });
 
       if (existingWebcam) {
-        sceneItem = context.scene.addSource(existingWebcam.sourceId, { id });
+        sceneItem = context.scene.addSource(existingWebcam.sourceId, { id, select: false });
       } else {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'dshow_input', {}, { id });
+        sceneItem = context.scene.createAndAddSource(
+          obj.name,
+          'dshow_input',
+          {},
+          { id, select: false },
+        );
       }
 
       // Avoid overwriting the crop for webcams
@@ -199,13 +204,33 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     let existing = false;
 
     if (obj.content instanceof ImageNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'image_source', {}, { id });
+      sceneItem = context.scene.createAndAddSource(
+        obj.name,
+        'image_source',
+        {},
+        { id, select: false },
+      );
     } else if (obj.content instanceof TextNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus', {}, { id });
+      sceneItem = context.scene.createAndAddSource(
+        obj.name,
+        'text_gdiplus',
+        {},
+        { id, select: false },
+      );
     } else if (obj.content instanceof VideoNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source', {}, { id });
+      sceneItem = context.scene.createAndAddSource(
+        obj.name,
+        'ffmpeg_source',
+        {},
+        { id, select: false },
+      );
     } else if (obj.content instanceof StreamlabelNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus', {}, { id });
+      sceneItem = context.scene.createAndAddSource(
+        obj.name,
+        'text_gdiplus',
+        {},
+        { id, select: false },
+      );
     } else if (obj.content instanceof WidgetNode) {
       // Check for already existing widgets of the same type instead
       const widgetType = obj.content.data.type;
@@ -215,24 +240,23 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           const type: WidgetType = source.getPropertiesManagerSettings().widgetType;
 
           if (widgetType === type) {
-            sceneItem = context.scene.addSource(source.sourceId, { id });
+            sceneItem = context.scene.addSource(source.sourceId, { id, select: false });
             existing = true;
           }
         }
       });
 
       if (!sceneItem) {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source', {}, { id });
+        sceneItem = context.scene.createAndAddSource(
+          obj.name,
+          'browser_source',
+          {},
+          { id, select: false },
+        );
       }
     } else if (obj.content instanceof SceneSourceNode) {
-      // Add a new scene to scenesServices if this scene is not exist.
-      // It is not the best way to create a scene here instead of `./scenes.ts` file,
-      // but the other way requires to much refactoring
       const sceneId = obj.content.data.sceneId;
-      if (!this.scenesService.getScene(sceneId)) {
-        this.scenesService.createScene(obj.name, { sceneId });
-      }
-      sceneItem = context.scene.addSource(sceneId);
+      sceneItem = context.scene.addSource(sceneId, { select: false });
     }
 
     this.adjustTransform(sceneItem, obj);

@@ -5,16 +5,7 @@ import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import { ChatbotBaseApiService } from './chatbot-base';
 
-import {
-  IChatbotAPIPutResponse,
-  IChatbotAPIDeleteResponse,
-  ILoyaltyResponse,
-  IChatbotLoyalty,
-  ILoyaltyPreferencesData,
-  ILoyaltyPreferencesResponse,
-  IChatbotAPIPostResponse,
-  IHeistPreferencesResponse,
-} from './chatbot-interfaces';
+import { IChatbotAPIPostResponse, IHeistPreferencesResponse } from './chatbot-interfaces';
 
 // state
 interface IChatbotHeistApiServiceState {

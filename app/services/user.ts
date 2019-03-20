@@ -127,6 +127,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Attempts to flush the user's session to disk if it exists
+   */
+  flushUserSession() {
+    if (this.isLoggedIn() && this.state.auth.partition) {
+      electron.remote.session.fromPartition(this.state.auth.partition).flushStorageData();
+    }
+  }
+
   isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken);
   }
@@ -261,9 +270,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.chatbotApiService.Base.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
+
+    const session = this.state.auth.partition
+      ? electron.remote.session.fromPartition(this.state.auth.partition)
+      : electron.remote.session.defaultSession;
+
+    session.clearStorageData({ storages: ['cookies'] });
+
     this.LOGOUT();
     this.userLogout.next();
-    electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.platformAppsService.unloadAllApps();
   }
 
@@ -306,12 +321,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     onAuthFinish: (...args: any[]) => any,
   ) {
     const service = getPlatformService(platform);
+    const partition = `persist:${uuid()}`;
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
       alwaysOnTop: false,
       show: false,
       webPreferences: {
+        partition,
         nodeIntegration: false,
         nativeWindowOpen: true,
         sandbox: true,
@@ -322,6 +339,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const parsed = this.parseAuthFromUrl(url);
 
       if (parsed) {
+        parsed.partition = partition;
         authWindow.close();
         onAuthStart();
         await this.login(service, parsed);

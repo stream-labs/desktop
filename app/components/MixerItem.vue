@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
+  <MixerVolmeter :audioSource="audioSource" v-if="!performanceMode"></MixerVolmeter>
 
   <div class="flex">
     <slider-input

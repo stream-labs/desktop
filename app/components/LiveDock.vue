@@ -13,16 +13,9 @@
     }" />
   </div>
 
-  <resize-bar
-    v-if="!collapsed"
-    :position="onLeft ? 'right' : 'left'"
-    @onresizestart="onResizeStartHandler"
-    @onresizestop="onResizeStopHandler"
-  />
-
   <transition name="slide-fade">
     <div
-      :style="liveDockStyles"
+      v-if="!collapsed"
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
@@ -82,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
+      <div class="live-dock-chat" v-if="!resizingInProgress && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -93,9 +86,9 @@
             />
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading" :style="defaultChatStyles" ref="chat" />
+        <chat v-if="!applicationLoading && selectedChat === 'default'" />
         <PlatformAppPageView
-          v-if="selectedChat !== 'default' && !collapsed"
+          v-if="selectedChat !== 'default'"
           class="live-dock-platform-app-webview"
           :appId="selectedChat"
           :pageSlot="slot"
@@ -105,7 +98,7 @@
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
-        <span>{{ $t('Your chat is currently offline') }}</span>
+        <span v-if="!resizingInProgress">{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>

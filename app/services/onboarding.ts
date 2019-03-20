@@ -2,7 +2,6 @@ import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
-import electron from 'electron';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 type TOnboardingStep =

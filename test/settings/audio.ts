@@ -2,6 +2,7 @@ import { focusChild, focusMain, test, TExecutionContext, useSpectron } from '../
 import { getDropdownOptions, setFormDropdown } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
+import { addTrailingSpace, createOptionsAssertion } from '../helpers/spectron/assertions';
 
 useSpectron();
 
@@ -16,12 +17,16 @@ test('Populates audio settings', async t => {
   await focusChild(t);
   await app.client.click('li=Audio');
 
-  await assertOptions('[data-name=SampleRate]', '44.1khz', ['44.1khz', '48khz'].map(addSpaces));
+  await assertOptions(
+    '[data-name=SampleRate]',
+    '44.1khz',
+    ['44.1khz', '48khz'].map(addTrailingSpace),
+  );
 
   await assertOptions(
     '[data-name=ChannelSetup]',
     'Stereo',
-    ['Mono', 'Stereo', '2.1', '4.0', '4.1', '5.1', '7.1'].map(addSpaces),
+    ['Mono', 'Stereo', '2.1', '4.0', '4.1', '5.1', '7.1'].map(addTrailingSpace),
   );
 
   /*
@@ -43,15 +48,3 @@ test('Populates audio settings', async t => {
   t.true(await app.client.isExisting('.volmeter-container'));
 });
 
-const createOptionsAssertion = (t: TExecutionContext, form: FormMonkey) => async (
-  selector: string,
-  expectedValue: string,
-  expectedOptions: string[],
-  dropdownSelector = '.multiselect__element',
-) => {
-  t.is(expectedValue, await form.getTextValue(selector));
-  t.deepEqual(await getDropdownOptions(t, [selector, dropdownSelector].join(' ')), expectedOptions);
-};
-
-// The trailing space is apparently required for all of these options
-const addSpaces = (x: string) => `${x} `;
