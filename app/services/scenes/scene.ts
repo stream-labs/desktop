@@ -507,10 +507,6 @@ export class Scene implements ISceneApi {
 
   @mutation()
   private REMOVE_NODE_FROM_SCENE(nodeId: string) {
-    if (this.selectionService.isSelected(nodeId)) {
-      this.selectionService.deselect(nodeId);
-    }
-
     this.sceneState.nodes = this.sceneState.nodes.filter(item => {
       return item.id !== nodeId;
     });
