@@ -6,16 +6,18 @@ import { IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm.vue';
 import TsxComponent from 'components/tsx-component';
 
-export abstract class BaseInput<
-  TValueType,
-  TMetadataType extends IInputMetadata
-> extends TsxComponent<{
+export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends TsxComponent<{
   metadata: TMetadataType;
   value: TValueType;
   title: string;
 }> {
+  @Prop()
   readonly value: TValueType;
+
+  @Prop()
   readonly title: string;
+
+  @Prop({ default: () => ({}) })
   readonly metadata: TMetadataType;
 
   /**
