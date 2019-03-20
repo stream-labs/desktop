@@ -132,7 +132,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   flushUserSession() {
     if (this.isLoggedIn() && this.state.auth.partition) {
-      electron.remote.session.fromPartition(this.state.auth.partition).flushStorageData();
+      return new Promise(resolve => {
+        const session = electron.remote.session.fromPartition(this.state.auth.partition);
+
+        session.flushStorageData();
+        session.cookies.flushStore(resolve);
+      });
     }
   }
 
