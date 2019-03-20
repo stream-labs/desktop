@@ -105,6 +105,24 @@ test('Invalid selection', async t => {
   t.deepEqual(selection.getIds(), [colorSource.sceneItemId]);
 });
 
+test('Removed nodes must not exist in selection', async t => {
+  sceneBuilder.build(`
+    Item1:
+    Item2:
+    Folder1
+  `);
+
+  const item1 = getNode('Item1');
+  const item2 = getNode('Item2');
+  const folder1 = getNode('Folder1');
+
+  selectionService.selectAll();
+  item1.remove();
+  folder1.remove();
+
+  t.deepEqual(selectionService.getIds(), [item2.id]);
+});
+
 test('Place after', async t => {
   sceneBuilder.build(`
     Item1:

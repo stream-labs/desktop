@@ -200,6 +200,7 @@ export class Scene implements ISceneApi {
   removeFolder(folderId: string) {
     const sceneFolder = this.getFolder(folderId);
     if (!sceneFolder) return;
+    if (sceneFolder.isSelected()) sceneFolder.deselect();
     sceneFolder.getSelection().remove();
     sceneFolder.detachParent();
     this.REMOVE_NODE_FROM_SCENE(folderId);
@@ -213,6 +214,7 @@ export class Scene implements ISceneApi {
     const sceneItem = this.getItem(sceneItemId);
     if (!sceneItem) return;
     const sceneItemModel = sceneItem.getModel();
+    if (sceneItem.isSelected()) sceneItem.deselect();
     sceneItem.detachParent();
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_NODE_FROM_SCENE(sceneItemId);
