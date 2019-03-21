@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
+import Utils from 'services/utils';
 
 export * from './service';
 
-export function mutation(options = { vuexSyncIgnore: false }) {
+export function mutation(options = { unsafe: false }) {
   return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
     return registerMutation(target, methodName, descriptor, options);
   };
@@ -14,20 +15,24 @@ function registerMutation(
   target: any,
   methodName: string,
   descriptor: PropertyDescriptor,
-  options = { vuexSyncIgnore: false },
+  options = { unsafe: false },
 ) {
   const serviceName = target.constructor.name;
   const mutationName = `${serviceName}.${methodName}`;
 
+  console.log(mutationName, options);
+
   target.originalMethods = target.originalMethods || {};
   target.originalMethods[methodName] = target[methodName];
+  target.mutationOptions = target.mutationOptions || {};
+  target.mutationOptions[methodName] = options;
   target.mutations = target.mutations || {};
   target.mutations[mutationName] = function(
     localState: any,
     payload: { args: any; constructorArgs: any },
   ) {
     const targetIsSingleton = !!target.constructor.instance;
-    let context = null;
+    let context: any;
 
     if (targetIsSingleton) {
       context = target.constructor.instance;
@@ -35,7 +40,37 @@ function registerMutation(
       context = new target.constructor(...payload.constructorArgs);
     }
 
-    descriptor.value.call(context, ...payload.args);
+    let contextProxy = context;
+
+    if (Utils.isDevMode() && !options.unsafe) {
+      const errorMsg = (key: string) =>
+        `Mutation ${mutationName} attempted to access this.${key}. ` +
+        'To ensure mutations can safely execute in any context, mutations are restricted ' +
+        'to only accessing this.state and their arguments.';
+
+      contextProxy = new Proxy(
+        {},
+        {
+          get(_, key) {
+            if (key === 'state') {
+              return context.state;
+            }
+
+            throw new Error(errorMsg(key.toString()));
+          },
+          set(_, key, val) {
+            if (key === 'state') {
+              Vue.set(context, 'state', val);
+              return true;
+            }
+
+            throw new Error(errorMsg(key.toString()));
+          },
+        },
+      );
+    }
+
+    descriptor.value.call(contextProxy, ...payload.args);
   };
 
   Object.defineProperty(target, methodName, {
@@ -47,7 +82,6 @@ function registerMutation(
       store.commit(mutationName, {
         args,
         constructorArgs,
-        __vuexSyncIgnore: options.vuexSyncIgnore,
       });
     },
   });
@@ -56,16 +90,16 @@ function registerMutation(
 }
 
 function inheritMutations(target: any) {
-  const baseClassMutations = Object.getPrototypeOf(target.prototype).constructor.prototype
-    .originalMethods;
-  if (baseClassMutations) {
-    Object.keys(baseClassMutations).forEach(methodName => {
+  const baseClassProto = Object.getPrototypeOf(target.prototype).constructor.prototype;
+  if (baseClassProto.originalMethods) {
+    Object.keys(baseClassProto.originalMethods).forEach(methodName => {
       if (Object.getOwnPropertyDescriptor(target.prototype, methodName)) return; // mutation is overridden
-      target.prototype[methodName] = baseClassMutations[methodName];
+      target.prototype[methodName] = baseClassProto.originalMethods[methodName];
       registerMutation(
         target.prototype,
         methodName,
         Object.getOwnPropertyDescriptor(target.prototype, methodName),
+        baseClassProto.mutationOptions[methodName],
       );
     });
   }

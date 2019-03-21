@@ -67,7 +67,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     return this.video && this.width > 0 && this.height > 0 && !this.locked;
   }
 
-  sceneItemState: ISceneItem;
+  state: ISceneItem;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -79,13 +79,13 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       return item.id === sceneItemId;
     }) as ISceneItem;
     const sourceState = this.sourcesService.state.sources[sourceId];
-    this.sceneItemState = sceneItemState;
+    this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);
-    Utils.applyProxy(this, this.sceneItemState);
+    Utils.applyProxy(this, this.state);
   }
 
   getModel(): ISceneItem & ISource {
-    return { ...this.source.sourceState, ...this.sceneItemState };
+    return { ...this.source.state, ...this.state };
   }
 
   getScene(): Scene {
@@ -121,14 +121,11 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   setSettings(patch: IPartialSettings) {
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
-    const changed = Utils.getChangedParams(this.sceneItemState, patch);
-    const newSettings = merge({}, this.sceneItemState, patch);
+    const changed = Utils.getChangedParams(this.state, patch);
+    const newSettings = merge({}, this.state, patch);
 
     if (changed.transform) {
-      const changedTransform = Utils.getChangedParams(
-        this.sceneItemState.transform,
-        patch.transform,
-      );
+      const changedTransform = Utils.getChangedParams(this.state.transform, patch.transform);
 
       if (changedTransform.position) {
         obsSceneItem.position = newSettings.transform.position;
@@ -337,10 +334,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
   }
 
-  protected get state() {
-    return this.sceneItemState;
-  }
-
   /**
    * only for scene sources
    */
@@ -433,6 +426,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
   @mutation()
   private UPDATE(patch: { sceneItemId: string } & IPartialSettings) {
-    merge(this.sceneItemState, patch);
+    merge(this.state, patch);
   }
 }
