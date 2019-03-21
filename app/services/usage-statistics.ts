@@ -139,7 +139,7 @@ export class UsageStatisticsService extends Service {
     });
     this.sendAnalytics();
   }
-  
+
   private sendAnalytics() {
     const data = { analyticsTokens: [...this.anaiticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);
