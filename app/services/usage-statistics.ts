@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
-import { Throttle } from 'lodash-decorators';
+import throttle from 'lodash/throttle';
 import { Service } from './service';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
@@ -54,6 +54,7 @@ export class UsageStatisticsService extends Service {
 
   init() {
     this.loadInstallerId();
+    this.sendAnalytics = throttle(this.sendAnalytics, 2 * 60 * 1000);
   }
 
   loadInstallerId() {
@@ -138,8 +139,7 @@ export class UsageStatisticsService extends Service {
     });
     this.sendAnalytics();
   }
-
-  @Throttle(2 * 60 * 1000)
+  
   private sendAnalytics() {
     const data = { analyticsTokens: [...this.anaiticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);

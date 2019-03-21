@@ -1,4 +1,4 @@
-import { throttle } from 'lodash-decorators';
+import throttle from 'lodash/throttle';
 import { Inject } from 'util/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
@@ -22,11 +22,12 @@ import { Subscription } from 'rxjs';
 
 @ServiceHelper()
 export class WidgetTester {
-  constructor(public name: string, private url: string) {}
+  constructor(public name: string, private url: string) {
+    this.test = throttle(this.test, 1000);
+  }
 
   @Inject() userService: UserService;
 
-  @throttle(1000)
   test() {
     const headers = authorizedHeaders(this.userService.apiToken);
     fetch(new Request(this.url, { headers }));
