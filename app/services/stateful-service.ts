@@ -20,8 +20,6 @@ function registerMutation(
   const serviceName = target.constructor.name;
   const mutationName = `${serviceName}.${methodName}`;
 
-  console.log(mutationName, options);
-
   target.originalMethods = target.originalMethods || {};
   target.originalMethods[methodName] = target[methodName];
   target.mutationOptions = target.mutationOptions || {};
