@@ -54,7 +54,7 @@ const releaseChannel = (() => {
 
 (function setupLogger() {
   // save logs to the cache directory
-  path.join(app.getPath('userData'), 'log.log');
+  electronLog.transports.file.file = path.join(app.getPath('userData'), 'log.log');
   electronLog.transports.file.level = 'info';
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
