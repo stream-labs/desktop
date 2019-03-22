@@ -241,8 +241,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
       if (options.size.width > screenWidth || options.size.height > screenHeight) {
         options.size = {
-          width: screenWidth * SCREEN_PERCENT,
-          height: screenHeight * SCREEN_PERCENT,
+          width: Math.round(screenWidth * SCREEN_PERCENT),
+          height: Math.round(screenHeight * SCREEN_PERCENT),
         };
       }
     }
