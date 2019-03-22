@@ -85,6 +85,18 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     return state.status === 'onAir' && state.endTime - state.startTime < 6 * 60 * 60;
   }
 
+  static format(timeInSeconds: number): string {
+    const absTime = Math.abs(timeInSeconds);
+    const s = absTime % 60;
+    const m = Math.floor(absTime / 60) % 60;
+    const h = Math.floor(absTime / 3600);
+    const sign = Math.sign(timeInSeconds) > 0 ? '' : '-';
+    const ss = s.toString(10).padStart(2, '0');
+    const mm = m.toString(10).padStart(2, '0');
+    const hh = h.toString(10).padStart(2, '0');
+    return `${sign}${hh}:${mm}:${ss}`;
+  }
+
   get hasProgram(): boolean {
     return Boolean(this.state.programID);
   }

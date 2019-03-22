@@ -5,43 +5,20 @@ import { NicoliveProgramService } from 'services/nicolive-program/nicolive-progr
 import { remote } from 'electron';
 import { $t } from 'services/i18n';
 
-import CommentForm from './CommentForm.vue';
-import ProgramDescription from './ProgramDescription.vue';
-import ProgramInfo from './ProgramInfo.vue';
-import ToolBar from './ToolBar.vue';
-import TopNav from './TopNav.vue';
-
-@Component({
-  components: {
-    TopNav,
-    ProgramInfo,
-    ProgramDescription,
-    ToolBar,
-    CommentForm,
-  },
-})
-export default class NicolivePanelRoot extends Vue {
+@Component({})
+export default class TopNav extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  isCreating: boolean = false;
-  async createProgram(): Promise<void> {
-    try {
-      this.isCreating = true;
-      await this.nicoliveProgramService.createProgram();
-    } catch (e) {
-      // TODO
-      console.warn(e);
-    } finally {
-      this.isCreating = false;
-    }
+  get hasProgram(): boolean {
+    return this.nicoliveProgramService.hasProgram;
   }
 
   isFetching: boolean = false;
-  async fetchProgram(): Promise<void> {
+  async fetchProgram() {
     try {
       this.isFetching = true;
-      await this.nicoliveProgramService.fetchProgram();
+      return await this.nicoliveProgramService.fetchProgram();
     } catch (e) {
       console.warn(e);
       // TODO: 翻訳
@@ -63,7 +40,16 @@ export default class NicolivePanelRoot extends Vue {
     }
   }
 
-  get hasProgram(): boolean {
-    return this.nicoliveProgramService.hasProgram;
+  isEditing: boolean = false;
+  async editProgram() {
+    try {
+      this.isEditing = true;
+      return await this.nicoliveProgramService.editProgram();
+    } catch (e) {
+      // TODO
+      console.warn(e);
+    } finally {
+      this.isEditing = false;
+    }
   }
 }
