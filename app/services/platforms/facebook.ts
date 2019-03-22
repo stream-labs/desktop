@@ -201,6 +201,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
           this.SET_LIVE_VIDEO_ID(info.id);
           this.SET_STREAM_URL(info.stream_url);
         }
+        this.SET_LIVE_VIDEO_ID(null);
         return info;
       });
   }
