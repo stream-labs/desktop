@@ -60,7 +60,7 @@ test.skip('Bit Goal', async t => {
   await testGoal(t, 'Bit Goal');
 });
 
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= 100; i++) {
   const testName = ['Donation Goal', 'Follower Goal', 'Bit Goal'][i % 3];
   test(`${testName} ${i}`, async t => {
     await testGoal(t, testName);
