@@ -4,6 +4,7 @@ import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import { ScenesService } from 'services/scenes';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { VFormGroup },
@@ -43,7 +44,12 @@ export default class SceneTransitions extends Vue {
   }
 
   get sceneOptions() {
-    return this.scenesService.scenes.map(scene => ({ title: scene.name, value: scene.id }));
+    const sceneOptions = this.scenesService.scenes.map(scene => ({
+      title: scene.name,
+      value: scene.id,
+    }));
+    sceneOptions.unshift({ title: $t('All'), value: 'ALL' });
+    return sceneOptions;
   }
 
   get transitionOptions() {

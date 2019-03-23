@@ -240,7 +240,22 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       return this.getTransition(matchedConnection.transitionId);
     }
 
+    const wildcardTransition = this.getWildcardTransition(fromId, toId);
+
+    if (wildcardTransition && this.getTransition(wildcardTransition.transitionId)) {
+      return this.getTransition(wildcardTransition.transitionId);
+    }
+
     return this.getDefaultTransition();
+  }
+
+  getWildcardTransition(fromId: string, toId: string) {
+    return this.state.connections.find(connection => {
+      return (
+        (connection.fromSceneId === fromId && connection.toSceneId === 'ALL') ||
+        (connection.fromSceneId === 'ALL' && connection.toSceneId === toId)
+      );
+    });
   }
 
   shutdown() {

@@ -144,6 +144,8 @@ export default class SceneTransitions extends Vue {
   }
 
   getSceneName(id: string) {
+    if (id === 'ALL') return $t('All');
+
     const scene = this.scenesService.getScene(id);
 
     if (scene) return scene.name;
