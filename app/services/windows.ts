@@ -406,7 +406,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   @mutation()
   private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
-    console.log(window.location.href, windowId, scaleFactor);
     this.state[windowId].scaleFactor = scaleFactor;
   }
 
