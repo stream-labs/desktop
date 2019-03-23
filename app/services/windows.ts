@@ -30,7 +30,6 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs';
-import { debounce } from 'lodash-decorators';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -212,7 +211,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
-  @debounce(500)
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     const bounds = window.getBounds();
@@ -370,6 +368,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
       ...optionsPatch,
+      scaleFactor: this.state.child.scaleFactor,
     };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
@@ -407,6 +406,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   @mutation()
   private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
+    console.log(window.location.href, windowId, scaleFactor);
     this.state[windowId].scaleFactor = scaleFactor;
   }
 
