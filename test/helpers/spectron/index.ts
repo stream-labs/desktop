@@ -47,6 +47,11 @@ interface ITestRunnerOptions {
   afterStartCb?(t: any): Promise<any>;
 
   /**
+   * Enable this to show network logs if test failed
+   */
+  logNetwork?: boolean;
+
+  /**
    * Called after cache directory is created but before
    * the app is started.  This is useful for setting up
    * some known state in the cache directory before the
@@ -58,6 +63,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  logNetwork: false,
 };
 
 export interface ITestContext {
@@ -173,8 +179,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (!errors.length) return;
-    fail(`The log-file has errors \n ${logs}`);
+    if (errors.length) {
+      fail(`The log-file has errors \n ${logs}`);
+    } else if (options.logNetwork && !testPassed) {
+      fail(`log-file: \n ${logs}`);
+    }
   }
 
   test.beforeEach(async t => {

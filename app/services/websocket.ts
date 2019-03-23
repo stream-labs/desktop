@@ -1,3 +1,4 @@
+import electronLog from 'electron-log';
 import { Service } from './service';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
@@ -112,6 +113,7 @@ export class WebsocketService extends Service {
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
         this.socket.on('event', (e: any) => {
+          this.log('event', e);
           this.socketEvent.next(e);
         });
       });
@@ -119,5 +121,6 @@ export class WebsocketService extends Service {
 
   private log(message: string, ...args: any[]) {
     console.debug(`WS: ${message}`, ...args);
+    electronLog.log(`WS: ${message}`);
   }
 }
