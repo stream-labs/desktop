@@ -47,7 +47,7 @@ async function testGoal(t: TExecutionContext, goalType: string) {
 
   await formMonkey.fill(formName, testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes(formName, testSet1));
+  t.true(await formMonkey.includes(formName, testSet2));
 }
 
 // TODO: Test is flaky
