@@ -200,8 +200,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         if (info && ['SCHEDULED_UNPUBLISHED', 'LIVE_STOPPED'].includes(info.status)) {
           this.SET_LIVE_VIDEO_ID(info.id);
           this.SET_STREAM_URL(info.stream_url);
+        } else {
+          this.SET_LIVE_VIDEO_ID(null);
         }
-        this.SET_LIVE_VIDEO_ID(null);
         return info;
       });
   }
