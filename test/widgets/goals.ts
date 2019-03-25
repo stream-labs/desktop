@@ -9,11 +9,8 @@ useSpectron({ appArgs: '--nosync', networkLogging: true });
 
 async function testGoal(t: TExecutionContext, goalType: string) {
   const client = t.context.app.client;
-  if (!(
-    await logIn(t)
-  )) {
-    return;
-  }
+  if (!(await logIn(t))) return;
+
   await addSource(t, goalType, goalType, false);
 
   await client.click('li=Visual Settings');
@@ -28,7 +25,7 @@ async function testGoal(t: TExecutionContext, goalType: string) {
     bar_bg_color: '#FF0000',
     text_color: '#FF0000',
     bar_text_color: '#FF0000',
-    font: 'Roboto'
+    font: 'Roboto',
   };
 
   await formMonkey.fill(formName, testSet1);
@@ -42,7 +39,7 @@ async function testGoal(t: TExecutionContext, goalType: string) {
     bar_bg_color: '#DDDDDD',
     text_color: '#FFFFFF',
     bar_text_color: '#F8E71C',
-    font: 'Open Sans'
+    font: 'Open Sans',
   };
 
   await formMonkey.fill(formName, testSet2);

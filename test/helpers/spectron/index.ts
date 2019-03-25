@@ -161,9 +161,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
-    // await new Promise(resolve => {
-    //   rimraf(context.cacheDir, resolve);
-    // });
+    await new Promise(resolve => {
+      rimraf(context.cacheDir, resolve);
+    });
   }
 
   /**
@@ -171,9 +171,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
-    console.log('check log file');
     if (!fs.existsSync(filePath)) return;
-    console.log('file exists');
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
       .substr(logFileLastReadingPos)
@@ -182,8 +180,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
-
-    console.log('check errors, tests passed', testPassed, 'logging ', options.networkLogging);
 
     if (errors.length) {
       fail(`The log-file has errors \n ${logs}`);
