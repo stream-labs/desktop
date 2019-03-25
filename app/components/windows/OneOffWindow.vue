@@ -24,7 +24,6 @@
   width: 100%;
   z-index: -1;
 
-  background-color: @day-primary;
   font-size: 24px;
   text-align: center;
 }
@@ -37,11 +36,9 @@
   flex-grow: 1;
 }
 
-.night-theme {
-  .child-window-titlebar,
-  .blank-slate {
-    background-color: @night-primary;
-    color: @night-paragraph;
-  }
+.child-window-titlebar,
+.blank-slate {
+  background-color: var(--background);
+  color: var(--paragraph);
 }
 </style>

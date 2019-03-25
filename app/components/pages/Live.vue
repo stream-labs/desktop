@@ -102,7 +102,7 @@
 .live-display-wrapper {
   max-width: 100%;
   .radius();
-  background-color: @day-section;
+  background-color: var(--section);
   position: relative;
   .border();
   border-top: 0;
@@ -132,15 +132,6 @@
 }
 
 .night-theme {
-  .mission-control-container {
-    border-color: @night-secondary;
-  }
-
-  .output-container {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
-
   .live-display-placeholder {
     background: @navy-secondary;
     border-color: @navy-secondary;
