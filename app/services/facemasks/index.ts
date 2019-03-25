@@ -304,7 +304,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   onSourceAdded(event: ISource) {
-    if (this.active && event.type === 'dshow_input') {
+    if (this.state.active && event.type === 'dshow_input') {
       this.setupFilter();
     }
   }
