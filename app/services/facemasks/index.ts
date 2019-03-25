@@ -255,14 +255,14 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.startup();
     }
 
-    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents()) {
+    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents) {
       this.registerDonationEvent({
         facemask: event.message[0].facemask,
         eventId: event.message[0]._id,
       });
     }
 
-    if (event.type === 'subscription' && this.shouldQueueSubscriptionEvents()) {
+    if (event.type === 'subscription' && this.shouldQueueSubscriptionEvents && event.message[0].subscriber_twitch_id) {
       this.registerSubscriptionEvent({
         subscriberId: event.message[0].subscriber_twitch_id,
         subPlan: event.message[0].sub_plan,
@@ -270,7 +270,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       });
     }
 
-    if (event.type === 'bits' && this.shouldQueueBitsEvents()) {
+    if (event.type === 'bits' && this.shouldQueueBitsEvents && event.message[0].data) {
       this.registerBitsEvent({
         facemask: event.message[0].data.facemask,
         eventId: event.message[0].data.fm_id,
@@ -287,7 +287,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
     }
 
-    if (event.message.type === 'subscription') {
+    if (event.message.type === 'subscription' && this.shouldQueueSubscriptionEvents) {
       this.playSubscriptionEvent({
         subscriberId: event.message.subscriber_twitch_id,
         subPlan: event.message.sub_plan,
@@ -295,7 +295,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       });
     }
 
-    if (event.message.type === 'bits') {
+    if (event.message.type === 'bits' && this.shouldQueueBitsEvents && event.message.data) {
       this.playBitsEvent({
         facemask: event.message.data.facemask,
         eventId: event.message.data.fm_id,
