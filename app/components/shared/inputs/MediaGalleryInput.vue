@@ -59,7 +59,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 6px;
-  background: linear-gradient(rgba(0, 0, 0, 0), @dark-1 40%);
+  background: var(--shadow);
   border-radius: 0 0 @radius @radius;
 
   i {
@@ -81,12 +81,13 @@
   font-size: 12px;
 }
 
-i {
+i,
+.change-media {
   transition: 0.1s all linear;
 
   &:hover {
     cursor: pointer;
-    color: @white;
+    color: var(--white);
   }
 }
 

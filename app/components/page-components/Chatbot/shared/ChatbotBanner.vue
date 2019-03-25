@@ -55,8 +55,8 @@
     margin: 0 4px;
     .radius();
     .weight(@medium);
-    background-color: @yellow-med-opac;
-    color: @white;
+    background-color: var(--yellow-semi);
+    color: var(--white);
     user-select: all;
   }
 

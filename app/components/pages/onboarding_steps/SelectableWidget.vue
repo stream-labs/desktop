@@ -68,7 +68,7 @@
   position: relative;
 
   &:hover {
-    border-color: @teal-light-opac;
+    border-color: var(--teal-semi);
   }
 
   &.selected {
@@ -101,12 +101,12 @@
 
 .widget__name {
   .weight(@medium);
-  color: @white;
+  color: var(--white);
   font-size: 14px;
 }
 
 .widget__desc {
-  color: @grey;
+  color: var(--icon);
   font-size: 13px;
 }
 
@@ -133,13 +133,13 @@
 }
 
 .widget-detail-close {
-  color: @grey;
+  color: var(--icon);
   .transition;
   margin-left: 20px;
   cursor: pointer;
 
   &:hover {
-    color: @white;
+    color: var(--white);
   }
 }
 

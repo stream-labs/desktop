@@ -240,7 +240,7 @@
     }
 
     .fa-moon-o {
-      color: @white;
+      color: var(--white);
       opacity: 1;
       display: block;
     }
@@ -248,7 +248,7 @@
 
   .user__name {
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
 

@@ -232,7 +232,7 @@
   border: 1px solid var(--teal);
 
   .variation-tile__image-box {
-    border: 1px solid @teal-light-opac;
+    border: 1px solid var(--teal-semi);
   }
 }
 

@@ -71,7 +71,7 @@
   animation: notify-appears 0.3s;
 
   &.info {
-    background-color: fade(@grey, 15%);
+    background-color: var(--icon-semi);
     color: var(--icon);
   }
 
@@ -103,7 +103,7 @@
     content: '|';
     padding-right: 12px;
     opacity: 0.5;
-    color: @grey;
+    color: var(--icon);
   }
 
   .fa {

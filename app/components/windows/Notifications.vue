@@ -40,7 +40,7 @@
   @import "../../styles/index";
 
 .notification {
-  color: @grey;
+  color: var(--icon);
   padding: 5px 10px;
   margin-bottom: 5px;
   display: grid;

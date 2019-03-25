@@ -156,7 +156,7 @@
 
   &:hover {
     :not(.transition-default) {
-      color: @white;
+      color: var(--white);
     }
   }
 }
@@ -193,7 +193,7 @@
 .night-theme {
   .transition-control {
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
   .transition-control.disabled:hover {

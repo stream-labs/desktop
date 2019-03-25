@@ -88,7 +88,7 @@
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--white"></div>
                 <div>
-                  <div class="design-system__code">@day-section, @night-title, @white</div>
+                  <div class="design-system__code">@day-section, @night-title, var(--white)</div>
                   <div>Day Background, Night Title</div>
                 </div>
               </div>
@@ -899,7 +899,7 @@
 }
 
 .design-system__color--white {
-  background-color: @white;
+  background-color: var(--white);
   border-color: @light-4;
 }
 

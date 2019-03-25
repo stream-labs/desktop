@@ -94,7 +94,7 @@ label {
 
   background: var(--accent);
   font-size: 12px;
-  color: @white;
+  color: var(--white);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -158,7 +158,7 @@ a,
     padding: 0 32px 0 8px;
 
     option {
-      color: @navy;
+      color: var(--navy);
     }
   }
 }
@@ -168,7 +168,7 @@ a,
   right: 8px;
   top: 10px;
   font-size: 10px;
-  color: @white;
+  color: var(--white);
 }
 
 .select--onboarding {
@@ -183,7 +183,7 @@ a,
   .multiselect__input {
     background: #45535a;
     border-color: transparent;
-    color: @white;
+    color: var(--white);
   }
 
   .multiselect__content {
@@ -202,7 +202,7 @@ a,
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
-    color: @grey;
+    color: var(--icon);
 
     &:focus {
       background: rgba(255, 255, 255, 0.14);
@@ -227,7 +227,7 @@ a,
     &:focus,
     &:active {
       background: transparent;
-      color: @white;
+      color: var(--white);
       border-bottom: 1px solid rgba(255, 255, 255, 0.14);
     }
   }
@@ -235,7 +235,7 @@ a,
   &:focus,
   &:active,
   &:hover {
-    color: @white;
+    color: var(--white);
   }
 }
 
@@ -391,7 +391,7 @@ select {
 }
 
 .toast-action {
-  color: @white !important;
+  color: var(--white) !important;
 }
 
 // Night theme rules
@@ -408,7 +408,7 @@ select {
     label {
       &::before {
         background: transparent;
-        border-color: @teal-light-opac;
+        border-color: var(--teal-semi);
       }
     }
   }
@@ -417,7 +417,7 @@ select {
     &:hover {
       .fa,
       i {
-        color: @white;
+        color: var(--white);
       }
     }
   }

@@ -144,7 +144,7 @@
   }
 
   .test-button .link {
-    color: @white;
+    color: var(--white);
   }
 </style>
 

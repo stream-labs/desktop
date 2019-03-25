@@ -103,7 +103,7 @@
     transition-delay: 0s;
 
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
 }
