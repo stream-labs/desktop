@@ -316,7 +316,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       alertDuration: duration,
     });
     setTimeout(() => {
-      this.facemaskFilter.update({ alertActivate: false });
+      this.updateFilter({ alertActivate: false });
     }, 500);
   }
 
