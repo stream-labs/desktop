@@ -321,7 +321,13 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   updateFilter(settings: Dictionary<TObsValue>) {
-    if (this.facemaskFilter) this.facemaskFilter.update(settings);
+    if (this.facemaskFilter) {
+      try {
+        this.facemaskFilter.update(settings);
+      } catch(e) {
+        this.facemaskFilter = null;
+      }
+    }
   }
 
   getInputDevicesList() {
