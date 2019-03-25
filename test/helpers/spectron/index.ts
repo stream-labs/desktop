@@ -49,7 +49,7 @@ interface ITestRunnerOptions {
   /**
    * Enable this to show network logs if test failed
    */
-  logNetwork?: boolean;
+  networkLogging?: boolean;
 
   /**
    * Called after cache directory is created but before
@@ -63,7 +63,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
-  logNetwork: false,
+  networkLogging: false,
 };
 
 export interface ITestContext {
@@ -88,6 +88,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
+    const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
+    if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -95,7 +97,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
-        options.appArgs ? options.appArgs : '',
+        ...appArgs,
         '.',
       ],
       env: {
@@ -159,9 +161,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
-    await new Promise(resolve => {
-      rimraf(context.cacheDir, resolve);
-    });
+    // await new Promise(resolve => {
+    //   rimraf(context.cacheDir, resolve);
+    // });
   }
 
   /**
@@ -169,7 +171,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    console.log('check log file');
     if (!fs.existsSync(filePath)) return;
+    console.log('file exists');
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
       .substr(logFileLastReadingPos)
@@ -179,9 +183,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
+    console.log('check errors, tests passed', testPassed, 'logging ', options.networkLogging);
+
     if (errors.length) {
       fail(`The log-file has errors \n ${logs}`);
-    } else if (options.logNetwork && !testPassed) {
+    } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
     }
   }

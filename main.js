@@ -60,7 +60,8 @@ const releaseChannel = (() => {
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
 
-  // network logging
+  // network logging is disabled by default
+  if (!process.argv.includes('--network-logging')) return;
   app.on('ready', () => {
 
     // ignore fs requests
