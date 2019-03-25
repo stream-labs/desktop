@@ -76,12 +76,6 @@
 }
 
 .resize-line {
-  background-color: @day-border;
-}
-
-.night-theme {
-  .resize-line {
-    background-color: @night-border;
-  }
+  background-color: var(--border);
 }
 </style>
