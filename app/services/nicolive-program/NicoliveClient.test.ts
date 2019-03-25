@@ -1,6 +1,10 @@
 import * as fetchMock from 'fetch-mock';
 const { NicoliveClient } = require('./NicoliveClient');
 
+afterEach(() => {
+  fetchMock.reset();
+});
+
 test('constructor', () => {
   const client = new NicoliveClient();
   expect(client).toBeInstanceOf(NicoliveClient);
@@ -10,6 +14,8 @@ test('constructor', () => {
 const programID = 'lv1';
 const communityID = 'co1';
 
+const dummyURL = 'https://example.com';
+
 const dummyBody = {
   meta: {
     status: 200,
@@ -18,12 +24,49 @@ const dummyBody = {
   data: 'dummy body',
 };
 
+const dummyErrorBody = {
+  meta: {
+    status: 404,
+    errorCode: 'NOT_FOUND',
+  },
+};
+
+test('wrapResultはレスポンスのdataを取り出す', async () => {
+  fetchMock.get(dummyURL, dummyBody);
+  const res = await fetch(dummyURL);
+
+  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({ ok: true, value: dummyBody.data });
+  expect(fetchMock.done()).toBe(true);
+});
+
+test('wrapResultは結果が200でないときレスポンス全体を返す', async () => {
+  fetchMock.get(dummyURL, { body: dummyErrorBody, status: 404 });
+  const res = await fetch(dummyURL);
+
+  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({ ok: false, value: dummyErrorBody });
+  expect(fetchMock.done()).toBe(true);
+});
+
+test('wrapResultはbodyがJSONでなければ元のbodyを込めたオブジェクトをthrowする', async () => {
+  fetchMock.get(dummyURL, 'invalid json');
+  const res = await fetch(dummyURL);
+
+  await expect(NicoliveClient.wrapResult(res)).rejects.toMatchInlineSnapshot(`
+Object {
+  "body": "invalid json",
+  "status": 200,
+  "statusText": "OK",
+}
+`);
+  expect(fetchMock.done()).toBe(true);
+});
+
 interface Suite {
-  name: string,
-  method: string,
-  base: string,
-  path: string,
-  args?: any[],
+  name: string;
+  method: string;
+  base: string;
+  path: string;
+  args?: any[];
 }
 const suites: Suite[] = [
   {
@@ -81,46 +124,59 @@ const suites: Suite[] = [
     path: `/v1/live/statusarea/${programID}`,
     args: [programID],
   },
-  {
-    name: 'fetchCommunity',
-    method: 'get',
-    base: NicoliveClient.publicBaseURL,
-    path: `/v1/communities.json?communityIds=${communityID}`,
-    args: [communityID],
-  },
 ];
 
-describe('bodyがそのまま得られる', () => {
-  afterEach(() => {
-    fetchMock.reset();
-  })
-  suites.forEach((suite: Suite) => {
-    test(suite.name, async () => {
-      const client = new NicoliveClient();
+suites.forEach((suite: Suite) => {
+  test(`dataを取り出して返す - ${suite.name}`, async () => {
+    const client = new NicoliveClient();
 
-      fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);
-      const result = await client[suite.name](...(suite.args || []));
+    fetchMock[suite.method.toLowerCase()](suite.base + suite.path, dummyBody);
+    const result = await client[suite.name](...(suite.args || []));
 
-      expect(result).toEqual(dummyBody);
-      expect(fetchMock.done()).toBe(true);
-    });
+    expect(result).toEqual({ ok: true, value: dummyBody.data });
+    expect(fetchMock.done()).toBe(true);
   });
 });
 
-describe('JSONが壊れていたらrejectする', () => {
-  afterEach(() => {
-    fetchMock.reset();
-  })
-  suites.forEach((suite: Suite) => {
-    test(suite.name, async () => {
-      const client = new NicoliveClient();
+const dummyCommunities = {
+  meta: {
+    status: 200,
+    errorCode: 'OK',
+  },
+  data: {
+    communities: [
+      {
+        id: communityID,
+      },
+    ],
+    errors: [] as any,
+  },
+};
 
-      fetchMock[suite.method.toLowerCase()](suite.base + suite.path, 'invalid json');
-      await expect(client[suite.name](...(suite.args || []))).rejects.toThrow('invalid json response body');
+test('fetchCommunityはコミュをひとつだけ返す', async () => {
+  const client = new NicoliveClient();
 
-      expect(fetchMock.done()).toBe(true);
-    });
-  });
+  fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, dummyCommunities);
+  const result = await client.fetchCommunity(communityID);
+
+  expect(result).toEqual({ ok: true, value: dummyCommunities.data.communities[0] });
+  expect(fetchMock.done()).toBe(true);
+});
+
+test('fetchCommunityはbodyがJSONでなければbodyを込めたオブジェクトをthrowする', async () => {
+  const client = new NicoliveClient();
+
+  fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, 'invalid json');
+  const result = client.fetchCommunity(communityID);
+
+  await expect(result).rejects.toMatchInlineSnapshot(`
+Object {
+  "body": "invalid json",
+  "status": 200,
+  "statusText": "OK",
+}
+`);
+  expect(fetchMock.done()).toBe(true);
 });
 
 function setupMock() {
@@ -132,8 +188,8 @@ function setupMock() {
     webContents = {
       on: (_event: string, callback: (ev: any, url: string) => any) => {
         this.webContentsCallbacks.push(callback);
-      }
-    }
+      },
+    };
     on(event: string, callback: (evt: any) => any) {
       this.callbacks.push(callback);
     }
@@ -157,7 +213,7 @@ function setupMock() {
   }
 
   let wrapper: {
-    browserWindow: BrowserWindow
+    browserWindow: BrowserWindow;
   } = {
     browserWindow: null,
   };
@@ -166,7 +222,7 @@ function setupMock() {
       BrowserWindow,
     },
     ipcRenderer: {
-      send() {}
+      send() {},
     },
   }));
 

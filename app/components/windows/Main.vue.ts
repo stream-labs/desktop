@@ -18,6 +18,7 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import Questionaire from '../pages/Questionaire.vue';
+import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
 
 @Component({
   mixins: [windowMixin],
@@ -29,7 +30,8 @@ import Questionaire from '../pages/Questionaire.vue';
     StudioFooter,
     CustomLoader,
     PatchNotes,
-    Questionaire
+    Questionaire,
+    NicoliveArea,
   }
 })
 export default class Main extends Vue {
@@ -63,6 +65,10 @@ export default class Main extends Vue {
 
   get isOnboarding() {
     return this.navigationService.state.currentPage === 'Onboarding';
+  }
+
+  get showNicoliveArea() {
+    return this.page === 'Studio' && this.isLoggedIn;
   }
 
   /**
