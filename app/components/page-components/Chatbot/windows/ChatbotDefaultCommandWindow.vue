@@ -19,8 +19,8 @@
               <span>{{ $t('Queue Settings') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
-            <div @click="onToggleSongRequestWindowHandler" v-if="isSongRequestCommand">
-              <span>{{ $t('Song Request Preferences') }}</span>
+            <div @click="onToggleMediaRequestWindowHandler" v-if="isSongRequestCommand">
+              <span>{{ $t('Media Share Preferences') }}</span>
               <i class="fas fa-chevron-right window-toggle__icon"></i>
             </div>
             <div @click="onToggleLoyaltyPreferencesWindowHandler" v-if="isLoyaltyCommand">
@@ -60,6 +60,12 @@
             :title="$t('Response')"
             v-model="editedCommand.response"
             :metadata="metadata.response"
+          />
+           <VFormGroup
+            v-if="defaultCommandToUpdate.ticket_response"
+            :title="$t('Ticket Response')"
+            v-model="editedCommand.ticket_response"
+            :metadata="metadata.ticket_response"
           />
           <VFormGroup
             v-if="defaultCommandToUpdate.success_response"
@@ -215,7 +221,7 @@
   width: 100%;
   padding: 15px;
   height: 48px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--dropdown-border);
   cursor: pointer;
   text-align: right;
 

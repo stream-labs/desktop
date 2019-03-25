@@ -7,8 +7,7 @@ import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAli
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
-import { IListMetadata, ITextMetadata, EInputType } from 'components/shared/inputs/index';
+import { IListMetadata, EInputType } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
 
 @Component({
@@ -64,8 +63,8 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   get isSongRequestCommand() {
     return (
-      this.defaultCommandToUpdate.slugName === 'songrequest' &&
-      this.defaultCommandToUpdate.commandName === 'songrequest'
+      this.defaultCommandToUpdate.slugName === 'media-share' &&
+      this.defaultCommandToUpdate.commandName === 'request'
     );
   }
 
@@ -224,6 +223,14 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: $t('The phrase that will appear when the user requested a banned song'),
         max: 450,
         uuid: $t('Banned Response'),
+        blockReturn: true,
+      }),
+      ticket_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t('The phrase that will appear when a ticket giveaway is started.'),
+        max: 450,
+        uuid: $t('Ticket Response'),
         blockReturn: true,
       }),
       music_response: metadataHelper.text({

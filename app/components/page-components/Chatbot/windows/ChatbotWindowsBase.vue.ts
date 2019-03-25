@@ -184,19 +184,19 @@ export default class ChatbotWindowsBase extends ChatbotBase {
     }
   }
 
-  onToggleSongRequestWindowHandler() {
+  onToggleMediaRequestWindowHandler() {
     switch (this.currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotApiService.Common.openSongRequestPreferencesWindow();
+        this.chatbotApiService.Common.openMediaRequestPreferencesWindow();
         break;
-      case 'ChatbotSongRequestPreferencesWindow':
+      case 'ChatbotMediaRequestPreferencesWindow':
         const queuePreferencesCommand = this.chatbotApiService.Commands.state
-          .defaultCommandsResponse['songrequest'].songrequest;
+          .defaultCommandsResponse['media-share'].request;
 
         this.chatbotApiService.Common.openDefaultCommandWindow({
           ...queuePreferencesCommand,
-          slugName: 'songrequest',
-          commandName: 'songrequest',
+          slugName: 'media-share',
+          commandName: 'request',
         });
         break;
     }

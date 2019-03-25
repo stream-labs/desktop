@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Component, Prop } from 'vue-property-decorator';
+import { Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm.vue';

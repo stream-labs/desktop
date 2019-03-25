@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { SpinWheelService, ISpinWheelData } from 'services/widgets/settings/spin-wheel';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';

@@ -1,11 +1,5 @@
 <template>
-  <webview
-    class="chat"
-    id="chatWebview"
-    ref="chat"
-    :src="chatUrl"
-  >
-  </webview>
+  <div class="chat" ref="chat" />
 </template>
 
 <script lang="ts" src="./Chat.vue.ts"></script>
