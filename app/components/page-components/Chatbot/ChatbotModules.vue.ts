@@ -12,6 +12,7 @@ import { IChatbotModule } from 'services/chatbot';
 })
 export default class ChatbotModules extends ChatbotBase {
   mounted() {
+    this.chatbotApiService.Commands.fetchDefaultCommands();
     this.chatbotApiService.Alerts.fetchChatAlerts();
     this.chatbotApiService.MediaRequest.fetchSongRequest();
     this.chatbotApiService.Heist.fetchHeistPreferences();
