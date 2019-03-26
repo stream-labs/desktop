@@ -11,7 +11,6 @@ import { ISceneItem } from './scene-item';
  */
 @Singleton()
 export class ScenesService {
-
   @Fallback()
   @Inject()
   private scenesService: InternalScenesService;
