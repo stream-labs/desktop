@@ -1,7 +1,7 @@
-import { ServiceHelper } from '../../../stateful-service';
-import { SceneItemFolder as InternalSceneItemFolder } from '../../../scenes';
-import { Fallback, InjectFromExternalApi } from '../../external-api';
-import { SourcesService } from '../sources/sources';
+import { ServiceHelper } from 'services/stateful-service';
+import { SceneItemFolder as InternalSceneItemFolder } from 'services/scenes';
+import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
+import { SourcesService } from 'services/api/external-api/sources/sources';
 import { SceneItem } from './scene-item';
 import { ISceneNode, SceneNode } from './scene-node';
 

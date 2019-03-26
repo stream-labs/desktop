@@ -1,9 +1,7 @@
-import { Prop, Watch, Component } from 'vue-property-decorator';
-import Vue from 'vue';
+import { Prop } from 'vue-property-decorator';
 import { ErrorField } from 'vee-validate';
 import { EInputType, IInputMetadata } from './index';
 import { BaseInput } from './BaseInput';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 /**
  * Base class for input-component layouts

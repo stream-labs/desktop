@@ -28,11 +28,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     leftDock: false,
     hideViewerCount: false,
     livedockCollapsed: true,
-    previewWidth: 300,
     livedockSize: 0,
     bottomdockSize: 240,
     performanceMode: false,
-    previewEnabled: true,
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
@@ -42,6 +40,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     experimental: {
       // put experimental features here
     },
+    resizingInProgress: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -49,7 +48,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   init() {
     super.init();
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-    this.setSettings({ previewEnabled: true }); // preview is always enabled on app start
+
+    // Make sure we somehow didn't persist this as true
+    this.setSettings({ resizingInProgress: false });
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -69,10 +70,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get nightMode() {
     return this.state.nightMode;
-  }
-
-  get previewEnabled(): boolean {
-    return !this.state.performanceMode && this.state.previewEnabled;
   }
 
   setNightMode(val: boolean) {

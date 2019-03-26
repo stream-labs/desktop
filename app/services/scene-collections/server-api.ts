@@ -3,7 +3,6 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
-import Util from 'services/utils';
 
 export interface IServerSceneCollection {
   id?: number;

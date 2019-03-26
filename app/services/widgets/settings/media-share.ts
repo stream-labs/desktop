@@ -1,7 +1,5 @@
 import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
-import { clone } from 'lodash';
-import { $t } from 'services/i18n';
 import { InheritMutations } from '../../stateful-service';
 
 export interface IMediaShareSettings extends IWidgetSettings {

@@ -9,7 +9,6 @@ import { CustomizationService } from 'services/customization';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
-import { Debounce } from 'lodash-decorators';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 
 Vue.use(VTooltip);
@@ -56,19 +55,11 @@ export default class Live extends Vue {
     this.userService.popoutRecentEvents();
   }
 
-  get previewWidth() {
-    return this.customizationService.state.previewWidth;
-  }
-
-  set previewWidth(previewWidth: number) {
-    this.customizationService.setSettings({ previewWidth });
-  }
-
   get previewEnabled() {
     return (
       this.customizationService.state.livePreviewEnabled &&
       !this.performanceModeEnabled &&
-      this.customizationService.state.previewEnabled
+      !this.customizationService.state.resizingInProgress
     );
   }
 
@@ -92,8 +83,15 @@ export default class Live extends Vue {
     this.customizationService.setSettings({ bottomdockSize: value });
   }
 
+  get displayWidth() {
+    // 29 pixels is roughly the size of the title control label
+    return (16 / 9) * (this.height - 29);
+  }
+
   get maxHeight() {
-    return this.$root.$el.getBoundingClientRect().height;
+    // Roughly 400 pixels below the top is a good top limit for
+    // resizing. It allows plenty of room for the title bar and header.
+    return this.$root.$el.getBoundingClientRect().height - 400;
   }
 
   get minHeight() {
@@ -101,11 +99,10 @@ export default class Live extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ previewEnabled: false });
+    this.customizationService.setSettings({ resizingInProgress: true });
   }
 
-  @Debounce(500) // the preview window is flickering to much without debouncing
   onResizeStopHandler() {
-    this.customizationService.setSettings({ previewEnabled: true });
+    this.customizationService.setSettings({ resizingInProgress: false });
   }
 }
