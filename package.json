@@ -10,10 +10,11 @@
     "yarn": ">= 1.5.2"
   },
   "scripts": {
-    "compile": "yarn clear && webpack-cli --progress --mode development",
-    "compile:ci": "yarn clear && webpack-cli --mode development",
-    "compile:production": "yarn clear && node --max-old-space-size=2048 node_modules/webpack-cli/bin/cli.js --progress --mode production",
-    "watch": "yarn clear && webpack-cli --watch --progress --mode development",
+    "compile": "yarn clear && yarn webpack-cli --progress --mode development",
+    "compile:ci": "yarn clear && yarn webpack-cli --mode development",
+    "compile:production": "yarn clear && yarn webpack-cli --progress --mode production",
+    "webpack-cli": "node --max-old-space-size=4096 node_modules/webpack-cli/bin/cli.js",
+    "watch": "yarn clear && yarn webpack-cli --watch --progress --mode development",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.electronDownload.mirror=https://github.com/stream-labs/electron/releases/download/  ",
