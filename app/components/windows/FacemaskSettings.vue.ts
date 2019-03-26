@@ -19,8 +19,6 @@ interface IFacemaskSelection {
   type: string;
   tier: number;
   name: string;
-  selectionCount: number;
-  selected: boolean;
 }
 
 interface IFormSettings {
@@ -59,24 +57,8 @@ export default class FacemaskSettings extends Vue {
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
   videoInputModel = this.facemasksService.state.device.value;
-
-  t2AvailableMasks = this.facemasksService.state.settings.t2masks.map(mask => {
-    return {
-      uuid: mask.uuid,
-      type: mask.type,
-      tier: mask.tier,
-      name: mask.name,
-    };
-  });
-
-  t3AvailableMasks = this.facemasksService.state.settings.t3masks.map(mask => {
-    return {
-      uuid: mask.uuid,
-      type: mask.type,
-      tier: mask.tier,
-      name: mask.name,
-    };
-  });
+  t2AvailableMasks = this.facemasksService.state.settings.t2masks as IFacemaskSelection[];
+  t3AvailableMasks = this.facemasksService.state.settings.t3masks as IFacemaskSelection[];
 
   inputDevices = this.facemasksService.getInputDevicesList().map(device => {
     return {
@@ -111,6 +93,7 @@ export default class FacemaskSettings extends Vue {
 
     if (validatedSettings.error) {
       this.onFailHandler(validatedSettings.message);
+      this.updatingInfo = false;
       return;
     }
 
@@ -141,7 +124,7 @@ export default class FacemaskSettings extends Vue {
       message = 'Error: Please select a bits price';
     }
 
-    if (!settings.device.value || !settings.device.name) {
+    if (!settings.device) {
       error = true;
       message = 'Error: Please select a video device';
     }
