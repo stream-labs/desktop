@@ -10344,10 +10344,10 @@ vue-select@^2.5.1:
   resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-2.6.0.tgz#362aed6f39bd4deefae1012f63208af77412a7d6"
   integrity sha512-Zg8nb1rWz4RCWnN9Pd+HIOG7s21u32ZGpI9bDVbLJ1JPp5H4mtOww4pesr5vMjV+rHD8cE+NDfn0zZp5loghWQ==
 
-vue-slider-component@2.8.14, vue-slider-component@^2.8.0:
-  version "2.8.14"
-  resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.8.14.tgz#0661212579b9131b3efeba155a33117c7abd857a"
-  integrity sha512-fMaDSKqf3P+51VRDenw664oGrJ9vEmvoNB1xFOF7ew3FKr2yTO6yXBnldXNOZUsBVSzWxDmErLk/OJm8OzHiMw==
+vue-slider-component@2.2.7, vue-slider-component@^2.8.0:
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.2.7.tgz#2551696ad01f3246ba48e6cdbb4b4cb70bcc52d6"
+  integrity sha1-JVFpatAfMka6SObNu0tMtwvMUtY=
 
 vue-spinner@1.0.3:
   version "1.0.3"

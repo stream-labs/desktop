@@ -208,7 +208,7 @@
     "vue-popperjs": "1.6.3",
     "vue-property-decorator": "7.3.0",
     "vue-resize": "^0.4.4",
-    "vue-slider-component": "2.8.14",
+    "vue-slider-component": "2.2.7",
     "vue-spinner": "1.0.3",
     "vue-template-compiler": "2.6.9",
     "vue-toasted": "1.1.24",
@@ -221,6 +221,7 @@
     "which": "1.3.1"
   },
   "resolutions": {
-    "uglify-es": "3.3.9"
+    "uglify-es": "3.3.9",
+    "vue-slider-component": "2.2.7"
   }
 }
