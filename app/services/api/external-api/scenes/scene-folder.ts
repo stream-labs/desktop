@@ -15,7 +15,6 @@ export interface ISceneItemFolder extends ISceneNode {
 @ServiceHelper()
 export class SceneItemFolder extends SceneNode {
   @Fallback() private sceneFolder: InternalSceneItemFolder;
-
   @InjectFromExternalApi() private sourcesService: SourcesService;
 
   constructor(public sceneId: string, public nodeId: string) {

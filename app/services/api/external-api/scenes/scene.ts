@@ -23,8 +23,7 @@ export class Scene {
   @Inject('ScenesService')
   private internalScenesService: InternalScenesService;
 
-  @Fallback()
-  private scene: InternalScene;
+  @Fallback() private scene: InternalScene;
 
   constructor(private sceneId: string) {
     this.scene = this.internalScenesService.getScene(sceneId);
