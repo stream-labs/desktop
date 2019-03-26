@@ -315,13 +315,9 @@ export class Selection implements ISceneItemActions {
  */
 @Singleton()
 export class SelectionService extends Selection {
-<<<<<<< HEAD
   @Fallback()
   @Inject('SelectionService')
   internalSelectionService: InternalSelectionService;
-=======
-  @Inject('SelectionService') internalSelectionService: InternalSelectionService;
->>>>>>> staging2
 
   get selection() {
     return this.internalSelectionService;
