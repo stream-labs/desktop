@@ -126,7 +126,7 @@ export class Scene {
   /**
    * creates sources from file system folders and files
    * source type depends on the file extension
-   */git
+   */
   addFile(path: string, folderId?: string): SceneNode {
     const newNode = this.scene.addFile(path, folderId);
     return newNode ? this.getNode(newNode.id) : null;
