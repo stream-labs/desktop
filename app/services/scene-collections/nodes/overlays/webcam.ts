@@ -90,25 +90,25 @@ export class WebcamNode extends Node<ISchema, IContext> {
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
     const input = item.getObsInput();
-    const deviceProperties = input.properties;
 
     // Select the first video device
     // TODO: Maybe do some string matching to figure out which
     // one is actually the webcam.  For most users, their webcam
     // will be the only option here.
-    const deviceProperty = deviceProperties.get('video_device_id');
+    const deviceProperty = input.properties.get('video_device_id');
 
     // Stop loading if there aren't any devices
     if ((deviceProperty as IListProperty).details.items.length === 0) return;
 
     const device = (deviceProperty as IListProperty).details.items[0]['value'];
-    const settings = { ...input.settings };
 
-    settings['video_device_id'] = device;
-    input.update(settings);
+    input.update({
+      video_device_id: device,
+      res_type: 1,
+    });
 
     // Figure out which resolutions this device can run at
-    const resolutionOptions = (deviceProperties.get(
+    const resolutionOptions = (input.properties.get(
       'resolution',
     ) as IListProperty).details.items.map(item => {
       return this.resStringToResolution(item.value as string);
@@ -158,13 +158,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
   applyResolution(sceneItem: SceneItem, resolution: string) {
     const input = sceneItem.getObsInput();
-    const settings = { ...input.settings };
-
-    // Custom resolution
-    settings['res_type'] = 1;
-    settings['resolution'] = resolution;
-
-    input.update(settings);
+    input.update({ resolution });
   }
 
   applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {

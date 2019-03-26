@@ -171,7 +171,7 @@
     flex-direction: row;
     align-items: center;
     height: 30px;
-    border-bottom: 1px solid @day-border;
+    border-bottom: 1px solid var(--border);
 
     .new-alert-modal__header__icon {
       padding-left: 10px;
@@ -190,7 +190,7 @@
   }
 
   .new-alert-modal__controls {
-    background-color: @day-section;
+    background-color: var(--section);
     padding: 10px 20px;
     text-align: right;
     flex-shrink: 0;
@@ -198,18 +198,6 @@
 
     .button {
       margin-left: 8px;
-    }
-  }
-}
-
-.night-theme {
-  .new-alert-modal {
-    .new-alert-modal__header {
-      border-bottom: 1px solid @night-border;
-    }
-
-    .new-alert-modal__controls {
-      background-color: @night-section;
     }
   }
 }

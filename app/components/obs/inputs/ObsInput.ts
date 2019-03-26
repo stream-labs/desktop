@@ -448,8 +448,7 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
 }
 
 export abstract class ObsInput<TValueType> extends Vue {
-  @Prop()
-  value: TValueType;
+  abstract value: TValueType;
 
   emitInput(eventData: TValueType) {
     this.$emit('input', eventData);

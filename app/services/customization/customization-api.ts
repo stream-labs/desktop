@@ -9,17 +9,22 @@ export interface ICustomizationServiceState {
   hideViewerCount: boolean;
   folderSelection: boolean;
   livedockCollapsed: boolean;
-  previewWidth: number;
   livedockSize: number;
   bottomdockSize: number;
   performanceMode: boolean;
-  previewEnabled: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental: any;
+
+  /**
+   * Will be true when a UI resizing operation is in
+   * progress. All displays and BrowserViews will be
+   * hidden during this operation.
+   */
+  resizingInProgress: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

@@ -1,10 +1,5 @@
 import uuid from 'uuid/v4';
-import {
-  IAlertBoxSettings,
-  IAlertBoxApiSettings,
-  IAlertBoxSetting,
-  IAlertBoxVariation,
-} from './alert-box-api';
+import { IAlertBoxVariation } from './alert-box-api';
 import { $t } from 'services/i18n';
 
 export const API_NAME_MAP = {

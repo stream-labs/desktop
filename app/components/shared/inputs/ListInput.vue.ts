@@ -20,10 +20,9 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
   readonly placeholder: string;
 
   onInputHandler(option: IListOption<string>) {
-    if (option) {
-      this.emitInput(option.value);
-      this.$nextTick();
-    }
+    // Fixes a render issue when reselecting the same option as currently selected
+    const val = option ? option.value : this.value;
+    this.emitInput(val);
   }
 
   getOptions(): IListMetadata<string> {

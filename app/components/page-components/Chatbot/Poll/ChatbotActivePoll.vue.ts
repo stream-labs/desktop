@@ -1,6 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { throttle } from 'lodash-decorators';
 import sumBy from 'lodash/sumBy';
+import throttle from 'lodash/throttle';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotVoteTracker from './ChatbotVoteTracker.vue';
 import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue';
@@ -12,6 +12,13 @@ import { ChatbotSettingSlug } from 'services/chatbot';
 export default class ChatbotActivePoll extends ChatbotBase {
   @Prop({ default: 'poll' })
   type: ChatbotSettingSlug;
+
+  constructor() {
+    super();
+    this.onToggleStateHandler = throttle(this.onToggleStateHandler, 1000);
+    this.onCancelHandler = throttle(this.onCancelHandler, 1000);
+    this.onCompleteHandler = throttle(this.onCompleteHandler, 1000);
+  }
 
   get isOpen() {
     if (this.type === 'poll') {
@@ -65,7 +72,6 @@ export default class ChatbotActivePoll extends ChatbotBase {
     return this.chatbotApiService.Betting.state.timeRemaining;
   }
 
-  @throttle(1000)
   onToggleStateHandler() {
     if (this.type === 'poll') {
       this.togglePoll();
@@ -90,13 +96,11 @@ export default class ChatbotActivePoll extends ChatbotBase {
     }
   }
 
-  @throttle(1000)
   onCancelHandler() {
     this.$modal.show(this.CANCEL_MODAL);
     this.chatbotApiService.Common.closeChatbotChildWindow();
   }
 
-  @throttle(1000)
   onCompleteHandler() {
     if (this.type === 'poll') {
       this.chatbotApiService.Poll.completePoll();

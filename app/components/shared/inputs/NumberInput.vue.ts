@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { INumberMetadata } from './index';
 

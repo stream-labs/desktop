@@ -1,6 +1,5 @@
 import { Node } from '../node';
 import { SceneItem } from '../../../scenes';
-import { uniqueId } from 'lodash';
 import { WidgetType } from 'services/widgets';
 
 interface ISchema {

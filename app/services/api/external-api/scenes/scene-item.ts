@@ -1,9 +1,8 @@
 import { ServiceHelper } from 'services/stateful-service';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
-import { Fallback, InjectFromExternalApi } from '../../external-api';
-import { ISourceModel, Source, SourcesService } from '../sources/sources';
+import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
+import { ISourceModel, Source, SourcesService } from 'services/api/external-api/sources/sources';
 import { ISceneNode, SceneNode } from './scene-node';
-import { AnchorPoint, AnchorPositions } from '../../../../util/ScalableRectangle';
 
 export interface ISceneItem extends ISceneItemSettings, ISceneNode {
   sceneItemId: string;

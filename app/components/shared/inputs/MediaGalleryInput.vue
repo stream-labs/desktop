@@ -30,7 +30,7 @@
   position: relative;
   width: 100%;
   height: 120px;
-  background-color: @day-section;
+  background-color: var(--section);
 
   img {
     max-height: 110px;
@@ -44,7 +44,7 @@
 
 .change-media {
   text-transform: uppercase;
-  color: @night-paragraph;
+  color: var(--paragraph);
   font-size: 11px;
 }
 
@@ -92,7 +92,7 @@ i {
 
 .url-uploader {
   .radius();
-  background-color: @day-primary;
+  background-color: var(--background);
   padding: 12px;
   position: absolute;
   top: 1px;
@@ -104,17 +104,6 @@ i {
     position: absolute;
     bottom: 25px;
     right: 12px;
-  }
-}
-
-.night-theme {
-  .media-box {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
-
-  .url-uploader {
-    background-color: @night-primary;
   }
 }
 </style>

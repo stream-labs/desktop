@@ -1,5 +1,3 @@
-import { IMediaGalleryFile } from './media-gallery';
-
 export const stockSounds = [
   {
     href: 'http://uploads.twitchalerts.com/sound-defaults/bonus-2.ogg',

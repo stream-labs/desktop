@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IListMetadata, IListOption } from '../../shared/inputs';
+import { IListMetadata } from '../../shared/inputs';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { Multiselect } from 'vue-multiselect';
 

@@ -3,34 +3,34 @@
  */
 
 // OFFLINE SERVICES
-export { AppService } from './services/app';
-export { InternalApiService } from './services/api/internal-api';
-export { ExternalApiService } from './services/api/external-api';
-export { SourcesService, Source } from './services/sources';
-export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from './services/scenes';
+export { AppService } from 'services/app';
+export { InternalApiService } from 'services/api/internal-api';
+export { ExternalApiService } from 'services/api/external-api';
+export { SourcesService, Source } from 'services/sources';
+export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from 'services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
-export { ClipboardService } from './services/clipboard';
-export { AudioService, AudioSource } from './services/audio';
-export { HostsService, UrlService } from './services/hosts';
-export { Hotkey, HotkeysService } from './services/hotkeys';
-export { KeyListenerService } from './services/key-listener';
-export { ShortcutsService } from './services/shortcuts';
-export { CustomizationService } from './services/customization';
-export { NotificationsService } from './services/notifications';
-export { OnboardingService } from './services/onboarding';
-export { NavigationService } from './services/navigation';
-export { PerformanceService } from './services/performance';
-export { PerformanceMonitorService } from './services/performance-monitor';
-export { SettingsService, StreamEncoderSettingsService } from './services/settings';
-export { VideoService } from './services/video';
-export { WindowsService } from './services/windows';
+export { ClipboardService } from 'services/clipboard';
+export { AudioService, AudioSource } from 'services/audio';
+export { HostsService, UrlService } from 'services/hosts';
+export { Hotkey, HotkeysService } from 'services/hotkeys';
+export { KeyListenerService } from 'services/key-listener';
+export { ShortcutsService } from 'services/shortcuts';
+export { CustomizationService } from 'services/customization';
+export { NotificationsService } from 'services/notifications';
+export { OnboardingService } from 'services/onboarding';
+export { NavigationService } from 'services/navigation';
+export { PerformanceService } from 'services/performance';
+export { PerformanceMonitorService } from 'services/performance-monitor';
+export { SettingsService, StreamEncoderSettingsService } from 'services/settings';
+export { VideoService } from 'services/video';
+export { WindowsService } from 'services/windows';
 export { TransitionsService } from 'services/transitions';
-export { FontLibraryService } from './services/font-library';
-export { SourceFiltersService } from './services/source-filters';
-export { CacheUploaderService } from './services/cache-uploader';
-export { TcpServerService } from './services/api/tcp-server';
-export { IpcServerService } from './services/api/ipc-server';
-export { JsonrpcService } from './services/api/jsonrpc';
+export { FontLibraryService } from 'services/font-library';
+export { SourceFiltersService } from 'services/source-filters';
+export { CacheUploaderService } from 'services/cache-uploader';
+export { TcpServerService } from 'services/api/tcp-server';
+export { IpcServerService } from 'services/api/ipc-server';
+export { JsonrpcService } from 'services/api/jsonrpc';
 export { DismissablesService } from 'services/dismissables';
 export { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 export { SceneCollectionsService } from 'services/scene-collections';
@@ -58,7 +58,7 @@ export {
   ChatbotBaseApiService,
   ChatbotAlertsApiService,
   ChatbotCommonService,
-  ChatbotSongRequestApiService,
+  ChatbotMediaRequestApiService,
   ChatbotGambleApiService,
   ChatbotCommandsApiService,
   ChatbotTimerApiService,
@@ -83,16 +83,17 @@ export { CrashReporterService } from 'services/crash-reporter';
 export { PatchNotesService } from 'services/patch-notes';
 export { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 export { StreamInfoService } from './services/stream-info';
-export { StreamingService } from './services/streaming';
-export { StreamlabelsService } from './services/streamlabels';
+export { StreamingService } from 'services/streaming';
+export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
 export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
+export { ChatService } from 'services/chat';
 
 // WIDGETS
-export { WidgetSource, WidgetsService, WidgetTester } from './services/widgets';
+export { WidgetSource, WidgetsService } from './services/widgets';
 export { BitGoalService } from 'services/widgets/settings/bit-goal';
 export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';

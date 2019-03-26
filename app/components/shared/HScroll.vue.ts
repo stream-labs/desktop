@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { isEqual } from 'lodash';
 

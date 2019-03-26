@@ -3,7 +3,6 @@ import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject } from '../util/injector';
 import { authorizedHeaders } from '../util/requests';
-import { TAppPage } from './navigation';
 
 interface IAnnouncementsInfo {
   id: number;

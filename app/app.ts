@@ -10,7 +10,6 @@ import Vue from 'vue';
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
-import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
@@ -28,15 +27,17 @@ const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 const isPreview = !!remote.process.env.SLOBS_PREVIEW;
 
-window['obs'] = window['require']('obs-studio-node');
+if (Utils.isMainWindow()) {
+  window['obs'] = window['require']('obs-studio-node');
 
-{
-  // Set up things for IPC
-  // Connect to the IPC Server
-  window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
-  document.addEventListener('close', e => {
-    window['obs'].IPC.disconnect();
-  });
+  {
+    // Set up things for IPC
+    // Connect to the IPC Server
+    window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
+    document.addEventListener('close', e => {
+      window['obs'].IPC.disconnect();
+    });
+  }
 }
 
 // This is the development DSN
@@ -116,6 +117,7 @@ Vue.use(VModal);
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
+document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {

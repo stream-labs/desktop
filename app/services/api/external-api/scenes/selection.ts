@@ -1,4 +1,4 @@
-import { Fallback, InjectFromExternalApi, Singleton } from '../../external-api';
+import { InjectFromExternalApi, Singleton, Fallback } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
@@ -6,8 +6,8 @@ import {
   SelectionService as InternalSelectionService,
 } from 'services/selection';
 import { ScenesService } from './scenes';
-import { Source, SourcesService } from '../sources/sources';
-import { Inject } from '../../../../util/injector';
+import { Source, SourcesService } from 'services/api/external-api/sources/sources';
+import { Inject } from 'util/injector';
 import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-folder';
@@ -315,9 +315,13 @@ export class Selection implements ISceneItemActions {
  */
 @Singleton()
 export class SelectionService extends Selection {
+<<<<<<< HEAD
   @Fallback()
   @Inject('SelectionService')
   internalSelectionService: InternalSelectionService;
+=======
+  @Inject('SelectionService') internalSelectionService: InternalSelectionService;
+>>>>>>> staging2
 
   get selection() {
     return this.internalSelectionService;

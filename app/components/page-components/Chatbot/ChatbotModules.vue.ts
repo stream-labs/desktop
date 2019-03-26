@@ -13,7 +13,7 @@ import { IChatbotModule } from 'services/chatbot';
 export default class ChatbotModules extends ChatbotBase {
   mounted() {
     this.chatbotApiService.Alerts.fetchChatAlerts();
-    this.chatbotApiService.SongRequest.fetchSongRequest();
+    this.chatbotApiService.MediaRequest.fetchSongRequest();
     this.chatbotApiService.Heist.fetchHeistPreferences();
     this.chatbotApiService.Gamble.fetchGamblePreferences();
   }
@@ -42,28 +42,23 @@ export default class ChatbotModules extends ChatbotBase {
         },
       },
       //  TODO: Commented for the time being seeing as it's not ready
-      /*{
-        title: $t('Song Request'),
+      {
+        title: $t('Media Share'),
         description: $t(
-          'Allow your viewers to to request songs from Youtube and play the songs on stream.',
+          'Allow your viewers to interact with your Media Share widget via Cloud Chatbot.',
         ),
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
-        enabled: this.songRequestCurrentlyEnabled,
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-mediashare--${backgroundUrlSuffix}.png`),
+        enabled: this.mediaRequestCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotApiService.Common.openSongRequestPreferencesWindow();
+          this.chatbotApiService.Common.openMediaRequestPreferencesWindow();
         },
         onToggleEnabled: () => {
-          if (!this.songRequestCurrentlyEnabled) {
-            // enabling, show onboarding
-            this.chatbotApiService.Common.openSongRequestOnboardingWindow();
-          }
-
-          this.chatbotApiService.SongRequest.updateSongRequest({
+          this.chatbotApiService.MediaRequest.updateSongRequest({
             ...this.songRequest,
-            enabled: !this.songRequestCurrentlyEnabled,
+            enabled: !this.mediaRequestCurrentlyEnabled,
           });
         },
-      },*/
+      },
       {
         title: $t('Heist'),
         description: $t(
@@ -110,11 +105,11 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get songRequest() {
-    return this.chatbotApiService.SongRequest.state.songRequestResponse;
+    return this.chatbotApiService.MediaRequest.state.mediaRequestResponse;
   }
 
-  get songRequestCurrentlyEnabled() {
-    return this.chatbotApiService.SongRequest.state.songRequestResponse.enabled;
+  get mediaRequestCurrentlyEnabled() {
+    return this.chatbotApiService.MediaRequest.state.mediaRequestResponse.enabled;
   }
 
   get heist() {

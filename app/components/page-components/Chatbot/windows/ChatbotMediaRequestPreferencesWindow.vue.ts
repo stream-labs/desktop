@@ -9,7 +9,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { ISongRequestData } from 'services/chatbot';
 import { debounce } from 'lodash-decorators';
-
+import os from 'os';
 // general tab is all from chatbot api directly
 // banned item is from media share api sl.com
 @Component({
@@ -17,70 +17,63 @@ import { debounce } from 'lodash-decorators';
     ValidatedForm,
   },
 })
-export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
+export default class ChatbotMediaRequestPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
     form: ValidatedForm;
   };
 
-  tabs: ITab[] = [
-    {
-      name: $t('General'),
-      value: 'general',
-    },
-    {
-      name: $t('Blacklist'),
-      value: 'blacklist',
-    },
-  ];
-
   securityDescription = $t(
-    `This slider helps you filter shared media before it can be submitted.\n' +
-      '1: No security\n
-      '2: 65%+ rating, 5k+ views\n
-      '3: 75%+ rating, 40k+ views\n
-      '4: 80%+ rating, 300k+ views\n
-      '5: 85%+ rating, 900k+ views`,
+    `This slider helps you filter shared media before it can be submitted.${os.EOL}
+    1: No security${os.EOL}
+    2: 65%+ rating, 5k+ views${os.EOL}
+    3: 75%+ rating, 40k+ views${os.EOL}
+    4: 80%+ rating, 300k+ views${os.EOL}
+    5: 85%+ rating, 900k+ views`,
   );
-
   selectedTab: string = 'general';
 
-  songRequestData: ISongRequestData = null;
-  songRequestBannedMedia: IMediaShareBan[] = [];
+  mediaRequestData: ISongRequestData = null;
 
   mounted() {
     this.fetchSongRequest();
   }
 
   async fetchSongRequest() {
-    await this.chatbotApiService.SongRequest.fetchSongRequestPreferencesData();
-    await this.chatbotApiService.SongRequest.fetchSongRequest();
-    this.songRequestBannedMedia = cloneDeep(
-      this.chatbotApiService.SongRequest.state.songRequestPreferencesResponse.banned_media,
-    );
-    this.songRequestData = cloneDeep(this.songRequestResponse.settings);
+    await this.chatbotApiService.MediaRequest.fetchSongRequest();
+    this.mediaRequestData = cloneDeep(this.mediaRequestResponse.settings);
   }
 
-  get songRequestResponse() {
-    return this.chatbotApiService.SongRequest.state.songRequestResponse;
+  get mediaRequestResponse() {
+    return this.chatbotApiService.MediaRequest.state.mediaRequestResponse;
   }
 
   get metadata() {
     return {
       general: {
+        limit: metadataHelper.number({
+          required: true,
+          min: 1,
+          max: 1000,
+          placeholder: $t('Queue Limit'),
+          isInteger: true,
+        }),
         max_duration: metadataHelper.number({
           required: true,
           min: 0,
           placeholder: $t('Max Duration'),
+          isInteger: true,
         }),
         max_requests_per_user: metadataHelper.number({
           required: true,
           min: 0,
           placeholder: $t('Max Requests per user'),
+          isInteger: true,
         }),
         skip_votes: metadataHelper.number({
           required: true,
           min: 0,
           placeholder: $t('Number of votes to skip song'),
+          isInteger: true,
         }),
         filter_level: metadataHelper.slider({
           min: 0,
@@ -109,15 +102,15 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    await this.chatbotApiService.SongRequest.updateSongRequest({
-      ...this.songRequestResponse,
-      settings: this.songRequestData,
+    await this.chatbotApiService.MediaRequest.updateSongRequest({
+      ...this.mediaRequestResponse,
+      settings: this.mediaRequestData,
     });
     this.chatbotApiService.Common.closeChildWindow();
   }
 
   async onUnbanMediaHandler(media: IMediaShareBan) {
-    await this.chatbotApiService.SongRequest.unbanMedia(media);
+    await this.chatbotApiService.MediaRequest.unbanMedia(media);
     this.fetchSongRequest();
   }
 }

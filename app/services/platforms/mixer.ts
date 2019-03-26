@@ -1,4 +1,3 @@
-import { Service } from '../service';
 import { StatefulService, mutation } from '../stateful-service';
 import {
   IPlatformService,
