@@ -1,10 +1,10 @@
-import { Inject } from '../../../../util/injector';
+import { Inject } from 'util/injector';
 import {
   Scene as InternalScene,
   SceneItemNode as InternalSceneNode,
   ScenesService as InternalScenesService,
 } from 'services/scenes';
-import { InjectFromExternalApi } from '../../external-api';
+import { InjectFromExternalApi } from 'services/api/external-api';
 import { ScenesService } from './scenes';
 import { Scene } from './scene';
 import { SceneItemFolder } from './scene-folder';

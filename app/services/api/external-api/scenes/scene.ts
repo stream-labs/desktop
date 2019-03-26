@@ -1,9 +1,9 @@
 import { ServiceHelper } from 'services/stateful-service';
-import { InjectFromExternalApi } from '../../external-api';
-import { Source, SourcesService } from '../sources/sources';
-import { Inject } from '../../../../util/injector';
+import { InjectFromExternalApi } from 'services/api/external-api';
+import { Source, SourcesService } from 'services/api/external-api/sources/sources';
+import { Inject } from 'util/injector';
 import { Scene as InternalScene, ScenesService as InternalScenesService } from 'services/scenes';
-import { TSourceType } from '../../../sources';
+import { TSourceType } from 'services/sources';
 import { Selection } from './selection';
 import { ISceneNodeAddOptions, ScenesService } from './scenes';
 import { ISceneNode, SceneNode } from './scene-node';
