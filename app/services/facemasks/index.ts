@@ -262,7 +262,11 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       });
     }
 
-    if (event.type === 'subscription' && this.shouldQueueSubscriptionEvents && event.message[0].subscriber_twitch_id) {
+    if (
+      event.type === 'subscription' &&
+      this.shouldQueueSubscriptionEvents &&
+      event.message[0].subscriber_twitch_id
+    ) {
       this.registerSubscriptionEvent({
         subscriberId: event.message[0].subscriber_twitch_id,
         subPlan: event.message[0].sub_plan,
@@ -324,7 +328,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     if (this.facemaskFilter) {
       try {
         this.facemaskFilter.update(settings);
-      } catch(e) {
+      } catch (e) {
         this.facemaskFilter = null;
       }
     }
