@@ -70,6 +70,7 @@ declare module 'vue-resize';
 declare module 'serve-handler';
 declare module 'v-selectpage';
 declare module '*.m.less';
+declare module 'streamlabs-beaker';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence
