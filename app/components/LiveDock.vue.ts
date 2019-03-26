@@ -188,11 +188,8 @@ export default class LiveDock extends Vue {
     this.chatService.refreshChat();
   }
 
-  get hideChat() {
-    // previewEnabled is poorly named.  It really just means stuff
-    // we disable while resizing.  It should not be in the customization
-    // service.  This is lazy.
-    return !this.customizationService.previewEnabled;
+  get resizingInProgress() {
+    return this.customizationService.state.resizingInProgress;
   }
 
   get hasChatApps() {

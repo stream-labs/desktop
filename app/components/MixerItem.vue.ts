@@ -15,8 +15,8 @@ export default class MixerItem extends Vue {
 
   @Inject() private customizationService: CustomizationService;
 
-  get previewEnabled() {
-    return !this.customizationService.state.performanceMode;
+  get performanceMode() {
+    return this.customizationService.state.performanceMode;
   }
 
   get sliderMetadata() {

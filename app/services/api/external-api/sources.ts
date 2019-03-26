@@ -1,6 +1,8 @@
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
+  ISource as IInternalSourceModel,
   Source as InternalSource,
   SourcesService as InternalSourcesService,
   TSourceType,
@@ -9,10 +11,19 @@ import { Inject } from 'util/injector';
 import { Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISerializable } from '../rpc-api';
+import Utils from '../../utils';
 
 export interface ISourceAddOptions {
   channel?: number;
   isTemporary?: boolean;
+}
+
+/**
+ * converts an InternalApi event to ExternalApi event
+ */
+function exposeSourceEvent(observable: Observable<IInternalSourceModel>): Observable<ISourceModel> {
+  // add `id` field to each sourceModel
+  return observable.pipe(map(source => ({ ...source, id: source.sourceId })));
 }
 
 @Singleton()
@@ -73,20 +84,21 @@ export class SourcesService {
   }
 
   get sourceAdded(): Observable<ISourceModel> {
-    return this.sourcesService.sourceAdded;
+    return exposeSourceEvent(this.sourcesService.sourceAdded);
   }
 
   get sourceUpdated(): Observable<ISourceModel> {
-    return this.sourcesService.sourceUpdated;
+    return exposeSourceEvent(this.sourcesService.sourceUpdated);
   }
 
   get sourceRemoved(): Observable<ISourceModel> {
-    return this.sourcesService.sourceRemoved;
+    return exposeSourceEvent(this.sourcesService.sourceRemoved);
   }
 }
 
 interface ISourceModel {
   sourceId: string;
+  id: string; // Streamdeck uses id field
   name: string;
   type: TSourceType;
   audio: boolean;
@@ -102,11 +114,24 @@ interface ISourceModel {
 // We need ServiceHelper to mark this class as serializable
 // TODO: refactor ServiceHelper, it has too much logic under the hood
 @ServiceHelper()
-export class Source implements ISerializable {
+export class Source implements ISourceModel, ISerializable {
   @Inject() private sourcesService: InternalSourcesService;
+  readonly id: string;
+  readonly name: string;
+  readonly type: TSourceType;
+  readonly audio: boolean;
+  readonly video: boolean;
+  readonly async: boolean;
+  readonly muted: boolean;
+  readonly width: number;
+  readonly height: number;
+  readonly doNotDuplicate: boolean;
+  readonly channel?: number;
+  readonly resourceId: string;
+
   private source: InternalSource;
 
-  constructor(private sourceId: string) {
+  constructor(public readonly sourceId: string) {
     this.source = this.sourcesService.getSource(sourceId);
   }
 
@@ -116,6 +141,7 @@ export class Source implements ISerializable {
   getModel(): ISourceModel {
     return {
       sourceId: this.sourceId,
+      id: this.sourceId,
       name: this.source.name,
       type: this.source.type,
       audio: this.source.audio,

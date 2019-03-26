@@ -56,6 +56,7 @@
     .radius();
     .weight(@medium);
     background-color: @yellow-med-opac;
+    color: @white;
     user-select: all;
   }
 

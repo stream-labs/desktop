@@ -68,7 +68,7 @@ interface IBitsSocketEvent {
     data: {
       facemask?: string;
       fm_id?: string;
-    }
+    };
   }[];
 }
 
