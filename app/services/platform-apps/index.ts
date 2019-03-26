@@ -65,8 +65,10 @@ interface IAppPage {
   allowPopout?: boolean; // Default true
   file: string; // Relative path to HTML file
   popOutSize?: {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
+    minWidth?: number;
+    minHeight?: number;
   };
 }
 
@@ -558,15 +560,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   getPagePopOutSize(appId: string, slot: EAppPageSlot) {
     const app = this.getApp(appId);
     const page = app.manifest.pages.find(page => page.slot === slot);
-    if (page.popOutSize) {
-      return {
-        width: page.popOutSize.width,
-        height: page.popOutSize.height,
-      };
-    }
-
-    // Default to 600x500
-    return { width: 600, height: 500 };
+    const popOutSize = page.popOutSize || {};
+    return {
+      width: popOutSize.width || 600,
+      height: popOutSize.height || 500,
+      minWidth: popOutSize.minWidth || 600,
+      minHeight: popOutSize.minHeight || 500,
+    };
   }
 
   getProductionApps() {

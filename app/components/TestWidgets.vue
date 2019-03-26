@@ -13,7 +13,7 @@
           class="button button--trans"
           v-for="tester in widgetTesters"
           :key="tester.name"
-          @click="tester.test()">
+          @click="test(tester.name)">
           {{ $t(tester.name) }}
         </button>
       </div>

@@ -154,10 +154,9 @@ export class Scene implements ISceneApi {
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
 
-    sceneItem.loadAttributes();
-
-    // Newly added sources are immediately active
-    this.selectionService.select(sceneItemId);
+    // Default is to select
+    if (options.select == null) options.select = true;
+    if (options.select) this.selectionService.select(sceneItemId);
 
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;

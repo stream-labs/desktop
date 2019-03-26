@@ -147,12 +147,6 @@
   height: 13px;
   line-height: 13px;
   font-size: 11px;
-  color: @grey;
-}
-
-.night-theme {
-  .edit-stream-info-option-longdes {
-    color: @night-paragraph;
-  }
+  color: var(--paragraph);
 }
 </style>

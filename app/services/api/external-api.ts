@@ -18,6 +18,7 @@ export function Singleton(): ClassDecorator {
  * Dependency-Injector for external-API modules
  * @see Inject
  */
+
 export function InjectFromExternalApi(serviceName?: string): PropertyDecorator {
   return function(target: Object, key: string) {
     Object.defineProperty(target, key, {
@@ -65,7 +66,7 @@ export class ExternalApiService extends RpcApi {
   /**
    * Instances of singleton resources
    */
-  private instances: Dictionary<Service> = {};
+  instances: Dictionary<Service> = {};
 
   init() {
     // initialize all singletons

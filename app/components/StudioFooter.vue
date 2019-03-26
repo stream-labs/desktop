@@ -59,7 +59,7 @@
   position: relative;
   .padding-h-sides(2);
   .padding-v-sides();
-  background-color: @day-section;
+  background-color: var(--section);
   max-width: none;
   flex: 0 0 auto;
 }
@@ -74,7 +74,7 @@
 }
 
 .error-wrapper {
-  background-color: @day-secondary;
+  background-color: var(--section);
   position: absolute;
   z-index: 2;
 }
@@ -109,7 +109,7 @@
   position: relative;
   width: 30px;
   height: 30px;
-  background-color: @day-button;
+  background-color: var(--button);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,7 +125,7 @@
   }
 
   &:hover {
-    background-color: darken(@day-button, 8%);
+    background-color: var(--button-hover);
   }
 
   &.active {
@@ -174,33 +174,6 @@
   >button:nth-child(2) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-  }
-}
-
-.night-theme {
-  .footer {
-    background-color: @night-section;
-  }
-
-  .error-wrapper {
-    background-color: @night-primary;
-  }
-
-  .record-button {
-    background-color: @night-button;
-    border-color: @night-border;
-
-    &:hover {
-      background-color: lighten(@night-button, 8%);
-    }
-
-    &.active {
-      background-color: @red;
-    }
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 </style>

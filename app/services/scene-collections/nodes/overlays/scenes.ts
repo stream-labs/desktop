@@ -33,30 +33,27 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
     };
   }
 
-  async loadItem(obj: ISchema, context: IContext): Promise<void> {
-    // scene can be already created if it is a scene-source of previous loaded scene
-    let scene = this.scenesService.getScene(obj.sceneId);
-
-    // if it's not created than create it now
-    if (!scene) {
-      scene = this.scenesService.createScene(obj.name, {
-        makeActive: true,
-        sceneId: obj.sceneId,
-      });
-    }
-
-    await obj.slots.load({ scene, assetsPath: context.assetsPath });
-
-    // append children to folders
-    const foldersSchemas = (obj.slots.data.items as TSlotSchema[])
-      .filter(item => item.sceneNodeType === 'folder')
-      .reverse();
-
-    const folders = scene.getFolders();
-    folders.forEach((folder, ind) => {
-      const childrenIds = (foldersSchemas[ind] as IFolderSchema).childrenIds;
-      scene.getSelection(childrenIds).moveTo(scene.id, folder.id);
+  async loadItem(obj: ISchema, context: IContext): Promise<() => Promise<void>> {
+    const scene = this.scenesService.createScene(obj.name, {
+      sceneId: obj.sceneId,
     });
+
+    // Load items into the scene after all scenes have been created
+    // to handle scene-in-scene situations
+    return async () => {
+      await obj.slots.load({ scene, assetsPath: context.assetsPath });
+
+      // append children to folders
+      const foldersSchemas = (obj.slots.data.items as TSlotSchema[])
+        .filter(item => item.sceneNodeType === 'folder')
+        .reverse();
+
+      const folders = scene.getFolders();
+      folders.forEach((folder, ind) => {
+        const childrenIds = (foldersSchemas[ind] as IFolderSchema).childrenIds;
+        scene.getSelection(childrenIds).moveTo(scene.id, folder.id);
+      });
+    };
   }
 
   migrate(version: number) {

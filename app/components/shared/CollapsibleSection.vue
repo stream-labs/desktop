@@ -22,7 +22,7 @@
 }
 
 .collapsible-section__title {
-  background-color: @light-1;
+  background-color: var(--background);
   .margin-bottom(2);
   .radius(1);
   .padding(2);
@@ -38,7 +38,7 @@
   }
 
   h2 {
-    color: @day-title;
+    color: var(--title);
     .margin--none;
     text-transform: capitalize;
   }
@@ -47,15 +47,6 @@
     .transition();
     .margin-right(1);
     font-size: 5px;
-  }
-}
-
-.night-theme {
-  .collapsible-section__title {
-    background-color: @dark-4;
-    h2 {
-      color: @white;
-    }
   }
 }
 </style>

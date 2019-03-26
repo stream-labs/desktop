@@ -1,15 +1,16 @@
 .button {
   .transition();
   .radius();
-  border: 1px solid transparent;
-  margin: 0;
   .weight(@medium);
-  font-family: 'Roboto';
   .text-transform();
-  height: 32px;
-  line-height: 30px;
   .padding-h-sides();
   .padding-v-sides(@0);
+
+  border: 1px solid transparent;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  height: 32px;
+  line-height: 30px;
 
   &:focus,
   &:visited {
@@ -29,24 +30,24 @@
 }
 
 .button--default {
-  background-color: @day-button;
-  color: @day-paragraph;
+  background-color: var(--button);
+  color: var(--paragraph);
 
   &:hover {
-    background-color: darken(@day-button, 2%);
-    color: @day-title;
+    background-color: var(--button-hover);
+    color: var(--title);
   }
 
   &:focus {
-    background-color: @day-button;
-    color: @day-title;
+    background-color: var(--button);
+    color: var(--title);
   }
 
   &.is-disabled,
   &:disabled {
     &:hover {
-      background-color: @day-button;
-      color: @day-title;
+      background-color: var(--button);
+      color: var(--title);
     }
   }
 }
@@ -114,6 +115,19 @@
   font-size: 15px;
 }
 
+.square-button {
+  .radius();
+  .transition();
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  color: @white;
+  font-size: 16px;
+}
+
 .button-container {
   display: flex;
   justify-content: flex-start;
@@ -133,18 +147,6 @@
     margin-right: 0;
     margin-left: 10px;
   }
-}
-
-.square-button {
-  .radius();
-  .transition();
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  height: 50px;
-  color: @white;
-  font-size: 16px;
 }
 
 .square-button--twitch,
@@ -224,29 +226,6 @@
 }
 
 .night-theme {
-  .button--default {
-    background-color: @dark-5;
-    border-color: @dark-5;
-    color: @light-1;
-
-    &:hover {
-      color: @light-1;
-    }
-
-    &:focus {
-      background-color: @dark-5;
-      color: @light-1;
-    }
-
-    &.is-disabled,
-    &:disabled {
-      &:hover {
-        background-color: @dark-5;
-        color: @light-1;
-      }
-    }
-  }
-
   .button--trans {
     color: @light-4;
     background-color: transparent;

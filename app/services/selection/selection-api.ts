@@ -1,7 +1,6 @@
 import {
   ISceneItemActions,
   ISceneItemApi,
-  ISceneItem,
   TSceneNodeApi,
   ISceneItemNode,
   ISceneItemFolderApi,

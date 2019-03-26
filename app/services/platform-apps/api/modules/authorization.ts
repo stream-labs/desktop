@@ -1,5 +1,5 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
-import electron, { BrowserWindow, app } from 'electron';
+import electron, { BrowserWindow } from 'electron';
 import url from 'url';
 import uuid from 'uuid/v4';
 

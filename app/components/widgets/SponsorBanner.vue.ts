@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { SponsorBannerService, ISponsorBannerData } from 'services/widgets/settings/sponsor-banner';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
