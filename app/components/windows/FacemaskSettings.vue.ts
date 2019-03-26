@@ -93,6 +93,7 @@ export default class FacemaskSettings extends Vue {
 
     if (validatedSettings.error) {
       this.onFailHandler(validatedSettings.message);
+      this.updatingInfo = false;
       return;
     }
 
