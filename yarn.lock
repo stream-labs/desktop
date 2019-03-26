@@ -2185,11 +2185,6 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"
   integrity sha1-UzRK2xRhehP26N0s4okF0cC6MhU=
 
-body-scroll-lock@^2.4.2:
-  version "2.4.6"
-  resolved "https://registry.yarnpkg.com/body-scroll-lock/-/body-scroll-lock-2.4.6.tgz#3ab8f6aff309cc5ce5ad7702f58308f755e262f3"
-  integrity sha1-Orj2r/MJzFzlrXcC9YMI91XiYvM=
-
 boxen@^1.2.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/boxen/-/boxen-1.3.0.tgz#55c6c39a8ba58d9c61ad22cd877532deb665a20b"
@@ -10280,14 +10275,7 @@ vue-i18n@7.6.0:
   resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-7.6.0.tgz#8745807756f6ca5090fd85629e9cab99b1c6e442"
   integrity sha512-IqyGj4nOFrGopCCpRucfMPJSgp5WauuI8HTaAQc7XIpHT7iOH4flndy1g09FiUzidi0lRVKJME+S7sPJny/t/A==
 
-vue-js-modal@1.3.15:
-  version "1.3.15"
-  resolved "https://registry.yarnpkg.com/vue-js-modal/-/vue-js-modal-1.3.15.tgz#59a6d6e3da414cbd4c9ce72348af63f65bacb99c"
-  integrity sha512-gUCDHR1OGgtWqEHcM5GIJJD0wdTTBx0yENHvu9RDUUWJf9lPPl7Q24dCQnOj4Qstf/Cf1cqiBf+1woW7ERWC9w==
-  dependencies:
-    body-scroll-lock "^2.4.2"
-
-vue-js-modal@^1.3.28:
+vue-js-modal@1.3.28, vue-js-modal@^1.3.28:
   version "1.3.28"
   resolved "https://registry.yarnpkg.com/vue-js-modal/-/vue-js-modal-1.3.28.tgz#fc83d8884802b22d6eb2ba5f5c4f7ec33d71a766"
   integrity sha512-ory5ymvMVDnyd/+i+DY4OZN1W8aS4gyPYwU8yvfhTc1sNTNEReBNd94MmBCOjJRihsaEl5daeWTKvsjujnqlsw==
