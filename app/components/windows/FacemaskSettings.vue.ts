@@ -123,7 +123,7 @@ export default class FacemaskSettings extends Vue {
       message = 'Error: Please select a bits price';
     }
 
-    if (!settings.device.value || !settings.device.name) {
+    if (!settings.device) {
       error = true;
       message = 'Error: Please select a video device';
     }
