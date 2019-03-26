@@ -1,5 +1,5 @@
 import { RpcApi } from './rpc-api';
-import { Inject } from 'util/injector';
+import { getResource, Inject } from 'util/injector';
 import { InternalApiService } from './internal-api';
 import * as apiResources from './external-api/resources';
 import { Service } from 'services/service';
@@ -10,6 +10,24 @@ import { Service } from 'services/service';
 export function Singleton() {
   return function(Klass: any) {
     Klass.isSingleton = true;
+  };
+}
+
+/**
+ * Dependency-Injector for external-API modules
+ * @see Inject
+ */
+export function InjectFromExternalApi(serviceName?: string) {
+  return function(target: Object, key: string) {
+    Object.defineProperty(target, key, {
+      get() {
+        const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);
+        const externalApiService = getResource<ExternalApiService>('ExternalApiService');
+        const singletonInstance = externalApiService.instances[name];
+        if (!singletonInstance) throw `Resource not found: ${name}`;
+        return singletonInstance;
+      },
+    });
   };
 }
 
@@ -31,7 +49,7 @@ export class ExternalApiService extends RpcApi {
   /**
    * Instances of singleton resources
    */
-  private instances: Dictionary<Service> = {};
+  instances: Dictionary<Service> = {};
 
   init() {
     // initialize all singletons

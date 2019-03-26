@@ -10,8 +10,7 @@ import {
 import { Inject } from 'util/injector';
 import { Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
-import { ISerializable } from '../rpc-api';
-import Utils from '../../utils';
+import { ISerializable } from '../../rpc-api';
 
 export interface ISourceAddOptions {
   channel?: number;
@@ -96,7 +95,7 @@ export class SourcesService {
   }
 }
 
-interface ISourceModel {
+export interface ISourceModel {
   sourceId: string;
   id: string; // Streamdeck uses id field
   name: string;
