@@ -25,12 +25,12 @@ import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
+import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs';
-import { debounce } from 'lodash-decorators';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -101,6 +101,7 @@ export function getComponents() {
     RecentEvents,
     MediaGallery,
     PlatformAppPopOut,
+    FacemaskSettings,
 
     BitGoal,
     DonationGoal,
@@ -212,7 +213,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
-  @debounce(500)
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     const bounds = window.getBounds();
@@ -241,8 +241,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
       if (options.size.width > screenWidth || options.size.height > screenHeight) {
         options.size = {
-          width: screenWidth * SCREEN_PERCENT,
-          height: screenHeight * SCREEN_PERCENT,
+          width: Math.round(screenWidth * SCREEN_PERCENT),
+          height: Math.round(screenHeight * SCREEN_PERCENT),
         };
       }
     }
@@ -370,6 +370,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
       ...optionsPatch,
+      scaleFactor: this.state.child.scaleFactor,
     };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
