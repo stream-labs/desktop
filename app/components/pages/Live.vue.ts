@@ -59,7 +59,7 @@ export default class Live extends Vue {
     return (
       this.customizationService.state.livePreviewEnabled &&
       !this.performanceModeEnabled &&
-      this.customizationService.state.previewEnabled
+      !this.customizationService.state.resizingInProgress
     );
   }
 
@@ -99,10 +99,10 @@ export default class Live extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ previewEnabled: false });
+    this.customizationService.setSettings({ resizingInProgress: true });
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ previewEnabled: true });
+    this.customizationService.setSettings({ resizingInProgress: false });
   }
 }

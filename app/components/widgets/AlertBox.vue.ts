@@ -34,6 +34,7 @@ const alertNameMap = () => ({
   stars: $t('Stars'),
   support: $t('Support'),
   likes: $t('Likes'),
+  shares: $t('Shares'),
   facemasks: $t('Facemask Donations'),
 });
 

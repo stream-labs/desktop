@@ -56,9 +56,11 @@ export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBas
         .then(response => response.json())
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
+          return this.fetchChatbotGlobalEnabled();
+        })
+        .then(() => {
           resolve(true);
         })
-        .then(this.fetchChatbotGlobalEnabled)
         .catch(err => {
           reject(err);
         });
