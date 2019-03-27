@@ -7,6 +7,7 @@ import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
+import { InternalApiClient } from '../services/api/internal-api-client';
 
 Vue.use(Vuex);
 
@@ -44,12 +45,8 @@ plugins.push((store: Store<any>) => {
         type: mutation.type,
         payload: mutation.payload,
       };
-
-      if (internalApiService.isMutationBufferingEnabled()) {
-        internalApiService.addMutationToBuffer(mutationToSend);
-      } else {
-        ipcRenderer.send('vuex-mutation', mutationToSend);
-      }
+      internalApiService.handleMutation(mutationToSend);
+      ipcRenderer.send('vuex-mutation', mutationToSend);
     }
   });
 
@@ -74,7 +71,17 @@ plugins.push((store: Store<any>) => {
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutation: any) => {
-    if (storeCanReceiveMutations) commitMutation(mutation);
+    if (!storeCanReceiveMutations) return;
+
+    // for main window commit mutation directly
+    if (Util.isMainWindow()) {
+      commitMutation(mutation);
+      return;
+    }
+
+    // for child and one-offs windows commit mutations via api-client
+    const servicesManager: ServicesManager = ServicesManager.instance;
+    servicesManager.internalApiClient.handleMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');
