@@ -4,7 +4,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { EInputType, formMetadata } from 'components/shared/inputs/index';
+import { formMetadata } from 'components/shared/inputs';
 
 import { IBettingOption } from 'services/chatbot';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';

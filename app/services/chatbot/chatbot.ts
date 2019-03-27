@@ -9,7 +9,7 @@ import {
   ChatbotModToolsApiService,
   ChatbotQueueApiService,
   ChatbotQuotesApiService,
-  ChatbotSongRequestApiService,
+  ChatbotMediaRequestApiService,
   ChatbotBaseApiService,
   ChatbotCommonService,
   ChatbotLoyaltyApiService,
@@ -29,7 +29,7 @@ export class ChatbotApiService extends Service {
   @Inject('ChatbotModToolsApiService') ModTools: ChatbotModToolsApiService;
   @Inject('ChatbotQueueApiService') Queue: ChatbotQueueApiService;
   @Inject('ChatbotQuotesApiService') Quotes: ChatbotQuotesApiService;
-  @Inject('ChatbotSongRequestApiService') SongRequest: ChatbotSongRequestApiService;
+  @Inject('ChatbotMediaRequestApiService') MediaRequest: ChatbotMediaRequestApiService;
   @Inject('ChatbotLoyaltyApiService') Loyalty: ChatbotLoyaltyApiService;
   @Inject('ChatbotHeistApiService') Heist: ChatbotHeistApiService;
   @Inject('ChatbotPollApiService') Poll: ChatbotPollApiService;

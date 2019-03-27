@@ -12,6 +12,9 @@
   .margin-bottom();
 
   label {
+    .transition();
+    .weight(@normal);
+
     margin: 0;
     line-height: 16px;
     cursor: auto;
@@ -20,11 +23,11 @@
     width: auto;
     padding-left: 28px;
     outline: 0;
-    .transition();
-    color: @day-paragraph;
-    .weight(@normal);
+    color: var(--paragraph);
 
-    &:before {
+    &::before {
+      .radius();
+
       position: absolute;
       top: 0;
       left: 0;
@@ -32,12 +35,11 @@
       height: 16px;
       content: '';
       background: transparent;
-      .radius();
-      -webkit-transition: border .1s ease,opacity .1s ease,box-shadow .1s ease,-webkit-transform .1s ease;
-      transition: border .1s ease,opacity .1s ease,box-shadow .1s ease,-webkit-transform .1s ease;
-      transition: border .1s ease,opacity .1s ease,transform .1s ease,box-shadow .1s ease;
-      transition: border .1s ease,opacity .1s ease,transform .1s ease,box-shadow .1s ease,-webkit-transform .1s ease;
-      border: 1px solid @day-input-border;
+      -webkit-transition: border 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease, -webkit-transform 0.1s ease;
+      transition: border 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease, -webkit-transform 0.1s ease;
+      transition: border 0.1s ease, opacity 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+      transition: border 0.1s ease, opacity 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease, -webkit-transform 0.1s ease;
+      border: 1px solid var(--input-border);
     }
   }
 
@@ -47,7 +49,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    opacity: 0!important;
+    opacity: 0 !important;
     outline: 0;
     z-index: 3;
     width: 20px;
@@ -55,22 +57,22 @@
     margin: 0;
   }
 
-  input:checked~label {
-    color: @day-title;
+  input:checked ~ label {
+    color: var(--title);
 
-    &:before {
+    &::before {
       border-color: @teal;
       background-color: @teal;
     }
   }
 
-  input:checked~label:after {
+  input:checked ~ label::after {
     position: absolute;
     left: 3px;
     top: 0;
     opacity: 1;
     color: @white;
-    font-family: 'Font Awesome 5 Free';
+    font-family: 'Font Awesome 5 Free', sans-serif;
     font-weight: 900;
     content: '\f00c';
     font-size: 10px;
@@ -78,7 +80,7 @@
 }
 
 .radio.checkbox {
-  label:before {
+  label::before {
     content: '';
     transform: none;
     width: 16px;
@@ -88,7 +90,7 @@
     left: 0;
   }
 
-  input:checked~label:after {
+  input:checked ~ label::after {
     content: '';
     width: 8px;
     height: 8px;
@@ -105,22 +107,6 @@
       .checkbox {
         margin-bottom: 0;
       }
-    }
-  }
-}
-
-.night {
-  .checkbox {
-    label {
-      color: @night-paragraph;
-
-      &:before {
-        border-color: @night-input-border;
-      }
-    }
-
-    input:checked~label {
-      color: @night-title;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Watch, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { debounce } from 'lodash-decorators';
 import { TObsType, IObsInput, ObsInput } from './ObsInput';
 import Utils from '../../../services/utils';

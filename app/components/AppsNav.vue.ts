@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';

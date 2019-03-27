@@ -1,4 +1,4 @@
-import { throttle } from 'lodash-decorators';
+import throttle from 'lodash/throttle';
 import { Inject } from 'util/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
@@ -13,25 +13,13 @@ import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
-import { mutation, ServiceHelper, StatefulService } from '../stateful-service';
+import { mutation, StatefulService } from '../stateful-service';
 import { WidgetSource } from './widget-source';
 import { InitAfter } from '../../util/service-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
-
-@ServiceHelper()
-export class WidgetTester {
-  constructor(public name: string, private url: string) {}
-
-  @Inject() userService: UserService;
-
-  @throttle(1000)
-  test() {
-    const headers = authorizedHeaders(this.userService.apiToken);
-    fetch(new Request(this.url, { headers }));
-  }
-}
+import { Throttle } from 'lodash-decorators';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -158,16 +146,23 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     return servicesManager.getResource(serviceName);
   }
 
-  getTesters() {
+  getTesters(): { name: string; url: string }[] {
     if (!this.userService.isLoggedIn()) return;
     return WidgetTesters.filter(tester => {
       return tester.platforms.includes(this.userService.platform.type);
     }).map(tester => {
-      return new WidgetTester(
-        tester.name,
-        tester.url(this.hostsService.streamlabs, this.userService.platform.type),
-      );
+      return {
+        name: tester.name,
+        url: tester.url(this.hostsService.streamlabs, this.userService.platform.type),
+      };
     });
+  }
+
+  @Throttle(1000)
+  test(testerName: string) {
+    const tester = this.getTesters().find(tester => tester.name === testerName);
+    const headers = authorizedHeaders(this.userService.apiToken);
+    fetch(new Request(tester.url, { headers }));
   }
 
   private previewSourceWatchers: Dictionary<Subscription> = {};

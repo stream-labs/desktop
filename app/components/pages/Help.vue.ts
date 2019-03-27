@@ -1,6 +1,6 @@
 /* tslint:disable:max-line-length */
 import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import electron from 'electron';
 
 @Component({})

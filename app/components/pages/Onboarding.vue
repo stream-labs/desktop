@@ -10,7 +10,7 @@
 @import "../../styles/index";
 
 .onboarding {
-  background-color: @night-bg;
+  background-color: var(--background);
 }
 </style>
 
@@ -78,14 +78,14 @@
 }
 
 .onboarding-desc {
-  color: @light-3;
+  color: var(--paragraph);
   .margin-bottom(3);
   padding: 0 16px;
 }
 
 .setup-later {
   .margin-top(3);
-  color: @night-paragraph;
+  color: var(--paragraph);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,10 +99,10 @@
   a {
     text-decoration: underline;
     .transition();
-    color: @night-paragraph;
+    color: var(--paragraph);
 
     &:hover {
-      color: @white;
+      color: var(--link-active);
     }
   }
 }
@@ -110,8 +110,8 @@
 .running-setup-container {
   width: 100%;
   padding: 30px;
-  color: @white;
-  background-color: @night-section;
+  color: var(--background);
+  background-color: var(--section);
   .margin-bottom(2);
   height: 270px;
   position: relative;
@@ -149,11 +149,11 @@
 }
 
 .running-setup-row--complete {
-  color: @night-paragraph;
+  color: var(--paragraph);
 }
 
 .running-setup-percent {
-  color: @light-3;
+  color: var(--paragraph);
 }
 
 .running-setup__deco {

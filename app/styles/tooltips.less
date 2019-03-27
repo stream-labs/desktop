@@ -3,7 +3,7 @@
 .tooltip-trigger {
   color: @icon;
   margin: 0 10px;
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .tooltip {
@@ -13,19 +13,20 @@
   border: 0;
   padding: 0;
 
-  &:before {
+  &::before {
     border: 0;
   }
 }
 
 .tooltip .tooltip-inner {
-  background: @white;
   .border();
-  .day-shadow();
+  .shadow();
   .radius();
+
+  background: var(--background);
   padding: 8px 10px 7px;
   font-size: 12px;
-  color: @day-paragraph;
+  color: var(--paragraph);
 }
 
 .tooltip .tooltip-arrow {
@@ -34,7 +35,7 @@
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: @day-border;
+  border-color: var(--border);
 }
 
 .tooltip[x-placement^="top"] {
@@ -100,24 +101,11 @@
 .tooltip[aria-hidden='true'] {
   visibility: hidden;
   opacity: 0;
-  transition: opacity .15s, visibility .15s;
+  transition: opacity 0.15s, visibility 0.15s;
 }
 
 .tooltip[aria-hidden='false'] {
   visibility: visible;
   opacity: 1;
-  transition: opacity .15s;
-}
-
-.night-theme {
-  .tooltip .tooltip-inner {
-    background-color: @night-section-alt;
-    border-color: @night-section-alt;
-    color: @white;
-    .night-shadow();
-  }
-
-  .tooltip-arrow {
-    border-color: @night-section-alt;
-  }
+  transition: opacity 0.15s;
 }
