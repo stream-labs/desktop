@@ -9,4 +9,5 @@ export * from './scenes/scene-item';
 export * from './scenes/scene-folder';
 export * from './scenes/selection';
 export * from './scene-collections/scene-collections'
+export * from './audio/audio';
 export * from './notifications/notifications';
