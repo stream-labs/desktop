@@ -1,5 +1,5 @@
 import { ServiceHelper } from 'services/stateful-service';
-import { InjectFromExternalApi } from 'services/api/external-api';
+import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources/sources';
 import { Inject } from 'util/injector';
 import { Scene as InternalScene, ScenesService as InternalScenesService } from 'services/scenes';
@@ -20,9 +20,10 @@ export interface IScene {
 export class Scene {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
-  @Inject('ScenesService') private internalScenesService: InternalScenesService;
+  @Inject('ScenesService')
+  private internalScenesService: InternalScenesService;
 
-  private scene: InternalScene;
+  @Fallback() private scene: InternalScene;
 
   constructor(private sceneId: string) {
     this.scene = this.internalScenesService.getScene(sceneId);
@@ -49,9 +50,9 @@ export class Scene {
   }
 
   getItem(sceneItemId: string): SceneItem {
-    const folder = this.scene.getItem(sceneItemId);
-    if (!folder) return null;
-    return folder ? new SceneItem(folder.sceneId, folder.id) : null;
+    const item = this.scene.getItem(sceneItemId);
+    if (!item) return null;
+    return item ? new SceneItem(item.sceneId, item.id, item.sourceId) : null;
   }
 
   getFolder(sceneFolderId: string): SceneItemFolder {

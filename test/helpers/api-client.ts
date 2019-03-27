@@ -119,6 +119,8 @@ export class ApiClient {
       throw parsedResponse.error;
     }
 
+    if (this.logsEnabled) this.log(`Response Sync:`, parsedResponse);
+
     return parsedResponse.result;
   }
 

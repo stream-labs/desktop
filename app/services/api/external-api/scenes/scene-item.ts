@@ -1,6 +1,6 @@
 import { ServiceHelper } from 'services/stateful-service';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
-import { InjectFromExternalApi } from 'services/api/external-api';
+import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { ISourceModel, Source, SourcesService } from 'services/api/external-api/sources/sources';
 import { ISceneNode, SceneNode } from './scene-node';
 
@@ -60,11 +60,10 @@ export interface ISceneItemActions {
  */
 @ServiceHelper()
 export class SceneItem extends SceneNode implements ISceneItemActions {
-  private sceneItem: InternalSceneItem;
-
+  @Fallback() private sceneItem: InternalSceneItem;
   @InjectFromExternalApi() private sourcesService: SourcesService;
 
-  constructor(public sceneId: string, public nodeId: string) {
+  constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
     this.sceneItem = this.internalScenesService.getSceneItem(this.nodeId);
   }

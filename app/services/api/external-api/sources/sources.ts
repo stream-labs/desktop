@@ -8,7 +8,7 @@ import {
   TSourceType,
 } from 'services/sources';
 import { Inject } from 'util/injector';
-import { Singleton } from 'services/api/external-api';
+import { Fallback, Singleton } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISerializable } from '../../rpc-api';
 
@@ -27,7 +27,9 @@ function exposeSourceEvent(observable: Observable<IInternalSourceModel>): Observ
 
 @Singleton()
 export class SourcesService {
-  @Inject() protected sourcesService: InternalSourcesService;
+  @Fallback()
+  @Inject()
+  protected sourcesService: InternalSourcesService;
 
   createSource(
     name: string,
