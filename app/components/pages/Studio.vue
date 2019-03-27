@@ -85,7 +85,7 @@
     max-width: 50%;
     .button {
       margin-top: 20px;
-      display: block;
+      display: block
     }
   }
 }

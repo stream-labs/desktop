@@ -122,7 +122,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
 
-    // await sleep(6000);
+    // await sleep(10000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
@@ -146,8 +146,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     context = t.context;
     appIsRunning = true;
-
-    await t.context.app.client.waitForVisible('.main-page-container');
 
     if (options.afterStartCb) {
       await options.afterStartCb(t);

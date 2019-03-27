@@ -69,7 +69,6 @@ declare module 'emojione';
 declare module 'vue-resize';
 declare module 'serve-handler';
 declare module 'v-selectpage';
-declare module 'streamlabs-beaker';
 declare module '*.m.less';
 declare module 'streamlabs-beaker';
 
