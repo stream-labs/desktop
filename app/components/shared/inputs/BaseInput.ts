@@ -9,7 +9,7 @@ import TsxComponent from 'components/tsx-component';
 export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends TsxComponent<{
   metadata: TMetadataType;
   value: TValueType;
-  title: string;
+  title?: string;
 }> {
   @Prop()
   readonly value: TValueType;

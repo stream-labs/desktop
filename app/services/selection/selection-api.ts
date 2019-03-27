@@ -11,7 +11,9 @@ import { ISourceApi } from 'services/sources';
 /**
  * Represents active items and folders for current scene
  */
-export interface ISelectionServiceApi extends ISelection {}
+export interface ISelectionServiceApi extends ISelection {
+  openEditTransform(): void;
+}
 
 /**
  * Allows call bulk actions with scene items and folders.

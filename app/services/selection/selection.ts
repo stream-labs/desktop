@@ -22,6 +22,7 @@ import Utils from '../utils';
 import { Source } from '../sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { Rect } from '../../util/rect';
+import { WindowsService } from 'services/windows';
 
 /**
  * represents selection of active scene and provide shortcuts
@@ -37,6 +38,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   private sceneId: string;
 
   @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
 
   init() {
     this.scenesService.sceneSwitched.subscribe(() => {
@@ -141,6 +143,14 @@ export class SelectionService extends StatefulService<ISelectionState>
   @shortcut('ArrowDown')
   nudgeActiveItemsDown() {
     return this.getSelection().nudgeActiveItemsDown.call(this);
+  }
+
+  openEditTransform() {
+    this.windowsService.showWindow({
+      componentName: 'EditTransform',
+      title: $t('Edit Transform'),
+      size: { width: 500, height: 670 },
+    });
   }
 
   /**
