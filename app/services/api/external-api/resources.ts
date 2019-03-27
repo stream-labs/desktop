@@ -9,3 +9,4 @@ export * from './scenes/scene-item';
 export * from './scenes/scene-folder';
 export * from './scenes/selection';
 export * from './streaming/streaming';
+export * from './notifications/notifications';
