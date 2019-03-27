@@ -330,6 +330,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
         this.facemaskFilter.update(settings);
       } catch (e) {
         this.facemaskFilter = null;
+        this.setupFilter();
       }
     }
   }
@@ -401,6 +402,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
     if (settings.device.name && settings.device.value) {
       this.SET_DEVICE(settings.device.name, settings.device.value);
+      this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
     }
