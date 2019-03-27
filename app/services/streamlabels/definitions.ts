@@ -1136,7 +1136,7 @@ const facebookDefinitions: IStreamlabelSet = {
         name: 'total_facebook_supporter_count',
         label: 'Total Supporter Count',
         settings: {
-          format: { tokens: ['{count}'] }
+          format: { tokens: ['{count}'] },
         },
       },
       {
@@ -1236,8 +1236,8 @@ const facebookDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}'] },
         },
-      }
-    ]
+      },
+    ],
   },
   shares: {
     label: 'Shares',
@@ -1415,8 +1415,8 @@ const facebookDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{amount}'] },
         },
-      }
-    ]
+      },
+    ],
   },
   star_amount: {
     label: 'Star Amount',
