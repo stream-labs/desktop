@@ -135,7 +135,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private finishStartStreaming() {
     const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
-    const confirmText = 'Are you sure you want to start streaming?';
+    const confirmText = $t('Are you sure you want to start streaming?');
     if (shouldConfirm && !confirm(confirmText)) return;
 
     if (
@@ -300,8 +300,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    */
   get formattedDurationInCurrentStreamingState() {
     const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
-    if (formattedTime === '03:50:00' && this.userService.platform.type === 'facebook') {
-      const msg = $t('You are 10 minutes away from the 4 hour stream limit');
+    if (formattedTime === '07:50:00' && this.userService.platform.type === 'facebook') {
+      const msg = $t('You are 10 minutes away from the 8 hour stream limit');
       const existingTimeupNotif = this.notificationsService
         .getUnread()
         .filter((notice: INotification) => notice.message === msg);

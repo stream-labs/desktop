@@ -124,6 +124,25 @@ export class ChatbotLoyaltyApiService extends PersistentStatefulService<
       });
   }
 
+  //  DELETE
+  clear() {
+    return this.chatbotBaseApiService
+      .api('DELETE', 'loyalty/reset-loyalty', {})
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchLoyalty();
+        }
+      });
+  }
+  delete(id: number) {
+    return this.chatbotBaseApiService
+      .api('DELETE', `loyalty/reset/${id}`, {})
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchLoyalty();
+        }
+      });
+  }
   //
   // Mutations
   //

@@ -54,7 +54,7 @@ const releaseChannel = (() => {
 
 (function setupLogger() {
   // save logs to the cache directory
-  path.join(app.getPath('userData'), 'log.log');
+  electronLog.transports.file.file = path.join(app.getPath('userData'), 'log.log');
   electronLog.transports.file.level = 'info';
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
@@ -210,7 +210,7 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    app.quit();
+    session.defaultSession.cookies.flushStore(() => app.quit());
   });
 
   // Pre-initialize the child window
@@ -476,8 +476,18 @@ ipcMain.on('streamlabels-writeFile', (e, info) => {
   });
 });
 
+/* The following 2 methods need to live in the main process
+   because events bound using the remote module are not
+   executed synchronously and therefore default actions
+   cannot be prevented. */
 ipcMain.on('webContents-preventNavigation', (e, id) => {
   webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
+  });
+});
+
+ipcMain.on('webContents-preventPopup', (e, id) => {
+  webContents.fromId(id).on('new-window', e => {
     e.preventDefault();
   });
 });

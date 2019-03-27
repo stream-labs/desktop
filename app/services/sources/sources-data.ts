@@ -139,4 +139,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: 'OvrStream',
     description: '',
   },
+  vlc_source: {
+    name: $t('VLC Source'),
+    description: $t('Add playlists of videos to your scene.'),
+  },
 });

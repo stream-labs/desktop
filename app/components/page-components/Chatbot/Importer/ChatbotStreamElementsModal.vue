@@ -27,7 +27,6 @@
         <button class="button button--default" @click="cancelHandler">{{ $t('Cancel') }}</button>
         <button
           class="button button--action"
-          
           :disabled="errors.items.length > 0"
           @click="continueHandler"
         >{{ $t('Continue') }}</button>
@@ -44,7 +43,7 @@
   flex-direction: row;
   align-items: center;
   height: 30px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
 
   .item-modal__header__icon {
     padding-left: 10px;
@@ -71,8 +70,8 @@
 }
 
 .item-modal__controls {
-  background-color: @day-section;
-  border-top: 1px solid @day-border;
+  background-color: var(--section);
+  border-top: 1px solid var(--border);
   padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
@@ -87,16 +86,5 @@
   font-weight: 500;
   text-decoration: underline;
   .cursor--pointer();
-}
-
-.night-theme {
-  .item-modal__header {
-    border-bottom: 1px solid @night-border;
-  }
-
-  .item-modal__controls {
-    border-top-color: @night-border;
-    background-color: @night-primary;
-  }
 }
 </style>
