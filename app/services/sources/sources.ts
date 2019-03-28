@@ -219,7 +219,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   addFile(path: string): Source {
-    let realpath = fs.realpathSync(path);
+    const realpath = fs.realpathSync(path);
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: [
