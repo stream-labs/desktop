@@ -44,12 +44,13 @@ export default class SceneTransitions extends Vue {
   }
 
   get sceneOptions() {
-    const sceneOptions = this.scenesService.scenes.map(scene => ({
-      title: scene.name,
-      value: scene.id,
-    }));
-    sceneOptions.unshift({ title: $t('All'), value: 'ALL' });
-    return sceneOptions;
+    return [
+      { title: $t('All'), value: 'ALL' },
+      ...this.scenesService.scenes.map(scene => ({
+        title: scene.name,
+        value: scene.id,
+      })),
+    ];
   }
 
   get transitionOptions() {

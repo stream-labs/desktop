@@ -143,7 +143,7 @@ export default class SceneTransitions extends Vue {
     return `<${$t('Deleted')}>`;
   }
 
-  getSceneName(id: string) {
+  getSceneName(id: string | 'ALL') {
     if (id === 'ALL') return $t('All');
 
     const scene = this.scenesService.getScene(id);
