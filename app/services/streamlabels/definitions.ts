@@ -47,6 +47,13 @@ export function getDefinitions(platform: TPlatform) {
     };
   }
 
+  if (platform === 'facebook') {
+    return {
+      ...allDefinitions,
+      ...facebookDefinitions,
+    };
+  }
+
   throw new Error(`${platform} is not a supported platform`);
 }
 
@@ -1100,6 +1107,374 @@ const mixerDefinitions: IStreamlabelSet = {
         label: 'Session Most Recent Follower',
         settings: {
           format: { tokens: ['{name}'] },
+        },
+      },
+    ],
+  },
+};
+const facebookDefinitions: IStreamlabelSet = {
+  supporters: {
+    label: 'Supporters',
+    files: [
+      {
+        name: 'most_recent_facebook_supporter',
+        label: 'Most Recent Supporter',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+      {
+        name: 'session_facebook_supporters',
+        label: 'Session Supporters (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'total_facebook_supporter_count',
+        label: 'Total Supporter Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_facebook_supporter_count',
+        label: 'Session Supporter Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_most_recent_facebook_supporter',
+        label: 'Session Most Recent Supporter',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+    ],
+  },
+  followers: {
+    label: 'Followers',
+    files: [
+      {
+        name: 'most_recent_facebook_follower',
+        label: 'Most Recent follower',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+      {
+        name: 'session_facebook_followers',
+        label: 'Session Followers (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_facebook_follower_count',
+        label: 'Session Follower Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'total_facebook_follower_count',
+        label: 'Total Follower Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_most_recent_facebook_follower',
+        label: 'Session Most Recent Follower',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+    ],
+  },
+  likes: {
+    label: 'Likes',
+    files: [
+      {
+        name: 'most_recent_facebook_like',
+        label: 'Most Recent Like',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+      {
+        name: 'session_facebook_likes',
+        label: 'Session Likes (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_facebook_like_count',
+        label: 'Session Like Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'total_facebook_like_count',
+        label: 'Total Like Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_most_recent_facebook_like',
+        label: 'Session Most Recent Like',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+    ],
+  },
+  shares: {
+    label: 'Shares',
+    files: [
+      {
+        name: 'most_recent_facebook_share',
+        label: 'Most Recent Share',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+      {
+        name: 'session_facebook_shares',
+        label: 'Session Shares (Max 100)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_facebook_share_count',
+        label: 'Session Share Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'total_facebook_share_count',
+        label: 'Total Share Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: 'session_most_recent_facebook_share',
+        label: 'Session Most Recent Share',
+        settings: {
+          format: { tokens: ['{name}'] },
+        },
+      },
+    ],
+  },
+  stars: {
+    label: 'Stars',
+    files: [
+      {
+        name: 'total_facebook_stars_count',
+        label: 'Total Stars Count',
+        settings: {
+          format: { tokens: ['{count}'] },
+        },
+      },
+      {
+        name: '90day_top_facebook_stars',
+        label: '90-Day Top Stars',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'monthly_top_facebook_stars',
+        label: 'Monthly Top Stars',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'weekly_top_facebook_stars',
+        label: 'Weekly Top Stars',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: '30day_top_facebook_stars',
+        label: '30-Day Top Stars',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_top_facebook_stars',
+        label: 'Session Top Stars',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: '90day_top_facebook_star_senders',
+        label: '90-Day Top Star Senders',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'monthly_top_facebook_star_senders',
+        label: 'Monthly Top Star Senders',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'weekly_top_facebook_star_senders',
+        label: 'Weekly Top Star Senders',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: '30day_top_facebook_star_senders',
+        label: '30-Day Top Star Senders',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_top_facebook_star_senders',
+        label: 'Session Top Star Senders',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: '90day_top_facebook_star_sender',
+        label: '90-Day Top Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] },
+        },
+      },
+      {
+        name: '30day_top_facebook_star_sender',
+        label: '30-Day Top Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] },
+        },
+      },
+      {
+        name: 'monthly_top_facebook_star_sender',
+        label: 'Monthly Top Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] },
+        },
+      },
+      {
+        name: 'weekly_top_facebook_star_sender',
+        label: 'Weekly Top Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] },
+        },
+      },
+      {
+        name: 'session_top_facebook_star_sender',
+        label: 'Session Top Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}'] },
+        },
+      },
+    ],
+  },
+  star_amount: {
+    label: 'Star Amount',
+    files: [
+      {
+        name: 'session_facebook_star_amount',
+        label: 'Session Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] },
+        },
+      },
+      {
+        name: 'monthly_facebook_star_amount',
+        label: 'Monthly Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] },
+        },
+      },
+      {
+        name: '30day_facebook_star_amount',
+        label: '30-Day Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] },
+        },
+      },
+      {
+        name: 'weekly_facebook_star_amount',
+        label: 'Weekly Cheer Amount',
+        settings: {
+          format: { tokens: ['{amount}'] },
+        },
+      },
+    ],
+  },
+  star_senders: {
+    label: 'Star Senders',
+    files: [
+      {
+        name: 'most_recent_facebook_star_sender',
+        label: 'Most Recent Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}', '{message}'] },
+        },
+      },
+      {
+        name: 'session_facebook_star_senders',
+        label: 'Session Star Senders (Max 25)',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{amount}', '{message}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_most_recent_facebook_star_sender',
+        label: 'Session Recent Star Sender',
+        settings: {
+          format: { tokens: ['{name}', '{amount}', '{message}'] },
         },
       },
     ],

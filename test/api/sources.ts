@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from 'services/scenes/scenes-api';
-import { SourcesService } from 'services/api/external-api/sources';
+import { SourcesService } from 'services/api/external-api/sources/sources';
 
 useSpectron({ restartAppAfterEachTest: false });
 
