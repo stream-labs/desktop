@@ -91,7 +91,7 @@
       "test-dist/test/api/*.js",
       "test-dist/test/widgets/*.js",
       "test-dist/test/settings/**/*.js",
-      "test-dist/test/twitch/**/*.js"
+      "test-dist/test/streaming/**/*.js"
     ],
     "serial": true
   },
