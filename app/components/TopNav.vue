@@ -79,6 +79,13 @@
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
       </a>
     </div>
+    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">
+      <a
+        @click="openFacemaskSettingsWindow"
+        class="link">
+        <i class="icon-face-masks-3" v-tooltip.right="facemasksTooltip" /><span>{{ $t('Face Masks') }}</span>
+      </a>
+    </div>
     <div class="top-nav-item">
       <a
         @click="navigateHelp"

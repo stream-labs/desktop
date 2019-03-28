@@ -1,11 +1,10 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
+import { IScenesServiceApi } from 'services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
-import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
+import { ISceneApi, ISceneNodeApi } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
@@ -66,7 +65,6 @@ test('Selection', async t => {
   selection.selectAll();
 
   t.is(selection.getSize(), 3);
-
 });
 
 test('Selection actions', async t => {

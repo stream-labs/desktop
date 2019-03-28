@@ -13,7 +13,9 @@ export type TSocketEvent =
   | IFollowSocketEvent
   | ISubscriptionSocketEvent
   | IAlertPlayingSocketEvent
-  | IAlertProfileChanged;
+  | IAlertProfileChanged
+  | IBitsSocketEvent
+  | IFmExtEnabledSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -45,6 +47,7 @@ interface IFollowSocketEvent {
   type: 'follow';
   message: {
     name: string;
+    _id: string;
   }[];
 }
 
@@ -52,14 +55,43 @@ interface ISubscriptionSocketEvent {
   type: 'subscription';
   message: {
     name: string;
+    subscriber_twitch_id?: string;
+    sub_plan?: string;
+    _id: string;
   }[];
 }
 
-interface IAlertPlayingSocketEvent {
+interface IBitsSocketEvent {
+  type: 'bits';
+  message: {
+    name: string;
+    data: {
+      facemask?: string;
+      fm_id?: string;
+    };
+  }[];
+}
+
+interface IFmExtEnabledSocketEvent {
+  type: 'fm-ext-enabled';
+}
+
+export interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
     facemask?: string;
     _id: string;
+    type: string;
+    payload?: {
+      _id?: string;
+    };
+    data: {
+      facemask?: string;
+      fm_id?: string;
+    };
+    subscriber_twitch_id?: string;
+    sub_plan?: string;
+    name?: string;
   };
 }
 
