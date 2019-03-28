@@ -11,6 +11,7 @@ import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
 import { handleResponse, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
+import { $t } from 'services/i18n';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -150,7 +151,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   fetchStreamKey(): Promise<string> {
-    return this.fetchBoundStreamId().then(boundStreamId => this.fetchStreamKeyForId(boundStreamId));
+    return this.fetchBoundStreamId()
+      .then(boundStreamId => this.fetchStreamKeyForId(boundStreamId))
+      .catch(() => $t('Please enable account for streaming to recieve a stream key'));
   }
 
   fetchChannelInfo(): Promise<IChannelInfo> {
