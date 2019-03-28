@@ -38,28 +38,10 @@ export default class Studio extends Vue {
         this.stacked = rect.width / rect.height <= 16 / 9;
       }
     }, 1000);
-
-    this.showDisplay();
   }
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
-  }
-
-  get appLoading() {
-    return this.appService.state.loading;
-  }
-
-  showDisplay() {
-    // Hide the display until loading animation is finished
-    if (this.appLoading) {
-      requestAnimationFrame(this.showDisplay);
-    } else {
-      setTimeout(
-        () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
-        500,
-      );
-    }
   }
 
   get displayEnabled() {
