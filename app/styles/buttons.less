@@ -53,8 +53,8 @@
 }
 
 .button--action {
-  background-color: @teal;
-  border-color: @teal;
+  background-color: var(--teal);
+  border-color: var(--teal);
   color: @white;
 
   &:hover {
@@ -63,13 +63,13 @@
   }
 
   &:focus {
-    background-color: @teal;
+    background-color: var(--teal);
   }
 
   &.is-disabled,
   &:disabled {
     &:hover {
-      background-color: @teal;
+      background-color: var(--teal);
     }
   }
 }
@@ -91,12 +91,12 @@
 }
 
 .button--warn {
-  background-color: @warning;
+  background-color: var(--warning);
 
   &:hover,
   &:focus,
   &:active {
-    background-color: lighten(@warning, 4%);
+    background-color: var(--warning-hover);
   }
 }
 
@@ -195,18 +195,18 @@
 }
 
 .button--soft-warning {
-  color: @red;
+  color: var(--warning);
   background: rgba(251, 72, 76, 0.16);
   border-color: transparent;
 
   &:focus {
-    color: @red;
+    color: var(--warning);
     background: rgba(251, 72, 76, 0.16);
   }
 
   &:hover {
     background: rgba(251, 72, 76, 0.2);
-    color: @red;
+    color: var(--warning);
   }
 }
 

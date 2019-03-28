@@ -18,7 +18,7 @@
 
 .help-tip {
   position: absolute;
-  background: @teal;
+  background: var(--teal);
   .radius();
   color: @white;
   top: -8px;

@@ -875,19 +875,19 @@
 }
 
 .design-system__color--primary {
-  background-color: @primary;
+  background-color: var(--teal);
 }
 
 .design-system__color--secondary {
-  background-color: @secondary;
+  background-color: var(--accent);
 }
 
 .design-system__color--warning {
-  background-color: @warning;
+  background-color: var(--warning);
 }
 
 .design-system__color--other-1 {
-  background-color: @yellow;
+  background-color: var(--new);
 }
 
 .design-system__color--other-2 {
