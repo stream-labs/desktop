@@ -32,6 +32,8 @@ interface IFormSettings {
     name: string;
     value: string;
   };
+  sub_duration?: number;
+  bits_duration?: number;
 }
 
 @Component({
@@ -53,6 +55,8 @@ export default class FacemaskSettings extends Vue {
   enabledModel = this.facemasksService.state.settings.enabled;
   donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;
   subsEnabledModel = this.facemasksService.state.settings.subs_enabled;
+  subsDurationModel = this.facemasksService.state.settings.sub_duration;
+  bitsDurationModel = this.facemasksService.state.settings.bits_duration;
   bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
@@ -77,7 +81,7 @@ export default class FacemaskSettings extends Vue {
   async handleSubmit() {
     this.updatingInfo = true;
 
-    const newSettings = {
+    const newSettings: IFormSettings = {
       enabled: this.enabledModel,
       donations_enabled: this.donationsEnabledModel,
       subs_enabled: this.subsEnabledModel,
@@ -88,6 +92,11 @@ export default class FacemaskSettings extends Vue {
         return device.value === this.videoInputModel;
       })[0],
     };
+
+    if (this.showTwitchFeatures) {
+      newSettings.sub_duration = this.subsDurationModel;
+      newSettings.bits_duration = this.bitsDurationModel;
+    }
 
     const validatedSettings = this.validateSettings(newSettings);
 
