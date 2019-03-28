@@ -196,7 +196,9 @@ export class AppService extends StatefulService<IAppState> {
       if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
         this.windowsService.closeChildWindow();
       }
-      this.windowsService.closeAllOneOffs();
+
+      // wait until all one-offs windows like Projectors will be closed
+      await this.windowsService.closeAllOneOffs();
 
       // This is kind of ugly, but it gives the browser time to paint before
       // we do long blocking operations with OBS.
