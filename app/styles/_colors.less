@@ -8,31 +8,7 @@
 @grey: #91979a;
 @black: #000;
 
-@day-primary: #ffffff;
-@day-secondary: #F7F9F9;
-@day-hover: #F7F9F9;
-@day-border: #F0F2F2;
-@day-input-border: #E3E8EB;
-@day-input-bg: #FBFCFC;
-@day-focus-border: darken(#E3E8EB, 4%);
-
-@night-primary: #17242D;
-@night-secondary: #09161d;
-@night-accent-light: #2b383f;
-@night-accent-dark: #050F14;
-@night-border: #2b383f;
-@night-slider-bg: #253239;
-@night-select-bg: #394951;
-
-@input-border-color: #cacaca;
-@input-label-color: #7e8689;
-
-@slider-progress-color: #3c4c53;
-@slider-background-color: #eaecee;
-
-@onboarding-bg: #2b383f;
-
-// Color Updates - What we should be using for all new things
+// Color Updates - Do not reference directly
 
 @teal: #31C3A2;
 @teal-semi: rgba(49, 195, 162, 0.08);
@@ -68,39 +44,20 @@
 @picarto: #2DA75F;
 @discord: #7289da;
 
-// Uses
-@primary: #31C3A2;
-@secondary: #8736E0;
-@warning: #F85640;
-@new: #FFC803;
-@info-dark: #CA9D00;
-@info-light: #FFF9E5;
-@icon: #91979A;
-
-// TODO: Replace with scoped variables
-@day-button: @light-3;
-@day-link: @dark-5;
-@day-link-active: @dark-2;
-@day-input-bg: @light-1;
-@day-input-border: @light-3;
-@day-solid-input: @light-2;
-@day-dropdown-bg: @light-2;
-@day-dropdown-border: @light-2;
-@day-shadow: rgba(55, 71, 79, 0.12);
-
-@night-button: @dark-5;
-@night-link: @light-4;
-@night-link-active: @light-1;
-@night-input-bg: transparent;
-@night-input-border: @dark-5;
-@night-solid-input: @dark-4;
-@night-dropdown-bg: @dark-4;
-@night-dropdown-border: @dark-4;
-@night-hover: @dark-4;
-@night-shadow: rgba(1, 2, 2, 0.16);
-
-// Scoped Variables
+// Variables for use
 :root {
+  // Brand Colors
+  --teal: @teal;
+  --accent: @purple;
+  --warning: @red;
+  --warning-hover: lighten(@red, 4%);
+  --new: @yellow;
+  --info-dark: @yellow-dark;
+  --info-light: @yellow-light;
+  --info-semi: @yellow-dark-semi;
+  --icon: @light-5;
+
+  // Theme Colors
   --background: @light-1;
   --section: @light-2;
   --section-alt: @light-2;
@@ -114,7 +71,7 @@
   --input-bg: @light-1;
   --input-border: @light-3;
   --focus-border: darken(@light-3, 4%);
-  --solid-input: @light-2;
+  --solid-input: @light-3;
   --dropdown-bg: @light-2;
   --dropdown-alt-bg: darken(@light-2, 4%);
   --dropdown-border: @light-2;
@@ -123,6 +80,7 @@
   --midtone: @light-5;
   --nav-border: @navy;
   --slider-bg: @light-3;
+  --slider-progress: @dark-5;
   --shadow: rgba(55, 71, 79, 0.12);
 }
 
@@ -148,6 +106,6 @@
   --scrollbar: @dark-4;
   --midtone: @light-1;
   --nav-border: @light-1;
-  --slider-bg: @dark-3;
+  --slider-bg: @dark-4;
   --shadow: rgba(1, 2, 2, 0.16);
 }

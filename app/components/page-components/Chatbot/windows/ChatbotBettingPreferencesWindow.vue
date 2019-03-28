@@ -91,31 +91,18 @@
 }
 
 .window-toggle__wrapper {
-  background-color: @day-primary;
+  background-color: var(--background);
   z-index: 1;
   width: 100%;
   padding: 15px;
   padding-left: 0px;
   height: 48px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   text-align: right;
 
   .window-toggle__icon {
     .margin-left();
-  }
-}
-
-.night-theme {
-  .window-toggle__wrapper {
-    background-color: @night-primary;
-    border-color: @night-border;
-  }
-  .loyalty-flex__underline {
-    border-bottom-color: @night-border;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    .margin-bottom(2);
   }
 }
 </style>

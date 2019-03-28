@@ -59,7 +59,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 6px;
-  background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
+  background: linear-gradient(rgba(0, 0, 0, 0), @dark-1 40%);
   border-radius: 0 0 @radius @radius;
 
   i {
@@ -69,7 +69,7 @@
   }
 
   .icon-close {
-    color: @red;
+    color: var(--warning);
   }
 }
 

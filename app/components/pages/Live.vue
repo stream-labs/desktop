@@ -144,10 +144,5 @@
   .live-display-placeholder__img--night {
     display: block;
   }
-
-  .live-display-wrapper {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
 }
 </style>

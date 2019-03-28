@@ -229,7 +229,7 @@
 }
 
 .variation-tile.active {
-  border: 1px solid @teal;
+  border: 1px solid var(--teal);
 
   .variation-tile__image-box {
     border: 1px solid @teal-light-opac;

@@ -51,7 +51,7 @@
   }
 
   .icon-close {
-    color: @red;
+    color: var(--warning);
   }
 }
 

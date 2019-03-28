@@ -59,7 +59,7 @@
   margin: 20px 10px 0;
   border: 2px solid transparent;
   .radius;
-  background: @night-select-bg;
+  background: var(--link);
   padding: 12px;
   text-align: left;
   display: flex;
@@ -72,13 +72,13 @@
   }
 
   &.selected {
-    border-color: @teal;
+    border-color: var(--teal);
 
     &:before {
       content: '\f00c';
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
-      color: @teal;
+      color: var(--teal);
       position: absolute;
       top: 6px;
       right: 10px;
@@ -125,7 +125,7 @@
 
 .widget-detail {
   .radius;
-  background: @night-select-bg;
+  background: var(--link);
   overflow: hidden;
   width: 80%;
   min-width: 550px;
