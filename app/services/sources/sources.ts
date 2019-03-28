@@ -219,6 +219,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   addFile(path: string): Source {
+    let realpath = fs.realpathSync(path);
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: [
@@ -238,7 +239,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       browser_source: ['html'],
       text_gdiplus: ['txt'],
     };
-    let ext = path.split('.').splice(-1)[0];
+    let ext = realpath.split('.').splice(-1)[0];
     if (!ext) return null;
     ext = ext.toLowerCase();
     const filename = path.split('\\').splice(-1)[0];
