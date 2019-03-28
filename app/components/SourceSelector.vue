@@ -105,7 +105,7 @@ i.disabled {
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  border-color: @day-section;
+  border-color: var(--section);
 }
 
 .title-container {
@@ -127,16 +127,6 @@ i.disabled {
 }
 
 .title-container {
-  color: @day-title
-}
-
-.night-theme {
-  .title-container {
-    color: @grey;
-  }
-
-  .sl-vue-tree.sl-vue-tree-root {
-    border-color: @night-section;
-  }
+  color: var(--title);
 }
 </style>

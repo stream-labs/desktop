@@ -150,7 +150,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   protected abstract get state(): ISceneItemNode;
-  protected abstract remove(): void;
+  abstract remove(): void;
 
   // TODO: Simplify this mutation so it is safe
   @mutation({ unsafe: true })

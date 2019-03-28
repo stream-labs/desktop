@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
 import { ISourceApi, TSourceType, ISource, ISourceAddOptions } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
-import { AnchorPoint, AnchorPositions } from '../../util/ScalableRectangle';
 
 /**
  * Api for scenes management

@@ -15,7 +15,6 @@
 @day-input-border: #E3E8EB;
 @day-input-bg: #FBFCFC;
 @day-focus-border: darken(#E3E8EB, 4%);
-@day-title: #2b383f;
 
 @night-primary: #17242D;
 @night-secondary: #09161d;
@@ -79,10 +78,6 @@
 @icon: #91979A;
 
 // TODO: Replace with scoped variables
-@day-bg: @light-1;
-@day-section: @light-2;
-@day-title: @dark-2;
-@day-paragraph: @dark-5;
 @day-button: @light-3;
 @day-link: @dark-5;
 @day-link-active: @dark-2;
@@ -93,11 +88,6 @@
 @day-dropdown-border: @light-2;
 @day-shadow: rgba(55, 71, 79, 0.12);
 
-@night-bg: @dark-3;
-@night-section: @dark-2;
-@night-section-alt: @dark-4;
-@night-title: @light-1;
-@night-paragraph: @light-4;
 @night-button: @dark-5;
 @night-link: @light-4;
 @night-link-active: @light-1;
@@ -116,15 +106,23 @@
   --section-alt: @light-2;
   --title: @dark-2;
   --paragraph: @dark-5;
+  --border: @light-2;
   --button: @light-3;
+  --button-hover: darken(@light-3, 8%);
   --link: @dark-5;
   --link-active: @dark-2;
   --input-bg: @light-1;
   --input-border: @light-3;
+  --focus-border: darken(@light-3, 4%);
   --solid-input: @light-2;
   --dropdown-bg: @light-2;
+  --dropdown-alt-bg: darken(@light-2, 4%);
   --dropdown-border: @light-2;
   --hover: @light-2;
+  --scrollbar: @light-1;
+  --midtone: @light-5;
+  --nav-border: @navy;
+  --slider-bg: @light-3;
   --shadow: rgba(55, 71, 79, 0.12);
 }
 
@@ -134,15 +132,22 @@
   --section-alt: @dark-4;
   --title: @light-1;
   --paragraph: @light-4;
+  --border: @dark-4;
   --button: @dark-5;
+  --button-hover: lighten(@dark-5, 8%);
   --link: @light-4;
   --link-active: @light-1;
   --input-bg: transparent;
   --input-border: @dark-5;
+  --focus-border: lighten(@dark-5, 4%);
   --solid-input: @dark-4;
   --dropdown-bg: @dark-4;
+  --dropdown-alt-bg: darken(@dark-4, 4%);
   --dropdown-border: @dark-4;
   --hover: @dark-4;
+  --scrollbar: @dark-4;
+  --midtone: @light-1;
+  --nav-border: @light-1;
+  --slider-bg: @dark-3;
   --shadow: rgba(1, 2, 2, 0.16);
 }
-

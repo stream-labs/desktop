@@ -22,9 +22,10 @@ export const API_NAME_MAP = {
   fanfunding: 'fanfunding',
   subscriber: 'subscribers', // YouTube
   sponsor: 'sponsors',
-  support: 'support',
-  like: 'likes',
-  star: 'stars',
+  facebook_support: 'support',
+  facebook_like: 'likes',
+  facebook_stars: 'stars',
+  facebook_share: 'shares',
   facemaskdonation: 'facemasks',
 };
 
