@@ -52,7 +52,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       sub_duration: 8,
       extension_enabled: false,
       bits_enabled: false,
-      bits_duaration: 10,
+      bits_duration: 10,
       bits_price: 500,
       pricing_options: [200, 500, 1000, 2000, 10000],
       primary_platform: 'twitch_account',
@@ -217,7 +217,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     if (this.registeredBits[bits.eventId] && this.facemaskFilter) {
       const uuid = this.registeredBits[bits.eventId];
       delete this.registeredBits[bits.eventId];
-      this.trigger(uuid, this.state.settings.bits_duaration);
+      this.trigger(uuid, this.state.settings.bits_duration);
     }
   }
 
@@ -255,7 +255,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.startup();
     }
 
-    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents) {
+    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents()) {
       this.registerDonationEvent({
         facemask: event.message[0].facemask,
         eventId: event.message[0]._id,
@@ -264,7 +264,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
     if (
       event.type === 'subscription' &&
-      this.shouldQueueSubscriptionEvents &&
+      this.shouldQueueSubscriptionEvents() &&
       event.message[0].subscriber_twitch_id
     ) {
       this.registerSubscriptionEvent({
@@ -274,7 +274,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       });
     }
 
-    if (event.type === 'bits' && this.shouldQueueBitsEvents && event.message[0].data) {
+    if (event.type === 'bits' && this.shouldQueueBitsEvents() && event.message[0].data) {
       this.registerBitsEvent({
         facemask: event.message[0].data.facemask,
         eventId: event.message[0].data.fm_id,
@@ -287,11 +287,15 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   onAlertPlayingSocketEvent(event: IAlertPlayingSocketEvent) {
-    if (event.message.type === 'donation' && event.message.facemask) {
+    if (
+      event.message.type === 'donation' &&
+      event.message.facemask &&
+      this.shouldQueueDonationEvents()
+    ) {
       this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
     }
 
-    if (event.message.type === 'subscription' && this.shouldQueueSubscriptionEvents) {
+    if (event.message.type === 'subscription' && this.shouldQueueSubscriptionEvents()) {
       this.playSubscriptionEvent({
         subscriberId: event.message.subscriber_twitch_id,
         subPlan: event.message.sub_plan,
@@ -299,7 +303,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       });
     }
 
-    if (event.message.type === 'bits' && this.shouldQueueBitsEvents && event.message.data) {
+    if (event.message.type === 'bits' && this.shouldQueueBitsEvents() && event.message.data) {
       this.playBitsEvent({
         facemask: event.message.data.facemask,
         eventId: event.message.data.fm_id,
