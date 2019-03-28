@@ -23,8 +23,18 @@
           <span v-else>{{$t(statusResponse.streamelements)}}</span>
         </div>
       </div>
+      <div class="section import-section">
+        <div class="section-content import-section__content">
+          <span>{{ $t('Desktop Streamlabs Chatbot') }}</span>
+          <button
+            class="button button--default"
+            @click="$modal.show('desktop-modal');"
+          >{{ $t('Instructions') }}</button>
+        </div>
+      </div>
       <ChatbotExtensionModal/>
       <ChatbotStreamElementsModal/>
+      <DesktopInstructionsModal/>
     </div>
   </transition>
 </template>

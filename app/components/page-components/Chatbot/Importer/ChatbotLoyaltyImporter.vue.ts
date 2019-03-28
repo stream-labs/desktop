@@ -2,11 +2,13 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import ChatbotExtensionModal from './ChatbotExtensionModal.vue';
 import ChatbotStreamElementsModal from './ChatbotStreamElementsModal.vue';
+import DesktopInstructionsModal from './DesktopInstructionsModal.vue';
 
 @Component({
   components: {
     ChatbotExtensionModal,
     ChatbotStreamElementsModal,
+    DesktopInstructionsModal,
   },
 })
 export default class ChatbotLoyaltyImporter extends ChatbotBase {
