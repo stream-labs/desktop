@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="!resizingInProgress && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+      <div class="live-dock-chat" v-if="!hideStyleBlockingElements && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -98,7 +98,7 @@
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
-        <span v-if="!resizingInProgress">{{ $t('Your chat is currently offline') }}</span>
+        <span v-if="!hideStyleBlockingElements">{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>
