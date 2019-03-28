@@ -11,7 +11,10 @@ export default class CustomLoader extends Vue {
     $t('Callibrating RNG blame threshold...'),
     $t('Dropping fire mixtape...'),
     $t('Reticulating emoji splines...'),
-    $t('Initializing sponsorship deals...'),
+    $t('Waking up 24/7 support team...'),
+    $t('Asking the stream gods for perfect settings...'),
+    $t('Powering up the clouds...'),
+    $t('Constructing additional widgets...'),
   ];
 
   render(h: Function) {
