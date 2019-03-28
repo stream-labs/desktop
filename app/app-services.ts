@@ -21,7 +21,7 @@ export { OnboardingService } from 'services/onboarding';
 export { NavigationService } from 'services/navigation';
 export { PerformanceService } from 'services/performance';
 export { PerformanceMonitorService } from 'services/performance-monitor';
-export { SettingsService, StreamEncoderSettingsService } from 'services/settings';
+export { SettingsService, OutputSettingsService } from 'services/settings';
 export { VideoService } from 'services/video';
 export { WindowsService } from 'services/windows';
 export { TransitionsService } from 'services/transitions';
