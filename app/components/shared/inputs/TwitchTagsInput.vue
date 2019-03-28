@@ -201,7 +201,7 @@ table.sp-table {
 }
 
 .sp-selected-tag {
-  color: @white !important;
+  color: var(--white) !important;
 }
 
 // HACK: specificity hack for the hover color for options

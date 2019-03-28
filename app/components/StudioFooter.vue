@@ -133,7 +133,7 @@
     background-color: var(--warning);
 
     span {
-      color: @white;
+      color: var(--white);
     }
   }
 

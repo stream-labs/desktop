@@ -107,6 +107,7 @@ if (
 }
 
 require('./app.g.less');
+require('./themes.g.less');
 
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);

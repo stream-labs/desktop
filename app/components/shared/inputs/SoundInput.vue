@@ -59,7 +59,7 @@
   transition: 0.1s all linear;
   &:hover {
     cursor: pointer;
-    color: @white;
+    color: var(--white);
   }
 }
 

@@ -206,7 +206,7 @@
 
 .select-widgets__column-title {
   .weight(@medium);
-  color: @white;
+  color: var(--white);
   font-size: 14px;
 }
 

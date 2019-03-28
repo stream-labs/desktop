@@ -115,9 +115,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background: var(--section);
 
   span {
-    color: @grey;
+    color: var(--icon);
     font-size: 12px;
   }
 }
@@ -132,11 +133,6 @@
 }
 
 .night-theme {
-  .live-display-placeholder {
-    background: @navy-secondary;
-    border-color: @navy-secondary;
-  }
-
   .live-display-placeholder__img--day {
     display: none;
   }

@@ -66,7 +66,7 @@
 }
 
 .onboarding-title {
-  color: @white;
+  color: var(--white);
   font-size: 22px;
   .margin-bottom(3);
 }
@@ -74,7 +74,7 @@
 .onboarding-title--sm {
   font-size: 15px;
   .weight(@medium);
-  color: @white;
+  color: var(--white);
 }
 
 .onboarding-desc {
