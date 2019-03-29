@@ -14,6 +14,7 @@ class ObsTextInput extends ObsInput<IObsInput<string>> {
 
   get metadata() {
     return {
+      name: this.value.name,
       masked: this.value.masked,
       disabled: this.value.enabled === false,
       rows: 4,

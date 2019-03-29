@@ -12,9 +12,7 @@ async function testGoal(t: TExecutionContext, goalType: string) {
   await addSource(t, goalType, goalType, false);
 
   await client.click('li=Visual Settings');
-  const formName = 'visual-properties-form';
-
-  const formMonkey = new FormMonkey(t);
+  const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
   const testSet1 = {
     layout: 'standard',
@@ -26,9 +24,9 @@ async function testGoal(t: TExecutionContext, goalType: string) {
     font: 'Roboto',
   };
 
-  await formMonkey.fill(formName, testSet1);
+  await formMonkey.fill(testSet1);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes(formName, testSet1));
+  t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
     layout: 'condensed',
@@ -40,9 +38,9 @@ async function testGoal(t: TExecutionContext, goalType: string) {
     font: 'Open Sans',
   };
 
-  await formMonkey.fill(formName, testSet2);
+  await formMonkey.fill(testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes(formName, testSet2));
+  t.true(await formMonkey.includes(testSet2));
 }
 
 // TODO: Test is flaky

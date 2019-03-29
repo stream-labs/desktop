@@ -5,6 +5,7 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUserName, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { async } from 'rxjs/internal/scheduler/async';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -38,6 +39,11 @@ export async function focusLibrary(t: any) {
   // doesn't work without delay, probably need to wait until load
   await sleep(2000);
   await focusWindow(t, /streamlabs\.com\/library/);
+}
+
+// Close current focused window
+export async function closeWindow(t: any) {
+  await t.context.app.browserWindow.close();
 }
 
 interface ITestRunnerOptions {

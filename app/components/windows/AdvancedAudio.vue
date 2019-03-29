@@ -3,7 +3,7 @@
   :show-controls="false"
 >
 
-  <div slot="content">
+  <form slot="content">
 
 
     <table>
@@ -18,7 +18,7 @@
         </tr>
       </thead>
 
-      <tr v-for="audioSource in audioSources" :key="audioSource.name">
+      <tr v-for="audioSource in audioSources" :key="audioSource.name" :name="audioSource.name">
         <td>{{ audioSource.name }}</td>
         <td
           v-for="formInput in audioSource.getSettingsForm()"
@@ -38,7 +38,7 @@
 
     </table>
 
-  </div>
+  </form>
 
 </modal-layout>
 </template>
