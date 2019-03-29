@@ -81,6 +81,9 @@ export class OutageNotificationsService extends Service {
       return;
     }
 
+    // The current version of SLOBS is up to date
+    if (msg.id === 'slobs-out-of-date-0.12') return;
+
     // The current message is still in effect
     if (this.currentMessageId === msg.id) return;
 
