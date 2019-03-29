@@ -14,6 +14,7 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() readonly value: string;
   @Prop() readonly metadata: IMediaGalleryMetadata;
+  @Prop() readonly title: string;
 
   url: string = '';
   showUrlUpload = false;

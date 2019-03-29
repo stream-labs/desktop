@@ -1,14 +1,13 @@
 import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import { BaseInput } from './BaseInput';
+import { IInputMetadata } from './index';
 
 @Component({})
-export default class BoolInput extends BaseInput<
-  boolean,
-  { name: string; title: string; disabled: boolean }
-> {
+export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
   @Prop() readonly value: boolean;
   @Prop() readonly title: string;
+  @Prop() readonly metadata: IInputMetadata;
 
   handleClick(e?: MouseEvent) {
     this.emitInput(!this.value, e);

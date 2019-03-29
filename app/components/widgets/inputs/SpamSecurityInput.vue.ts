@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMetadata> {
   @Prop() readonly value: number;
   @Prop() readonly metadata: ISpamSecurityMetadata;
+  @Prop() readonly title: string;
 
   idxMod = this.metadata.indexModifier || 0;
 

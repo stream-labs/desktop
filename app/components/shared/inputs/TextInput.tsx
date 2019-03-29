@@ -12,6 +12,8 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
   @Prop({ default: () => ({}) })
   readonly metadata: ITextMetadata;
 
+  @Prop() readonly title: string;
+
   textVisible = !this.metadata.masked;
 
   toggleVisible() {

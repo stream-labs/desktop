@@ -12,6 +12,7 @@ import { TextInput } from './inputs';
 export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata> {
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() readonly value: string;
+  @Prop() readonly title: string;
   @Prop() readonly metadata: IMediaGalleryMetadata;
 
   url: string = '';
