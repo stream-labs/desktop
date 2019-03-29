@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.12.3-preview.4",
+  "version": "0.12.3-preview.5",
   "main": "main.js",
   "engines": {
     "node": ">= 10 < 12",
