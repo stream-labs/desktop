@@ -1,6 +1,12 @@
-import { closeWindow, focusChild, focusMain, test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import {
+  closeWindow,
+  focusChild,
+  focusMain,
+  test,
+  TExecutionContext,
+  useSpectron,
+} from '../helpers/spectron';
 import { FormMonkey } from '../helpers/form-monkey';
-import { sleep } from '../helpers/sleep';
 
 useSpectron();
 
@@ -50,7 +56,7 @@ test('Change Advanced Audio Settings', async t => {
   await desktopAudioForm.fill(updatedSettings);
   await micAuxForm.fill(updatedSettings);
 
-  // check settings still updated after window close
+  // check settings are still updated after window close
   await closeWindow(t);
   await focusMain(t);
   await clickAdvancedAudio(t);
