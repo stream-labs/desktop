@@ -53,7 +53,7 @@
           />
         </h-form-group>
       </div>
-      <div class="row">
+      <div class="row" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Sub Alert Duration')">
           <slider-input v-model="subsDurationModel" :metadata="{min: 2, max: 300}"/>
         </h-form-group>
@@ -102,7 +102,7 @@
           />
         </h-form-group>
       </div>
-      <div class="row">
+      <div class="row" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Bits Alert Duration')">
           <slider-input v-model="bitsDurationModel" :metadata="{min: 2, max: 300}"/>
         </h-form-group>
