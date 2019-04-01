@@ -18,6 +18,6 @@ export default class CustomLoader extends Vue {
   ];
 
   render(h: Function) {
-    return <Loading loadingStrs={this.loadingStrings} />;
+    return <Loading loadingStrs={this.loadingStrings} isRandom />;
   }
 }

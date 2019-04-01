@@ -9056,10 +9056,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.3.29:
-  version "0.3.29"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.29.tgz#65abaef7755f225931f2dddcd1b27b9718bae2e3"
-  integrity sha512-D2Ba4GzMThVzXjqvTRHyfGwKTnt1RgmeblEIi7gCumKc17s0EHKm8+C58Lvl9APtYYm8lT0ZrXPmwpwmLixW3Q==
+streamlabs-beaker@^0.3.54:
+  version "0.3.54"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.54.tgz#7f0cc14e25e6c144d187caef1428030a88a0746b"
+  integrity sha512-GgNPNpOxllY/Zzv2rcXgktdMp+TeRJhdOYgYSEQ/uWXvuIIfpzm4y3bNMo469AOX6kZGiI8usnOAnuiBno9cvQ==
   dependencies:
     google-fonts-webpack-plugin "^0.4.4"
     v-tooltip "^2.0.0-rc.33"
