@@ -243,7 +243,7 @@
   "Amount of currency a viewer will receive when raiding the channel.": "Amount of currency a viewer will receive when raiding the channel.",
   "Donation Bonus": "Donation Bonus",
   "Super Chat Bonus": "Super Chat Bonus",
-  "This timer name is already taken. Try another name.": "This timer name is already taken. Try another name."
+  "This timer name is already taken. Try another name.": "This timer name is already taken. Try another name.",
   "Permit Duration": "Permit Duration",
   "Add to Whitelist": "Add to Whitelist",
   "Add to Blacklist": "Add to Blacklist",
@@ -291,7 +291,7 @@
   "Prime": "Prime",
   "Poll Option": "Poll Option",
   "Send chat notification when voting": "Send chat notification when voting",
-  "Notify a viewer that their vote has been registered in chat.": "Notify a viewer that their vote has been registered in chat."
+  "Notify a viewer that their vote has been registered in chat.": "Notify a viewer that their vote has been registered in chat.",
   "This title is already taken. Try another title.": "This title is already taken. Try another title.",
   "Maximum Queue Size": "Maximum Queue Size",
   "Pick User Message": "Pick User Message",
