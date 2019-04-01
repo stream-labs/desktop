@@ -188,8 +188,8 @@ export default class LiveDock extends Vue {
     this.chatService.refreshChat();
   }
 
-  get resizingInProgress() {
-    return this.customizationService.state.resizingInProgress;
+  get hideStyleBlockingElements() {
+    return this.customizationService.state.hideStyleBlockingElements;
   }
 
   get hasChatApps() {

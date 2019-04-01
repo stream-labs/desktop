@@ -147,7 +147,7 @@
 }
 
 .transition-default {
-  color: @teal;
+  color: var(--teal);
 }
 
 .transition-default-selector {
@@ -156,7 +156,7 @@
 
   &:hover {
     :not(.transition-default) {
-      color: @white;
+      color: var(--white);
     }
   }
 }
@@ -171,10 +171,10 @@
 }
 
 .transition-redundant {
-  color: @yellow;
+  color: var(--new);
 
   &:hover {
-    color: @yellow;
+    color: var(--new);
   }
 }
 
@@ -193,7 +193,7 @@
 .night-theme {
   .transition-control {
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
   .transition-control.disabled:hover {

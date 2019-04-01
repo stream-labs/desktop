@@ -57,7 +57,7 @@ export class ExternalApiService extends RpcApi {
   /**
    * InternalApiService is for fallback calls
    */
-  @Inject() private internalApiService: InternalApiService;
+  @Inject() internalApiService: InternalApiService;
   /**
    * List of all API resources
    * @see RpcApi.getResource()

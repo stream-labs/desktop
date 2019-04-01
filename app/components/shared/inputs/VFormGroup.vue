@@ -63,7 +63,7 @@
     align-self: center;
     display: inline-block;
     z-index: 1;
-    color: @icon;
+    color: var(--icon);
     line-height: 0;
   }
 
@@ -73,6 +73,6 @@
     font-size: 11px;
 
     .whisper { font-style: italic; }
-    .input-error { color: @red; }
+    .input-error { color: var(--warning); }
   }
 </style>

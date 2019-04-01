@@ -17,6 +17,9 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
   @Prop({ default: () => ({}) })
   readonly metadata: IWTextMetadata;
 
+  @Prop()
+  readonly title: string;
+
   getValidations() {
     return {
       ...super.getValidations(),

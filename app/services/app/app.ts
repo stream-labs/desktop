@@ -32,6 +32,7 @@ import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
+import { CustomizationService } from 'services/customization';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -78,6 +79,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private customizationService: CustomizationService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   private pid = require('process').pid;
@@ -189,6 +191,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
+      this.customizationService.setSettings({ hideStyleBlockingElements: true });
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -196,7 +199,9 @@ export class AppService extends StatefulService<IAppState> {
       if (this.windowsService.state.child.componentName !== 'ManageSceneCollections') {
         this.windowsService.closeChildWindow();
       }
-      this.windowsService.closeAllOneOffs();
+
+      // wait until all one-offs windows like Projectors will be closed
+      await this.windowsService.closeAllOneOffs();
 
       // This is kind of ugly, but it gives the browser time to paint before
       // we do long blocking operations with OBS.
@@ -236,6 +241,11 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.startRequestsHandling();
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
+    // Set timeout to allow transition animation to play
+    setTimeout(
+      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
+      500,
+    );
     if (error) throw error;
     return returningValue;
   }

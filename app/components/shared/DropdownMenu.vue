@@ -74,7 +74,7 @@
 
   &:hover,
   &.active {
-    color: @navy;
+    color: var(--navy);
   }
 }
 

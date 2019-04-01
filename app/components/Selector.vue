@@ -60,7 +60,7 @@
   border: 1px solid transparent;
 
   &.selector-item--active {
-    background-color: var(--button);
+    background-color: var(--solid-input);
     color: var(--title);
     .weight(@medium);
 

@@ -187,16 +187,16 @@
 @import "../../styles/index";
 
 .streamlabel-token {
-  color: @teal;
+  color: var(--teal);
 }
 
 .streamlabel-preview {
-  color: @black;
+  color: var(--black);
 }
 
 .night-theme {
   .streamlabel-preview {
-    color: @white;
+    color: var(--white);
   }
 }
 </style>

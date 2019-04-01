@@ -17,6 +17,8 @@ export default class AlertLayoutInput extends BaseInput<string, IListMetadata<st
   @Prop()
   readonly metadata: IListMetadata<string>;
 
+  @Prop() readonly title: string;
+
   get layoutOptions() {
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 

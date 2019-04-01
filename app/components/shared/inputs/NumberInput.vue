@@ -40,7 +40,7 @@
     .arrows {
       .absolute(0, 8px, 0, auto);
       width: 30px;
-      color: @grey;
+      color: var(--icon);
       opacity: .7;
       cursor: pointer;
       .transition();

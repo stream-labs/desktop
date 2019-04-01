@@ -317,7 +317,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.source.sourceState, ...this.audioSourceState };
+    return { ...this.source.state, ...this.audioSourceState };
   }
 
   getSettingsForm(): TObsFormData {

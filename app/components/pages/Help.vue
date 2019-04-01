@@ -107,20 +107,20 @@
 .callout--discord {
   background-color: @discord;
   .padding(2);
-  color: @white;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   a {
     display: inline-block;
-    color: @white;
+    color: var(--white);
     .weight(@medium);
   }
 }
 
 .button--discord {
-  background-color: @white;
+  background-color: var(--white);
   color: @discord;
 
   .icon-discord {
@@ -161,7 +161,7 @@
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     content: '\f04b';
-    color: @white;
+    color: var(--white);
     position: absolute;
     top: 0;
     right: 0;

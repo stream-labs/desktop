@@ -73,7 +73,7 @@
   text-align: center;
   opacity: .26;
   margin-left: 8px;
-  color: @grey;
+  color: var(--icon);
 }
 
 .fa.disabled,
@@ -99,7 +99,7 @@ i.disabled {
     .source-selector-action {
       .transition();
       opacity: 1;
-      color: @grey;
+      color: var(--icon);
     }
   }
 }
@@ -110,7 +110,7 @@ i.disabled {
 
 .title-container {
   display: inline-block;
-  color: @grey;
+  color: var(--icon);
 }
 
 .layer-icon {

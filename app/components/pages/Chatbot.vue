@@ -64,12 +64,12 @@
 }
 .chatbot__side-menu {
   width: 200px;
-  background: @day-secondary;
-  border-right: 1px solid @day-border;
+  background: var(--section);
+  border-right: 1px solid var(--border);
 
   .chatbot__side-menu__global-toggle {
     padding: 20px;
-    background-color: #eaf9f5;
+    background-color: var(--slider-bg);
     .weight(@bold);
   }
   .side-menu {
@@ -83,17 +83,6 @@
     .chatbot__side-menu__tab__description {
       font-size: 12px;
       line-height: 13px;
-    }
-  }
-}
-
-.night-theme {
-  .chatbot__side-menu {
-    border-color: @night-secondary;
-    background-color: @night-secondary;
-
-    .chatbot__side-menu__global-toggle {
-      background-color: #173134;
     }
   }
 }

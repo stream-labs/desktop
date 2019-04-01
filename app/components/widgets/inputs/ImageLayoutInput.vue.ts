@@ -11,6 +11,9 @@ export default class ImageLayoutInput extends BaseInput<string, IListMetadata<st
   readonly value: string;
 
   @Prop()
+  readonly title: string;
+
+  @Prop()
   readonly metadata: IListMetadata<string>;
 
   layoutOptions = [
