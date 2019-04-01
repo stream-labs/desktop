@@ -35,5 +35,10 @@
   "Next": "Next",
   "Scene Collections Import": "Scene Collections Import",
   "The following scene collections have been imported from your Streamlabs account": "The following scene collections have been imported from your Streamlabs account",
-  "Continue": "Continue"
+  "Continue": "Continue",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
