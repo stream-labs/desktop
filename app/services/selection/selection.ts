@@ -23,6 +23,7 @@ import { Source } from '../sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { Rect } from '../../util/rect';
 import { WindowsService } from 'services/windows';
+import { isTextProperty } from 'obs-studio-node';
 
 /**
  * represents selection of active scene and provide shortcuts
@@ -64,6 +65,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
+  getTransform: () => { crop: any; position: any; scale: any };
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
   copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
@@ -341,6 +343,12 @@ export class Selection implements ISelection {
 
   getLastSelectedId(): string {
     return this.state.lastSelectedId;
+  }
+
+  getTransform() {
+    if (!this.isSceneItem) return;
+    const item = this.getNodes()[0] as SceneItem;
+    return item.sceneItemState.transform;
   }
 
   getSize(): number {
