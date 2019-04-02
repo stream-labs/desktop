@@ -72,5 +72,11 @@
   "Video Bitrate": "Video Bitrate",
   "Scene item selection mode": "Scene item selection mode",
   "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
-  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item"
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
