@@ -104,7 +104,7 @@ function startApp() {
     );
   }
 
-  const bt = require('backtrace-node');
+  const Sentry = require('@sentry/node');
 
   function handleFinishedReport() {
     dialog.showErrorBox(`Unhandled Exception`,
@@ -119,19 +119,12 @@ function startApp() {
   }
 
   function handleUnhandledException(err) {
-    bt.report(err, {}, handleFinishedReport);
+    Sentry.captureException(err);
+    handleFinishedReport();
   }
 
   if (pjson.env === 'production') {
-    bt.initialize({
-      disableGlobalHandler: true,
-      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-      attributes: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
+    Sentry.init({ dsn: 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674' });
 
     process.on('uncaughtException', handleUnhandledException);
 
