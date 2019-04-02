@@ -61,6 +61,7 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 
 const { ipcRenderer } = electron;
 
@@ -125,6 +126,7 @@ export class ServicesManager extends Service {
     QuestionaireService,
     MonitorCaptureCroppingService,
     NicoliveProgramService,
+    NicoliveProgramStateService,
   };
 
   private instances: Dictionary<Service> = {};

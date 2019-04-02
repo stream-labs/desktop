@@ -2,6 +2,7 @@ import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
 import { ProgramSchedules } from './ResponseTypes';
 import { Inject } from 'util/injector';
+import { NicoliveProgramStateService } from './state';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 
@@ -22,7 +23,10 @@ interface INicoliveProgramState {
   comments: number;
   adPoint: number;
   giftPoint: number;
-  /** TODO: 永続化 */
+  /**
+   * 自動延長状態をコンポーネントに伝えるための一時置き場
+   * 直接ここを編集してはいけない、stateServiceの操作結果を反映するだけにする
+   */
   autoExtensionEnabled: boolean;
   panelOpened: boolean;
 }
@@ -40,6 +44,7 @@ const WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
 };
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
+  @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
   @Inject()
   windowsService: WindowsService;
   @Inject()
@@ -66,8 +71,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     panelOpened: true,
   };
 
-  init() {
+  init(): void {
     super.init();
+
+    this.stateService.updated.subscribe({
+      next: ({ autoExtensionEnabled }) => {
+        this.setState({ autoExtensionEnabled });
+      }
+    });
 
     this.userService.userLoginState.subscribe(user => {
       const isLoggedIn = Boolean(user);
@@ -238,8 +249,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   toggleAutoExtension(): void {
-    const autoExtensionEnabled = !this.state.autoExtensionEnabled;
-    this.setState({ autoExtensionEnabled });
+    this.stateService.toggleAutoExtension();
   }
 
   async extendProgram(): Promise<void> {
