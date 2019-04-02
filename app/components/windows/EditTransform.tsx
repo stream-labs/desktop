@@ -35,10 +35,36 @@ export default class EditTransform extends TsxComponent<{}> {
   setPos(dir: 'x' | 'y') {
     return (value: string) => {
       const delta = Number(value) - Math.round(this.rect[dir]);
-      console.log(value, delta);
       this.selectionService.setDeltaPos(dir, delta);
       this.rect[dir] += delta;
     };
+  }
+
+  setScale(dir: 'width' | 'height') {
+    const scaleKey: 'x' | 'y' = dir === 'width' ? 'x' : 'y';
+    return (value: string) => {
+      if (Number(value) === this.rect[dir]) return;
+      const scale = Number(value) / this.rect[dir];
+      this.selectionService.unilateralScale(scaleKey, scale);
+      this.rect[dir] = Number(value);
+    };
+  }
+
+  cropForm(h: Function) {
+    return this.transform ? (
+      <HFormGroup metadata={{ title: $t('Crop') }}>
+        {['left', 'right', 'top', 'bottom'].map(dir => (
+          <div>
+            <span>{dirMap(dir)}</span>
+            <NumberInput
+              value={this.transform.crop[dir]}
+              metadata={{ isInteger: true }}
+              onInput={this.setTransform('crop', dir)}
+            />
+          </div>
+        ))}
+      </HFormGroup>
+    ) : null;
   }
 
   render(h: Function) {
@@ -62,24 +88,16 @@ export default class EditTransform extends TsxComponent<{}> {
           </HFormGroup>
           <HFormGroup metadata={{ title: $t('Size') }}>
             <div style="display: flex;">
-              <NumberInput value={Math.round(this.rect.width)} metadata={{ isInteger: true }} />
-              <NumberInput value={Math.round(this.rect.height)} metadata={{ isInteger: true }} />
+              {['width', 'height'].map((dir: 'width' | 'height') => (
+                <NumberInput
+                  value={Math.round(this.rect[dir])}
+                  metadata={{ isInteger: true }}
+                  onInput={this.setScale(dir)}
+                />
+              ))}
             </div>
           </HFormGroup>
-          {this.transform && (
-            <HFormGroup metadata={{ title: $t('Crop') }}>
-              {['left', 'right', 'top', 'bottom'].map(dir => (
-                <div>
-                  <span>{dirMap(dir)}</span>
-                  <NumberInput
-                    value={this.transform.crop[dir]}
-                    metadata={{ isInteger: true }}
-                    onInput={this.setTransform('crop', dir)}
-                  />
-                </div>
-              ))}
-            </HFormGroup>
-          )}
+          {this.cropForm(h)}
         </ValidatedForm>
       </ModalLayout>
     );

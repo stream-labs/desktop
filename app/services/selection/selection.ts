@@ -86,6 +86,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   resetTransform: () => void;
   scale: (scale: IVec2, origin?: IVec2) => void;
   scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
+  unilateralScale: (dimension: 'x' | 'y', sale: number) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -347,7 +348,7 @@ export class Selection implements ISelection {
   }
 
   getTransform() {
-    if (!this.isSceneItem) return;
+    if (!this.isSceneItem()) return;
     const item = this.getNodes()[0] as SceneItem;
     return item.sceneItemState.transform;
   }
@@ -583,6 +584,10 @@ export class Selection implements ISelection {
    */
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
+  }
+
+  unilateralScale(dimension: 'x' | 'y', scale: number) {
+    this.getItems().forEach(item => item.unilateralScale(dimension, scale));
   }
 
   setDeltaPos(dir: 'x' | 'y', delta: number) {

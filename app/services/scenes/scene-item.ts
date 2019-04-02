@@ -289,6 +289,13 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.scale(scaleDelta, origin);
   }
 
+  unilateralScale(dimension: 'x' | 'y', scale: number) {
+    const scaleX = dimension === 'x' ? scale : 1;
+    const scaleY = dimension === 'y' ? scale : 1;
+    const scaleDelta = v2(scaleX, scaleY);
+    this.scale(scaleDelta, AnchorPositions[AnchorPoint.NorthWest]);
+  }
+
   flipY() {
     this.preservePosition(() => {
       const rect = this.getRectangle();
