@@ -121,13 +121,13 @@ const simpleEncoderToAnvancedEncoderMap: Dictionary<EObsAdvancedEncoder> = {
 };
 
 /**
- * each encoder have different set of fields
+ * each encoder have different names for setting fields
  */
 export const encoderFieldsMap = {
-  x264: { preset: 'preset', encoderOptions: 'x264opts' },
-  nvenc: { preset: 'preset' },
-  qsv: { preset: 'target_usage' },
-  amd: { preset: 'QualityPreset' },
+  [EEncoderFamily.x264]: { preset: 'preset', encoderOptions: 'x264opts' },
+  [EEncoderFamily.nvenc]: { preset: 'preset' },
+  [EEncoderFamily.qsv]: { preset: 'target_usage' },
+  [EEncoderFamily.amd]: { preset: 'QualityPreset' },
 };
 
 function simpleEncoderToAdvancedEncoder(encoder: EEncoderFamily) {
@@ -137,9 +137,22 @@ function simpleEncoderToAdvancedEncoder(encoder: EEncoderFamily) {
 export function obsEncoderToEncoderFamily(
   obsEncoder: EObsAdvancedEncoder | EObsSimpleEncoder,
 ): EEncoderFamily {
-  if (obsEncoder === 'obs_x264') return EEncoderFamily.x264;
-  const encoder = invert(simpleEncoderToAnvancedEncoderMap)[obsEncoder] || obsEncoder;
-  return encoder as EEncoderFamily;
+  switch (obsEncoder) {
+    case EObsAdvancedEncoder.obs_x264:
+    case EObsSimpleEncoder.x264:
+    case EObsSimpleEncoder.x264_lowcpu:
+      return EEncoderFamily.x264;
+    case EObsSimpleEncoder.qsv:
+    case EObsAdvancedEncoder.obs_qsv11:
+      return EEncoderFamily.qsv;
+    case EObsSimpleEncoder.nvenc:
+    case EObsAdvancedEncoder.ffmpeg_nvenc:
+    case EObsAdvancedEncoder.jim_nvenc:
+      return EEncoderFamily.nvenc;
+    case EObsSimpleEncoder.amd:
+    case EObsAdvancedEncoder.amd_amf_h264:
+      return EEncoderFamily.amd;
+  }
 }
 
 export class OutputSettingsService extends Service {
