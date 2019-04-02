@@ -119,6 +119,12 @@ function startApp() {
   }
 
   function handleUnhandledException(err) {
+
+    Sentry.configureScope((scope) => {
+      scope.setTag("version", process.env.SLOBS_VERSION);
+      scope.setTag("release", process.env.SLOBS_VERSION);
+    });
+    
     Sentry.captureException(err);
     handleFinishedReport();
   }

@@ -2125,15 +2125,6 @@ backo2@1.0.2:
   resolved "https://registry.yarnpkg.com/backo2/-/backo2-1.0.2.tgz#31ab1ac8b129363463e35b3ebb69f4dfcfba7947"
   integrity sha1-MasayLEpNjRj41s+u2n038+6eUc=
 
-backtrace-node@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/backtrace-node/-/backtrace-node-0.7.3.tgz#cdc0d1f89f45a1d30fb3b77a2311947eea339e08"
-  integrity sha1-zcDR+J9FodMPs7d6IxGUfuozngg=
-  dependencies:
-    pend "~1.2.0"
-    source-scan "~1.0.1"
-    streamsink "~1.2.0"
-
 bail@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/bail/-/bail-1.0.3.tgz#63cfb9ddbac829b02a3128cd53224be78e6c21a3"
@@ -8995,13 +8986,6 @@ source-map@~0.5.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
   integrity sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w=
 
-source-scan@~1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/source-scan/-/source-scan-1.0.1.tgz#0ba9f8c2a9356f9531a65beb48b7bb376504e97b"
-  integrity sha1-C6n4wqk1b5UxplvrSLe7N2UE6Xs=
-  dependencies:
-    streamsink "~1.2.0"
-
 spdx-correct@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/spdx-correct/-/spdx-correct-1.0.2.tgz#4b3073d933ff51f3912f03ac5519498a4150db40"
@@ -9167,11 +9151,6 @@ streamlabs-beaker@^0.3.29:
     vue-select "^2.5.1"
     vue-slider-component "^2.8.0"
     vuejs-paginate "^2.1.0"
-
-streamsink@~1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/streamsink/-/streamsink-1.2.0.tgz#efafee9f1e22d3591ed7de3dcaa95c3f5e79f73c"
-  integrity sha1-76/unx4i01ke1949yqlcP1559zw=
 
 string-argv@^0.0.2:
   version "0.0.2"
