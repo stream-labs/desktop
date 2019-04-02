@@ -75,4 +75,25 @@ test('Shows optimized encoder for specific games', async t => {
   //   await app.client.click('button=End Stream');
   //   await app.client.isExisting('button=Go Live');
   // }
+
+  await sleep(9999999);
+
+  await app.client.click('.profile input[type=checkbox]');
+  await sleep(1000);
+  await app.client.click('button=Confirm & Go Live');
+  await focusMain(t);
+  await app.client.waitForExist('button=End Stream');
+  await app.client.click('.top-nav .icon-settings');
+
+  await focusChild(t);
+  await app.client.click('li=Output');
+
+  t.is('Advanced', await app.client.getValue('[data-name=Mode] input'));
+  t.is('Software (x264)', await app.client.getValue('[data-name=Encoder] input'));
+  t.is('2500', await getFormInput(t, 'Bitrate'));
+
+  await app.client.click('button=Done');
+  await focusMain(t);
+  await app.client.click('button=End Stream');
+  await app.client.isExisting('button=Go Live');
 });
