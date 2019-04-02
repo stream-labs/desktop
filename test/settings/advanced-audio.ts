@@ -63,6 +63,4 @@ test('Change Advanced Audio Settings', async t => {
   await focusChild(t);
   t.true(await desktopAudioForm.includes(updatedSettings));
   t.true(await micAuxForm.includes(updatedSettings));
-
-  t.pass();
 });
