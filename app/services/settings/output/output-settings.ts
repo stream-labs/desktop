@@ -12,13 +12,34 @@ export enum EEncoder {
 
 enum EObsEncoder {
   x264 = 'x264',
-  obs_x264 = 'obs_x264',
+  x264_lowcpu = 'x264_lowcpu',
   nvenc = 'nvenc',
-  ffmpeg_nvenc = 'ffmpeg_nvenc',
   amd = 'amd',
-  amd_amf_h264 = 'amd_amf_h264',
   qsv = 'qsv',
+  jim_nvenc = 'jim_nvenc',
+
+  ffmpeg_nvenc = 'ffmpeg_nvenc',
+  obs_x264 = 'obs_x264',
+  amd_amf_h264 = 'amd_amf_h264',
   obs_qsv11 = 'obs_qsv11',
+}
+
+enum EObsSimpleEncoder {
+  x264 = 'x264',
+  x264_lowcpu = 'x264_lowcpu',
+  nvenc = 'nvenc',
+  amd = 'amd',
+  qsv = 'qsv',
+  jim_nvenc = 'jim_nvenc',
+}
+
+enum EObsAdvancedEncoder {
+  x264 = 'x264',
+  x264_lowcpu = 'x264_lowcpu',
+  nvenc = 'nvenc',
+  amd = 'amd',
+  qsv = 'qsv',
+  jim_nvenc = 'jim_nvenc',
 }
 
 enum EFileFormat {
