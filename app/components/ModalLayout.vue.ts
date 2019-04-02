@@ -4,9 +4,21 @@ import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import { AppService } from 'services/app';
+import TsxComponent from 'components/tsx-component';
 
 @Component({})
-export default class ModalLayout extends Vue {
+export default class ModalLayout extends TsxComponent<{
+  showControls?: boolean;
+  showCancel?: boolean;
+  showDone?: boolean;
+  disableDone?: boolean;
+  containsTabs?: boolean;
+  doneHandler?: Function;
+  cancelHandler?: Function;
+  contentStyles?: Dictionary<string>;
+  fixedSectionHeight?: number;
+  customControls?: boolean;
+}> {
   contentStyle: Object = {};
   fixedStyle: Object = {};
 

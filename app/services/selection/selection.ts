@@ -150,10 +150,11 @@ export class SelectionService extends StatefulService<ISelectionState>
   }
 
   openEditTransform() {
+    const windowHeight = this.isSceneItem() ? 460 : 300;
     this.windowsService.showWindow({
       componentName: 'EditTransform',
       title: $t('Edit Transform'),
-      size: { width: 500, height: 670 },
+      size: { width: 500, height: windowHeight },
     });
   }
 

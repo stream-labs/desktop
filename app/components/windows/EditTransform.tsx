@@ -1,5 +1,4 @@
 import { Component } from 'vue-property-decorator';
-import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from 'util/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -8,6 +7,7 @@ import TsxComponent from 'components/tsx-component';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 import { NumberInput } from 'components/shared/inputs/inputs';
+import { WindowsService } from 'services/windows';
 
 const dirMap = (dir: string) =>
   ({
@@ -20,8 +20,11 @@ const dirMap = (dir: string) =>
 @Component({})
 export default class EditTransform extends TsxComponent<{}> {
   @Inject() selectionService: SelectionService;
+  @Inject() windowsService: WindowsService;
 
-  rect = cloneDeep(this.selectionService.getBoundingRect());
+  // We only care about the attributes of the rectangle not the functionality
+  originRect = { ...this.selectionService.getBoundingRect() };
+  rect = { ...this.selectionService.getBoundingRect() };
 
   get transform() {
     return this.selectionService.getTransform();
@@ -50,11 +53,24 @@ export default class EditTransform extends TsxComponent<{}> {
     };
   }
 
+  rotate(deg: number) {
+    return () => this.selectionService.rotate(deg);
+  }
+
+  reset() {
+    this.selectionService.resetTransform();
+    this.rect = { ...this.originRect, x: 0, y: 0 };
+  }
+
+  cancel() {
+    this.windowsService.closeChildWindow();
+  }
+
   cropForm(h: Function) {
     return this.transform ? (
       <HFormGroup metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map(dir => (
-          <div>
+          <div style="display: flex; justify-content: space-between; margin: 0 70px 8px 0; align-items: baseline;">
             <span>{dirMap(dir)}</span>
             <NumberInput
               value={this.transform.crop[dir]}
@@ -69,7 +85,7 @@ export default class EditTransform extends TsxComponent<{}> {
 
   render(h: Function) {
     return (
-      <ModalLayout>
+      <ModalLayout customControls showControls={false}>
         <ValidatedForm slot="content" name="transform">
           <HFormGroup metadata={{ title: $t('Position') }}>
             <div style="display: flex;">
@@ -82,10 +98,6 @@ export default class EditTransform extends TsxComponent<{}> {
               ))}
             </div>
           </HFormGroup>
-          <HFormGroup metadata={{ title: $t('Rotation') }}>
-            <button class="button button--default">{$t('Rotate 90 Degrees CW')}</button>
-            <button class="button button--default">{$t('Rotate 90 Degrees CCW')}</button>
-          </HFormGroup>
           <HFormGroup metadata={{ title: $t('Size') }}>
             <div style="display: flex;">
               {['width', 'height'].map((dir: 'width' | 'height') => (
@@ -97,8 +109,26 @@ export default class EditTransform extends TsxComponent<{}> {
               ))}
             </div>
           </HFormGroup>
+          <HFormGroup metadata={{ title: $t('Rotation') }}>
+            <button class="button button--default" onClick={this.rotate(90)}>
+              {$t('Rotate 90 Degrees CW')}
+            </button>
+            <div style="margin: 8px;" />
+            <button class="button button--default" onClick={this.rotate(-90)}>
+              {$t('Rotate 90 Degrees CCW')}
+            </button>
+          </HFormGroup>
           {this.cropForm(h)}
         </ValidatedForm>
+
+        <div slot="controls">
+          <button class="button button--default" onClick={this.reset}>
+            {$t('Reset')}
+          </button>
+          <button class="button button--action" onClick={this.cancel}>
+            {$t('Done')}
+          </button>
+        </div>
       </ModalLayout>
     );
   }
