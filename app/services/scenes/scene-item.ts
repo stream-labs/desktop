@@ -180,19 +180,23 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   }
 
   nudgeLeft() {
-    this.setTransform({ position: { x: this.transform.position.x - 1 } });
+    this.setDeltaPos('x', -1);
   }
 
   nudgeRight() {
-    this.setTransform({ position: { x: this.transform.position.x + 1 } });
+    this.setDeltaPos('x', 1);
   }
 
   nudgeUp() {
-    this.setTransform({ position: { y: this.transform.position.y - 1 } });
+    this.setDeltaPos('y', -1);
   }
 
   nudgeDown() {
-    this.setTransform({ position: { y: this.transform.position.y + 1 } });
+    this.setDeltaPos('y', 1);
+  }
+
+  setDeltaPos(dir: 'x' | 'y', delta: number) {
+    this.setTransform({ position: { [dir]: this.transform.position[dir] + delta } });
   }
 
   setVisibility(visible: boolean) {

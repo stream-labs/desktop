@@ -1,4 +1,5 @@
 import { Component } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from 'util/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -7,22 +8,37 @@ import TsxComponent from 'components/tsx-component';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 import { NumberInput } from 'components/shared/inputs/inputs';
-import { Rect } from 'util/rect';
+
+const dirMap = (dir: string) =>
+  ({
+    left: $t('Left'),
+    right: $t('Right'),
+    top: $t('Top'),
+    bottom: $t('Bottom'),
+  }[dir]);
 
 @Component({})
 export default class EditTransform extends TsxComponent<{}> {
   @Inject() selectionService: SelectionService;
 
-  mounted() {
-    console.log(this.selectionService.getTransform());
+  rect = cloneDeep(this.selectionService.getBoundingRect());
+
+  get transform() {
+    return this.selectionService.getTransform();
   }
 
-  get rect() {
-    return this.selectionService.getBoundingRect();
+  setTransform(key: string, subkey: string) {
+    return (value: string) =>
+      this.selectionService.setTransform({ [key]: { [subkey]: Number(value) } });
   }
 
-  get lastSelected() {
-    return this.selectionService.getLastSelected();
+  setPos(dir: 'x' | 'y') {
+    return (value: string) => {
+      const delta = Number(value) - Math.round(this.rect[dir]);
+      console.log(value, delta);
+      this.selectionService.setDeltaPos(dir, delta);
+      this.rect[dir] += delta;
+    };
   }
 
   render(h: Function) {
@@ -31,8 +47,13 @@ export default class EditTransform extends TsxComponent<{}> {
         <ValidatedForm slot="content" name="transform">
           <HFormGroup metadata={{ title: $t('Position') }}>
             <div style="display: flex;">
-              <NumberInput value={Math.round(this.rect.x)} metadata={{ isInteger: true }} />
-              <NumberInput value={Math.round(this.rect.y)} metadata={{ isInteger: true }} />
+              {['x', 'y'].map((dir: 'x' | 'y') => (
+                <NumberInput
+                  value={Math.round(this.rect[dir])}
+                  metadata={{ isInteger: true }}
+                  onInput={this.setPos(dir)}
+                />
+              ))}
             </div>
           </HFormGroup>
           <HFormGroup metadata={{ title: $t('Rotation') }}>
@@ -45,20 +66,18 @@ export default class EditTransform extends TsxComponent<{}> {
               <NumberInput value={Math.round(this.rect.height)} metadata={{ isInteger: true }} />
             </div>
           </HFormGroup>
-          {this.selectionService.isSceneItem() && (
+          {this.transform && (
             <HFormGroup metadata={{ title: $t('Crop') }}>
-              <div style="display: flex;">
-                <span>{$t('Left')}</span>
-                <NumberInput value={0} metadata={{ isInteger: true }} />
-                <span>{$t('Right')}</span>
-                <NumberInput value={0} metadata={{ isInteger: true }} />
-              </div>
-              <div style="display: flex;">
-                <span>{$t('Top')}</span>
-                <NumberInput value={0} metadata={{ isInteger: true }} />
-                <span>{$t('Bottom')}</span>
-                <NumberInput value={0} metadata={{ isInteger: true }} />
-              </div>
+              {['left', 'right', 'top', 'bottom'].map(dir => (
+                <div>
+                  <span>{dirMap(dir)}</span>
+                  <NumberInput
+                    value={this.transform.crop[dir]}
+                    metadata={{ isInteger: true }}
+                    onInput={this.setTransform('crop', dir)}
+                  />
+                </div>
+              ))}
             </HFormGroup>
           )}
         </ValidatedForm>

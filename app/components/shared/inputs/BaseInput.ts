@@ -10,6 +10,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   metadata: TMetadataType;
   value?: TValueType;
   title?: string;
+  onInput?: Function;
 }> {
   @Prop()
   readonly value: TValueType;
@@ -19,6 +20,9 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
 
   @Prop({ default: () => ({}) })
   readonly metadata: TMetadataType;
+
+  @Prop()
+  readonly onInput: Function;
 
   /**
    * true if the component listens and re-emits child-inputs events
@@ -59,6 +63,8 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
+
+    if (this.onInput) this.onInput(eventData);
 
     const needToSendEventToForm =
       (this.form && !this.parentInput) ||

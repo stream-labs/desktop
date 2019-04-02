@@ -82,6 +82,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   setSettings: (settings: Partial<ISceneItemSettings>) => void;
   setVisibility: (isVisible: boolean) => void;
   setTransform: (transform: IPartialTransform) => void;
+  setDeltaPos: (dir: 'x' | 'y', delta: number) => void;
   resetTransform: () => void;
   scale: (scale: IVec2, origin?: IVec2) => void;
   scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
@@ -582,6 +583,10 @@ export class Selection implements ISelection {
    */
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
+  }
+
+  setDeltaPos(dir: 'x' | 'y', delta: number) {
+    this.getItems().forEach(item => item.setDeltaPos(dir, delta));
   }
 
   flipY() {
