@@ -59,7 +59,7 @@
   margin: 20px 10px 0;
   border: 2px solid transparent;
   .radius;
-  background: @night-select-bg;
+  background: var(--link);
   padding: 12px;
   text-align: left;
   display: flex;
@@ -68,17 +68,17 @@
   position: relative;
 
   &:hover {
-    border-color: @teal-light-opac;
+    border-color: var(--teal-semi);
   }
 
   &.selected {
-    border-color: @teal;
+    border-color: var(--teal);
 
     &:before {
       content: '\f00c';
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
-      color: @teal;
+      color: var(--teal);
       position: absolute;
       top: 6px;
       right: 10px;
@@ -101,12 +101,12 @@
 
 .widget__name {
   .weight(@medium);
-  color: @white;
+  color: var(--white);
   font-size: 14px;
 }
 
 .widget__desc {
-  color: @grey;
+  color: var(--icon);
   font-size: 13px;
 }
 
@@ -125,7 +125,7 @@
 
 .widget-detail {
   .radius;
-  background: @night-select-bg;
+  background: var(--link);
   overflow: hidden;
   width: 80%;
   min-width: 550px;
@@ -133,13 +133,13 @@
 }
 
 .widget-detail-close {
-  color: @grey;
+  color: var(--icon);
   .transition;
   margin-left: 20px;
   cursor: pointer;
 
   &:hover {
-    color: @white;
+    color: var(--white);
   }
 }
 

@@ -3,11 +3,7 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import moment from 'moment';
 import { padStart } from 'lodash';
-import {
-  IStreamEncoderSettings,
-  SettingsService,
-  StreamEncoderSettingsService,
-} from 'services/settings';
+import { IOutputSettings, SettingsService, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import electron from 'electron';
@@ -65,7 +61,7 @@ export interface StreamingContext {
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
-  @Inject() streamEncoderSettingsService: StreamEncoderSettingsService;
+  @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
@@ -366,11 +362,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.streamingStatusChange.next(EStreamingState.Live);
         this.runPlatformAfterGoLiveHook();
 
-        let streamEncoderInfo: Partial<IStreamEncoderSettings> = {};
+        let streamEncoderInfo: Partial<IOutputSettings> = {};
         let game: string = null;
 
         try {
-          streamEncoderInfo = this.streamEncoderSettingsService.getSettings();
+          streamEncoderInfo = this.outputSettingsService.getSettings();
           if (this.streamInfoService.state.channelInfo) {
             game = this.streamInfoService.state.channelInfo.game;
           }

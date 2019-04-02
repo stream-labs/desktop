@@ -85,7 +85,7 @@
 }
 
 .NameSource-label__error {
-  color: @warning;
+  color: var(--warning);
 }
 
 .sources-container {
@@ -116,7 +116,7 @@
 }
 
 .recommended-label {
-  color: @teal;
+  color: var(--teal);
   margin-left: 10px;
   text-transform: none;
 }

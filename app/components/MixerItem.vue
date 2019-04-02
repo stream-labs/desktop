@@ -75,7 +75,7 @@
     flex: 0 0 60px;
 
     .fa-volume-off {
-      color: @red;
+      color: var(--warning);
     }
   }
 }

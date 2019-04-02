@@ -88,7 +88,7 @@
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--white"></div>
                 <div>
-                  <div class="design-system__code">@day-section, @night-title, @white</div>
+                  <div class="design-system__code">@day-section, @night-title, var(--white)</div>
                   <div>Day Background, Night Title</div>
                 </div>
               </div>
@@ -875,19 +875,19 @@
 }
 
 .design-system__color--primary {
-  background-color: @primary;
+  background-color: var(--teal);
 }
 
 .design-system__color--secondary {
-  background-color: @secondary;
+  background-color: var(--accent);
 }
 
 .design-system__color--warning {
-  background-color: @warning;
+  background-color: var(--warning);
 }
 
 .design-system__color--other-1 {
-  background-color: @yellow;
+  background-color: var(--new);
 }
 
 .design-system__color--other-2 {
@@ -899,7 +899,7 @@
 }
 
 .design-system__color--white {
-  background-color: @white;
+  background-color: var(--white);
   border-color: @light-4;
 }
 

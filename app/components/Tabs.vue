@@ -34,7 +34,7 @@
   width: 100%;
   height: 48px;
   border: 0;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
   padding: 0;
 }
 
@@ -42,11 +42,5 @@
   height: calc(~'100% - 48px');
   position: relative;
   overflow-y: auto;
-}
-
-.night-theme {
-  .tabs {
-    border-color: @night-border;
-  }
 }
 </style>

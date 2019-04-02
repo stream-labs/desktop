@@ -15,7 +15,7 @@ const args = process.argv.slice(2);
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync('yarn test ' + args.join(' '), { stdio: [0, 1, 2] });
+    execSync('yarn test --timeout=2m' + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }
@@ -26,8 +26,7 @@ function retryTests() {
   log('retrying failed tests');
 
   if (!fs.existsSync(failedTestsFile)) {
-    log('no tests to retry');
-    return false;
+    throw 'no tests to retry';
   }
 
   const failedTests = JSON.parse(fs.readFileSync(failedTestsFile));

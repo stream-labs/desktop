@@ -144,7 +144,7 @@
   }
 
   .test-button .link {
-    color: @white;
+    color: var(--white);
   }
 </style>
 
@@ -396,7 +396,7 @@
   }
 
   .custom-code__alert.active {
-    background-color: @teal;
+    background-color: var(--teal);
   }
 
   .retry-button {

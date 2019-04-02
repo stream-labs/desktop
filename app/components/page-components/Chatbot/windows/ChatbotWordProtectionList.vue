@@ -122,7 +122,7 @@ tbody tr {
       .transition;
 
       &:hover {
-        color: @teal;
+        color: var(--teal);
       }
     }
   }

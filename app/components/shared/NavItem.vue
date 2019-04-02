@@ -60,7 +60,7 @@
 
   .fa,
   i {
-    color: @icon;
+    color: var(--icon);
     position: relative;
     margin-right: -16px;
     left: -24px;

@@ -40,7 +40,7 @@
   flex-direction: column;
 
   span {
-    color: @grey;
+    color: var(--icon);
     font-size: 12px;
   }
 }

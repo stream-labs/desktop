@@ -1,25 +1,22 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm.vue';
 import TsxComponent from 'components/tsx-component';
 
-export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends TsxComponent<{
+export abstract class BaseInput<
+  TValueType,
+  TMetadataType extends IInputMetadata
+> extends TsxComponent<{
   metadata: TMetadataType;
   value?: TValueType;
   title?: string;
   onInput?: Function;
 }> {
-  @Prop()
-  readonly value: TValueType;
-
-  @Prop()
-  readonly title: string;
-
-  @Prop({ default: () => ({}) })
-  readonly metadata: TMetadataType;
+  abstract readonly value: TValueType;
+  abstract readonly title: string;
+  abstract readonly metadata: TMetadataType;
 
   @Prop()
   readonly onInput: Function;
@@ -32,7 +29,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   /**
    * uuid serves to link input field and validator message
    */
-  readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
+  readonly uuid = this.options.uuid || uuid();
 
   /**
    * contains ValidatedForm if exist

@@ -216,12 +216,12 @@ export class ApiClient {
       });
   }
 
-  unsubscribe(subscriptionId: string) {
+  unsubscribe(subscriptionId: string): Promise<any> {
     delete this.subscriptions[subscriptionId];
     return this.request(subscriptionId, 'unsubscribe');
   }
 
-  unsubscribeAll() {
+  unsubscribeAll(): Promise<any> {
     return Promise.all(
       Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId)),
     );

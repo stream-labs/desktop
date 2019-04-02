@@ -1,38 +1,4 @@
-
-@teal-med-opac: rgba(49, 195, 162, 0.6);
-@teal-light-opac: rgba(49, 195, 162, 0.3);
-@yellow-med-opac: rgba(255, 205, 70, 0.6);
-@yellow-light-opac: rgba(255, 205, 70, 0.3);
-@navy: #13242d;
-@navy-secondary: #09161d;
-@grey: #91979a;
-@black: #000;
-
-@day-primary: #ffffff;
-@day-secondary: #F7F9F9;
-@day-hover: #F7F9F9;
-@day-border: #F0F2F2;
-@day-input-border: #E3E8EB;
-@day-input-bg: #FBFCFC;
-@day-focus-border: darken(#E3E8EB, 4%);
-
-@night-primary: #17242D;
-@night-secondary: #09161d;
-@night-accent-light: #2b383f;
-@night-accent-dark: #050F14;
-@night-border: #2b383f;
-@night-slider-bg: #253239;
-@night-select-bg: #394951;
-
-@input-border-color: #cacaca;
-@input-label-color: #7e8689;
-
-@slider-progress-color: #3c4c53;
-@slider-background-color: #eaecee;
-
-@onboarding-bg: #2b383f;
-
-// Color Updates - What we should be using for all new things
+// LESS Color Varaibles -- DO NOT REFERENCE DIRECTLY
 
 @teal: #31C3A2;
 @teal-semi: rgba(49, 195, 162, 0.08);
@@ -44,7 +10,7 @@
 @yellow-dark: #CA9D00;
 @yellow-dark-semi: rgba(202, 157, 0, 0.08);
 @yellow-light: #FFF9E5;
-@white: #FFFFFF;
+@navy: #13242d;
 
 @light-1: #ffffff;
 @light-2: #F5F8FA;
@@ -67,87 +33,3 @@
 @periscope: #3FA4C4;
 @picarto: #2DA75F;
 @discord: #7289da;
-
-// Uses
-@primary: #31C3A2;
-@secondary: #8736E0;
-@warning: #F85640;
-@new: #FFC803;
-@info-dark: #CA9D00;
-@info-light: #FFF9E5;
-@icon: #91979A;
-
-// TODO: Replace with scoped variables
-@day-button: @light-3;
-@day-link: @dark-5;
-@day-link-active: @dark-2;
-@day-input-bg: @light-1;
-@day-input-border: @light-3;
-@day-solid-input: @light-2;
-@day-dropdown-bg: @light-2;
-@day-dropdown-border: @light-2;
-@day-shadow: rgba(55, 71, 79, 0.12);
-
-@night-button: @dark-5;
-@night-link: @light-4;
-@night-link-active: @light-1;
-@night-input-bg: transparent;
-@night-input-border: @dark-5;
-@night-solid-input: @dark-4;
-@night-dropdown-bg: @dark-4;
-@night-dropdown-border: @dark-4;
-@night-hover: @dark-4;
-@night-shadow: rgba(1, 2, 2, 0.16);
-
-// Scoped Variables
-:root {
-  --background: @light-1;
-  --section: @light-2;
-  --section-alt: @light-2;
-  --title: @dark-2;
-  --paragraph: @dark-5;
-  --border: @light-2;
-  --button: @light-3;
-  --button-hover: darken(@light-3, 8%);
-  --link: @dark-5;
-  --link-active: @dark-2;
-  --input-bg: @light-1;
-  --input-border: @light-3;
-  --focus-border: darken(@light-3, 4%);
-  --solid-input: @light-2;
-  --dropdown-bg: @light-2;
-  --dropdown-alt-bg: darken(@light-2, 4%);
-  --dropdown-border: @light-2;
-  --hover: @light-2;
-  --scrollbar: @light-1;
-  --midtone: @light-5;
-  --nav-border: @navy;
-  --slider-bg: @light-3;
-  --shadow: rgba(55, 71, 79, 0.12);
-}
-
-.night-theme {
-  --background: @dark-3;
-  --section: @dark-2;
-  --section-alt: @dark-4;
-  --title: @light-1;
-  --paragraph: @light-4;
-  --border: @dark-4;
-  --button: @dark-5;
-  --button-hover: lighten(@dark-5, 8%);
-  --link: @light-4;
-  --link-active: @light-1;
-  --input-bg: transparent;
-  --input-border: @dark-5;
-  --focus-border: lighten(@dark-5, 4%);
-  --solid-input: @dark-4;
-  --dropdown-bg: @dark-4;
-  --dropdown-alt-bg: darken(@dark-4, 4%);
-  --dropdown-border: @dark-4;
-  --hover: @dark-4;
-  --scrollbar: @dark-4;
-  --midtone: @light-1;
-  --nav-border: @light-1;
-  --slider-bg: @dark-3;
-  --shadow: rgba(1, 2, 2, 0.16);
-}

@@ -79,7 +79,7 @@
 
 // Backgrounds
 .bg--teal() {
-  background-color: @teal;
+  background-color: var(--teal);
 }
 
 // Border radius
@@ -94,7 +94,7 @@
 
 // Hovers
 .icon-hover() {
-  color: @icon;
+  color: var(--icon);
   .transition();
 
   &:hover {
@@ -103,11 +103,11 @@
 }
 
 .night-icon-hover() {
-  color: @icon;
+  color: var(--icon);
   .transition();
 
   &:hover {
-    color: @white;
+    color: var(--white);
   }
 }
 
@@ -330,11 +330,11 @@
 }
 
 .teal() {
-  color: @teal;
+  color: var(--teal);
 }
 
 .warning() {
-  color: @red;
+  color: var(--warning);
 }
 
 .letter-spacing() {

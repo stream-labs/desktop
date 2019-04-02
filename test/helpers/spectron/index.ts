@@ -47,6 +47,11 @@ interface ITestRunnerOptions {
   afterStartCb?(t: any): Promise<any>;
 
   /**
+   * Enable this to show network logs if test failed
+   */
+  networkLogging?: boolean;
+
+  /**
    * Called after cache directory is created but before
    * the app is started.  This is useful for setting up
    * some known state in the cache directory before the
@@ -58,6 +63,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  networkLogging: false,
 };
 
 export interface ITestContext {
@@ -82,6 +88,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
+    const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
+    if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -89,7 +97,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
-        options.appArgs ? options.appArgs : '',
+        ...appArgs,
         '.',
       ],
       env: {
@@ -109,12 +117,20 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     await t.context.app.start();
 
+    // Disable CSS transitions while running tests to allow for eager test clicks
+    await t.context.app.webContents.executeJavaScript(`
+      const disableAnimationsEl = document.createElement('style');
+      disableAnimationsEl.textContent =
+        '*{ transition: none !important; transition-property: none !important; }';
+      document.head.appendChild(disableAnimationsEl);
+    `);
+
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
 
-    // await sleep(100000);
+    // await sleep(10000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
@@ -173,8 +189,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (!errors.length) return;
-    fail(`The log-file has errors \n ${logs}`);
+    if (errors.length) {
+      fail(`The log-file has errors \n ${logs}`);
+    } else if (options.networkLogging && !testPassed) {
+      fail(`log-file: \n ${logs}`);
+    }
   }
 
   test.beforeEach(async t => {
@@ -226,9 +245,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     testPassed = false;
     failMsg = msg;
   }
-
 }
-
 
 function saveFailedTestsToFile(failedTests: string[]) {
   const filePath = 'test-dist/failed-tests.json';

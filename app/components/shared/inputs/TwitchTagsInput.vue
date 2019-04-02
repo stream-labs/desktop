@@ -20,7 +20,7 @@
     />
 
     <div class="update-tags-notice" v-else>
-      <span class="badge badge--new">{{ $t('New') }}</span>
+      <span class="badge badge--new">{{ $t('Add') }}</span>
       <span class="message">
         <span>{{ $t('You can now edit your channel tags from this screen.') }}</span>
         <div>{{ $t('Log out and back in to reauthorize additional permissions.') }}</div>
@@ -201,7 +201,7 @@ table.sp-table {
 }
 
 .sp-selected-tag {
-  color: @white !important;
+  color: var(--white) !important;
 }
 
 // HACK: specificity hack for the hover color for options

@@ -1,6 +1,6 @@
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
-import { sleep } from '../helpers/sleep';
+import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { logIn } from '../../helpers/spectron/user';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron({ appArgs: '--nosync' });
 

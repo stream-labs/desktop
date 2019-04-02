@@ -58,7 +58,7 @@
   .chatbot-aliases__alias {
     margin-right: 10px;
     padding: 6px 12px;
-    background-color: @teal;
+    background-color: var(--teal);
     border-radius: 20px;
     color: white;
     cursor: pointer;

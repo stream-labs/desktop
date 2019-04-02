@@ -110,7 +110,7 @@
 @import '../../styles/index';
 
 .fa-warning {
-  color: @red;
+  color: var(--warning);
 }
 
 p,

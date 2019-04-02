@@ -13,16 +13,10 @@
 .volmeter {
   position: absolute;
   overflow: hidden;
-  background-color: @slider-background-color;
+  background-color: var(--slider-bg);
 }
 
 .volmeter-spacer {
   margin: 10px 0;
-}
-
-.night-theme {
-  .volmeter {
-    background-color: @night-slider-bg;
-  }
 }
 </style>

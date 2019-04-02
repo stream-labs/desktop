@@ -7,6 +7,7 @@ import electron from 'electron';
 export default class FileInput extends BaseInput<string, IFileMetadata> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IFileMetadata;
+  @Prop() readonly title: string;
 
   showFileDialog() {
     const options: Electron.OpenDialogOptions = {

@@ -106,7 +106,7 @@
 
   .chatbot-alerts-window__sidebar {
     width: 250px;
-    border-right: 1px solid @day-border;
+    border-right: 1px solid var(--border);
 
     .chatbot-alerts-window__sidebar__tab {
       .text-transform();
@@ -165,30 +165,4 @@ tbody tr {
     padding-right: 10px;
   }
 }
-
-.night-theme {
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    .transition;
-
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
-  .chatbot-alerts-window__sidebar {
-    border-right: 1px solid @night-border;
-  }
-}
-
-
 </style>

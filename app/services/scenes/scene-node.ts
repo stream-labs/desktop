@@ -152,7 +152,8 @@ export abstract class SceneItemNode implements ISceneItemNode {
   protected abstract get state(): ISceneItemNode;
   abstract remove(): void;
 
-  @mutation()
+  // TODO: Simplify this mutation so it is safe
+  @mutation({ unsafe: true })
   protected SET_PARENT(parentId?: string) {
     const nodeState = this.state;
     const sceneState = this.scenesService.state.scenes[nodeState.sceneId];

@@ -36,12 +36,4 @@
 .input-wrapper--search {
   width: 50%;
 }
-
-.night-theme {
-  .manage-scene-collections--new {
-    &:hover {
-      background: @night-hover;
-    }
-  }
-}
 </style>
