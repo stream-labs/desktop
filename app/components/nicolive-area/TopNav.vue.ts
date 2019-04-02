@@ -41,7 +41,7 @@ export default class TopNav extends Vue {
 
   private twitterShareContent(): { text: string, url: string } {
     const title = this.nicoliveProgramService.state.title;
-    const url = `https://live2.nicovideo.jp/watch/${this.programID}?ref=sharetw`;
+    const url = `https://live.nicovideo.jp/watch/${this.programID}?ref=sharetw`;
     const time = this.nicoliveProgramService.state.startTime;
     const formattedTime = moment.unix(time).format('YYYY/MM/DD HH:mm');
 
