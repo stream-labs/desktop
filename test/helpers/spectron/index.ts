@@ -47,6 +47,11 @@ interface ITestRunnerOptions {
   afterStartCb?(t: any): Promise<any>;
 
   /**
+   * Enable this to show network logs if test failed
+   */
+  networkLogging?: boolean;
+
+  /**
    * Called after cache directory is created but before
    * the app is started.  This is useful for setting up
    * some known state in the cache directory before the
@@ -58,6 +63,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  networkLogging: false,
 };
 
 export interface ITestContext {
@@ -82,6 +88,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
+    const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
+    if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -89,7 +97,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
-        options.appArgs ? options.appArgs : '',
+        ...appArgs,
         '.',
       ],
       env: {
@@ -181,8 +189,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (!errors.length) return;
-    fail(`The log-file has errors \n ${logs}`);
+    if (errors.length) {
+      fail(`The log-file has errors \n ${logs}`);
+    } else if (options.networkLogging && !testPassed) {
+      fail(`log-file: \n ${logs}`);
+    }
   }
 
   test.beforeEach(async t => {

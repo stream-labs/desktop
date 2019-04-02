@@ -1,3 +1,4 @@
+import electronLog from 'electron-log';
 import { Service } from './service';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
@@ -5,6 +6,7 @@ import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import { Subject } from 'rxjs';
+import { AppService } from 'services/app';
 
 export type TSocketEvent =
   | IStreamlabelsSocketEvent
@@ -100,8 +102,9 @@ interface IAlertProfileChanged {
 }
 
 export class WebsocketService extends Service {
-  @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
+  @Inject() private userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private appService: AppService;
 
   socket: SocketIOClient.Socket;
 
@@ -144,6 +147,7 @@ export class WebsocketService extends Service {
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
         this.socket.on('event', (e: any) => {
+          this.log('event', e);
           this.socketEvent.next(e);
         });
       });
@@ -151,5 +155,9 @@ export class WebsocketService extends Service {
 
   private log(message: string, ...args: any[]) {
     console.debug(`WS: ${message}`, ...args);
+
+    if (this.appService.state.argv.includes('--network-logging')) {
+      electronLog.log(`WS: ${message}`);
+    }
   }
 }
