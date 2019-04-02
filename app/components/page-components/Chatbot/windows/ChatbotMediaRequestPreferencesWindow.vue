@@ -23,11 +23,6 @@
             :metadata="metadata.general.max_duration"
           />
           <VFormGroup
-            :title="$t('Spam Security')"
-            v-model="mediaRequestData.general.filter_level"
-            :metadata="metadata.general.filter_level"
-          />
-          <VFormGroup
             :title="$t('Max Requests per User')"
             v-model="mediaRequestData.general.max_requests_per_user"
             :metadata="metadata.general.max_requests_per_user"
