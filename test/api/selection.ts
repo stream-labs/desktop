@@ -1,11 +1,10 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
+import { IScenesServiceApi } from 'services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
-import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
+import { ISceneApi, ISceneNodeApi } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
@@ -66,7 +65,6 @@ test('Selection', async t => {
   selection.selectAll();
 
   t.is(selection.getSize(), 3);
-
 });
 
 test('Selection actions', async t => {
@@ -103,6 +101,24 @@ test('Invalid selection', async t => {
   // ids must be only from active scene
   selection.select([colorSource.sceneItemId, colorFromAnotherScene.sceneItemId]);
   t.deepEqual(selection.getIds(), [colorSource.sceneItemId]);
+});
+
+test('Removed nodes must not exist in selection', async t => {
+  sceneBuilder.build(`
+    Item1:
+    Item2:
+    Folder1
+  `);
+
+  const item1 = getNode('Item1');
+  const item2 = getNode('Item2');
+  const folder1 = getNode('Folder1');
+
+  selectionService.selectAll();
+  item1.remove();
+  folder1.remove();
+
+  t.deepEqual(selectionService.getIds(), [item2.id]);
 });
 
 test('Place after', async t => {

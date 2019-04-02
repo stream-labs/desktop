@@ -14,6 +14,9 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
   @Prop({ default: '' })
   readonly value: string;
 
+  @Prop()
+  readonly title: string;
+
   @Prop({ default: () => ({ type: 'html' }) })
   readonly metadata: IInputMetadata;
 

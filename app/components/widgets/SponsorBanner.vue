@@ -69,7 +69,7 @@
 
 .close-button {
   position: absolute;
-  color: @red;
+  color: var(--warning);
   top: 0;
   right: -20px;
   font-size: 13px;

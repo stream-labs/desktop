@@ -46,7 +46,7 @@
 }
 
 .app-platform-error {
-  color: @red;
+  color: var(--warning);
   font-size: 12px;
 }
 </style>

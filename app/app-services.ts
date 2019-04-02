@@ -93,7 +93,7 @@ export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-as
 export { ChatService } from 'services/chat';
 
 // WIDGETS
-export { WidgetSource, WidgetsService, WidgetTester } from './services/widgets';
+export { WidgetSource, WidgetsService } from './services/widgets';
 export { BitGoalService } from 'services/widgets/settings/bit-goal';
 export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';

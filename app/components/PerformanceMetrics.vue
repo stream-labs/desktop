@@ -52,7 +52,7 @@
 
 .performance-metric-wrapper {
   .padding-right();
-  color: @grey;
+  color: var(--icon);
   white-space: nowrap;
   display: flex;
   align-items: center;

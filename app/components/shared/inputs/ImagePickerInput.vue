@@ -28,8 +28,8 @@
 .widget-layout-picker__option {
   width: 64px;
   height: 64px;
-  border: 1px solid @day-solid-input;
-  background-color: @day-solid-input;
+  border: 1px solid var(--solid-input);
+  background-color: var(--solid-input);
   .transition();
   position: relative;
   .radius();
@@ -45,20 +45,8 @@
   }
 
   &.active {
-    background-color: @dark-2;
-    border-color: @dark-2
-  }
-}
-
-.night-theme {
-  .widget-layout-picker__option {
-    border-color: @night-border;
-    background-color: @night-solid-input;
-
-    &.active {
-      background-color: @dark-2;
-      border-color: @dark-2
-    }
+    background-color: var(--link-active);
+    border-color: var(--link-active);
   }
 }
 </style>

@@ -55,5 +55,6 @@
   "Select stream tags": "Select stream tags",
   "You can now edit your channel tags from this screen.": "You can now edit your channel tags from this screen.",
   "Log out and back in to reauthorize additional permissions.": "Log out and back in to reauthorize additional permissions.",
-  "Are you sure you want to start streaming?": "Are you sure you want to start streaming?"
+  "Are you sure you want to start streaming?": "Are you sure you want to start streaming?",
+  "Please enable account for streaming to recieve a stream key": "Please enable account for streaming to recieve a stream key"
 }

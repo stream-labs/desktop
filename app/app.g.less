@@ -30,8 +30,8 @@ body {
 }
 
 .main {
-  background: @white;
-  color: @day-paragraph;
+  background: var(--background);
+  color: var(--paragraph);
 }
 
 // Layout
@@ -50,7 +50,7 @@ h1 {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   text-transform: capitalize;
-  color: @day-title;
+  color: var(--title);
   margin-bottom: 24px;
 }
 
@@ -61,7 +61,7 @@ h2 {
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   text-transform: capitalize;
-  color: @day-title;
+  color: var(--title);
 }
 
 h3 {
@@ -69,7 +69,7 @@ h3 {
 
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  color: @day-title;
+  color: var(--title);
 }
 
 h4 {
@@ -79,11 +79,11 @@ h4 {
 
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  color: @day-title;
+  color: var(--title);
 }
 
 label {
-  color: @day-paragraph;
+  color: var(--paragraph);
   line-height: 1.3;
 }
 
@@ -92,9 +92,9 @@ label {
   .weight(@medium);
   .margin-left();
 
-  background: @secondary;
+  background: var(--accent);
   font-size: 12px;
-  color: @white;
+  color: var(--white);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -104,17 +104,17 @@ a,
   .transition();
   .weight(@medium);
 
-  color: @day-link;
+  color: var(--link);
   text-decoration: none;
   display: flex;
   align-items: center;
 
   &:hover {
-    color: @day-link-active;
+    color: var(--link-active);
 
     .fa,
     i {
-      color: @day-link-active;
+      color: var(--link-active);
     }
   }
 
@@ -123,7 +123,7 @@ a,
     .margin-right();
 
     font-size: 14px;
-    color: @icon;
+    color: var(--icon);
   }
 }
 
@@ -158,7 +158,7 @@ a,
     padding: 0 32px 0 8px;
 
     option {
-      color: @navy;
+      color: var(--navy);
     }
   }
 }
@@ -168,7 +168,7 @@ a,
   right: 8px;
   top: 10px;
   font-size: 10px;
-  color: @white;
+  color: var(--white);
 }
 
 .select--onboarding {
@@ -183,7 +183,7 @@ a,
   .multiselect__input {
     background: #45535a;
     border-color: transparent;
-    color: white;
+    color: var(--white);
   }
 
   .multiselect__content {
@@ -202,7 +202,7 @@ a,
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
-    color: @grey;
+    color: var(--icon);
 
     &:focus {
       background: rgba(255, 255, 255, 0.14);
@@ -227,7 +227,7 @@ a,
     &:focus,
     &:active {
       background: transparent;
-      color: @white;
+      color: var(--white);
       border-bottom: 1px solid rgba(255, 255, 255, 0.14);
     }
   }
@@ -235,7 +235,7 @@ a,
   &:focus,
   &:active,
   &:hover {
-    color: @white;
+    color: var(--white);
   }
 }
 
@@ -246,14 +246,14 @@ a,
 
 .slide-open__menu {
   position: absolute;
-  background: @day-bg;
+  background: var(--background);
   right: calc(~'100% + 20px');
   align-self: center;
   display: flex;
   z-index: 10;
   .padding-h-sides();
   .radius();
-  .day-shadow();
+  .shadow();
 }
 
 .tabs {
@@ -281,17 +281,17 @@ a,
   i {
     font-size: 14px;
     vertical-align: middle;
-    color: @icon;
+    color: var(--icon);
   }
 
   &.is-active,
   &.active {
-    color: @day-link-active;
-    border-bottom-color: @dark-2;
+    color: var(--link-active);
+    border-bottom-color: var(--link-active);
 
     .fa,
     i {
-      color: @day-link-active;
+      color: var(--link-active);
     }
   }
 }
@@ -304,11 +304,11 @@ a,
     &.checkbox input:checked ~ label,
     &.checkbox input ~ label {
       &::before {
-        border-color: @day-input-border;
+        border-color: var(--input-border);
         background: transparent;
       }
 
-      &::after { color: @day-paragraph; }
+      &::after { color: var(--paragraph); }
     }
   }
 }
@@ -327,14 +327,14 @@ select {
 }
 
 ::-webkit-scrollbar-track {
-  background: @day-border;
+  background: var(--section);
   border-radius: 0 3px 3px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: @white;
-  border: 2px solid @day-border;
-  border-right: 1px solid @day-border;
+  background-color: var(--scrollbar);
+  border: 2px solid var(--border);
+  border-right: 1px solid var(--border);
   border-radius: 10px;
 }
 
@@ -368,7 +368,8 @@ select {
 }
 
 .v--modal {
-  background-color: @day-bg;
+  background-color: var(--background);
+  box-shadow: 0 0 0 var(--shadow);
 }
 
 // Toasts
@@ -390,44 +391,13 @@ select {
 }
 
 .toast-action {
-  color: @white !important;
+  color: var(--white) !important;
 }
 
 // Night theme rules
 .night-theme {
-  &.main {
-    background: @night-bg;
-    color: @night-paragraph;
-  }
-
-  .v--modal {
-    background-color: @night-bg;
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-  }
-
   .v--modal-overlay {
     background: rgba(0, 0, 0, 0.5);
-  }
-
-  a {
-    &:hover {
-      color: @white;
-    }
-  }
-
-  .border {
-    border: 1px solid transparent;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    color: @night-title;
-  }
-
-  label {
-    color: @night-paragraph;
   }
 
   ::placeholder {
@@ -435,71 +405,20 @@ select {
   }
 
   .checkbox {
-    input:checked ~ label {
-      color: @white;
-    }
-
     label {
       &::before {
         background: transparent;
-        border-color: @teal-light-opac;
+        border-color: var(--teal-semi);
       }
     }
-  }
-
-  a,
-  .link {
-    color: @night-link;
-
-    &:hover,
-    &:focus,
-    &.active {
-      color: @night-link-active;
-
-      .fa,
-      i {
-        color: @night-link-active;
-      }
-    }
-  }
-
-  .tab-button {
-    color: @night-link;
-
-    &.is-active,
-    &.active,
-    &:hover {
-      color: @night-link-active;
-      border-bottom-color: @white;
-
-      .fa,
-      i {
-        color: @night-link-active;
-      }
-    }
-  }
-
-  .slide-open__menu {
-    background-color: @night-section;
-    border-color: @night-section;
-    .night-shadow;
   }
 
   .slide-open__close {
     &:hover {
       .fa,
       i {
-        color: @white;
+        color: var(--white);
       }
     }
-  }
-
-  ::-webkit-scrollbar-track {
-    background: @night-accent-dark;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: @night-accent-light;
-    border-color: @night-accent-dark;
   }
 }

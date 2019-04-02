@@ -34,7 +34,7 @@ export class ServicesManager extends Service {
    * The child windows or one-off windows don't execute services methods directly
    * They use InternalApiClient to send IPC requests to the main window
    */
-  private internalApiClient: InternalApiClient;
+  internalApiClient: InternalApiClient;
 
   init() {
     // this helps to debug services from the console

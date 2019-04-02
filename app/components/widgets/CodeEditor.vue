@@ -20,7 +20,7 @@
   .toolbar {
     height: 32px;
     padding-top: 8px;
-    border-bottom: 1px solid @day-border;
+    border-bottom: 1px solid var(--border);
 
     i {
       font-size: 16px;
@@ -29,12 +29,6 @@
       &:hover {
         cursor: pointer;
       }
-    }
-  }
-
-  .night-theme {
-    .toolbar {
-      border-color: @night-slider-bg;
     }
   }
 </style>

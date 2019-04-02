@@ -37,8 +37,8 @@
   .radius();
   .padding();
   text-align: center;
-  background-color: rgba(202, 157, 0, 0.08);
-  color: @info-dark;
+  background-color: var(--info-semi);
+  color: var(--info-dark);
 
   .icon-close {
     .padding--5;
@@ -55,13 +55,13 @@
     margin: 0 4px;
     .radius();
     .weight(@medium);
-    background-color: @yellow-med-opac;
-    color: @white;
+    background-color: var(--yellow-semi);
+    color: var(--white);
     user-select: all;
   }
 
   .label--beta {
-    background-color: #ca9d00;
+    background-color: var(--info-dark);
     .radius();
     font-weight: 500;
   }

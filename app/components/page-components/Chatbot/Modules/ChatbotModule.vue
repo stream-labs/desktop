@@ -46,15 +46,15 @@
   margin: 10px;
   width: 300px;
   .radius(2);
-  background-color: @day-secondary;
+  background-color: var(--section);
 
   &.chatbot-module__container--coming-soon {
     .chatbot-module__image {
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: @day-bg;
-      border-color: @day-secondary;
+      background-color: var(--background);
+      border-color: var(--section);
       border-width: 0 1px;
       border-style: solid;
     }
@@ -69,6 +69,7 @@
     h3 {
       font-size: 16px;
       .margin--none();
+      color: var(--title);
     }
   }
 
@@ -80,37 +81,15 @@
 
   .chatbot-module__body {
     .padding--10();
-    color: @day-paragraph;
+    color: var(--paragraph);
     height: 180px;
     .flex();
     .flex--column();
     .flex--space-between();
 
     .chatbot-module__action {
-      .align-items--inline;
-      .text-align--right;
-    }
-  }
-}
-
-
-.night-theme {
-  .chatbot-module__container {
-    background-color: @night-accent-light;
-
-    &.chatbot-module__container--coming-soon {
-      .chatbot-module__image {
-        background-color: @night-bg;
-        border-color: @night-accent-light;
-      }
-    }
-
-    h3, p {
-      color: white;
-    }
-
-    .chatbot-module__body {
-      color: @night-paragraph;
+      .align-items--inline();
+      .text-align--right();
     }
   }
 }
