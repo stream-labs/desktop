@@ -1,8 +1,6 @@
 const sh = require('shelljs');
 
 const logDir = '~/AppData/Roaming/slobs-client/node-obs/logs';
-
-
 let tail;
 let currentLog;
 
