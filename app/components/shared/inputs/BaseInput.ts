@@ -54,6 +54,9 @@ export abstract class BaseInput<
 
     if (!comp) return;
     this.form = comp as ValidatedForm;
+
+    // Vue doesn't like when optional methods are undefined
+    if (!this.onInput) this.onInput = null;
   }
 
   emitInput(eventData: TValueType, event?: any) {
