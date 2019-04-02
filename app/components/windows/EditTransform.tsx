@@ -35,15 +35,15 @@ export default class EditTransform extends TsxComponent<{}> {
       this.selectionService.setTransform({ [key]: { [subkey]: Number(value) } });
   }
 
-  setPos(dir: 'x' | 'y') {
+  setPos(dir: string) {
     return (value: string) => {
       const delta = Number(value) - Math.round(this.rect[dir]);
-      this.selectionService.setDeltaPos(dir, delta);
+      this.selectionService.setDeltaPos(dir as 'x' | 'y', delta);
       this.rect[dir] += delta;
     };
   }
 
-  setScale(dir: 'width' | 'height') {
+  setScale(dir: string) {
     const scaleKey: 'x' | 'y' = dir === 'width' ? 'x' : 'y';
     return (value: string) => {
       if (Number(value) === this.rect[dir]) return;
@@ -83,32 +83,31 @@ export default class EditTransform extends TsxComponent<{}> {
     ) : null;
   }
 
+  coordinateForm(h: Function, type: string) {
+    const title = type === 'pos' ? $t('Position') : $t('Size');
+    const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
+    const inputHandler = type === 'pos' ? this.setPos : this.setScale;
+    return (
+      <HFormGroup metadata={{ title }}>
+        <div style="display: flex;">
+          {dataArray.map(dir => (
+            <NumberInput
+              value={Math.round(this.rect[dir])}
+              metadata={{ isInteger: true }}
+              onInput={inputHandler(dir)}
+            />
+          ))}
+        </div>
+      </HFormGroup>
+    );
+  }
+
   render(h: Function) {
     return (
       <ModalLayout customControls showControls={false}>
         <ValidatedForm slot="content" name="transform">
-          <HFormGroup metadata={{ title: $t('Position') }}>
-            <div style="display: flex;">
-              {['x', 'y'].map((dir: 'x' | 'y') => (
-                <NumberInput
-                  value={Math.round(this.rect[dir])}
-                  metadata={{ isInteger: true }}
-                  onInput={this.setPos(dir)}
-                />
-              ))}
-            </div>
-          </HFormGroup>
-          <HFormGroup metadata={{ title: $t('Size') }}>
-            <div style="display: flex;">
-              {['width', 'height'].map((dir: 'width' | 'height') => (
-                <NumberInput
-                  value={Math.round(this.rect[dir])}
-                  metadata={{ isInteger: true }}
-                  onInput={this.setScale(dir)}
-                />
-              ))}
-            </div>
-          </HFormGroup>
+          {this.coordinateForm(h, 'pos')}
+          {this.coordinateForm(h, 'scale')}
           <HFormGroup metadata={{ title: $t('Rotation') }}>
             <button class="button button--default" onClick={this.rotate(90)}>
               {$t('Rotate 90 Degrees CW')}

@@ -17,9 +17,7 @@ export abstract class BaseInput<
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;
-
-  @Prop()
-  readonly onInput: Function;
+  readonly onInput?: Function;
 
   /**
    * true if the component listens and re-emits child-inputs events

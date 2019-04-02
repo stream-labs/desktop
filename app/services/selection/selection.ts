@@ -351,7 +351,7 @@ export class Selection implements ISelection {
   getTransform() {
     if (!this.isSceneItem()) return;
     const item = this.getNodes()[0] as SceneItem;
-    return item.sceneItemState.transform;
+    return item.state.transform;
   }
 
   getSize(): number {
