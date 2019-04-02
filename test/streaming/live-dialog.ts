@@ -3,7 +3,7 @@ import { getFormInput } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
 import { logIn } from '../helpers/spectron/user';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron({ appArgs: '--nosync', pauseIfFailed: true });
 
 test('Shows optimized encoder for specific games', async t => {
   const { app } = t.context;
