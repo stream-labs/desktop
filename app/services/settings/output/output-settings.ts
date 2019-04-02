@@ -121,6 +121,7 @@ function simpleEncoderToAdvancedEncoder(encoder: EEncoder) {
  * returns a short encoder's name if exists
  */
 export function obsEncoderToEncoder(obsEncoder: EObsEncoder): EEncoder {
+  if (obsEncoder === 'obs_x264') return EEncoder.x264;
   const encoder = invert(simpleEncoderToAnvancedEncoderMap)[obsEncoder] || obsEncoder;
   return encoder as EEncoder;
 }
