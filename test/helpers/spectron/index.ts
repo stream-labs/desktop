@@ -42,6 +42,11 @@ export async function focusLibrary(t: any) {
   await focusWindow(t, /streamlabs\.com\/library/);
 }
 
+// Close current focused window
+export async function closeWindow(t: any) {
+  await t.context.app.browserWindow.close();
+}
+
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
