@@ -126,40 +126,4 @@ export default class ProgramInfo extends Vue {
   get giftPoint(): number {
     return this.nicoliveProgramService.state.giftPoint;
   }
-
-  get programEndTime(): number {
-    return this.nicoliveProgramService.state.endTime;
-  }
-
-  get programStartTime(): number {
-    return this.nicoliveProgramService.state.startTime;
-  }
-
-  currentTime: number = 0;
-  updateCurrrentTime() {
-    this.currentTime = Math.floor(Date.now() / 1000);
-  }
-
-  get programCurrentTime(): number {
-    return this.currentTime - this.programStartTime;
-  }
-
-  @Watch('programStatus')
-  onStatusChange(newValue: string, oldValue: string) {
-    if (newValue === 'end') {
-      clearInterval(this.timeTimer);
-    } else if (oldValue === 'end') {
-      clearInterval(this.timeTimer);
-      this.startTimer();
-    }
-  }
-
-  startTimer() {
-    this.timeTimer = (setInterval(() => this.updateCurrrentTime(), 1000) as any) as number;
-  }
-
-  timeTimer: number = 0;
-  mounted() {
-    this.startTimer();
-  }
 }
