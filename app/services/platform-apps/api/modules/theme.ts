@@ -8,6 +8,11 @@ enum ETheme {
   Night = 'night',
 }
 
+const themeTable = {
+  'day-theme': ETheme.Day,
+  'night-theme': ETheme.Night,
+};
+
 export class ThemeModule extends Module {
   moduleName = 'Theme';
   permissions: EApiPermissions[] = [];
@@ -18,8 +23,8 @@ export class ThemeModule extends Module {
     super();
 
     this.customizationService.settingsChanged.subscribe(patch => {
-      if (patch.nightMode != null) {
-        this.themeChanged.next(patch.nightMode ? ETheme.Night : ETheme.Day);
+      if (patch.theme != null) {
+        this.themeChanged.next(themeTable[patch.theme]);
       }
     });
   }
@@ -29,6 +34,6 @@ export class ThemeModule extends Module {
 
   @apiMethod()
   getTheme(): ETheme {
-    return this.customizationService.nightMode ? ETheme.Night : ETheme.Day;
+    return themeTable[this.customizationService.currentTheme];
   }
 }

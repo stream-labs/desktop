@@ -20,7 +20,7 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get modules(): IChatbotModule[] {
-    const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
+    const backgroundUrlSuffix = this.isDarkTheme ? 'night' : 'day';
     const comingSoonText = $t(
       'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.',
     );

@@ -1,5 +1,5 @@
 <template>
-<div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
+<div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
   <div class="main-spacer"></div>
   <news-banner/>

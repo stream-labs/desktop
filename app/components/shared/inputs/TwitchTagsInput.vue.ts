@@ -23,7 +23,7 @@ export default class TwitchTagsInput extends Vue {
     const search = document.querySelector('.sp-search');
     const searchInput = document.querySelector('.sp-search-input');
     const results = document.querySelector('.sp-result-area');
-    const cssClass = this.customizationService.nightMode ? 'night-theme' : '';
+    const cssClass = this.customizationService.currentTheme;
     search.classList.toggle(cssClass);
     searchInput.classList.toggle(cssClass);
     results.classList.toggle(cssClass);

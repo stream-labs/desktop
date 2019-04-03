@@ -23,13 +23,13 @@
       ref="slider"
       :piecewiseStyle="{
         position: 'absolute',
-        backgroundColor: nightMode ? '#253239' : '#eaecee',
+        backgroundColor: sliderColor[theme],
         height: '2px',
         width: '2px',
         'borderRadius': '1px',
         top: '12px'
     }"
-      :labelStyle="{ color: nightMode ? '#253239' : '#eaecee' }"
+      :labelStyle="{ color: sliderColor[theme]  }"
       :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
       :sliderStyle="options.sliderStyle"
       :dotSize="options.dotSize"

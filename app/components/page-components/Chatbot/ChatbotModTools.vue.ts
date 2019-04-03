@@ -19,7 +19,7 @@ export default class ChatbotModTools extends ChatbotBase {
   }
 
   get modules(): IChatbotModule[] {
-    const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
+    const backgroundUrlSuffix = this.isDarkTheme ? 'night' : 'day';
     return [
       {
         title: $t('Caps Protection'),

@@ -202,7 +202,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
-      const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+      const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
 
       return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
     }
@@ -211,7 +211,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   dashboardUrl(subPage: string) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
-    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
 
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
@@ -219,7 +219,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   appStoreUrl(appId?: string) {
     const host = this.hostsService.platform;
     const token = this.apiToken;
-    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
     if (appId) {
@@ -231,7 +231,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
-    const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme() ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {

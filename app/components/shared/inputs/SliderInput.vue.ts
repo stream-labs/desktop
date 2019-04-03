@@ -69,8 +69,15 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
     }
   }
 
-  get nightMode() {
-    return this.customizationService.nightMode;
+  get sliderColor() {
+    return {
+      'night-theme': '#253239',
+      'day-theme': '#eaecee',
+    };
+  }
+
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 
   handleKeydown(event: KeyboardEvent) {

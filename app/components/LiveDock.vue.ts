@@ -137,7 +137,7 @@ export default class LiveDock extends Vue {
   openYoutubeStreamUrl() {
     const platform = this.userService.platform.type;
     const service = getPlatformService(platform);
-    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
     const youtubeDomain =
       nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     if (service instanceof YoutubeService) {
