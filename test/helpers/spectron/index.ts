@@ -122,12 +122,16 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await t.context.app.start();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
-    await t.context.app.webContents.executeJavaScript(`
+    const disableTransitionsCode = `
       const disableAnimationsEl = document.createElement('style');
       disableAnimationsEl.textContent =
-        '*{ transition: none !important; transition-property: none !important; }';
+        '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
-    `);
+    `;
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
