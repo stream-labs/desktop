@@ -11,6 +11,7 @@ interface INicoliveProgramState {
   description: string;
   endTime: number;
   startTime: number;
+  isMemberOnly: boolean;
   communityID: string;
   communityName: string;
   communitySymbol: string;
@@ -32,6 +33,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     description: '',
     endTime: 0,
     startTime: 0,
+    isMemberOnly: false,
     communityID: '',
     communityName: '',
     communitySymbol: '',
@@ -151,6 +153,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       description: program.description,
       startTime: program.beginAt,
       endTime: program.endAt,
+      isMemberOnly: program.isMemberOnly,
       communityID: socialGroupId,
       communityName: community.name,
       communitySymbol: community.thumbnailUrl.small,
@@ -172,6 +175,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       description: program.description,
       startTime: program.beginAt,
       endTime: program.endAt,
+      isMemberOnly: program.isMemberOnly,
     });
   }
 
