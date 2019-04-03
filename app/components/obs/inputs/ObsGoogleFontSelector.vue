@@ -5,14 +5,14 @@
       <div class="input-label">
         <label>
           {{ $t('Font Family') }}
-          <i v-if="loading" class="fa fa-spinner fa-pulse google-font-loading" />
+          <i v-if="isLoading" class="fa fa-spinner fa-pulse google-font-loading" />
         </label>
       </div>
       <div class="input-wrapper">
         <multiselect
           :value="selectedFamily"
           :options="fontFamilies"
-          :disabled="loading"
+          :disabled="isLoading"
           @input="setFamily">
         </multiselect>
       </div>
@@ -21,7 +21,7 @@
       <div class="input-label">
         <label>
           {{ $t('Font Style') }}
-          <i v-if="loading" class="fa fa-spinner fa-pulse google-font-loading" />
+          <i v-if="isLoading" class="fa fa-spinner fa-pulse google-font-loading" />
         </label>
       </div>
       <div class="input-wrapper">
@@ -29,7 +29,7 @@
           :value="selectedStyle"
           :options="fontStyles"
           :allow-empty="false"
-          :disabled="loading"
+          :disabled="isLoading"
           @input="setStyle">
         </multiselect>
       </div>
