@@ -17,7 +17,7 @@ export abstract class BaseInput<
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;
-  readonly onInput?: Function;
+  onInput: Function = null;
 
   /**
    * true if the component listens and re-emits child-inputs events
@@ -54,9 +54,6 @@ export abstract class BaseInput<
 
     if (!comp) return;
     this.form = comp as ValidatedForm;
-
-    // Vue doesn't like when optional methods are undefined
-    if (!this.onInput) this.onInput = null;
   }
 
   emitInput(eventData: TValueType, event?: any) {
