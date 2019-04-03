@@ -15,9 +15,16 @@ import {
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
+// Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': '#09161d',
   'day-theme': '#f7f9f9',
+};
+
+// Maps to --section
+const DISPLAY_BACKGROUNDS = {
+  'night-theme': { r: 11, g: 22, b: 28 },
+  'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 /**
@@ -79,6 +86,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get themeBackground() {
     return THEME_BACKGROUNDS[this.currentTheme];
+  }
+
+  get displayBackground() {
+    return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
   isDarkTheme() {
