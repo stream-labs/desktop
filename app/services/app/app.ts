@@ -103,8 +103,11 @@ export class AppService extends StatefulService<IAppState> {
       showDialog(message);
 
       crashHandler.unregisterProcess(this.pid);
-      electron.ipcRenderer.send('shutdownComplete');
 
+      obs.NodeObs.StopCrashHandler();
+      obs.IPC.disconnect();
+
+      electron.ipcRenderer.send('shutdownComplete');
       return;
     }
 

@@ -3,12 +3,14 @@ import { addSource } from '../helpers/spectron/sources';
 import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
+import { sleep } from '../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron({ appArgs: '--nosync', networkLogging: true });
 
 async function testGoal(t: TExecutionContext, goalType: string) {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
+
   await addSource(t, goalType, goalType, false);
 
   await client.click('li=Visual Settings');
@@ -44,16 +46,16 @@ async function testGoal(t: TExecutionContext, goalType: string) {
 }
 
 // TODO: Test is flaky
-test.skip('Donation Goal', async t => {
+test('Donation Goal', async t => {
   await testGoal(t, 'Donation Goal');
 });
 
 // TODO: Test is flaky
-test.skip('Follower Goal', async t => {
+test('Follower Goal', async t => {
   await testGoal(t, 'Follower Goal');
 });
 
 // TODO: Test is flaky
-test.skip('Bit Goal', async t => {
+test('Bit Goal', async t => {
   await testGoal(t, 'Bit Goal');
 });

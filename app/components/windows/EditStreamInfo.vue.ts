@@ -397,7 +397,7 @@ export default class EditStreamInfo extends Vue {
   get dateMetadata() {
     return {
       title: $t('Scheduled Date'),
-      dateFormat: 'MM/DD/YYYY',
+      dateFormat: 'MM/dd/yyyy',
       placeholder: 'MM/DD/YYYY',
       description: this.isFacebook
         ? $t(

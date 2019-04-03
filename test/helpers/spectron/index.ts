@@ -13,6 +13,8 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
+const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -48,8 +50,14 @@ export async function closeWindow(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  pauseIfFailed?: boolean;
   appArgs?: string;
   afterStartCb?(t: any): Promise<any>;
+
+  /**
+   * Enable this to show network logs if test failed
+   */
+  networkLogging?: boolean;
 
   /**
    * Called after cache directory is created but before
@@ -63,6 +71,8 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  networkLogging: false,
+  pauseIfFailed: false,
 };
 
 export interface ITestContext {
@@ -87,6 +97,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
+    const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
+    if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -94,7 +106,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
-        options.appArgs ? options.appArgs : '',
+        ...appArgs,
         '.',
       ],
       env: {
@@ -186,8 +198,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (!errors.length) return;
-    fail(`The log-file has errors \n ${logs}`);
+    if (errors.length) {
+      fail(`The log-file has errors \n ${logs}`);
+    } else if (options.networkLogging && !testPassed) {
+      fail(`log-file: \n ${logs}`);
+    }
   }
 
   test.beforeEach(async t => {
@@ -202,6 +217,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
+    await checkErrorsInLogFile();
+    if (!testPassed && options.pauseIfFailed) {
+      console.log('Test execution has been paused due `pauseIfFailed` enabled');
+      await sleep(ALMOST_INFINITY);
+    }
+
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
@@ -211,8 +232,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp(t);
-      } else {
-        await checkErrorsInLogFile();
       }
     } catch (e) {
       testPassed = false;

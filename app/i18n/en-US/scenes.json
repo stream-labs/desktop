@@ -32,5 +32,9 @@
   "Wait": "Wait",
   "Add a new Scene.": "Add a new Scene.",
   "Remove Scene.": "Remove Scene.",
-  "Edit Scene Transitions.": "Edit Scene Transitions."
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }

@@ -65,7 +65,7 @@ export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoa
       ends_at: metadata.text({
         title: $t('End After'),
         required: true,
-        dateFormat: 'MM/DD/YYYY',
+        dateFormat: 'MM/dd/yyyy',
         placeholder: 'MM/DD/YYYY',
       }),
 

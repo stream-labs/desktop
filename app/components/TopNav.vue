@@ -79,7 +79,7 @@
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
       </a>
     </div>
-    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">
+    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive, 'top-nav-item--error': facemasksExtensionError }">
       <a
         @click="openFacemaskSettingsWindow"
         class="link">
@@ -134,6 +134,15 @@
       > i,
       > span {
         color: var(--teal);
+      }
+    }
+  }
+
+  &.top-nav-item--error {
+    > a {
+      > i,
+      > span {
+        color: @red;
       }
     }
   }
