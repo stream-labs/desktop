@@ -2,13 +2,13 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
+import { Scene, SceneItemNode } from '../../app/services/scenes';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
 let sceneBuilder: SceneBuilder;
-let scene: ISceneApi;
-let getNode: (name: string) => ISceneNodeApi;
+let scene: Scene;
+let getNode: (name: string) => SceneItemNode;
 let getNodeId: (name: string) => string;
 
 async function afterStart() {
