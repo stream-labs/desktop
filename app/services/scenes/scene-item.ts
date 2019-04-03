@@ -26,6 +26,7 @@ import {
 import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
+import { TSceneNodeType } from './scenes';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -50,6 +51,8 @@ export class SceneItem extends SceneItemNode {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+
+  sceneNodeType: TSceneNodeType = 'item';
 
   // Some computed attributes
 

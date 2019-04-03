@@ -2,7 +2,7 @@
  * abstract class for representing scene's folders and items
  */
 import { ServiceHelper, mutation } from '../stateful-service';
-import { TSceneNodeType } from './scenes-api';
+import { TSceneNodeType } from '.';
 import { Inject } from '../../util/injector';
 import {
   ScenesService,
@@ -14,11 +14,19 @@ import {
 } from './index';
 import { SelectionService } from 'services/selection';
 
+export function isFolder(node: SceneItemNode): node is SceneItemFolder {
+  return node.sceneNodeType === 'folder';
+}
+
+export function isItem(node: SceneItemNode): node is SceneItem {
+  return node.sceneNodeType === 'item';
+}
+
 @ServiceHelper()
 export abstract class SceneItemNode implements ISceneItemNode {
   id: string;
   parentId: string;
-  sceneNodeType: TSceneNodeType;
+  abstract sceneNodeType: TSceneNodeType;
   resourceId: string;
   sceneId: string;
 
@@ -144,11 +152,11 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   isFolder(): this is SceneItemFolder {
-    return this.sceneNodeType === 'folder';
+    return isFolder(this);
   }
 
   isItem(): this is SceneItem {
-    return this.sceneNodeType === 'item';
+    return isItem(this);
   }
 
   getResourceId() {

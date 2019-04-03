@@ -73,12 +73,12 @@ export class Scene {
 
   getItem(sceneItemId: string): SceneItem {
     const node = this.getNode(sceneItemId);
-    return node && node.sceneNodeType === 'item' ? (node as SceneItem) : null;
+    return node && node.isItem() ? node : null;
   }
 
   getFolder(sceneFolderId: string): SceneItemFolder {
     const node = this.getNode(sceneFolderId);
-    return node && node.sceneNodeType === 'folder' ? (node as SceneItemFolder) : null;
+    return node && node.isFolder() ? node : null;
   }
 
   /**
@@ -319,21 +319,20 @@ export class Scene {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     nodes = nodes.filter(sceneNode => {
       if (sceneNode.sceneNodeType === 'folder') return true;
-      const item = sceneNode as ISceneItemInfo;
-      const source = this.sourcesService.getSource(item.sourceId);
+      const source = this.sourcesService.getSource(sceneNode.sourceId);
       if (!source) return false;
       arrayItems.push({
         name: source.sourceId,
-        id: item.id,
+        id: sceneNode.id,
         sourceId: source.sourceId,
-        crop: item.crop,
-        scaleX: item.scaleX == null ? 1 : item.scaleX,
-        scaleY: item.scaleY == null ? 1 : item.scaleY,
-        visible: item.visible,
-        x: item.x == null ? 0 : item.x,
-        y: item.y == null ? 0 : item.y,
-        locked: item.locked,
-        rotation: item.rotation || 0,
+        crop: sceneNode.crop,
+        scaleX: sceneNode.scaleX == null ? 1 : sceneNode.scaleX,
+        scaleY: sceneNode.scaleY == null ? 1 : sceneNode.scaleY,
+        visible: sceneNode.visible,
+        x: sceneNode.x == null ? 0 : sceneNode.x,
+        y: sceneNode.y == null ? 0 : sceneNode.y,
+        locked: sceneNode.locked,
+        rotation: sceneNode.rotation || 0,
       });
       return true;
     });
