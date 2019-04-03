@@ -109,12 +109,6 @@ table {
     td {
       color: white;
     }
-
-    td:last-child {
-      .icon-edit {
-        .night-icon-hover();
-      }
-    }
   }
 }
 </style>

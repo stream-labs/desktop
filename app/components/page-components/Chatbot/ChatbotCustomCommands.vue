@@ -186,11 +186,4 @@ table {
     }
   }
 }
-
-.night-theme {
-  .icon-question {
-    .night-icon-hover();
-    padding-left: 3px;
-  }
-}
 </style>
