@@ -128,15 +128,11 @@ function startApp() {
   const bt = require('backtrace-node');
 
   function handleFinishedReport() {
-    dialog.showErrorBox(`Unhandled Exception`,
-    'An unexpected error occured and the application must be shut down.\n' +
-    'Information concerning this occasion has been sent for debugging purposes.\n' +
-    'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
+    dialog.showErrorBox('Something Went Wrong',
+    'An unexpected error occured and Streamlabs OBS must be shut down.\n' +
     'Please restart the application.');
 
-    if (app) {
-      app.quit();
-    }
+    app.exit();
   }
 
   function handleUnhandledException(err) {
