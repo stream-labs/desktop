@@ -128,6 +128,12 @@ export default class TopNav extends Vue {
     this.facemasksService.showSettings();
   }
 
+  toggleNightTheme() {
+    const newTheme =
+      this.customizationService.currentTheme === 'night-theme' ? 'day-theme' : 'night-theme';
+    this.customizationService.setTheme(newTheme);
+  }
+
   openDiscord() {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
