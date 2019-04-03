@@ -46,7 +46,7 @@
       </template>
 
       <template slot="toggle" slot-scope="{ node }">
-        <span v-if="!node.isLeaf && node.children.length">
+        <span v-if="!node.isLeaf">
           <i v-if="node.isExpanded" class="icon-down"></i>
           <i v-if="!node.isExpanded" class="icon-down icon-right"></i>
         </span>
@@ -91,7 +91,7 @@ i.disabled {
   overflow: auto;
 }
 
-.sl-vue-tree-node {
+.sl-vue-tree-node-item {
   &:hover,
   &.sl-vue-tree-selected {
     .transition();
