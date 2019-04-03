@@ -198,11 +198,11 @@
 
 .patch-notes-title {
   flex-grow: 1;
-  color: @black;
+  color: var(--black);
 }
 
 .patch-notes-version {
-  color: @grey;
+  color: var(--icon);
 }
 
 .patch-notes-list {
@@ -216,7 +216,7 @@
 
 .night-theme {
   .patch-notes-title {
-    color: @white;
+    color: var(--white);
   }
 }
 </style>

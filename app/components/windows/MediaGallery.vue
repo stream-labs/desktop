@@ -101,7 +101,7 @@
   font-size: 16px;
   letter-spacing: 0;
   margin-bottom: 30px;
-  color: @day-title;
+  color: var(--title);
 }
 
 .left-panel {
@@ -109,8 +109,8 @@
 }
 
 .dropzone {
-  border: 2px dashed @teal-med-opac;
-  color: @teal-med-opac;
+  border: 2px dashed var(--teal);
+  color: var(--teal);
   text-align: center;
   padding: 10px 20px;
   font-size: 12px;
@@ -122,9 +122,9 @@
   }
 
   &:hover {
-    background-color: @teal-light-opac;
-    color: @teal;
-    border-color: @teal;
+    background-color: var(--teal-semi);
+    color: var(--teal);
+    border-color: var(--teal);
     cursor: pointer;
   }
 }
@@ -141,11 +141,11 @@
 
 .list__item {
   padding: 3px 8px;
-  color: @day-paragraph;
+  color: var(--paragraph);
   .weight(@medium);
 
   i {
-    color: @grey;
+    color: var(--icon);
     padding-right: 6px;
   }
 
@@ -155,7 +155,7 @@
 }
 
 .list__item.active {
-  background-color: @teal-light-opac;
+  background-color: var(--button);
 }
 
 .progress-slider {
@@ -164,11 +164,11 @@
   height: 6px;
   margin-bottom: 0;
   margin-top: 6px;
-  background-color: @slider-background-color;
+  background-color: var(--slider-bg);
 }
 
 .progress-slider__fill {
-  background-color: @day-paragraph;
+  background-color: var(--paragraph);
   height: 6px;
   position: absolute;
   top: 0;
@@ -181,25 +181,25 @@
 }
 
 .toolbar {
-  border: 1px solid @teal-light-opac;
+  border: 1px solid var(--teal-semi);
   .padding();
   .radius;
-  background: @day-secondary;
+  background: var(--section);
   width: 100%;
 
   i {
     font-size: 20px;
-    color: @teal-med-opac;
+    color: var(--icon);
     margin-right: 8px;
 
     &:hover {
-      color: @teal;
+      color: var(--teal);
       cursor: pointer;
     }
   }
 
   i.disabled {
-    color: @night-accent-light;
+    color: var(--solid-input);
 
     &:hover {
       cursor: default;
@@ -226,7 +226,7 @@
 }
 
 .drag-overlay {
-  border: 1px solid @yellow;
+  border: 1px solid var(--new);
   background: rgba(255, 200, 0, 0.15);
   z-index: 100000;
   box-sizing: border-box;
@@ -243,8 +243,8 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  border: 1px solid @day-secondary;
-  background: @day-shadow;
+  border: 1px solid var(--section);
+  background: var(--shadow);
   z-index: 99999;
   .radius;
 }
@@ -269,7 +269,7 @@
 }
 
 .uploads-manager__item {
-  border: 1px solid @day-border;
+  border: 1px solid var(--border);
   width: 23%;
   margin: 0 14px 14px 0;
   height: 170px;
@@ -278,8 +278,8 @@
   overflow: hidden;
 
   &:hover {
-    border-color: @teal-med-opac;
-    background-color: @teal-light-opac;
+    border-color: var(--teal);
+    background-color: var(--teal-semi);
 
     .copy-button {
       display: inline-block;
@@ -287,8 +287,8 @@
   }
 
   &.selected {
-    border-color: @teal;
-    background-color: @teal-light-opac;
+    border-color: var(--teal);
+    background-color: var(--teal-semi);
   }
 }
 
@@ -300,7 +300,7 @@
 }
 
 .upload__size {
-  color: @white;
+  color: var(--white);
   text-transform: uppercase;
   font-size: 12px;
 }
@@ -317,39 +317,11 @@
   &.image {
     background: linear-gradient(rgba(55, 71, 79, 0), rgba(55, 71, 79, 0.3), rgba(55, 71, 79, 0.6), rgba(55, 71, 79, 0.9));
     .upload__title {
-      color: @white;
+      color: var(--white);
     }
     .upload__size {
-      color: @grey;
+      color: var(--icon);
     }
-  }
-}
-
-.night-theme {
-  .uploads-manager__item {
-    border-color: @night-border;
-  }
-  .busy-overlay {
-    border-color: @night-secondary;
-  }
-  .toolbar {
-    background-color: @night-secondary;
-    border-color: @night-accent-light;
-  }
-  .progress-slider__fill {
-    background-color: @night-paragraph;
-  }
-  .progress-slider {
-    background-color: @night-slider-bg;
-  }
-  .list__item.active {
-    background-color: @night-secondary;
-  }
-  .list__item {
-    color: @white;
-  }
-  .header {
-    color: @white;
   }
 }
 </style>

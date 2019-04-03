@@ -53,7 +53,7 @@
   }
 
   &:hover {
-    background: @day-hover;
+    background: var(--hover);
 
     .editable-scene-collection--action {
       display: inline;
@@ -63,7 +63,7 @@
 
 .editable-scene-collection--active {
   font-size: 12px;
-  color: @teal;
+  color: var(--teal);
 }
 
 .editable-scene-collection--action {
@@ -71,11 +71,12 @@
 }
 
 .editable-scene-collection--action-delete {
-  color: @red;
+  color: var(--warning);
 }
 
 .editable-scene-collection--name {
   max-width: 230px;
+  color: var(--title);
 
   >div {
     white-space: nowrap;
@@ -91,21 +92,5 @@
 
 .editable-scene-collection--modified {
   font-size: 12px;
-}
-
-.night-theme {
-  .editable-scene-collection {
-    &:hover {
-      background-color: @night-hover;
-    }
-  }
-
-  .editable-scene-collection--name {
-    color: @white;
-
-    input {
-      background: transparent;
-    }
-  }
 }
 </style>

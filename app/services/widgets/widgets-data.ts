@@ -397,7 +397,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t("Include your channel's chat into your stream."),
     demoVideo: true,
     demoFilename: 'source-chatbox.mp4',
-    supportList: [$t('Twitch chat'), $t('Youtube chat'), $t('Mixer chat')],
+    supportList: [$t('Twitch chat'), $t('Youtube chat'), $t('Mixer chat'), $t('Facebook chat')],
   },
   [WidgetType.EventList]: {
     name: $t('Event List'),

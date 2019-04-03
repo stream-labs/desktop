@@ -98,7 +98,7 @@ tbody tr {
       .transition;
 
       &:hover {
-        color: @teal;
+        color: var(--teal);
       }
     }
   }
@@ -109,7 +109,7 @@ tbody tr {
   flex-direction: row;
   align-items: center;
   height: 30px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
 
   .new-list-item-modal__header__icon {
     .padding-left();
@@ -128,8 +128,8 @@ tbody tr {
 }
 
 .new-list-item-modal__controls {
-  background-color: @day-secondary;
-  border-top: 1px solid @day-border;
+  background-color: var(--section);
+  border-top: 1px solid var(--border);
   padding: 10px 20px;
   text-align: right;
   flex-shrink: 0;
@@ -139,16 +139,4 @@ tbody tr {
     margin-left: 8px;
   }
 }
-
-.night-theme {
-  .new-list-item-modal__header {
-    border-bottom: 1px solid @night-border;
-  }
-
-  .new-list-item-modal__controls {
-    border-top-color: @night-border;
-    background-color: @night-primary;
-  }
-}
-
 </style>

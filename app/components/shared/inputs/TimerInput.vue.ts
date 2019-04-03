@@ -5,6 +5,7 @@ import { ITimerMetadata } from './index';
 @Component({})
 export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   @Prop() value: number;
+  @Prop() title: string;
   @Prop() metadata: ITimerMetadata;
 
   holdTimeout: number = null;

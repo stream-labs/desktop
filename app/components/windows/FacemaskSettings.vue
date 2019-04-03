@@ -53,10 +53,16 @@
           />
         </h-form-group>
       </div>
+      <div class="row" v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Sub Alert Duration')">
+          <slider-input v-model="subsDurationModel" :metadata="{min: 2, max: 300}"/>
+        </h-form-group>
+      </div>
       <div class="row" v-if="showTwitchFeatures && showExtensionPromt">
         <h-form-group :title="$t('Get the Extension')">
           <div class="extension-warning">
             <span>{{$t('The Streamlabs Face Masks extension is required for Subscription and Bits Masks')}}</span>
+            <span>{{$t('Make sure to enable the extension in the extension config page to complete setup')}}</span>
             <a @click="openExtensionPage">{{extensionUrl}}</a>
           </div>
         </h-form-group>
@@ -96,6 +102,11 @@
           />
         </h-form-group>
       </div>
+      <div class="row" v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Bits Alert Duration')">
+          <slider-input v-model="bitsDurationModel" :metadata="{min: 2, max: 300}"/>
+        </h-form-group>
+      </div>
       <div class="row last-item" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Bits Price')">
           <list-input
@@ -130,8 +141,8 @@
   }
 
   .extension-warning {
-    background-color: @purple;
-    color: @white;
+    background-color: var(--accent);
+    color: var(--white);
     border-radius: 4px;
     padding: 6px;
     a {

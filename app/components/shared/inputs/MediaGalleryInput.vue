@@ -30,7 +30,7 @@
   position: relative;
   width: 100%;
   height: 120px;
-  background-color: @day-section;
+  background-color: var(--section);
 
   img {
     max-height: 110px;
@@ -44,7 +44,7 @@
 
 .change-media {
   text-transform: uppercase;
-  color: @night-paragraph;
+  color: var(--paragraph);
   font-size: 11px;
 }
 
@@ -59,7 +59,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 6px;
-  background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
+  background: var(--shadow);
   border-radius: 0 0 @radius @radius;
 
   i {
@@ -69,7 +69,7 @@
   }
 
   .icon-close {
-    color: @red;
+    color: var(--warning);
   }
 }
 
@@ -81,18 +81,19 @@
   font-size: 12px;
 }
 
-i {
+i,
+.change-media {
   transition: 0.1s all linear;
 
   &:hover {
     cursor: pointer;
-    color: @white;
+    color: var(--white);
   }
 }
 
 .url-uploader {
   .radius();
-  background-color: @day-primary;
+  background-color: var(--background);
   padding: 12px;
   position: absolute;
   top: 1px;
@@ -104,17 +105,6 @@ i {
     position: absolute;
     bottom: 25px;
     right: 12px;
-  }
-}
-
-.night-theme {
-  .media-box {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
-
-  .url-uploader {
-    background-color: @night-primary;
   }
 }
 </style>

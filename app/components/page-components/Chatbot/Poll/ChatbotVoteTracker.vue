@@ -54,7 +54,7 @@
     span {
       display: block;
       height: 100%;
-      background-color: @purple;
+      background-color: var(--accent);
       position: relative;
       .radius();
       transition: 0.4s linear;
@@ -103,7 +103,7 @@
     transition-delay: 0s;
 
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
 }

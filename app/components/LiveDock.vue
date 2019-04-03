@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="!resizingInProgress && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+      <div class="live-dock-chat" v-if="!hideStyleBlockingElements && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -98,7 +98,7 @@
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
-        <span v-if="!resizingInProgress">{{ $t('Your chat is currently offline') }}</span>
+        <span v-if="!hideStyleBlockingElements">{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>
@@ -115,7 +115,7 @@
   z-index: 1000;
   width: 28%;
   box-sizing: border-box;
-  border-left: 1px solid @day-border;
+  border-left: 1px solid var(--border);
   .padding(2);
 
   &.can-animate {
@@ -123,7 +123,7 @@
   }
 
   &.live-dock--left {
-    border-right: 1px solid @day-border;
+    border-right: 1px solid var(--border);
 
     .live-dock-chevron {
       right: 5px;
@@ -243,12 +243,12 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: @red;
+  background: var(--warning);
   margin: 0 8px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
 
   &.live-dock-offline {
-    background: @icon;
+    background: var(--icon);
     animation: none;
   }
 }
@@ -264,25 +264,5 @@
 
 .live-dock-platform-app-webview {
   .flex--grow();
-}
-
-.night-theme {
-  .live-dock {
-    border-color: @night-border;
-  }
-
-  .live-dock-text,
-  .live-dock-timer,
-  .live-dock-viewer-count {
-    color: @white;
-  }
-
-  .live-dock-chat__img--offline-day {
-    display: none;
-  }
-
-  .live-dock-chat__img--offline-night {
-    display: flex;
-  }
 }
 </style>

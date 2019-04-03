@@ -40,12 +40,12 @@
   &.active {
     opacity: 1;
     .weight(@medium);
-    border-color: @navy;
-    color: @day-title;
+    border-color: var(--nav-border);
+    color: var(--title);
 
     .fa,
     i {
-      color: @day-title;
+      color: var(--title);
     }
   }
 
@@ -60,7 +60,7 @@
 
   .fa,
   i {
-    color: @icon;
+    color: var(--icon);
     position: relative;
     margin-right: -16px;
     left: -24px;
@@ -81,19 +81,4 @@
 .nav-item__children {
   .margin-top();
 }
-
-.night-theme {
-  .nav-item {
-    &.active {
-      border-color: @white;
-      color: @white;
-
-      .fa,
-      i {
-        color: @white;
-      }
-    }
-  }
-}
-
 </style>

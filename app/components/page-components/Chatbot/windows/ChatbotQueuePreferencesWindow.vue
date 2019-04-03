@@ -41,12 +41,12 @@
 @import '../../../../styles/index';
 
 .window-toggle__wrapper {
-  background-color: @day-primary;
+  background-color: var(--background);
   z-index: 1;
   width: 100%;
   padding: 15px;
   height: 48px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   text-align: right;
 
@@ -57,12 +57,5 @@
 
 .chatbot-quote-preferences__container {
   padding-top: 45px;
-}
-
-.night-theme {
-  .window-toggle__wrapper {
-    background-color: @night-primary;
-    border-color: @night-border;
-  }
 }
 </style>

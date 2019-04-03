@@ -29,7 +29,7 @@
   position: relative;
   width: 100%;
   height: 30px;
-  background-color: @day-secondary;
+  background-color: var(--section);
 }
 
 .footer {
@@ -51,7 +51,7 @@
   }
 
   .icon-close {
-    color: @red;
+    color: var(--warning);
   }
 }
 
@@ -59,7 +59,7 @@
   transition: 0.1s all linear;
   &:hover {
     cursor: pointer;
-    color: @white;
+    color: var(--white);
   }
 }
 
@@ -73,12 +73,12 @@
 
 .url-uploader {
   .radius();
-  background-color: @day-primary;
+  background-color: var(--background);
   padding: 12px;
   position: absolute;
   height: 120px;
   width: 100%;
-  border: 1px solid @day-secondary;
+  border: 1px solid var(--border);
   z-index: 10;
 
   button {
@@ -91,18 +91,6 @@
 .change-media {
   text-transform: uppercase;
   font-size: 11px;
-  color: @night-paragraph;
-}
-
-.night-theme {
-  .media-box {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-  }
-
-  .url-uploader {
-    background-color: @night-primary;
-    border-color: @night-secondary;
-  }
+  color: var(--paragraph);
 }
 </style>

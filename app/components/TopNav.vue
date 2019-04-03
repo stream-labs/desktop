@@ -79,7 +79,7 @@
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
       </a>
     </div>
-    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">
+    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive, 'top-nav-item--error': facemasksExtensionError }">
       <a
         @click="openFacemaskSettingsWindow"
         class="link">
@@ -133,7 +133,16 @@
     > a {
       > i,
       > span {
-        color: @teal;
+        color: var(--teal);
+      }
+    }
+  }
+
+  &.top-nav-item--error {
+    > a {
+      > i,
+      > span {
+        color: @red;
       }
     }
   }
@@ -151,8 +160,8 @@
   .padding-h-sides(2);
   position: relative;
   max-width: none;
-  background-color: @day-secondary;
-  border-bottom: 1px solid @day-border;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
   flex: 0 0 48px;
   z-index: 1;
 
@@ -207,7 +216,7 @@
   }
 
   .fa-sun-o {
-    color: @yellow;
+    color: var(--new);
   }
 
   .fa-moon-o {
@@ -241,18 +250,13 @@
 }
 
 .night-theme {
-  .top-nav {
-    background-color: @night-primary;
-    border-color: @night-border;
-  }
-
   .theme-toggle {
     .fa-sun-o {
       display: none;
     }
 
     .fa-moon-o {
-      color: @white;
+      color: var(--white);
       opacity: 1;
       display: block;
     }
@@ -260,7 +264,7 @@
 
   .user__name {
     &:hover {
-      color: @white;
+      color: var(--white);
     }
   }
 

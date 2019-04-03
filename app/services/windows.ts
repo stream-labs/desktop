@@ -339,20 +339,22 @@ export class WindowsService extends StatefulService<IWindowsState> {
   /**
    * Closes all one-off windows
    */
-  closeAllOneOffs() {
+  closeAllOneOffs(): Promise<any> {
+    const closingPromises: Promise<void>[] = [];
     Object.keys(this.windows).forEach(windowId => {
       if (windowId === 'main') return;
       if (windowId === 'child') return;
-      this.closeOneOffWindow(windowId);
+      closingPromises.push(this.closeOneOffWindow(windowId));
     });
+    return Promise.all(closingPromises);
   }
 
-  closeOneOffWindow(windowId: string) {
-    if (this.windows[windowId]) {
-      if (!this.windows[windowId].isDestroyed()) {
-        this.windows[windowId].destroy();
-      }
-    }
+  closeOneOffWindow(windowId: string): Promise<void> {
+    if (!this.windows[windowId] || this.windows[windowId].isDestroyed()) return Promise.resolve();
+    return new Promise(resolve => {
+      this.windows[windowId].on('closed', resolve);
+      this.windows[windowId].destroy();
+    });
   }
 
   // @ExecuteInCurrentWindow()

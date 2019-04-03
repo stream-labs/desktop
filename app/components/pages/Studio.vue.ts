@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
+import { AppService } from 'services/app';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 
 @Component({
@@ -21,10 +22,9 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private appService: AppService;
 
-  $refs: {
-    studioModeContainer: HTMLDivElement;
-  };
+  $refs: { studioModeContainer: HTMLDivElement };
 
   stacked = false;
 
@@ -45,7 +45,7 @@ export default class Studio extends Vue {
   }
 
   get displayEnabled() {
-    return !this.customizationService.state.resizingInProgress && !this.performanceMode;
+    return !this.customizationService.state.hideStyleBlockingElements && !this.performanceMode;
   }
 
   get performanceMode() {
@@ -81,10 +81,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ resizingInProgress: true });
+    this.customizationService.setSettings({ hideStyleBlockingElements: true });
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ resizingInProgress: false });
+    this.customizationService.setSettings({ hideStyleBlockingElements: false });
   }
 }

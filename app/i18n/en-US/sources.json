@@ -142,5 +142,17 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud",
   "The streamer manually adds images of sponsors.": "The streamer manually adds images of sponsors.",
-  "Mixer chat": "Mixer chat"
+  "Mixer chat": "Mixer chat",
+  "There are no existing sources of this type.": "There are no existing sources of this type.",
+  "Instant Replay": "Instant Replay",
+  "Include text into your stream, such as follower count, last donation, and many others.": "Include text into your stream, such as follower count, last donation, and many others.",
+  "Automatically plays your most recently captured replay in your stream.": "Automatically plays your most recently captured replay in your stream.",
+  "New filter": "New filter",
+  "Third party widgets": "Third party widgets",
+  "OpenVR Capture": "OpenVR Capture",
+  "Directly capture the OpenVR monitoring video buffer of your HMD.": "Directly capture the OpenVR monitoring video buffer of your HMD.",
+  "LIV Client Capture": "LIV Client Capture",
+  "VLC Source": "VLC Source",
+  "Add playlists of videos to your scene.": "Add playlists of videos to your scene.",
+  "Settings for ": "Settings for "
 }

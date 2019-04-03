@@ -142,7 +142,7 @@
 
 .left-accordion__button {
   display: flex;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
   .padding();
   .weight(@medium);
   position: relative;
@@ -163,7 +163,7 @@
 }
 
 .left-accordion__button.active {
-  background-color: @teal-light-opac;
+  background-color: var(--section);
 }
 
 .add-alert-button {
@@ -174,9 +174,9 @@
   position: absolute;
   left: 0;
   top: 50px;
-  background-color: @white;
+  background-color: var(--background);
   z-index: 1;
-  box-shadow: 0 2px @day-shadow;
+  box-shadow: 0 2px var(--shadow);
   .padding();
 
   .button {
@@ -210,8 +210,9 @@
   .radius();
   width: 90%;
   margin: 8px auto;
-  box-shadow: 0 2px @day-shadow;
-  border: 1px solid @day-border;
+  box-shadow: 0 2px var(--shadow);
+  border: 1px solid var(--border);
+  background-color: var(--section-alt);
   height: 100px;
   position: relative;
   .padding();
@@ -228,10 +229,10 @@
 }
 
 .variation-tile.active {
-  border: 1px solid @teal;
+  border: 1px solid var(--teal);
 
   .variation-tile__image-box {
-    border: 1px solid @teal-light-opac;
+    border: 1px solid var(--teal-semi);
   }
 }
 
@@ -250,7 +251,7 @@
   left: 0;
   width: 100%;
   padding: 4px;
-  background-color: @day-shadow;
+  background-color: var(--shadow);
 
   input,
   input:disabled {
@@ -267,43 +268,6 @@
 
   i {
     margin-left: 4px;
-  }
-}
-
-.night-theme {
-  .left-accordion__button {
-    border-color: @night-border;
-  }
-
-  .left-accordion__button.active {
-    background-color: @night-secondary;
-  }
-
-  .add-alert-dropdown {
-    background-color: @night-secondary;
-    box-shadow: 0 2px @night-shadow;
-  }
-
-  .variation-tile {
-    background-color: @night-section-alt;
-    box-shadow: 0 2px @night-shadow;
-    border-color: @night-border;
-  }
-
-  .variation-tile.active {
-    border: 1px solid @teal;
-
-    .variation-tile__image-box {
-      border: 1px solid @teal-light-opac;
-    }
-  }
-
-  .variation-tile__image-box {
-    background-color: @night-secondary;
-  }
-
-  .variation-tile__name {
-    background-color: @night-shadow;
   }
 }
 </style>

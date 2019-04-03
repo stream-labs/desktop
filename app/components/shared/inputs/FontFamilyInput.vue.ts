@@ -736,6 +736,8 @@ const fonts = [
 })
 export default class FontFamilyInput extends BaseInput<string, IInputMetadata> {
   @Prop() readonly value: string;
+  @Prop() readonly title: string;
+  @Prop() readonly metadata: IInputMetadata;
 
   fonts = fonts;
 

@@ -116,7 +116,7 @@ export abstract class RpcApi extends Service {
     }
 
     if (response) {
-      if (this.isMutationBufferingEnabled()) this.stopBufferingMutations();
+      if (this.mutationsBufferingEnabled) this.stopBufferingMutations();
       return response;
     }
 
@@ -256,12 +256,8 @@ export abstract class RpcApi extends Service {
     return mutations;
   }
 
-  isMutationBufferingEnabled() {
-    return this.mutationsBufferingEnabled;
-  }
-
-  addMutationToBuffer(mutation: IMutation) {
-    this.bufferedMutations.push(mutation);
+  handleMutation(mutation: IMutation) {
+    if (this.mutationsBufferingEnabled) this.bufferedMutations.push(mutation);
   }
 
   /**

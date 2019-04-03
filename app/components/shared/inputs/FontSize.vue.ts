@@ -17,6 +17,9 @@ export default class FontSize extends BaseInput<string, INumberMetadata> {
   @Prop()
   readonly metadata: INumberMetadata;
 
+  @Prop()
+  readonly title: string;
+
   sliderOptions = metadata.slider({
     min: 8,
     max: 144,

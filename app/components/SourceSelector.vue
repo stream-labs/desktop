@@ -73,7 +73,7 @@
   text-align: center;
   opacity: .26;
   margin-left: 8px;
-  color: @grey;
+  color: var(--icon);
 }
 
 .fa.disabled,
@@ -99,18 +99,18 @@ i.disabled {
     .source-selector-action {
       .transition();
       opacity: 1;
-      color: @grey;
+      color: var(--icon);
     }
   }
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  border-color: @day-section;
+  border-color: var(--section);
 }
 
 .title-container {
   display: inline-block;
-  color: @grey;
+  color: var(--icon);
 }
 
 .layer-icon {
@@ -127,16 +127,6 @@ i.disabled {
 }
 
 .title-container {
-  color: @day-title
-}
-
-.night-theme {
-  .title-container {
-    color: @grey;
-  }
-
-  .sl-vue-tree.sl-vue-tree-root {
-    border-color: @night-section;
-  }
+  color: var(--title);
 }
 </style>

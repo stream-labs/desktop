@@ -79,7 +79,7 @@
 
 // Backgrounds
 .bg--teal() {
-  background-color: @teal;
+  background-color: var(--teal);
 }
 
 // Border radius
@@ -89,29 +89,16 @@
 
 // Borders
 .border() {
-  border: 1px solid @day-section;
-}
-
-.night-border() {
-  border: 1px solid @night-section;
+  border: 1px solid var(--section);
 }
 
 // Hovers
 .icon-hover() {
-  color: @icon;
+  color: var(--icon);
   .transition();
 
   &:hover {
-    color: @dark-2;
-  }
-}
-
-.night-icon-hover() {
-  color: @icon;
-  .transition();
-
-  &:hover {
-    color: @white;
+    color: var(--title);
   }
 }
 
@@ -301,12 +288,8 @@
 }
 
 // Shadows
-.day-shadow() {
-  box-shadow: 0 8px 16px @day-shadow;
-}
-
-.night-shadow() {
-  box-shadow: 0 8px 16px @night-shadow;
+.shadow() {
+  box-shadow: 0 8px 16px var(--shadow);
 }
 
 // Transitiions
@@ -338,11 +321,11 @@
 }
 
 .teal() {
-  color: @teal;
+  color: var(--teal);
 }
 
 .warning() {
-  color: @red;
+  color: var(--warning);
 }
 
 .letter-spacing() {

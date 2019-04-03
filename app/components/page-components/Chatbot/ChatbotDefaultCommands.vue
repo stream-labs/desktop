@@ -91,7 +91,7 @@ table {
       .align-items--inline;
       .text-align(@right);
       .padding-right();
-      color: @white;
+      color: var(--white);
 
       .icon-edit {
         font-size: 10px;
@@ -108,12 +108,6 @@ table {
 
     td {
       color: white;
-    }
-
-    td:last-child {
-      .icon-edit {
-        .night-icon-hover();
-      }
     }
   }
 }

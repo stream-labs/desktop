@@ -20,13 +20,13 @@
 @import "../../styles/index";
 .dropdown-menu {
   top: 5px !important;
-  background-color: @day-primary;
+  background-color: var(--background);
   .radius();
   .padding();
   max-height: 166px;
   overflow-y: auto;
   z-index: 200000;
-  .day-shadow();
+  .shadow();
 }
 
 .dropdown-menu__toggle {
@@ -35,7 +35,7 @@
   text-transform: capitalize;
   font-size: 14px;
   .weight(@medium);
-  color: @day-title;
+  color: var(--title);
 
   span {
     max-width: 300px;
@@ -59,7 +59,7 @@
 .dropdown-menu__separator {
   width: 100%;
   height: 1px;
-  background-color: @grey;
+  background-color: var(--midtone);
   opacity: .2;
   .margin-v-sides();
 }
@@ -70,40 +70,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  color: @grey;
+  color: var(--midtone);
 
   &:hover,
   &.active {
-    color: @navy;
-  }
-}
-
-.night-theme {
-  .dropdown-menu {
-    background-color: @night-primary;
-    .night-shadow();
-  }
-
-  .dropdown-menu__toggle {
-    .fa,
-    i {
-      .night-icon-hover();
-    }
-
-    &:focus {
-      outline: 0;
-    }
-  }
-
-  .dropdown-menu__item {
-    &:hover,
-    &.active {
-      color: @white;
-    }
-  }
-
-  .dropdown-menu__toggle {
-    color: @white;
+    color: var(--title);
   }
 }
 
@@ -115,6 +86,7 @@
   border: 0 !important;
   padding: 8px !important;
   color: inherit !important;
+  background-color: var(--background) !important;
 }
 
 .popper[x-placement^="top"] {
@@ -133,5 +105,3 @@
   margin-right: 5px;
 }
 </style>
-
-

@@ -40,17 +40,17 @@
   @import "../../styles/index";
 
 .notification {
-  color: @grey;
+  color: var(--icon);
   padding: 5px 10px;
   margin-bottom: 5px;
   display: grid;
   grid-template-columns: 30px 1fr 130px;
-  background: @day-primary;
+  background: var(--hover);
   .border();
 
   &.has-action:hover {
-    color: @navy;
-    background: @day-secondary;
+    color: var(--title);
+    background: var(--section);
     cursor: pointer;
   }
 
@@ -59,24 +59,11 @@
   }
 
   .fa-warning {
-    color: @red;
+    color: var(--warning);
   }
 
   .date {
     text-align: right;
-  }
-}
-
-.night-theme {
-  .notification {
-    background: @night-hover;
-    border-color: @night-hover;
-
-    &.has-action:hover {
-      color: @white;
-      border-color: @night-secondary;
-      background: @night-secondary;
-    }
   }
 }
 </style>

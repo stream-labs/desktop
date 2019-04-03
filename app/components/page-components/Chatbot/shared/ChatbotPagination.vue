@@ -39,7 +39,7 @@
     cursor: pointer;
 
     &.chatbot-pagination__page--current {
-      color: @day-title;
+      color: var(--title);
       .weight(@bold);
     }
   }
@@ -54,14 +54,5 @@
   .padding(1);
   .padding-left();
   .padding-right();
-}
-
-
-.night-theme {
-.chatbot-pagination__page {
-    &.chatbot-pagination__page--current {
-      color: @white;
-    }
-  }
 }
 </style>
