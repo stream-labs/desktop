@@ -53,7 +53,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   get backgroundColor() {
-    return this.customizationService.getThemeBackground();
+    return this.customizationService.themeBackground;
   }
 
   destroyed() {

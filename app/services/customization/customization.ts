@@ -77,7 +77,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return this.setSettings({ theme });
   }
 
-  getThemeBackground() {
+  get themeBackground() {
     return THEME_BACKGROUNDS[this.currentTheme];
   }
 
@@ -125,7 +125,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         options: [
           { value: 'night-theme', description: $t('Night (Classic)') },
           { value: 'day-theme', description: $t('Day (Classic)') },
-          { value: 'spacegray-theme', description: $t('Space Gray') },
         ],
         visible: true,
         enabled: true,
