@@ -13,6 +13,8 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
+const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -43,6 +45,7 @@ export async function focusLibrary(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  pauseIfFailed?: boolean;
   appArgs?: string;
   afterStartCb?(t: any): Promise<any>;
 
@@ -64,6 +67,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
   networkLogging: false,
+  pauseIfFailed: false,
 };
 
 export interface ITestContext {
@@ -208,6 +212,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
+    await checkErrorsInLogFile();
+    if (!testPassed && options.pauseIfFailed) {
+      console.log('Test execution has been paused due `pauseIfFailed` enabled');
+      await sleep(ALMOST_INFINITY);
+    }
+
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
@@ -217,8 +227,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp(t);
-      } else {
-        await checkErrorsInLogFile();
       }
     } catch (e) {
       testPassed = false;

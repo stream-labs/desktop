@@ -1,8 +1,8 @@
-import { EEncoder } from 'services/settings';
+import { EEncoderFamily } from 'services/settings';
 
 export interface IEncoderProfile {
   game: string;
-  encoder: EEncoder;
+  encoder: EEncoderFamily;
   bitrateMin: number;
   bitrateMax: number;
   presetIn: string;

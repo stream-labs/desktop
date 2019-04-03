@@ -34,7 +34,8 @@
     "screentest": "node test/screentest/runner.js",
     "commit": "commit",
     "postinstall": "scripts/facemask-plugin-move.bat",
-    "signbinaries": "yarn install --cwd bin && node bin/sign-binaries.js"
+    "signbinaries": "yarn install --cwd bin && node bin/sign-binaries.js",
+    "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js"
   },
   "prettier": {
     "singleQuote": true,

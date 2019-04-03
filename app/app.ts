@@ -164,28 +164,39 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// EVENT LOGGING
+// ERRORS LOGGING
 
+// override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
-  logError(args[0]);
+  writeErrorToLog(...args);
   consoleError.call(console, ...args);
 };
 
-function logError(error: Error | string) {
+/**
+ * Try to serialize error arguments and stack and write them to the log file
+ */
+function writeErrorToLog(...errors: (Error | string)[]) {
   let message = '';
-  let stack = '';
 
-  if (error instanceof Error) {
-    message = error.message;
-    stack = error.stack;
-  } else if (typeof error === 'string') {
-    message = error;
-  }
+  // format error arguments depending on the type
+  const formattedErrors = errors.map(error => {
+    if (error instanceof Error) {
+      message = error.stack;
+    } else if (typeof error === 'string') {
+      message = error;
+    } else {
+      try {
+        message = JSON.stringify(error);
+      } catch (e) {
+        message = 'UNSERIALIZABLE';
+      }
+    }
+    return message;
+  });
 
   // send error to the main process via IPC
   electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${message}
-    ${stack}
+    ${formattedErrors.join('\n')}
   `);
 }
