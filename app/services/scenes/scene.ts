@@ -5,7 +5,6 @@ import {
   ISceneItem,
   SceneItem,
   IScene,
-  ISceneApi,
   ISceneNodeAddOptions,
   ISceneItemInfo,
   ISceneItemFolder,
@@ -28,7 +27,7 @@ export interface ISceneHierarchy extends ISceneItemNode {
 }
 
 @ServiceHelper()
-export class Scene implements ISceneApi {
+export class Scene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
@@ -192,7 +191,6 @@ export class Scene implements ISceneApi {
       sceneId: this.id,
       resourceId: `SceneItemFolder${JSON.stringify([this.id, id])}`,
       parentId: '',
-      childrenIds: [],
     });
     return this.getFolder(id);
   }
@@ -293,14 +291,14 @@ export class Scene implements ISceneApi {
 
     // recalculate children order in dest and source folder
 
-    if (destFolderId) {
-      this.getFolder(destFolderId).recalculateChildrenOrder();
-    }
+    // if (destFolderId) {
+    //   this.getFolder(destFolderId).recalculateChildrenOrder();
+    // }
 
-    if (sourceNode.parentId !== destFolderId) {
-      const sourceFolder = sourceNode.getParent();
-      if (sourceFolder) sourceFolder.recalculateChildrenOrder();
-    }
+    // if (sourceNode.parentId !== destFolderId) {
+    //   const sourceFolder = sourceNode.getParent();
+    //   if (sourceFolder) sourceFolder.recalculateChildrenOrder();
+    // }
 
     itemsToMove.forEach(item => {
       let currentIdx: number;
@@ -357,8 +355,7 @@ export class Scene implements ISceneApi {
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
       if (nodeModel.sceneNodeType === 'folder') {
-        const folderModel = nodeModel as ISceneItemFolder;
-        this.createFolder(folderModel.name, { id: folderModel.id });
+        this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
         const itemModel = nodeModel as ISceneItemInfo;
         this.ADD_SOURCE_TO_SCENE(itemModel.id, itemModel.sourceId, obsSceneItems[itemIndex].id);
@@ -370,8 +367,7 @@ export class Scene implements ISceneApi {
     // add items to folders
     nodes.reverse().forEach(nodeModel => {
       if (nodeModel.sceneNodeType !== 'folder') return;
-      const folder = nodeModel as ISceneItemFolder;
-      this.getSelection(folder.childrenIds).moveTo(this.id, folder.id);
+      this.getSelection(nodeModel.childrenIds).moveTo(this.id, nodeModel.id);
     });
   }
 

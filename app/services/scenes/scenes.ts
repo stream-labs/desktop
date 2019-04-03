@@ -4,15 +4,7 @@ import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import {
-  IScene,
-  ISceneCreateOptions,
-  ISceneItem,
-  IScenesServiceApi,
-  IScenesState,
-  Scene,
-  SceneItem,
-} from './index';
+import { IScene, ISceneCreateOptions, ISceneItem, IScenesState, Scene, SceneItem } from './index';
 import { ISource, SourcesService } from 'services/sources';
 import { Inject } from 'util/injector';
 import * as obs from '../../../obs-api';
@@ -20,7 +12,7 @@ import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 
-export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
+export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
     displayOrder: [],

@@ -4,13 +4,13 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { Inject } from 'util/injector';
 import { Selection, SelectionService } from 'services/selection';
-import { ISceneItemFolderApi, SceneItem, ISceneHierarchy, TSceneNode } from 'services/scenes';
+import { SceneItem, ISceneHierarchy, TSceneNode } from 'services/scenes';
 
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from './scenes-api';
 
 @ServiceHelper()
-export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
+export class SceneItemFolder extends SceneItemNode {
   name: string;
 
   protected readonly state: ISceneItemFolder;
@@ -149,31 +149,8 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.state;
   }
 
-  /**
-   * for internal usage only
-   */
-  recalculateChildrenOrder() {
-    this.state.childrenIds = this.childrenIds;
-    const childrenCount = this.childrenIds.length;
-    const nodeInd = this.getNodeIndex();
-    const foundChildren: TSceneNode[] = [];
-    const sceneNodes = this.getScene().getNodes();
-
-    for (let i = nodeInd + 1; foundChildren.length < childrenCount; i++) {
-      const sceneNode = sceneNodes[i];
-      if (sceneNode.parentId === this.id) foundChildren.push(sceneNode);
-    }
-
-    this.SET_CHILDREN_ORDER(foundChildren.map(child => child.id));
-  }
-
   @mutation()
   private UPDATE(patch: TPatch<ISceneItemFolder>) {
     merge(this.state, patch);
-  }
-
-  @mutation()
-  private SET_CHILDREN_ORDER(childrenIds: string[]) {
-    this.state.childrenIds = childrenIds;
   }
 }

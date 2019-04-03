@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import { IScenesServiceApi } from '../../services/scenes';
+import { ScenesService } from 'services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
-import { ISelectionServiceApi } from '../../services/selection';
+import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -16,7 +16,7 @@ export default class NameScene extends Vue {
   error = '';
 
   @Inject()
-  scenesService: IScenesServiceApi;
+  scenesService: ScenesService;
 
   @Inject()
   sourcesService: ISourcesServiceApi;
@@ -25,7 +25,7 @@ export default class NameScene extends Vue {
   windowsService: WindowsService;
 
   @Inject()
-  selectionService: ISelectionServiceApi;
+  selectionService: SelectionService;
 
   options: {
     sceneToDuplicate?: string; // id of scene

@@ -8,8 +8,7 @@ interface ISchema {
   items: TSceneNodeInfo[];
 }
 
-export interface ISceneItemInfo {
-  id: string;
+export interface ISceneItemInfo extends ISceneNodeInfo {
   sourceId: string;
   x: number;
   y: number;
@@ -20,12 +19,21 @@ export interface ISceneItemInfo {
   hotkeys?: HotkeysNode;
   locked?: boolean;
   rotation?: number;
-
-  sceneNodeType?: TSceneNodeType;
-  parentId?: string;
+  sceneNodeType: 'item';
 }
 
-export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolder;
+interface ISceneItemFolderInfo extends ISceneNodeInfo {
+  name: string;
+  sceneNodeType: 'folder';
+  childrenIds: string[];
+}
+
+interface ISceneNodeInfo {
+  id: string;
+  sceneNodeType: 'item' | 'folder';
+}
+
+export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolderInfo;
 
 interface IContext {
   scene: Scene;
@@ -67,10 +75,14 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               crop: transform.crop,
               locked: sceneItem.locked,
               rotation: transform.rotation,
+              sceneNodeType: 'item',
             });
           });
         } else {
-          resolve(sceneItem.getModel());
+          resolve({
+            ...sceneItem.getModel(),
+            childrenIds: sceneItem.childrenIds,
+          });
         }
       });
     });

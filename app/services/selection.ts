@@ -14,20 +14,28 @@ import {
   TSceneNodeModel,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
-import { Inject } from '../../util/injector';
-import { shortcut } from '../shortcuts';
-import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
+import { Inject } from 'util/injector';
+import { shortcut } from 'services/shortcuts';
 import { Subject } from 'rxjs';
-import Utils from '../utils';
-import { Source } from '../sources';
+import Utils from 'services/utils';
+import { Source } from 'services/sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
-import { Rect } from '../../util/rect';
+import { Rect } from 'util/rect';
+
+interface ISelectionState {
+  selectedIds: string[];
+  lastSelectedId: string;
+}
+
+/**
+ * list of ISceneNode.id or ISceneNode
+ */
+export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];
 
 /**
  * represents selection of active scene and provide shortcuts
  */
-export class SelectionService extends StatefulService<ISelectionState>
-  implements ISelectionServiceApi {
+export class SelectionService extends StatefulService<ISelectionState> {
   static initialState: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
@@ -146,7 +154,7 @@ export class SelectionService extends StatefulService<ISelectionState>
   /**
    * @override Selection.select
    */
-  select(items: TNodesList): ISelection {
+  select(items: TNodesList): void {
     this.getSelection().select.call(this, items);
 
     const scene = this.getScene();
@@ -161,7 +169,6 @@ export class SelectionService extends StatefulService<ISelectionState>
       });
 
     this.updated.next(this.state);
-    return this;
   }
 
   /**
@@ -192,7 +199,7 @@ export class SelectionService extends StatefulService<ISelectionState>
  * Helper for working with multiple sceneItems
  */
 @ServiceHelper()
-export class Selection implements ISelection {
+export class Selection {
   @Inject() private scenesService: ScenesService;
 
   _resourceId: string;
