@@ -346,9 +346,8 @@ export class Scene {
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
-        const itemModel = nodeModel as ISceneItemInfo;
-        this.ADD_SOURCE_TO_SCENE(itemModel.id, itemModel.sourceId, obsSceneItems[itemIndex].id);
-        this.getItem(itemModel.id).loadItemAttributes(itemModel);
+        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
+        this.getItem(nodeModel.id).loadItemAttributes(nodeModel);
         itemIndex++;
       }
     });
