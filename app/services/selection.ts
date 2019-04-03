@@ -460,11 +460,19 @@ export class Selection {
     }
   }
 
-  isVisible() {
-    return !this.getItems().find(item => !item.visible);
+  /**
+   * A selection is considered visible if at least 1 item
+   * in the selection is visible.
+   */
+  isVisible(): boolean {
+    return !!this.getItems().find(item => item.visible);
   }
 
-  isLocked() {
+  /**
+   * A selection is considered locked if all items in the
+   * selection are locked.
+   */
+  isLocked(): boolean {
     return !this.getItems().find(item => !item.locked);
   }
 

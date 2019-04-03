@@ -16,6 +16,7 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
   get metadata() {
     return {
       type: 'number',
+      name: this.value.name,
       min: this.value.minVal,
       max: this.value.maxVal,
       disabled: this.value.enabled === false,

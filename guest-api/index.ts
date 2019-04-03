@@ -19,6 +19,11 @@ import path from 'path';
 (() => {
   const readFile = util.promisify(fs.readFile);
 
+  // No guest content should ever be able to pop up alert/confirm boxes
+  window.alert = window.confirm = () => {
+    throw new Error('Alert and Confirm are disabled in this context');
+  };
+
   global.eval = function() {
     throw new Error('Eval is disabled for security');
   };

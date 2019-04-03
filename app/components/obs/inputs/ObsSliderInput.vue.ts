@@ -17,6 +17,7 @@ class ObsSliderInput extends ObsInput<IObsSliderInputValue> {
   get metadata() {
     return {
       type: 'slider',
+      name: this.value.name,
       title: this.value.showDescription !== false ? this.value.description : undefined,
       disabled: this.value.enabled === false,
       max: this.value.maxVal,

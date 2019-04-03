@@ -27,7 +27,11 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   @Prop()
   value: IObsInput<IObsFont>;
 
-  fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
+  fonts: IFontDescriptor[] = [];
+
+  mounted() {
+    fontManager.getAvailableFonts((fonts: IFontDescriptor[]) => (this.fonts = fonts));
+  }
 
   setFamily(family: string) {
     // Select a default style for the family, preferably "Regular"
@@ -88,7 +92,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     return {
       options: this.fontFamilies,
       allowEmpty: false,
-      disabled: this.value.enabled === false,
+      disabled: this.value.enabled === false || this.fonts.length === 0,
     };
   }
 
@@ -113,7 +117,7 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
     return {
       options: this.stylesForFamily,
       allowEmpty: false,
-      disabled: this.value.enabled === false,
+      disabled: this.value.enabled === false || this.fonts.length === 0,
     };
   }
 }
