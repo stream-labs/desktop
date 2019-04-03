@@ -123,13 +123,4 @@ tbody tr {
     font-size: 15px;
   }
 }
-
-
-
-.night-theme {
-  .icon-edit,
-  .icon-trash {
-    .night-icon-hover();
-  }
-}
 </style>

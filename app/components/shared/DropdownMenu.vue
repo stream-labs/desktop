@@ -74,7 +74,7 @@
 
   &:hover,
   &.active {
-    color: var(--navy);
+    color: var(--title);
   }
 }
 
@@ -86,6 +86,7 @@
   border: 0 !important;
   padding: 8px !important;
   color: inherit !important;
+  background-color: var(--background) !important;
 }
 
 .popper[x-placement^="top"] {
