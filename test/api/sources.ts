@@ -1,14 +1,14 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from 'services/scenes/scenes-api';
+import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
   const scene = scenesService.activeScene;
 
@@ -35,7 +35,7 @@ test('Creating, fetching and removing sources', async t => {
 
 test('Source events', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
   let eventData: Dictionary<any>;
 
