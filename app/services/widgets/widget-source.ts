@@ -16,11 +16,11 @@ export class WidgetSource implements IWidgetSource {
   readonly sourceId: string;
   readonly previewSourceId: string;
 
-  private readonly widgetSourceState: IWidgetSource;
+  private readonly state: IWidgetSource;
 
   constructor(sourceId: string) {
-    this.widgetSourceState = this.widgetsService.state.widgetSources[sourceId];
-    Utils.applyProxy(this, this.widgetSourceState);
+    this.state = this.widgetsService.state.widgetSources[sourceId];
+    Utils.applyProxy(this, this.state);
   }
 
   getSource() {
@@ -77,6 +77,6 @@ export class WidgetSource implements IWidgetSource {
 
   @mutation()
   private SET_PREVIEW_SOURCE_ID(previewSourceId: string) {
-    Object.assign(this.widgetSourceState, { previewSourceId });
+    Object.assign(this.state, { previewSourceId });
   }
 }

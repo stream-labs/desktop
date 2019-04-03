@@ -51,7 +51,7 @@
   .margin-bottom(3);
   .radius();
 
-  background: @day-section;
+  background: var(--section);
 
   .button {
     .margin-right(2);
@@ -67,8 +67,8 @@
   .radius();
   .margin-right();
 
-  background-color: @light-3;
-  color: @icon;
+  background-color: var(--background);
+  color: var(--icon);
   font-size: 10px;
   padding: 4px;
   vertical-align: text-bottom;
@@ -87,20 +87,10 @@
 }
 
 .input-error {
-  color: @red;
+  color: var(--warning);
 }
 
 // wrap
 .nowrap {
   white-space: nowrap;
-}
-
-.night-theme {
-  .section {
-    background: @night-section;
-  }
-
-  .section-title__icon {
-    background-color: @dark-3;
-  }
 }

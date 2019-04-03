@@ -475,7 +475,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       // tslint:disable-next-line:prefer-template
       client.socket.write(JSON.stringify(response) + '\n');
     } catch (e) {
-      console.error(e);
+      console.error('unable to send response', response, e);
     }
   }
 

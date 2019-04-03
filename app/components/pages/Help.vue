@@ -107,20 +107,20 @@
 .callout--discord {
   background-color: @discord;
   .padding(2);
-  color: @white;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   a {
     display: inline-block;
-    color: @white;
+    color: var(--white);
     .weight(@medium);
   }
 }
 
 .button--discord {
-  background-color: @white;
+  background-color: var(--white);
   color: @discord;
 
   .icon-discord {
@@ -138,7 +138,7 @@
 }
 
 .help-item {
-  background-color: @day-section;
+  background-color: var(--section);
   .radius(2);
   .padding(2);
   display: grid;
@@ -161,7 +161,7 @@
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     content: '\f04b';
-    color: @white;
+    color: var(--white);
     position: absolute;
     top: 0;
     right: 0;
@@ -190,7 +190,7 @@
 }
 
 .help-view-more {
-  background-color: @day-section;
+  background-color: var(--section);
   .radius();
   .padding(2);
   text-align: center;
@@ -215,11 +215,11 @@
   height: auto;
   max-height: 400px;
   .radius();
-  background-color: @day-section;
+  background-color: var(--section);
   .padding(3);
   position: relative;
   z-index: 10;
-  .day-shadow();
+  .shadow();
 
   .icon-close {
     .absolute(16px, 16px, auto, auto);
@@ -230,17 +230,5 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 306px;
-}
-
-.night-theme {
-  .help-item,
-  .help-view-more,
-  .help-item__more-info-content {
-    background-color: @night-section-alt;
-  }
-
-  .help-item__more-info-content {
-    .night-shadow();
-  }
 }
 </style>

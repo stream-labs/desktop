@@ -1,6 +1,6 @@
 import electron from 'electron';
 import { Observable, Subject } from 'rxjs';
-import { IJsonRpcEvent, IJsonRpcResponse, JsonrpcService } from 'services/api/jsonrpc';
+import { IJsonRpcEvent, IJsonRpcResponse, IMutation, JsonrpcService } from 'services/api/jsonrpc';
 import * as traverse from 'traverse';
 import { Service } from '../service';
 import { ServicesManager } from '../../services-manager';
@@ -24,6 +24,8 @@ export class InternalApiClient {
    * almost the same as `promises` but for keeping subscriptions
    */
   private subscriptions: Dictionary<Subject<any>> = {};
+
+  private skippedMutationsCount = 0;
 
   constructor() {
     this.listenMainWindowMessages();
@@ -73,7 +75,13 @@ export class InternalApiClient {
           }
 
           const result = response.result;
-          response.mutations.forEach(mutation => commitMutation(mutation));
+          const mutations = response.mutations;
+
+          // commit all mutations caused by the api-request now
+          mutations.forEach(mutation => commitMutation(mutation));
+          // we'll still receive already committed mutations from async IPC event
+          // mark them as ignored
+          this.skippedMutationsCount += mutations.length;
 
           if (result && result._type === 'SUBSCRIPTION') {
             if (result.emitter === 'PROMISE') {
@@ -114,6 +122,15 @@ export class InternalApiClient {
   getResource(resourceId: string) {
     // ServiceManager already applied the proxy-function to all services in the ChildWindow
     return this.servicesManager.getResource(resourceId);
+  }
+
+  handleMutation(mutation: IMutation) {
+    if (this.skippedMutationsCount) {
+      // this mutation is already committed
+      this.skippedMutationsCount--;
+      return;
+    }
+    commitMutation(mutation);
   }
 
   /**

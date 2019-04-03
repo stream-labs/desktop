@@ -13,7 +13,7 @@ import { ISceneItemFolder } from './scenes-api';
 export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
   name: string;
 
-  private readonly sceneFolderState: ISceneItemFolder;
+  protected readonly state: ISceneItemFolder;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
@@ -28,7 +28,7 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     });
 
     Utils.applyProxy(this, state);
-    this.sceneFolderState = state as ISceneItemFolder;
+    this.state = state as ISceneItemFolder;
   }
 
   add(sceneNodeId: string) {
@@ -146,14 +146,14 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
   }
 
   getModel(): ISceneItemFolder {
-    return this.sceneFolderState;
+    return this.state;
   }
 
   /**
    * for internal usage only
    */
   recalculateChildrenOrder() {
-    this.sceneFolderState.childrenIds = this.childrenIds;
+    this.state.childrenIds = this.childrenIds;
     const childrenCount = this.childrenIds.length;
     const nodeInd = this.getNodeIndex();
     const foundChildren: TSceneNode[] = [];
@@ -167,17 +167,13 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     this.SET_CHILDREN_ORDER(foundChildren.map(child => child.id));
   }
 
-  protected get state() {
-    return this.sceneFolderState;
-  }
-
   @mutation()
   private UPDATE(patch: TPatch<ISceneItemFolder>) {
-    merge(this.sceneFolderState, patch);
+    merge(this.state, patch);
   }
 
   @mutation()
   private SET_CHILDREN_ORDER(childrenIds: string[]) {
-    this.sceneFolderState.childrenIds = childrenIds;
+    this.state.childrenIds = childrenIds;
   }
 }

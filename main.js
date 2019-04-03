@@ -54,11 +54,32 @@ const releaseChannel = (() => {
 
 (function setupLogger() {
   // save logs to the cache directory
-  path.join(app.getPath('userData'), 'log.log');
+  electronLog.transports.file.file = path.join(app.getPath('userData'), 'log.log');
   electronLog.transports.file.level = 'info';
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+
+  // network logging is disabled by default
+  if (!process.argv.includes('--network-logging')) return;
+  app.on('ready', () => {
+
+    // ignore fs requests
+    const filter = { urls: ['https://*', 'http://*'] };
+
+    session.defaultSession.webRequest.onBeforeRequest(filter, (details, callback) => {
+      log('HTTP REQUEST', details.method, details.url);
+      callback(details);
+    });
+
+    session.defaultSession.webRequest.onErrorOccurred(filter, (details) => {
+      log('HTTP REQUEST FAILED', details.method, details.url);
+    });
+
+    session.defaultSession.webRequest.onCompleted(filter, (details) => {
+      log('HTTP REQUEST COMPLETED', details.method, details.url, details.statusCode);
+    });
+  });
 })();
 
 function log(...args) {

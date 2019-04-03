@@ -16,7 +16,7 @@ import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
-import { encoderFieldsMap, OutputSettingsService, obsEncoderToEncoder } from './output';
+import { encoderFieldsMap, OutputSettingsService, obsEncoderToEncoderFamily } from './output';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -166,7 +166,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       !this.streamingService.isIdle &&
       this.videoEncodingOptimizationService.state.useOptimizedProfile
     ) {
-      const encoder = obsEncoderToEncoder(
+      const encoder = obsEncoderToEncoderFamily(
         this.findSettingValue(settings, 'Streaming', 'Encoder') ||
           this.findSettingValue(settings, 'Streaming', 'StreamEncoder'),
       );

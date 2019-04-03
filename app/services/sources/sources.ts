@@ -185,7 +185,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
+    this.updateSourceFlags(source.state, obsInput.outputFlags, true);
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
@@ -193,7 +193,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type: managerType,
     };
 
-    this.sourceAdded.next(source.sourceState);
+    this.sourceAdded.next(source.state);
 
     if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
   }
@@ -214,11 +214,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
-    this.sourceRemoved.next(source.sourceState);
+    this.sourceRemoved.next(source.state);
     source.getObsInput().release();
   }
 
   addFile(path: string): Source {
+    const realpath = fs.realpathSync(path);
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: [
@@ -238,7 +239,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       browser_source: ['html'],
       text_gdiplus: ['txt'],
     };
-    let ext = path.split('.').splice(-1)[0];
+    let ext = realpath.split('.').splice(-1)[0];
     if (!ext) return null;
     ext = ext.toLowerCase();
     const filename = path.split('\\').splice(-1)[0];
@@ -416,7 +417,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.sourceUpdated.next(source.sourceState);
+    this.sourceUpdated.next(source.state);
   }
 
   reset() {

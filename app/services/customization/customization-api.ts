@@ -1,5 +1,7 @@
 import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { overArgs } from 'lodash-decorators';
+import Display from 'components/shared/Display.vue';
 
 export interface ICustomizationServiceState {
   nightMode: boolean;
@@ -19,12 +21,10 @@ export interface ICustomizationServiceState {
   navigateToLiveOnStreamStart: boolean;
   experimental: any;
 
-  /**
-   * Will be true when a UI resizing operation is in
-   * progress. All displays and BrowserViews will be
-   * hidden during this operation.
-   */
-  resizingInProgress: boolean;
+  // Will be true when the UI is performing animations, transitions, or property changes that affect
+  // the display of elements we cannot draw over. During this time such elements, for example
+  // BrowserViews and the OBS Display, will be hidden until the operation is complete.
+  hideStyleBlockingElements: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

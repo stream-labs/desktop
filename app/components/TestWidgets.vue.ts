@@ -25,4 +25,8 @@ export default class TestWidgets extends Vue {
   get facemasksActive() {
     return this.facemasksService.active;
   }
+
+  test(testerName: string) {
+    this.widgetsService.test(testerName);
+  }
 }

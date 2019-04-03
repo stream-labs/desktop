@@ -33,7 +33,7 @@ test('Stream Boss Manage Battle settings', async t => {
 
   await client.click('li=Manage Battle');
 
-  const formMonkey = new FormMonkey(t);
+  const formMonkey = new FormMonkey(t, 'form[name=manage-battle-form]');
 
   const testSet1 = {
     boss_heal: false,
@@ -45,9 +45,9 @@ test('Stream Boss Manage Battle settings', async t => {
     donation_multiplier: 4,
   };
 
-  await formMonkey.fill('manage-battle-form', testSet1);
+  await formMonkey.fill(testSet1);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('manage-battle-form', testSet1));
+  t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
     boss_heal: true,
@@ -59,9 +59,9 @@ test('Stream Boss Manage Battle settings', async t => {
     donation_multiplier: 200,
   };
 
-  await formMonkey.fill('manage-battle-form', testSet2);
+  await formMonkey.fill(testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('manage-battle-form', testSet2));
+  t.true(await formMonkey.includes(testSet2));
 });
 
 test('Stream Boss Manage Visual Settings', async t => {
@@ -70,8 +70,7 @@ test('Stream Boss Manage Visual Settings', async t => {
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   await client.click('li=Visual Settings');
-
-  const formMonkey = new FormMonkey(t);
+  const formMonkey = new FormMonkey(t, 'form[name=visual-settings-form]');
 
   const testSet1 = {
     text_color: '#FF0000',
@@ -80,9 +79,9 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_bg_color: '#FF0000',
     font: 'Sacramento',
   };
-  await formMonkey.fill('visual-settings-form', testSet1);
+  await formMonkey.fill(testSet1);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet1));
+  t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
     text_color: '#FFFFFF',
@@ -91,7 +90,7 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_bg_color: '#46E65A',
     font: 'Roboto',
   };
-  await formMonkey.fill('visual-settings-form', testSet2);
+  await formMonkey.fill(testSet2);
   await waitForWidgetSettingsSync(t);
-  t.true(await formMonkey.includes('visual-settings-form', testSet2));
+  t.true(await formMonkey.includes(testSet2));
 });

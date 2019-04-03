@@ -141,8 +141,8 @@
   }
 
   .extension-warning {
-    background-color: @purple;
-    color: @white;
+    background-color: var(--accent);
+    color: var(--white);
     border-radius: 4px;
     padding: 6px;
     a {

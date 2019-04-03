@@ -22,14 +22,6 @@ export default class ChatbotMediaRequestPreferencesWindow extends ChatbotWindows
     form: ValidatedForm;
   };
 
-  securityDescription = $t(
-    `This slider helps you filter shared media before it can be submitted.${os.EOL}
-    1: No security${os.EOL}
-    2: 65%+ rating, 5k+ views${os.EOL}
-    3: 75%+ rating, 40k+ views${os.EOL}
-    4: 80%+ rating, 300k+ views${os.EOL}
-    5: 85%+ rating, 900k+ views`,
-  );
   selectedTab: string = 'general';
 
   mediaRequestData: ISongRequestData = null;
@@ -74,12 +66,6 @@ export default class ChatbotMediaRequestPreferencesWindow extends ChatbotWindows
           min: 0,
           placeholder: $t('Number of votes to skip song'),
           isInteger: true,
-        }),
-        filter_level: metadataHelper.slider({
-          min: 0,
-          max: 4,
-          interval: 1,
-          description: this.securityDescription,
         }),
       },
       new_banned_media: metadataHelper.text({

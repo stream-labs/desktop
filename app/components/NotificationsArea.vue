@@ -71,18 +71,18 @@
   animation: notify-appears 0.3s;
 
   &.info {
-    background-color: fade(@grey, 15%);
-    color: @icon;
+    background-color: var(--icon-semi);
+    color: var(--icon);
   }
 
   &.warning {
     background-color: fade(@red, 20%);
-    color: @red;
+    color: var(--warning);
   }
 
   &.success {
     background-color: fade(@teal, 20%);
-    color: @teal;
+    color: var(--teal);
   }
 
   &.has-action {
@@ -103,7 +103,7 @@
     content: '|';
     padding-right: 12px;
     opacity: 0.5;
-    color: @grey;
+    color: var(--icon);
   }
 
   .fa {
@@ -112,10 +112,10 @@
 }
 
 .notifications__counter--warning {
-  color: @red;
+  color: var(--warning);
 
   .fa {
-    color: @red;
+    color: var(--warning);
   }
 }
 

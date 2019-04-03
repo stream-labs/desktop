@@ -18,11 +18,11 @@
     content: '|';
     padding-right: 12px;
     opacity: .5;
-    color: @grey;
+    color: var(--icon);
   }
 }
 
 .icon-cloud-backup-2 {
-  color: @grey;
+  color: var(--icon);
 }
 </style>

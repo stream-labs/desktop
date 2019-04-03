@@ -76,30 +76,30 @@ textarea,
 textarea[type=text] {
   .radius();
 
-  border: 1px solid @day-input-border;
-  background: @day-input-bg;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
   margin-bottom: 0;
   font-size: 14px;
-  color: @day-paragraph;
+  color: var(--paragraph);
   box-shadow: none;
   height: 32px;
   padding: 0 @spacing;
 
   &:focus {
     box-shadow: none;
-    background: @day-input-bg;
-    border-color: @day-focus-border;
+    background: var(--input-bg);
+    border-color: var(--focus-border);
   }
 
   &:disabled,
   .is-disabled {
-    background-color: @light-3;
-    border-color: @light-3;
+    background-color: var(--button);
+    border-color: var(--button);
   }
 
   &.input--transparent {
     border: 0;
-    border-bottom: 1px dashed @grey;
+    border-bottom: 1px dashed var(--midtone);
     padding: 0;
     height: 20px;
     background: transparent;
@@ -114,25 +114,9 @@ textarea[type=text] {
   line-height: 20px;
 }
 
-.multiselect {
-  min-height: 32px;
-
-  .multiselect__input,
-  .multiselect__single {
-    background: @day-dropdown-bg;
-    border-color: @day-dropdown-border;
-
-    &:hover,
-    &:focus {
-      background: @day-dropdown-bg;
-      border-color: @day-dropdown-border;
-    }
-  }
-}
-
 .multiselect__input {
-  background: @day-dropdown-bg;
-  border-color: @day-dropdown-border;
+  background: var(--dropdown-bg);
+  border-color: var(--dropdown-border);
 }
 
 .multiselect__select {
@@ -170,6 +154,22 @@ textarea[type=text] {
   }
 }
 
+.multiselect {
+  min-height: 32px;
+
+  .multiselect__input,
+  .multiselect__single {
+    background: var(--dropdown-bg);
+    border-color: var(--input-border);
+
+    &:hover,
+    &:focus {
+      background: var(--dropdown-bg);
+      border-color: var(--input-border);
+    }
+  }
+}
+
 .multiselect__content-wrapper {
   position: relative;
 }
@@ -178,7 +178,7 @@ textarea[type=text] {
   border-bottom-left-radius: @radius;
   border-bottom-right-radius: @radius;
   top: 30px;
-  background: @day-dropdown-bg;
+  background: var(--dropdown-bg);
   list-style-type: none;
   margin: 0;
   width: 100%;
@@ -187,7 +187,7 @@ textarea[type=text] {
   max-height: 300px;
   overflow-y: auto;
   .padding-top();
-  .day-shadow();
+  .shadow();
 }
 
 .multiselect__element {
@@ -206,7 +206,7 @@ textarea[type=text] {
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  color: @day-paragraph;
+  color: var(--paragraph);
   max-width: 100%;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -218,8 +218,8 @@ textarea[type=text] {
 }
 
 .multiselect__option--highlight {
-  background: @light-3;
-  color: @day-title;
+  background: var(--button);
+  color: var(--title);
 
   &::after {
     display: none;
@@ -227,11 +227,11 @@ textarea[type=text] {
 }
 
 .multiselect__option--selected {
-  background: @light-3;
-  color: @day-title;
+  background: var(--button);
+  color: var(--title);
 
   &.multiselect__option--highlight {
-    background: @light-3;
+    background: var(--button);
 
     &::after {
       display: none;
@@ -261,17 +261,14 @@ textarea[type=text] {
   }
 }
 
-// Rule to change background color when the section has a bg
 .section {
   .multiselect__input,
   .multiselect__content {
-    background: @white;
-    border-color: @white;
+    background: var(--background);
 
     &:hover,
     &:focus {
-      background: @white;
-      border-color: @white;
+      background: var(--background);
     }
   }
 }
@@ -286,14 +283,14 @@ textarea[type=text] {
 
   .colorpicker__input {
     cursor: pointer !important;
-    background: @day-dropdown-bg;
-    border-color: @day-dropdown-border;
+    background: var(--dropdown-bg);
+    border-color: var(--dropdown-border);
 
     &:focus,
     &:visited,
     &:active {
-      background: @day-dropdown-bg;
-      border-color: @day-dropdown-border;
+      background: var(--dropdown-bg);
+      border-color: var(--dropdown-border);
     }
   }
 
@@ -318,9 +315,9 @@ textarea[type=text] {
     z-index: 10;
     border-bottom-right-radius: @radius;
     border-bottom-left-radius: @radius;
-    background: @day-dropdown-bg;
-    border-color: @day-dropdown-border;
-    .day-shadow() !important;
+    background: var(--dropdown-bg);
+    border-color: var(--dropdown-border);
+    .shadow() !important;
   }
 
   // hide alpha input
@@ -332,11 +329,11 @@ textarea[type=text] {
     margin-left: -8px;
     padding-left: 8px;
     padding-top: 8px;
-    border-top: 1px solid @day-border;
+    border-top: 1px solid var(--border);
   }
 
   .vc-sketch-field .vc-input__label {
-    color: @icon;
+    color: var(--icon);
   }
 
   .vc-checkerboard {
@@ -356,110 +353,4 @@ textarea[type=text] {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
-}
-
-.night-theme {
-  input[type="text"],
-  input[type="password"],
-  input[type="number"],
-  textarea {
-    background: @night-input-bg;
-    color: @night-paragraph;
-    border-color: @night-input-border;
-
-    &:disabled,
-    .is-disabled {
-      background-color: @dark-4;
-      border-color: @dark-4;
-    }
-
-    &.input--transparent {
-      border-bottom: 1px dashed @grey;
-    }
-  }
-
-  .multiselect {
-    .multiselect__input,
-    .multiselect__single {
-      background: @night-dropdown-bg;
-      border-color: @night-dropdown-border;
-
-      &:hover,
-      &:focus {
-        background: @night-dropdown-bg;
-        border-color: @night-dropdown-border;
-      }
-    }
-  }
-
-  .multiselect__content {
-    background: @night-dropdown-bg;
-    color: @white;
-    .night-shadow();
-  }
-
-  .multiselect__option {
-    color: @night-paragraph;
-  }
-
-  .multiselect__option--selected {
-    color: @white;
-    background: @night-hover;
-
-    &.multiselect__option--highlight {
-      background: @night-hover;
-    }
-  }
-
-  .multiselect__option--highlight {
-    background: transparent;
-    color: @night-title;
-  }
-
-  .section {
-    .multiselect__input,
-    .multiselect__content {
-      background: @night-dropdown-bg;
-      border-color: @night-dropdown-border;
-
-      &:hover,
-      &:focus {
-        background: @night-dropdown-bg;
-        border-color: @night-dropdown-border;
-      }
-    }
-  }
-
-  .colorpicker {
-    .colorpicker__input {
-      background: @night-dropdown-bg;
-      border-color: @night-dropdown-border;
-
-      &:focus,
-      &:visited,
-      &:active {
-        background: @night-dropdown-bg;
-        border-color: @night-dropdown-border;
-      }
-    }
-
-    .colorpicker-menu {
-      .night-shadow() !important;
-
-      background: @night-dropdown-bg !important;
-      border-color: @night-dropdown-border !important;
-    }
-
-    .vue-color__editable-input__label {
-      color: @grey !important;
-    }
-
-    .vue-color__sketch__presets {
-      border-color: @night-border;
-    }
-
-    .vc-sketch-presets {
-      border-color: @night-border;
-    }
-  }
 }

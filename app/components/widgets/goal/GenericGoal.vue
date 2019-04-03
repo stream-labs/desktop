@@ -54,7 +54,7 @@
   display: flex;
   justify-content: space-between;
   .padding();
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
 }
 
 .goal-row:last-of-type {
@@ -71,12 +71,6 @@
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-  }
-}
-
-.night-theme {
-  .goal-row {
-    border-color: @night-border;
   }
 }
 </style>

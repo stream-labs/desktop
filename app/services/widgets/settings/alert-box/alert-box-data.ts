@@ -26,6 +26,7 @@ export const API_NAME_MAP = {
   facebook_like: 'likes',
   facebook_stars: 'stars',
   facebook_share: 'shares',
+  facebook_follow: 'fbfollows',
   facemaskdonation: 'facemasks',
 };
 

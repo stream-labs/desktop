@@ -23,7 +23,7 @@
   align-items: center;
   height: 30px;
   flex: 0 0 30px;
-  border-bottom: 1px solid @day-border;
+  border-bottom: 1px solid var(--border);
 }
 
 .titlebar-icon {
@@ -45,15 +45,5 @@
   cursor: pointer;
   .icon-hover();
   margin-right: 16px;
-}
-
-.night-theme {
-  .titlebar {
-    border-color: @night-border;
-  }
-
-  .titlebar-action {
-    .night-icon-hover();
-  }
 }
 </style>

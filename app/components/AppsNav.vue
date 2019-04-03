@@ -60,8 +60,8 @@
   align-items: center;
   .padding-h-sides();
   max-width: none;
-  background-color: @day-secondary;
-  border-bottom: 1px solid @day-border;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
   flex: 0 0 35px;
   height: 35px;
   z-index: 1;
@@ -97,12 +97,12 @@
 
 .app-tab {
   .padding();
-  color: @day-paragraph;
+  color: var(--paragraph);
   .weight(@medium);
   cursor: pointer;
 
   &.is-active {
-    color: @day-title;
+    color: var(--title);
   }
 }
 
@@ -115,7 +115,7 @@
   .absolute(0, auto, 0, 0);
   padding-top: 8px;
   width: 20px;
-  background-image: linear-gradient(to right, @day-primary 80% , transparent);
+  background-image: linear-gradient(to right, var(--background) 80% , transparent);
   z-index: 1;
   opacity: 0;
 }
@@ -125,30 +125,9 @@
   .absolute(0, 0, 0, auto);
   padding-top: 8px;
   width: 20px;
-  background-image: linear-gradient(to left, @day-primary 80%, transparent);
+  background-image: linear-gradient(to left, var(--background) 80%, transparent);
   z-index: 1;
   text-align: right;
   opacity: 0;
 }
-
-.night-theme {
-  .apps-nav {
-    background-color: @night-primary;
-    border-color: @night-border;
-  }
-  .app-tab {
-    color: @night-paragraph;
-
-    &.is-active {
-      color: @night-title;
-    }
-  }
-  .left {
-    background-image: linear-gradient(to right, @night-primary 80%, transparent);
-  }
-  .right {
-    background-image: linear-gradient(to left, @night-primary 80%, transparent);
-  }
-}
-
 </style>

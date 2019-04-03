@@ -1,5 +1,4 @@
 import { IInputMetadata } from '../../app/components/shared/inputs';
-import { SpectronClient } from 'spectron';
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
 import { TExecutionContext } from './spectron';
@@ -19,19 +18,18 @@ interface IUIInput {
  * helper for simulating user input into SLOBS forms
  */
 export class FormMonkey {
-  private client: SpectronClient;
+  constructor(
+    private t: TExecutionContext,
+    private formSelector = 'body',
+    private showLogs = false,
+  ) {}
 
-  constructor(private t: TExecutionContext, private showLogs = false) {
-    this.client = t.context.app.client;
+  get client() {
+    return this.t.context.app.client;
   }
 
-  async getInputs(formName: string): Promise<IUIInput[]> {
-    const formSelector = `form[name=${formName}]`;
-
-    if (!(await this.client.isExisting(formSelector))) {
-      throw new Error(`form not found: ${formName}`);
-    }
-
+  async getInputs(): Promise<IUIInput[]> {
+    const formSelector = this.formSelector;
     const result = [];
     const $inputs = await this.client.$$(`${formSelector} [data-role=input]`);
     this.log(`${$inputs.length} inputs found in ${formSelector}`);
@@ -40,7 +38,7 @@ export class FormMonkey {
       const id = ($input as any).ELEMENT;
       const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
       const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
-      const selector = `form[name=${formName}] [data-name="${name}"]`;
+      const selector = `${formSelector} [data-name="${name}"]`;
       result.push({ id, name, type, selector });
     }
     return result;
@@ -49,8 +47,8 @@ export class FormMonkey {
   /**
    * fill the form with values
    */
-  async fill(formName: string, formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
-    const inputs = await this.getInputs(formName);
+  async fill(formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
+    const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
     formData = cloneDeep(formData);
@@ -100,8 +98,8 @@ export class FormMonkey {
   /**
    * returns all input values from the form
    */
-  async read(formName: string): Promise<Dictionary<any>> {
-    const inputs = await this.getInputs(formName);
+  async read(): Promise<Dictionary<any>> {
+    const inputs = await this.getInputs();
     const formData = {};
 
     for (const input of inputs) {
@@ -141,8 +139,8 @@ export class FormMonkey {
     return formData;
   }
 
-  async includes(formName: string, expectedData: Dictionary<any>): Promise<boolean> {
-    const formData = await this.read(formName);
+  async includes(expectedData: Dictionary<any>): Promise<boolean> {
+    const formData = await this.read();
     this.log('check form includes expected data:');
     this.log(formData);
     this.log(expectedData);

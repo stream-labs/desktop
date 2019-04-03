@@ -9,6 +9,7 @@ import { IInputMetadata } from './index';
 export default class ColorInput extends BaseInput<string, IInputMetadata> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IInputMetadata;
+  @Prop() readonly title: string;
 
   pickerVisible = false;
 
