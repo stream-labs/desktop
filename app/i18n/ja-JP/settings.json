@@ -111,13 +111,16 @@
       "StreamEncoder": {
         "name": "エンコーダ",
         "obs_x264": "ソフトウェア（x264）",
-        "obs_qsv11": "ハードウェア（QSV）"
+        "obs_qsv11": "ハードウェア（QSV）",
+        "ffmpeg_nvenc": "ハードウェア (NVENC)"
       },
       "ABitrate": {
         "name": "音声ビットレート（kbps）"
       },
       "UseAdvanced": {
-        "name": "高度なエンコーダ設定を有効にする"
+        "name": "高度なエンコーダ設定を有効にする",
+        "true": "有効",
+        "false": "無効"
       },
       "EnforceBitrate": {
         "name": "ストリーミングサービスのビットレート制限を強制する"
@@ -140,6 +143,15 @@
         "quality": null,
         "balanced": null,
         "speed": null
+      },
+      "NVENCPreset": {
+        "name": "エンコーダープリセット",
+        "default": "規定",
+        "hq": "高品質",
+        "hp": "高性能",
+        "ll": "低遅延",
+        "llhq": "低遅延高品質",
+        "llhp": "低遅延高性能"
       },
       "x264Settings": {
         "name": "エンコーダーのカスタム設定"

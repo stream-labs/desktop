@@ -1,5 +1,5 @@
 import {
-    OptimizeSettings, SettingsKeyAccessor, OptimizationKey,
+    OptimizeSettings, SettingsKeyAccessor, OptimizationKey, EncoderType
 } from './optimizer';
 
 /**
@@ -8,7 +8,7 @@ import {
  */
 export function getBestSettingsForNiconico(
     options: { bitrate: number },
-    settings: SettingsKeyAccessor // TODO 見る
+    settings: SettingsKeyAccessor
 ): OptimizeSettings {
     let audioBitrate: number;
     let resolution: string;
@@ -29,20 +29,49 @@ export function getBestSettingsForNiconico(
         resolution = '512x288';
     }
 
-    return {
-        outputMode: 'Advanced',
-        rateControl: 'CBR',
+    let encoderSettings: OptimizeSettings = {
+        encoder: EncoderType.x264,
+        simpleUseAdvanced: true,
+        encoderPreset: 'ultrafast',
+    };
+    if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc)) {
+        encoderSettings = {
+            encoder: EncoderType.nvenc,
+            simpleUseAdvanced: true,
+            NVENCPreset: 'llhq',
+        };
+        console.log('NVENC あった');
+    } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv)) {
+        encoderSettings = {
+            encoder: EncoderType.qsv,
+            simpleUseAdvanced: true,
+            targetUsage: 'speed',
+        };
+        console.log('obs_qsv11 あった');
+    }
+
+    const commonSettings: OptimizeSettings = {
+        outputMode: 'Simple',
         videoBitrate: (options.bitrate - audioBitrate),
         audioBitrate: audioBitrate.toString(10),
         quality: resolution,
-        colorSpace: '709',
         fpsType: 'Common FPS Values',
         fpsCommon: '30',
-        encoder: 'obs_x264',
-        keyframeInterval: 300,
-        encoderPreset: 'ultrafast',
-        profile: 'high',
-        tune: 'zerolatency',
-        audioTrackIndex: '1',
     };
+
+    const advancedSettings: OptimizeSettings = {
+        outputMode: 'Advanced',
+        advRateControl: 'CBR',
+        advColorSpace: '709',
+        advKeyframeInterval: 300,
+        advProfile: 'high',
+        advAudioTrackIndex: '1',
+    };
+
+    return Object.assign(
+        {},
+        commonSettings,
+        // advancedSettings,
+        encoderSettings
+    );
 }

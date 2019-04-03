@@ -1,42 +1,56 @@
 import { $t } from 'services/i18n';
 import { ISettingsSubCategory } from './settings-api';
 
+export enum EncoderType {
+  x264 = 'obs_x264',
+  nvenc = 'ffmpeg_nvenc',
+  amd = 'amd_amf_h264',
+  qsv = 'obs_qsv11'
+}
+
 export enum OptimizationKey {
     outputMode = 'outputMode',
     quality = 'quality',
-    colorSpace = 'colorSpace',
+    advColorSpace = 'advColorSpace',
     fpsType = 'fpsType',
     fpsCommon = 'fpsCommon',
     encoder = 'encoder',
-    rateControl = 'rateControl',
-    videoBitrate = 'videoBitrate',
-    keyframeInterval = 'keyframeInterval',
+    simpleUseAdvanced = 'simpleUseAdvanced',
+    targetUsage = 'targetUsage',
     encoderPreset = 'encoderPreset',
-    profile = 'profile',
-    tune = 'tune',
+    NVENCPreset = 'NVENCPreset',
+    advRateControl = 'advRateControl',
+    videoBitrate = 'videoBitrate',
+    advKeyframeInterval = 'advKeyframeInterval',
+    advProfile = 'advProfile',
+    advX264Tune = 'advX264Tune',
     audioBitrate = 'audioBitrate',
-    audioTrackIndex = 'audioTrackIndex',
+    advAudioTrackIndex = 'advAudioTrackIndex',
 }
 
 // OptimizationKey のキーと完全対応していること
 export type OptimizeSettings = {
     outputMode?: 'Simple' | 'Advanced'
     quality?: string
-    colorSpace?: '601' | '709'
+    advColorSpace?: '601' | '709'
     fpsType?: 'Common FPS Values' | 'Integer FPS Value' | 'Fractional FPS Value'
     fpsCommon?: string
-    encoder?: 'obs_x264' | 'obs_qsv11'
-    rateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
+    encoder?: EncoderType
+    simpleUseAdvanced?: boolean
+    targetUsage?: 'quality' | 'balanced' | 'speed' // for QSV
+    encoderPreset?: ('ultrafast' | 'superfast' | 'veryfast' | 'faster' | 'fast' |
+    'medium' | 'slow' | 'slower') // for x264
+    NVENCPreset?: 'default' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq' | 'llhp' // for NVENC
+    advRateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
     videoBitrate?: number
-    keyframeInterval?: number
-    encoderPreset?: string
-    profile?: 'high' | 'main' | 'baseline'
-    tune?: string
+    advKeyframeInterval?: number
+    advProfile?: 'high' | 'main' | 'baseline'
+    advX264Tune?: string
     audioBitrate?: string
-    audioTrackIndex?: string
+    advAudioTrackIndex?: string
 };
 
-enum CategoryName {
+export enum CategoryName {
     output = 'Output',
     video = 'Video',
     advanced = 'Advanced',
@@ -48,95 +62,321 @@ export type KeyDescription = {
     subCategory: string,
     setting: string,
     label?: string,
-    lookupValueName?: boolean,
+    lookupValueName?: boolean, //< 値をキーに翻訳を引くかどうか
     dependents?: { value: any, params: KeyDescription[] }[],
 };
 
-const AllKeyDescriptions: KeyDescription[] = [
+export const AllKeyDescriptions: KeyDescription[] = [
     {
         key: OptimizationKey.outputMode,
         category: CategoryName.output,
         subCategory: 'Untitled',
         setting: 'Mode',
         lookupValueName: true,
-        dependents: [{
-            value: 'Advanced',
-            params: [
-                {
-                    key: OptimizationKey.encoder,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    setting: 'Encoder',
-                    lookupValueName: true,
-                    dependents: [{
-                        value: 'obs_x264',
-                        params: [
+        dependents: [
+            {
+                value: 'Advanced',
+                params: [
+                    {
+                        key: OptimizationKey.encoder,
+                        category: CategoryName.output,
+                        subCategory: 'Streaming',
+                        setting: 'Encoder',
+                        lookupValueName: true,
+                        dependents: [
                             {
-                                key: OptimizationKey.rateControl,
-                                category: CategoryName.output,
-                                subCategory: 'Streaming',
-                                setting: 'rate_control',
-                                lookupValueName: true,
-                                dependents: [{
-                                    value: 'CBR',
-                                    params: [
-                                        {
-                                            key: OptimizationKey.videoBitrate,
-                                            category: CategoryName.output,
-                                            subCategory: 'Streaming',
-                                            setting: 'bitrate',
-                                            label: 'settings.videoBitrate',
-                                        },
-                                    ]
-                                }]
+                                value: 'obs_x264',
+                                params: [
+                                    {
+                                        key: OptimizationKey.advRateControl,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'rate_control',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: 'CBR',
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.videoBitrate,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'bitrate',
+                                                        label: 'settings.videoBitrate',
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        key: OptimizationKey.advKeyframeInterval,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        label: 'settings.keyframeInterval',
+                                        setting: 'keyint_sec',
+                                    },
+                                    {
+                                        key: OptimizationKey.encoderPreset,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'preset',
+                                        label: 'settings.encoderPreset',
+                                    },
+                                    {
+                                        key: OptimizationKey.advProfile,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'profile',
+                                        lookupValueName: true,
+                                    },
+                                    {
+                                        key: OptimizationKey.advX264Tune,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'tune',
+                                        lookupValueName: true,
+                                    }
+                                ]
                             },
                             {
-                                key: OptimizationKey.keyframeInterval,
-                                category: CategoryName.output,
-                                subCategory: 'Streaming',
-                                label: 'settings.keyframeInterval',
-                                setting: 'keyint_sec',
+                                value: 'obs_qsv11',
+                                params: [
+                                    {
+                                        key: OptimizationKey.targetUsage,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'QSVPreset',
+                                    },
+                                    {
+                                        key: OptimizationKey.advProfile,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'profile',
+                                        lookupValueName: true,
+                                    },
+                                    {
+                                        key: OptimizationKey.advKeyframeInterval,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        label: 'settings.keyframeInterval',
+                                        setting: 'keyint_sec',
+                                    },
+                                    // async_depth
+                                    //    4
+                                    // max_bitrate (CBRのときはない, VBRのときはある    )
+                                    // accuracy
+                                    // convergence
+                                    // qpi, qpp, qpb, icq_quality, la_depth
+                                    {
+                                        key: OptimizationKey.advRateControl,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'rate_control',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: 'CBR',
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.videoBitrate,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'bitrate',
+                                                        label: 'settings.videoBitrate',
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
                             },
                             {
-                                key: OptimizationKey.encoderPreset,
-                                category: CategoryName.output,
-                                subCategory: 'Streaming',
-                                setting: 'preset',
-                                label: 'settings.encoderPreset',
-                                lookupValueName: true,
-                            },
-                            {
-                                key: OptimizationKey.profile,
-                                category: CategoryName.output,
-                                subCategory: 'Streaming',
-                                setting: 'profile',
-                                lookupValueName: true,
-                            },
-                            {
-                                key: OptimizationKey.tune,
-                                category: CategoryName.output,
-                                subCategory: 'Streaming',
-                                setting: 'tune',
-                                lookupValueName: true,
-                            },
+                                value: 'ffmpeg_nvenc',
+                                params: [
+                                    // 'Rescale' // bool
+                                    //    'RescaleRes' // '1920x1200' ... '640x400' (10個)
+                                    // 'rate_control' // 'CBR', 'VBR', 'CQP', 'lossless'
+                                    //     'bitrate' // int CBR, VBRのときのみ
+                                    //     'cqp' // int CQPのときのみ
+                                    // 'keyint_sec' // int
+                                    // 'preset' // 'default', 'hq', 'hp', 'bd' /* ブルーレイ */, 'll', 'llhq', 'llhp'
+                                    // 'profile' // 'high', 'main', 'baseline', 'high444p'
+                                    // 'level' // 'auto', 1, 1.0, 1b, 1.0b, 1.1, 1.2, 1.3, 2, 2.0, 2.1, 2.2,
+                                    //            3, 3.0, 3.1, 3.2, 4, 4.0, 4.1, 4.2, 5, 5.0, 5.1
+                                    // '2pass' // bool
+                                    // 'gpu' // int 0
+                                    // 'bf' // int 2 // B-フレーム
+                                    {
+                                        key: OptimizationKey.NVENCPreset,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'preset',
+                                    },
+                                    {
+                                        key: OptimizationKey.advProfile,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'profile',
+                                        lookupValueName: true,
+                                    },
+                                    {
+                                        key: OptimizationKey.advKeyframeInterval,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        label: 'settings.keyframeInterval',
+                                        setting: 'keyint_sec',
+                                    },
+                                    {
+                                        key: OptimizationKey.advRateControl,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'rate_control',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: 'CBR',
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.videoBitrate,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'bitrate',
+                                                        label: 'settings.videoBitrate',
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
-                    }]
-                },
-                {
-                    key: OptimizationKey.audioTrackIndex,
-                    category: CategoryName.output,
-                    subCategory: 'Streaming',
-                    setting: 'TrackIndex',
-                },
-                {
-                    key: OptimizationKey.audioBitrate,
-                    category: CategoryName.output,
-                    subCategory: 'Audio - Track 1',
-                    setting: 'Track1Bitrate',
-                    label: 'settings.audioBitrate',
-                },
-            ]
-        }]
+                    },
+                    {
+                        key: OptimizationKey.advAudioTrackIndex,
+                        category: CategoryName.output,
+                        subCategory: 'Streaming',
+                        setting: 'TrackIndex',
+                    },
+                    {
+                        key: OptimizationKey.audioBitrate,
+                        category: CategoryName.output,
+                        subCategory: 'Audio - Track 1',
+                        setting: 'Track1Bitrate',
+                        label: 'settings.audioBitrate',
+                    },
+                    {
+                        key: OptimizationKey.advColorSpace,
+                        category: CategoryName.advanced,
+                        subCategory: 'Video',
+                        setting: 'ColorSpace',
+                    }
+                ]
+            },
+            {
+                value: 'Simple',
+                params: [
+                    {
+                        key: OptimizationKey.videoBitrate,
+                        category: CategoryName.output,
+                        subCategory: 'Streaming',
+                        setting: 'VBitrate',
+                        label: 'settings.videoBitrate',
+                    },
+                    {
+                        key: OptimizationKey.encoder,
+                        category: CategoryName.output,
+                        subCategory: 'Streaming',
+                        setting: 'StreamEncoder',
+                        lookupValueName: true,
+                        dependents: [
+                            {
+                                value: 'obs_x264',
+                                params: [
+                                    {
+                                        key: OptimizationKey.simpleUseAdvanced,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'UseAdvanced',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: true,
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.encoderPreset,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'Preset',
+                                                        label: 'settings.encoderPreset',
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                value: 'obs_qsv11',
+                                params: [
+                                    {
+                                        key: OptimizationKey.simpleUseAdvanced,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'UseAdvanced',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: true,
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.targetUsage,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'QSVPreset',
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                value: 'ffmpeg_nvenc',
+                                params: [
+                                    {
+                                        key: OptimizationKey.simpleUseAdvanced,
+                                        category: CategoryName.output,
+                                        subCategory: 'Streaming',
+                                        setting: 'UseAdvanced',
+                                        lookupValueName: true,
+                                        dependents: [
+                                            {
+                                                value: true,
+                                                params: [
+                                                    {
+                                                        key: OptimizationKey.NVENCPreset,
+                                                        category: CategoryName.output,
+                                                        subCategory: 'Streaming',
+                                                        setting: 'NVENCPreset',
+                                                        lookupValueName: true,
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        key: OptimizationKey.audioBitrate,
+                        category: CategoryName.output,
+                        subCategory: 'Streaming',
+                        setting: 'ABitrate',
+                    }
+                ]
+            }
+        ]
     },
     {
         key: OptimizationKey.quality,
@@ -147,29 +387,25 @@ const AllKeyDescriptions: KeyDescription[] = [
         lookupValueName: true,
     },
     {
-        key: OptimizationKey.colorSpace,
-        category: CategoryName.advanced,
-        subCategory: 'Video',
-        setting: 'ColorSpace',
-    },
-    {
         key: OptimizationKey.fpsType,
         category: CategoryName.video,
         subCategory: 'Untitled',
         setting: 'FPSType',
         lookupValueName: true,
-        dependents: [{
-            value: 'Common FPS Values',
-            params: [
-                {
-                    key: OptimizationKey.fpsCommon,
-                    category: CategoryName.video,
-                    subCategory: 'Untitled',
-                    setting: 'FPSCommon',
-                    label: 'streaming.FPS',
-                },
-            ]
-        }]
+        dependents: [
+            {
+                value: 'Common FPS Values',
+                params: [
+                    {
+                        key: OptimizationKey.fpsCommon,
+                        category: CategoryName.video,
+                        subCategory: 'Untitled',
+                        setting: 'FPSCommon',
+                        label: 'streaming.FPS',
+                    }
+                ]
+            }
+        ]
     },
 ];
 
@@ -190,6 +426,9 @@ export interface OptimizedSettings {
  */
 function i18nPath(top: string, ...args: string[]): string {
     return top + [...args].map(s => {
+        if (typeof s !== 'string') {
+            s = (s as any).toString();
+        }
         if (s.match(/\s/)) {
             return `['${s}']`;
         }
@@ -257,6 +496,32 @@ type OptimizeItem = {
     newValue?: string
 };
 
+/** KeyDescription を OptimizeSettings にある分岐点に沿う物だけ列挙する
+ * @param values 
+ * @param desc 
+ */
+export function* iterateKeyDescriptions(
+    values: OptimizeSettings,
+    desc: KeyDescription[]
+): IterableIterator<KeyDescription> {
+    for (const item of desc) {
+        if (values.hasOwnProperty(item.key)) {
+            if (item.dependents) {
+                const newItem = Object.assign({}, item);
+                newItem.dependents = [];
+                yield newItem;
+                for (const dependent of item.dependents) {
+                    if (dependent.value == values[item.key]) {
+                        yield *iterateKeyDescriptions(values, dependent.params);
+                    }
+                }
+            } else {
+                yield item;
+            }
+        }
+    }
+}
+
 function* iterateAllKeyDescriptions(keyDescriptionis: KeyDescription[]): IterableIterator<KeyDescription> {
     for (const item of keyDescriptionis) {
         yield item;
@@ -285,7 +550,47 @@ function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boo
     return false;
 }
 
+/**
+ * source を keysNeededに存在するキーに必要なだけの内容に削減したものを返す。
+ * @param source 
+ * @param keysNeeded 
+ */
+export function filterKeyDescriptions(keysNeeded: OptimizeSettings, source: KeyDescription[]): KeyDescription[] {
+    const result: KeyDescription[] = [];
+
+    for (const item of source) {
+        const key = item.key;
+        if (item.dependents && item.dependents.length > 0) {
+            const newItem = Object.assign({}, item);
+            delete newItem.dependents;
+            let newDependents  = [];
+            for (const dependent of item.dependents) {
+                const params = filterKeyDescriptions(keysNeeded, dependent.params)
+                if (params.length > 0) {
+                    const dep = Object.assign({}, dependent);
+                    dep.params = params;
+                    newDependents.push(dep);
+                }
+            }
+
+            if (newDependents.length > 0) {
+                newItem.dependents = newDependents;
+            }
+            if (newDependents.length > 0 || keysNeeded.hasOwnProperty(key)) {
+                result.push(newItem);
+            }
+        } else {
+            if (keysNeeded.hasOwnProperty(key)) {
+                result.push(item);
+            }
+        }
+    }
+    return result;
+}
+
+// params の中に、 OptimizationKey 型の全ての値を key として保持しているかどうかを確認する。
 function validateKeyDescriptions(params: KeyDescription[]) {
+    // ここは全ての枝を列挙する
     const actual = new Set<string>(Array.from(iterateAllKeyDescriptions(params)).map(d => d.key));
     const missing = [];
     for (const key of Object.values(OptimizationKey)) {
@@ -294,7 +599,7 @@ function validateKeyDescriptions(params: KeyDescription[]) {
         }
     }
     if (missing.length > 0) {
-        console.error(`niconico-optimization: : missing keys in keyDescriptions: ${missing}`);
+        console.error(`niconico-optimization: missing keys in keyDescriptions: ${missing}`);
     }
 }
 validateKeyDescriptions(AllKeyDescriptions);
@@ -415,27 +720,13 @@ export class SettingsKeyAccessor {
         for (const item of keyDescriptions) {
             yield f(item);
             if (item.dependents) {
-                // cacheオブジェクトの参照ではその後の変更で書き換わってしまうので、元の値をディープコピーして保存する
-                let lastCategorySettings = JSON.parse(JSON.stringify(this.getCategory(item.category)));
-
-                let changed = false;
                 const value = this.findValue(item);
-
-                for (const dependent of item.dependents) {
-                    this.setValue(item, dependent.value);
-                    if (value !== dependent.value) {
-                        changed = true;
+                if (value) {
+                    for (const dependent of item.dependents) {
+                        if (value === dependent.value) {
+                            yield* this.travarseKeyDescriptions(dependent.params, f);
+                        }
                     }
-                    yield* this.travarseKeyDescriptions(dependent.params, f);
-                }
-
-                if (changed) {
-                    // まず値を変更した上で書き戻し、
-                    this.setValue(item, value);
-                    this.writeBackCategory(item.category);
-                    // 次に元の値群を書き戻すことで依存値が書き戻せる
-                    this.categoryCache.set(item.category, lastCategorySettings);
-                    this.updateCategory(item.category);
                 }
             }
         }
@@ -494,6 +785,26 @@ export class SettingsKeyAccessor {
             }
         }
     }
+
+    /**
+    // 指定した keyに指定した値が選択肢として現れるかを確認する
+     * @param key 
+     * @param value 
+     * @param keyDescriptions 
+     */
+    hasSpecificValue(
+        key: OptimizationKey,
+        value: any,
+        keyDescriptions: KeyDescription[] = AllKeyDescriptions
+    ): boolean {
+        const descriptions = filterKeyDescriptions({ [key]: 'dummy' }, keyDescriptions);
+        const setting = this.getSetting(key, descriptions);
+        if (setting && setting.hasOwnProperty('options') && Array.isArray(setting.options)) {
+            const options: { value: any }[] = setting.options;
+            return options.find(v => v.value === value) !== undefined;
+        }
+        return false;
+    }
 }
 
 export class Optimizer {
@@ -502,11 +813,14 @@ export class Optimizer {
 
     constructor(accessor: SettingsKeyAccessor, keysNeeded: OptimizeSettings) {
         this.accessor = accessor;
-        this.keyDescriptions = AllKeyDescriptions;
+        this.keyDescriptions = filterKeyDescriptions(keysNeeded, AllKeyDescriptions);
+        console.log('Optimizer.keyDescriptions = ', JSON.stringify(this.keyDescriptions, null, 2));
     }
 
     getCurrentSettings(): OptimizeSettings {
-        return Object.assign({}, ...this.accessor.getValues(this.keyDescriptions));
+        const o = Object.assign({}, ...this.accessor.getValues(this.keyDescriptions));
+        console.log('getCurrentSettings()', JSON.stringify(o, null, 2));
+        return o;
     }
 
     /**
@@ -538,7 +852,8 @@ export class Optimizer {
 
     optimizeInfo(current: OptimizeSettings, optimized: OptimizeSettings): [CategoryName, OptimizeItem[]][] {
         const map = new Map<CategoryName, OptimizeItem[]>();
-        for (const keyDescription of iterateAllKeyDescriptions(this.keyDescriptions)) {
+        const merged = Object.assign({}, current, optimized);
+        for (const keyDescription of iterateKeyDescriptions(merged, this.keyDescriptions)) {
             const opt = new OptKeyProperty(keyDescription);
             const key = opt.key;
             const category = opt.category;

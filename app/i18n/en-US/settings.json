@@ -111,13 +111,16 @@
       "StreamEncoder": {
         "name": "Encoder",
         "obs_x264": "Software (x264)",
-        "obs_qsv11": "Hardware (QSV)"
+        "obs_qsv11": "Hardware (QSV)",
+        "ffmpeg_nvenc": "Hardware (NVENC)"
       },
       "ABitrate": {
         "name": null
       },
       "UseAdvanced": {
-        "name": null
+        "name": null,
+        "true": null,
+        "false": null
       },
       "EnforceBitrate": {
         "name": null
@@ -140,6 +143,15 @@
         "quality": null,
         "balanced": null,
         "speed": null
+      },
+      "NVENCPreset": {
+        "name": null,
+        "default": null,
+        "hq": null,
+        "hp": null,
+        "ll": null,
+        "llhq": null,
+        "llhp": null
       },
       "x264Settings": {
         "name": null
