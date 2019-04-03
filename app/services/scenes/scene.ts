@@ -289,17 +289,6 @@ export class Scene {
 
     this.SET_NODES_ORDER(sceneNodesIds);
 
-    // recalculate children order in dest and source folder
-
-    // if (destFolderId) {
-    //   this.getFolder(destFolderId).recalculateChildrenOrder();
-    // }
-
-    // if (sourceNode.parentId !== destFolderId) {
-    //   const sourceFolder = sourceNode.getParent();
-    //   if (sourceFolder) sourceFolder.recalculateChildrenOrder();
-    // }
-
     itemsToMove.forEach(item => {
       let currentIdx: number;
       this.getObsScene()
