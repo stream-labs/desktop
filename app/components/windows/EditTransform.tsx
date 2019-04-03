@@ -26,17 +26,24 @@ export default class EditTransform extends TsxComponent<{}> {
   originRect = { ...this.selectionService.getBoundingRect() };
   rect = { ...this.selectionService.getBoundingRect() };
 
+  $refs: {
+    validForm: ValidatedForm;
+  };
+
   get transform() {
     return this.selectionService.getTransform();
   }
 
   setTransform(key: string, subkey: string) {
-    return (value: string) =>
+    return async (value: string) => {
+      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
       this.selectionService.setTransform({ [key]: { [subkey]: Number(value) } });
+    };
   }
 
   setPos(dir: string) {
-    return (value: string) => {
+    return async (value: string) => {
+      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
       const delta = Number(value) - Math.round(this.rect[dir]);
       this.selectionService.setDeltaPos(dir as 'x' | 'y', delta);
       this.rect[dir] += delta;
@@ -45,7 +52,8 @@ export default class EditTransform extends TsxComponent<{}> {
 
   setScale(dir: string) {
     const scaleKey: 'x' | 'y' = dir === 'width' ? 'x' : 'y';
-    return (value: string) => {
+    return async (value: string) => {
+      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
       if (Number(value) === this.rect[dir]) return;
       const scale = Number(value) / this.rect[dir];
       this.selectionService.unilateralScale(scaleKey, scale);
@@ -59,7 +67,7 @@ export default class EditTransform extends TsxComponent<{}> {
 
   reset() {
     this.selectionService.resetTransform();
-    this.rect = { ...this.originRect, x: 0, y: 0 };
+    this.rect = { ...this.originRect };
   }
 
   cancel() {
@@ -74,7 +82,7 @@ export default class EditTransform extends TsxComponent<{}> {
             <span>{dirMap(dir)}</span>
             <NumberInput
               value={this.transform.crop[dir]}
-              metadata={{ isInteger: true }}
+              metadata={{ isInteger: true, min: 0 }}
               onInput={this.setTransform('crop', dir)}
             />
           </div>
@@ -93,7 +101,7 @@ export default class EditTransform extends TsxComponent<{}> {
           {dataArray.map(dir => (
             <NumberInput
               value={Math.round(this.rect[dir])}
-              metadata={{ isInteger: true }}
+              metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
               onInput={inputHandler(dir)}
             />
           ))}
@@ -105,7 +113,7 @@ export default class EditTransform extends TsxComponent<{}> {
   render(h: Function) {
     return (
       <ModalLayout customControls showControls={false}>
-        <ValidatedForm slot="content" name="transform">
+        <ValidatedForm slot="content" name="transform" ref="validForm">
           {this.coordinateForm(h, 'pos')}
           {this.coordinateForm(h, 'scale')}
           <HFormGroup metadata={{ title: $t('Rotation') }}>
