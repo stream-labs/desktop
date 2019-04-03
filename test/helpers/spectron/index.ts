@@ -13,6 +13,8 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
+const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+
 async function focusWindow(t: any, regex: RegExp) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -40,9 +42,15 @@ export async function focusLibrary(t: any) {
   await focusWindow(t, /streamlabs\.com\/library/);
 }
 
+// Close current focused window
+export async function closeWindow(t: any) {
+  await t.context.app.browserWindow.close();
+}
+
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  pauseIfFailed?: boolean;
   appArgs?: string;
   afterStartCb?(t: any): Promise<any>;
 
@@ -64,6 +72,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
   networkLogging: false,
+  pauseIfFailed: false,
 };
 
 export interface ITestContext {
@@ -118,12 +127,16 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await t.context.app.start();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
-    await t.context.app.webContents.executeJavaScript(`
+    const disableTransitionsCode = `
       const disableAnimationsEl = document.createElement('style');
       disableAnimationsEl.textContent =
-        '*{ transition: none !important; transition-property: none !important; }';
+        '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
-    `);
+    `;
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
@@ -208,6 +221,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
+    await checkErrorsInLogFile();
+    if (!testPassed && options.pauseIfFailed) {
+      console.log('Test execution has been paused due `pauseIfFailed` enabled');
+      await sleep(ALMOST_INFINITY);
+    }
+
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
@@ -217,8 +236,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.restartAppAfterEachTest) {
         client.disconnect();
         await stopApp(t);
-      } else {
-        await checkErrorsInLogFile();
       }
     } catch (e) {
       testPassed = false;

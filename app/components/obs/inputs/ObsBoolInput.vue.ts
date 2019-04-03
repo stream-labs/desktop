@@ -16,6 +16,7 @@ class ObsBoolInput extends ObsInput<IObsInput<boolean>> {
   get metadata() {
     return metadata.bool({
       title: this.value.showDescription !== false ? this.value.description : null,
+      name: this.value.name,
       disabled: !this.value.enabled,
     });
   }
