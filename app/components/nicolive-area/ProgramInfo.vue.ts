@@ -99,6 +99,10 @@ export default class ProgramInfo extends Vue {
     return this.nicoliveProgramService.state.title;
   }
 
+  get programIsMemberOnly(): boolean {
+    return this.nicoliveProgramService.state.isMemberOnly;
+  }
+
   get communityID(): string {
     return this.nicoliveProgramService.state.communityID;
   }

@@ -34,6 +34,7 @@ const programs = {
     description: '番組詳細情報',
     beginAt: schedules.onAir.onAirBeginAt,
     endAt: schedules.onAir.onAirEndAt,
+    isMemberOnly: true,
   },
 };
 
@@ -145,16 +146,7 @@ test('fetchProgram:成功', async () => {
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
   instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [schedules.onAir] });
-  instance.client.fetchProgram = jest.fn().mockResolvedValue({
-    ok: true,
-    value: {
-      status: schedules.onAir.status,
-      title: '番組タイトル',
-      description: '番組詳細情報',
-      beginAt: 100,
-      endAt: 150,
-    },
-  });
+  instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.onAir });
   instance.client.fetchCommunity = jest
     .fn()
     .mockResolvedValue({ ok: true, value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } } });
@@ -174,6 +166,7 @@ Array [
     "communitySymbol": "symbol url",
     "description": "番組詳細情報",
     "endTime": 150,
+    "isMemberOnly": true,
     "programID": "lv1",
     "startTime": 100,
     "status": "onAir",
@@ -253,6 +246,7 @@ Array [
   Object {
     "description": "番組詳細情報",
     "endTime": 150,
+    "isMemberOnly": true,
     "startTime": 100,
     "status": "onAir",
     "title": "番組タイトル",
