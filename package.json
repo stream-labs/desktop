@@ -97,7 +97,6 @@
     "serial": true
   },
   "dependencies": {
-    "@sentry/node": "5.0.3",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz",
@@ -108,6 +107,7 @@
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.18-iojs-v2.0.8.tar.gz",
+    "raven": "^2.6.4",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",

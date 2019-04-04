@@ -125,7 +125,7 @@ function startApp() {
     );
   }
 
-  const Sentry = require('@sentry/node');
+  var Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox(`Unhandled Exception`,
@@ -139,35 +139,25 @@ function startApp() {
     }
   }
 
-  function handleUnhandledException(err) {
-
-    Sentry.configureScope((scope) => {
-      scope.setTag("version", process.env.SLOBS_VERSION);
-      scope.setTag("release", process.env.SLOBS_VERSION);
-    });
-    
-    Sentry.captureException(err);
+  Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+    release: process.env.SLOBS_VERSION, 
+    sampleRate: 0.1
+  }).install(function (err, initialErr, eventId) {
     handleFinishedReport();
-  }
+  });
 
-  if (pjson.env === 'production') {
-    Sentry.init({ dsn: 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674' });
-
-    process.on('uncaughtException', handleUnhandledException);
-
-    crashReporter.start({
-      productName: 'streamlabs-obs',
-      companyName: 'streamlabs',
-      ignoreSystemCrashHandler: true,
-      submitURL:
-        'https://sentry.io/api/1283430/minidump/' +
-        '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
-      extra: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
-  }
+  crashReporter.start({
+    productName: 'streamlabs-obs',
+    companyName: 'streamlabs',
+    ignoreSystemCrashHandler: true,
+    submitURL:
+      'https://sentry.io/api/1283430/minidump/' +
+      '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+    extra: {
+      version: pjson.version,
+      processType: 'main'
+    }
+  });
 
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1600,
