@@ -1,19 +1,19 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from 'services/scenes/scenes-api';
-import { ISelectionServiceApi } from '../../app/services/selection';
+import { ScenesService } from 'services/scenes';
+import { SelectionService } from '../../app/services/selection';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneNodeApi } from 'services/scenes';
+import { Scene, SceneItemNode } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
 let sceneBuilder: SceneBuilder;
-let scene: ISceneApi;
-let getNode: (name: string) => ISceneNodeApi;
+let scene: Scene;
+let getNode: (name: string) => SceneItemNode;
 let getNodeId: (name: string) => string;
-let selectionService: ISelectionServiceApi;
+let selectionService: SelectionService;
 
 async function afterStart() {
   const client = await getClient();
@@ -26,8 +26,8 @@ async function afterStart() {
 
 test('Selection', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
 
   const color1 = scene.createAndAddSource('Color1', 'color_source');
@@ -69,8 +69,8 @@ test('Selection', async t => {
 
 test('Selection actions', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
 
   let [color1, color2, color3] = scene.getItems();
@@ -88,8 +88,8 @@ test('Selection actions', async t => {
 
 test('Invalid selection', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const anotherScene = scenesService.createScene('Another scene');
   const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
   const [colorSource] = scenesService.activeScene.getItems();

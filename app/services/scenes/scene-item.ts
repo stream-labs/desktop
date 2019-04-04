@@ -21,19 +21,19 @@ import {
   ScenesService,
   Scene,
   ISceneItem,
-  ISceneItemApi,
   ISceneItemInfo,
 } from './index';
 import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
+import { TSceneNodeType } from './scenes';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @ServiceHelper()
-export class SceneItem extends SceneItemNode implements ISceneItemApi {
+export class SceneItem extends SceneItemNode {
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -51,6 +51,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+
+  sceneNodeType: TSceneNodeType = 'item';
 
   // Some computed attributes
 

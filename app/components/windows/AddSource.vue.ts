@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import { IScenesServiceApi } from 'services/scenes';
+import { ScenesService } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, ISourceApi, ISourceAddOptions } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
@@ -16,7 +16,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
-  @Inject() scenesService: IScenesServiceApi;
+  @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;

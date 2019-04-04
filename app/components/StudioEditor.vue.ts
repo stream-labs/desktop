@@ -8,7 +8,7 @@ import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
 import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
-import { SelectionService } from 'services/selection/selection';
+import { SelectionService } from 'services/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';

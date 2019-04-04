@@ -4,7 +4,7 @@ import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
-import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
+import { ScenesService } from '../../../app/services/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest({ window: 'child' });
@@ -26,7 +26,7 @@ test('AddSource window', async t => {
 test('AddSource window with suggestions', async t => {
   const client = await getClient();
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('MySource', 'color_source');
   sourcesService.showAddSource('color_source');
   t.pass();

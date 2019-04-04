@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
-import { IScenesServiceApi } from 'services/scenes';
+import { ScenesService } from 'services/scenes';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -17,7 +17,7 @@ test('The default sources exists', async t => {
 
 test('The sources with audio have to be appeared in AudioService', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
 
   const scene = scenesService.activeScene;
@@ -29,7 +29,7 @@ test('The sources with audio have to be appeared in AudioService', async t => {
 
 test('The audio sources have to keep settings after application restart', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
   const sceneCollectionsService = client.getResource<ISceneCollectionsServiceApi>(
     'SceneCollectionsService',
@@ -59,7 +59,7 @@ test('The audio sources have to keep settings after application restart', async 
 
 test('Events are emitted when the audio source is updated', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
 
   const scene = scenesService.activeScene;

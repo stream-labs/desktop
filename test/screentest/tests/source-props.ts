@@ -3,7 +3,7 @@ import { useSpectron } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
-import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
+import { ScenesService } from '../../../app/services/scenes/';
 
 let showSourceProps: (name: string) => void;
 
@@ -28,7 +28,7 @@ useSpectron({
     ];
 
     const client = await getClient();
-    const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+    const scenesService = client.getResource<ScenesService>('ScenesService');
     const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
 
     types.forEach(type => {
