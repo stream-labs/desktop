@@ -18,7 +18,7 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
   const api = await getClient();
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
 
-  customizationService.setNightMode(config.nightMode);
+  customizationService.setTheme(config.nightMode ? 'night-theme' : 'day-theme');
 
   if (config.resolution) {
     t.context.app.browserWindow.setSize(config.resolution.width, config.resolution.height);

@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
-import { SelectionService } from 'services/selection/selection';
+import { SelectionService } from 'services/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { WidgetType } from 'services/widgets';

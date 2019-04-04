@@ -1,5 +1,5 @@
 <template>
-<div class="titlebar" :class="{'night-theme': nightMode}">
+<div class="titlebar" :class="theme">
   <img class="titlebar-icon" src="../../media/images/icon.ico" />
   <div class="titlebar-title">
     {{ title }}

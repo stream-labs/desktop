@@ -148,6 +148,28 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openEmoteProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotEmoteProtectionWindow',
+      title: $t('Chatbot Emote Protection Preferences'),
+      size: {
+        width: 650,
+        height: 500,
+      },
+    });
+  }
+
+  openParagraphProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotParagraphProtectionWindow',
+      title: $t('Chatbot Paragraph Protection Preferences'),
+      size: {
+        width: 650,
+        height: 500,
+      },
+    });
+  }
+
   openQuoteWindow(quote?: IQuote) {
     if (quote) {
       this.SET_QUOTE_TO_UPDATE(quote);

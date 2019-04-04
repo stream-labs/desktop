@@ -85,7 +85,7 @@ export class ChatService extends Service {
 
   private async navigateToChat() {
     const service = getPlatformService(this.userService.platform.type);
-    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
 
     // Youtube requires some special redirecting
     if (service instanceof YoutubeService) {
@@ -144,7 +144,9 @@ export class ChatService extends Service {
         this.chatView.webContents.executeJavaScript(
           `
           localStorage.setItem('bttv_clickTwitchEmotes', true);
-          localStorage.setItem('bttv_darkenedMode', ${settings.nightMode ? 'true' : 'false'});
+          localStorage.setItem('bttv_darkenedMode', ${
+            this.customizationService.isDarkTheme() ? 'true' : 'false'
+          });
 
           var bttvscript = document.createElement('script');
           bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');

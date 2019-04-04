@@ -1,5 +1,5 @@
 <template>
-<div style="height: 100%" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}">
+<div style="height: 100%" :class="theme">
   <title-bar :title="options.title" class="child-window-titlebar" v-if="!options.isFullScreen" />
   <div class="blank-slate">
     <div class="spinner-spacer" />

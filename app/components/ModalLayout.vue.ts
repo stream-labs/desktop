@@ -82,8 +82,8 @@ export default class ModalLayout extends TsxComponent<{
     this.fixedStyle = fixedStyle;
   }
 
-  get nightTheme() {
-    return this.customizationService.nightMode;
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 
   cancel() {

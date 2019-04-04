@@ -57,6 +57,8 @@ import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/wind
 import ChatbotSymbolProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
 import ChatbotLinkProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
 import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
+import ChatbotParagraphProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotParagraphProtectionWindow.vue';
+import ChatbotEmoteProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotEmoteProtectionWindow.vue';
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
 import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
@@ -130,6 +132,8 @@ export function getComponents() {
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
     ChatbotWordProtectionWindow,
+    ChatbotParagraphProtectionWindow,
+    ChatbotEmoteProtectionWindow,
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,

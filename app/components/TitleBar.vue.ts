@@ -36,7 +36,7 @@ export default class TitleBar extends Vue {
     electron.remote.getCurrentWindow().close();
   }
 
-  get nightMode() {
-    return this.customizationService.nightMode;
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 }

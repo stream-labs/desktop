@@ -1,5 +1,5 @@
 <template>
-  <div id="mainWrapper" class="modal-layout" :class="{'night-theme': nightTheme}">
+  <div id="mainWrapper" class="modal-layout" :class="theme">
     <div class="ModalLayout-fixed" :style="fixedStyle">
       <slot name="fixed"/>
     </div>

@@ -20,8 +20,6 @@ const YELLOW = 'rgba(255,205,71,.6)';
 const YELLOW_BG = 'rgba(255,205,71,.16)';
 const RED = 'rgba(252,62,63,.6)';
 const RED_BG = 'rgba(252,62,63,.16)';
-const NIGHT_BG = '#09161d';
-const DAY_BG = '#f7f9f9';
 
 @Component({})
 export default class MixerVolmeter extends Vue {
@@ -55,7 +53,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   get backgroundColor() {
-    return this.customizationService.nightMode ? NIGHT_BG : DAY_BG;
+    return this.customizationService.themeBackground;
   }
 
   destroyed() {
