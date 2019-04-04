@@ -24,7 +24,7 @@ export default class OneOffWindow extends Vue {
     return Util.getCurrentUrlParams().windowId;
   }
 
-  get nightTheme() {
-    return this.customizationService.nightMode;
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 }

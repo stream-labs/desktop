@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -33,8 +33,8 @@ export default class ChildWindow extends Vue {
     return this.windowsService.state.child;
   }
 
-  get nightTheme() {
-    return this.customizationService.nightMode;
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 
   get currentComponent() {

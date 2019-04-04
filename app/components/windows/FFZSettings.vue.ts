@@ -24,7 +24,7 @@ export default class FFZSettings extends Vue {
     const webview = this.$refs.ffzSettings;
     const settings = this.customizationService.getSettings();
 
-    this.nightMode = settings.nightMode;
+    this.nightMode = this.customizationService.isDarkTheme();
 
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);

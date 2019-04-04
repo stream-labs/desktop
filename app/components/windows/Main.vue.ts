@@ -88,8 +88,8 @@ export default class Main extends Vue {
     return this.navigationService.state.params;
   }
 
-  get nightTheme() {
-    return this.customizationService.nightMode;
+  get theme() {
+    return this.customizationService.currentTheme;
   }
 
   get applicationLoading() {

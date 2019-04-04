@@ -4,7 +4,7 @@ import { overArgs } from 'lodash-decorators';
 import Display from 'components/shared/Display.vue';
 
 export interface ICustomizationServiceState {
-  nightMode: boolean;
+  theme: string;
   updateStreamInfoOnLive: boolean;
   livePreviewEnabled: boolean;
   leftDock: boolean;

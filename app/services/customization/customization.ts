@@ -15,6 +15,18 @@ import {
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
+// Maps to --background
+const THEME_BACKGROUNDS = {
+  'night-theme': '#09161d',
+  'day-theme': '#f7f9f9',
+};
+
+// Maps to --section
+const DISPLAY_BACKGROUNDS = {
+  'night-theme': { r: 11, g: 22, b: 28 },
+  'day-theme': { r: 245, g: 248, b: 250 },
+};
+
 /**
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
@@ -22,7 +34,7 @@ import { $t } from 'services/i18n';
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
-    nightMode: true,
+    theme: 'night-theme',
     updateStreamInfoOnLive: true,
     livePreviewEnabled: true,
     leftDock: false,
@@ -64,16 +76,24 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return this.state;
   }
 
-  set nightMode(val: boolean) {
-    this.setSettings({ nightMode: val });
+  get currentTheme() {
+    return this.state.theme;
   }
 
-  get nightMode() {
-    return this.state.nightMode;
+  setTheme(theme: string) {
+    return this.setSettings({ theme });
   }
 
-  setNightMode(val: boolean) {
-    this.nightMode = val;
+  get themeBackground() {
+    return THEME_BACKGROUNDS[this.currentTheme];
+  }
+
+  get displayBackground() {
+    return DISPLAY_BACKGROUNDS[this.currentTheme];
+  }
+
+  isDarkTheme() {
+    return ['night-theme'].includes(this.currentTheme);
   }
 
   setUpdateStreamInfoOnLive(update: boolean) {
@@ -108,11 +128,15 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     const settings = this.getSettings();
 
     return [
-      <IObsInput<boolean>>{
-        value: settings.nightMode,
-        name: 'nightMode',
-        description: $t('Night mode'),
-        type: 'OBS_PROPERTY_BOOL',
+      <IObsListInput<string>>{
+        value: settings.theme,
+        name: 'theme',
+        description: $t('Theme'),
+        type: 'OBS_PROPERTY_LIST',
+        options: [
+          { value: 'night-theme', description: $t('Night (Classic)') },
+          { value: 'day-theme', description: $t('Day (Classic)') },
+        ],
         visible: true,
         enabled: true,
       },

@@ -129,7 +129,9 @@ export default class TopNav extends Vue {
   }
 
   toggleNightTheme() {
-    this.customizationService.nightMode = !this.customizationService.nightMode;
+    const newTheme =
+      this.customizationService.currentTheme === 'night-theme' ? 'day-theme' : 'night-theme';
+    this.customizationService.setTheme(newTheme);
   }
 
   openDiscord() {

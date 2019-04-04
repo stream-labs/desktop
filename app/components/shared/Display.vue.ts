@@ -3,11 +3,13 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { VideoService, Display as OBSDisplay } from 'services/video';
 import { WindowsService } from 'services/windows';
+import { CustomizationService } from 'services/customization';
 
 @Component({})
 export default class Display extends Vue {
   @Inject() videoService: VideoService;
   @Inject() windowsService: WindowsService;
+  @Inject() customizationService: CustomizationService;
 
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
@@ -28,11 +30,16 @@ export default class Display extends Vue {
     this.$emit('click', event);
   }
 
+  get paddingColor() {
+    return this.customizationService.displayBackground;
+  }
+
   createDisplay() {
     const displayId = this.videoService.getRandomDisplayId();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
       paddingSize: this.paddingSize,
+      paddingColor: this.paddingColor,
     });
     this.display.setShoulddrawUI(this.drawUI);
 
@@ -49,6 +56,11 @@ export default class Display extends Vue {
 
   @Watch('sourceId')
   changeSource() {
+    this.updateDisplay();
+  }
+
+  @Watch('paddingColor')
+  updateDisplay() {
     this.destroyDisplay();
     this.createDisplay();
   }
