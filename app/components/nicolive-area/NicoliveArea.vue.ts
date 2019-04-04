@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import CommentForm from './CommentForm.vue';
 import ProgramDescription from './ProgramDescription.vue';
 import ProgramInfo from './ProgramInfo.vue';
+import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
 
@@ -16,6 +17,7 @@ import TopNav from './TopNav.vue';
     TopNav,
     ProgramInfo,
     ProgramDescription,
+    ProgramStatistics,
     ToolBar,
     CommentForm,
   },

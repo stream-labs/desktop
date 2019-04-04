@@ -114,20 +114,4 @@ export default class ProgramInfo extends Vue {
   get communitySymbol(): string {
     return this.nicoliveProgramService.state.communitySymbol;
   }
-
-  get viewers(): number {
-    return this.nicoliveProgramService.state.viewers;
-  }
-
-  get comments(): number {
-    return this.nicoliveProgramService.state.comments;
-  }
-
-  get adPoint(): number {
-    return this.nicoliveProgramService.state.adPoint;
-  }
-
-  get giftPoint(): number {
-    return this.nicoliveProgramService.state.giftPoint;
-  }
 }

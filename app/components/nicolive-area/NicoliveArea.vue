@@ -4,6 +4,7 @@
     <template v-if="hasProgram">
       <program-info />
       <tool-bar />
+      <program-statistics />
       <program-description />
       <comment-form />
     </template>
