@@ -125,7 +125,7 @@ function startApp() {
     );
   }
 
-  var Raven = require('raven');
+  const Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox(`Unhandled Exception`,
@@ -140,24 +140,25 @@ function startApp() {
   }
 
   Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
-    release: process.env.SLOBS_VERSION, 
-    sampleRate: 0.1
+    release: process.env.SLOBS_VERSION 
   }).install(function (err, initialErr, eventId) {
     handleFinishedReport();
   });
 
-  crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    ignoreSystemCrashHandler: true,
-    submitURL:
-      'https://sentry.io/api/1283430/minidump/' +
-      '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
-    extra: {
-      version: pjson.version,
-      processType: 'main'
-    }
-  });
+  if (pjson.env === 'production') {
+    crashReporter.start({
+      productName: 'streamlabs-obs',
+      companyName: 'streamlabs',
+      ignoreSystemCrashHandler: true,
+      submitURL:
+        'https://sentry.io/api/1283430/minidump/' +
+        '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+      extra: {
+        version: pjson.version,
+        processType: 'main'
+      }
+    });
+  }
 
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1600,
