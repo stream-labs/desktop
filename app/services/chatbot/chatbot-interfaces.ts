@@ -98,6 +98,16 @@ export interface ISymbolProtectionResponse {
   enabled: boolean;
 }
 
+export interface IEmoteProtectionResponse {
+  settings: IEmoteProtectionData;
+  enabled: boolean;
+}
+
+export interface IParagraphProtectionResponse {
+  settings: IParagraphProtectionData;
+  enabled: boolean;
+}
+
 export interface ILinkProtectionResponse {
   settings: ILinkProtectionData;
   enabled: boolean;
@@ -386,6 +396,10 @@ export interface IProtectionAdvanced {
   percent?: number;
 }
 
+export interface IParagraphProtectionAdvanced {
+  maximum?: number;
+}
+
 export interface IProtectionList<type> {
   [id: number]: type;
 }
@@ -401,6 +415,19 @@ export interface ISymbolProtectionData {
   general: IProtectionGeneral;
   advanced: IProtectionAdvanced;
 }
+
+// emote protection data
+export interface IEmoteProtectionData {
+  general: IProtectionGeneral;
+  advanced: IProtectionAdvanced;
+}
+
+// paragraph protection data
+export interface IParagraphProtectionData {
+  general: IProtectionGeneral;
+  advanced: IParagraphProtectionAdvanced;
+}
+
 // link protection data
 export interface ILinkProtectionData {
   commands: ILinkProtectionCommands;
@@ -836,6 +863,8 @@ export type ChatbotSettingSlug =
   | 'symbol-protection'
   | 'link-protection'
   | 'words-protection'
+  | 'emote-protection'
+  | 'paragraph-protection'
   | 'heist'
   | 'poll'
   | 'betting';

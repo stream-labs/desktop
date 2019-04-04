@@ -12,6 +12,8 @@ import { IChatbotModule } from 'services/chatbot';
 })
 export default class ChatbotModTools extends ChatbotBase {
   mounted() {
+    this.chatbotApiService.ModTools.fetchEmoteProtection();
+    this.chatbotApiService.ModTools.fetchParagraphProtection();
     this.chatbotApiService.ModTools.fetchCapsProtection();
     this.chatbotApiService.ModTools.fetchSymbolProtection();
     this.chatbotApiService.ModTools.fetchLinkProtection();
@@ -83,6 +85,36 @@ export default class ChatbotModTools extends ChatbotBase {
           });
         },
       },
+      {
+        title: $t('Emote Protection'),
+        description: $t('Removes messages containing excessive an amount of emotes.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-word--${backgroundUrlSuffix}.png`),
+        enabled: this.emoteProtectionCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotApiService.Common.openEmoteProtectionWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.ModTools.updateEmoteProtection({
+            ...this.emoteProtection,
+            enabled: !this.emoteProtectionCurrentlyEnabled,
+          });
+        },
+      },
+      {
+        title: $t('Paragraph Protection'),
+        description: $t('Prevents viewers from sending overly lengthy messages.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-word--${backgroundUrlSuffix}.png`),
+        enabled: this.parargaphProtectionCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotApiService.Common.openParagraphProtectionWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.ModTools.updateParagraphProtection({
+            ...this.paragraphProtection,
+            enabled: !this.parargaphProtectionCurrentlyEnabled,
+          });
+        },
+      },
     ];
   }
 
@@ -102,6 +134,14 @@ export default class ChatbotModTools extends ChatbotBase {
     return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
+  get emoteProtection() {
+    return this.chatbotApiService.ModTools.state.emoteProtectionResponse;
+  }
+
+  get paragraphProtection() {
+    return this.chatbotApiService.ModTools.state.paragraphProtectionResponse;
+  }
+
   get capsProtectionCurrentlyEnabled() {
     return this.capsProtection.enabled === true;
   }
@@ -116,5 +156,13 @@ export default class ChatbotModTools extends ChatbotBase {
 
   get wordProtectionCurrentlyEnabled() {
     return this.wordProtection.enabled === true;
+  }
+
+  get emoteProtectionCurrentlyEnabled() {
+    return this.emoteProtection.enabled === true;
+  }
+
+  get parargaphProtectionCurrentlyEnabled() {
+    return this.paragraphProtection.enabled === true;
   }
 }

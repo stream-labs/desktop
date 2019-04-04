@@ -12,6 +12,8 @@ import {
   ISymbolProtectionResponse,
   IWordProtectionData,
   IWordProtectionResponse,
+  IParagraphProtectionData,
+  IEmoteProtectionData,
 } from 'services/chatbot';
 
 import {
@@ -87,11 +89,23 @@ interface IWordProtectionMetadata {
   new_blacklist_item: IWordProtectionBlacklistItem;
 }
 
+interface IEmoteProtectionMetaData {
+  general: IProtectionGeneralMetadata;
+  advanced: IProtectionAdvancedMetadata;
+}
+
+interface IParagraphProtectionMetaData {
+  general: IProtectionGeneralMetadata;
+  advanced: IProtectionAdvancedMetadata;
+}
+
 interface IProtectionMetadata {
   caps: ICapsProtectionMetadata;
   symbol: ISymbolProtectionMetadata;
   link: ILinkProtectionMetadata;
   word: IWordProtectionMetadata;
+  emote: IEmoteProtectionMetaData;
+  paragraph: IParagraphProtectionMetaData;
 }
 
 @Component({})
@@ -174,12 +188,54 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     },
     blacklist: [],
   };
+  paragraphProtection: IParagraphProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    advanced: {
+      maximum: 140,
+    },
+  };
+  emoteProtection: IEmoteProtectionData = {
+    general: {
+      excluded: {
+        info: {},
+        level: 0,
+      },
+      message: '',
+      permit: {
+        duration: 120,
+      },
+      punishment: {
+        duration: 0,
+        type: 'Purge',
+      },
+    },
+    advanced: {
+      minimum: 5,
+      percent: 50,
+      maximum: 50,
+    },
+  };
 
   mounted() {
     this.capsProtection = cloneDeep(this.capsProtectionResponse.settings);
     this.symbolProtection = cloneDeep(this.symbolProtectionResponse.settings);
     this.linkProtection = cloneDeep(this.linkProtectionResponse.settings);
     this.wordProtection = cloneDeep(this.wordProtectionResponse.settings);
+    this.emoteProtection = cloneDeep(this.emoteProtectionResponse.settings);
+    this.paragraphProtection = cloneDeep(this.paragraphProtectionResponse.settings);
   }
 
   get capsProtectionResponse() {
@@ -196,6 +252,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   get wordProtectionResponse() {
     return this.chatbotApiService.ModTools.state.wordProtectionResponse;
+  }
+
+  get emoteProtectionResponse() {
+    return this.chatbotApiService.ModTools.state.emoteProtectionResponse;
+  }
+
+  get paragraphProtectionResponse() {
+    return this.chatbotApiService.ModTools.state.paragraphProtectionResponse;
   }
 
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
@@ -383,6 +447,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       word: {
         general: this.generalMetadata('words'),
         new_blacklist_item: this.wordBlacklistItemMetadata,
+      },
+      paragraph: {
+        general: this.generalMetadata('paragraph'),
+        advanced: this.advancedMetadata('paragraph'),
+      },
+      emote: {
+        general: this.generalMetadata('paragraph'),
+        advanced: this.advancedMetadata('paragraph'),
       },
     };
   }

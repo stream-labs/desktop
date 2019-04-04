@@ -10,6 +10,8 @@ import {
   ILinkProtectionResponse,
   IWordProtectionResponse,
   ChatbotSettingSlug,
+  IParagraphProtectionResponse,
+  IEmoteProtectionResponse,
 } from './chatbot-interfaces';
 
 // state
@@ -18,6 +20,8 @@ interface IChatbotModToolsApiServiceState {
   symbolProtectionResponse: ISymbolProtectionResponse;
   linkProtectionResponse: ILinkProtectionResponse;
   wordProtectionResponse: IWordProtectionResponse;
+  emoteProtectionResponse: IEmoteProtectionResponse;
+  paragraphProtectionResponse: IParagraphProtectionResponse;
 }
 
 export class ChatbotModToolsApiService extends PersistentStatefulService<
@@ -39,6 +43,14 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
       settings: null,
     },
     wordProtectionResponse: {
+      enabled: false,
+      settings: null,
+    },
+    emoteProtectionResponse: {
+      enabled: false,
+      settings: null,
+    },
+    paragraphProtectionResponse: {
       enabled: false,
       settings: null,
     },
@@ -79,6 +91,22 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
       });
   }
 
+  fetchEmoteProtection() {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/emote-protection', {})
+      .then((response: IEmoteProtectionResponse) => {
+        this.UPDATE_EMOTE_PROTECTION(response);
+      });
+  }
+
+  fetchParagraphProtection() {
+    return this.chatbotBaseApiService
+      .api('GET', 'settings/paragraph-protection', {})
+      .then((response: IParagraphProtectionResponse) => {
+        this.UPDATE_PARAGRAPH_PROTECTION(response);
+      });
+  }
+
   // reset
   resetSettings(slug: ChatbotSettingSlug) {
     return this.chatbotBaseApiService
@@ -89,7 +117,9 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
             | ICapsProtectionResponse
             | ISymbolProtectionResponse
             | ILinkProtectionResponse
-            | IWordProtectionResponse,
+            | IWordProtectionResponse
+            | IEmoteProtectionResponse
+            | IParagraphProtectionResponse,
         ) => {
           switch (slug) {
             case 'caps-protection':
@@ -103,6 +133,12 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
               break;
             case 'words-protection':
               this.UPDATE_WORD_PROTECTION(response as IWordProtectionResponse);
+              break;
+            case 'emote-protection':
+              this.UPDATE_EMOTE_PROTECTION(response as IEmoteProtectionResponse);
+              break;
+            case 'paragraph-protection':
+              this.UPDATE_PARAGRAPH_PROTECTION(response as IParagraphProtectionResponse);
               break;
           }
           return Promise.resolve(response);
@@ -151,6 +187,26 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
       });
   }
 
+  updateEmoteProtection(data: IEmoteProtectionResponse) {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/emote-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchEmoteProtection();
+        }
+      });
+  }
+
+  updateParagraphProtection(data: IParagraphProtectionResponse) {
+    return this.chatbotBaseApiService
+      .api('POST', 'settings/paragraph-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchParagraphProtection();
+        }
+      });
+  }
+
   //
   // Mutations
   //
@@ -172,5 +228,15 @@ export class ChatbotModToolsApiService extends PersistentStatefulService<
   @mutation()
   private UPDATE_WORD_PROTECTION(response: IWordProtectionResponse) {
     Vue.set(this.state, 'wordProtectionResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_EMOTE_PROTECTION(response: IEmoteProtectionResponse) {
+    Vue.set(this.state, 'emoteProtectionResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_PARAGRAPH_PROTECTION(response: IParagraphProtectionResponse) {
+    Vue.set(this.state, 'paragraphProtectionResponse', response);
   }
 }
