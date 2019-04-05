@@ -15,7 +15,7 @@ const args = process.argv.slice(2);
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync('yarn test --timeout=2m' + args.join(' '), { stdio: [0, 1, 2] });
+    execSync('yarn test --timeout=2m ' + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }
