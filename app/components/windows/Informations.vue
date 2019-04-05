@@ -22,7 +22,7 @@
         <br />
         ネットワークが正しく接続されているかを確認してください。
       </p>
-      <p class="error-attention">※N Airに関するニコニコインフォ一覧をWebブラウザで表示する場合は<a href="http://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">こちら</a></p>
+      <p class="error-attention">※N Airに関するニコニコインフォ一覧をWebブラウザで表示する場合は<a href="https://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">こちら</a></p>
     </div>
   </div>
 
