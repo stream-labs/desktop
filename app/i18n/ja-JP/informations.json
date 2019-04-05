@@ -1,0 +1,7 @@
+{
+  "title": "お知らせ",
+  "errorHeading": "ニコニコインフォ一覧の取得に失敗しました",
+  "errorDescription": "オフラインになっている可能性があります。\nネットワークが正しく接続されているかを確認してください。",
+  "errorAttention": "※N Airに関するニコニコインフォ一覧をWebブラウザで表示する場合は{link}",
+  "errorAttentionLink": "こちら"
+}

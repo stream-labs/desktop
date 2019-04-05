@@ -1,5 +1,5 @@
 <template>
-<modal-layout title="お知らせ" :showControls="false">
+<modal-layout :title="$t('informations.title')" :showControls="false">
 
   <div class="informations" slot="content" data-test="Informations">
     <ul class="information-list" v-if="!fetching && !hasError">
@@ -16,13 +16,15 @@
     </div>
     <div class="information-error" v-else-if="hasError">
       <i class="icon-warning"></i>
-      <h2 class="error-title">ニコニコインフォ一覧の取得に失敗しました</h2>
+      <h2 class="error-title">{{ $t("informations.errorHeading") }}</h2>
       <p class="error-text">
-        オフラインになっている可能性があります。
-        <br />
-        ネットワークが正しく接続されているかを確認してください。
+        {{ $t("informations.errorDescription") }}
       </p>
-      <p class="error-attention">※N Airに関するニコニコインフォ一覧をWebブラウザで表示する場合は<a href="http://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">こちら</a></p>
+      <i18n class="error-attention" path="informations.errorAttention" tag="p">
+        <a place="link" href="http://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">
+          {{ $t("informations.errorAttentionLink") }}
+        </a>
+      </i18n>
     </div>
   </div>
 

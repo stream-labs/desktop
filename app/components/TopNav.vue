@@ -35,7 +35,7 @@
         @click="openInformations"
         class="link">
         <i class="icon-notification" :class="{'isUnseen': hasUnseenInformation}" />
-        <span>お知らせ</span>
+        <span>{{ $t('informations.title') }}</span>
       </a>
     </div>
   </div>
