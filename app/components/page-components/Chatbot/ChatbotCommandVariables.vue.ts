@@ -1,7 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 
-@Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
   get variables() {
     return this.chatbotApiService.Commands.state.commandVariablesResponse;
