@@ -19,10 +19,7 @@ type TCommandSlug =
   | 'gamble'
   | 'quotes';
 
-@Component({
-  components: {
-  },
-})
+@Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
