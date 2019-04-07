@@ -44,8 +44,6 @@ export default class ChatbotCommandVariables extends ChatbotBase {
       return Object.keys(section).length !== 0;
     });
 
-    console.log(remaining);
-
     return remaining;
   }
 
