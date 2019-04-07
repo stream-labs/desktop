@@ -125,7 +125,7 @@ function startApp() {
     );
   }
 
-  const bt = require('backtrace-node');
+  const Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox('Something Went Wrong',
@@ -135,22 +135,13 @@ function startApp() {
     app.exit();
   }
 
-  function handleUnhandledException(err) {
-    bt.report(err, {}, handleFinishedReport);
-  }
-
   if (pjson.env === 'production') {
-    bt.initialize({
-      disableGlobalHandler: true,
-      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-      attributes: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
 
-    process.on('uncaughtException', handleUnhandledException);
+    Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+      release: process.env.SLOBS_VERSION 
+    }).install(function (err, initialErr, eventId) {
+      handleFinishedReport();
+    });
 
     crashReporter.start({
       productName: 'streamlabs-obs',
