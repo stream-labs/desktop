@@ -5,11 +5,13 @@ import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import moment from 'moment';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
+import { EmptySection } from 'streamlabs-beaker';
 
 @Component({
   components: {
     ChatbotPagination,
     ChatbotGenericModalWindow,
+    EmptySection,
   },
 })
 export default class ChatbotQuotes extends ChatbotBase {

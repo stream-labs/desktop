@@ -5,9 +5,10 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITextMetadata } from '../../../shared/inputs';
 
 import { NEW_LINK_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
+import { EmptySection } from 'streamlabs-beaker';
 
 @Component({
-  components: { ValidatedForm },
+  components: { ValidatedForm, EmptySection },
 })
 export default class ChatbotLinkProtectionList extends ChatbotBase {
   $refs: {

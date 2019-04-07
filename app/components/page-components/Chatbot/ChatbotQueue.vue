@@ -66,13 +66,6 @@
   .cursor--pointer;
 }
 
-.chatbot-empty-placeholder__container {
-  .flex();
-  .flex--column();
-  .flex--center();
-  .padding-vertical--20;
-}
-
 tbody tr {
 
   td:nth-child(2) {

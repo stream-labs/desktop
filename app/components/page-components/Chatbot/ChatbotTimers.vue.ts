@@ -4,11 +4,13 @@ import { IChatbotTimer, DELETE_COMMAND_MODAL } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
+import { EmptySection } from 'streamlabs-beaker';
 
 @Component({
   components: {
     ChatbotPagination,
     ChatbotGenericModalWindow,
+    EmptySection,
   },
 })
 export default class ChatbotTimers extends ChatbotBase {
