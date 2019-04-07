@@ -252,7 +252,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       title: $t('Cloudbot Profile'),
       size: {
         width: 650,
-        height: 500,
+        height: 650,
       },
     });
   }
@@ -267,7 +267,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       title: $t('Cloudbot Profile'),
       size: {
         width: 650,
-        height: 500,
+        height: 650,
       },
     });
   }
