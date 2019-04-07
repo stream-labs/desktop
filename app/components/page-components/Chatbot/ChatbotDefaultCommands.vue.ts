@@ -2,7 +2,6 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
-import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
 
@@ -22,7 +21,6 @@ type TCommandSlug =
 
 @Component({
   components: {
-    CollapsibleSection,
   },
 })
 export default class ChatbotDefaultCommands extends ChatbotBase {
