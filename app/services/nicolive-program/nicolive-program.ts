@@ -21,6 +21,7 @@ interface INicoliveProgramState {
   giftPoint: number;
   /** TODO: 永続化 */
   autoExtensionEnabled: boolean;
+  panelOpened: boolean;
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
@@ -42,6 +43,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     adPoint: 0,
     giftPoint: 0,
     autoExtensionEnabled: false,
+    panelOpened: true,
   };
 
   private setState(partialState: Partial<INicoliveProgramState>) {
@@ -333,5 +335,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       clearTimeout(this.autoExtensionTimer);
       console.log('自動延長タイマーが解除されました');
     }
+  }
+
+  updatePanelOpened(panelOpened: boolean): void {
+    this.setState({ panelOpened });
   }
 }

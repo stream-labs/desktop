@@ -26,11 +26,12 @@ export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  // 永続化？
-  opened: boolean = true;
+  get opened(): boolean {
+    return this.nicoliveProgramService.state.panelOpened;
+  }
 
   onToggle(): void {
-    this.opened = !this.opened;
+    this.nicoliveProgramService.updatePanelOpened(!this.opened);
   }
 
   isCreating: boolean = false;
