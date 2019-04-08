@@ -3,6 +3,8 @@ import { Component } from 'vue-property-decorator';
 import { Accordion, Badge } from 'streamlabs-beaker';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
+import { ICommandVariable } from 'services/chatbot';
+
 @Component({
   components: { Accordion, Badge },
 })
@@ -11,7 +13,7 @@ export default class ChatbotCommandVariables extends ChatbotBase {
 
   get filteredVariables() {
     const grouped = {};
-    const arr = this.chatbotApiService.Commands.state.commandVariablesResponse as any[];
+    const arr = this.chatbotApiService.Commands.state.commandVariablesResponse;
 
     for (const variable of arr) {
       for (const tag of variable.tags) {
@@ -26,21 +28,19 @@ export default class ChatbotCommandVariables extends ChatbotBase {
 
     const filteredVariables = mapValues(grouped, (section, slug) => {
       return pickBy(
-        mapValues(section, (variable: any) => {
-          const found =
-            slug.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-            variable.variable.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-            variable.example.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-            variable.result.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1;
+        mapValues(section, (variable: ICommandVariable) => {
+          const found = [slug, variable.variable, variable.example, variable.result]
+            .map(str => str.toLowerCase())
+            .find(str => str.includes(this.searchQuery.toLowerCase()));
           return found ? variable : undefined;
         }),
-        (x, y) => {
-          return x !== undefined;
+        (variable: ICommandVariable) => {
+          return variable !== undefined;
         },
       );
     });
 
-    const remaining = pickBy(filteredVariables, (section, slug) => {
+    const remaining = pickBy(filteredVariables, section => {
       return Object.keys(section).length !== 0;
     });
 
