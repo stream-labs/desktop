@@ -6,7 +6,7 @@ import { padStart } from 'lodash';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs/Subject';
-import electron from 'electron';
+import * as electron from 'electron';
 import {
   IStreamingServiceApi,
   IStreamingServiceState,
