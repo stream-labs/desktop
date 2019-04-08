@@ -1,13 +1,13 @@
-import { Service } from './../service';
+import { Service } from 'services/service';
 import { IPlatformService, IStreamingSetting } from '.';
-import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
+import { HostsService } from 'services/hosts';
+import { SettingsService } from 'services/settings';
+import { Inject } from 'util/injector';
 import { sleep } from 'util/sleep';
-import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
-import { UserService } from '../user';
+import { handleErrors, requiresToken, authorizedHeaders } from 'util/requests';
+import { UserService } from 'services/user';
 import { Builder, parseString } from 'xml2js';
-import { StreamingService, EStreamingState } from '../streaming';
+import { StreamingService, EStreamingState } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 
 export type INiconicoProgramSelection = {

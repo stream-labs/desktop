@@ -21,7 +21,7 @@
         {{ $t("informations.errorDescription") }}
       </p>
       <i18n class="error-attention" path="informations.errorAttention" tag="p">
-        <a place="link" href="http://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">
+        <a place="link" href="https://blog.nicovideo.jp/niconews/category/se_n-air/" @click="handleAnchorClick($event)">
           {{ $t("informations.errorAttentionLink") }}
         </a>
       </i18n>

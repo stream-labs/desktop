@@ -30,7 +30,7 @@
         <i class="icon-help" /><span>{{ $t('common.help') }}</span>
       </a>
     </div>
-    <div class="top-nav-item information-button" v-if="isDevMode">
+    <div class="top-nav-item information-button">
       <a
         @click="openInformations"
         class="link">
