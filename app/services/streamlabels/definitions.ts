@@ -605,6 +605,96 @@ const youtubeDefinitions: IStreamlabelSet = {
  * Used by Twitch
  */
 const twitchDefinitions: IStreamlabelSet = {
+  sub_gifter: {
+    label: 'Top Sub Gifter',
+    files: [
+      {
+        name: 'all_time_top_sub_gifter',
+        label: 'All-Time Top Sub Gifter',
+        settings: {
+          format: { tokens: ['{name}', '{count}'] },
+        },
+      },
+      {
+        name: 'session_top_sub_gifter',
+        label: 'Session Top Sub Gifter',
+        settings: {
+          format: { tokens: ['{name}', '{count}'] },
+        },
+      },
+      {
+        name: 'monthly_top_sub_gifter',
+        label: 'Monthly Top Sub Gifter',
+        settings: {
+          format: { tokens: ['{name}', '{count}'] },
+        },
+      },
+      {
+        name: '30day_top_sub_gifter',
+        label: '30-Day Top Sub Gifter',
+        settings: {
+          format: { tokens: ['{name}', '{count}'] },
+        },
+      },
+      {
+        name: 'weekly_top_sub_gifter',
+        label: 'Weekly Top Sub Gifter',
+        settings: {
+          format: { tokens: ['{name}', '{count}'] },
+        },
+      },
+    ],
+  },
+  top_sub_gifters: {
+    label: 'Top Sub Gifters (Top 10)',
+    files: [
+      {
+        name: 'all_time_top_sub_gifters',
+        label: 'All-Time Top Sub Gifters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{count}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'session_top_sub_gifters',
+        label: 'Session Top Sub Gifters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{count}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'monthly_top_sub_gifters',
+        label: 'Monthly Top Sub Gifters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{count}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: '30day_top_sub_gifters',
+        label: '30-Day Top Sub Gifters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{count}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+      {
+        name: 'weekly_top_sub_gifters',
+        label: 'Weekly Top Sub Gifters',
+        settings: {
+          format: { tokens: ['{list}'] },
+          item_format: { tokens: ['{name}', '{count}'] },
+          item_separator: { tokens: ['\\n'] },
+        },
+      },
+    ],
+  },
   donation_train: {
     label: 'Donation Train',
     files: [
