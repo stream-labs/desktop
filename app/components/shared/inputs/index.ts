@@ -141,12 +141,16 @@ const validationMessages = {
     messages: {
       required: () => $t('The field is required'),
       min_value: (fieldName: string, params: number[]) =>
-        `The field value must be ${params[0]} or larger`,
+        $t(`The field value must be ${params[0]} or larger`),
       max_value: (fieldName: string, params: number[]) =>
-        `The field value must be ${params[0]} or less`,
+        $t(`The field value must be ${params[0]} or less`),
       date_format: (fieldName: string, params: number[]) =>
-        `The date must be in ${params[0]} format`,
+        $t(`The date must be in ${params[0]} format`),
       alpha_num: () => $t('This field may only contain alphabetic characters or numbers'),
+      min: (fieldName: string, params: number[]) =>
+        $t(`This field must be at least ${params[0]} characters.`),
+      max: (fieldName: string, params: number[]) =>
+        $t(`This field may not be greater than ${params[0]} characters.`),
     },
   },
 };
