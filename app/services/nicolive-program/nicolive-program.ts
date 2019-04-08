@@ -3,6 +3,7 @@ import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient
 import { ProgramSchedules } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -41,6 +42,9 @@ const WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
   @Inject()
   windowsService: WindowsService;
+  @Inject()
+  userService: UserService;
+
   client: NicoliveClient = new NicoliveClient();
 
   static initialState: INicoliveProgramState = {
@@ -61,6 +65,16 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     autoExtensionEnabled: false,
     panelOpened: true,
   };
+
+  init() {
+    super.init();
+
+    this.userService.userLoginState.subscribe(user => {
+      const isLoggedIn = Boolean(user);
+      const panelState = NicoliveProgramService.getPanelState(this.state.panelOpened, isLoggedIn);
+      this.updateWindowSize(panelState);
+    });
+  }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
     const nextState = { ...this.state, ...partialState };
@@ -373,7 +387,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   /*
    * TODO: 最小幅が変動するときにその差分だけ実際の幅を操作する（初期状態を考慮するとパネル開閉状態の永続化が必要）
-   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅管理する存在を置くこと、おそらくmain側が適している
+   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
    * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
    */
   updateWindowSize(state: PanelState): void {
