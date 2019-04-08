@@ -78,13 +78,13 @@ export default class EditTransform extends TsxComponent<{}> {
     return this.transform ? (
       <HFormGroup metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map(dir => (
-          <div style="display: flex; justify-content: space-between; margin: 0 70px 8px 0; align-items: baseline;">
-            <span>{dirMap(dir)}</span>
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <NumberInput
               value={this.transform.crop[dir]}
               metadata={{ isInteger: true, min: 0 }}
               onInput={this.setTransform('crop', dir)}
             />
+            <span style="margin-left: 8px;">{dirMap(dir)}</span>
           </div>
         ))}
       </HFormGroup>
@@ -99,11 +99,13 @@ export default class EditTransform extends TsxComponent<{}> {
       <HFormGroup metadata={{ title }}>
         <div style="display: flex;">
           {dataArray.map(dir => (
-            <NumberInput
-              value={Math.round(this.rect[dir])}
-              metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
-              onInput={inputHandler(dir)}
-            />
+            <div style="margin-right: 8px;">
+              <NumberInput
+                value={Math.round(this.rect[dir])}
+                metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
+                onInput={inputHandler(dir)}
+              />
+            </div>
           ))}
         </div>
       </HFormGroup>
@@ -117,11 +119,11 @@ export default class EditTransform extends TsxComponent<{}> {
           {this.coordinateForm(h, 'pos')}
           {this.coordinateForm(h, 'scale')}
           <HFormGroup metadata={{ title: $t('Rotation') }}>
-            <button class="button button--default" onClick={this.rotate(90)}>
+            <button class="button button--default" style="width: 172px;" onClick={this.rotate(90)}>
               {$t('Rotate 90 Degrees CW')}
             </button>
             <div style="margin: 8px;" />
-            <button class="button button--default" onClick={this.rotate(-90)}>
+            <button class="button button--default" style="width: 172px;" onClick={this.rotate(-90)}>
               {$t('Rotate 90 Degrees CCW')}
             </button>
           </HFormGroup>
