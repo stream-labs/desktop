@@ -11,6 +11,7 @@ import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
+import { AppService } from 'services/app';
 
 @Component({
   components: { BoolInput },
@@ -23,6 +24,7 @@ export default class ExtraSettings extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
+  @Inject() appService: AppService;
 
   cacheUploading = false;
 
@@ -43,7 +45,7 @@ export default class ExtraSettings extends Vue {
   }
 
   showCacheDir() {
-    electron.remote.shell.openItem(electron.remote.app.getPath('userData'));
+    electron.remote.shell.openItem(this.appService.appDataDirectory);
   }
 
   deleteCacheDir() {

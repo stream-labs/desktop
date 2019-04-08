@@ -21,6 +21,7 @@ import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { $t } from 'services/i18n';
 import { throttle } from 'lodash-decorators';
 import * as Interfaces from './definitions';
+import { AppService } from 'services/app';
 
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
@@ -30,6 +31,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() streamingService: StreamingService;
   @Inject() private windowsService: WindowsService;
+  @Inject() appService: AppService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
@@ -737,7 +739,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   private get facemasksDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'plugin_config/facemask-plugin');
+    return path.join(this.appService.appDataDirectory, 'plugin_config/facemask-plugin');
   }
 
   private libraryUrl(uuid: string) {

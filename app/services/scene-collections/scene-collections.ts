@@ -664,7 +664,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   private get legacyDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
+    return path.join(this.appService.appDataDirectory, 'SceneConfigs');
   }
 
   /**
