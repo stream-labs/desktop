@@ -2,6 +2,6 @@
   "title": "Notification",
   "errorHeading": "Failed to fetch niconico information",
   "errorDescription": "This problem can be related to a poor network connection.\nCheck the health of your Internet connection.",
-  "errorAttention": "Note: Click {link} if you would view the information in Web browser.",
+  "errorAttention": "Note: Click {link} to view the information in Web browser.",
   "errorAttentionLink": "here"
 }
