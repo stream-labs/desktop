@@ -1,5 +1,5 @@
 import { ScenesService, Scene } from './index';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { Inject } from 'util/injector';

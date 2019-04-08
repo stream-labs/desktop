@@ -1,6 +1,6 @@
 import { Node } from '../node';
 import { SceneItem } from '../../../scenes';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import path from 'path';
 import fs from 'fs';
 

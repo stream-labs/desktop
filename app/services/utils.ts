@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import electron from 'electron';
 
 export const enum EBit {

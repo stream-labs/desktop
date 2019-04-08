@@ -1,4 +1,4 @@
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import electron from 'electron';
 import { mutation, ServiceHelper, StatefulService } from 'services/stateful-service';
 import {

@@ -4,7 +4,7 @@ import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 import { Multiselect } from 'vue-multiselect';
 import { ObsImporterService } from '../../../services/obs-importer';
-import { defer } from 'lodash';
+import defer from 'lodash/defer';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 

@@ -5,7 +5,7 @@ import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
 import { Inject } from 'util/injector';
 import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
-import { defer } from 'lodash';
+import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 
