@@ -73,7 +73,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   onResetHandler() {
-    if (confirm($t('Are you sure you want to reset chatbot notifications preferences?'))) {
+    if (confirm($t('Are you sure you want to reset cloudbot notifications preferences?'))) {
       this.chatbotApiService.Alerts.resetSettings();
     }
   }

@@ -4,6 +4,7 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
+import { remote } from 'electron';
 
 import {
   IChatbotAuthResponse,
@@ -90,6 +91,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBas
       options.headers.append('Content-Type', 'application/json');
       options.body = JSON.stringify(data || {});
     }
+    options.headers.append('User-Agent', `Streamlabs OBS/${remote.process.env.SLOBS_VERSION}`);
     const request = new Request(url, options);
 
     return fetch(request)

@@ -67,7 +67,7 @@
 }
 
 .chatbot-profile__timer {
-  background-color: var(--button);
+  background-color: var(--section);
   height: 40px;
 
   .chatbot-profile__timer__container {
@@ -91,7 +91,7 @@
   margin: 10px;
   width: 300px;
   .radius(2);
-  background-color: var(--section);
+  background-color: var(--section-alt);
 
   .chatbot-profile__header {
     .flex();
