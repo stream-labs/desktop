@@ -63,7 +63,7 @@ export class AppService extends StatefulService<IAppState> {
     argv: electron.remote.process.argv,
   };
 
-  private autosaveInterval: number;
+  readonly appDataDirectory = electron.remote.app.getPath('userData');
 
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;

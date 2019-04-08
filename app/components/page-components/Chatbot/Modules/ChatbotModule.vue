@@ -46,7 +46,7 @@
   margin: 10px;
   width: 300px;
   .radius(2);
-  background-color: var(--section);
+  background-color: var(--section-alt);
 
   &.chatbot-module__container--coming-soon {
     .chatbot-module__image {

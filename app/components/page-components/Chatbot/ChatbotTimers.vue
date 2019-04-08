@@ -1,107 +1,97 @@
 <template>
-<div>
-  <!-- batch actions -->
-  <div class="flex flex--space-between padding--10">
-    <button
-      @click="onOpenTimerWindowHandler"
-      class="button button--action margin--10"
-    >
-      {{ $t('Add Timer') }}
-    </button>
-    <input
-      v-model="searchQuery"
-      type="text"
-      class="chatbot__input--search width--auto margin--10"
-      placeholder="Search"
-    />
-  </div>
-  <div v-if="!timers || timers.length === 0" class="chatbot-empty-placeholder__container">
-    <img
-      :src="require(`../../../../media/images/chatbot/chatbot-placeholder-timer--${this.nightMode ? 'night' : 'day'}.svg`)"
-      width="200"
-    />
-    <span>{{ $t('Click add timer to get started.') }}</span>
-  </div>
-  <div v-else class="padding--10 margin-horizontal--10">
-    <table>
-      <thead>
-        <tr>
-          <th> {{ $t("Timer") }} </th>
-          <th> {{ $t("Response") }} </th>
-          <th>
-            <div class="flex">
-              {{ $t("Interval ") }}
-               <i class="icon-question icon-btn" v-tooltip="$t('In Minutes')" />
-            </div>
-          </th>
-          <th> {{ $t("Line Minimum") }} </th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(timer, index) in timers"
-          :key="timer.name"
-        >
-          <td> {{ timer.name }} </td>
-          <td> {{ timer.message }} </td>
-          <td> {{ timer.interval }} </td>
-          <td> {{ timer.chat_lines }} </td>
-          <td>
-            <div class="align-items--inline">
-              <ToggleInput
-                :value="timer.enabled"
-                @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
-              />
-            </div>
-          </td>
-          <td>
-            <div class="align-items--inline">
-              <i
-                class="icon-trash padding--5 cursor--pointer"
-                @click="onDeleteTimerHandler(timer)"
-              />
-              <i
-                class="fas icon-edit chatbot-edit cursor--pointer"
-                @click="onOpenTimerWindowHandler(timer)"
-              />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <ChatbotPagination
-      v-if="totalPages > 1"
-      :totalPages="totalPages"
-      :currentPage="currentPage"
-      @change="fetchTimers"
-    />
-    <ChatbotGenericModalWindow
+  <div>
+    <!-- batch actions -->
+    <div class="flex flex--space-between padding--10">
+      <button
+        @click="onOpenTimerWindowHandler"
+        class="button button--action margin--10"
+      >{{ $t('Add Timer') }}</button>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="chatbot__input--search width--auto margin--10"
+        placeholder="Search"
+      >
+    </div>
+
+    <empty-section
+      v-if="!timers || timers.length === 0"
+      :variation="'text'"
+      :title="$t('You don\'t have any Timers')"
+      :subtitle="$t('Click Add Timer to get started')"
+    ></empty-section>
+    <div v-else class="padding--10 margin-horizontal--10">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ $t("Timer") }}</th>
+            <th>{{ $t("Response") }}</th>
+            <th>
+              <div class="flex">
+                {{ $t("Interval ") }}
+                <i
+                  class="icon-question icon-btn"
+                  v-tooltip="$t('In Minutes')"
+                />
+              </div>
+            </th>
+            <th>{{ $t("Line Minimum") }}</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(timer, index) in timers" :key="timer.name">
+            <td>{{ timer.name }}</td>
+            <td>{{ timer.message }}</td>
+            <td>{{ timer.interval }}</td>
+            <td>{{ timer.chat_lines }}</td>
+            <td>
+              <div class="align-items--inline">
+                <ToggleInput
+                  :value="timer.enabled"
+                  @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
+                />
+              </div>
+            </td>
+            <td>
+              <div class="align-items--inline">
+                <i
+                  class="icon-trash padding--5 cursor--pointer"
+                  @click="onDeleteTimerHandler(timer)"
+                />
+                <i
+                  class="fas icon-edit chatbot-edit cursor--pointer"
+                  @click="onOpenTimerWindowHandler(timer)"
+                />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ChatbotPagination
+        v-if="totalPages > 1"
+        :totalPages="totalPages"
+        :currentPage="currentPage"
+        @change="fetchTimers"
+      />
+      <ChatbotGenericModalWindow
         :name="DELETE_COMMAND_MODAL"
         @yes="onYesHandler"
         @no="onNoHandler"
         :header="$t('Are you sure you want to delete %{name} ?',{name: selectedTimer ? selectedTimer.name : ''})"
         :message="$t('Once deleted it can not be recovered.')"
       />
+    </div>
   </div>
-</div>
 </template>
 
 <script lang='ts' src="./ChatbotTimers.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
-
-.chatbot-empty-placeholder__container {
-  .flex();
-  .flex--column();
-  .flex--center();
-  .padding-vertical--20;
-}
-
-table{
-  table-layout:fixed;
+@import '../../../styles/index';
+table {
+  table-layout: fixed;
   width: 100%;
 
   tr {
@@ -132,7 +122,6 @@ table{
       width: 50px;
     }
 
-
     th:last-child:not(.text-align--center),
     td:last-child:not(.text-align--center) {
       width: 100px;
@@ -162,5 +151,4 @@ table{
     font-size: 15px;
   }
 }
-
 </style>

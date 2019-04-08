@@ -5,11 +5,13 @@ import moment from 'moment';
 import { Debounce } from 'lodash-decorators';
 import { DELETE_MODAL, DELETE_ALL_MODAL, IQueuedUser } from 'services/chatbot';
 import ChatbotGenericModalWindow from '../windows/ChatbotGenericModalWindow.vue';
+import { EmptySection } from 'streamlabs-beaker';
 
 @Component({
   components: {
     ChatbotPagination,
     ChatbotGenericModalWindow,
+    EmptySection,
   },
 })
 export default class ChatbotQueueList extends ChatbotBase {
@@ -44,6 +46,10 @@ export default class ChatbotQueueList extends ChatbotBase {
 
   get currentAfter() {
     return this.dataList.cursor.after;
+  }
+
+  get status() {
+    return this.chatbotApiService.Queue.state.queueStateResponse.status;
   }
 
   mounted() {

@@ -147,6 +147,10 @@ const validationMessages = {
       date_format: (fieldName: string, params: number[]) =>
         $t('The date must be in %{format} format', { format: params[0] }),
       alpha_num: () => $t('This field may only contain alphabetic characters or numbers'),
+      min: (fieldName: string, params: number[]) =>
+        $t('This field must be at least %{value} characters.', { value: params[0] }),
+      max: (fieldName: string, params: number[]) =>
+        $t('This field may not be greater than %{value} characters.', { value: params[0] }),
     },
   },
 };
