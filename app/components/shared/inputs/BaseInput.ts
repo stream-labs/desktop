@@ -25,7 +25,7 @@ export abstract class BaseInput<
   /**
    * uuid serves to link input field and validator message
    */
-  readonly uuid = this.options.uuid || uuid();
+  private readonly uuid = uuid();
 
   /**
    * contains ValidatedForm if exist
@@ -88,6 +88,7 @@ export abstract class BaseInput<
     const metadata = this.metadata || ({} as TMetadataType);
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
+    options.uuid = metadata.uuid || this.uuid;
     return options;
   }
 
