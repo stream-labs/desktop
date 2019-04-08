@@ -9,9 +9,7 @@ import { InitAfter } from '../../util/service-observer';
 import { downloadFile } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { ScenesService } from 'services/scenes';
 import { IpcServerService } from 'services/api/ipc-server';
-import { AudioService } from 'services/audio';
 import { PrefabsService } from 'services/prefabs';
 import { UserService } from 'services/user';
 
@@ -52,8 +50,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
-  @Inject() private scenesService: ScenesService;
-  @Inject() private audioService: AudioService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private prefabsService: PrefabsService;
   @Inject() private userService: UserService;
@@ -102,7 +98,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     try {
       const deviceUrls = await this.fetchDeviceUrls();
       const deviceName = deviceUrls.name;
-      const cacheDir = electron.remote.app.getPath('userData');
+      const cacheDir = this.appService.appDataDirectory;
       const tempDir = electron.remote.app.getPath('temp');
       let newSceneCollectionCreated = false;
 
