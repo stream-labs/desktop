@@ -96,10 +96,6 @@ export default class Main extends Vue {
     return this.appService.state.loading;
   }
 
-  get hideStyleBlockingElements() {
-    return this.customizationService.state.hideStyleBlockingElements;
-  }
-
   get showLoadingSpinner() {
     return (
       this.appService.state.loading && this.page !== 'Onboarding' && this.page !== 'BrowseOverlays'
