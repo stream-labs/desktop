@@ -65,7 +65,7 @@ export default class NewsBanner extends Vue {
           </div>
           <div class={styles.titleContainer}>
             <h3 class={styles.title}>{this.headerText}</h3>
-            <p class={styles.subheading}>{this.currentBanner.subHeader}</p>
+            <span class={styles.subheading}>{this.currentBanner.subHeader}</span>
           </div>
           <div class={styles.ctaContainer}>
             <button class={cx('button', styles.learnMore)} disabled={!this.bannerExists}>

@@ -10,12 +10,14 @@ export abstract class BaseInput<
   TMetadataType extends IInputMetadata
 > extends TsxComponent<{
   metadata: TMetadataType;
-  value: TValueType;
-  title: string;
+  value?: TValueType;
+  title?: string;
+  onInput?: Function;
 }> {
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;
+  onInput: Function = null;
 
   /**
    * true if the component listens and re-emits child-inputs events
@@ -56,6 +58,8 @@ export abstract class BaseInput<
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
+
+    if (this.onInput) this.onInput(eventData);
 
     const needToSendEventToForm =
       (this.form && !this.parentInput) ||

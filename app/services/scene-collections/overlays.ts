@@ -22,6 +22,7 @@ import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
 import { SceneSourceNode } from './nodes/overlays/scene';
+import { AppService } from 'services/app';
 
 const NODE_TYPES = {
   RootNode,
@@ -46,6 +47,7 @@ export interface IDownloadProgress {
 export class OverlaysPersistenceService extends Service {
   @Inject() private scenesService: ScenesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private appService: AppService;
 
   /**
    * Downloads the requested overlay into a temporary directory
@@ -134,6 +136,6 @@ export class OverlaysPersistenceService extends Service {
   }
 
   get overlaysDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Overlays');
+    return path.join(this.appService.appDataDirectory, 'Overlays');
   }
 }

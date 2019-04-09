@@ -26,6 +26,7 @@ import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
+import EditTransform from 'components/windows/EditTransform';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -104,6 +105,7 @@ export function getComponents() {
     MediaGallery,
     PlatformAppPopOut,
     FacemaskSettings,
+    EditTransform,
 
     BitGoal,
     DonationGoal,

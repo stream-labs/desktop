@@ -13,13 +13,12 @@
     </div>
     <br>
     <br>
-    <div v-if="dataList.data.length === 0" class="chatbot-empty-placeholder__container">
-      <img
-        :src="require(`../../../../../media/images/sleeping-kevin-${this.nightMode ? 'night' : 'day'}.png`)"
-        width="200"
-      >
-      <span>{{ $t('No users in this list') }}</span>
-    </div>
+    <empty-section
+      v-if="dataList.data.length === 0"
+      :variation="'text'"
+      :title="$t(isPicked ? 'You don\'t have any queued users yet' : 'You don\'t have any pending users yet')"
+      :subtitle="status != 'Open' ? $t('Open the queue to get started') : ''"
+    ></empty-section>
     <div v-else>
       <table class="queue__table-header">
         <thead>
@@ -47,7 +46,10 @@
                 v-bind:style="{display: isPicked ? 'none' : ''}"
               >{{ formatDate(queueUser.created_at) }}</td>
               <td class="text-align--right">
-                <i class="icon-trash padding--5 cursor--pointer" @click="onRemoveEntryHandler(queueUser)"/>
+                <i
+                  class="icon-trash padding--5 cursor--pointer"
+                  @click="onRemoveEntryHandler(queueUser)"
+                />
                 <i
                   v-if="!isPicked"
                   class="fas fa-arrow-right chatbot-arrow cursor--pointer"
@@ -81,13 +83,6 @@
 
 <style lang="less" scoped>
 @import '../../../../styles/index';
-.chatbot-empty-placeholder__container {
-  .flex();
-  .flex--column();
-  .flex--center();
-  .padding-vertical--20;
-}
-
 table {
   table-layout: fixed;
   width: 100%;

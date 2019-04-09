@@ -41,13 +41,13 @@
           >
         </div>
       </div>
-      <div class="chatbot-list-placeholder__container" v-if="loyalty.length < 1">
-        <img
-          :src="require(`../../../../media/images/sleeping-kevin-${this.nightMode ? 'night' : 'day'}.png`)"
-          width="200"
-        >
-        <span>{{ $t('No users in this list') }}</span>
-      </div>
+
+      <empty-section
+        v-if="loyalty.length < 1"
+        :variation="'text'"
+        :title="$t('No users in this list')"
+        :subtitle="$t('Go to Settings to customize your loyalty system')"
+      ></empty-section>
       <div class="padding--10 margin-horizontal--10" key="loyalty-table" v-else>
         <table>
           <thead>
@@ -65,8 +65,14 @@
               <td>{{ (data.time / 60).toFixed(2) }}</td>
               <td>
                 <div class="align-items--inline">
-                  <i @click="onOpenLoyaltyDeleteHandler(data)" class="icon-trash padding--5 cursor--pointer"/>
-                  <i @click="onOpenLoyaltyWindowHandler(data)" class="icon-edit padding--5 cursor--pointer"/>
+                  <i
+                    @click="onOpenLoyaltyDeleteHandler(data)"
+                    class="icon-trash padding--5 cursor--pointer"
+                  />
+                  <i
+                    @click="onOpenLoyaltyWindowHandler(data)"
+                    class="icon-edit padding--5 cursor--pointer"
+                  />
                 </div>
               </td>
             </tr>
