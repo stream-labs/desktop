@@ -130,6 +130,11 @@ export default class LiveDock extends Vue {
     return this.streamInfoService.state.viewerCount.toString();
   }
 
+  get offlineImageSrc() {
+    const mode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    return require(`../../media/images/sleeping-kevin-${mode}.png`);
+  }
+
   showEditStreamInfo() {
     this.streamingService.showEditStreamInfo();
   }
