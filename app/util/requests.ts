@@ -15,8 +15,7 @@ export const handleResponse = (response: Response): Promise<any> => {
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
   const result = isJson ? response.json() : response.text();
-
-  return response.ok ? result : result.then(r => Promise.reject(r));
+  return response.ok ? result : Promise.reject(response);
 };
 
 export const handleErrors = (response: Response): Promise<any> => {
