@@ -220,6 +220,17 @@ export interface ISongRequestResponse {
   settings: ISongRequestData;
 }
 
+export interface IManagedUser {
+  id: string;
+  platform: string;
+  user: string;
+}
+
+export interface IUserManagementResponse {
+  data: IManagedUser[];
+  pagination: IChatbotPagination;
+}
+
 // shared
 export interface IChatbotPermission {
   level: number;
