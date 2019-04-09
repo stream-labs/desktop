@@ -13,7 +13,7 @@
       :key="sourceId"
       :title="sourcesService.getSource(sourceId).name"
       :hotkeys="sourceHotkeys"/>
-    </div>
+  </div>
 </div>
 </template>
 
