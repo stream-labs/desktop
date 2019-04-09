@@ -55,8 +55,20 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
+  /**
+   * The top nav slot is mounted in the main app nav
+   */
   TopNav = 'top_nav',
+
+  /**
+   * The chat slot is mounted in the live dock
+   */
   Chat = 'chat',
+
+  /**
+   * The background slot is never mounted anywhere
+   */
+  Background = 'background',
 }
 
 interface IAppPage {

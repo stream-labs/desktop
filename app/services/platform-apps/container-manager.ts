@@ -43,7 +43,8 @@ export class PlatformContainerManager {
     this.unregisterApp(app);
 
     app.manifest.pages.forEach(page => {
-      if (page.persistent) {
+      // Background pages are always persistent
+      if (page.persistent || page.slot === EAppPageSlot.Background) {
         this.createContainer(app, page.slot, true);
       }
     });
