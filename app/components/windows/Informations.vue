@@ -132,6 +132,7 @@
 .error-text {
   color: @grey;
   text-align: center;
+  white-space: pre-line;
 }
 
 .error-attention {
