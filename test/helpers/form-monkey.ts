@@ -1,7 +1,6 @@
 import { IInputMetadata } from '../../app/components/shared/inputs';
 import { sleep } from './sleep';
-import cloneDeep from 'lodash/cloneDeep';
-import isMatch from 'lodash/isMatch';
+import { cloneDeep, isMatch } from 'lodash';
 import { TExecutionContext } from './spectron';
 
 interface IFormMonkeyFillOptions {
