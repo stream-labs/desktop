@@ -9,8 +9,9 @@ import {
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleResponse, authorizedHeaders, requiresToken } from '../../util/requests';
+import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
+import { handlePlatformResponse, requiresToken } from './utils';
 
 interface IFacebookPage {
   access_token: string;
@@ -122,7 +123,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   fetchPages() {
     const request = this.formRequest(`${this.apiBase}/me/accounts`);
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(async json => {
         let pageId = this.userService.platform.channelId;
         if (!pageId) {
@@ -174,7 +175,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       this.activeToken,
     );
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
@@ -193,7 +194,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       'fields=status,stream_url,title,description';
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         const info =
           json.data.find((vid: any) => vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0];
@@ -222,14 +223,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       status: 'SCHEDULED_UNPUBLISHED',
     });
     const req = new Request(url, { headers, body, method: 'POST' });
-    return fetch(req).then(handleResponse);
+    return fetch(req).then(handlePlatformResponse);
   }
 
   fetchViewerCount(): Promise<number> {
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => json.live_views);
   }
 
@@ -257,7 +258,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         body: JSON.stringify(data),
       });
       return fetch(request)
-        .then(handleResponse)
+        .then(handlePlatformResponse)
         .then(() => true);
     }
     return Promise.resolve(true);
@@ -270,7 +271,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     const headers = this.getHeaders();
     const request = new Request(url, { headers, method: 'GET' });
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then((json: any) => json.data);
   }
 
