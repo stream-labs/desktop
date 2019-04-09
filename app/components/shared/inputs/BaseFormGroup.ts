@@ -22,7 +22,7 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
 
     // collect errors
     this.form.validated.subscribe(errors => {
-      this.inputErrors = errors.filter(error => error.field === this.uuid);
+      this.inputErrors = errors.filter(error => error.field === this.options.uuid);
     });
   }
 
@@ -41,9 +41,8 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
 
   getOptions() {
     const options = super.getOptions();
-    options.uuid = this.uuid;
+    // add `type` to options
     options.type = this.type || options.type;
-    options.title = this.title || options.title;
     return options;
   }
 }
