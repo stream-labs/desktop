@@ -151,7 +151,6 @@
     "electron": "https://github.com/stream-labs/electron/releases/download/2.0.16-streamlabs/electron-2.0.16-streamlabs.tgz",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "2.2.4",
-    "emojione": "3.1.7",
     "file-loader": "1.1.11",
     "fuse.js": "3.2.1",
     "humps": "2.0.1",

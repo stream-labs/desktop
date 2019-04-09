@@ -13,7 +13,7 @@ import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 @ServiceHelper()
 export class Source implements ISourceApi {

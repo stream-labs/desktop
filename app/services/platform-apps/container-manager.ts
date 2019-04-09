@@ -1,6 +1,7 @@
 import { ILoadedApp, EAppPageSlot } from '.';
 import electron from 'electron';
-import { trim, compact } from 'lodash';
+import trim from 'lodash/trim';
+import compact from 'lodash/compact';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import url from 'url';

@@ -1,4 +1,6 @@
-import { get, set, invert } from 'lodash';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import invert from 'lodash/invert';
 import { Rect } from './rect';
 import { v2, Vec2 } from './vec2';
 

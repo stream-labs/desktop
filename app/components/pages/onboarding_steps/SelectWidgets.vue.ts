@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { without, defer } from 'lodash';
+import without from 'lodash/without';
+import defer from 'lodash/defer';
 import { Component } from 'vue-property-decorator';
 import { WidgetsService, WidgetType } from '../../../services/widgets';
 import { Inject } from '../../../util/injector';

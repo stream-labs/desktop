@@ -4,16 +4,17 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const plugins = [];
 
-
 // uncomment to watch circular dependencies
-
 // plugins.push(new CircularDependencyPlugin({
-//   // exclude detection of files based on a RegExp
-//   exclude: /a\.js|node_modules/,
-//   // add errors to webpack instead of warnings
-//   //failOnError: true
-// }));
+  //   // exclude detection of files based on a RegExp
+  //   exclude: /a\.js|node_modules/,
+  //   // add errors to webpack instead of warnings
+  //   //failOnError: true
+  // }));
 
+// uncomment and install to analyze bundle size
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// plugins.push(new BundleAnalyzerPlugin());
 
 module.exports = {
   entry: {

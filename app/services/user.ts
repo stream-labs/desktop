@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import URI from 'urijs';
-import { defer } from 'lodash';
+import defer from 'lodash/defer';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Inject } from 'util/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
