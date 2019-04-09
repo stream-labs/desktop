@@ -44,7 +44,7 @@
       <live-dock class="live-dock" />
     </div>
   </div>
-  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
+  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }" v-if="hideStyleBlockingElements">
     <custom-loader></custom-loader>
   </div>
 </div>
