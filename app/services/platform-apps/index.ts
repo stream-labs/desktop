@@ -56,8 +56,20 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
+  /**
+   * The top nav slot is mounted in the main app nav
+   */
   TopNav = 'top_nav',
+
+  /**
+   * The chat slot is mounted in the live dock
+   */
   Chat = 'chat',
+
+  /**
+   * The background slot is never mounted anywhere
+   */
+  Background = 'background',
 }
 
 interface IAppPage {
@@ -247,7 +259,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    * Loads an unpacked app.
    * There can only be 1 unpacked app at a time.
    */
-  async loadUnpackedApp(appPath: string, appToken: string) {
+  async loadUnpackedApp(appPath: string, appToken: string): Promise<string> {
     const id = await this.getAppIdFromServer(appToken);
 
     if (id == null) {
@@ -360,13 +372,19 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     }
 
     // Validate pages
-    // Only 1 page per slot top is allowed
+    // Only 1 page per slot is allowed
     const seenSlots: Dictionary<boolean> = {};
 
     for (let i = 0; i < manifest.pages.length; i++) {
       const page = manifest.pages[i];
 
       this.validateObject(page, `manifest.pages[${i}]`, ['slot', 'file']);
+
+      if (!Object.values(EAppPageSlot).includes(page.slot)) {
+        throw new Error(
+          `Error: manifest.pages[${i}].slot "${page.slot}" is not a valid page slot.`,
+        );
+      }
 
       if (seenSlots[page.slot]) {
         throw new Error(
@@ -445,7 +463,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (app.unpacked) {
       const error = await this.loadUnpackedApp(app.appPath, app.appToken);
 
-      if (error) return error;
+      if (error) {
+        this.unloadApp(app);
+        return error;
+      }
     } else {
       this.containerManager.refreshContainers(app);
     }
