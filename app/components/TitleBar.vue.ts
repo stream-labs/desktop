@@ -32,9 +32,6 @@ export default class TitleBar extends Vue {
     if (Utils.isMainWindow() && this.streamingService.isStreaming) {
       if (!confirm($t('Are you sure you want to exit while live?'))) return;
     }
-    if (Utils.isMainWindow) {
-      this.customizationService.setSettings({ hideStyleBlockingElements: true });
-    }
 
     electron.remote.getCurrentWindow().close();
   }
