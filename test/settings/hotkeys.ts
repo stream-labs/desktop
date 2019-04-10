@@ -1,7 +1,11 @@
-import { focusChild, focusMain, restartApp, test, TExecutionContext, useSpectron } from '../helpers/spectron';
-import { ISceneCollectionsServiceApi } from '../../app/services/scene-collections';
-import { getClient } from '../helpers/api-client';
-import { sleep } from '../helpers/sleep';
+import {
+  focusChild,
+  focusMain,
+  restartApp,
+  test,
+  TExecutionContext,
+  useSpectron
+} from '../helpers/spectron';
 
 useSpectron();
 
@@ -62,12 +66,6 @@ test('Binds a hotkey', async t => {
   t.is(binding, 'Ctrl+B');
 });
 
-
-test('restart test', async t => {
-  await restartApp(t);
-  console.log('restarted');
-  t.pass();
-});
 
 const openHotkeySettings = async (t: TExecutionContext) => {
   const { app } = t.context;
