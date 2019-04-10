@@ -10,9 +10,10 @@ import {
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleResponse, requiresToken, authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
+import { handlePlatformResponse, requiresToken } from './utils';
 
 interface IMixerServiceState {
   typeIdMap: object;
@@ -104,7 +105,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
@@ -116,7 +117,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         this.userService.updatePlatformChannelId(json.id);
         return json;
@@ -148,7 +149,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(`${this.apiBase}channels/${this.mixerUsername}`, { headers });
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => json.viewersCurrent);
   }
 
@@ -168,7 +169,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(() => true);
   }
 
@@ -181,7 +182,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     );
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(response => {
         response.forEach((game: any) => {
           this.ADD_GAME_MAPPING(game.name, game.id);
