@@ -4,24 +4,14 @@ import { mkdtemp, readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from './helpers/spectron';
 import { setFormDropdown, setFormInput } from './helpers/spectron/forms';
 import { sleep } from './helpers/sleep';
+import { setTemporaryRecordingPath } from './helpers/spectron/output';
 
 useSpectron();
 
 test('Recording', async t => {
-  const tmpDir = await mkdtemp(path.join(tmpdir(), `slobs-recording-`));
+
   const { app } = t.context;
-
-  /*
-   * Set recording path to a temp dir
-   */
-  await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Output');
-
-  await setFormInput(t, 'Recording Path', tmpDir);
-  await app.client.click('button=Done');
+  const tmpDir = await setTemporaryRecordingPath(t);
 
   const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
 
