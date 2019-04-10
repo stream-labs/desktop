@@ -4,7 +4,7 @@ import {
   restartApp,
   test,
   TExecutionContext,
-  useSpectron
+  useSpectron,
 } from '../helpers/spectron';
 
 useSpectron();
@@ -31,11 +31,11 @@ test('Populates essential hotkeys for them to be bound', async t => {
     'Mute',
     'Unmute',
     'Push to Mute',
-    'Push to Talk'
+    'Push to Talk',
   ]) {
     await t.true(
       await app.client.isExisting(`.Hotkey-description=${hotkey}`),
-      `Hotkey for ${hotkey} was not found`
+      `Hotkey for ${hotkey} was not found`,
     );
   }
 });
@@ -65,7 +65,6 @@ test('Binds a hotkey', async t => {
   binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
   t.is(binding, 'Ctrl+B');
 });
-
 
 const openHotkeySettings = async (t: TExecutionContext) => {
   const { app } = t.context;
