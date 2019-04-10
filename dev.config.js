@@ -1,16 +1,19 @@
-const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const plugins = [];
 
-// uncomment to watch circular dependencies
+// only makes sense with transpileOnly mode which is currently broken
+// const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+// plugins.push(new ForkTsCheckerWebpackPlugin({ vue: true }))
+
+// uncomment and install to watch circular dependencies
+// const CircularDependencyPlugin = require('circular-dependency-plugin');
 // plugins.push(new CircularDependencyPlugin({
-  //   // exclude detection of files based on a RegExp
-  //   exclude: /a\.js|node_modules/,
-  //   // add errors to webpack instead of warnings
-  //   //failOnError: true
-  // }));
+//   // exclude detection of files based on a RegExp
+//   exclude: /a\.js|node_modules/,
+//   // add errors to webpack instead of warnings
+//   //failOnError: true
+// }));
 
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -19,21 +22,26 @@ const plugins = [];
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js',
-    'guest-api': './guest-api'
   },
   output: {
     path: __dirname + '/bundles',
-    filename: '[name].js'
+    filename: '[name].js',
   },
 
-  devtool: 'source-map',
+  context: __dirname,
+
+  mode: 'development',
+
+  devtool: 'cheap-module-source-map',
+
+  watchOptions: { ignored: /node_modules/ },
 
   target: 'electron-renderer',
 
   resolve: {
     extensions: ['.js', '.ts', '.json', '.tsx'],
-    modules: [path.resolve(__dirname, 'app'), 'node_modules']
+    modules: [path.resolve(__dirname, 'app'), 'node_modules'],
+    symlinks: false,
   },
 
   // We want to dynamically require native addons
@@ -58,29 +66,39 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+        include: path.resolve(__dirname, 'app/components'),
         options: {
           esModule: true,
           transformToRequire: {
             video: 'src',
             source: 'src'
           },
-          loaders: { tsx: ['babel-loader', { loader: 'ts-loader', options: { appendTsxSuffixTo: [/\.vue$/] } }]  }
         }
       },
       {
         test: /\.ts$/,
         loader: 'ts-loader',
-        exclude: /node_modules|vue\/src/
+        options: {
+          experimentalWatchApi: true,
+          // transpileOnly: true
+        },
+        exclude: /node_modules|vue\/src/,
       },
       {
         test: /\.tsx$/,
-        use: [{ loader: 'babel-loader' }, { loader: 'ts-loader', options: { appendTsxSuffixTo: [/\.vue$/] } }],
+        include: path.resolve(__dirname, 'app/components'),
+        use: [
+          { loader: 'babel-loader' },
+          {
+            loader: 'ts-loader',
+            options: {
+              appendTsxSuffixTo: [/\.vue$/],
+              experimentalWatchApi: true,
+              // transpileOnly: true,
+            }
+          }
+        ],
         exclude: /node_modules/,
-      },
-      {
-        test: /\.ts$/,
-        enforce: 'pre',
-        loader: 'tslint-loader'
       },
       {
         test: /\.js$/,
@@ -89,6 +107,7 @@ module.exports = {
       },
       {
         test: /\.m\.less$/, // Local style modules
+        include: path.resolve(__dirname, 'app/components'),
         use: [
           { loader: 'style-loader' },
           {
@@ -100,6 +119,10 @@ module.exports = {
       },
       {
         test: /\.g\.less$/, // Global styles
+        include: [
+          path.resolve(__dirname, 'app/app.g.less'),
+          path.resolve(__dirname, 'app/themes.g.less')
+        ],
         use: [
           'style-loader',
           {
@@ -131,13 +154,6 @@ module.exports = {
         }
       }
     ]
-  },
-
-  optimization: {
-    minimizer: [new TerserPlugin({
-      sourceMap: true,
-      terserOptions: { mangle: false }
-    })]
   },
 
   plugins

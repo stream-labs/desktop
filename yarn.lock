@@ -2723,11 +2723,6 @@ cipher-base@^1.0.0, cipher-base@^1.0.1:
   dependencies:
     inherits "^2.0.1"
 
-circular-dependency-plugin@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/circular-dependency-plugin/-/circular-dependency-plugin-3.0.0.tgz#9b68692e35b0e3510998d0164b6ae5011bea5760"
-  integrity sha1-m2hpLjWw41EJmNAWS2rlARvqV2A=
-
 clamp@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
@@ -9075,14 +9070,13 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.3.54:
-  version "0.3.54"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.54.tgz#7f0cc14e25e6c144d187caef1428030a88a0746b"
-  integrity sha512-GgNPNpOxllY/Zzv2rcXgktdMp+TeRJhdOYgYSEQ/uWXvuIIfpzm4y3bNMo469AOX6kZGiI8usnOAnuiBno9cvQ==
+streamlabs-beaker@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.4.tgz#b18bac848c89e8b9a1a6d2d5f586cfb54658afc5"
+  integrity sha512-d6mlYW6bTwVEDIHc0tSEtsyczJtMv+5/x3Oqp79vgL1DAqVyYvRDoszhN9z7MaWrE9X6Jby1JTh/mnlKixIROQ==
   dependencies:
     google-fonts-webpack-plugin "^0.4.4"
     v-tooltip "^2.0.0-rc.33"
-    vee-validate "^2.1.7"
     vue "^2.6.6"
     vue-class-component "^6.0.0"
     vue-color "^2.7.0"
@@ -10213,7 +10207,7 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-vee-validate@2.2.0, vee-validate@^2.1.7:
+vee-validate@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.0.tgz#0dcb6251a50cde9a3a1e924c917cc3d0a543b661"
   integrity sha512-s72VQcl1DWTNQKQyHtUDcU536dIx/GYDnCObDj4AXDZtWnqM3rXbgp7FCT3D2q9HFKw7IykW9bVrClhPBeQnrw==
