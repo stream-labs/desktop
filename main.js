@@ -160,8 +160,6 @@ function startApp() {
     title: 'Streamlabs OBS',
   });
 
-  mainWindow.openDevTools({ mode: 'detach' });
-
   mainWindowState.manage(mainWindow);
 
   mainWindow.setMenu(null);
