@@ -5,6 +5,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import { IManagedUser, IChatbotErrorResponse } from 'services/chatbot';
 import cloneDeep from 'lodash/cloneDeep';
+import startCase from 'lodash/startCase';
 
 @Component({ components: { ValidatedForm } })
 export default class RegularModal extends ChatbotWindowsBase {
@@ -23,6 +24,7 @@ export default class RegularModal extends ChatbotWindowsBase {
       user: metadata.text({
         required: true,
         max: 100,
+        min: 3,
         title: this.newRegular.platform === 'Youtube' ? $t('Channel Id') : $t('Name'),
         placeholder: this.newRegular.platform === 'Youtube' ? $t('Channel Id') : $t('Name'),
         tooltip:
@@ -46,6 +48,12 @@ export default class RegularModal extends ChatbotWindowsBase {
     // if editing existing custom command
     if (this.isEdit) {
       this.newRegular = cloneDeep(this.regularToUpdate);
+    } else {
+      this.newRegular = {
+        id: null,
+        platform: startCase(this.platform),
+        user: null,
+      };
     }
   }
 
@@ -55,6 +63,10 @@ export default class RegularModal extends ChatbotWindowsBase {
 
   get regularToUpdate() {
     return this.chatbotApiService.Common.state.regularToUpdate;
+  }
+
+  get platform() {
+    return this.chatbotApiService.Base.userService.platform.type;
   }
 
   async onSaveHandler() {
@@ -73,8 +85,6 @@ export default class RegularModal extends ChatbotWindowsBase {
   }
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
-    if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert($t('This user is already a regular.'));
-    }
+    alert($t('This user is already a regular.'));
   }
 }

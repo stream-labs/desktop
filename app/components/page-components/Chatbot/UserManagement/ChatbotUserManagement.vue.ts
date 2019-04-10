@@ -3,9 +3,10 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { ModalComp, EmptySection } from 'streamlabs-beaker';
 import { IManagedUser } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
+import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
 @Component({
-  components: { ModalComp, EmptySection },
+  components: { ModalComp, EmptySection, ChatbotPagination },
 })
 export default class ChatbotUserManagement extends ChatbotBase {
   searchQuery = '';
@@ -17,10 +18,6 @@ export default class ChatbotUserManagement extends ChatbotBase {
 
   get users() {
     return this.chatbotApiService.UserManagement.state.regularsResponse;
-  }
-
-  get platform() {
-    return this.chatbotApiService.Base.userService.platform.type;
   }
 
   get currentPage() {

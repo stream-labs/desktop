@@ -352,9 +352,8 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   }
 
   openRegularWindow(user?: IManagedUser) {
-    if (user) {
-      this.SET_REGULAR_TO_UPDATE(user);
-    }
+    this.SET_REGULAR_TO_UPDATE(user);
+
     this.windowsService.showWindow({
       componentName: 'ChatbotRegularWindow',
       title: $t('Cloudbot Regular Window'),

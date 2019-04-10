@@ -2,7 +2,7 @@
 <template>
   <ModalLayout :showControls="false" :customControls="true" :containsTabs="false">
     <div slot="content">
-      <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
+      <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container" v-if="newRegular">
         <VFormGroup
           v-model="newRegular.platform"
           :metadata="metaData.platform"

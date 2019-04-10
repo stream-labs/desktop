@@ -45,17 +45,17 @@
             </tr>
           </tbody>
         </table>
+        <ChatbotPagination
+          v-if="totalPages > 1"
+          :totalPages="totalPages"
+          :currentPage="currentPage"
+          @change="fetchRegulars"
+        />
       </div>
 
       <div class="margin-top--25"></div>
     </div>
-    <!--<add-user-modal
-      ref="addModal"
-      name="add-user-modal"
-      :currentPlatform="platform()"
-      @onSave="onAddUser"
-      @onEdit="onUpdateUser"
-    />-->
+
     <ModalComp
       :type="'confirmation'"
       :width="400"
@@ -70,7 +70,7 @@
 
 <style lang="less" scoped>
 @import '../../../../styles/index';
-.section__body{
+.section__body {
   .padding--10;
   .margin-horizontal--10;
 }
