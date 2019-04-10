@@ -5,6 +5,7 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUserName, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -82,6 +83,14 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
+let startApp: (t: TExecutionContext) => Promise<any>;
+let stopApp: () => Promise<any>;
+
+export async function restartApp(t: TExecutionContext) {
+  await stopApp();
+  await startApp(t);
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -95,7 +104,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  async function startApp(t: TExecutionContext) {
+  startApp = async function startApp(t: TExecutionContext) {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -147,6 +156,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
+    await t.context.app.client.waitForVisible('a=Setup later'); // wait for loader dismissing
     if (options.skipOnboarding) {
       await focusMain(t);
       await t.context.app.client.click('a=Setup later');
@@ -171,9 +181,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.afterStartCb) {
       await options.afterStartCb(t);
     }
-  }
+  };
 
-  async function stopApp(t: TExecutionContext) {
+  stopApp = async function stopApp() {
     try {
       await context.app.stop();
     } catch (e) {
@@ -185,7 +195,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await new Promise(resolve => {
       rimraf(context.cacheDir, resolve);
     });
-  }
+  };
 
   /**
    * test should be considered as failed if it writes exceptions in to the log file
@@ -235,7 +245,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp(t);
+        await stopApp();
       }
     } catch (e) {
       testPassed = false;
@@ -251,7 +261,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (appIsRunning) {
-      await stopApp(t);
+      await stopApp();
       if (!testPassed) failedTests.push(testName);
     }
 

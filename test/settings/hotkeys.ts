@@ -1,4 +1,7 @@
-import { focusChild, focusMain, test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { focusChild, focusMain, restartApp, test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { ISceneCollectionsServiceApi } from '../../app/services/scene-collections';
+import { getClient } from '../helpers/api-client';
+import { sleep } from '../helpers/sleep';
 
 useSpectron();
 
@@ -24,11 +27,11 @@ test('Populates essential hotkeys for them to be bound', async t => {
     'Mute',
     'Unmute',
     'Push to Mute',
-    'Push to Talk',
+    'Push to Talk'
   ]) {
     await t.true(
       await app.client.isExisting(`.Hotkey-description=${hotkey}`),
-      `Hotkey for ${hotkey} was not found`,
+      `Hotkey for ${hotkey} was not found`
     );
   }
 });
@@ -49,8 +52,21 @@ test('Binds a hotkey', async t => {
 
   // Check that the binding persisted
   await openHotkeySettings(t);
-  const binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
+  let binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
   t.is(binding, 'Ctrl+B');
+
+  // check hotkey exists after restart
+  await restartApp(t);
+  await openHotkeySettings(t);
+  binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
+  t.is(binding, 'Ctrl+B');
+});
+
+
+test('restart test', async t => {
+  await restartApp(t);
+  console.log('restarted');
+  t.pass();
 });
 
 const openHotkeySettings = async (t: TExecutionContext) => {
