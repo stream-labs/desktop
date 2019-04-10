@@ -92,7 +92,6 @@ export class AppService extends StatefulService<IAppState> {
   async load() {
     if (Utils.isDevMode()) {
       electron.ipcRenderer.on('showErrorAlert', () => {
-        console.log('GOT ERROR ALERT');
         this.SET_ERROR_ALERT(true);
       });
     }
