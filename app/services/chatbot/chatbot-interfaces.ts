@@ -346,6 +346,13 @@ export interface ICommandVariable {
   tags: string[];
 }
 
+export interface IPermissionCheckboxes {
+  regular?: { checked: boolean; string: string };
+  subscriber?: { checked: boolean; string: string };
+  moderator?: { checked: boolean; string: string };
+  streamer?: { checked: boolean; string: string };
+}
+
 // timers
 export interface ITimersData {
   [id: number]: IChatbotTimer;

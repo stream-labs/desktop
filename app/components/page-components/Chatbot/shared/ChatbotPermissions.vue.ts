@@ -1,6 +1,7 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { filter, map, cloneDeep } from 'lodash';
+import { IPermissionCheckboxes } from 'services/chatbot';
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
@@ -10,14 +11,14 @@ export default class ChatbotAliases extends ChatbotBase {
   paneMenuOpen: boolean = false;
   text: string = 'Everyone';
 
-  checkboxes = {
+  checkboxes: IPermissionCheckboxes = {
     regular: { checked: true, string: 'Regulars' },
     subscriber: { checked: true, string: 'Subscribers' },
     moderator: { checked: true, string: 'Moderators' },
     streamer: { checked: true, string: 'Streamer' },
   };
 
-  previousCheckBoxes: any = {};
+  previousCheckBoxes: IPermissionCheckboxes = {};
 
   mounted() {
     this.updateChecks();
@@ -25,12 +26,12 @@ export default class ChatbotAliases extends ChatbotBase {
   }
 
   @Watch('value')
-  valueWatcher(newValue: any) {
+  valueWatcher(newValue: number) {
     this.updateChecks();
   }
 
   @Watch('checkboxes', { deep: true })
-  checkBoxWatcher(newValue: any) {
+  checkBoxWatcher(newValue: IPermissionCheckboxes) {
     let value = 0;
 
     const itemsChecked = filter(newValue, type => type.checked).length;
@@ -92,7 +93,7 @@ export default class ChatbotAliases extends ChatbotBase {
     this.checkboxes[key].checked = !value;
   }
 
-  documentClick(e: any) {
+  documentClick(e: MouseEvent) {
     const el = this.$refs.paneMenu;
     const target = e.target;
 
