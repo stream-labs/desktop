@@ -33,6 +33,7 @@ import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
+import path from 'path';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -87,14 +88,27 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
+    // This is used for debugging
+    window['obs'] = obs;
+
+    // Host a new OBS server instance
+    obs.IPC.host(`slobs-${uuid()}`);
+    obs.NodeObs.SetWorkingDirectory(
+      path.join(
+        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        'node_modules',
+        'obs-studio-node',
+      ),
+    );
+
     crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
 
-    // Initialize OBS
+    // Initialize OBS API
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
-      electron.remote.process.env.SLOBS_IPC_USERDATA,
+      this.appDataDirectory,
       electron.remote.process.env.SLOBS_VERSION,
     );
 
