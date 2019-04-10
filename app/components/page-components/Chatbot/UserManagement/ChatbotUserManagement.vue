@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex cloudbot-button__container">
+    <div class="flex flex--space-between padding--10">
       <input
         v-model="searchQuery"
         type="text"
@@ -37,7 +37,7 @@
               <td>{{ $t('Regular') }}</td>
               <td>{{ user.user }}</td>
               <td>
-                <div class="flex flex-end align-items--inline">
+                <div class="flex flex--end align-items--inline">
                   <i class="icon-trash padding--5 cursor--pointer" @click="openDeleteModal(user)"/>
                   <i class="fas icon-edit padding--5 cursor--pointer" @click="openAddModal(user)"/>
                 </div>
@@ -67,3 +67,27 @@
 </template>
 
 <script lang='ts' src="./ChatbotUserManagement.vue.ts"></script>
+
+<style lang="less" scoped>
+@import '../../../../styles/index';
+.section__body{
+  .padding--10;
+  .margin-horizontal--10;
+}
+.cloudbot-button__container {
+  .padding-bottom(2);
+
+  input {
+    margin-left: 0;
+  }
+
+  button {
+    margin-right: 0;
+  }
+}
+
+.cloudbot-edit {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+</style>

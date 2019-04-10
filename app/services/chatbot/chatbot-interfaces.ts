@@ -10,6 +10,7 @@ export interface IChatbotCommonServiceState {
   loyaltyToUpdate: IChatbotLoyalty;
   pollProfileToUpdate: IPollProfile;
   bettingProfileToUpdate: IBettingProfile;
+  regularToUpdate: IManagedUser;
 }
 
 // responses
@@ -830,16 +831,28 @@ export interface IBettingCommand {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Subscriber Only' = 1 << 1,
+  'Subscriber Only' = 2,
+  'Regulars Only' = 4,
+  'Regulars & Subscribers' = 6,
 }
 
 export enum ChatbotPermissionsEnums {
   'None' = 0,
   'Everyone' = 1,
-  'Subscriber Only' = 1 << 1,
-  'Moderator Only' = 1 << 5,
-  'Streamer Only' = 1 << 7,
-  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5),
+  'Subscribers' = 2,
+  'Regulars' = 4,
+  'Moderators' = 32,
+  'Streamer' = 64,
+  'Subscribers, Regulars' = 6,
+  'Subscribers, Moderators' = 34,
+  'Subscribers, Streamer' = 66,
+  'Regulars, Moderators' = 36,
+  'Regulars, Streamer' = 68,
+  'Moderators, Streamer' = 96,
+  'Regulars, Subscribers, Moderators' = 38,
+  'Subscribers, Regulars, Streamer' = 70,
+  'Subscribers, Moderators, Streamer' = 98,
+  'Regulars, Moderators, Streamer' = 100,
 }
 
 export enum ChatbotPunishments {

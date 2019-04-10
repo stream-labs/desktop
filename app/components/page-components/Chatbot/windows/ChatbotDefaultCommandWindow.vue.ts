@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ITab } from 'components/Tabs.vue';
 import { IDefaultCommand } from 'services/chatbot';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
+import ChatbotPermissions from 'components/page-components/Chatbot/shared/ChatbotPermissions.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -14,6 +15,7 @@ import { debounce } from 'lodash-decorators';
   components: {
     ChatbotAliases,
     ValidatedForm,
+    ChatbotPermissions,
   },
 })
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {

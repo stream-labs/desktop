@@ -17,7 +17,7 @@ import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBann
 import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
 import ChatbotPoll from 'components/page-components/Chatbot/ChatbotPoll.vue';
 import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vue';
-import ChatbotUserManagement from 'components/page-components/Chatbot/ChatbotUserManagement.vue';
+import ChatbotUserManagement from 'components/page-components/Chatbot/UserManagement/ChatbotUserManagement.vue';
 
 @Component({
   components: {

@@ -23,7 +23,7 @@
 
     <!-- custom commands -->
     <empty-section
-      v-if="!commands.data || commands.data.length === 0"
+      v-if="!commands || commands.length === 0"
       :variation="'text'"
       :title="$t('You don\'t have any Commands')"
       :subtitle="$t('Click Add Command to get started')"
