@@ -171,8 +171,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.afterStartCb) {
       await options.afterStartCb(t);
     }
-
-    await sleep(200000);
   }
 
   async function stopApp(t: TExecutionContext) {
