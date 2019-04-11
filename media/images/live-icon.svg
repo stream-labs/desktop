@@ -1,8 +1,0 @@
-<svg class="live-status" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 20">
-    <rect width="52" height="20" fill="#ff3000"/>
-    <path d="M6.022,15.859V4.141H8.489v9.251h6.442v2.467Z" fill="#fff"/>
-    <path d="M19.865,15.859H17.4V8.985h2.468Z" fill="#fff"/>
-    <path d="M29.732,15.859H27.265L22.331,4.141H24.8l3.7,8.789,3.7-8.789h2.467Z" fill="#fff"/>
-    <path d="M39.6,10.925v2.467h6.441v2.467H37.132V4.141h8.908V6.608H39.6v1.85h6.441v2.467Z" fill="#fff"/>
-    <circle cx="18.63" cy="5.774" r="1.633" fill="#fff"/>
-</svg>
