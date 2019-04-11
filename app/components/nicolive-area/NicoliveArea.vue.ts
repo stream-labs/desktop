@@ -11,6 +11,7 @@ import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
+const ControlsArrow = require('../../../media/images/controls-arrow-vertical.svg');
 
 @Component({
   components: {
@@ -20,6 +21,7 @@ import TopNav from './TopNav.vue';
     ProgramStatistics,
     ToolBar,
     CommentForm,
+    ControlsArrow,
   },
 })
 export default class NicolivePanelRoot extends Vue {
