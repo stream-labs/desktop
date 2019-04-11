@@ -29,7 +29,7 @@ const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 const pid = require('process').pid;
 const crashHandler = require('crash-handler');
-const electronLog = require('electron-log');
+let electronLog = require('electron-log');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -138,7 +138,7 @@ function startApp() {
   if (pjson.env === 'production') {
 
     Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
-      release: process.env.SLOBS_VERSION 
+      release: process.env.SLOBS_VERSION
     }).install(function (err, initialErr, eventId) {
       handleFinishedReport();
     });
