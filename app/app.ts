@@ -27,6 +27,18 @@ const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 const isPreview = !!remote.process.env.SLOBS_PREVIEW;
 
+// Disable Vue animations in a test environment
+if (remote.process.env.CI) {
+  const div = {
+    functional: true,
+    render: (h: Function, { data, children }: { data: any; children: any }) =>
+      h('div', data, children),
+  };
+
+  Vue.component('transition', div);
+  Vue.component('transition-group', div);
+}
+
 if (Utils.isMainWindow()) {
   window['obs'] = window['require']('obs-studio-node');
 
