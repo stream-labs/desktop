@@ -140,9 +140,9 @@
       },
       "QSVPreset": {
         "name": "@:settings.Output.Streaming.target_usage.name",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "@:settings.Output.Streaming.target_usage.quality",
+        "balanced": "@:settings.Output.Streaming.target_usage.balanced",
+        "speed": "@:settings.Output.Streaming.target_usage.speed"
       },
       "NVENCPreset": {
         "name": "エンコーダープリセット",
@@ -211,9 +211,9 @@
       },
       "target_usage": {
         "name": "ターゲットの利用法",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "Quality",
+        "balanced": "Balanced",
+        "speed": "Speed"
       },
       "profile": {
         "name": "プロファイル",
