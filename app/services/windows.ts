@@ -221,9 +221,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    const bounds = window.getBounds();
-    const currentDisplay = electron.screen.getDisplayMatching(bounds);
-    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    if (window) {
+      const bounds = window.getBounds();
+      const currentDisplay = electron.screen.getDisplayMatching(bounds);
+      this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    }
   }
 
   showWindow(options: Partial<IWindowOptions>) {
