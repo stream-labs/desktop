@@ -12,6 +12,7 @@ export default class ProgramInfo extends Vue {
 
   isCreating: boolean = false;
   async createProgram() {
+    if (this.isCreating) throw new Error('createProgram is running');
     try {
       this.isCreating = true;
       return await this.nicoliveProgramService.createProgram();
@@ -25,6 +26,7 @@ export default class ProgramInfo extends Vue {
 
   isFetching: boolean = false;
   async fetchProgram() {
+    if (this.isFetching) throw new Error('fetchProgram is running');
     try {
       this.isFetching = true;
       return await this.nicoliveProgramService.fetchProgram();
@@ -51,6 +53,7 @@ export default class ProgramInfo extends Vue {
 
   isStarting: boolean = false;
   async startProgram() {
+    if (this.isStarting) throw new Error('startProgram is running');
     try {
       this.isStarting = true;
       return await this.nicoliveProgramService.startProgram();
@@ -64,6 +67,7 @@ export default class ProgramInfo extends Vue {
 
   isEnding: boolean = false;
   async endProgram() {
+    if (this.isEnding) throw new Error('endProgram is running');
     try {
       this.isEnding = true;
       const isOk = await new Promise(resolve => {
