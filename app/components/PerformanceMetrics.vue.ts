@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { StreamingService } from '../services/streaming';
 import { PerformanceService } from '../services/performance';
 import { UserService } from '../services/user';
-import { StreamInfoService } from '../services/stream-info';
 import { SettingsService } from '../services/settings';
 import { Inject } from '../util/injector';
 import { $t } from 'services/i18n';
@@ -14,7 +13,6 @@ export default class PerformanceMetrics extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
   @Inject() userService: UserService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
 
@@ -78,13 +76,5 @@ export default class PerformanceMetrics extends Vue {
   get bandwidth() {
     if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return this.performanceService.state.bandwidth.toFixed(0);
-  }
-
-  get viewerCount() {
-    return this.streamInfoService.state.viewerCount.toString();
-  }
-
-  get commentCount() {
-    return this.streamInfoService.state.commentCount.toString();
   }
 }
