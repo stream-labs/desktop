@@ -162,7 +162,8 @@
       "Encoder": {
         "name": "@:settings.Output.Streaming.StreamEncoder.name",
         "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
-        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11"
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11",
+        "ffmpeg_nvenc": "@:settings.Output.Streaming.StreamEncoder.ffmpeg_nvenc"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
