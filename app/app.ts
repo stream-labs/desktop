@@ -151,11 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+if (Utils.isDevMode()) {
+  window.addEventListener('error', () => ipcRenderer.send('showErrorAlert'));
+}
+
 // ERRORS LOGGING
 
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
+  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);
 };

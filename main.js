@@ -490,3 +490,7 @@ ipcMain.on('requestPerformanceStats', e => {
   const stats = app.getAppMetrics();
   e.sender.send('performanceStatsResponse', stats);
 });
+
+ipcMain.on('showErrorAlert', () => {
+  mainWindow.send('showErrorAlert');
+});

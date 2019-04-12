@@ -9,9 +9,10 @@ import {
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleResponse, requiresToken, authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { $t } from 'services/i18n';
+import { handlePlatformResponse, requiresToken } from './utils';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -110,7 +111,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(resp => (resp.status === 403 ? this.handleForbidden(resp) : handleResponse(resp)))
+      .then(resp => {
+        return resp.status === 403 ? this.handleForbidden(resp) : handlePlatformResponse(resp);
+      })
       .then(() => this.SET_ENABLED_STATUS(true));
   }
 
@@ -124,7 +127,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => json.items[0].contentDetails.boundStreamId);
   }
 
@@ -146,7 +149,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => json.items[0].cdn.ingestionInfo.streamName);
   }
 
@@ -168,7 +171,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         if (json.items.length) {
           this.SET_STREAM_ID(json.items[0].id);
@@ -186,7 +189,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       const request = new Request(url);
 
       return fetch(request)
-        .then(handleResponse)
+        .then(handlePlatformResponse)
         .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
     });
   }
@@ -201,7 +204,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       this.oauthToken
     }`;
     return fetch(`${this.apiBase}/liveBroadcasts?${query}`)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         if (!json.items.length) return;
         this.SET_STREAM_ID(json.items[0].id);
@@ -220,7 +223,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       status: { privacyStatus: 'public' },
     });
     const req = new Request(url, { headers, body, method: 'POST' });
-    return fetch(req).then(handleResponse);
+    return fetch(req).then(handlePlatformResponse);
   }
 
   fetchNewToken(): Promise<void> {
@@ -230,7 +233,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
@@ -264,7 +267,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         });
 
         return fetch(request)
-          .then(handleResponse)
+          .then(handlePlatformResponse)
           .then(() => true);
       });
   }
@@ -283,7 +286,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
-      .then(handleResponse)
+      .then(handlePlatformResponse)
       .then(json => {
         const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
         this.SET_STREAM_ID(json.items[0].id);
