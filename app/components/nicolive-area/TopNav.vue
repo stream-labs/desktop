@@ -17,6 +17,8 @@
 @import "../../styles/_colors";
 @import "../../styles/mixins";
 
+// TODO: app/components/TopNav.vue のスタイルを継承
+
 .top-nav {
   display: flex;
   flex-direction: row;
