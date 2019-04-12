@@ -126,6 +126,10 @@ export default class Main extends Vue {
     return this.platformAppsService.enabledApps;
   }
 
+  get errorAlert() {
+    return this.appService.state.errorAlert;
+  }
+
   onDropHandler(event: DragEvent) {
     const files = event.dataTransfer.files;
 

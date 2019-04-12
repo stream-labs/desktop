@@ -1,7 +1,7 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
-  <div class="main-spacer"></div>
+  <div class="main-spacer" :class="{ 'main-spacer--error': errorAlert }"></div>
   <news-banner/>
   <div
     class="main-contents"
@@ -100,6 +100,10 @@
   height: 4px;
   flex: 0 0 4px;
   .bg--teal();
+
+  &.main-spacer--error {
+    background-color: @red;
+  }
 }
 
 .main-page-container {
