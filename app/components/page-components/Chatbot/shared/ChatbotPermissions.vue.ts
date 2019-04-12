@@ -89,14 +89,10 @@ export default class ChatbotAliases extends ChatbotBase {
       this.checkboxes.streamer.checked = true;
       this.text = 'Everyone';
     } else {
-      this.checkboxes.subscriber.checked =
-        (this.value & ChatbotPermissionsEnums.Subscribers) === ChatbotPermissionsEnums.Subscribers;
-      this.checkboxes.regular.checked =
-        (this.value & ChatbotPermissionsEnums.Regulars) === ChatbotPermissionsEnums.Regulars;
-      this.checkboxes.moderator.checked =
-        (this.value & ChatbotPermissionsEnums.Moderators) === ChatbotPermissionsEnums.Moderators;
-      this.checkboxes.streamer.checked =
-        (this.value & ChatbotPermissionsEnums.Streamer) === ChatbotPermissionsEnums.Streamer;
+      this.checkboxes.subscriber.checked = !!(this.value & ChatbotPermissionsEnums.Subscribers);
+      this.checkboxes.regular.checked = !!(this.value & ChatbotPermissionsEnums.Regulars);
+      this.checkboxes.moderator.checked = !!(this.value & ChatbotPermissionsEnums.Moderators);
+      this.checkboxes.streamer.checked = !!(this.value & ChatbotPermissionsEnums.Streamer);
 
       const checked = filter(this.checkboxes, type => {
         return type.checked;
