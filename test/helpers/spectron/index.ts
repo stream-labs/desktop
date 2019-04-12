@@ -178,6 +178,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await context.app.stop();
     } catch (e) {
       fail('Crash on shutdown');
+      console.error(e);
     }
     appIsRunning = false;
     await checkErrorsInLogFile();
