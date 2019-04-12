@@ -1,6 +1,6 @@
 <template>
-  <div class="top-nav" v-if="hasProgram">
-    <div class="tabs">
+  <div class="top-nav">
+    <div class="tabs" v-if="hasProgram">
       <div class="top-nav-item">
         <a @click="fetchProgram" :disabled="isFetching" class="link"><i class="icon-reload"></i>番組再取得</a>
       </div>
