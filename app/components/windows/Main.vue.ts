@@ -76,6 +76,10 @@ export default class Main extends Vue {
     this.handleResize();
   }
 
+  get transitionName() {
+    return electron.remote.process.env.CI ? 'test' : 'loader';
+  }
+
   get title() {
     return this.windowsService.state.main.title;
   }

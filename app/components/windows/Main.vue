@@ -44,8 +44,8 @@
       <live-dock class="live-dock" />
     </div>
   </div>
-  <transition name="loader">
-    <div class="main-loading" v-if="applicationLoading"><custom-loader></custom-loader></div>
+  <transition :name="transitionName">
+    <div class="main-loading" :class="transitionName" v-if="applicationLoading"><custom-loader></custom-loader></div>
   </transition>
 </div>
 </template>
@@ -126,6 +126,10 @@
   /deep/ .s-loader__bg {
     top: 34px;
   }
+}
+
+.main-loading.test {
+  display: none;
 }
 
 .loader-enter-active,
