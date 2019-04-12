@@ -838,28 +838,18 @@ export interface IBettingCommand {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Subscriber Only' = 2,
-  'Regulars Only' = 4,
-  'Regulars & Subscribers' = 6,
+  'Subscribers' = 1 << 1,
+  'Regulars' = 1 << 2,
+  'Regulars & Subscribers' = (1 << 1) | (1 << 2),
 }
 
 export enum ChatbotPermissionsEnums {
   'None' = 0,
   'Everyone' = 1,
-  'Subscribers' = 2,
-  'Regulars' = 4,
-  'Moderators' = 32,
-  'Streamer' = 64,
-  'Subscribers, Regulars' = 6,
-  'Subscribers, Moderators' = 34,
-  'Subscribers, Streamer' = 66,
-  'Regulars, Moderators' = 36,
-  'Regulars, Streamer' = 68,
-  'Moderators, Streamer' = 96,
-  'Regulars, Subscribers, Moderators' = 38,
-  'Subscribers, Regulars, Streamer' = 70,
-  'Subscribers, Moderators, Streamer' = 98,
-  'Regulars, Moderators, Streamer' = 100,
+  'Subscribers' = 1 << 1,
+  'Regulars' = 1 << 2,
+  'Moderators' = 1 << 5,
+  'Streamer' = 1 << 7,
 }
 
 export enum ChatbotPunishments {

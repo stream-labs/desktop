@@ -57,7 +57,7 @@
             <td>{{ $t(command.response) }}</td>
             <td>{{ command.cooldowns.global }}</td>
             <td>{{ command.cooldowns.user }}</td>
-            <td>{{ command.permission ? $t(chatbotPermissionsEnums[command.permission.level]) : '-' }}</td>
+            <td>{{ command.permission ? $t(getPermission(command.permission.level)) : '-' }}</td>
             <td>
               <ToggleInput
                 :value="command.enabled"

@@ -1,10 +1,15 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { filter, map, cloneDeep } from 'lodash';
-import { IPermissionCheckboxes } from 'services/chatbot';
+import { IPermissionCheckboxes, ChatbotPermissionsEnums } from 'services/chatbot';
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
+  $refs: {
+    paneMenu: HTMLDivElement;
+    menu: HTMLDivElement;
+  };
+
   @Prop()
   value: number;
 
@@ -49,12 +54,20 @@ export default class ChatbotAliases extends ChatbotBase {
 
     this.previousCheckBoxes = cloneDeep(newValue);
 
-    value += newValue.subscriber.checked ? 2 : 0;
-    value += newValue.regular.checked ? 4 : 0;
-    value += newValue.moderator.checked ? 32 : 0;
-    value += newValue.streamer.checked ? 64 : 0;
+    value += newValue.subscriber.checked
+      ? ChatbotPermissionsEnums.Subscribers
+      : ChatbotPermissionsEnums.None;
+    value += newValue.regular.checked
+      ? ChatbotPermissionsEnums.Regulars
+      : ChatbotPermissionsEnums.None;
+    value += newValue.moderator.checked
+      ? ChatbotPermissionsEnums.Moderators
+      : ChatbotPermissionsEnums.None;
+    value += newValue.streamer.checked
+      ? ChatbotPermissionsEnums.Streamer
+      : ChatbotPermissionsEnums.None;
 
-    if (value === 102) {
+    if (value === 166) {
       value = 1; // It's for everyone
       this.text = 'Everyone';
     } else {
@@ -76,10 +89,14 @@ export default class ChatbotAliases extends ChatbotBase {
       this.checkboxes.streamer.checked = true;
       this.text = 'Everyone';
     } else {
-      this.checkboxes.subscriber.checked = (this.value & 2) === 2;
-      this.checkboxes.regular.checked = (this.value & 4) === 4;
-      this.checkboxes.moderator.checked = (this.value & 32) === 32;
-      this.checkboxes.streamer.checked = (this.value & 64) === 64;
+      this.checkboxes.subscriber.checked =
+        (this.value & ChatbotPermissionsEnums.Subscribers) === ChatbotPermissionsEnums.Subscribers;
+      this.checkboxes.regular.checked =
+        (this.value & ChatbotPermissionsEnums.Regulars) === ChatbotPermissionsEnums.Regulars;
+      this.checkboxes.moderator.checked =
+        (this.value & ChatbotPermissionsEnums.Moderators) === ChatbotPermissionsEnums.Moderators;
+      this.checkboxes.streamer.checked =
+        (this.value & ChatbotPermissionsEnums.Streamer) === ChatbotPermissionsEnums.Streamer;
 
       const checked = filter(this.checkboxes, type => {
         return type.checked;
@@ -94,11 +111,10 @@ export default class ChatbotAliases extends ChatbotBase {
   }
 
   documentClick(e: MouseEvent) {
-    const el = this.$refs.paneMenu;
+    const el = this.$refs.paneMenu as Element;
     const target = e.target;
 
-    // @ts-ignore
-    if (el !== target && !el.contains(target)) {
+    if (el !== target && !el.contains(target as Node)) {
       this.paneMenuOpen = false;
     }
   }
@@ -119,9 +135,8 @@ export default class ChatbotAliases extends ChatbotBase {
   }
 
   onResize(event?: UIEvent) {
-    // @ts-ignore
-    const menu = this.$refs.menu as Vue;
-    const paneMenu = this.$refs.paneMenu as Element;
+    const menu = this.$refs.menu;
+    const paneMenu = this.$refs.paneMenu;
 
     const rect = paneMenu.getBoundingClientRect();
     menu.style.width = `${rect.width}px`;
