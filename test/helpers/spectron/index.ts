@@ -147,8 +147,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
+    await t.context.app.client.waitForVisible('a=Setup later'); // wait for the loader disappearing
     if (options.skipOnboarding) {
-      await focusMain(t);
       await t.context.app.client.click('a=Setup later');
 
       // This will only show up if OBS is installed
