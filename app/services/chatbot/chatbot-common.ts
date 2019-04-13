@@ -13,6 +13,7 @@ import {
   IChatbotLoyalty,
   IPollProfile,
   IBettingProfile,
+  IManagedUser,
 } from './chatbot-interfaces';
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -28,6 +29,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     loyaltyToUpdate: null,
     pollProfileToUpdate: null,
     bettingProfileToUpdate: null,
+    regularToUpdate: null,
   };
 
   hideModBanner() {
@@ -349,6 +351,19 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openRegularWindow(user?: IManagedUser) {
+    this.SET_REGULAR_TO_UPDATE(user);
+
+    this.windowsService.showWindow({
+      componentName: 'ChatbotRegularWindow',
+      title: $t('Cloudbot Regular Window'),
+      size: {
+        width: 650,
+        height: 325,
+      },
+    });
+  }
+
   @mutation()
   private HIDE_MOD_BANNER() {
     Vue.set(this.state, 'modBannerVisible', false);
@@ -392,5 +407,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private SET_BETTING_PROFILE_TO_UPDATE(profile: IBettingProfile) {
     Vue.set(this.state, 'bettingProfileToUpdate', profile);
+  }
+
+  @mutation()
+  private SET_REGULAR_TO_UPDATE(user: IManagedUser) {
+    Vue.set(this.state, 'regularToUpdate', user);
   }
 }
