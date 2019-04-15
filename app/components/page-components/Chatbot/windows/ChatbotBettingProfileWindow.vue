@@ -40,7 +40,7 @@
               <table class="options__table-header">
                 <thead>
                   <tr>
-                    <th>{{$t('#')}}</th>
+                    <th>#</th>
                     <th>{{ $t('Bet Option') }}</th>
                     <th>{{ $t('Command') }}</th>
                     <th></th>

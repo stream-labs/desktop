@@ -59,7 +59,7 @@
   margin: 20px 10px 0;
   border: 2px solid transparent;
   .radius;
-  background: var(--link);
+  background: var(--button);
   padding: 12px;
   text-align: left;
   display: flex;

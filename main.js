@@ -26,7 +26,6 @@ const rimraf = require('rimraf');
 const path = require('path');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
-const obs = require('obs-studio-node');
 const pid = require('process').pid;
 const crashHandler = require('crash-handler');
 const electronLog = require('electron-log');
@@ -112,20 +111,7 @@ function startApp() {
   crashHandler.startCrashHandler(app.getAppPath());
   crashHandler.registerProcess(pid, false);
 
-  { // Initialize obs-studio-server
-    // Set up environment variables for IPC.
-    process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
-    process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
-    // Host a new IPC Server and connect to it.
-    obs.IPC.host(process.env.SLOBS_IPC_PATH);
-    obs.NodeObs.SetWorkingDirectory(path.join(
-      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-      'node_modules',
-      'obs-studio-node')
-    );
-  }
-
-  const bt = require('backtrace-node');
+  const Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox('Something Went Wrong',
@@ -135,22 +121,13 @@ function startApp() {
     app.exit();
   }
 
-  function handleUnhandledException(err) {
-    bt.report(err, {}, handleFinishedReport);
-  }
-
   if (pjson.env === 'production') {
-    bt.initialize({
-      disableGlobalHandler: true,
-      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-      attributes: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
 
-    process.on('uncaughtException', handleUnhandledException);
+    Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+      release: process.env.SLOBS_VERSION
+    }).install(function (err, initialErr, eventId) {
+      handleFinishedReport();
+    });
 
     crashReporter.start({
       productName: 'streamlabs-obs',
@@ -379,10 +356,6 @@ app.on('ready', () => {
   }
 });
 
-app.on('quit', (e, exitCode) => {
-  obs.IPC.disconnect();
-});
-
 ipcMain.on('openDevTools', () => {
   openDevTools();
 });
@@ -516,4 +489,8 @@ ipcMain.on('getMainWindowWebContentsId', e => {
 ipcMain.on('requestPerformanceStats', e => {
   const stats = app.getAppMetrics();
   e.sender.send('performanceStatsResponse', stats);
+});
+
+ipcMain.on('showErrorAlert', () => {
+  mainWindow.send('showErrorAlert');
 });

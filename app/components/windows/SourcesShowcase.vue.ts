@@ -14,7 +14,7 @@ import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { PlatformAppsService, IAppSource } from 'services/platform-apps';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { PrefabsService } from '../../services/prefabs';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;

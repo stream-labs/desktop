@@ -15,7 +15,7 @@ import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
-import { uniqBy } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
@@ -367,6 +367,9 @@ export class Scene {
     if (this.id === source.sourceId) return false;
 
     const sceneToAdd = this.scenesService.getScene(source.sourceId);
+
+    if (!sceneToAdd) return true;
+
     return !sceneToAdd.hasNestedScene(this.id);
   }
 

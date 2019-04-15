@@ -13,7 +13,7 @@
         :value="displayValue"
         @input="handleInput($event.target.value)"
         @mousewheel="onMouseWheelHandler"
-        :name="uuid"
+        :name="options.uuid"
         v-validate="validate"
         :disabled="options.disabled"
     />

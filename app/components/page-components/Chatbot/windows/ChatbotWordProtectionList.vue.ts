@@ -1,22 +1,16 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 
-import {
-  IInputMetadata,
-  IListMetadata,
-  INumberMetadata,
-  EInputType,
-  ITextMetadata,
-} from 'components/shared/inputs/index';
-
 import { IWordProtectionBlackListItem, NEW_WORD_PROTECTION_LIST_MODAL_ID } from 'services/chatbot';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { debounce } from 'lodash-decorators';
 import { metadata } from 'components/widgets/inputs';
 
+import { EmptySection } from 'streamlabs-beaker';
+
 @Component({
-  components: { ValidatedForm },
+  components: { ValidatedForm, EmptySection },
 })
 export default class ChatbotLinkProtectionList extends ChatbotBase {
   $refs: {

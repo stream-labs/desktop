@@ -61,7 +61,7 @@
             v-model="editedCommand.response"
             :metadata="metadata.response"
           />
-           <VFormGroup
+          <VFormGroup
             v-if="defaultCommandToUpdate.ticket_response"
             :title="$t('Ticket Response')"
             v-model="editedCommand.ticket_response"
@@ -145,11 +145,10 @@
             v-model="editedCommand.lose_response"
             :metadata="metadata.lose_response"
           />
-          <VFormGroup
+          <ChatbotPermissions
+            class="margin-bottom--10"
             v-if="defaultCommandToUpdate.permission"
-            :title="$t('Permission')"
             v-model="editedCommand.permission.level"
-            :metadata="metadata.permission"
           />
           <VFormGroup
             v-if="defaultCommandToUpdate.response_type"

@@ -26,6 +26,8 @@ import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
+import EditTransform from 'components/windows/EditTransform';
+import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -72,7 +74,7 @@ import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/wind
 import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
 import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
 import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
-import OverlayWindow from '../components/windows/OverlayWindow.vue';
+import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -105,6 +107,8 @@ export function getComponents() {
     MediaGallery,
     PlatformAppPopOut,
     FacemaskSettings,
+    EditTransform,
+    OverlayWindow,
 
     BitGoal,
     DonationGoal,
@@ -146,8 +150,7 @@ export function getComponents() {
     ChatbotPollPreferencesWindow,
     ChatbotBettingProfileWindow,
     ChatbotBettingPreferencesWindow,
-
-    OverlayWindow,
+    ChatbotRegularWindow,
   };
 }
 
@@ -222,9 +225,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    const bounds = window.getBounds();
-    const currentDisplay = electron.screen.getDisplayMatching(bounds);
-    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    if (window) {
+      const bounds = window.getBounds();
+      const currentDisplay = electron.screen.getDisplayMatching(bounds);
+      this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    }
   }
 
   showWindow(options: Partial<IWindowOptions>) {

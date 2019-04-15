@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 export interface IHScrollModel {
   canScroll: boolean;

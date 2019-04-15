@@ -3,6 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
+import { AppService } from 'services/app';
+import { Inject } from 'util/injector';
 
 export interface IFamilyWithStyle {
   family: IFontFamily;
@@ -25,6 +27,8 @@ export interface IFontManifest {
 
 export class FontLibraryService extends Service {
   private manifest: IFontManifest;
+
+  @Inject() appService: AppService;
 
   // Used to prevent downloading the same font multiple times
   fontDownloadPromises: Dictionary<Promise<string>> = {};
@@ -117,7 +121,7 @@ export class FontLibraryService extends Service {
   }
 
   private get fontsDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Fonts');
+    return path.join(this.appService.appDataDirectory, 'Fonts');
   }
 
   // Create a local font library path from a filename

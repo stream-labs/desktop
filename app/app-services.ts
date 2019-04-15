@@ -70,6 +70,7 @@ export {
   ChatbotPollApiService,
   ChatbotBettingApiService,
   ChatbotImporterApiService,
+  ChatbotUserManagementApiService,
 } from 'services/chatbot';
 export { MediaGalleryService } from 'services/media-gallery';
 export { GuestApiService } from 'services/guest-api';

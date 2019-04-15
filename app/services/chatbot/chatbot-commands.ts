@@ -15,6 +15,7 @@ import {
   IChatbotAPIDeleteResponse,
   ICommandVariablesResponse,
   ICommandPreferencesResponse,
+  ICommandVariable,
 } from './chatbot-interfaces';
 
 // state
@@ -22,7 +23,7 @@ interface IChatbotCommandsApiServiceState {
   commandPreferencesResponse: ICommandPreferencesResponse;
   defaultCommandsResponse: IDafaultCommandsResponse;
   customCommandsResponse: ICustomCommandsResponse;
-  commandVariablesResponse: ICommandVariablesResponse;
+  commandVariablesResponse: ICommandVariable[];
 }
 
 export class ChatbotCommandsApiService extends PersistentStatefulService<

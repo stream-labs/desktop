@@ -1,6 +1,7 @@
 import { Component, Watch } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
+import ChatbotPermissions from 'components/page-components/Chatbot/shared/ChatbotPermissions.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
@@ -20,6 +21,7 @@ import { debounce } from 'lodash-decorators';
   components: {
     ChatbotAliases,
     ValidatedForm,
+    ChatbotPermissions,
   },
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
@@ -64,6 +66,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     // if editing existing custom command
     if (this.isEdit) {
       this.newCommand = cloneDeep(this.customCommandToUpdate);
+      this.newCommand.permission.level = this.customCommandToUpdate.permission.level;
     }
   }
 
