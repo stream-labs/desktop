@@ -8,6 +8,7 @@ import { StatefulService, mutation, ServiceHelper } from 'services/stateful-serv
 import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
+import mapValues from 'lodash/mapValues';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -244,7 +245,6 @@ export interface IHotkey {
   actionName: string;
   bindings: IBinding[];
   description?: string;
-  resourceId?: string;
   sceneId?: string;
   sourceId?: string;
   sceneItemId?: string;
@@ -406,10 +406,27 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
 
     return {
-      general: this.getGeneralHotkeys(),
-      sources: sourcesHotkeys,
-      scenes: scenesHotkeys,
+      general: this.serializeHotkeys(this.getGeneralHotkeys()),
+      sources: this.serializeHotkeys(sourcesHotkeys),
+      scenes: this.serializeHotkeys(scenesHotkeys),
     };
+  }
+
+  /**
+   * Hotkey service helpers are extremely expensive to create from the
+   * child window, so we serialize them here first.
+   * @param hotkeys A group of hotkeys, either an array or a dictionary
+   */
+  private serializeHotkeys(hotkeys: Dictionary<Hotkey[]>): Dictionary<IHotkey[]>;
+  private serializeHotkeys(hotkeys: Hotkey[]): IHotkey[];
+  private serializeHotkeys(
+    hotkeys: Dictionary<Hotkey[]> | Hotkey[],
+  ): Dictionary<IHotkey[]> | IHotkey[] {
+    if (Array.isArray(hotkeys)) {
+      return hotkeys.map(h => ({ ...h.getModel(), description: h.description }));
+    }
+
+    return mapValues(hotkeys, h => this.serializeHotkeys(h));
   }
 
   clearAllHotkeys() {
@@ -565,8 +582,6 @@ export class Hotkey implements IHotkey {
   description: string;
   action: IHotkeyAction;
   shouldApply: boolean;
-
-  @Inject() private hotkeysService: HotkeysService;
 
   private readonly hotkeyModel: IHotkey;
 

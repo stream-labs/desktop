@@ -37,8 +37,8 @@ export default class HotkeyGroup extends Vue {
             style={this.collapsed ? { display: 'none' } : null}
             class={cx({ 'section-content--opened': !!this.title }, 'section-content')}
           >
-            {this.hotkeys.map((hotkey: IHotkey) => (
-              <div key={hotkey.resourceId}>
+            {this.hotkeys.map(hotkey => (
+              <div key={hotkey.actionName + hotkey.sceneId + hotkey.sceneItemId + hotkey.sourceId}>
                 <Hotkey hotkey={hotkey} />
               </div>
             ))}

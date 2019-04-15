@@ -73,6 +73,7 @@ import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/wind
 import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
 import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
 import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
+import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -147,6 +148,7 @@ export function getComponents() {
     ChatbotPollPreferencesWindow,
     ChatbotBettingProfileWindow,
     ChatbotBettingPreferencesWindow,
+    ChatbotRegularWindow,
   };
 }
 

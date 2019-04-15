@@ -8,7 +8,7 @@
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
       >
-       <button
+      <button
         @click="onResetDefaultCommandsHandler"
         class="chatbot__button--reset button button--soft-warning margin--10"
       >{{ $t('Reset Commands') }}</button>
@@ -37,7 +37,7 @@
             <td>{{ $t(command.description) }}</td>
             <td>
               {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) :
-              (command.permission ?$t(chatbotPermissionsEnums[command.permission.level]) : '-') }}
+              (command.permission ?$t(getPermission(command.permission.level)) : '-') }}
             </td>
             <td>
               <div class="align-items--inline">
