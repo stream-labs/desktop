@@ -93,7 +93,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const [containerX, containerY] = this.getWindowContainerStartingPosition();
 
     const commonWindowOptions = {
-      backgroundColor: this.customizationService.nightMode ? '#17242d' : '#fff',
+      backgroundColor: this.customizationService.themeBackground,
       show: false,
       frame: false,
       width: 300,
@@ -150,7 +150,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
     this.windows.chat.loadURL(
       await getPlatformService(this.userService.platform.type).getChatUrl(
-        this.customizationService.nightMode ? 'night' : 'day',
+        this.customizationService.isDarkTheme() ? 'night' : 'day',
       ),
     );
 

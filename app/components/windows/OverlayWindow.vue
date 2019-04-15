@@ -42,7 +42,7 @@
   }
 
   & /deep/ .studio-controls-selector {
-    background: @day-section;
+    background: var(--section);
     .radius();
     flex-grow: 1;
     overflow-y: auto;
@@ -63,14 +63,6 @@
   .flex--center();
   .flex--space-between();
   top: 32px;
-}
-
-.night-theme {
-  .overlay-content {
-    & /deep/ .studio-controls-selector {
-      background: @night-section;
-    }
-  }
 }
 
 .live-dock-viewer-count {
