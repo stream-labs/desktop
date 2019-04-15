@@ -34,7 +34,7 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 
 /* Determine the current release channel we're
  * on based on name. The channel will always be

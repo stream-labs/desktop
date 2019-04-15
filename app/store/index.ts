@@ -104,7 +104,7 @@ export function createStore(): Promise<Store<any>> {
     modules: {
       ...statefulServiceModules,
     },
-    strict: debug,
+    strict: false,
   });
 
   StatefulService.setupVuexStore(store);
