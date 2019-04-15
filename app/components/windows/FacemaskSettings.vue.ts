@@ -98,10 +98,17 @@ export default class FacemaskSettings extends Vue {
       newSettings.bits_duration = this.bitsDurationModel;
     }
 
-    const validatedSettings = this.validateSettings(newSettings);
+    if (!newSettings.device) {
+      newSettings.device = {
+        name: null,
+        value: null,
+      };
+    }
 
-    if (validatedSettings.error) {
-      this.onFailHandler(validatedSettings.message);
+    const validationResults = this.validateSettings(newSettings);
+
+    if (validationResults.error) {
+      this.onFailHandler(validationResults.message);
       this.updatingInfo = false;
       return;
     }
@@ -133,7 +140,7 @@ export default class FacemaskSettings extends Vue {
       message = 'Error: Please select a bits price';
     }
 
-    if (!settings.device) {
+    if (!settings.device.value) {
       error = true;
       message = 'Error: Please select a video device';
     }
