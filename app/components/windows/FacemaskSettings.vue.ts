@@ -78,10 +78,8 @@ export default class FacemaskSettings extends Vue {
     };
   });
 
-  async handleSubmit() {
-    this.updatingInfo = true;
-
-    const newSettings: IFormSettings = {
+  createSettingsObject(): IFormSettings {
+    return {
       enabled: this.enabledModel,
       donations_enabled: this.donationsEnabledModel,
       subs_enabled: this.subsEnabledModel,
@@ -92,6 +90,12 @@ export default class FacemaskSettings extends Vue {
         return device.value === this.videoInputModel;
       })[0],
     };
+  }
+
+  async handleSubmit() {
+    this.updatingInfo = true;
+
+    const newSettings = this.createSettingsObject();
 
     if (this.showTwitchFeatures) {
       newSettings.sub_duration = this.subsDurationModel;
