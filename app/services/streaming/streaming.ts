@@ -15,7 +15,6 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
-import { StreamInfoService } from 'services/stream-info';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
@@ -48,7 +47,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() customizationService: CustomizationService;
 
   streamingStatusChange = new Subject<EStreamingState>();

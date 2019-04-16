@@ -7,12 +7,8 @@ import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
-const LiveIcon = require('../../media/images/live-icon.svg');
-
 @Component({
-  components: {
-    LiveIcon
-  }
+  components: {}
 })
 export default class TitleBar extends Vue {
   @Inject() customizationService: CustomizationService;

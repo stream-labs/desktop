@@ -1,7 +1,6 @@
 <template>
 <div class="titlebar">
   <div class="titlebar-title">
-    <LiveIcon v-if="isStreaming" />
     {{ title }}
   </div>
   <div class="titlebar-actions">
