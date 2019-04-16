@@ -1,8 +1,6 @@
-import * as path from 'path';
-import { tmpdir } from 'os';
-import { mkdtemp, readdir } from 'fs-extra';
+import { readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from './helpers/spectron';
-import { setFormDropdown, setFormInput } from './helpers/spectron/forms';
+import { setFormDropdown } from './helpers/spectron/forms';
 import { sleep } from './helpers/sleep';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 
@@ -36,7 +34,7 @@ test('Recording', async t => {
 
     // Stop recording
     await app.client.click('.record-button');
-    await sleep(1000);
+    await app.client.waitForVisible('.record-button:not(.active)');
   }
 
   // Check that every file was created

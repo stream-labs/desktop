@@ -18,9 +18,9 @@ function testGoal(goalType: string) {
     await addSource(t, goalType, goalType, false);
 
     // end goal if it's already exist
-    try {
+    if (await client.isVisible('button=End Goal')) {
       await client.click('button=End Goal');
-    } catch (e) {}
+    }
 
     await client.waitForVisible('button=Start Goal');
 
@@ -75,5 +75,4 @@ function testGoal(goalType: string) {
     await waitForWidgetSettingsSync(t);
     t.true(await formMonkey.includes(testSet2));
   });
-
 }
