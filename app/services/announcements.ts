@@ -2,7 +2,7 @@ import { StatefulService, mutation } from './stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject } from '../util/injector';
-import { authorizedHeaders, handleResponse } from '../util/requests';
+import { authorizedHeaders } from '../util/requests';
 
 interface IAnnouncementsInfo {
   id: number;

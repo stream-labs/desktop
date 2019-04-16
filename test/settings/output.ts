@@ -4,8 +4,6 @@ import { sleep } from '../helpers/sleep';
 
 useSpectron();
 
-const AUDIO_BITRATES = [64, 96, 128, 160, 192, 224, 256, 288, 320];
-
 test('Populates simple output mode settings', async t => {
   const { app } = t.context;
 
