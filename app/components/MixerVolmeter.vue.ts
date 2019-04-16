@@ -45,6 +45,7 @@ export default class MixerVolmeter extends Vue {
   colorLocation: WebGLUniformLocation;
   translationLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
+  volumeLocation: WebGLUniformLocation;
 
   peakHoldCounters: number[];
   peakHolds: number[];
@@ -67,6 +68,8 @@ export default class MixerVolmeter extends Vue {
       uniform vec2 u_translation;
       uniform vec2 u_scale;
 
+      varying vec2 v_displacement;
+
       void main() {
         // Scale the positon
         vec2 scaledPosition = a_position * u_scale;
@@ -76,6 +79,8 @@ export default class MixerVolmeter extends Vue {
 
         // convert the position from pixels to 0.0 to 1.0
         vec2 zeroToOne = position / u_resolution;
+
+        v_displacement = zeroToOne;
 
         // convert from 0->1 to 0->2
         vec2 zeroToTwo = zeroToOne * 2.0;
@@ -88,16 +93,38 @@ export default class MixerVolmeter extends Vue {
     `;
 
     const fShaderSrc = `
-      precision mediump float;
+      precision highp float;
 
       uniform vec4 u_color;
+      uniform float u_volume;
+
+      uniform float u_warning;
+      uniform float u_danger;
+
+      varying vec2 v_displacement;
 
       void main() {
-        gl_FragColor = u_color;
+        vec4 mult = vec4(0.3, 0.3, 0.3, 1);
+
+        if (v_displacement.x < u_volume) {
+          mult = vec4(1, 1, 1, 1);
+        }
+
+        vec4 baseColor;
+
+        if (v_displacement.x > u_danger) {
+          baseColor = vec4(0.98, 0.24, 0.24, 1);
+        } else if (v_displacement.x > u_warning) {
+          baseColor = vec4(1, 0.8, 0.28, 1);
+        } else {
+          baseColor = vec4(0.19, 0.76, 0.64, 1);
+        }
+
+        gl_FragColor = baseColor * mult;
       }
     `;
 
-    this.gl = this.$refs.canvas.getContext('webgl');
+    this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
     const vShader = this.compileShader(vShaderSrc, this.gl.VERTEX_SHADER);
     const fShader = this.compileShader(fShaderSrc, this.gl.FRAGMENT_SHADER);
@@ -126,6 +153,16 @@ export default class MixerVolmeter extends Vue {
     this.colorLocation = this.gl.getUniformLocation(this.program, 'u_color');
     this.translationLocation = this.gl.getUniformLocation(this.program, 'u_translation');
     this.scaleLocation = this.gl.getUniformLocation(this.program, 'u_scale');
+    this.volumeLocation = this.gl.getUniformLocation(this.program, 'u_volume');
+
+    this.gl.useProgram(this.program);
+
+    const warningLocation = this.gl.getUniformLocation(this.program, 'u_warning');
+    this.gl.uniform1f(warningLocation, this.dbToUnitScalar(WARNING_LEVEL));
+
+    console.log(this.dbToUnitScalar(DANGER_LEVEL));
+    const dangerLocation = this.gl.getUniformLocation(this.program, 'u_danger');
+    this.gl.uniform1f(dangerLocation, this.dbToUnitScalar(DANGER_LEVEL));
   }
 
   /**
@@ -226,7 +263,6 @@ export default class MixerVolmeter extends Vue {
 
     this.gl.viewport(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    this.gl.useProgram(this.program);
 
     this.gl.enableVertexAttribArray(this.positionLocation);
     this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
@@ -242,8 +278,9 @@ export default class MixerVolmeter extends Vue {
 
   drawVolmeterChannel(peak: number, channel: number) {
     const normalVol = Math.max((peak + 60) * (1 / 60), 0);
-    this.gl.uniform2f(this.scaleLocation, normalVol, CHANNEL_HEIGHT);
+    this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
     this.gl.uniform2f(this.translationLocation, 0, channel * (CHANNEL_HEIGHT + PADDING_HEIGHT));
+    this.gl.uniform1f(this.volumeLocation, normalVol);
 
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
@@ -279,6 +316,10 @@ export default class MixerVolmeter extends Vue {
     //   PEAK_WIDTH,
     //   CHANNEL_HEIGHT,
     // );
+  }
+
+  dbToUnitScalar(db: number) {
+    return (db + 60) * (1 / 60);
   }
 
   dbToPx(db: number) {
