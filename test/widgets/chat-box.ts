@@ -6,7 +6,8 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Chatbox Visual Settings', async t => {
+// TODO: flaky
+test.skip('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
@@ -51,7 +52,8 @@ test('Chatbox Visual Settings', async t => {
   t.true(await formMonkey.includes(testSet2));
 });
 
-test('Chatbox Font Settings', async t => {
+// TODO: flaky
+test.skip('Chatbox Font Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);

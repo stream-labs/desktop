@@ -6,7 +6,8 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Set stream-boss health', async t => {
+// TODO flaky
+test.skip('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
@@ -26,7 +27,8 @@ test('Set stream-boss health', async t => {
   t.pass();
 });
 
-test('Stream Boss Manage Battle settings', async t => {
+// TODO: flaky
+test.skip('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
