@@ -196,9 +196,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  async function stopApp(t: TExecutionContext) {
+  async function stopApp() {
     try {
-      await t.context.app.stop();
+      await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
@@ -216,7 +216,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
-    console.log('check ', filePath);
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
@@ -260,7 +259,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp(t);
+        await stopApp();
       }
     } catch (e) {
       testPassed = false;
@@ -276,7 +275,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (appIsRunning) {
-      await stopApp(t);
+      await stopApp();
       if (!testPassed) failedTests.push(testName);
     }
 
