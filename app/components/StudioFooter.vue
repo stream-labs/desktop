@@ -5,6 +5,9 @@
   </div>
 
   <div class="nav-right">
+    <div class="nav-item elapsed-time">
+      <time>{{ streamingElapsedTime }}</time>
+    </div>
     <div class="nav-item">
       <button
         :disabled="locked"
@@ -83,6 +86,10 @@
     padding: 0 8px;
     font-size: 10px;
   }
+}
+
+.elapsed-time {
+  white-space: nowrap;
 }
 
 .record-button {

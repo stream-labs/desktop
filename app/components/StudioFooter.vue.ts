@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import { StreamingService } from '../services/streaming';
+import { StreamingService, EStreamingState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 import NotificationsArea from './NotificationsArea.vue';
@@ -33,8 +33,25 @@ export default class StudioFooterComponent extends Vue {
     return this.streamingService.isRecording;
   }
 
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
+  }
+
   get loggedIn() {
     return this.userService.isLoggedIn();
+  }
+
+  streamingElapsedTime: string = '--:--:--';
+  @Watch('streamingStatus')
+  updateStreamingElapsedTime (): void {
+    if (this.streamingService.state.streamingStatus !== EStreamingState.Live) {
+      this.streamingElapsedTime = '--:--:--';
+      return;
+    }
+
+    this.streamingElapsedTime = this.streamingService.formattedDurationInCurrentStreamingState;
+
+    setTimeout(() => this.updateStreamingElapsedTime(), 200);
   }
 
   recordTooltip = $t('streaming.recordTooltip');
