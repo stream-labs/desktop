@@ -8,7 +8,7 @@
         </ul>
         <div class="program-menu">
             <div class="program-menu-item">
-                <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" v-tooltip.bottom="twitterShareTooltip" class="link"><i class="icon-twitter icon-btn--lg icon-btn"></i></a>
+                <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" v-tooltip.bottom="twitterShareTooltip" class="link"><i class="icon-twitter icon-btn"></i></a>
             </div>
             <div class="program-menu-item popup-menu-wrapper" :class="[{ 'is-show':showPopupMenu }]">
                 <button class="popup-toggle-btn" @click="showPopupMenu=!showPopupMenu"><i class="icon-ellipsis-horizontal icon-btn"></i></button>
