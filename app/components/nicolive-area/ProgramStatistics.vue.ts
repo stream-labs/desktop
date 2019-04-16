@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import * as moment from 'moment';
+import { $t } from 'services/i18n';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
@@ -9,6 +10,14 @@ import { remote } from 'electron';
 export default class ProgramStatistics extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+
+  visitorTooltip = $t('common.numberOfVisitors');
+  commentTooltip = $t('common.numberOfComments');
+  adPointTooltip = $t('common.numberOfadPoint');
+  giftPointTooltip = $t('common.numberOfgiftPoint');
+  twitterShareTooltip = $t('common.twitter');
+
+  showPopupMenu:boolean = false;
 
   get programID(): string {
     return this.nicoliveProgramService.state.programID;

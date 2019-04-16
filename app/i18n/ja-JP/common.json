@@ -54,7 +54,10 @@
   "browse": "参照",
   "numberOfVisitors": "来場者数",
   "numberOfComments": "コメント数",
+  "numberOfadPoint": "ニコニ広告ポイント",
+  "numberOfgiftPoint": "ギフトポイント",
   "notifications": "通知",
   "help": "ヘルプ",
-  "simpleMode": "シンプルモード"
+  "simpleMode": "シンプルモード",
+  "twitter": "ツイッター"
 }
