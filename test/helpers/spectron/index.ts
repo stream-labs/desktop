@@ -5,6 +5,7 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUserName, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { async } from 'rxjs/internal/scheduler/async';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -45,6 +46,25 @@ export async function focusLibrary(t: any) {
 // Close current focused window
 export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
+}
+
+// Try to click element multiple times
+// A gross solution for the situation when the loading element overlaps the target element
+export async function clickWhenReady(t: any, selector: string) {
+  await t.context.app.client.waitForVisible(selector);
+  let attempts = 5;
+  let err: Error;
+  while (attempts--) {
+    try {
+      await t.context.app.client.click(selector);
+      return;
+    } catch (e) {
+      err = e;
+      await sleep(500);
+    }
+  }
+  console.error(`unable to click ${selector}`);
+  throw err;
 }
 
 interface ITestRunnerOptions {
@@ -133,8 +153,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
     `;
-    await focusChild(t);
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
@@ -149,7 +167,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // tests will want to skip this flow, so we do it automatically.
     await t.context.app.client.waitForVisible('a=Setup later'); // wait for the loader disappearing
     if (options.skipOnboarding) {
-      await t.context.app.client.click('a=Setup later');
+      await clickWhenReady(t, 'a=Setup later');
 
       // This will only show up if OBS is installed
       if (await t.context.app.client.isExisting('button=Start Fresh')) {
@@ -165,6 +183,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
+    // disable animations in the child window
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+
     context = t.context;
     appIsRunning = true;
 
@@ -175,7 +198,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   async function stopApp(t: TExecutionContext) {
     try {
-      await context.app.stop();
+      await t.context.app.stop();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
@@ -193,6 +216,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    console.log('check ', filePath);
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs

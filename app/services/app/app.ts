@@ -35,6 +35,7 @@ import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
 import path from 'path';
 import Utils from 'services/utils';
+import electronLog from 'electron-log';
 
 const crashHandler = window['require']('crash-handler');
 

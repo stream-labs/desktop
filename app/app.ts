@@ -157,6 +157,9 @@ if (Utils.isDevMode()) {
 
 // ERRORS LOGGING
 
+// catch and log unhandled errors/rejected promises:
+electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
+
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {

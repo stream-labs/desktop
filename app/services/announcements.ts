@@ -2,7 +2,7 @@ import { StatefulService, mutation } from './stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject } from '../util/injector';
-import { authorizedHeaders } from '../util/requests';
+import { authorizedHeaders, handleResponse } from '../util/requests';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -46,6 +46,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   private async fetchBanner() {
+    if (!this.userService.isLoggedIn()) return this.state;
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
