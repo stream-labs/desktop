@@ -73,7 +73,6 @@ export default class Main extends Vue {
     }
 
     electron.remote.getCurrentWindow().show();
-    this.handleResize();
   }
 
   get title() {
