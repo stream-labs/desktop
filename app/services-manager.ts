@@ -61,6 +61,8 @@ import { I18nService } from 'services/i18n';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
+import { InformationsService } from 'services/informations';
+import { InformationsStateService } from 'services/informations/state';
 
 const { ipcRenderer } = electron;
 
@@ -125,6 +127,8 @@ export class ServicesManager extends Service {
     OutageNotificationsService,
     QuestionaireService,
     MonitorCaptureCroppingService,
+    InformationsService,
+    InformationsStateService,
   };
 
   private instances: Dictionary<Service> = {};

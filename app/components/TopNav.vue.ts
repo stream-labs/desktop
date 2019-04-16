@@ -10,6 +10,7 @@ import StreamingStatus from 'components/StreamingStatus.vue';
 import { SettingsService } from 'services/settings';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
+import { InformationsService } from 'services/informations';
 
 @Component({
   components: {
@@ -23,6 +24,7 @@ export default class TopNav extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
+  @Inject() informationsService: InformationsService;
 
   slideOpen = false;
 
@@ -64,6 +66,10 @@ export default class TopNav extends Vue {
     return Utils.isDevMode();
   }
 
+  openInformations() {
+    this.informationsService.showInformations();
+  }
+
   openDevTools() {
     electron.ipcRenderer.send('openDevTools');
   }
@@ -74,5 +80,9 @@ export default class TopNav extends Vue {
 
   get isUserLoggedIn() {
     return this.userService.isLoggedIn();
+  }
+
+  get hasUnseenInformation() {
+    return this.informationsService.hasUnseenItem;
   }
 }
