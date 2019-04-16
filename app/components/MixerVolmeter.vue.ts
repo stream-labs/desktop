@@ -4,6 +4,9 @@ import { Subscription } from 'rxjs';
 import { AudioSource } from 'services/audio';
 import { Inject } from 'util/injector';
 import { CustomizationService } from 'services/customization';
+import { compileShader, createProgram } from 'util/webgl/utils';
+import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
+import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -13,13 +16,10 @@ const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
 const DANGER_LEVEL = -9;
 
-// Colors
-const GREEN = 'rgba(49,195,162,.6)';
-const GREEN_BG = 'rgba(49,195,162,.16)';
-const YELLOW = 'rgba(255,205,71,.6)';
-const YELLOW_BG = 'rgba(255,205,71,.16)';
-const RED = 'rgba(252,62,63,.6)';
-const RED_BG = 'rgba(252,62,63,.16)';
+// Colors (RGB)
+const GREEN = [49, 195, 162];
+const YELLOW = [255, 205, 71];
+const RED = [252, 62, 63];
 
 @Component({})
 export default class MixerVolmeter extends Vue {
@@ -46,6 +46,7 @@ export default class MixerVolmeter extends Vue {
   translationLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
   volumeLocation: WebGLUniformLocation;
+  peakHoldLocation: WebGLUniformLocation;
 
   peakHoldCounters: number[];
   peakHolds: number[];
@@ -61,74 +62,11 @@ export default class MixerVolmeter extends Vue {
     this.setChannelCount(1);
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
 
-    const vShaderSrc = `
-      attribute vec2 a_position;
-
-      uniform vec2 u_resolution;
-      uniform vec2 u_translation;
-      uniform vec2 u_scale;
-
-      varying vec2 v_displacement;
-
-      void main() {
-        // Scale the positon
-        vec2 scaledPosition = a_position * u_scale;
-
-        // Add in the translation.
-        vec2 position = scaledPosition + u_translation;
-
-        // convert the position from pixels to 0.0 to 1.0
-        vec2 zeroToOne = position / u_resolution;
-
-        v_displacement = zeroToOne;
-
-        // convert from 0->1 to 0->2
-        vec2 zeroToTwo = zeroToOne * 2.0;
-
-        // convert from 0->2 to -1->+1 (clipspace)
-        vec2 clipSpace = zeroToTwo - 1.0;
-
-        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-      }
-    `;
-
-    const fShaderSrc = `
-      precision highp float;
-
-      uniform vec4 u_color;
-      uniform float u_volume;
-
-      uniform float u_warning;
-      uniform float u_danger;
-
-      varying vec2 v_displacement;
-
-      void main() {
-        vec4 mult = vec4(0.3, 0.3, 0.3, 1);
-
-        if (v_displacement.x < u_volume) {
-          mult = vec4(1, 1, 1, 1);
-        }
-
-        vec4 baseColor;
-
-        if (v_displacement.x > u_danger) {
-          baseColor = vec4(0.98, 0.24, 0.24, 1);
-        } else if (v_displacement.x > u_warning) {
-          baseColor = vec4(1, 0.8, 0.28, 1);
-        } else {
-          baseColor = vec4(0.19, 0.76, 0.64, 1);
-        }
-
-        gl_FragColor = baseColor * mult;
-      }
-    `;
-
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
-    const vShader = this.compileShader(vShaderSrc, this.gl.VERTEX_SHADER);
-    const fShader = this.compileShader(fShaderSrc, this.gl.FRAGMENT_SHADER);
-    this.program = this.createProgram(vShader, fShader);
+    const vShader = compileShader(this.gl, vShaderSrc, this.gl.VERTEX_SHADER);
+    const fShader = compileShader(this.gl, fShaderSrc, this.gl.FRAGMENT_SHADER);
+    this.program = createProgram(this.gl, vShader, fShader);
 
     const positionBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
@@ -154,77 +92,25 @@ export default class MixerVolmeter extends Vue {
     this.translationLocation = this.gl.getUniformLocation(this.program, 'u_translation');
     this.scaleLocation = this.gl.getUniformLocation(this.program, 'u_scale');
     this.volumeLocation = this.gl.getUniformLocation(this.program, 'u_volume');
+    this.peakHoldLocation = this.gl.getUniformLocation(this.program, 'u_peakHold');
 
     this.gl.useProgram(this.program);
 
     const warningLocation = this.gl.getUniformLocation(this.program, 'u_warning');
     this.gl.uniform1f(warningLocation, this.dbToUnitScalar(WARNING_LEVEL));
 
-    console.log(this.dbToUnitScalar(DANGER_LEVEL));
     const dangerLocation = this.gl.getUniformLocation(this.program, 'u_danger');
     this.gl.uniform1f(dangerLocation, this.dbToUnitScalar(DANGER_LEVEL));
+
+    // Set colors
+    this.setColorUniform('u_green', GREEN);
+    this.setColorUniform('u_yellow', YELLOW);
+    this.setColorUniform('u_red', RED);
   }
 
-  /**
-   * Creates and compiles a shader.
-   *
-   * @param {string} shaderSource The GLSL source code for the shader.
-   * @param {number} shaderType The type of shader, VERTEX_SHADER or
-   *     FRAGMENT_SHADER.
-   * @return {!WebGLShader} The shader.
-   */
-  compileShader(shaderSource: string, shaderType: GLenum) {
-    // Create the shader object
-    const shader = this.gl.createShader(shaderType);
-
-    // Set the shader source code.
-    this.gl.shaderSource(shader, shaderSource);
-
-    // Compile the shader
-    this.gl.compileShader(shader);
-
-    // Check if it compiled
-    const success = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
-
-    if (!success) {
-      // Something went wrong during compilation; get the error
-      throw `could not compile shader: ${this.gl.getShaderInfoLog(shader)}`;
-    }
-
-    return shader;
-  }
-
-  /**
-   * Creates a program from 2 shaders.
-   *
-   * @param {!WebGLShader} vertexShader A vertex shader.
-   * @param {!WebGLShader} fragmentShader A fragment shader.
-   * @return {!WebGLProgram} A program.
-   */
-  createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
-    // create a program.
-    const program = this.gl.createProgram();
-
-    // attach the shaders.
-    this.gl.attachShader(program, vertexShader);
-    this.gl.attachShader(program, fragmentShader);
-
-    // link the program.
-    this.gl.linkProgram(program);
-
-    // Check if it linked.
-    const success = this.gl.getProgramParameter(program, this.gl.LINK_STATUS);
-
-    if (!success) {
-      // something went wrong with the link
-      throw `program filed to link: ${this.gl.getProgramInfoLog(program)}`;
-    }
-
-    return program;
-  }
-
-  get backgroundColor() {
-    return this.customizationService.themeBackground;
+  private setColorUniform(uniform: string, color: number[]) {
+    const location = this.gl.getUniformLocation(this.program, uniform);
+    this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 
   destroyed() {
@@ -262,6 +148,12 @@ export default class MixerVolmeter extends Vue {
     // console.log(peaks[0]);
 
     this.gl.viewport(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+
+    const bg = this.customizationService.themeBackground;
+
+    console.log(bg);
+
+    this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.gl.enableVertexAttribArray(this.positionLocation);
@@ -277,10 +169,19 @@ export default class MixerVolmeter extends Vue {
   }
 
   drawVolmeterChannel(peak: number, channel: number) {
-    const normalVol = Math.max((peak + 60) * (1 / 60), 0);
+    this.updatePeakHold(peak, channel);
+
     this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
     this.gl.uniform2f(this.translationLocation, 0, channel * (CHANNEL_HEIGHT + PADDING_HEIGHT));
-    this.gl.uniform1f(this.volumeLocation, normalVol);
+    this.gl.uniform1f(this.volumeLocation, this.dbToUnitScalar(peak));
+
+    // X component is the location of peak hold from 0 to 1
+    // Y component is width of the peak hold from 0 to 1
+    this.gl.uniform2f(
+      this.peakHoldLocation,
+      this.dbToUnitScalar(this.peakHolds[channel]),
+      PEAK_WIDTH / this.canvasWidth,
+    );
 
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
@@ -319,7 +220,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   dbToUnitScalar(db: number) {
-    return (db + 60) * (1 / 60);
+    return Math.max((db + 60) * (1 / 60), 0);
   }
 
   dbToPx(db: number) {
