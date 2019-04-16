@@ -16,6 +16,14 @@ function testGoal(goalType: string) {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
     await addSource(t, goalType, goalType, false);
+
+    // end goal if it's already exist
+    try {
+      await client.click('button=End Goal');
+    } catch (e) {}
+
+    await client.waitForVisible('button=Start Goal');
+
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
       title: 'My Goal',
