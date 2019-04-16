@@ -39,7 +39,7 @@ function testGoal(goalType: string) {
   });
 
   // TODO flaky test
-  test.skip(`${goalType} change settings`, async t => {
+  test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
 
