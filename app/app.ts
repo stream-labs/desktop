@@ -1,4 +1,4 @@
-import { I18nService } from 'services/i18n';
+import { I18nService, $t } from 'services/i18n';
 
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
@@ -21,11 +21,18 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
+import * as obs from '../obs-api';
+import { ObsUserPluginsService } from 'services/obs-user-plugins';
+import uuid from 'uuid/v4';
+import path from 'path';
+import { EVideoCodes } from 'obs-studio-node/module';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+
+const crashHandler = window['require']('crash-handler');
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -93,6 +100,24 @@ if (
   };
 }
 
+const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
+  switch (resultCode) {
+    case EVideoCodes.NotSupported: {
+      return $t('OBSInit.NotSupportedError');
+    }
+    case EVideoCodes.ModuleNotFound: {
+      return $t('OBSInit.ModuleNotFoundError');
+    }
+    default: {
+      return $t('OBSInit.UnknownError');
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+};
+
 require('./app.g.less');
 require('./themes.g.less');
 
@@ -113,6 +138,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // handle closeWindow event from the main process
     const windowsService: WindowsService = WindowsService.instance;
     if (Utils.isMainWindow()) {
+      // This is used for debugging
+      window['obs'] = obs;
+
+      // Host a new OBS server instance
+      obs.IPC.host(`slobs-${uuid()}`);
+      obs.NodeObs.SetWorkingDirectory(
+        path.join(
+          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+          'node_modules',
+          'obs-studio-node',
+        ),
+      );
+
+      await ObsUserPluginsService.instance.initialize();
+
+      const appService: AppService = AppService.instance;
+
+      // Initialize OBS API
+      const apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.SLOBS_VERSION,
+      );
+
+      if (apiResult !== EVideoCodes.Success) {
+        const message = apiInitErrorResultToMessage(apiResult);
+        showDialog(message);
+
+        crashHandler.unregisterProcess(appService.pid);
+
+        obs.NodeObs.StopCrashHandler();
+        obs.IPC.disconnect();
+
+        electron.ipcRenderer.send('shutdownComplete');
+        return;
+      }
+
       ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
       AppService.instance.load();
     } else {

@@ -22,18 +22,14 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import * as obs from '../../../obs-api';
-import { EVideoCodes } from 'obs-studio-node/module';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
-import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
-import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
-import path from 'path';
 import Utils from 'services/utils';
 
 const crashHandler = window['require']('crash-handler');
@@ -81,12 +77,11 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
-  @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private customizationService: CustomizationService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
-  private pid = require('process').pid;
+  readonly pid = require('process').pid;
 
   @track('app_start')
   @RunInLoadingMode()
@@ -97,42 +92,7 @@ export class AppService extends StatefulService<IAppState> {
       });
     }
 
-    // This is used for debugging
-    window['obs'] = obs;
-
-    // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
-    obs.NodeObs.SetWorkingDirectory(
-      path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-        'node_modules',
-        'obs-studio-node',
-      ),
-    );
-
     crashHandler.registerProcess(this.pid, false);
-
-    await this.obsUserPluginsService.initialize();
-
-    // Initialize OBS API
-    const apiResult = obs.NodeObs.OBS_API_initAPI(
-      'en-US',
-      this.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
-    );
-
-    if (apiResult !== EVideoCodes.Success) {
-      const message = apiInitErrorResultToMessage(apiResult);
-      showDialog(message);
-
-      crashHandler.unregisterProcess(this.pid);
-
-      obs.NodeObs.StopCrashHandler();
-      obs.IPC.disconnect();
-
-      electron.ipcRenderer.send('shutdownComplete');
-      return;
-    }
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -296,21 +256,3 @@ export class AppService extends StatefulService<IAppState> {
     this.state.argv = argv;
   }
 }
-
-export const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
-  switch (resultCode) {
-    case EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
-    }
-    case EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
-    }
-    default: {
-      return $t('OBSInit.UnknownError');
-    }
-  }
-};
-
-const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
-};
