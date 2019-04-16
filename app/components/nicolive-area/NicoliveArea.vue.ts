@@ -38,6 +38,7 @@ export default class NicolivePanelRoot extends Vue {
 
   isCreating: boolean = false;
   async createProgram(): Promise<void> {
+    if (this.isCreating) throw new Error('createProgram is running');
     try {
       this.isCreating = true;
       await this.nicoliveProgramService.createProgram();
@@ -51,6 +52,7 @@ export default class NicolivePanelRoot extends Vue {
 
   isFetching: boolean = false;
   async fetchProgram(): Promise<void> {
+    if (this.isFetching) throw new Error('fetchProgram is running');
     try {
       this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();

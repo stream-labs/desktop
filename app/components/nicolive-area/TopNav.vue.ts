@@ -16,6 +16,7 @@ export default class TopNav extends Vue {
 
   isFetching: boolean = false;
   async fetchProgram() {
+    if (this.isFetching) throw new Error('fetchProgram is running');
     try {
       this.isFetching = true;
       return await this.nicoliveProgramService.fetchProgram();
@@ -42,6 +43,7 @@ export default class TopNav extends Vue {
 
   isEditing: boolean = false;
   async editProgram() {
+    if (this.isEditing) throw new Error('editProgram is running');
     try {
       this.isEditing = true;
       return await this.nicoliveProgramService.editProgram();

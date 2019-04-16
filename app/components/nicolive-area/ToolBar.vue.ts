@@ -14,6 +14,7 @@ export default class ToolBar extends Vue {
 
   isExtending: boolean = false;
   async extendProgram() {
+    if (this.isExtending) throw new Error('extendProgram is running');
     try {
       this.isExtending = true;
       return await this.nicoliveProgramService.extendProgram();
