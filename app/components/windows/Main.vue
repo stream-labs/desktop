@@ -19,14 +19,15 @@
       />
     </div>
 
-    <div class="main-middle" :class="mainResponsiveClasses" v-if="!showLoadingSpinner" ref="mainMiddle">
+    <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
 
-      <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <top-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
 
       <component
         class="main-page-container"
+        v-if="!showLoadingSpinner"
         :is="page"
         :params="params"/>
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
