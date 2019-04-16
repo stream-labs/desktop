@@ -7,7 +7,6 @@ import ObsImport from './onboarding_steps/ObsImport.vue';
 import OptimizeC from './onboarding_steps/OptimizeC.vue';
 import SuccessfullyImported from './onboarding_steps/SuccessfullyImported.vue';
 import SceneCollectionsImport from './onboarding_steps/SceneCollectionsImport.vue';
-import SelectWidgets from './onboarding_steps/SelectWidgets.vue';
 import { OnboardingService } from '../../services/onboarding';
 import { Inject } from '../../util/injector';
 import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
@@ -20,7 +19,6 @@ import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
     ObsImport,
     OptimizeC,
     SuccessfullyImported,
-    SelectWidgets,
     SceneCollectionsImport,
     OptimizeBrandDevice,
   },
