@@ -1,4 +1,5 @@
-const m = jest.requireActual('services/stateful-service');
+import { Service } from 'services/service';
+import { merge } from 'lodash';
 
 export function mutation() {
   return function(x: any) {
@@ -6,9 +7,33 @@ export function mutation() {
   };
 }
 
-export const StatefulService = m.StatefulService;
-StatefulService.setupVuexStore({ watch: (x: any) => x });
+export class StatefulService<State> extends Service {
 
-export function __setup(state?: { [serviceName: string]: any }) {
-  StatefulService.setupVuexStore({ watch: (x: any) => x, state });
+  static store: { [serviceName: string]: any } = {};
+  static overrideState: { [serviceName: string]: any } = null;
+
+  get store(): { [serviceName: string]: any } {
+    return {
+      state: StatefulService.store,
+      watch() {}
+    };
+  }
+
+  get state(): State {
+    return this.store.state[this.serviceName];
+  }
+
+  set state(newState: State) {
+    this.store.state[this.serviceName] = newState;
+  }
+
+  init(): void {
+    this.state = (this.constructor as any).initialState;
+    const state = StatefulService.overrideState[this.serviceName];
+    if (state) this.state = merge({}, this.state, state);
+  }
+}
+
+export function __setup(states?: { [serviceName: string]: any }) {
+  StatefulService.overrideState = states;
 }
