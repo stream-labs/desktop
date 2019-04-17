@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 interface IState {
   autoExtensionEnabled: boolean;
+  panelOpened: boolean;
 }
 
 /**
@@ -14,6 +15,7 @@ interface IState {
 export class NicoliveProgramStateService extends PersistentStatefulService<IState> {
   static defaultState = {
     autoExtensionEnabled: false,
+    panelOpened: true,
   };
 
   private subject: Subject<IState> = new BehaviorSubject<IState>(this.state);
@@ -21,6 +23,10 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
 
   toggleAutoExtension(): void {
     this.setState({ autoExtensionEnabled: !this.state.autoExtensionEnabled });
+  }
+
+  togglePanelOpened(): void {
+    this.setState({ panelOpened: !this.state.panelOpened });
   }
 
   private setState(nextState: Partial<IState>): void {
