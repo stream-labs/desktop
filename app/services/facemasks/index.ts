@@ -512,18 +512,22 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     this.updateFilterReference(dshowInputs);
   }
 
+  getMatchingWebcams(dshowInputs: Source[]) {
+    return dshowInputs.filter(videoInput => {
+      let videoDeviceId = null;
+      let obsProp = videoInput.getObsInput().properties.first();
+      do {
+        if (obsProp.name === 'video_device_id') {
+          videoDeviceId = obsProp.value;
+        }
+      } while ((obsProp = obsProp.next()));
+      return videoDeviceId === this.state.settings.device.value;
+    });
+  }
+
   updateFilterReference(dshowInputs: Source[]) {
     if (dshowInputs.length) {
-      const matches = dshowInputs.filter(videoInput => {
-        let videoDeviceId = null;
-        let obsProp = videoInput.getObsInput().properties.first();
-        do {
-          if (obsProp.name === 'video_device_id') {
-            videoDeviceId = obsProp.value;
-          }
-        } while ((obsProp = obsProp.next()));
-        return videoDeviceId === this.state.settings.device.value;
-      });
+      const matches = this.getMatchingWebcams(dshowInputs); 
 
       if (matches.length === 1) {
         const slobsSource = matches[0];
