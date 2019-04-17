@@ -47,25 +47,6 @@ export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
 }
 
-// Try to click element multiple times
-// A gross solution for the situation when the loading element overlaps the target element
-export async function clickWhenReady(t: any, selector: string) {
-  await t.context.app.client.waitForVisible(selector);
-  let attempts = 5;
-  let err: Error;
-  while (attempts--) {
-    try {
-      await t.context.app.client.click(selector);
-      return;
-    } catch (e) {
-      err = e;
-      await sleep(500);
-    }
-  }
-  console.error(`unable to click ${selector}`);
-  throw err;
-}
-
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
@@ -167,7 +148,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     await t.context.app.client.waitForExist('.main-loading', 5000, true);
     if (options.skipOnboarding) {
-      await clickWhenReady(t, 'a=Setup later');
 
       // This will only show up if OBS is installed
       if (await t.context.app.client.isExisting('button=Start Fresh')) {
