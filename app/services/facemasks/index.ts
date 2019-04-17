@@ -43,7 +43,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   downloadProgress = {};
 
   static defaultState: Interfaces.IFacemasksServiceState = {
-    device: { name: null, value: null },
     modtimeMap: {},
     active: false,
     downloadProgress: 0,
@@ -354,7 +353,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       devices[0].selected = true;
     }
 
-    const enabled = this.state.device.value;
+    const enabled = this.state.settings.device.value;
 
     if (enabled) {
       devices.forEach(device => {
@@ -368,7 +367,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   getDeviceStatus() {
     const availableDevices = this.getInputDevicesList();
-    const enabledDeviceId = this.state.device ? this.state.device.value : null;
+    const enabledDeviceId = this.state.settings.device ? this.state.settings.device.value : null;
     const availableDeviceSelected = enabledDeviceId
       ? availableDevices.some(device => {
           return enabledDeviceId === (device.value as string);
@@ -407,7 +406,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     uuids = uuids.concat(t3).concat(t2);
 
     if (settings.device.name && settings.device.value) {
-      this.SET_DEVICE(settings.device.name, settings.device.value);
+      // this.SET_DEVICE(settings.device.name, settings.device.value);
       this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
@@ -478,7 +477,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   getEnabledDevice() {
-    return this.state.device;
+    return this.state.settings.device;
   }
 
   getEnabledStatus() {
@@ -517,7 +516,14 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   updateFilterReference(dshowInputs: Source[]) {
     if (dshowInputs.length) {
       const matches = dshowInputs.filter(videoInput => {
-        return videoInput.getObsInput().settings.video_device_id === this.state.device.value;
+        let video_device_id = null;
+        let obsProp = videoInput.getObsInput().properties.first();
+        do {
+          if (obsProp.name === 'video_device_id') {
+            video_device_id = obsProp.value;
+          }
+        } while ((obsProp = obsProp.next()));
+        return video_device_id === this.state.settings.device.value;
       });
 
       if (matches.length === 1) {
@@ -711,11 +717,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @mutation()
   private SET_ACTIVE(active: boolean) {
     this.state.active = active;
-  }
-
-  @mutation()
-  private SET_DEVICE(name: string, value: string) {
-    this.state.device = { name, value };
   }
 
   @mutation()
