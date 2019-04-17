@@ -29,8 +29,7 @@ test('Chatbox Visual Settings', async t => {
     message_hide_delay: 10,
   };
 
-  await formMonkey.fill(testSet1);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -47,8 +46,7 @@ test('Chatbox Visual Settings', async t => {
     message_hide_delay: 60,
   };
 
-  await formMonkey.fill(testSet2);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
 });
 
@@ -66,8 +64,7 @@ test('Chatbox Font Settings', async t => {
     text_size: 20,
   };
 
-  await formMonkey.fill(testSet1);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -75,7 +72,6 @@ test('Chatbox Font Settings', async t => {
     text_size: 15,
   };
 
-  await formMonkey.fill(testSet2);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
 });

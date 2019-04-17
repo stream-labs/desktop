@@ -2,19 +2,40 @@ import { getClient } from './api-client';
 import { WebsocketService } from '../../app/services/websocket';
 import { sleep } from './sleep';
 import { TExecutionContext } from './spectron';
+import { Observable, Subject } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 
-export async function waitForWidgetSettingsSync(t: TExecutionContext) {
+let listener: Subject<any>;
+
+// return an existing SettingsUpdate listener or create one
+async function getListener(): Promise<Observable<any>> {
+  if (listener) return listener;
+
   const apiClient = await getClient();
   const websocketService = apiClient.getResource<WebsocketService>('WebsocketService');
+  listener = new Subject();
 
-  // waitForEvent() catches only subscribed events
-  websocketService.socketEvent.subscribe(() => void 0);
-
-  // check that we receive a socket event with new widget settings
-  await apiClient.waitForEvent((event: Dictionary<any>) => {
-    // maybe there is better way to distinguish WidgetEvents, but just check the event type for now
-    return typeof event.type === 'string' && event.type.includes('SettingsUpdate');
+  // listen all websocket events and filter SettingsUpdate event
+  websocketService.socketEvent.subscribe((event: Dictionary<any>) => {
+    if (typeof event.type === 'string' && event.type.includes('SettingsUpdate')) {
+      listener.next(event);
+    }
   });
-  // WidgetSettings component has Debouncing for the saving method, so wait a bit
-  await sleep(1000);
+
+  return listener;
+}
+
+export async function waitForWidgetSettingsSync(t: TExecutionContext, fn: Function) {
+  return new Promise(async (resolve, reject) => {
+    // start listen widgets SettingsUpdate events
+    const listener = await getListener();
+    listener.pipe(first()).subscribe(ev => resolve(ev));
+
+    // execute code
+    await fn();
+
+    // wait for events
+    await sleep(5000);
+    reject('No widget events received');
+  });
 }

@@ -59,7 +59,7 @@ function testGoal(goalType: string) {
     };
 
     await formMonkey.fill(testSet1);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
     t.true(await formMonkey.includes(testSet1));
 
     const testSet2 = {
@@ -72,8 +72,7 @@ function testGoal(goalType: string) {
       font: 'Open Sans',
     };
 
-    await formMonkey.fill(testSet2);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
     t.true(await formMonkey.includes(testSet2));
   });
 }
