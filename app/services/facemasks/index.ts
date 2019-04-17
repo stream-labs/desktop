@@ -406,7 +406,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     uuids = uuids.concat(t3).concat(t2);
 
     if (settings.device.name && settings.device.value) {
-      // this.SET_DEVICE(settings.device.name, settings.device.value);
       this.setupFilter();
     } else {
       this.SET_ACTIVE(false);
