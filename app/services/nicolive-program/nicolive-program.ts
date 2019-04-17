@@ -25,10 +25,11 @@ interface INicoliveProgramState {
   giftPoint: number;
   /**
    * 永続化された状態をコンポーネントに伝えるための一時置き場
-   * 直接ここを編集してはいけない、stateServiceの操作結果を反映するだけにする
+   * 直接ここを編集してはいけない、stateService等の操作結果を反映するだけにする
    */
   autoExtensionEnabled: boolean;
-  panelOpened: boolean;
+  panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
+  isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
 }
 
 enum PanelState {
@@ -38,7 +39,7 @@ enum PanelState {
 }
 
 const WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
-  INACTIVE: 800, // 初期値
+  INACTIVE: 800, // 通常値
   OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
   CLOSED: 800 + 24, // +開閉ボタン幅
 };
@@ -68,23 +69,27 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     adPoint: 0,
     giftPoint: 0,
     autoExtensionEnabled: false,
-    panelOpened: true,
+    panelOpened: null,
+    isLoggedIn: null,
   };
 
   init(): void {
     super.init();
 
     this.stateService.updated.subscribe({
-      next: (persistentState) => {
+      next: persistentState => {
         this.setState(persistentState);
       }
     });
 
-    this.userService.userLoginState.subscribe(user => {
-      const isLoggedIn = Boolean(user);
-      const panelState = NicoliveProgramService.getPanelState(this.state.panelOpened, isLoggedIn);
-      this.updateWindowSize(panelState);
+    this.userService.userLoginState.subscribe({
+      next: user => {
+        this.setState({ isLoggedIn: Boolean(user) });
+      }
     });
+
+    // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
+    this.setState({ isLoggedIn: this.userService.isLoggedIn() });
   }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
@@ -92,7 +97,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
     this.refreshAutoExtensionTimer(this.state, nextState);
-    this.refreshWindowConstraints(this.state, nextState);
+    this.refreshWindowSize(this.state, nextState);
     this.SET_STATE(nextState);
   }
 
@@ -382,30 +387,39 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.stateService.togglePanelOpened();
   }
 
-  static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState {
-    if (!isLoggedIn) return 'INACTIVE' as PanelState;
-    return panelOpened ? ('OPENED' as PanelState) : ('CLOSED' as PanelState);
+  static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState | null {
+    if (panelOpened === null || isLoggedIn === null) return null;
+    if (!isLoggedIn) return PanelState.INACTIVE;
+    return panelOpened ? PanelState.OPENED : PanelState.CLOSED;
   }
 
   /** パネルが出る幅の分だけ画面の最小幅を拡張する */
-  refreshWindowConstraints(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    if (prevState.panelOpened === nextState.panelOpened) return;
-    const isLoggedIn = this.userService.isLoggedIn();
-    const panelState = NicoliveProgramService.getPanelState(nextState.panelOpened, isLoggedIn);
-    this.updateWindowSize(panelState);
+  refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+    if (prevState.panelOpened === nextState.panelOpened && prevState.isLoggedIn === nextState.isLoggedIn) return;
+
+    const prevPanelState = NicoliveProgramService.getPanelState(prevState.panelOpened, prevState.isLoggedIn);
+    const nextPanelState = NicoliveProgramService.getPanelState(nextState.panelOpened, nextState.isLoggedIn);
+    this.updateWindowSize(prevPanelState, nextPanelState);
   }
 
   /*
-   * TODO: 最小幅が変動するときにその差分だけ実際の幅を操作する（初期状態を考慮するとパネル開閉状態の永続化が必要）
    * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
    * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
    */
-  updateWindowSize(state: PanelState): void {
+  updateWindowSize(prevState: PanelState, nextState: PanelState): void {
+    if (prevState === nextState) return;
+    const initialized = Boolean(prevState);
+
     const win = this.windowsService.getWindow('main');
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
-    const newMinWidth = WINDOW_MIN_WIDTH[state];
-    win.setMinimumSize(newMinWidth, minHeight);
-    win.setSize(Math.max(width, newMinWidth), height);
+    const prevMinWidth = WINDOW_MIN_WIDTH[prevState];
+    const nextMinWidth = WINDOW_MIN_WIDTH[nextState];
+    win.setMinimumSize(nextMinWidth, minHeight);
+
+    // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、情報が揃ってから更新する
+    if (initialized && !win.isMaximized()) {
+      win.setSize(width + nextMinWidth - prevMinWidth, height);
+    }
   }
 }
