@@ -22,6 +22,7 @@ import { $t } from 'services/i18n';
 import { throttle } from 'lodash-decorators';
 import * as Interfaces from './definitions';
 import { AppService } from 'services/app';
+import { propsToSettings } from 'util/obs';
 
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
@@ -514,14 +515,8 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   getMatchingWebcams(dshowInputs: Source[]) {
     return dshowInputs.filter(videoInput => {
-      let videoDeviceId = null;
-      let obsProp = videoInput.getObsInput().properties.first();
-      do {
-        if (obsProp.name === 'video_device_id') {
-          videoDeviceId = obsProp.value;
-        }
-      } while ((obsProp = obsProp.next()));
-      return videoDeviceId === this.state.settings.device.value;
+      const settings = propsToSettings(videoInput.getObsInput().properties);
+      return settings.video_device_id === this.state.settings.device.value;
     });
   }
 
