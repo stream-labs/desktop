@@ -110,7 +110,7 @@
 .running-setup-container {
   width: 100%;
   padding: 30px;
-  color: var(--background);
+  color: var(--paragraph);
   background-color: var(--section);
   .margin-bottom(2);
   height: 270px;

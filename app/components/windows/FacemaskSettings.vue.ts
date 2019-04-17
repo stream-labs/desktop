@@ -60,7 +60,7 @@ export default class FacemaskSettings extends Vue {
   bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
-  videoInputModel = this.facemasksService.state.device.value;
+  videoInputModel = this.facemasksService.state.settings.device.value;
   t2AvailableMasks = this.facemasksService.state.settings.t2masks as IFacemaskSelection[];
   t3AvailableMasks = this.facemasksService.state.settings.t3masks as IFacemaskSelection[];
 
