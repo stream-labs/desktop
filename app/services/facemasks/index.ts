@@ -527,7 +527,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   updateFilterReference(dshowInputs: Source[]) {
     if (dshowInputs.length) {
-      const matches = this.getMatchingWebcams(dshowInputs); 
+      const matches = this.getMatchingWebcams(dshowInputs);
 
       if (matches.length === 1) {
         const slobsSource = matches[0];
