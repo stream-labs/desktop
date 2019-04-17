@@ -62,11 +62,22 @@ const setup = createSetupFunction({
         subscribe() {}
       }
     },
-    WindowsService: {},
+    WindowsService: {
+      getWindow() {
+        return {
+          getMinimumSize: () => [800, 600],
+          setMinimumSize: () => {},
+          getSize: () => [800, 600],
+          setSize: () => {},
+          isMaximized: () => false,
+        }
+      }
+    },
     UserService: {
       userLoginState: {
         subscribe() {}
-      }
+      },
+      isLoggedIn: () => true,
     },
   }
 });
