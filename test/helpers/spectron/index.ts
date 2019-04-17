@@ -164,7 +164,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await t.context.app.client.waitForVisible('a=Setup later'); // wait for the loader disappearing
+
+    await t.context.app.client.waitForExist('.main-loading', 5000, true);
     if (options.skipOnboarding) {
       await clickWhenReady(t, 'a=Setup later');
 
