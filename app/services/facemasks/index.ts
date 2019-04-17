@@ -515,14 +515,14 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   updateFilterReference(dshowInputs: Source[]) {
     if (dshowInputs.length) {
       const matches = dshowInputs.filter(videoInput => {
-        let video_device_id = null;
+        let videoDeviceId = null;
         let obsProp = videoInput.getObsInput().properties.first();
         do {
           if (obsProp.name === 'video_device_id') {
-            video_device_id = obsProp.value;
+            videoDeviceId = obsProp.value;
           }
         } while ((obsProp = obsProp.next()));
-        return video_device_id === this.state.settings.device.value;
+        return videoDeviceId === this.state.settings.device.value;
       });
 
       if (matches.length === 1) {
