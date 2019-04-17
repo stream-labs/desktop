@@ -5,7 +5,7 @@ import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 import { sleep } from '../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync', networkLogging: true });
+useSpectron({ appArgs: '--nosync' });
 
 testGoal('Donation Goal');
 testGoal('Follower Goal');

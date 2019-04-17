@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { WebsocketService } from 'services/websocket';
+import electronLog from 'electron-log';
 
 export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   loadingState: 'none',
@@ -156,7 +157,10 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    return fetch(request).then(handleResponse);
+    electronLog.log('REQUEST TO', method, req.url, JSON.stringify(req.body));
+    const result = await fetch(request).then(handleResponse);
+    electronLog.log('RESPONSE FROM', method, req.url, result);
+    return result;
   }
 
   protected getHost(): string {
