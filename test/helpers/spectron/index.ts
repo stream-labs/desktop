@@ -148,6 +148,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     await t.context.app.client.waitForExist('.main-loading', 5000, true);
     if (options.skipOnboarding) {
+      await t.context.app.client.click('a=Setup later');
 
       // This will only show up if OBS is installed
       if (await t.context.app.client.isExisting('button=Start Fresh')) {
