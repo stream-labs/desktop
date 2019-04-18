@@ -79,7 +79,6 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_bg_color: '#FF0000',
     font: 'Sacramento',
   };
-  await formMonkey.fill(testSet1);
   await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
   t.true(await formMonkey.includes(testSet1));
 
@@ -90,7 +89,6 @@ test('Stream Boss Manage Visual Settings', async t => {
     bar_bg_color: '#46E65A',
     font: 'Roboto',
   };
-  await formMonkey.fill(testSet2);
   await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
 });

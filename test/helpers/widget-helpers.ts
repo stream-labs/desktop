@@ -3,9 +3,7 @@ import { WebsocketService } from '../../app/services/websocket';
 import { sleep } from './sleep';
 import { TExecutionContext } from './spectron';
 import { Observable, Subject } from 'rxjs';
-import { filter, first } from 'rxjs/operators';
-
-
+import { first } from 'rxjs/operators';
 
 // returns SettingsUpdate event listener
 async function getListener(): Promise<Observable<any>> {
