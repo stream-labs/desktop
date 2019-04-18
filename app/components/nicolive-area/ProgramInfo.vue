@@ -4,8 +4,8 @@
       <img :src="communitySymbol" />
     </div>
     <div class="program-info-description">
-      <h1 class="program-title">{{programTitle}}</h1>
-      <h2 class="community-name"><i v-if="programIsMemberOnly" class="icon-lock"></i><span>{{communityName}}</span></h2>
+      <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">{{programTitle}}</h1>
+      <h2 class="community-name"><i v-if="programIsMemberOnly" class="icon-lock"></i><span v-tooltip.bottom="communityNameTooltip">{{communityName}}</span></h2>
     </div>
     <!-- <div>status: {{ programStatus }}</div> -->
     <div class="program-button">
@@ -37,7 +37,6 @@
   color: @white;
   font-size: 13px;
   font-weight: bold;
-  width: 100%;
   margin-bottom: 4px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -56,7 +55,6 @@
 
   span {
     font-size: 12px;
-    width: 100%;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
