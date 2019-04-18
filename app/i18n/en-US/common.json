@@ -54,7 +54,10 @@
   "browse": "Browse",
   "numberOfVisitors": "Number of visitors",
   "numberOfComments": "Number of comments",
+  "numberOfadPoint": "Number of nicoad point",
+  "numberOfgiftPoint": "Number of gift point",
   "notifications": "Notifications",
   "help": "Help",
-  "simpleMode": "Simple Mode"
+  "simpleMode": "Simple Mode",
+  "twitter": "Twitter"
 }
