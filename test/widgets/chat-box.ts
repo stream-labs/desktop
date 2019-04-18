@@ -7,7 +7,7 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 useSpectron({ appArgs: '--nosync' });
 
 // TODO: flaky
-test.skip('Chatbox Visual Settings', async t => {
+test('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
@@ -29,8 +29,7 @@ test.skip('Chatbox Visual Settings', async t => {
     message_hide_delay: 10,
   };
 
-  await formMonkey.fill(testSet1);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -47,13 +46,12 @@ test.skip('Chatbox Visual Settings', async t => {
     message_hide_delay: 60,
   };
 
-  await formMonkey.fill(testSet2);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
 });
 
 // TODO: flaky
-test.skip('Chatbox Font Settings', async t => {
+test('Chatbox Font Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
@@ -66,8 +64,7 @@ test.skip('Chatbox Font Settings', async t => {
     text_size: 20,
   };
 
-  await formMonkey.fill(testSet1);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -75,7 +72,6 @@ test.skip('Chatbox Font Settings', async t => {
     text_size: 15,
   };
 
-  await formMonkey.fill(testSet2);
-  await waitForWidgetSettingsSync(t);
+  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
 });

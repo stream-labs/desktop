@@ -5,7 +5,7 @@ import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 import { sleep } from '../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync', networkLogging: true });
+useSpectron({ appArgs: '--nosync' });
 
 testGoal('Donation Goal');
 testGoal('Follower Goal');
@@ -39,7 +39,7 @@ function testGoal(goalType: string) {
   });
 
   // TODO flaky test
-  test.skip(`${goalType} change settings`, async t => {
+  test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
 
@@ -59,7 +59,7 @@ function testGoal(goalType: string) {
     };
 
     await formMonkey.fill(testSet1);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
     t.true(await formMonkey.includes(testSet1));
 
     const testSet2 = {
@@ -72,8 +72,7 @@ function testGoal(goalType: string) {
       font: 'Open Sans',
     };
 
-    await formMonkey.fill(testSet2);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
     t.true(await formMonkey.includes(testSet2));
   });
 }
