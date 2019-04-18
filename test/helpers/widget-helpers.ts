@@ -5,15 +5,13 @@ import { TExecutionContext } from './spectron';
 import { Observable, Subject } from 'rxjs';
 import { filter, first } from 'rxjs/operators';
 
-let listener: Subject<any>;
 
-// return an existing SettingsUpdate listener or create one
+
+// returns SettingsUpdate event listener
 async function getListener(): Promise<Observable<any>> {
-  if (listener) return listener;
-
   const apiClient = await getClient();
   const websocketService = apiClient.getResource<WebsocketService>('WebsocketService');
-  listener = new Subject();
+  const listener = new Subject();
 
   // listen all websocket events and filter SettingsUpdate event
   websocketService.socketEvent.subscribe((event: Dictionary<any>) => {
