@@ -33,6 +33,16 @@ const DISPLAY_BACKGROUNDS = {
  */
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
+  static get migrations() {
+    return [
+      {
+        oldKey: 'nightMode',
+        newKey: 'theme',
+        transform: (val: boolean) => (val ? 'night-theme' : 'day-theme'),
+      },
+    ];
+  }
+
   static defaultState: ICustomizationServiceState = {
     theme: 'night-theme',
     updateStreamInfoOnLive: true,
@@ -58,16 +68,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
 
   init() {
-    super.init();
+    super.init(CustomizationService.migrations);
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
 
     // Hide these elements until the app is finished loading
     this.setSettings({ hideStyleBlockingElements: true });
-
-    if (this.state.nightMode != null) {
-      const theme = this.state.nightMode ? 'night-theme' : 'day-theme';
-      this.setSettings({ theme, nightMode: null });
-    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
