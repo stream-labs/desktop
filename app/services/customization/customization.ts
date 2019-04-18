@@ -63,6 +63,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
     // Hide these elements until the app is finished loading
     this.setSettings({ hideStyleBlockingElements: true });
+
+    if (this.state.nightMode != null) {
+      const theme = this.state.nightMode ? 'night-theme' : 'day-theme';
+      this.setSettings({ theme, nightMode: null });
+    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
