@@ -51,7 +51,6 @@ interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
-  showLogsIfFailed?: boolean;
   appArgs?: string;
   afterStartCb?(t: any): Promise<any>;
 
@@ -74,7 +73,6 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   restartAppAfterEachTest: true,
   networkLogging: false,
   pauseIfFailed: false,
-  showLogsIfFailed: true,
 };
 
 export interface ITestContext {
@@ -211,7 +209,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (errors.length) {
       fail(`The log-file has errors \n ${logs}`);
-    } else if ((options.networkLogging || options.showLogsIfFailed) && !testPassed) {
+    } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
     }
   }

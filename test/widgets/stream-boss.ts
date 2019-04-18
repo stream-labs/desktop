@@ -6,7 +6,6 @@ import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync' });
 
-// TODO flaky
 test('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;
 
@@ -64,7 +63,6 @@ test('Stream Boss Manage Battle settings', async t => {
   t.true(await formMonkey.includes(testSet2));
 });
 
-// TODO flaky
 test.skip('Stream Boss Manage Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;

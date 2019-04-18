@@ -38,7 +38,6 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=Start Goal');
   });
 
-  // TODO flaky test
   test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
