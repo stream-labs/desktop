@@ -10,7 +10,7 @@ install:
   - yarn compile:ci
 
 test_script:
-  - yarn test-flaky --match="*Goal*" --match="*Boss*" --match="*Chatbox*" --match="*Jar*"
+  - yarn test-flaky
   # - yarn screentest
   # - 7z a screentest.zip test-dist\screentest\*
   # - ps: $env:warning_ico = ":warning:"
