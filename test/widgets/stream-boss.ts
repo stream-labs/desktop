@@ -26,7 +26,6 @@ test('Set stream-boss health', async t => {
   t.pass();
 });
 
-// TODO: flaky
 test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
@@ -63,7 +62,7 @@ test('Stream Boss Manage Battle settings', async t => {
   t.true(await formMonkey.includes(testSet2));
 });
 
-test.skip('Stream Boss Manage Visual Settings', async t => {
+test('Stream Boss Manage Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
