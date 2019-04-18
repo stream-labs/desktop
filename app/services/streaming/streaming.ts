@@ -2,7 +2,7 @@ import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'util/injector';
 import moment from 'moment';
-import { padStart } from 'lodash';
+import padStart from 'lodash/padStart';
 import { IOutputSettings, SettingsService, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';

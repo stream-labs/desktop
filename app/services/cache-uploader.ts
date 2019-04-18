@@ -5,7 +5,7 @@ import electron from 'electron';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { compact } from 'lodash';
+import compact from 'lodash/compact';
 import archiver from 'archiver';
 import AWS from 'aws-sdk';
 import { AppService } from 'services/app';

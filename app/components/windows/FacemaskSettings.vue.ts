@@ -78,10 +78,8 @@ export default class FacemaskSettings extends Vue {
     };
   });
 
-  async handleSubmit() {
-    this.updatingInfo = true;
-
-    const newSettings: IFormSettings = {
+  createSettingsObject(): IFormSettings {
+    return {
       enabled: this.enabledModel,
       donations_enabled: this.donationsEnabledModel,
       subs_enabled: this.subsEnabledModel,
@@ -92,16 +90,29 @@ export default class FacemaskSettings extends Vue {
         return device.value === this.videoInputModel;
       })[0],
     };
+  }
+
+  async handleSubmit() {
+    this.updatingInfo = true;
+
+    const newSettings = this.createSettingsObject();
 
     if (this.showTwitchFeatures) {
       newSettings.sub_duration = this.subsDurationModel;
       newSettings.bits_duration = this.bitsDurationModel;
     }
 
-    const validatedSettings = this.validateSettings(newSettings);
+    if (!newSettings.device) {
+      newSettings.device = {
+        name: null,
+        value: null,
+      };
+    }
 
-    if (validatedSettings.error) {
-      this.onFailHandler(validatedSettings.message);
+    const validationResults = this.validateSettings(newSettings);
+
+    if (validationResults.error) {
+      this.onFailHandler(validationResults.message);
       this.updatingInfo = false;
       return;
     }
@@ -133,7 +144,7 @@ export default class FacemaskSettings extends Vue {
       message = 'Error: Please select a bits price';
     }
 
-    if (!settings.device) {
+    if (!settings.device.value) {
       error = true;
       message = 'Error: Please select a video device';
     }

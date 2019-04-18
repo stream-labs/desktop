@@ -2,7 +2,7 @@ import { Node } from '../node';
 import { SceneItem } from '../../../scenes';
 import { VideoService } from '../../../video';
 import { SourcesService } from '../../../sources';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import { IListProperty } from '../../../../../obs-api';
 import { ScalableRectangle } from '../../../../util/ScalableRectangle';
 

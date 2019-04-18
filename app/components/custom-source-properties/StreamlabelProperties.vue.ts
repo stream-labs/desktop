@@ -6,7 +6,8 @@ import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import { Multiselect } from 'vue-multiselect';
 import { StreamlabelsService, IStreamlabelSettings } from 'services/streamlabels';
-import { debounce, pick } from 'lodash';
+import debounce from 'lodash/debounce';
+import pick from 'lodash/pick';
 
 @Component({
   components: { Multiselect },

@@ -45,6 +45,11 @@ const sourceIconMap = {
   liv_capture: 'fab fa-simplybuilt fa-rotate-180',
 };
 
+interface ISceneNodeData {
+  id: string;
+  sourceId: string;
+}
+
 @Component({
   components: { SlVueTree },
 })
@@ -63,19 +68,22 @@ export default class SourceSelector extends Vue {
 
   $refs: {
     treeContainer: HTMLDivElement;
-    slVueTree: SlVueTree<ISceneItemNode>;
+    slVueTree: SlVueTree<ISceneNodeData>;
   };
 
-  get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
+  get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneItemNode>[] => {
+    const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneNodeData>[] => {
       return sceneNodes.map(sceneNode => {
         return {
           title: sceneNode.name,
           isSelected: sceneNode.isSelected(),
           isLeaf: sceneNode.isItem(),
           isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
-          data: sceneNode.getModel(),
+          data: {
+            id: sceneNode.id,
+            sourceId: sceneNode.isItem() ? sceneNode.sourceId : null,
+          },
           children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null,
         };
       });
@@ -151,7 +159,7 @@ export default class SourceSelector extends Vue {
   }
 
   handleSort(
-    treeNodesToMove: ISlTreeNode<ISceneItemNode>[],
+    treeNodesToMove: ISlTreeNode<ISceneNodeData>[],
     position: ICursorPosition<TSceneNode>,
   ) {
     const nodesToMove = this.scene.getSelection(treeNodesToMove.map(node => node.data.id));
@@ -168,12 +176,12 @@ export default class SourceSelector extends Vue {
     this.selectionService.select(nodesToMove.getIds());
   }
 
-  makeActive(treeNodes: ISlTreeNode<ISceneItemNode>[], ev: MouseEvent) {
+  makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.selectionService.select(ids);
   }
 
-  toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
+  toggleFolder(treeNode: ISlTreeNode<ISceneNodeData>) {
     const nodeId = treeNode.data.id;
     if (treeNode.isExpanded) {
       this.expandedFoldersIds.splice(this.expandedFoldersIds.indexOf(nodeId), 1);

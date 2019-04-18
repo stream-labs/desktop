@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import rimraf from 'rimraf';
-import { without } from 'lodash';
+import without from 'lodash/without';
 import { AppService } from 'services/app';
 
 interface IStreamlabelActiveSubscriptions {

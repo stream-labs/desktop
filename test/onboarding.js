@@ -35,30 +35,7 @@ test('Adding some starter widgets', async t => {
     await t.context.app.client.click('button=Start Fresh');
   }
 
-  // Select and deselect some widgets
-  await app.client.click('div=Alertbox');
-  await app.client.click('button=Remove Widget');
-
-  await app.client.click('div=Chatbox');
-  await app.client.click('button=Add Widget');
-
-  await app.client.click('div=Donation Goal');
-  await app.client.click('button=Add Widget');
-
-  await app.client.click('button=Add 2 Widgets');
   await app.client.click('a=Setup later');
 
-  t.false(await sourceIsExisting(t, 'Alert Box'));
-  t.false(await sourceIsExisting(t, 'Event List'));
-  t.false(await sourceIsExisting(t, 'The Jar'));
-  t.true(await sourceIsExisting(t, 'Chat Box'));
-  t.false(await sourceIsExisting(t, 'Donation Ticker'));
-  t.true(await sourceIsExisting(t, 'Donation Goal'));
-
   await logOut(t); // widget settings don't work with a fake-auth
-  await selectSource(t, 'Chat Box');
-  await clickSourceProperties(t);
-  await focusChild(t);
-
-  t.true(await app.client.isExisting('label=Custom CSS'));
 });

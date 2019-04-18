@@ -1,7 +1,7 @@
 import { Observable, EMPTY } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { concatMap, expand, filter, map, toArray } from 'rxjs/operators';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import { TTwitchPagination } from './pagination';
 import { ITwitchRequestHeaders } from '../twitch';
 
