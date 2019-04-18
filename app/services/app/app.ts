@@ -33,12 +33,15 @@ import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
+import path from 'path';
+import Utils from 'services/utils';
 
 const crashHandler = window['require']('crash-handler');
 
 interface IAppState {
   loading: boolean;
   argv: string[];
+  errorAlert: boolean;
 }
 
 /**
@@ -61,6 +64,7 @@ export class AppService extends StatefulService<IAppState> {
   static initialState: IAppState = {
     loading: true,
     argv: electron.remote.process.argv,
+    errorAlert: false,
   };
 
   readonly appDataDirectory = electron.remote.app.getPath('userData');
@@ -87,14 +91,33 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
+    if (Utils.isDevMode()) {
+      electron.ipcRenderer.on('showErrorAlert', () => {
+        this.SET_ERROR_ALERT(true);
+      });
+    }
+
+    // This is used for debugging
+    window['obs'] = obs;
+
+    // Host a new OBS server instance
+    obs.IPC.host(`slobs-${uuid()}`);
+    obs.NodeObs.SetWorkingDirectory(
+      path.join(
+        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        'node_modules',
+        'obs-studio-node',
+      ),
+    );
+
     crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
 
-    // Initialize OBS
+    // Initialize OBS API
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
-      electron.remote.process.env.SLOBS_IPC_USERDATA,
+      this.appDataDirectory,
       electron.remote.process.env.SLOBS_VERSION,
     );
 
@@ -261,6 +284,11 @@ export class AppService extends StatefulService<IAppState> {
   @mutation()
   private FINISH_LOADING() {
     this.state.loading = false;
+  }
+
+  @mutation()
+  private SET_ERROR_ALERT(errorAlert: boolean) {
+    this.state.errorAlert = errorAlert;
   }
 
   @mutation()

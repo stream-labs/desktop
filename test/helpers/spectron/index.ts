@@ -142,8 +142,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
     `;
-    await focusChild(t);
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
@@ -156,9 +154,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await t.context.app.client.waitForVisible('a=Setup later'); // wait for loader dismissing
+    await t.context.app.client.waitForExist('.main-loading', 5000, true);
     if (options.skipOnboarding) {
-      await focusMain(t);
       await t.context.app.client.click('a=Setup later');
 
       // This will only show up if OBS is installed
@@ -175,6 +172,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
+    // disable animations in the child window
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+
     context = t.context;
     appIsRunning = true;
 
@@ -185,9 +187,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   stopApp = async function stopApp() {
     try {
-      await context.app.stop();
+      await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
+      console.error(e);
     }
     appIsRunning = false;
     await checkErrorsInLogFile();

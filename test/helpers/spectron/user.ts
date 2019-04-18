@@ -168,6 +168,7 @@ async function requestUserPool(path: string): Promise<any> {
       (err: any, res: any, body: any) => {
         if (err || res.statusCode !== 200) {
           reject(`Unable to request users pool ${err || body}`);
+          return;
         }
         resolve(JSON.parse(body));
       },
