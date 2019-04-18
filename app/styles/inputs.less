@@ -102,6 +102,65 @@ textarea {
   }
 }
 
+.toggle-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.toggle-label {
+  color: @text-secondary;
+  font-size: 11px;
+  margin-right: 12px;
+}
+
+.toggle-button {
+  width: 30px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  -webkit-appearance: inherit;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    .transition;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+  
+  &:before {
+    width: 30px;
+    height: 8px;;
+    margin: auto;
+    background-color: @bg-quaternary;
+    border-radius: 20px;
+  }
+
+  &:after {
+    width: 16px;
+    height: 16px;
+    background-color: @grey;
+    border-radius: 100%;
+  }
+
+  &:checked {
+    &:before {
+        background-color: @text-secondary;
+    }
+    
+    &:after {
+      left: 16px;
+      background-color: @text-active;
+    }
+  }
+}
+
 .multiselect {
   min-height: 36px;
 }
