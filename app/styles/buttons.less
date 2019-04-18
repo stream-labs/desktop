@@ -146,7 +146,8 @@ button,
 }
 
 
-.button--go-live {
+.button--go-live,
+.button--start-program {
   color: @white;
   background: @accent;
   font-size: 20px;
@@ -175,4 +176,26 @@ button,
   background: rgba(255, 255, 255, .1);
   border-color: transparent;
   color: @white;
+}
+
+.button--create-program {
+  font-size: 14px;
+  background-color: @nicolive-button;
+
+  &:hover {
+     background-color: @nicolive-button-hover;
+  }
+}
+
+.button--fetch-program {
+  color:@nicolive-button;
+  background-color: transparent;
+  border-width: 1px;
+  border-style: solid;
+  border-color: @nicolive-button;
+
+   &:hover {
+    color: @white;
+    background-color: @nicolive-button;
+  }
 }

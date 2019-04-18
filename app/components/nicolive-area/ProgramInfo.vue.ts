@@ -10,6 +10,9 @@ export default class ProgramInfo extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
+  programTitleTooltip = this.programTitle;
+  communityNameTooltip = this.communityName;
+
   isCreating: boolean = false;
   async createProgram() {
     if (this.isCreating) throw new Error('createProgram is running');
