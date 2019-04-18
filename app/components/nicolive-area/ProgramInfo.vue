@@ -1,13 +1,12 @@
 <template>
   <div class="program-info">
     <div class="community-icon">
-      <img :src="communitySymbol" />
+      <img :src="communitySymbol" class="community-thumbnail" :alt="communityName" />
     </div>
     <div class="program-info-description">
       <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">{{programTitle}}</h1>
-      <h2 class="community-name"><i v-if="programIsMemberOnly" class="icon-lock"></i><span v-tooltip.bottom="communityNameTooltip">{{communityName}}</span></h2>
+      <h2 class="community-name-wrapper"><i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i><span class="community-name" v-tooltip.bottom="communityNameTooltip">{{communityName}}</span></h2>
     </div>
-    <!-- <div>status: {{ programStatus }}</div> -->
     <div class="program-button">
       <button v-if="programStatus === 'onAir'" @click="endProgram" :disabled="isEnding" class="button button--end-program button--soft-warning">番組終了</button>
       <button v-else-if="programStatus === 'end'" @click="createProgram" :disabled="isCreating" class="button button--create-program">番組作成</button>
@@ -47,13 +46,13 @@
   margin-left: 16px;
 }
 
-.community-name {
+.community-name-wrapper {
   display: flex;
   align-items: center;
   color: @light-grey;
   margin: 0;
 
-  span {
+  .community-name {
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -67,15 +66,13 @@
 }
 
 .community-icon {
-  width: 44px;
-  height: 44px;
   margin-right: 10px;
   flex-shrink: 0;
 
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 100%;
+  .community-thumbnail {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
   }
 }
 
