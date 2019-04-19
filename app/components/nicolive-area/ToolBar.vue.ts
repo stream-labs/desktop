@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
+import { $t } from 'services/i18n';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 
 @Component({})
 export default class ToolBar extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+
+  // TODO: あとでまとめる
+  manualExtentionTooltip = '30分延長する';
 
   format(timeInSeconds: number): string {
     return NicoliveProgramService.format(timeInSeconds);
