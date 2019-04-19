@@ -30,8 +30,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   droppedFramesDetected = new Subject<number>();
   private intervalId: number;
 
-  measurements: number[];
-
   @mutation()
   private SET_PERFORMANCE_STATS(stats: IPerformanceState) {
     Object.keys(stats).forEach(stat => {
@@ -52,34 +50,15 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
           this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
         }
 
-        const electronCpu = am
+        stats.CPU += am
           .map(proc => {
             return proc.cpu.percentCPUUsage;
           })
           .reduce((sum, usage) => sum + usage);
 
-        if (this.measurements != null) {
-          this.measurements.push(electronCpu);
-        }
-
-        if (this.measurements && this.measurements.length >= 60) {
-          console.log(
-            `Average Electron CPU over ${this.measurements.length} measurements:`,
-            this.measurements.reduce((sum, meas) => sum + meas, 0) / this.measurements.length,
-          );
-
-          this.measurements = null;
-        }
-
-        stats.CPU += electronCpu;
-
         this.SET_PERFORMANCE_STATS(stats);
       },
     );
-
-    window['startMeasure'] = () => {
-      this.measurements = [];
-    };
   }
 
   stop() {
