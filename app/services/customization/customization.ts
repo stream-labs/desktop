@@ -97,7 +97,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
-  isDarkTheme() {
+  get isDarkTheme() {
     return ['night-theme'].includes(this.currentTheme);
   }
 

@@ -42,7 +42,7 @@ export default class ChatbotLoyalty extends ChatbotBase {
   }
 
   get nightMode() {
-    return this.customizationService.isDarkTheme();
+    return this.customizationService.isDarkTheme;
   }
 
   onOpenLoyaltyPreferencesHandler() {

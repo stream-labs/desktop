@@ -29,7 +29,7 @@ export default class ChatbotBase extends Vue {
   @Inject() customizationService: CustomizationService;
 
   get isDarkTheme() {
-    return this.customizationService.isDarkTheme();
+    return this.customizationService.isDarkTheme;
   }
 
   get chatbotPermissionsEnums() {

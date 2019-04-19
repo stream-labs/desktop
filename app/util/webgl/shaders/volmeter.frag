@@ -1,6 +1,5 @@
 precision mediump float;
 
-uniform vec4 u_color;
 uniform float u_volume;
 uniform vec2 u_peakHold;
 
@@ -12,10 +11,12 @@ uniform vec3 u_green;
 uniform vec3 u_yellow;
 uniform vec3 u_red;
 
+uniform float u_bgMultiplier;
+
 varying vec2 v_displacement;
 
 void main() {
-  vec4 mult = vec4(0.3, 0.3, 0.3, 1);
+  vec4 mult = vec4(u_bgMultiplier, u_bgMultiplier, u_bgMultiplier, 1);
 
   if (v_displacement.x < u_volume) {
     mult = vec4(1, 1, 1, 1);

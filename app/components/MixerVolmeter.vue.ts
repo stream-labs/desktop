@@ -42,11 +42,11 @@ export default class MixerVolmeter extends Vue {
 
   // GL Uniform locations
   resolutionLocation: WebGLUniformLocation;
-  colorLocation: WebGLUniformLocation;
   translationLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
   volumeLocation: WebGLUniformLocation;
   peakHoldLocation: WebGLUniformLocation;
+  bgMultiplierLocation: WebGLUniformLocation;
 
   peakHoldCounters: number[];
   peakHolds: number[];
@@ -88,11 +88,11 @@ export default class MixerVolmeter extends Vue {
 
     // lookup uniforms
     this.resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
-    this.colorLocation = this.gl.getUniformLocation(this.program, 'u_color');
     this.translationLocation = this.gl.getUniformLocation(this.program, 'u_translation');
     this.scaleLocation = this.gl.getUniformLocation(this.program, 'u_scale');
     this.volumeLocation = this.gl.getUniformLocation(this.program, 'u_volume');
     this.peakHoldLocation = this.gl.getUniformLocation(this.program, 'u_peakHold');
+    this.bgMultiplierLocation = this.gl.getUniformLocation(this.program, 'u_bgMultiplier');
 
     this.gl.useProgram(this.program);
 
@@ -139,19 +139,9 @@ export default class MixerVolmeter extends Vue {
   }
 
   drawVolmeter(peaks: number[]) {
-    // this.ctx.fillStyle = this.backgroundColor;
-    // this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-    // peaks.forEach((peak, channel) => {
-    //   this.drawVolmeterChannel(peak, channel);
-    // });
-
-    // console.log(peaks[0]);
-
     this.gl.viewport(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
 
     const bg = this.customizationService.themeBackground;
-
-    console.log(bg);
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -161,7 +151,9 @@ export default class MixerVolmeter extends Vue {
 
     // Set uniforms
     this.gl.uniform2f(this.resolutionLocation, 1, this.canvasHeight);
-    this.gl.uniform4f(this.colorLocation, 0.5, 0.5, 1.0, 1.0);
+
+    // Volmeter backgrounds appear brighter against a darker background
+    this.gl.uniform1f(this.bgMultiplierLocation, this.customizationService.isDarkTheme ? 0.2 : 0.5);
 
     peaks.forEach((peak, channel) => {
       this.drawVolmeterChannel(peak, channel);
@@ -184,47 +176,10 @@ export default class MixerVolmeter extends Vue {
     );
 
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-    // this.updatePeakHold(peak, channel);
-    // const heightOffset = channel * (CHANNEL_HEIGHT + PADDING_HEIGHT);
-    // const warningPx = this.dbToPx(WARNING_LEVEL);
-    // const dangerPx = this.dbToPx(DANGER_LEVEL);
-    // this.ctx.fillStyle = GREEN_BG;
-    // this.ctx.fillRect(0, heightOffset, warningPx, CHANNEL_HEIGHT);
-    // this.ctx.fillStyle = YELLOW_BG;
-    // this.ctx.fillRect(warningPx, heightOffset, dangerPx - warningPx, CHANNEL_HEIGHT);
-    // this.ctx.fillStyle = RED_BG;
-    // this.ctx.fillRect(dangerPx, heightOffset, this.canvasWidth - dangerPx, CHANNEL_HEIGHT);
-    // const peakPx = this.dbToPx(peak);
-    // const greenLevel = Math.min(peakPx, warningPx);
-    // this.ctx.fillStyle = GREEN;
-    // this.ctx.fillRect(0, heightOffset, greenLevel, CHANNEL_HEIGHT);
-    // if (peak > WARNING_LEVEL) {
-    //   const yellowLevel = Math.min(peakPx, dangerPx);
-    //   this.ctx.fillStyle = YELLOW;
-    //   this.ctx.fillRect(warningPx, heightOffset, yellowLevel - warningPx, CHANNEL_HEIGHT);
-    // }
-    // if (peak > DANGER_LEVEL) {
-    //   this.ctx.fillStyle = RED;
-    //   this.ctx.fillRect(dangerPx, heightOffset, peakPx - dangerPx, CHANNEL_HEIGHT);
-    // }
-    // this.ctx.fillStyle = GREEN;
-    // if (this.peakHolds[channel] > WARNING_LEVEL) this.ctx.fillStyle = YELLOW;
-    // if (this.peakHolds[channel] > DANGER_LEVEL) this.ctx.fillStyle = RED;
-    // this.ctx.fillRect(
-    //   this.dbToPx(this.peakHolds[channel]) - PEAK_WIDTH / 2,
-    //   heightOffset,
-    //   PEAK_WIDTH,
-    //   CHANNEL_HEIGHT,
-    // );
   }
 
   dbToUnitScalar(db: number) {
     return Math.max((db + 60) * (1 / 60), 0);
-  }
-
-  dbToPx(db: number) {
-    return Math.round((db + 60) * (this.canvasWidth / 60));
   }
 
   updatePeakHold(peak: number, channel: number) {

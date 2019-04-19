@@ -131,7 +131,7 @@ export default class LiveDock extends Vue {
   }
 
   get offlineImageSrc() {
-    const mode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     return require(`../../media/images/sleeping-kevin-${mode}.png`);
   }
 
@@ -142,7 +142,7 @@ export default class LiveDock extends Vue {
   openYoutubeStreamUrl() {
     const platform = this.userService.platform.type;
     const service = getPlatformService(platform);
-    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const youtubeDomain =
       nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     if (service instanceof YoutubeService) {
