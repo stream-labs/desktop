@@ -70,7 +70,11 @@ export class NicoliveClient {
   }
 
   static isAllowedURL(url: string): boolean {
-    return /^https?:\/\/live2?.nicovideo.jp\//.test(url);
+    // メンテ中は作成画面に http://blog.nicovideo.jp/niconews/category/nicolivemainte/ へのリンクが表示されるので表示を許す
+    return (
+      /^https?:\/\/live2?.nicovideo.jp\//.test(url) ||
+      /^https?:\/\/blog\.nicovideo\.jp\/niconews\//.test(url)
+    );
   }
 
   private static createRequest(method: 'GET' | 'POST' | 'PUT' | 'DELETE', requestInit: RequestInit): RequestInit {
