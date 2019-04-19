@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { WebsocketService } from 'services/websocket';
+import electronLog from 'electron-log';
 
 export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   loadingState: 'none',
