@@ -75,8 +75,11 @@ export class InformationsService extends StatefulService<IInformationsState> {
 
   private async fetchFeed() {
     this.SET_FETCHING(true);
+    const headers = new Headers();
+    headers.append('Cache-Control', 'max-age=0');
+
     try {
-      return await fetch(this.hostsService.niconicoNAirInformationsFeed, { cache: 'no-cache' })
+      return await fetch(this.hostsService.niconicoNAirInformationsFeed, { headers })
         .then(handleErrors)
         .then(response => response.text())
         .then(InformationsService.parseXml);
