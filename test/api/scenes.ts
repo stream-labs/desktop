@@ -70,7 +70,7 @@ test('Creating, fetching and removing scene-items', async t => {
   items = scene.getItems();
 
   // special check for the Streamdeck
-  t.falsy(items[0].childrenIds, 'Scene Items must not have children');
+  t.falsy(items[0].getModel()['childrenIds'], 'Scene Items must not have children');
 
   itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image1']);

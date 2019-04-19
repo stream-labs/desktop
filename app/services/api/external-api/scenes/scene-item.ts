@@ -78,10 +78,10 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
   /**
    * returns serialized representation of scene-item
    */
-  getModel(): ISceneItem & ISourceModel {
+  getModel(): ISceneItem {
     return {
-      ...this.getSource().getModel(),
       ...super.getModel(),
+      sourceId: this.getSource().sourceId,
       sceneItemId: this.sceneItem.sceneItemId,
       transform: this.sceneItem.transform,
       visible: this.sceneItem.visible,

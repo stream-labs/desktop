@@ -264,9 +264,11 @@ export class ApiClient {
 
     return new Proxy(resourceModel, {
       get: (target, property: string, receiver) => {
-        if (resourceModel[property] !== void 0) return resourceModel[property];
-
         const resourceScheme = this.getResourceScheme(resourceId);
+
+        if (resourceModel[property] !== void 0 || !resourceScheme[property]) {
+          return resourceModel[property];
+        }
 
         if (resourceScheme[property] !== 'function') {
           return handleRequest(resourceId, property as string);
