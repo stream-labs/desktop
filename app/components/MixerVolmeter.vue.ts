@@ -34,6 +34,10 @@ export default class MixerVolmeter extends Vue {
     spacer: HTMLDivElement;
   };
 
+  // Used for Canvas 2D rendering
+  ctx: CanvasRenderingContext2D;
+
+  // Used for WebGL rendering
   gl: WebGLRenderingContext;
   program: WebGLProgram;
 
@@ -64,6 +68,21 @@ export default class MixerVolmeter extends Vue {
 
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
+    if (this.gl) {
+      this.initWebglRendering();
+    } else {
+      // This machine does not support hardware acceleration, so fall back
+      // to canvas 2D rendering.
+      this.ctx = this.$refs.canvas.getContext('2d');
+    }
+  }
+
+  destroyed() {
+    clearInterval(this.canvasWidthInterval);
+    this.unsubscribeVolmeter();
+  }
+
+  private initWebglRendering() {
     const vShader = compileShader(this.gl, vShaderSrc, this.gl.VERTEX_SHADER);
     const fShader = compileShader(this.gl, fShaderSrc, this.gl.FRAGMENT_SHADER);
     this.program = createProgram(this.gl, vShader, fShader);
@@ -114,12 +133,7 @@ export default class MixerVolmeter extends Vue {
     this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 
-  destroyed() {
-    clearInterval(this.canvasWidthInterval);
-    this.unsubscribeVolmeter();
-  }
-
-  setChannelCount(channels: number) {
+  private setChannelCount(channels: number) {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
       this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
@@ -129,7 +143,7 @@ export default class MixerVolmeter extends Vue {
     }
   }
 
-  setCanvasWidth() {
+  private setCanvasWidth() {
     const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
 
     if (width !== this.canvasWidth) {
@@ -139,8 +153,13 @@ export default class MixerVolmeter extends Vue {
     }
   }
 
-  drawVolmeter(peaks: number[]) {
-    this.gl.viewport(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+  private getBgMultiplier() {
+    // Volmeter backgrounds appear brighter against a darker background
+    return this.customizationService.isDarkTheme ? 0.2 : 0.5;
+  }
+
+  private drawVolmeterWebgl(peaks: number[]) {
+    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
 
     const bg = this.customizationService.themeBackground;
 
@@ -153,15 +172,14 @@ export default class MixerVolmeter extends Vue {
     // Set uniforms
     this.gl.uniform2f(this.resolutionLocation, 1, this.canvasHeight);
 
-    // Volmeter backgrounds appear brighter against a darker background
-    this.gl.uniform1f(this.bgMultiplierLocation, this.customizationService.isDarkTheme ? 0.2 : 0.5);
+    this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
 
     peaks.forEach((peak, channel) => {
-      this.drawVolmeterChannel(peak, channel);
+      this.drawVolmeterChannelWebgl(peak, channel);
     });
   }
 
-  drawVolmeterChannel(peak: number, channel: number) {
+  private drawVolmeterChannelWebgl(peak: number, channel: number) {
     this.updatePeakHold(peak, channel);
 
     this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
@@ -179,8 +197,76 @@ export default class MixerVolmeter extends Vue {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
   }
 
-  dbToUnitScalar(db: number) {
+  private drawVolmeterC2d(peaks: number[]) {
+    const bg = this.customizationService.themeBackground;
+    this.ctx.fillStyle = this.rgbToCss([bg.r, bg.g, bg.b]);
+    this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    peaks.forEach((peak, channel) => {
+      this.drawVolmeterChannelC2d(peak, channel);
+    });
+  }
+
+  private drawVolmeterChannelC2d(peak: number, channel: number) {
+    this.updatePeakHold(peak, channel);
+
+    const heightOffset = channel * (CHANNEL_HEIGHT + PADDING_HEIGHT);
+    const warningPx = this.dbToPx(WARNING_LEVEL);
+    const dangerPx = this.dbToPx(DANGER_LEVEL);
+
+    const bgMultiplier = this.getBgMultiplier();
+
+    this.ctx.fillStyle = this.rgbToCss(GREEN, bgMultiplier);
+    this.ctx.fillRect(0, heightOffset, warningPx, CHANNEL_HEIGHT);
+    this.ctx.fillStyle = this.rgbToCss(YELLOW, bgMultiplier);
+    this.ctx.fillRect(warningPx, heightOffset, dangerPx - warningPx, CHANNEL_HEIGHT);
+    this.ctx.fillStyle = this.rgbToCss(RED, bgMultiplier);
+    this.ctx.fillRect(dangerPx, heightOffset, this.canvasWidth - dangerPx, CHANNEL_HEIGHT);
+
+    const peakPx = this.dbToPx(peak);
+
+    const greenLevel = Math.min(peakPx, warningPx);
+    this.ctx.fillStyle = this.rgbToCss(GREEN);
+    this.ctx.fillRect(0, heightOffset, greenLevel, CHANNEL_HEIGHT);
+
+    if (peak > WARNING_LEVEL) {
+      const yellowLevel = Math.min(peakPx, dangerPx);
+      this.ctx.fillStyle = this.rgbToCss(YELLOW);
+      this.ctx.fillRect(warningPx, heightOffset, yellowLevel - warningPx, CHANNEL_HEIGHT);
+    }
+
+    if (peak > DANGER_LEVEL) {
+      this.ctx.fillStyle = this.rgbToCss(RED);
+      this.ctx.fillRect(dangerPx, heightOffset, peakPx - dangerPx, CHANNEL_HEIGHT);
+    }
+
+    this.ctx.fillStyle = this.rgbToCss(GREEN);
+    if (this.peakHolds[channel] > WARNING_LEVEL) this.ctx.fillStyle = this.rgbToCss(YELLOW);
+    if (this.peakHolds[channel] > DANGER_LEVEL) this.ctx.fillStyle = this.rgbToCss(RED);
+    this.ctx.fillRect(
+      this.dbToPx(this.peakHolds[channel]),
+      heightOffset,
+      PEAK_WIDTH,
+      CHANNEL_HEIGHT,
+    );
+  }
+
+  private dbToUnitScalar(db: number) {
     return Math.max((db + 60) * (1 / 60), 0);
+  }
+
+  private dbToPx(db: number) {
+    return Math.round((db + 60) * (this.canvasWidth / 60));
+  }
+
+  /**
+   * Converts RGB components into a CSS string, and optionally applies
+   * a multiplier to lighten or darken the color without changing its hue.
+   * @param rgb An array containing the RGB values from 0-255
+   * @param multiplier A multiplier to lighten or darken the color
+   */
+  private rgbToCss(rgb: number[], multiplier = 1) {
+    return `rgb(${rgb.map(v => Math.round(v * multiplier)).join(',')})`;
   }
 
   updatePeakHold(peak: number, channel: number) {
@@ -196,7 +282,12 @@ export default class MixerVolmeter extends Vue {
   subscribeVolmeter() {
     this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
       this.setChannelCount(volmeter.peak.length);
-      this.drawVolmeter(volmeter.peak);
+
+      if (this.gl) {
+        this.drawVolmeterWebgl(volmeter.peak);
+      } else {
+        this.drawVolmeterC2d(volmeter.peak);
+      }
     });
   }
 
