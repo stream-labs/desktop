@@ -16,6 +16,6 @@ void main() {
   // Convert to clip space
   vec2 clipSpace = position * 2.0 - 1.0;
 
-  // Invert y axis, and covert to vec4
+  // Invert y axis, and convert to vec4
   gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 }
