@@ -80,4 +80,5 @@ export default class NicolivePanelRoot extends Vue {
   get hasProgram(): boolean {
     return this.nicoliveProgramService.hasProgram;
   }
+
 }
