@@ -10,12 +10,25 @@
             <div class="program-menu-item">
                 <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" v-tooltip.bottom="twitterShareTooltip" class="link"><i class="icon-twitter icon-btn"></i></a>
             </div>
-            <div class="program-menu-item popup-menu-wrapper" :class="[{ 'is-show':showPopupMenu }]">
-                <button class="popup-toggle-btn" @click="showPopupMenu=!showPopupMenu"><i class="icon-ellipsis-horizontal icon-btn"></i></button>
-                <ul class="popup-menu-list">
-                    <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="contentTreeURL" class="link"><i class="icon-contents-tree"></i>コンテンツツリーを見る</a></li>
-                    <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a></li>
-                </ul>
+            <div class="program-menu-item" :class="{ 'is-show': showPopupMenu }">
+              <popper
+                trigger="click"
+                :options="{ placement: 'bottom-end' }"
+                @show="showPopupMenu = true"
+                @hide="showPopupMenu = false"
+              >
+                  <div class="popper">
+                      <ul class="popup-menu-list">
+                          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="contentTreeURL" class="link"><i class="icon-contents-tree"></i>コンテンツツリーを見る</a></li>
+                          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a></li>
+                      </ul>
+                  </div>
+
+                  <button slot="reference" class="popup-toggle-btn">
+                      <i class="icon-ellipsis-horizontal icon-btn"></i>
+                  </button>
+
+              </popper>
             </div>
         </div>
     </div>
@@ -69,10 +82,6 @@
     }
 }
 
- .popup-menu-wrapper {
-    position: relative;
- }
-
  .popup-toggle-btn {
      .is-show & {
         i {
@@ -83,18 +92,13 @@
  }
 
  .popup-menu-list {
-    display: none;
     min-width: 200px;
     z-index: 2;
     list-style: none;
     position: absolute;
-    top: 20px;
+    top: 6px;
     right: 0;
     box-shadow: 0 0 4px rgba(0,0,0,.1);
-
-    .is-show & {
-         display: block;
-    }
  }
 
 .popup-menu-item {

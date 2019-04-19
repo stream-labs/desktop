@@ -5,8 +5,11 @@ import { $t } from 'services/i18n';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
+import Popper from 'vue-popperjs';
 
-@Component({})
+@Component({
+  components: { Popper }
+})
 export default class ProgramStatistics extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
