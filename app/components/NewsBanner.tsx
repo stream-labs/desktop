@@ -2,16 +2,18 @@ import Vue from 'vue';
 import { shell } from 'electron';
 import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { $t } from 'services/i18n';
 import cx from 'classnames';
 import styles from './NewsBanner.m.less';
+import { CustomizationService } from 'services/customization';
 
 @Component({})
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
   @Inject() navigationService: NavigationService;
+  @Inject() customizationService: CustomizationService;
 
   processingClose = false;
 
@@ -20,7 +22,15 @@ export default class NewsBanner extends Vue {
   }
 
   get bannerExists() {
-    return this.announcementsService.bannerExists();
+    return this.announcementsService.bannerExists;
+  }
+
+  @Watch('bannerExists')
+  toggleAnimation() {
+    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    window.setTimeout(() => {
+      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    }, 500);
   }
 
   get headerText() {

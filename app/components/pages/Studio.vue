@@ -1,6 +1,6 @@
 <template>
 <div class="studio-page">
-  <div v-if="false" class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
+  <div v-if="displayEnabled" class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
       class="studio-display-container"
