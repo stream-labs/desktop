@@ -5,6 +5,7 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { BrowserWindow } from 'electron';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -32,17 +33,11 @@ interface INicoliveProgramState {
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
 }
 
-enum PanelState {
+export enum PanelState {
   INACTIVE = 'INACTIVE',
   OPENED = 'OPENED',
   CLOSED = 'CLOSED',
 }
-
-const WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
-  INACTIVE: 800, // 通常値
-  OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
-  CLOSED: 800 + 24, // +開閉ボタン幅
-};
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
@@ -399,27 +394,40 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     const prevPanelState = NicoliveProgramService.getPanelState(prevState.panelOpened, prevState.isLoggedIn);
     const nextPanelState = NicoliveProgramService.getPanelState(nextState.panelOpened, nextState.isLoggedIn);
-    this.updateWindowSize(prevPanelState, nextPanelState);
+    if (prevPanelState !== nextPanelState) {
+      NicoliveProgramService.updateWindowSize(this.windowsService.getWindow('main'), prevPanelState, nextPanelState);
+    }
   }
+
+  static WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
+    INACTIVE: 800, // 通常値
+    OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
+    CLOSED: 800 + 24, // +開閉ボタン幅
+  };
 
   /*
    * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
    * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
    */
-  updateWindowSize(prevState: PanelState, nextState: PanelState): void {
-    if (prevState === nextState) return;
-    const initialized = Boolean(prevState);
+  static updateWindowSize(win: BrowserWindow, prevState: PanelState, nextState: PanelState): void {
+    if (nextState === null) throw new Error('nextState is null');
+    const onInit = !prevState;
 
-    const win = this.windowsService.getWindow('main');
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
-    const prevMinWidth = WINDOW_MIN_WIDTH[prevState];
-    const nextMinWidth = WINDOW_MIN_WIDTH[nextState];
+    const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
     win.setMinimumSize(nextMinWidth, minHeight);
 
-    // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、情報が揃ってから更新する
-    if (initialized && !win.isMaximized()) {
-      win.setSize(width + nextMinWidth - prevMinWidth, height);
+    // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
+    if (onInit && width < nextMinWidth) {
+      win.setSize(nextMinWidth, height);
+    }
+
+    // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
+    // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
+    if (!onInit && !win.isMaximized()) {
+      const prevMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[prevState];
+      win.setSize(Math.max(width + nextMinWidth - prevMinWidth, nextMinWidth), height);
     }
   }
 }
