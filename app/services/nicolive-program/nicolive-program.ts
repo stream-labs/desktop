@@ -9,7 +9,8 @@ import { BrowserWindow } from 'electron';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
-interface INicoliveProgramState {
+
+type ProgramState = {
   programID: string;
   status: 'reserved' | 'test' | 'onAir' | 'end';
   title: string;
@@ -24,6 +25,9 @@ interface INicoliveProgramState {
   comments: number;
   adPoint: number;
   giftPoint: number;
+}
+
+interface INicoliveProgramState extends ProgramState {
   /**
    * 永続化された状態をコンポーネントに伝えるための一時置き場
    * 直接ここを編集してはいけない、stateService等の操作結果を反映するだけにする
@@ -48,7 +52,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   client: NicoliveClient = new NicoliveClient();
 
-  static initialState: INicoliveProgramState = {
+  static programInitialState: ProgramState = {
     programID: '',
     status: 'end',
     title: '',
@@ -63,6 +67,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     comments: 0,
     adPoint: 0,
     giftPoint: 0,
+  };
+
+  static initialState: INicoliveProgramState = {
+    ...NicoliveProgramService.programInitialState,
     autoExtensionEnabled: false,
     panelOpened: null,
     isLoggedIn: null,
@@ -80,6 +88,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.userService.userLoginState.subscribe({
       next: user => {
         this.setState({ isLoggedIn: Boolean(user) });
+        if (!user) { 
+          this.setState(NicoliveProgramService.programInitialState);
+        }
       }
     });
 
