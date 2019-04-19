@@ -185,9 +185,16 @@ button,
   &:hover {
      background-color: @nicolive-button-hover;
   }
+
+  &:disabled {
+    &:hover {
+      background-color: @nicolive-button;
+    }
+  }
 }
 
 .button--fetch-program {
+  font-size: 13px;
   color:@nicolive-button;
   background-color: transparent;
   border-width: 1px;
@@ -195,7 +202,8 @@ button,
   border-color: @nicolive-button;
 
    &:hover {
-    color: @white;
-    background-color: @nicolive-button;
+    opacity: .5;
+    color: inherit;
+    background-color: transparent
   }
 }
