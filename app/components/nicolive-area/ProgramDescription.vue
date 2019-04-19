@@ -40,11 +40,6 @@
   font-size: 12px;
   color: @text-primary;
   margin: 0;
-
-  &.active {
-    padding: 0 16px;
-    border-bottom: 1px solid @text-primary;
-  }
 }
 
 .color-change-wrapper {
