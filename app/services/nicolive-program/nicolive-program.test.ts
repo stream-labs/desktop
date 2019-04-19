@@ -1,5 +1,4 @@
 import { createSetupFunction } from 'util/test-setup';
-import { flatMap } from 'lodash';
 import { Subject } from 'rxjs';
 import { BehaviorSubject } from '../../../node_modules/rxjs/BehaviorSubject';
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;

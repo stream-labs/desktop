@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk, FailedResult } from './NicoliveClient';
-import { ProgramSchedules, CommonErrorResponse } from './ResponseTypes';
+import { ProgramSchedules } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { WindowsService } from 'services/windows';
