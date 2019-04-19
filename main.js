@@ -59,6 +59,9 @@ const releaseChannel = (() => {
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
 
+  // catch and log unhandled errors/rejected promises
+  electronLog.catchErrors();
+
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
   app.on('ready', () => {
@@ -492,5 +495,7 @@ ipcMain.on('requestPerformanceStats', e => {
 });
 
 ipcMain.on('showErrorAlert', () => {
-  mainWindow.send('showErrorAlert');
+  if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    mainWindow.send('showErrorAlert');
+  }
 });

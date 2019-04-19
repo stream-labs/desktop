@@ -5,6 +5,8 @@ import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
+import { FacemasksService } from 'services/facemasks';
+import { UserService } from 'services/user';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -27,6 +29,8 @@ export class ProtocolLinksService extends Service {
   @Inject() navigationService: NavigationService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() platformAppStoreService: PlatformAppStoreService;
+  @Inject() facemasksService: FacemasksService;
+  @Inject() userService: UserService;
 
   // Maps base URL components to handler function names
   private handlers: Dictionary<string>;
@@ -87,5 +91,11 @@ export class ProtocolLinksService extends Service {
     } else {
       this.navigationService.navigate('PlatformAppStore', { appId });
     }
+  }
+
+  @protocolHandler('facemasks')
+  private openFacemaskSettings() {
+    if (!this.userService.isLoggedIn()) return;
+    this.facemasksService.showSettings();
   }
 }
