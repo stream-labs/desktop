@@ -16,7 +16,7 @@
           <comment-form />
         </template>
         <template v-else>
-          <p class="message"><i class="icon-niconico"></i>このエリアではニコニコ生放送を配信するための機能が利用できます</p>
+          <p class="message"><i class="icon-niconico"></i>このエリアではニコニコ生放送を<br>配信するための機能が利用できます</p>
           <div class="button-wrapper">
             <button class="button button--create-program" @click="createProgram" :disabled="isCreating">新しく番組を作成する</button>
             <button class="button button--fetch-program" @click="fetchProgram" :disabled="isFetching">作成済みの番組を取得する</button>
@@ -88,7 +88,7 @@
   justify-content: center;
 
   &.isCreate {
-    padding: 60px;
+    padding: 16px;
     align-items: center;
     background-color: @bg-secondary;
 
