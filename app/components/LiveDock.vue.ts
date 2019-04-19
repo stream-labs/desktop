@@ -100,14 +100,26 @@ export default class LiveDock extends Vue {
 
   collapse() {
     this.canAnimate = true;
-    this.customizationService.setLiveDockCollapsed(true);
-    setTimeout(() => (this.canAnimate = false), 300);
+    this.customizationService.setSettings({
+      livedockCollapsed: true,
+      hideStyleBlockingElements: true,
+    });
+    setTimeout(() => {
+      this.canAnimate = false;
+      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    }, 300);
   }
 
   expand() {
     this.canAnimate = true;
-    this.customizationService.setLiveDockCollapsed(false);
-    setTimeout(() => (this.canAnimate = false), 300);
+    this.customizationService.setSettings({
+      livedockCollapsed: false,
+      hideStyleBlockingElements: true,
+    });
+    setTimeout(() => {
+      this.canAnimate = false;
+      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    }, 300);
   }
 
   get isStreaming() {

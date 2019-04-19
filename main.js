@@ -161,6 +161,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    transparent: true,
   });
 
   mainWindowState.manage(mainWindow);
@@ -213,7 +214,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    transparent: true,
   });
 
   childWindow.setMenu(null);

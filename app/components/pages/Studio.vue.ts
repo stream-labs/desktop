@@ -24,18 +24,23 @@ export default class Studio extends Vue {
   @Inject() private transitionsService: TransitionsService;
   @Inject() private appService: AppService;
 
-  $refs: { studioModeContainer: HTMLDivElement };
+  $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
   stacked = false;
+  verticalPlaceholder = false;
 
   sizeCheckInterval: number;
 
   mounted() {
     this.sizeCheckInterval = window.setInterval(() => {
       if (this.studioMode) {
-        const rect = this.$refs.studioModeContainer.getBoundingClientRect();
+        const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
 
-        this.stacked = rect.width / rect.height <= 16 / 9;
+        this.stacked = clientWidth / clientHeight <= 16 / 9;
+      }
+      if (!this.displayEnabled && !this.performanceMode) {
+        const { clientWidth, clientHeight } = this.$refs.placeholder;
+        this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
       }
     }, 1000);
   }

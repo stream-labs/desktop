@@ -158,6 +158,8 @@ export default class Main extends Vue {
 
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
+
+    document.getElementsByTagName('body')[0].classList.add(this.theme);
   }
 
   destroyed() {
@@ -168,10 +170,16 @@ export default class Main extends Vue {
 
   hasLiveDock = true;
 
+  windowResizeTimeout: number;
+
   windowSizeHandler() {
+    this.onResizeStartHandler();
     this.windowWidth = window.innerWidth;
 
+    clearTimeout(this.windowResizeTimeout);
+
     this.hasLiveDock = this.windowWidth >= 1100;
+    this.windowResizeTimeout = window.setTimeout(this.onResizeStopHandler, 200);
   }
 
   handleResize() {
