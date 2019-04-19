@@ -1,9 +1,23 @@
 import { createSetupFunction } from 'util/test-setup';
-import { NicoliveProgramService } from './nicolive-program';
+type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 
 const initialState = {
-  ...NicoliveProgramService.initialState,
   programID: 'lv1',
+  status: 'end',
+  title: '',
+  description: '',
+  endTime: 0,
+  startTime: 0,
+  isMemberOnly: false,
+  communityID: '',
+  communityName: '',
+  communitySymbol: '',
+  viewers: 0,
+  comments: 0,
+  adPoint: 0,
+  giftPoint: 0,
+  autoExtensionEnabled: false,
+  panelOpened: true,
 };
 
 const schedules = {
@@ -42,7 +56,18 @@ const setup = createSetupFunction({
   state: {
     NicoliveProgramService: initialState,
   },
+  injectee: {
+    WindowsService: {},
+    UserService: {
+      userLoginState: {
+        subscribe() {}
+      }
+    },
+  }
 });
+
+jest.mock('services/windows', () => ({ WindowsService: {} }));
+jest.mock('services/user', () => ({ UserService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');

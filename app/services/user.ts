@@ -89,6 +89,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return service.isLoggedIn().then(valid => {
         if (!valid) {
           this.LOGOUT();
+          this.userLogout.next();
         }
       });
     }
@@ -261,6 +262,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (parsed) {
         authWindow.close();
         this.LOGIN(parsed);
+        this.userLogin.next(parsed);
         this.setRavenContext();
       } else {
         // 認可されていない場合は画面を出して操作可能にする

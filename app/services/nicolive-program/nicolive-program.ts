@@ -1,6 +1,9 @@
 import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
 import { ProgramSchedules } from './ResponseTypes';
+import { Inject } from 'util/injector';
+import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -24,7 +27,24 @@ interface INicoliveProgramState {
   panelOpened: boolean;
 }
 
+enum PanelState {
+  INACTIVE = 'INACTIVE',
+  OPENED = 'OPENED',
+  CLOSED = 'CLOSED',
+}
+
+const WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
+  INACTIVE: 800, // 初期値
+  OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
+  CLOSED: 800 + 24, // +開閉ボタン幅
+};
+
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
+  @Inject()
+  windowsService: WindowsService;
+  @Inject()
+  userService: UserService;
+
   client: NicoliveClient = new NicoliveClient();
 
   static initialState: INicoliveProgramState = {
@@ -46,11 +66,22 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     panelOpened: true,
   };
 
+  init() {
+    super.init();
+
+    this.userService.userLoginState.subscribe(user => {
+      const isLoggedIn = Boolean(user);
+      const panelState = NicoliveProgramService.getPanelState(this.state.panelOpened, isLoggedIn);
+      this.updateWindowSize(panelState);
+    });
+  }
+
   private setState(partialState: Partial<INicoliveProgramState>) {
     const nextState = { ...this.state, ...partialState };
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
     this.refreshAutoExtensionTimer(this.state, nextState);
+    this.refreshWindowConstraints(this.state, nextState);
     this.SET_STATE(nextState);
   }
 
@@ -339,5 +370,32 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   updatePanelOpened(panelOpened: boolean): void {
     this.setState({ panelOpened });
+  }
+
+  static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState {
+    if (!isLoggedIn) return 'INACTIVE' as PanelState;
+    return panelOpened ? ('OPENED' as PanelState) : ('CLOSED' as PanelState);
+  }
+
+  /** パネルが出る幅の分だけ画面の最小幅を拡張する */
+  refreshWindowConstraints(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+    if (prevState.panelOpened === nextState.panelOpened) return;
+    const isLoggedIn = this.userService.isLoggedIn();
+    const panelState = NicoliveProgramService.getPanelState(nextState.panelOpened, isLoggedIn);
+    this.updateWindowSize(panelState);
+  }
+
+  /*
+   * TODO: 最小幅が変動するときにその差分だけ実際の幅を操作する（初期状態を考慮するとパネル開閉状態の永続化が必要）
+   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
+   * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
+   */
+  updateWindowSize(state: PanelState): void {
+    const win = this.windowsService.getWindow('main');
+    const [, minHeight] = win.getMinimumSize();
+    const [width, height] = win.getSize();
+    const newMinWidth = WINDOW_MIN_WIDTH[state];
+    win.setMinimumSize(newMinWidth, minHeight);
+    win.setSize(Math.max(width, newMinWidth), height);
   }
 }
