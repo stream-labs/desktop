@@ -71,6 +71,7 @@ export default class MixerVolmeter extends Vue {
     const positionBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
 
+    // Vertex geometry for a unit square
     // tslint:disable-next-line
     const positions = [
       0, 0,
