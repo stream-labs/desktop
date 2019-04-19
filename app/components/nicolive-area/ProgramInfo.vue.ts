@@ -10,6 +10,12 @@ export default class ProgramInfo extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
+  programTitleTooltip = this.programTitle;
+  communityNameTooltip = this.communityName;
+
+  // TODO: 後でまとめる
+  programIsMemberOnlyTooltip = 'コミュニティ限定放送';
+
   isCreating: boolean = false;
   async createProgram() {
     if (this.isCreating) throw new Error('createProgram is running');
