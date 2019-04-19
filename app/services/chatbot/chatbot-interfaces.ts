@@ -10,6 +10,7 @@ export interface IChatbotCommonServiceState {
   loyaltyToUpdate: IChatbotLoyalty;
   pollProfileToUpdate: IPollProfile;
   bettingProfileToUpdate: IBettingProfile;
+  regularToUpdate: IManagedUser;
 }
 
 // responses
@@ -220,6 +221,17 @@ export interface ISongRequestResponse {
   settings: ISongRequestData;
 }
 
+export interface IManagedUser {
+  id: string;
+  platform: string;
+  user: string;
+}
+
+export interface IUserManagementResponse {
+  data: IManagedUser[];
+  pagination: IChatbotPagination;
+}
+
 // shared
 export interface IChatbotPermission {
   level: number;
@@ -332,6 +344,13 @@ export interface ICommandVariable {
   example: string;
   result: string;
   tags: string[];
+}
+
+export interface IPermissionCheckboxes {
+  regular?: { checked: boolean; string: string };
+  subscriber?: { checked: boolean; string: string };
+  moderator?: { checked: boolean; string: string };
+  streamer?: { checked: boolean; string: string };
 }
 
 // timers
@@ -819,16 +838,18 @@ export interface IBettingCommand {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Subscriber Only' = 1 << 1,
+  'Subscribers' = 1 << 1,
+  'Regulars' = 1 << 2,
+  'Regulars & Subscribers' = (1 << 1) | (1 << 2),
 }
 
 export enum ChatbotPermissionsEnums {
   'None' = 0,
   'Everyone' = 1,
-  'Subscriber Only' = 1 << 1,
-  'Moderator Only' = 1 << 5,
-  'Streamer Only' = 1 << 7,
-  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5),
+  'Subscribers' = 1 << 1,
+  'Regulars' = 1 << 2,
+  'Moderators' = 1 << 5,
+  'Streamer' = 1 << 7,
 }
 
 export enum ChatbotPunishments {

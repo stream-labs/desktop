@@ -17,6 +17,7 @@ import {
   ChatbotPollApiService,
   ChatbotBettingApiService,
   ChatbotImporterApiService,
+  ChatbotUserManagementApiService,
 } from './index';
 import { ChatbotGambleApiService } from './chatbot-gamble';
 
@@ -36,4 +37,5 @@ export class ChatbotApiService extends Service {
   @Inject('ChatbotBettingApiService') Betting: ChatbotBettingApiService;
   @Inject('ChatbotImporterApiService') Importer: ChatbotImporterApiService;
   @Inject('ChatbotGambleApiService') Gamble: ChatbotGambleApiService;
+  @Inject('ChatbotUserManagementApiService') UserManagement: ChatbotUserManagementApiService;
 }

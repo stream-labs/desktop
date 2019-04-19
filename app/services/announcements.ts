@@ -46,6 +46,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   private async fetchBanner() {
+    if (!this.userService.isLoggedIn()) return this.state;
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {

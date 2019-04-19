@@ -3806,10 +3806,10 @@ electron-download@^4.1.0:
     semver "^5.4.1"
     sumchecker "^2.0.2"
 
-electron-log@^2.2.17:
-  version "2.2.17"
-  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.17.tgz#e71e2ebb949fc96ded7cdb99eeee7202e48981d2"
-  integrity sha512-v+Af5W5z99ehhaLOfE9eTSXUwjzh2wFlQjz51dvkZ6ZIrET6OB/zAZPvsuwT6tm3t5x+M1r+Ed3U3xtPZYAyuQ==
+electron-log@^3.0.4:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-3.0.5.tgz#9bdd307f1f1aec85c0873babd6bdfffb1a661436"
+  integrity sha512-wWOPNBVGh7NJx/OLXdgtuYrqxoG9ZWO+kZYloIHi66B5W9EgXZw71jdZ1ddeWNg4CkABypa8tkrRGqCKF+9tYg==
 
 electron-osx-sign@0.4.11:
   version "0.4.11"
@@ -7111,9 +7111,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.19-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.22-iojs-v2.0.8.tar.gz":
   version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.19-iojs-v2.0.8.tar.gz#d8f2460aac3932e0da7d630accb4d2266be09b70"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.22-iojs-v2.0.8.tar.gz#fbc7ff8153b9a17664db628640f6d3d9afd7e95b"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -9075,10 +9075,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.3.54:
-  version "0.3.54"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.54.tgz#7f0cc14e25e6c144d187caef1428030a88a0746b"
-  integrity sha512-GgNPNpOxllY/Zzv2rcXgktdMp+TeRJhdOYgYSEQ/uWXvuIIfpzm4y3bNMo469AOX6kZGiI8usnOAnuiBno9cvQ==
+streamlabs-beaker@^0.3.56:
+  version "0.3.82"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.82.tgz#ad511ee434be5b9377cc9de5402a0254bab0e9bf"
+  integrity sha512-jddvSJvxjkyvvnET87HDfIQJ9emT3ZWHsMsJiigk43o1PUyvQ9kAQzV8F9OOlXn4SuwZ3/tyT89lzTZXr+lZPw==
   dependencies:
     google-fonts-webpack-plugin "^0.4.4"
     v-tooltip "^2.0.0-rc.33"

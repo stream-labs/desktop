@@ -47,9 +47,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       return pickBy(
         mapValues(section, (command, key) => {
           const found = command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1;
-          return found && ['!skip', '!wrongvideo'].indexOf(command.command) === -1
-            ? command
-            : undefined;
+          return found && ['!skip'].indexOf(command.command) === -1 ? command : undefined;
         }),
         (x, y) => {
           return x !== undefined;

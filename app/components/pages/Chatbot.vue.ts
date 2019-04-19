@@ -17,6 +17,7 @@ import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBann
 import ChatbotLoyalty from 'components/page-components/Chatbot/ChatbotLoyalty.vue';
 import ChatbotPoll from 'components/page-components/Chatbot/ChatbotPoll.vue';
 import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vue';
+import ChatbotUserManagement from 'components/page-components/Chatbot/UserManagement/ChatbotUserManagement.vue';
 
 @Component({
   components: {
@@ -35,6 +36,7 @@ import ChatbotBetting from 'components/page-components/Chatbot/ChatbotBetting.vu
     ChatbotLoyalty,
     ChatbotPoll,
     ChatbotBetting,
+    ChatbotUserManagement,
   },
 })
 export default class Chatbot extends Vue {
@@ -58,6 +60,7 @@ export default class Chatbot extends Vue {
     { title: 'Loyalty', enabled: true },
     { title: 'Poll', enabled: true },
     { title: 'Betting', enabled: true },
+    { title: 'User Management', enabled: true },
   ];
 
   //
@@ -73,6 +76,7 @@ export default class Chatbot extends Vue {
     Loyalty: 'fas fa-dollar-sign',
     Poll: 'icon-suggestions',
     Betting: 'fas fa-money-bill-wave',
+    'User Management': 'fas fa-th-list',
   };
 
   selectedTab = 'Modules';
