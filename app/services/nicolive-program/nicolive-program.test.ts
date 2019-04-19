@@ -1,24 +1,7 @@
 import { createSetupFunction } from 'util/test-setup';
+import { Subject } from 'rxjs';
+import { BehaviorSubject } from '../../../node_modules/rxjs/BehaviorSubject';
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
-
-const initialState = {
-  programID: 'lv1',
-  status: 'end',
-  title: '',
-  description: '',
-  endTime: 0,
-  startTime: 0,
-  isMemberOnly: false,
-  communityID: '',
-  communityName: '',
-  communitySymbol: '',
-  viewers: 0,
-  comments: 0,
-  adPoint: 0,
-  giftPoint: 0,
-  autoExtensionEnabled: false,
-  panelOpened: true,
-};
 
 const schedules = {
   ch: { nicoliveProgramId: 'lv1', socialGroupId: 'ch1', status: 'onAir', onAirBeginAt: 100, onAirEndAt: 150 },
@@ -54,7 +37,9 @@ const programs = {
 
 const setup = createSetupFunction({
   state: {
-    NicoliveProgramService: initialState,
+    NicoliveProgramService: {
+      programID: 'lv1',
+    },
   },
   injectee: {
     NicoliveProgramStateService: {
@@ -399,25 +384,25 @@ describe('refreshStatisticsPolling', () => {
   }[] = [
     {
       name: '初期状態から予約状態の番組を開くとタイマーは止まったまま',
-      prev: initialState,
+      prev: null,
       next: { status: 'reserved', programID: 'lv1' },
       result: 'NOOP',
     },
     {
       name: '初期状態からテスト状態の番組を開くとタイマーは止まったまま',
-      prev: initialState,
+      prev: null,
       next: { status: 'test', programID: 'lv1' },
       result: 'NOOP',
     },
     {
       name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
-      prev: initialState,
+      prev: null,
       next: { status: 'onAir', programID: 'lv1' },
       result: 'REFRESH',
     },
     {
       name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
-      prev: initialState,
+      prev: null,
       next: { status: 'end', programID: 'lv1' },
       result: 'NOOP',
     },
@@ -473,10 +458,11 @@ describe('refreshStatisticsPolling', () => {
       setup();
       const { NicoliveProgramService } = require('./nicolive-program');
       const instance = NicoliveProgramService.instance as NicoliveProgramService;
+      const state = instance.state;
 
       instance.updateStatistics = jest.fn();
 
-      instance.refreshStatisticsPolling(suite.prev, suite.next);
+      instance.refreshStatisticsPolling({...state, ...suite.prev}, {...state, ...suite.next});
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearInterval).toHaveBeenCalledTimes(1);
@@ -565,25 +551,25 @@ describe('refreshProgramStatusTimer', () => {
   }[] = [
     {
       name: '初期状態から予約状態の番組を開くとタイマーを更新する',
-      prev: initialState,
+      prev: null,
       next: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'REFRESH',
     },
     {
       name: '初期状態からテスト状態の番組を開くとタイマーを更新する',
-      prev: initialState,
+      prev: null,
       next: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'REFRESH',
     },
     {
       name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
-      prev: initialState,
+      prev: null,
       next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'REFRESH',
     },
     {
       name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
-      prev: initialState,
+      prev: null,
       next: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'NOOP',
     },
@@ -661,8 +647,9 @@ describe('refreshProgramStatusTimer', () => {
       jest.spyOn(Date, 'now').mockImplementation(jest.fn().mockReturnValue(50));
 
       instance.updateStatistics = jest.fn();
+      const state = instance.state;
 
-      instance.refreshProgramStatusTimer(suite.prev, suite.next);
+      instance.refreshProgramStatusTimer({...state, ...suite.prev}, {...state, ...suite.next});
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearTimeout).toHaveBeenCalledTimes(1);
