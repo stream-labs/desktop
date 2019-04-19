@@ -4,25 +4,18 @@ uniform vec2 u_resolution;
 uniform vec2 u_translation;
 uniform vec2 u_scale;
 
-varying vec2 v_displacement;
+varying vec2 v_position;
 
 void main() {
-  // Scale the positon
-  vec2 scaledPosition = a_position * u_scale;
+  // Get the position in unit space
+  vec2 position = (a_position * u_scale + u_translation) / u_resolution;
 
-  // Add in the translation.
-  vec2 position = scaledPosition + u_translation;
+  // Use this position in the fragment shader
+  v_position = position;
 
-  // convert the position from pixels to 0.0 to 1.0
-  vec2 zeroToOne = position / u_resolution;
+  // Convert to clip space
+  vec2 clipSpace = position * 2.0 - 1.0;
 
-  v_displacement = zeroToOne;
-
-  // convert from 0->1 to 0->2
-  vec2 zeroToTwo = zeroToOne * 2.0;
-
-  // convert from 0->2 to -1->+1 (clipspace)
-  vec2 clipSpace = zeroToTwo - 1.0;
-
+  // Invert y axis, and covert to vec4
   gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 }
