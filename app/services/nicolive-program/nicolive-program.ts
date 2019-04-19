@@ -24,7 +24,7 @@ interface INicoliveProgramState {
   adPoint: number;
   giftPoint: number;
   /**
-   * 自動延長状態をコンポーネントに伝えるための一時置き場
+   * 永続化された状態をコンポーネントに伝えるための一時置き場
    * 直接ここを編集してはいけない、stateServiceの操作結果を反映するだけにする
    */
   autoExtensionEnabled: boolean;
@@ -75,8 +75,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     super.init();
 
     this.stateService.updated.subscribe({
-      next: ({ autoExtensionEnabled }) => {
-        this.setState({ autoExtensionEnabled });
+      next: (persistentState) => {
+        this.setState(persistentState);
       }
     });
 
@@ -378,8 +378,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
   }
 
-  updatePanelOpened(panelOpened: boolean): void {
-    this.setState({ panelOpened });
+  togglePanelOpened(): void {
+    this.stateService.togglePanelOpened();
   }
 
   static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState {

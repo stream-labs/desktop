@@ -33,7 +33,7 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   onToggle(): void {
-    this.nicoliveProgramService.updatePanelOpened(!this.opened);
+    this.nicoliveProgramService.togglePanelOpened();
   }
 
   isCreating: boolean = false;
