@@ -57,6 +57,11 @@ const setup = createSetupFunction({
     NicoliveProgramService: initialState,
   },
   injectee: {
+    NicoliveProgramStateService: {
+      updated: {
+        subscribe() {}
+      }
+    },
     WindowsService: {},
     UserService: {
       userLoginState: {
@@ -68,6 +73,7 @@ const setup = createSetupFunction({
 
 jest.mock('services/windows', () => ({ WindowsService: {} }));
 jest.mock('services/user', () => ({ UserService: {} }));
+jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
