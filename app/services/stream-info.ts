@@ -44,7 +44,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   streamInfoChanged = new BehaviorSubject<IStreamInfo>(StreamInfoService.initialState);
 
   init() {
-    this.refreshStreamInfo();
+    this.refreshStreamInfo().catch(e => null);
 
     this.viewerCountInterval = window.setInterval(() => {
       if (!this.userService.isLoggedIn()) return;
@@ -64,7 +64,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   }
 
   refreshStreamInfo(): Promise<void> {
-    if (!this.userService.isLoggedIn()) return Promise.reject(null);
+    if (!this.userService.isLoggedIn()) return Promise.reject('failed to fetch stream info');
 
     this.SET_ERROR(false);
     this.SET_FETCHING(true);

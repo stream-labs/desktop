@@ -1,5 +1,4 @@
 export interface IFacemasksServiceState {
-  device: IInputDeviceSelection;
   modtimeMap: Dictionary<IFacemaskMetadata>;
   active: boolean;
   downloadProgress: number;

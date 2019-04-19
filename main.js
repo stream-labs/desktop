@@ -26,7 +26,6 @@ const rimraf = require('rimraf');
 const path = require('path');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
-const obs = require('obs-studio-node');
 const pid = require('process').pid;
 const crashHandler = require('crash-handler');
 const electronLog = require('electron-log');
@@ -59,6 +58,9 @@ const releaseChannel = (() => {
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+
+  // catch and log unhandled errors/rejected promises
+  electronLog.catchErrors();
 
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
@@ -112,19 +114,6 @@ function startApp() {
   crashHandler.startCrashHandler(app.getAppPath());
   crashHandler.registerProcess(pid, false);
 
-  { // Initialize obs-studio-server
-    // Set up environment variables for IPC.
-    process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
-    process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
-    // Host a new IPC Server and connect to it.
-    obs.IPC.host(process.env.SLOBS_IPC_PATH);
-    obs.NodeObs.SetWorkingDirectory(path.join(
-      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-      'node_modules',
-      'obs-studio-node')
-    );
-  }
-
   const Raven = require('raven');
 
   function handleFinishedReport() {
@@ -138,7 +127,7 @@ function startApp() {
   if (pjson.env === 'production') {
 
     Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
-      release: process.env.SLOBS_VERSION 
+      release: process.env.SLOBS_VERSION
     }).install(function (err, initialErr, eventId) {
       handleFinishedReport();
     });
@@ -370,10 +359,6 @@ app.on('ready', () => {
   }
 });
 
-app.on('quit', (e, exitCode) => {
-  obs.IPC.disconnect();
-});
-
 ipcMain.on('openDevTools', () => {
   openDevTools();
 });
@@ -510,5 +495,7 @@ ipcMain.on('requestPerformanceStats', e => {
 });
 
 ipcMain.on('showErrorAlert', () => {
-  mainWindow.send('showErrorAlert');
+  if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    mainWindow.send('showErrorAlert');
+  }
 });
