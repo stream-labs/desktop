@@ -46,8 +46,8 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveProgramStateService: {
       updated: {
-        subscribe() {}
-      }
+        subscribe() {},
+      },
     },
     WindowsService: {
       getWindow() {
@@ -57,16 +57,16 @@ const setup = createSetupFunction({
           getSize: () => [800, 600],
           setSize: () => {},
           isMaximized: () => false,
-        }
-      }
+        };
+      },
     },
     UserService: {
       userLoginState: {
-        subscribe() {}
+        subscribe() {},
       },
       isLoggedIn: () => true,
     },
-  }
+  },
 });
 
 jest.mock('services/windows', () => ({ WindowsService: {} }));
@@ -512,7 +512,7 @@ describe('refreshStatisticsPolling', () => {
 
       instance.updateStatistics = jest.fn();
 
-      instance.refreshStatisticsPolling({...state, ...suite.prev}, {...state, ...suite.next});
+      instance.refreshStatisticsPolling({ ...state, ...suite.prev }, { ...state, ...suite.next });
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearInterval).toHaveBeenCalledTimes(1);
@@ -699,7 +699,7 @@ describe('refreshProgramStatusTimer', () => {
       instance.updateStatistics = jest.fn();
       const state = instance.state;
 
-      instance.refreshProgramStatusTimer({...state, ...suite.prev}, {...state, ...suite.next});
+      instance.refreshProgramStatusTimer({ ...state, ...suite.prev }, { ...state, ...suite.next });
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearTimeout).toHaveBeenCalledTimes(1);
@@ -804,7 +804,7 @@ describe('refreshWindowSize', () => {
         injectee: {
           UserService: {
             userLoginState,
-            isLoggedIn: () => suite.persistentIsLoggedIn
+            isLoggedIn: () => suite.persistentIsLoggedIn,
           },
           NicoliveProgramStateService: {
             updated,
@@ -818,9 +818,9 @@ describe('refreshWindowSize', () => {
                 setSize,
                 isMaximized: () => false,
               };
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       const { NicoliveProgramService } = require('./nicolive-program');
@@ -854,9 +854,9 @@ describe('updateWindowSize', () => {
   const SMALL_WIDTH = BASE_WIDTH - 1; // 800より小さくしておくと便利
 
   const initSuites: {
-    prev: PanelState | null,
-    next: PanelState,
-    smallerThanMinWidth: boolean,
+    prev: PanelState | null;
+    next: PanelState;
+    smallerThanMinWidth: boolean;
   }[] = [
     [null, 'INACTIVE', true],
     [null, 'INACTIVE', false],
@@ -871,7 +871,9 @@ describe('updateWindowSize', () => {
   }));
 
   for (const suite of initSuites) {
-    test(`${stateName[suite.prev]}→${stateName[suite.next]} 最小幅より${suite.smallerThanMinWidth ? '小さい' : '大きい'}`, () => {
+    test(`${stateName[suite.prev]}→${stateName[suite.next]} 最小幅より${
+      suite.smallerThanMinWidth ? '小さい' : '大きい'
+    }`, () => {
       setup();
       const { NicoliveProgramService } = require('./nicolive-program');
       const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
@@ -885,11 +887,7 @@ describe('updateWindowSize', () => {
         isMaximized: () => false,
       };
 
-      NicoliveProgramService.updateWindowSize(
-        win,
-        suite.prev,
-        suite.next
-      );
+      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
       expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
       expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
 
@@ -923,37 +921,32 @@ describe('updateWindowSize', () => {
   const WIDTH_DIFF = 32;
 
   for (const suite of suites) {
-    test(
-      `${stateName[suite.prev]}→${stateName[suite.next]} ${suite.isMaximized ? '最大化中は幅が変わらない' : '変化量を維持して幅を更新する'}`,
-      () => {
-        setup();
-        const { NicoliveProgramService } = require('./nicolive-program');
-        const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
+    test(`${stateName[suite.prev]}→${stateName[suite.next]} ${
+      suite.isMaximized ? '最大化中は幅が変わらない' : '変化量を維持して幅を更新する'
+    }`, () => {
+      setup();
+      const { NicoliveProgramService } = require('./nicolive-program');
+      const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
 
-        const win = {
-          getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
-          getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
-          setMinimumSize: jest.fn(),
-          setSize: jest.fn(),
-          isMaximized: () => suite.isMaximized,
-        };
+      const win = {
+        getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
+        getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
+        setMinimumSize: jest.fn(),
+        setSize: jest.fn(),
+        isMaximized: () => suite.isMaximized,
+      };
 
-        NicoliveProgramService.updateWindowSize(
-          win,
-          suite.prev,
-          suite.next
-        );
+      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
 
-        expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-        expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
+      expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
+      expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
 
-        if (suite.isMaximized) {
-          expect(win.setSize).toHaveBeenCalledTimes(0);
-        } else {
-          expect(win.setSize).toHaveBeenCalledTimes(1);
-          expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF, BASE_HEIGHT);
-        }
+      if (suite.isMaximized) {
+        expect(win.setSize).toHaveBeenCalledTimes(0);
+      } else {
+        expect(win.setSize).toHaveBeenCalledTimes(1);
+        expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF, BASE_HEIGHT);
       }
-    );
+    });
   }
 });
