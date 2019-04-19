@@ -91,11 +91,21 @@
   overflow-x: hidden;
 
   &.dark-mode {
-    background-color: @bg-secondary;
+    background-color: @bg-tertiary;
   }
 
   &.light-mode {
     background-color: @white;
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+      border: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: @grey;
+      border-color: @white;
+    }
   }
 }
 
