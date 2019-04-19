@@ -73,7 +73,7 @@ export default class MixerVolmeter extends Vue {
     } else {
       // This machine does not support hardware acceleration, so fall back
       // to canvas 2D rendering.
-      this.ctx = this.$refs.canvas.getContext('2d');
+      this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
   }
 
