@@ -40,14 +40,12 @@ export function getBestSettingsForNiconico(
             simpleUseAdvanced: true,
             NVENCPreset: 'llhq',
         };
-        console.log('NVENC あった');
     } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv)) {
         encoderSettings = {
             encoder: EncoderType.qsv,
             simpleUseAdvanced: true,
             targetUsage: 'speed',
         };
-        console.log('obs_qsv11 あった');
     }
 
     const commonSettings: OptimizeSettings = {

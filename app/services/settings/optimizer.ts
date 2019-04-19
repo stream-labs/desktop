@@ -814,13 +814,10 @@ export class Optimizer {
     constructor(accessor: SettingsKeyAccessor, keysNeeded: OptimizeSettings) {
         this.accessor = accessor;
         this.keyDescriptions = filterKeyDescriptions(keysNeeded, AllKeyDescriptions);
-        console.log('Optimizer.keyDescriptions = ', JSON.stringify(this.keyDescriptions, null, 2));
     }
 
     getCurrentSettings(): OptimizeSettings {
-        const o = Object.assign({}, ...this.accessor.getValues(this.keyDescriptions));
-        console.log('getCurrentSettings()', JSON.stringify(o, null, 2));
-        return o;
+        return Object.assign({}, ...this.accessor.getValues(this.keyDescriptions));
     }
 
     /**
