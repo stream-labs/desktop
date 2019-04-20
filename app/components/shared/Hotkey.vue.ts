@@ -45,11 +45,13 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
   }
 
   isMouseKey(binding: IKeyedBinding) {
-    return binding.binding.key === 'LeftMouseButton' ||
+    return (
+      binding.binding.key === 'LeftMouseButton' ||
       binding.binding.key === 'RightMouseButton' ||
       binding.binding.key === 'MiddleMouseButton' ||
       binding.binding.key === 'X1MouseButton' ||
-      binding.binding.key === 'X2MouseButton';
+      binding.binding.key === 'X2MouseButton'
+    );
   }
 
   changedMouseSelect(event: any, index: number) {
@@ -58,7 +60,7 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
 
     const binding = this.bindings[index];
 
-    if(newValue == '(None)') {
+    if (newValue === '(None)') {
       binding.binding = this.getBlankBinding();
     } else {
       binding.binding = {
