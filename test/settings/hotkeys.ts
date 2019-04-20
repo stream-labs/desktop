@@ -42,15 +42,33 @@ test('Binds a hotkey', async t => {
   await openHotkeySettings(t);
 
   // Bind a hotkey to Start Recording
-  await app.client.click('.hotkey[data-test-id=Start_Recording] .Hotkey-bindings');
+  await app.client.click('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
   // @ts-ignore keys is a valid method, just not typed
-  await app.client.keys(BINDING);
+  app.client.keys(BINDING);
   await app.client.click('button=Done');
 
   // Check that the binding persisted
   await openHotkeySettings(t);
   const binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
   t.is(binding, 'Ctrl+B');
+});
+
+test('Binds a mouse button', async t => {
+  const { app } = t.context;
+
+  await openHotkeySettings(t);
+
+  // Bind a hotkey to Start Recording
+  await app.client.selectByValue(
+    '.hotkey[data-test-id=Start_Recording] .Hotkey-select',
+    'RightMouseButton',
+  );
+  await app.client.click('button=Done');
+
+  // Check that the binding persisted
+  await openHotkeySettings(t);
+  const binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
+  t.is(binding, 'RightMouseButton');
 });
 
 const openHotkeySettings = async (t: TExecutionContext) => {
@@ -62,5 +80,5 @@ const openHotkeySettings = async (t: TExecutionContext) => {
 
   // Wait for hotkeys to populate
   await app.client.click('li=Hotkeys');
-  await app.client.waitForExist('.hotkey');
+  await app.client.waitForExist('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
 };
