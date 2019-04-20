@@ -2,7 +2,7 @@
   <div class="hotkey" :data-test-id="description.replace(/\s+/, '_')">
     <div class="Hotkey-description">{{ description }}</div>
     <div class="Hotkey-bindings">
-      <transition-group name="bindings" tag="div">
+      <transition-group name="bindings" tag="div" class="Hotkey-bindings-transition">
         <div
           v-for="(binding, index) in bindings"
           :key="binding.key"
@@ -14,7 +14,7 @@
             :value="getBindingString(binding.binding)"
             @keydown="e => handleKeydown(e, index)"
           />
-          <select @change="e => changedMouseSelect(e, index)">
+          <select class="Hotkey-select" @change="e => changedMouseSelect(e, index)">
             <option>(None)</option>
             <option :selected="binding.binding.key == 'LeftMouseButton'" :value="'LeftMouseButton'">Left Mouse</option>
             <option :selected="binding.binding.key == 'MiddleMouseButton'" :value="'MiddleMouseButton'">Middle Mouse</option>
@@ -38,20 +38,45 @@
 .hotkey {
   display: flex;
   flex-direction: row;
-  .margin-bottom(3);
+  align-items: baseline;
+  .margin-bottom(2);
+}
+
+.Hotkey-bindings, .Hotkey-bindings-transition {
+  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.hotkey-bindings__binding {
+  align-items: baseline;
+  display: flex;
+  flex-direction: row;
+  .margin-bottom(1);
+  width: 100%;
 }
 
 .Hotkey-description {
-  width: 200px;
+  display: flex;
+  flex-basis: 200px;
   padding-right: 10px;
 }
 
 .Hotkey-input {
-  display: inline-block;
-  width: 150px;
+  display:flex;
+}
+
+.Hotkey-select {
+  display:flex;
+  height: unset;
+  margin: 0;
+  max-width: 150px;
 }
 
 .Hotkey-control {
+  display: flex;
   margin-left: 15px;
   cursor: pointer;
   opacity: 0.6;
