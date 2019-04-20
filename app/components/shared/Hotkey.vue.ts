@@ -30,14 +30,42 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
   handleKeydown(event: KeyboardEvent, index: number) {
     event.preventDefault();
 
-    if (this.isModifierPress(event)) return;
+    const binding = this.bindings[index];
+
+    const isMouseBinding = this.isMouseKey(binding);
+
+    if (this.isModifierPress(event) && !isMouseBinding) return;
+
+    binding.binding = {
+      key: isMouseBinding ? binding.binding.key : event.code,
+      modifiers: this.getModifiers(event),
+    };
+
+    this.setBindings();
+  }
+
+  isMouseKey(binding: IKeyedBinding) {
+    return binding.binding.key === 'LeftMouseButton' ||
+      binding.binding.key === 'RightMouseButton' ||
+      binding.binding.key === 'MiddleMouseButton' ||
+      binding.binding.key === 'X1MouseButton' ||
+      binding.binding.key === 'X2MouseButton';
+  }
+
+  changedMouseSelect(event: any, index: number) {
+    event.preventDefault();
+    const newValue = event.target.value;
 
     const binding = this.bindings[index];
 
-    binding.binding = {
-      key: event.code,
-      modifiers: this.getModifiers(event),
-    };
+    if(newValue == '(None)') {
+      binding.binding = this.getBlankBinding();
+    } else {
+      binding.binding = {
+        key: newValue,
+        modifiers: binding.binding.modifiers,
+      };
+    }
 
     this.setBindings();
   }
