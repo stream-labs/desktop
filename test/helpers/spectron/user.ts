@@ -1,16 +1,14 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
-import get = Reflect.get;
 const request = require('request');
 
-// const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
-const USER_POOL_URL = `http://localhost:5000`;
+const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
 const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
 interface ITestUser {
-  email: string; // must be unique
+  email: string;
   workerId: string; // null if user is not active right now
   updated: string; // time of the last request for this user
   username: string; // Mixer use username as an id for API requests
