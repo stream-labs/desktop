@@ -8,9 +8,9 @@
       <h2 class="community-name-wrapper"><i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i><span class="community-name" v-tooltip.bottom="communityNameTooltip">{{communityName}}</span></h2>
     </div>
     <div class="program-button">
-      <button v-if="programStatus === 'onAir'" @click="endProgram" :disabled="isEnding" class="button button--end-program button--soft-warning">番組終了</button>
+      <button v-if="programStatus === 'onAir' || programStatus === 'reserved'" @click="endProgram" :disabled="isEnding || programStatus === 'reserved'" class="button button--end-program button--soft-warning">番組終了</button>
       <button v-else-if="programStatus === 'end'" @click="createProgram" :disabled="isCreating" class="button button--create-program">番組作成</button>
-      <button v-else @click="startProgram" :disabled="isStarting || programStatus === 'reserved'" class="button button--start-program">番組開始</button>
+      <button v-else @click="startProgram" :disabled="isStarting" class="button button--start-program">番組開始</button>
     </div>
   </div>
 </template>

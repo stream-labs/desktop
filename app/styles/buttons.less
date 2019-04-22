@@ -166,6 +166,15 @@ button,
     background: rgba(204, 0, 41, .3);
     border: 1px solid @red;
   }
+
+  &:disabled {
+    background-color: @black;
+    border-color: @black;
+
+    &:hover {
+      background-color: @black;
+    }
+  }
 }
 
 .button--default {
