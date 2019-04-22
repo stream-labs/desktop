@@ -4,8 +4,19 @@
       <img :src="communitySymbol" class="community-thumbnail" :alt="communityName" />
     </div>
     <div class="program-info-description">
-      <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">{{programTitle}}</h1>
-      <h2 class="community-name-wrapper"><i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i><span class="community-name" v-tooltip.bottom="communityNameTooltip">{{communityName}}</span></h2>
+      <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">
+        <a :href="watchPageURL" @click.prevent="openInDefaultBrowser($event)">
+          {{programTitle}}
+        </a>
+      </h1>
+      <h2 class="community-name-wrapper">
+        <i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i>
+        <span class="community-name" v-tooltip.bottom="communityNameTooltip">
+          <a :href="communityPageURL" @click.prevent="openInDefaultBrowser($event)">
+            {{communityName}}
+          </a>
+        </span>
+      </h2>
     </div>
     <div class="program-button">
       <button v-if="programStatus === 'onAir'" @click="endProgram" :disabled="isEnding" class="button button--end-program button--soft-warning">番組終了</button>
@@ -57,7 +68,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-  } 
+  }
 
   .icon-lock {
     font-size: 10px;

@@ -101,6 +101,10 @@ export default class ProgramInfo extends Vue {
     }
   }
 
+  get programID(): string {
+    return this.nicoliveProgramService.state.programID;
+  }
+
   get programStatus(): string {
     return this.nicoliveProgramService.state.status;
   }
@@ -124,4 +128,21 @@ export default class ProgramInfo extends Vue {
   get communitySymbol(): string {
     return this.nicoliveProgramService.state.communitySymbol;
   }
+
+  openInDefaultBrowser(event: MouseEvent): void {
+    const href = (event.currentTarget as HTMLAnchorElement).href;
+    const url = new URL(href);
+    if (/^https?/.test(url.protocol)) {
+      remote.shell.openExternal(url.toString());
+    }
+  }
+
+  get watchPageURL(): string {
+    return `https://live.nicovideo.jp/watch/${this.programID}`;
+  }
+
+  get communityPageURL(): string {
+    return `https://com.nicovideo.jp/community/${this.communityID}`;
+  }
+
 }
