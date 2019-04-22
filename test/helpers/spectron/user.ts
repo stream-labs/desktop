@@ -1,27 +1,23 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
-import get = Reflect.get;
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
 const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
-let userName: string; // keep user's name if SLOBS is logged-in
+let user: ITestUser; // keep user's name if SLOBS is logged-in
 
 interface ITestUser {
-  name: string; // must be unique
+  email: string;
   workerId: string; // null if user is not active right now
   updated: string; // time of the last request for this user
-  platforms: {
-    // tokens for platforms
-    username: string; // Mixer use username as an id for API requests
-    type: TPlatform; // twitch, youtube, etc..
-    id: string; // platform userId
-    token: string; // platform token
-    apiToken: string; // Streamlabs API token
-    widgetToken: string; // needs for widgets showing
-    channelId?: string; // for the Mixer and Facebook only
-  }[];
+  username: string; // Mixer use username as an id for API requests
+  type: TPlatform; // twitch, youtube, etc..
+  id: string; // platform userId
+  token: string; // platform token
+  apiToken: string; // Streamlabs API token
+  widgetToken: string; // needs for widgets showing
+  channelId?: string; // for the Mixer and Facebook only
 }
 
 export async function logOut(t: TExecutionContext) {
@@ -43,7 +39,7 @@ export async function logIn(
   const app = t.context.app;
   let authInfo: IPlatformAuth;
 
-  if (userName) throw 'User already logged in';
+  if (email) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
     authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
@@ -66,9 +62,9 @@ export async function logIn(
  * account.
  */
 export async function releaseUserInPool() {
-  if (!userName || !USER_POOL_TOKEN) return;
-  await requestUserPool(`release/${userName}`);
-  userName = '';
+  if (!user || !USER_POOL_TOKEN) return;
+  await requestUserPool(`release/${user.type}/${user.email}`);
+  user = null;
 }
 
 /**
@@ -121,12 +117,12 @@ async function reserveUserFromPool(
 ): Promise<IPlatformAuth> {
   // try to get a user account from users-pool service
   // give it several attempts
-  let user: ITestUser;
   let attempts = 3;
   while (attempts--) {
     try {
       let urlPath = 'reserve';
-      if (email) urlPath += `/${email}`; // request a specific user if 'email' is set
+      if (platformType) urlPath += `/${platformType}`; // request a specific platform
+      if (email) urlPath += `/${email}`; // request a specific account
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {
@@ -140,17 +136,15 @@ async function reserveUserFromPool(
   if (!user) throw 'Unable to reserve a user after 3 attempts';
 
   // the account has been received, get tokens from it
-  userName = user.name; // need to save the user's name to return it back to the pool after the test
-  const platform = user.platforms.find(platform => platform.type === platformType);
   return {
-    widgetToken: platform.widgetToken,
-    apiToken: platform.apiToken,
+    widgetToken: user.widgetToken,
+    apiToken: user.apiToken,
     platform: {
-      username: platform.username,
-      type: platformType,
-      id: platform.id,
-      token: platform.token,
-      channelId: platform.channelId,
+      username: user.username,
+      type: user.type,
+      id: user.id,
+      token: user.token,
+      channelId: user.channelId,
     },
   };
 }
@@ -176,6 +170,6 @@ async function requestUserPool(path: string): Promise<any> {
   });
 }
 
-export function getUserName(): string {
-  return userName;
+export function getUser(): ITestUser {
+  return user;
 }
