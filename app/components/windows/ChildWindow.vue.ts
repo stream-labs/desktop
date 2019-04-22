@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -57,7 +57,20 @@ export default class ChildWindow extends Vue {
     electron.remote.getCurrentWindow().setTitle(this.currentComponent.title);
   }
 
+  windowResizeTimeout: number;
+
+  windowSizeHandler() {
+    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    clearTimeout(this.windowResizeTimeout);
+
+    this.windowResizeTimeout = window.setTimeout(
+      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
+      200,
+    );
+  }
+
   private onWindowUpdatedHandler(options: IWindowOptions) {
+    window.removeEventListener('resize', this.windowSizeHandler);
     // If the window was closed, just clear the stack
     if (!options.isShown) {
       this.clearComponentStack();
@@ -68,6 +81,7 @@ export default class ChildWindow extends Vue {
       this.currentComponent.isShown = false;
       this.components.push({ name: options.componentName, isShown: true, title: options.title });
       this.setWindowTitle();
+      window.addEventListener('resize', this.windowSizeHandler);
       return;
     }
 
@@ -75,6 +89,7 @@ export default class ChildWindow extends Vue {
       this.components.pop();
       this.currentComponent.isShown = true;
       this.setWindowTitle();
+      window.addEventListener('resize', this.windowSizeHandler);
       return;
     }
 
@@ -87,6 +102,7 @@ export default class ChildWindow extends Vue {
     this.refreshingTimeout = window.setTimeout(() => {
       this.components.push({ name: options.componentName, isShown: true, title: options.title });
       this.setWindowTitle();
+      window.addEventListener('resize', this.windowSizeHandler);
     }, 50);
   }
 }

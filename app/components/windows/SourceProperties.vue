@@ -5,7 +5,7 @@
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200">
-  <display slot="fixed" v-if="source" :sourceId="source.id" />
+  <display slot="fixed" v-if="source && !hideStyleBlockingElements" :sourceId="source.id" />
   <div slot="content">
     <component
       v-if="propertiesManagerUI"

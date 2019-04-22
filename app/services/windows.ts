@@ -316,6 +316,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
+      transparent: true,
     }));
 
     newWindow.setMenu(null);

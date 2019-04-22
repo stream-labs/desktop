@@ -26,7 +26,11 @@
 
       <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
         <div class="display">
-          <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
+          <display
+            v-if="!animating && !hideStyleBlockingElements"
+            :sourceId="widget.previewSourceId"
+            @click="createProjector"
+          />
         </div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
