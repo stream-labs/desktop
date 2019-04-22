@@ -8,7 +8,7 @@
         </ul>
         <div class="program-menu">
             <div class="program-menu-item">
-                <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" v-tooltip.bottom="twitterShareTooltip" class="link"><i class="icon-twitter icon-btn"></i></a>
+                <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" class="link"><i class="icon-twitter icon-btn" v-tooltip.bottom="twitterShareTooltip"></i></a>
             </div>
             <div class="program-menu-item" :class="{ 'is-show': showPopupMenu }">
               <popper
@@ -41,7 +41,8 @@
 
 .program-statistics {
     display: flex;
-    padding: 12px 16px;
+    height: 40px;
+    padding: 0 16px;
     justify-content: space-between;
 }
 
@@ -55,17 +56,13 @@
 .program-statistics-item {
     display: flex;
     align-items: center;
+    font-size: 12px;
     margin-right: 16px;
     color: @text-secondary;
  }
 
 .program-statistics-icon {
-    font-size: 14px;
     margin-right: 8px;
-}
-
-.program-statistics-value {
-    font-size: 14px;
 }
 
 .program-menu {
@@ -83,6 +80,8 @@
 }
 
  .popup-toggle-btn {
+     display: flex;
+
      .is-show & {
         i {
             color: @text-active;
@@ -91,9 +90,13 @@
     }
  }
 
+ .popper {
+    //TODO: 重なり順を変数で管理したい
+    z-index: 2;
+ }
+
  .popup-menu-list {
     min-width: 200px;
-    z-index: 2;
     list-style: none;
     position: absolute;
     top: 6px;
