@@ -40,7 +40,6 @@ button,
   }
 }
 
-
 .button--semi-opac {
   background: rgba(255, 255, 255, .1);
 
@@ -120,12 +119,10 @@ button,
   background: @accent;
   font-size: 16px;
 
-
   &:focus,
   &:hover {
     background: @red;
   }
-
 }
 
 .square-button--skip,
@@ -168,7 +165,6 @@ button,
   &:hover {
     background: rgba(204, 0, 41, .3);
     border: 1px solid @red;
-
   }
 }
 
@@ -205,5 +201,12 @@ button,
     opacity: .5;
     color: inherit;
     background-color: transparent
+  }
+
+  &:disabled {
+    &:hover {
+      color:@nicolive-button;
+      background-color: transparent;
+    }
   }
 }
