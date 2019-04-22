@@ -59,74 +59,14 @@ test('filterKeyDescriptions', () => {
         subCategory: 'Untitled',
         setting: 'Mode',
         lookupValueName: true,
-        // dependents: undefined
     }]);
 
     const qsvSettings: OptimizeSettings = {
         outputMode: 'Simple',
-        //videoBitrate: 12345,
-        //encoder: EncoderType.qsv,
         simpleUseAdvanced: true,
-        //targetUsage: 'speed',
     }
     const qsv = filterKeyDescriptions(qsvSettings, AllKeyDescriptions);
-    expect(qsv).toEqual([{
-        key: OptimizationKey.outputMode,
-        category: CategoryName.output,
-        subCategory: 'Untitled',
-        setting: 'Mode',
-        lookupValueName: true,
-        dependents: [
-            {
-                value: 'Simple',
-                params: [
-                    {
-                        key: OptimizationKey.encoder,
-                        category: CategoryName.output,
-                        subCategory: 'Streaming',
-                        setting: 'StreamEncoder',
-                        lookupValueName: true,
-                        dependents: [
-                            {
-                                value: 'obs_x264',
-                                params: [
-                                    {
-                                        category: CategoryName.output,
-                                        subCategory: 'Streaming',
-                                        key: 'simpleUseAdvanced',
-                                        setting: 'UseAdvanced',
-                                        lookupValueName: true,
-                                    }
-                                ]
-                            }, {
-                                value: 'obs_qsv11',
-                                params: [
-                                    {
-                                        category: CategoryName.output,
-                                        subCategory: 'Streaming',
-                                        key: 'simpleUseAdvanced',
-                                        setting: 'UseAdvanced',
-                                        lookupValueName: true,
-                                    }
-                                ]
-                            }, {
-                                value: 'ffmpeg_nvenc',
-                                params: [
-                                    {
-                                        category: CategoryName.output,
-                                        subCategory: 'Streaming',
-                                        key: 'simpleUseAdvanced',
-                                        setting: 'UseAdvanced',
-                                        lookupValueName: true,
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }]);
+    expect(qsv).toMatchSnapshot();
 });
 
 test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
@@ -187,8 +127,7 @@ test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
     const simpleResult = [...a.travarseKeyDescriptions(simpleDescriptions, d => [d.key, d.setting])];
 
     expect(accessor.findSettingValue).toHaveBeenCalledTimes(1);
-    expect(accessor.findSettingValue.mock.calls[0][1]).toEqual('Untitled');
-    expect(accessor.findSettingValue.mock.calls[0][2]).toEqual('Mode');
+    expect(accessor.findSettingValue).toHaveBeenLastCalledWith(undefined, 'Untitled', 'Mode');
 
     expect(simpleResult).toEqual([
         [OptimizationKey.outputMode, 'Mode'],
@@ -270,68 +209,7 @@ test('SettingsKeyAccessor#optimizeInfo', () => {
     const a = new SettingsKeyAccessor(accessor);
 
     const opt = new Optimizer(a, best);
-    expect(opt.optimizeInfo(current, delta)).toEqual([
-        [
-            'Output',
-            [
-                {
-                    currentValue: 'Advanced',
-                    key: 'outputMode',
-                    name: 'Mode',
-                    newValue: 'Simple',
-                },
-                {
-                    currentValue: 5808,
-                    key: 'videoBitrate',
-                    name: 'VBitrate',
-                },
-                {
-                    currentValue: 'obs_x264',
-                    key: 'encoder',
-                    name: 'StreamEncoder',
-                },
-                {
-                    currentValue: undefined,
-                    key: 'simpleUseAdvanced',
-                    name: 'UseAdvanced',
-                    newValue: true,
-                },
-                {
-                    currentValue: undefined,
-                    key: 'encoderPreset',
-                    name: 'Preset',
-                    newValue: 'ultrafast',
-                },
-                {
-                    currentValue: '128',
-                    key: 'audioBitrate',
-                    name: 'ABitrate',
-                    newValue: '192',
-                },
-            ],
-        ],
-        [
-            'Video',
-            [
-                {
-                    currentValue: '1280x720',
-                    key: 'quality',
-                    name: 'Output',
-                },
-                {
-                    currentValue: 'Common FPS Values',
-                    key: 'fpsType',
-                    name: 'FPSType',
-                },
-                {
-                    currentValue: '30',
-                    key: 'fpsCommon',
-                    name: 'FPSCommon',
-                },
-            ],
-        ],
-    ]);
+    expect(opt.optimizeInfo(current, delta)).toMatchSnapshot();
 });
 
-test('Optimizer#getCurrentSettings', () => {
-});
+test.todo('Optimizer#getCurrentSettings');

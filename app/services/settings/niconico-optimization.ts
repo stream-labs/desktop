@@ -57,6 +57,7 @@ export function getBestSettingsForNiconico(
         fpsCommon: '30',
     };
 
+    // 出力=詳細(Output: Advanced) のときのエンコーダー以外の設定
     const advancedSettings: OptimizeSettings = {
         outputMode: 'Advanced',
         advRateControl: 'CBR',
@@ -66,10 +67,9 @@ export function getBestSettingsForNiconico(
         advAudioTrackIndex: '1',
     };
 
-    return Object.assign(
-        {},
-        commonSettings,
-        // advancedSettings,
-        encoderSettings
-    );
+    return {
+        ...commonSettings,
+        // ...advancedSettings, // #239 のワークアラウンドでコメントアウト: 出力=詳細が最適化に使える様になったときに有効にしたい
+        ...encoderSettings
+    };
 }
