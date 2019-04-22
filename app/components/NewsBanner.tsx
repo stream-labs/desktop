@@ -8,12 +8,14 @@ import { $t } from 'services/i18n';
 import cx from 'classnames';
 import styles from './NewsBanner.m.less';
 import { CustomizationService } from 'services/customization';
+import { WindowsService } from 'services/windows';
 
 @Component({})
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
+  @Inject() windowsService: WindowsService;
 
   processingClose = false;
 
@@ -27,9 +29,9 @@ export default class NewsBanner extends Vue {
 
   @Watch('bannerExists')
   toggleAnimation() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
     window.setTimeout(() => {
-      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+      this.windowsService.updateStyleBlockers('main', false);
     }, 500);
   }
 

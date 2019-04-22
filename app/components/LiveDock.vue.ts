@@ -16,6 +16,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
+import { WindowsService } from 'services/windows';
 
 @Component({
   components: {
@@ -33,6 +34,7 @@ export default class LiveDock extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() appService: AppService;
   @Inject() chatService: ChatService;
+  @Inject() windowsService: WindowsService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -100,25 +102,21 @@ export default class LiveDock extends Vue {
 
   collapse() {
     this.canAnimate = true;
-    this.customizationService.setSettings({
-      livedockCollapsed: true,
-      hideStyleBlockingElements: true,
-    });
+    this.windowsService.updateStyleBlockers('main', true);
+    this.customizationService.setSettings({ livedockCollapsed: true });
     setTimeout(() => {
       this.canAnimate = false;
-      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+      this.windowsService.updateStyleBlockers('main', false);
     }, 300);
   }
 
   expand() {
     this.canAnimate = true;
-    this.customizationService.setSettings({
-      livedockCollapsed: false,
-      hideStyleBlockingElements: true,
-    });
+    this.windowsService.updateStyleBlockers('main', true);
+    this.customizationService.setSettings({ livedockCollapsed: false });
     setTimeout(() => {
       this.canAnimate = false;
-      this.customizationService.setSettings({ hideStyleBlockingElements: false });
+      this.windowsService.updateStyleBlockers('main', false);
     }, 300);
   }
 
@@ -205,8 +203,8 @@ export default class LiveDock extends Vue {
     this.chatService.refreshChat();
   }
 
-  get hideStyleBlockingElements() {
-    return this.customizationService.state.hideStyleBlockingElements;
+  get hideStyleBlockers() {
+    return this.windowsService.state.main.hideStyleBlockers;
   }
 
   get hasChatApps() {

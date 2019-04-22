@@ -18,7 +18,6 @@ import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -38,7 +37,6 @@ export default class WidgetEditor extends Vue {
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private windowsService: WindowsService;
   @Inject() private projectorService: ProjectorService;
-  @Inject() private customizationService: CustomizationService;
 
   @Prop() isAlertBox?: boolean;
   @Prop() selectedId?: string;
@@ -73,8 +71,8 @@ export default class WidgetEditor extends Vue {
   animating = false;
   canShowEditor = false;
 
-  get hideStyleBlockingElements() {
-    return this.customizationService.state.hideStyleBlockingElements;
+  get hideStyleBlockers() {
+    return this.windowsService.state.child.hideStyleBlockers;
   }
 
   get loaded() {

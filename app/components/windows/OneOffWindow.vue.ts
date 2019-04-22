@@ -39,11 +39,11 @@ export default class OneOffWindow extends Vue {
   windowResizeTimeout: number;
 
   windowSizeHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers(this.windowId, true);
     clearTimeout(this.windowResizeTimeout);
 
     this.windowResizeTimeout = window.setTimeout(
-      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
+      () => this.windowsService.updateStyleBlockers(this.windowId, false),
       200,
     );
   }

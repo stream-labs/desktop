@@ -52,7 +52,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     experimental: {
       // put experimental features here
     },
-    hideStyleBlockingElements: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -60,9 +59,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   init() {
     super.init();
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-
-    // Hide these elements until the app is finished loading
-    this.setSettings({ hideStyleBlockingElements: true });
 
     if (this.state.nightMode != null) {
       const theme = this.state.nightMode ? 'night-theme' : 'day-theme';

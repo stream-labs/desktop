@@ -18,7 +18,7 @@ export default class ChildWindow extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private appService: AppService;
 
-  components: { name: string; isShown: boolean; title: string }[] = [];
+  components: { name: string; isShown: boolean; title: string; hideStyleBlockers: boolean }[] = [];
   private refreshingTimeout = 0;
 
   mounted() {
@@ -60,11 +60,11 @@ export default class ChildWindow extends Vue {
   windowResizeTimeout: number;
 
   windowSizeHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('child', true);
     clearTimeout(this.windowResizeTimeout);
 
     this.windowResizeTimeout = window.setTimeout(
-      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
+      () => this.windowsService.updateStyleBlockers('child', false),
       200,
     );
   }
@@ -79,7 +79,12 @@ export default class ChildWindow extends Vue {
 
     if (options.preservePrevWindow) {
       this.currentComponent.isShown = false;
-      this.components.push({ name: options.componentName, isShown: true, title: options.title });
+      this.components.push({
+        name: options.componentName,
+        isShown: true,
+        title: options.title,
+        hideStyleBlockers: options.hideStyleBlockers,
+      });
       this.setWindowTitle();
       window.addEventListener('resize', this.windowSizeHandler);
       return;
@@ -100,7 +105,12 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(() => {
-      this.components.push({ name: options.componentName, isShown: true, title: options.title });
+      this.components.push({
+        name: options.componentName,
+        isShown: true,
+        title: options.title,
+        hideStyleBlockers: options.hideStyleBlockers,
+      });
       this.setWindowTitle();
       window.addEventListener('resize', this.windowSizeHandler);
     }, 50);

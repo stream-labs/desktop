@@ -8,7 +8,6 @@ import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 import { Subscription } from 'rxjs';
-import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -19,14 +18,13 @@ import { CustomizationService } from 'services/customization';
 export default class Projector extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: ISourcesServiceApi;
-  @Inject() customizationService: CustomizationService;
 
   oldBounds: electron.Rectangle;
 
   sourcesSubscription: Subscription;
 
-  get hideStyleBlockingElements() {
-    return this.customizationService.state.hideStyleBlockingElements;
+  get hideStyleBlockers() {
+    return this.windowsService.state[this.windowId].hideStyleBlockers;
   }
 
   get windowId() {

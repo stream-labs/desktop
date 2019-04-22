@@ -169,6 +169,11 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+
+  // Will be true when the UI is performing animations, transitions, or property changes that affect
+  // the display of elements we cannot draw over. During this time such elements, for example
+  // BrowserViews and the OBS Display, will be hidden until the operation is complete.
+  hideStyleBlockers: boolean;
 }
 
 interface IWindowsState {
@@ -179,6 +184,7 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
   isShown: true,
+  hideStyleBlockers: false,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -192,11 +198,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
+      hideStyleBlockers: true,
       title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
+      hideStyleBlockers: false,
       isShown: false,
     },
   };
@@ -307,7 +315,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return windowId;
     }
 
-    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+    this.CREATE_ONE_OFF_WINDOW(windowId, { ...DEFAULT_WINDOW_OPTIONS, ...options });
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
@@ -379,6 +387,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
+  updateStyleBlockers(windowId: string, hideStyleBlockers: boolean) {
+    this.UPDATE_HIDE_STYLE_BLOCKERS(windowId, hideStyleBlockers);
+  }
+
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
@@ -422,6 +434,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
     this.state[windowId].scaleFactor = scaleFactor;
+  }
+
+  @mutation()
+  private UPDATE_HIDE_STYLE_BLOCKERS(windowId: string, hideStyleBlockers: boolean) {
+    this.state[windowId].hideStyleBlockers = hideStyleBlockers;
   }
 
   @mutation()

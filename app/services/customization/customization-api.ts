@@ -21,11 +21,6 @@ export interface ICustomizationServiceState {
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental: any;
-
-  // Will be true when the UI is performing animations, transitions, or property changes that affect
-  // the display of elements we cannot draw over. During this time such elements, for example
-  // BrowserViews and the OBS Display, will be hidden until the operation is complete.
-  hideStyleBlockingElements: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

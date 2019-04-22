@@ -27,7 +27,7 @@
       <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
         <div class="display">
           <display
-            v-if="!animating && !hideStyleBlockingElements"
+            v-if="!animating && !hideStyleBlockers"
             :sourceId="widget.previewSourceId"
             @click="createProjector"
           />

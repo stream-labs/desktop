@@ -7,8 +7,8 @@ import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
-import { AppService } from 'services/app';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { WindowsService } from 'services/windows';
 
 @Component({
   components: {
@@ -22,7 +22,7 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() private appService: AppService;
+  @Inject() private windowsService: WindowsService;
 
   $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
@@ -50,7 +50,7 @@ export default class Studio extends Vue {
   }
 
   get displayEnabled() {
-    return !this.customizationService.state.hideStyleBlockingElements && !this.performanceMode;
+    return !this.windowsService.state.main.hideStyleBlockers && !this.performanceMode;
   }
 
   get performanceMode() {
@@ -86,10 +86,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 }
