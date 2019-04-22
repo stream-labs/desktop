@@ -29,7 +29,10 @@ void main() {
 
   // If the current position is less than the volume, or is within
   // the peak hold band, then it will be bright.
-  if ((v_position.x < u_volume) || ((v_position.x > u_peakHold.x) && (v_position.x < u_peakHold.x + u_peakHold.y))) {
+  if (
+    (v_position.x < u_volume) ||
+    ((v_position.x > u_peakHold.x) && (v_position.x < u_peakHold.x + u_peakHold.y) && u_peakHold.x != 0.0)
+  ) {
     mult = vec4(1, 1, 1, 1);
   }
 
