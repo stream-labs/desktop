@@ -186,7 +186,7 @@ test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
     outputMode = 'Simple';
     const simpleResult = [...a.travarseKeyDescriptions(simpleDescriptions, d => [d.key, d.setting])];
 
-    expect(accessor.findSettingValue.mock.calls.length).toEqual(1);
+    expect(accessor.findSettingValue).toHaveBeenCalledTimes(1);
     expect(accessor.findSettingValue.mock.calls[0][1]).toEqual('Untitled');
     expect(accessor.findSettingValue.mock.calls[0][2]).toEqual('Mode');
 
