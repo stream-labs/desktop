@@ -78,23 +78,12 @@ export default class ChildWindow extends Vue {
     }
 
     if (options.preservePrevWindow) {
-      this.currentComponent.isShown = false;
-      this.components.push({
-        name: options.componentName,
-        isShown: true,
-        title: options.title,
-        hideStyleBlockers: options.hideStyleBlockers,
-      });
-      this.setWindowTitle();
-      window.addEventListener('resize', this.windowSizeHandler);
+      this.handlePreservePrevWindow(options);
       return;
     }
 
     if (options.isPreserved) {
-      this.components.pop();
-      this.currentComponent.isShown = true;
-      this.setWindowTitle();
-      window.addEventListener('resize', this.windowSizeHandler);
+      this.handleIsPreservedWindow();
       return;
     }
 
@@ -114,5 +103,24 @@ export default class ChildWindow extends Vue {
       this.setWindowTitle();
       window.addEventListener('resize', this.windowSizeHandler);
     }, 50);
+  }
+
+  private handlePreservePrevWindow(options: IWindowOptions) {
+    this.currentComponent.isShown = false;
+    this.components.push({
+      name: options.componentName,
+      isShown: true,
+      title: options.title,
+      hideStyleBlockers: options.hideStyleBlockers,
+    });
+    this.setWindowTitle();
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  private handleIsPreservedWindow() {
+    this.components.pop();
+    this.currentComponent.isShown = true;
+    this.setWindowTitle();
+    window.addEventListener('resize', this.windowSizeHandler);
   }
 }

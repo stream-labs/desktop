@@ -88,7 +88,7 @@ export default class LiveDock extends Vue {
   @Watch('streamingStatus')
   onStreamingStatusChange() {
     if (this.streamingStatus === EStreamingState.Starting) {
-      this.expand();
+      this.setCollapsed(false);
     }
   }
 
@@ -100,20 +100,10 @@ export default class LiveDock extends Vue {
     return this.customizationService.state.livedockCollapsed;
   }
 
-  collapse() {
+  setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
     this.windowsService.updateStyleBlockers('main', true);
-    this.customizationService.setSettings({ livedockCollapsed: true });
-    setTimeout(() => {
-      this.canAnimate = false;
-      this.windowsService.updateStyleBlockers('main', false);
-    }, 300);
-  }
-
-  expand() {
-    this.canAnimate = true;
-    this.windowsService.updateStyleBlockers('main', true);
-    this.customizationService.setSettings({ livedockCollapsed: false });
+    this.customizationService.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
       this.windowsService.updateStyleBlockers('main', false);

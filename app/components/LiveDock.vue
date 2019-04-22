@@ -6,7 +6,7 @@
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
-    @click="expand">
+    @click="setCollapsed(false)">
     <i :class="{
       'icon-down icon-left': !onLeft,
       'icon-down icon-right': onLeft
@@ -19,7 +19,7 @@
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
-        @click="collapse">
+        @click="setCollapsed(true)">
         <i
           :class="{
           'icon-down icon-left': onLeft,
