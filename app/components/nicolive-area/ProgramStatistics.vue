@@ -49,6 +49,7 @@
 .program-statistics-list {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     list-style: none;
     margin: 0;
 }
