@@ -111,13 +111,16 @@
       "StreamEncoder": {
         "name": "Encoder",
         "obs_x264": "Software (x264)",
-        "obs_qsv11": "Hardware (QSV)"
+        "obs_qsv11": "Hardware (QSV)",
+        "ffmpeg_nvenc": "Hardware (NVENC)"
       },
       "ABitrate": {
         "name": null
       },
       "UseAdvanced": {
-        "name": null
+        "name": null,
+        "true": null,
+        "false": null
       },
       "EnforceBitrate": {
         "name": null
@@ -137,9 +140,18 @@
       },
       "QSVPreset": {
         "name": "@:settings.Output.Streaming.target_usage.name",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "@:settings.Output.Streaming.target_usage.quality",
+        "balanced": "@:settings.Output.Streaming.target_usage.balanced",
+        "speed": "@:settings.Output.Streaming.target_usage.speed"
+      },
+      "NVENCPreset": {
+        "name": null,
+        "default": null,
+        "hq": null,
+        "hp": null,
+        "ll": null,
+        "llhq": null,
+        "llhp": null
       },
       "x264Settings": {
         "name": null
@@ -150,7 +162,8 @@
       "Encoder": {
         "name": "@:settings.Output.Streaming.StreamEncoder.name",
         "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
-        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11"
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11",
+        "ffmpeg_nvenc": "@:settings.Output.Streaming.StreamEncoder.ffmpeg_nvenc"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
@@ -198,9 +211,9 @@
       },
       "target_usage": {
         "name": "Target Usage",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "Quality",
+        "balanced": "Balanced",
+        "speed": "Speed"
       },
       "profile": {
         "name": null,

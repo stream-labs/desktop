@@ -111,13 +111,16 @@
       "StreamEncoder": {
         "name": "エンコーダ",
         "obs_x264": "ソフトウェア（x264）",
-        "obs_qsv11": "ハードウェア（QSV）"
+        "obs_qsv11": "ハードウェア（QSV）",
+        "ffmpeg_nvenc": "ハードウェア (NVENC)"
       },
       "ABitrate": {
         "name": "音声ビットレート（kbps）"
       },
       "UseAdvanced": {
-        "name": "高度なエンコーダ設定を有効にする"
+        "name": "高度なエンコーダ設定を有効にする",
+        "true": "有効",
+        "false": "無効"
       },
       "EnforceBitrate": {
         "name": "ストリーミングサービスのビットレート制限を強制する"
@@ -137,9 +140,18 @@
       },
       "QSVPreset": {
         "name": "@:settings.Output.Streaming.target_usage.name",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "@:settings.Output.Streaming.target_usage.quality",
+        "balanced": "@:settings.Output.Streaming.target_usage.balanced",
+        "speed": "@:settings.Output.Streaming.target_usage.speed"
+      },
+      "NVENCPreset": {
+        "name": "エンコーダープリセット",
+        "default": "規定",
+        "hq": "高品質",
+        "hp": "高性能",
+        "ll": "低遅延",
+        "llhq": "低遅延高品質",
+        "llhp": "低遅延高性能"
       },
       "x264Settings": {
         "name": "エンコーダーのカスタム設定"
@@ -150,7 +162,8 @@
       "Encoder": {
         "name": "@:settings.Output.Streaming.StreamEncoder.name",
         "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
-        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11"
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11",
+        "ffmpeg_nvenc": "@:settings.Output.Streaming.StreamEncoder.ffmpeg_nvenc"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
@@ -198,9 +211,9 @@
       },
       "target_usage": {
         "name": "ターゲットの利用法",
-        "quality": null,
-        "balanced": null,
-        "speed": null
+        "quality": "Quality",
+        "balanced": "Balanced",
+        "speed": "Speed"
       },
       "profile": {
         "name": "プロファイル",
