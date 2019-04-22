@@ -269,7 +269,16 @@ export class NicoliveClient {
 
   /** 番組作成画面を開いて結果を返す */
   async createProgram(): Promise<CreateResult> {
-    const win = new BrowserWindow({ width: 1200, height: 900 });
+    const win = new BrowserWindow({
+      width: 1200,
+      height: 900,
+      webPreferences: {
+        nodeIntegration: false,
+        nodeIntegrationInWorker: false,
+        sandbox: true,
+        nativeWindowOpen: true,
+      },
+    });
     return new Promise<CreateResult>((resolve, _reject) => {
       win.on('closed', () => resolve(CreateResult.OTHER));
       win.webContents.on('did-navigate', (_event, url) => {
@@ -292,7 +301,16 @@ export class NicoliveClient {
 
   /** 番組編集画面を開いて結果を返す */
   async editProgram(programID: string): Promise<EditResult> {
-    const win = new BrowserWindow({ width: 1200, height: 900 });
+    const win = new BrowserWindow({
+      width: 1200,
+      height: 900,
+      webPreferences: {
+        nodeIntegration: false,
+        nodeIntegrationInWorker: false,
+        sandbox: true,
+        nativeWindowOpen: true,
+      },
+    });
     return new Promise<EditResult>((resolve, _reject) => {
       win.on('closed', () => resolve(EditResult.OTHER));
       win.webContents.on('did-navigate', (_event, url) => {
