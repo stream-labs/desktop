@@ -2,8 +2,8 @@
   <div class="tool-bar">
     <span class="status-indicator" :class="{ 'is-live': programStatus === 'onAir' }">LIVE</span>
     <span class="program-time"><time>{{ format(programCurrentTime) }}</time> / <time>{{ format(programTotalTime) }}</time></span>
-    <button class="manual-extention" @click="extendProgram" :disabled="autoExtensionEnabled || isExtending || !isProgramExtendable">
-      <i class="icon-manual-extention icon-btn icon-btn--lg" v-tooltip.bottom="manualExtentionTooltip"></i>
+    <button class="manual-extention" v-tooltip.bottom="manualExtentionTooltip" @click="extendProgram" :disabled="autoExtensionEnabled || isExtending || !isProgramExtendable">
+      <i class="icon-manual-extention icon-btn icon-btn--lg"></i>
     </button>
     <div class="reservation-timer" v-if="programStatus === 'reserved'">
       番組開始まで {{ format(-programCurrentTime) }}
@@ -56,8 +56,17 @@
 }
 
 .manual-extention {
+  margin-left: 12px;
+
   i {
-    margin-left: 12px;
+    margin-left: 0;
+  }
+
+  &:disabled {
+    i {
+      opacity: 0.26;
+      cursor: inherit;   
+    }
   }
 }
 
