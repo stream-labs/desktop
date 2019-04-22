@@ -5,6 +5,7 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUserName, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { async } from 'rxjs/internal/scheduler/async';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
@@ -45,6 +46,10 @@ export async function focusLibrary(t: any) {
 // Close current focused window
 export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
+}
+
+export async function waitForLoader(t: any) {
+  await t.context.app.client.waitForExist('.main-loading', 10000, true);
 }
 
 interface ITestRunnerOptions {
@@ -146,7 +151,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
 
-    await t.context.app.client.waitForExist('.main-loading', 5000, true);
+    await waitForLoader(t);
     if (options.skipOnboarding) {
       await t.context.app.client.click('a=Setup later');
 
