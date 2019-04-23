@@ -17,8 +17,8 @@ import { $t } from 'services/i18n';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
-  'night-theme': '#09161d',
-  'day-theme': '#f7f9f9',
+  'night-theme': { r: 9, g: 22, b: 29 },
+  'day-theme': { r: 247, g: 249, b: 249 },
 };
 
 // Maps to --section
@@ -97,7 +97,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
-  isDarkTheme() {
+  get isDarkTheme() {
     return ['night-theme'].includes(this.currentTheme);
   }
 

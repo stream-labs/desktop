@@ -168,6 +168,7 @@
     "pngjs": "3.3.3",
     "prettier": "1.15.2",
     "progress": "2.0.0",
+    "raw-loader": "^2.0.0",
     "read-pkg-up": "4.0.0",
     "recursive-readdir": "^2.2.2",
     "reflect-metadata": "0.1.12",
