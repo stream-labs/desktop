@@ -24,6 +24,7 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   show_smfredemption_message: boolean;
   show_tiltifydonation_message: boolean;
   show_treat_message: boolean;
+  facebook_show_stars_message: boolean;
 
   // WHITE-LISTED SETTINGS
   bits_alert_min_amount: number;
