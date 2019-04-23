@@ -2,7 +2,7 @@
 
 import test from 'ava';
 import { uniqueId, sample } from 'lodash';
-import { useSpectron, focusMain } from '../helpers/spectron/index';
+import { useSpectron, focusMain, TExecutionContext } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
 import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
 
@@ -20,30 +20,30 @@ const SOURCE_TYPES = [
   'Game Capture',
   'Video Capture Device',
   'Audio Input Capture',
-  'Audio Output Capture'
+  'Audio Output Capture',
 ];
 
 // Utilities
 
-async function getSceneElements(t) {
-  return t.context.app.client.$('h4=Scenes').$('../..').$$('li');
+async function getSceneElements(t: TExecutionContext) {
+  return t.context.app.client.$('.scene-collections-wrapper').$$('li');
 }
 
-async function getSourceElements(t) {
-  return t.context.app.client.$('h4=Sources').$('../..').$$('li');
+async function getSourceElements(t: TExecutionContext) {
+  return t.context.app.client.$('h2=Sources').$('../..').$$('.sl-vue-tree-node-item');
 }
 
 
 // Actions
 
-async function addRandomScene(t) {
+async function addRandomScene(t: TExecutionContext) {
   const name = uniqueId('scene_');
 
   await focusMain(t);
   await addScene(t, name);
 }
 
-async function removeRandomScene(t) {
+async function removeRandomScene(t: TExecutionContext) {
   await focusMain(t);
   const scenes = await getSceneElements(t);
 
@@ -54,7 +54,7 @@ async function removeRandomScene(t) {
   }
 }
 
-async function selectRandomScene(t) {
+async function selectRandomScene(t: TExecutionContext) {
   await focusMain(t);
   const scenes = await getSceneElements(t);
 
@@ -64,7 +64,7 @@ async function selectRandomScene(t) {
   }
 }
 
-async function addRandomSource(t) {
+async function addRandomSource(t: TExecutionContext) {
   const type = sample(SOURCE_TYPES);
   const name = `${type} ${uniqueId()}`;
 
@@ -74,7 +74,7 @@ async function addRandomSource(t) {
   await addSource(t, type, name);
 }
 
-async function removeRandomSource(t) {
+async function removeRandomSource(t: TExecutionContext) {
   await focusMain(t);
   const sources = await getSourceElements(t);
 
@@ -89,7 +89,7 @@ async function removeRandomSource(t) {
   }
 }
 
-async function selectRandomSource(t) {
+async function selectRandomSource(t: TExecutionContext) {
   await focusMain(t);
   const sources = await getSourceElements(t);
 
@@ -99,16 +99,22 @@ async function selectRandomSource(t) {
   }
 }
 
+async function createRandomProjector(t: TExecutionContext) {
+  await focusMain(t);
+  await selectRandomSource(t);
+
+}
+
 const ACTION_FUNCTIONS = [
   addRandomScene,
   removeRandomScene,
   selectRandomScene,
   addRandomSource,
   removeRandomSource,
-  selectRandomSource
+  selectRandomSource,
 ];
 
-test('Stress test', async t => {
+test('Stress test', async (t: TExecutionContext) => {
   let quit = false;
 
   // Quit after 1 hour
