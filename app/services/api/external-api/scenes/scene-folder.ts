@@ -28,6 +28,7 @@ export class SceneItemFolder extends SceneNode {
   getModel(): ISceneItemFolder {
     return {
       name: this.sceneFolder.name,
+      childrenIds: this.sceneNode.childrenIds,
       ...super.getModel(),
     };
   }
