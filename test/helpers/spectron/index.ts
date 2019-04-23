@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUserName, releaseUserInPool } from './user';
+import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 
 export const test = avaTest as TestInterface<ITestContext>;
@@ -248,8 +248,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!testPassed) {
       failedTests.push(testName);
-      const userName = getUserName();
-      if (userName) console.log(`Test failed for the account: ${userName}`);
+      const user = getUser();
+      if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
   });
