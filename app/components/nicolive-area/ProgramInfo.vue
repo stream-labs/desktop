@@ -5,17 +5,15 @@
     </div>
     <div class="program-info-description">
       <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">
-        <a :href="watchPageURL" @click.prevent="openInDefaultBrowser($event)">
+        <a :href="watchPageURL" @click.prevent="openInDefaultBrowser($event)" class="program-title-link" >
           {{programTitle}}
         </a>
       </h1>
-      <h2 class="community-name-wrapper">
+      <h2 class="community-name">
         <i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i>
-        <span class="community-name" v-tooltip.bottom="communityNameTooltip">
-          <a :href="communityPageURL" @click.prevent="openInDefaultBrowser($event)">
-            {{communityName}}
-          </a>
-        </span>
+        <a :href="communityPageURL" @click.prevent="openInDefaultBrowser($event)" class="community-name-link" v-tooltip.bottom="communityNameTooltip">
+          {{communityName}}
+        </a>
       </h2>
     </div>
     <div class="program-button">
@@ -44,35 +42,50 @@
 }
 
 .program-title {
+  margin-bottom: 4px;
+}
+
+.program-title-link {
+  display: block;
   color: @white;
   font-size: 13px;
   font-weight: bold;
-  margin-bottom: 4px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  text-decoration: none;
+
+  &:hover {
+    color: @text-primary;
+  }
 }
 
 .program-button {
   margin-left: 16px;
 }
 
-.community-name-wrapper {
+.community-name {
   display: flex;
   align-items: center;
-  color: @light-grey;
   margin: 0;
 
-  .community-name {
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
   .icon-lock {
+    color: @light-grey;
     font-size: 10px;
     margin-right: 6px;
+  }
+}
+
+.community-name-link {
+  color: @light-grey;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+
+  &:hover {
+    color: @text-primary;
   }
 }
 
