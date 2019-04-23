@@ -43,7 +43,6 @@ export abstract class SceneNode {
       sceneId: this.sceneNode.sceneId,
       sceneNodeType: this.sceneNode.sceneNodeType,
       parentId: this.sceneNode.parentId,
-      childrenIds: this.sceneNode.childrenIds,
     };
   }
 
