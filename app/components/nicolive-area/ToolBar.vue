@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   height: 40px;
-  padding: 0 12px;
+  padding: 0 16px;
   background-color: @bg-secondary;
   position: relative;
 }
