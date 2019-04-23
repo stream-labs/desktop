@@ -62,12 +62,6 @@ test('OBS Importer', async (t: TExecutionContext) => {
   t.true(await sourceIsExisting(t, 'Color Source'));
   t.true(await sourceIsExisting(t, 'Text (GDI+)'));
 
-  // check source properties
-  await selectSource('Text (GDI+)');
-  await clickSourceProperties(t);
-  await focusChild(t);
-  t.is(await getFormInput(t, 'Text'), 'Test text');
-
   // check collection 2 exists
   await focusMain(t);
   await switchCollection(t, 'Collection 2');
