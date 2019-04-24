@@ -15,14 +15,15 @@ const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 
-async function focusWindow(t: any, regex: RegExp) {
+export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return;
+    if (url.match(regex)) return true;
   }
+  return false;
 }
 
 // Focuses the main window
