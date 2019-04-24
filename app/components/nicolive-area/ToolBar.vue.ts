@@ -83,6 +83,8 @@ export default class ToolBar extends Vue {
 
   timeTimer: number = 0;
   mounted() {
-    this.startTimer();
+    if (this.programStatus !== 'end') {
+      this.startTimer();
+    }
   }
 }
