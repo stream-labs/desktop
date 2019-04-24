@@ -54,7 +54,7 @@ export default class ToolBar extends Vue {
     return this.nicoliveProgramService.state.autoExtensionEnabled;
   }
 
-  currentTime: number = 0;
+  currentTime: number = NaN;
   updateCurrrentTime() {
     this.currentTime = Math.floor(Date.now() / 1000);
   }
@@ -71,6 +71,7 @@ export default class ToolBar extends Vue {
   onStatusChange(newValue: string, oldValue: string) {
     if (newValue === 'end') {
       clearInterval(this.timeTimer);
+    　this.currentTime = NaN;
     } else if (oldValue === 'end') {
       clearInterval(this.timeTimer);
       this.startTimer();
@@ -83,6 +84,8 @@ export default class ToolBar extends Vue {
 
   timeTimer: number = 0;
   mounted() {
-    this.startTimer();
+    if (this.programStatus !== 'end') {
+      this.startTimer();
+    }
   }
 }
