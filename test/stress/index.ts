@@ -5,6 +5,7 @@ import { uniqueId, sample } from 'lodash';
 import { useSpectron, focusMain, TExecutionContext } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
 import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
+import { contextMenuClick } from '../helpers/spectron/context-menu';
 
 useSpectron();
 
@@ -20,7 +21,7 @@ const SOURCE_TYPES = [
   'Game Capture',
   'Video Capture Device',
   'Audio Input Capture',
-  'Audio Output Capture',
+  'Audio Output Capture'
 ];
 
 // Utilities
@@ -102,7 +103,7 @@ async function selectRandomSource(t: TExecutionContext) {
 async function createRandomProjector(t: TExecutionContext) {
   await focusMain(t);
   await selectRandomSource(t);
-
+  await contextMenuClick(t, 'Create Source Projector');
 }
 
 const ACTION_FUNCTIONS = [
@@ -111,7 +112,7 @@ const ACTION_FUNCTIONS = [
   selectRandomScene,
   addRandomSource,
   removeRandomSource,
-  selectRandomSource,
+  selectRandomSource
 ];
 
 test('Stress test', async (t: TExecutionContext) => {
