@@ -71,6 +71,7 @@ export default class ToolBar extends Vue {
   onStatusChange(newValue: string, oldValue: string) {
     if (newValue === 'end') {
       clearInterval(this.timeTimer);
+    　this.currentTime = NaN;
     } else if (oldValue === 'end') {
       clearInterval(this.timeTimer);
       this.startTimer();
