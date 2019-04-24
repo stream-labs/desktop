@@ -34,8 +34,8 @@ export class ScenesService {
     return model;
   }
 
-  makeSceneActive(id: string): void {
-    this.scenesService.makeSceneActive(id);
+  makeSceneActive(id: string): boolean {
+    return this.scenesService.makeSceneActive(id);
   }
 
   get activeScene(): Scene {
