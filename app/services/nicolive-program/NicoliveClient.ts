@@ -279,7 +279,6 @@ export class NicoliveClient {
       webPreferences: {
         nodeIntegration: false,
         nodeIntegrationInWorker: false,
-        sandbox: true,
         nativeWindowOpen: true,
       },
     });
@@ -311,7 +310,6 @@ export class NicoliveClient {
       webPreferences: {
         nodeIntegration: false,
         nodeIntegrationInWorker: false,
-        sandbox: true,
         nativeWindowOpen: true,
       },
     });
