@@ -7,7 +7,7 @@ import { Fallback, InjectFromExternalApi, Singleton } from 'services/api/externa
 import { ServiceHelper } from 'services/stateful-service';
 import { ISerializable } from '../../rpc-api';
 import * as obs from '../../../../../obs-api';
-import { ISourceModel, SourcesService } from '../sources/sources';
+import { SourcesService } from 'services/api/external-api/sources/sources';
 
 @Singleton()
 export class AudioService {
