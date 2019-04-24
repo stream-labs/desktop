@@ -2,9 +2,9 @@
 
 import test from 'ava';
 import { uniqueId, sample } from 'lodash';
-import { useSpectron, focusMain, TExecutionContext } from '../helpers/spectron/index';
+import { useSpectron, focusMain, TExecutionContext, focusWindow, closeWindow } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
-import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
+import { addSource, clickRemoveSource, rightClickSource } from '../helpers/spectron/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
 
 useSpectron();
@@ -24,10 +24,12 @@ const SOURCE_TYPES = [
   'Audio Output Capture'
 ];
 
+type TSourceName = string;
+
 // Utilities
 
 async function getSceneElements(t: TExecutionContext) {
-  return t.context.app.client.$('.scene-collections-wrapper').$$('li');
+  return t.context.app.client.$('.selector-list').$$('li');
 }
 
 async function getSourceElements(t: TExecutionContext) {
@@ -90,20 +92,46 @@ async function removeRandomSource(t: TExecutionContext) {
   }
 }
 
-async function selectRandomSource(t: TExecutionContext) {
+async function selectRandomSource(t: TExecutionContext): Promise<TSourceName> {
   await focusMain(t);
   const sources = await getSourceElements(t);
 
   if (sources.length > 0) {
     const source = sample(sources);
     await t.context.app.client.elementIdClick(source.value.ELEMENT);
+    const text = await t.context.app.client.elementIdText(source.value.ELEMENT);
+
+    console.log('  Source:', text.value);
+
+    return text.value;
   }
+
+  return '';
 }
 
-async function createRandomProjector(t: TExecutionContext) {
+async function createProjector(t: TExecutionContext) {
   await focusMain(t);
-  await selectRandomSource(t);
+  const sourceName = await selectRandomSource(t);
+  if (!sourceName) return;
+  await rightClickSource(t, sourceName);
   await contextMenuClick(t, 'Create Source Projector');
+}
+
+async function destroyProjector(t: TExecutionContext) {
+  if (await focusWindow(t, /windowId=(?!main)(?!child)/)) {
+    await closeWindow(t);
+  }
+  await focusMain(t);
+}
+
+async function toggleDayNightMode(t: TExecutionContext) {
+  await focusMain(t);
+  await t.context.app.client.click('button.theme-toggle');
+}
+
+async function toggleStudioNode(t: TExecutionContext) {
+  await focusMain(t);
+  await t.context.app.client.click('.icon-studio-mode-3');
 }
 
 const ACTION_FUNCTIONS = [
@@ -112,7 +140,11 @@ const ACTION_FUNCTIONS = [
   selectRandomScene,
   addRandomSource,
   removeRandomSource,
-  selectRandomSource
+  selectRandomSource,
+  createProjector,
+  destroyProjector,
+  toggleDayNightMode,
+  toggleStudioNode,
 ];
 
 test('Stress test', async (t: TExecutionContext) => {
