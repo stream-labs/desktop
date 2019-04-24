@@ -4,14 +4,14 @@
       <img :src="communitySymbol" class="community-thumbnail" :alt="communityName" />
     </div>
     <div class="program-info-description">
-      <h1 class="program-title" v-tooltip.bottom="programTitleTooltip">
+      <h1 class="program-title" v-tooltip.bottom="programTitle">
         <a :href="watchPageURL" @click.prevent="openInDefaultBrowser($event)" class="program-title-link" >
           {{programTitle}}
         </a>
       </h1>
       <h2 class="community-name">
         <i v-if="programIsMemberOnly" class="icon-lock" v-tooltip.bottom="programIsMemberOnlyTooltip"></i>
-        <a :href="communityPageURL" @click.prevent="openInDefaultBrowser($event)" class="community-name-link" v-tooltip.bottom="communityNameTooltip">
+        <a :href="communityPageURL" @click.prevent="openInDefaultBrowser($event)" class="community-name-link" v-tooltip.bottom="communityName">
           {{communityName}}
         </a>
       </h2>
