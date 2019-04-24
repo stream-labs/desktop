@@ -53,8 +53,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     status: 'end',
     title: '',
     description: '',
-    endTime: 0,
-    startTime: 0,
+    endTime: NaN,
+    startTime: NaN,
     isMemberOnly: false,
     communityID: '',
     communityName: '',
@@ -132,6 +132,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static format(timeInSeconds: number): string {
+    if (Number.isNaN(timeInSeconds)) return '--:--:--';
     const absTime = Math.abs(timeInSeconds);
     const s = absTime % 60;
     const m = Math.floor(absTime / 60) % 60;

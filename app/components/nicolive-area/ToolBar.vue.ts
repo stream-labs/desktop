@@ -54,7 +54,7 @@ export default class ToolBar extends Vue {
     return this.nicoliveProgramService.state.autoExtensionEnabled;
   }
 
-  currentTime: number = 0;
+  currentTime: number = NaN;
   updateCurrrentTime() {
     this.currentTime = Math.floor(Date.now() / 1000);
   }
