@@ -161,6 +161,7 @@ test('fetchProgramで結果が空ならエラー', async () => {
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
 NicoliveProgramServiceFailure {
+  "additionalMessage": "",
   "method": "fetchProgram",
   "reason": "no_suitable_program",
   "type": "logic",
@@ -232,6 +233,7 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
 NicoliveProgramServiceFailure {
+  "additionalMessage": "",
   "method": "fetchProgram",
   "reason": "404",
   "type": "http_error",
@@ -325,6 +327,7 @@ test('refreshProgram:失敗', async () => {
 
   await expect(instance.refreshProgram()).rejects.toMatchInlineSnapshot(`
 NicoliveProgramServiceFailure {
+  "additionalMessage": "",
   "method": "fetchProgram",
   "reason": "500",
   "type": "http_error",
@@ -368,6 +371,7 @@ test('endProgram:失敗', async () => {
 
   await expect(instance.endProgram()).rejects.toMatchInlineSnapshot(`
 NicoliveProgramServiceFailure {
+  "additionalMessage": "",
   "method": "endProgram",
   "reason": "500",
   "type": "http_error",
@@ -410,6 +414,7 @@ test('extendProgram:失敗', async () => {
 
   await expect(instance.extendProgram()).rejects.toMatchInlineSnapshot(`
 NicoliveProgramServiceFailure {
+  "additionalMessage": "",
   "method": "extendProgram",
   "reason": "500",
   "type": "http_error",
