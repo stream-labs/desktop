@@ -48,7 +48,8 @@ export class NicoliveProgramServiceFailure {
   constructor(
     public type: 'logic' | 'http_error' | 'network_error',
     public method: string,
-    public reason: string
+    public reason: string,
+    public additionalMessage: string = ''
   ) {}
 
   static fromClientError(method: string, res: FailedResult) {
@@ -56,7 +57,7 @@ export class NicoliveProgramServiceFailure {
       console.error(res.value);
       return new this('network_error', method, 'network_error');
     }
-    return new this('http_error', method, res.value.meta.status.toString(10));
+    return new this('http_error', method, res.value.meta.status.toString(10), res.value.meta.errorMessage);
   }
 
   static fromConditionalError(method: string, reason: string) {
@@ -159,7 +160,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     return this.openErrorDialog({
       title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`),
-      message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`)
+      message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`, {
+        additionalMessage: failure.additionalMessage
+      })
     });
   }
 
