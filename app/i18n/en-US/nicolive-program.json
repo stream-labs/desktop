@@ -105,8 +105,8 @@
           "message": "You can not post a comment because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
-          "title": "Invalid request",
-          "message": "You can not post a comment because the request you sent was invalid."
+          "title": "Failed to post a comment",
+          "message": "Please make sure the content of comment.\n%{additionalMessage}"
         },
         "401": {
           "title": "You are not logged in",
