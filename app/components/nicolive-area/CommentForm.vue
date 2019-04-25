@@ -1,7 +1,16 @@
 <template>
   <div class="comment-form">
-    <input type="text" :readonly="isCommentSending" :disabled="isCommentSending" placeholder="Ctrl+Enterで固定表示" v-model="operatorCommentValue" @keydown.enter="sendOperatorComment($event)" class="comment-input">
-    <button type="submit" :disabled="isCommentSending" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
+    <input
+      type="text"
+      :readonly="isCommentSending"
+      :disabled="isCommentSending"
+      placeholder="Ctrl+Enterで固定表示"
+      v-model="operatorCommentValue"
+      @keydown.enter="sendOperatorComment($event)"
+      class="comment-input"
+      maxlength="80"
+    />
+    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
     <div class="comment-disabled-message" v-if="programStatus === 'end'">
       番組が終了したため、放送者コメントを投稿できません
     </div>

@@ -13,6 +13,7 @@ export default class CommentForm extends Vue {
 
   async sendOperatorComment(event: KeyboardEvent) {
     const text = this.operatorCommentValue;
+    if (text.length === 0) return;
     const isPermanent = event.ctrlKey;
     if (this.isCommentSending) throw new Error('sendOperatorComment is running');
 
