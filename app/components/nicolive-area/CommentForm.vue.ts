@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
 
 @Component({})
 export default class CommentForm extends Vue {
@@ -20,9 +20,13 @@ export default class CommentForm extends Vue {
       this.isCommentSending = true;
       await this.nicoliveProgramService.sendOperatorComment(text, isPermanent);
       this.operatorCommentValue = '';
-    } catch (err) {
-      // TODO
-      console.warn(err);
+    } catch (caught) {
+      
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isCommentSending = false;
     }
