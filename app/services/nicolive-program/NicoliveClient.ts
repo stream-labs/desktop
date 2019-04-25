@@ -95,10 +95,12 @@ export class NicoliveClient {
       obj = JSON.parse(body);
     } catch(e) {
       // bodyがJSONになってない異常失敗
-      throw {
-        status: res.status,
-        statusText: res.statusText,
-        body,
+
+      // breadcrumbsに載るようにログ
+      console.warn('non-json body', body);
+      return {
+        ok: false,
+        value: e,
       };
     }
 
@@ -278,6 +280,9 @@ export class NicoliveClient {
       obj = JSON.parse(body);
     } catch (e) {
       // bodyがJSONになってない異常失敗
+
+      // breadcrumbsに載るようにログ
+      console.warn('non-json body', body);
       return {
         ok: false,
         value: e,

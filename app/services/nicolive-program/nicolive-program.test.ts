@@ -272,8 +272,8 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
 Array [
   Object {
     "communityID": "co1",
-    "communityName": false,
-    "communitySymbol": false,
+    "communityName": "(コミュニティの取得に失敗しました)",
+    "communitySymbol": "",
     "description": "番組詳細情報",
     "endTime": 150,
     "isMemberOnly": undefined,

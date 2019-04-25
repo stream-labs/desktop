@@ -47,15 +47,14 @@ test('wrapResultは結果が200でないときレスポンス全体を返す', a
   expect(fetchMock.done()).toBe(true);
 });
 
-test('wrapResultはbodyがJSONでなければ元のbodyを込めたオブジェクトをthrowする', async () => {
+test('wrapResultはbodyがJSONでなければSyntaxErrorをwrapして返す', async () => {
   fetchMock.get(dummyURL, 'invalid json');
   const res = await fetch(dummyURL);
 
-  await expect(NicoliveClient.wrapResult(res)).rejects.toMatchInlineSnapshot(`
+  await expect(NicoliveClient.wrapResult(res)).resolves.toMatchInlineSnapshot(`
 Object {
-  "body": "invalid json",
-  "status": 200,
-  "statusText": "OK",
+  "ok": false,
+  "value": [SyntaxError: Unexpected token i in JSON at position 0],
 }
 `);
   expect(fetchMock.done()).toBe(true);
@@ -163,17 +162,16 @@ test('fetchCommunityはコミュをひとつだけ返す', async () => {
   expect(fetchMock.done()).toBe(true);
 });
 
-test('fetchCommunityはbodyがJSONでなければbodyを込めたオブジェクトをthrowする', async () => {
+test('fetchCommunityはbodyがJSONでなければSyntaxErrorをwrapして返す', async () => {
   const client = new NicoliveClient();
 
   fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, 'invalid json');
   const result = client.fetchCommunity(communityID);
 
-  await expect(result).rejects.toMatchInlineSnapshot(`
+  await expect(result).resolves.toMatchInlineSnapshot(`
 Object {
-  "body": "invalid json",
-  "status": 200,
-  "statusText": "OK",
+  "ok": false,
+  "value": [SyntaxError: Unexpected token i in JSON at position 0],
 }
 `);
   expect(fetchMock.done()).toBe(true);
