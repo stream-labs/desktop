@@ -27,4 +27,8 @@ export default class CommentForm extends Vue {
       this.isCommentSending = false;
     }
   }
+
+  get programStatus(): string {
+    return this.nicoliveProgramService.state.status;
+  }
 }
