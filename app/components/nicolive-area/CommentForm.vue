@@ -10,7 +10,7 @@
       class="comment-input"
       maxlength="80"
     />
-    <button type="submit" :disabled="isCommentSending" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
+    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
     <div class="comment-disabled-message" v-if="programStatus === 'end'">
       番組が終了したため、放送者コメントを投稿できません
     </div>
