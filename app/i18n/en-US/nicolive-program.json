@@ -104,6 +104,10 @@
           "title": "A network error has occurred",
           "message": "You can not post a comment because of a network error.\nCheck the health of your Internet connection."
         },
+        "400": {
+          "title": "Invalid request",
+          "message": "You can not post a comment because the request you sent was invalid."
+        },
         "401": {
           "title": "You are not logged in",
           "message": "You can not post a comment because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
