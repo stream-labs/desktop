@@ -195,11 +195,15 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       throw programResponse.value;
     }
     if (!isOk(communityResponse)) {
-      console.warn(communityResponse.value.meta.errorCode);
-      throw communityResponse.value;
+      // コミュニティ情報が取れなくても配信はできてよいはず
+      console.error(
+        'fetchCommunity',
+        communityResponse.value.meta.status,
+        communityResponse.value.meta.errorMessage || ''
+      );
     }
 
-    const community = communityResponse.value;
+    const community = isOk(communityResponse) && communityResponse.value;
     const program = programResponse.value;
 
     this.setState({
@@ -211,8 +215,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
       communityID: socialGroupId,
-      communityName: community.name,
-      communitySymbol: community.thumbnailUrl.small,
+      communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
+      communitySymbol: community ? community.thumbnailUrl.small : '',
     });
   }
 
