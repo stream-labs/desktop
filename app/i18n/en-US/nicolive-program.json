@@ -1,0 +1,130 @@
+{
+  "errors": {
+    "api": {
+      "fetchProgramSchedules": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "The program information could not be fetched because of a network error.\nCheck the health of your Internet connection."
+        },
+        "401": {
+          "title": "You are not logged in",
+          "message": "Program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+        },
+        "500": {
+          "title": "An error occurred on the server",
+          "message": "The program information could not be fatched because an error occurred on the server.\nThere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
+        },
+        "503": {
+          "title": "Under maintenance",
+          "message": "Program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
+        }
+      },
+      "fetchProgram": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "The program information could not be fetched because of a network error.\nCheck the health of your Internet connection."
+        },
+        "401": {
+          "title": "You are not logged in",
+          "message": "Program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+        },
+        "404": {
+          "title": "There is no program",
+          "message": "You can not start the program because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create a Program\" button."
+        },
+        "500": {
+          "title": "An error occurred on the server",
+          "message": "The program information could not be fatched because an error occurred on the server.\nThere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
+        },
+        "503": {
+          "title": "Under maintenance",
+          "message": "Program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
+        }
+      },
+      "startProgram": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "You could not start the program because of a network error.\nCheck the health of your Internet connection."
+        },
+        "401": {
+          "title": "You do not have the authority to start the program",
+          "message": "You can not start the program because the account you are logged into does not have authority to start the program.\nMake sure you are logged in with the correct account."
+        },
+        "403": {
+          "title": "You do not have the authority to start the program",
+          "message": "You can not start the program because the account you are logged into does not have authority to start the program.\nMake sure you are logged in with the correct account."
+        },
+        "404": {
+          "title": "There is no program",
+          "message": "You can not start the program because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create a Program\" button."
+        },
+        "409": {
+          "title": "The program has already started",
+          "message": "Update program information and get the latest program information."
+        }
+      },
+      "endProgram": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "You could not end the program because of a network error.\nCheck the health of your Internet connection."
+        },
+        "401": {
+          "title": "You do not have the authority to end the program",
+          "message": "Make sure you are logged in \nMake sure you are logged in with the correct account."
+        },
+        "403": {
+          "title": "You do not have the authority to end the program",
+          "message": "Make sure you are logged in \nMake sure you are logged in with the correct account."
+        }
+      },
+      "extendProgram": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "You could not extend the program time because of a network error.\nCheck the health of your Internet connection."
+        },
+        "400": {
+          "title": "Invalid request",
+          "message": "You could not extend the program time because the request you sent was invalid.\nTry again later."
+        },
+        "401": {
+          "title": "You do not have the authority to extend the program",
+          "message": "You can not extend the program because the account you are logged into does not have authority to extend the program. \nMake sure you are logged in with the correct account."
+        },
+        "403": {
+          "title": "The upper limit of extension",
+          "message": "You can not extend the program time any more because it has reached the extension limit or the program itself has already ended.\nIf the displaced time on N Air has not reached the upper limit, update the program information and get the latest program information."
+        },
+        "404": {
+          "title": "There is no program",
+          "message": "You can not extend the program because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create A Program\" button."
+        }
+      },
+      "sendOperatorComment": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "You can not post a comment because of a network error.\nCheck the health of your Internet connection."
+        },
+        "401": {
+          "title": "You are not logged in",
+          "message": "You can not post a comment because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+        },
+        "403": {
+          "title": "You do not have the authority to post a comment",
+          "message": "You can not post a comment because the account you are logged into does not have authority.\nMake sure you are logged in with the correct account."
+        },
+        "404": {
+          "title": "There is no program",
+          "message": "You can not post a comment because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create A Program\" button."
+        }
+      }
+    },
+    "logic": {
+      "fetchProgram": {
+        "no_suitable_program": {
+          "title": "There is no program",
+          "message": "Click \"Create a Program\" button.\nNote: You can not fetch the channel program information."
+        }
+      }
+    }
+  }
+}

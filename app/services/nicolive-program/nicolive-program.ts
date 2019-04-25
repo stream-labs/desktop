@@ -1,11 +1,12 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
+import { NicoliveClient, CreateResult, EditResult, isOk, FailedResult } from './NicoliveClient';
 import { ProgramSchedules } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, remote } from 'electron';
+import { $t } from 'services/i18n';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -41,6 +42,26 @@ export enum PanelState {
   INACTIVE = 'INACTIVE',
   OPENED = 'OPENED',
   CLOSED = 'CLOSED',
+}
+
+export class NicoliveProgramServiceFailure {
+  constructor(
+    public type: 'logic' | 'http_error' | 'network_error',
+    public method: string,
+    public reason: string
+  ) {}
+
+  static fromClientError(method: string, res: FailedResult) {
+    if (res.value instanceof Error) {
+      console.error(res.value);
+      return new this('network_error', method, 'network_error');
+    }
+    return new this('http_error', method, res.value.meta.status.toString(10));
+  }
+
+  static fromConditionalError(method: string, reason: string) {
+    return new this('logic', method, reason);
+  }
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
@@ -88,7 +109,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.userService.userLoginState.subscribe({
       next: user => {
         this.setState({ isLoggedIn: Boolean(user) });
-        if (!user) { 
+        if (!user) {
           this.setState(NicoliveProgramService.programInitialState);
         }
       }
@@ -110,6 +131,36 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   @mutation()
   private SET_STATE(nextState: INicoliveProgramState): void {
     this.state = nextState;
+  }
+
+  static async openErrorDialog({ title, message }: { title: string, message: string }): Promise<void> {
+    return new Promise<void>(resolve => {
+      remote.dialog.showMessageBox(
+        remote.getCurrentWindow(),
+        {
+          type: 'warning',
+          title,
+          message,
+          buttons: [$t('common.close')],
+          noLink: true,
+        },
+        _ => resolve()
+      );
+    });
+  }
+
+  static async openErrorDialogFromFailure(failure: NicoliveProgramServiceFailure): Promise<void> {
+    if (failure.type === 'logic') {
+      return this.openErrorDialog({
+        title: $t(`nicolive-program.errors.logic.${failure.method}.${failure.reason}.title`),
+        message: $t(`nicolive-program.errors.logic.${failure.method}.${failure.reason}.message`)
+      });
+    }
+
+    return this.openErrorDialog({
+      title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`),
+      message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`)
+    });
   }
 
   /**
@@ -174,15 +225,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   async fetchProgram(): Promise<void> {
     const schedulesResponse = await this.client.fetchProgramSchedules();
     if (!isOk(schedulesResponse)) {
-      console.warn(schedulesResponse.value.meta.errorCode);
-      throw schedulesResponse.value;
+      throw NicoliveProgramServiceFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
     }
 
     const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
 
     if (!programSchedule) {
       this.setState({ status: 'end' });
-      throw new Error('no suitable schedule');
+      throw NicoliveProgramServiceFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
     }
     const { nicoliveProgramId, socialGroupId } = programSchedule;
 
@@ -191,15 +241,22 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       this.client.fetchCommunity(socialGroupId),
     ]);
     if (!isOk(programResponse)) {
-      console.warn(programResponse.value.meta.errorCode);
-      throw programResponse.value;
+      throw NicoliveProgramServiceFailure.fromClientError('fetchProgram', programResponse);
     }
     if (!isOk(communityResponse)) {
-      console.warn(communityResponse.value.meta.errorCode);
-      throw communityResponse.value;
+      // コミュニティ情報が取れなくても配信はできてよいはず
+      if (communityResponse.value instanceof Error) {
+        console.error('fetchCommunity', communityResponse.value);
+      } else {
+        console.error(
+          'fetchCommunity',
+          communityResponse.value.meta.status,
+          communityResponse.value.meta.errorMessage || ''
+        );
+      }
     }
 
-    const community = communityResponse.value;
+    const community = isOk(communityResponse) && communityResponse.value;
     const program = programResponse.value;
 
     this.setState({
@@ -211,16 +268,15 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
       communityID: socialGroupId,
-      communityName: community.name,
-      communitySymbol: community.thumbnailUrl.small,
+      communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
+      communitySymbol: community ? community.thumbnailUrl.small : '',
     });
   }
 
   async refreshProgram(): Promise<void> {
     const programResponse = await this.client.fetchProgram(this.state.programID);
     if (!isOk(programResponse)) {
-      console.warn(programResponse.value.meta.errorCode);
-      throw programResponse.value;
+      throw NicoliveProgramServiceFailure.fromClientError('fetchProgram', programResponse);
     }
 
     const program = programResponse.value;
@@ -245,7 +301,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async startProgram(): Promise<void> {
     const result = await this.client.startProgram(this.state.programID);
-    if (!isOk(result)) throw result.value;
+    if (!isOk(result)) {
+      throw NicoliveProgramServiceFailure.fromClientError('startProgram', result);
+    }
 
     const endTime = result.value.end_time;
     const startTime = result.value.start_time;
@@ -254,7 +312,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async endProgram(): Promise<void> {
     const result = await this.client.endProgram(this.state.programID);
-    if (!isOk(result)) throw result.value;
+    if (!isOk(result)) {
+      throw NicoliveProgramServiceFailure.fromClientError('endProgram', result);
+    }
 
     const endTime = result.value.end_time;
     this.setState({ status: 'end', endTime });
@@ -266,7 +326,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async extendProgram(): Promise<void> {
     const result = await this.client.extendProgram(this.state.programID);
-    if (!isOk(result)) throw result.value;
+    if (!isOk(result)) {
+      throw NicoliveProgramServiceFailure.fromClientError('extendProgram', result);
+    }
 
     const endTime = result.value.end_time;
     this.setState({ endTime });
@@ -318,7 +380,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async sendOperatorComment(text: string, isPermanent: boolean): Promise<void> {
     const result = await this.client.sendOperatorComment(this.state.programID, { text, isPermanent });
-    if (!isOk(result)) throw result.value;
+    if (!isOk(result)) {
+      throw NicoliveProgramServiceFailure.fromClientError('sendOperatorComment', result);
+    }
   }
 
   static TIMER_PADDING_SECONDS = 3;

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
 import { $t } from 'services/i18n';
 
@@ -19,36 +19,29 @@ export default class ProgramInfo extends Vue {
     try {
       this.isCreating = true;
       return await this.nicoliveProgramService.createProgram();
-    } catch (e) {
-      // TODO
-      console.warn(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isCreating = false;
     }
   }
 
   isFetching: boolean = false;
-  async fetchProgram() {
+  async fetchProgram(): Promise<void> {
     if (this.isFetching) throw new Error('fetchProgram is running');
     try {
       this.isFetching = true;
-      return await this.nicoliveProgramService.fetchProgram();
-    } catch (e) {
-      console.warn(e);
-      // TODO: 翻訳
-      // TODO: エラー理由を見て出し分ける
-      await new Promise(resolve => {
-        remote.dialog.showMessageBox(
-          remote.getCurrentWindow(),
-          {
-            type: 'warning',
-            message: 'ニコニコ生放送にて番組が作成されていません。\n［番組作成］ボタンより、番組を作成してください。',
-            buttons: [$t('common.ok')],
-            noLink: true,
-          },
-          done => resolve(done)
-        );
-      });
+      await this.nicoliveProgramService.fetchProgram();
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isFetching = false;
     }
@@ -60,9 +53,12 @@ export default class ProgramInfo extends Vue {
     try {
       this.isStarting = true;
       return await this.nicoliveProgramService.startProgram();
-    } catch (e) {
-      // TODO
-      console.warn(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isStarting = false;
     }
@@ -90,11 +86,30 @@ export default class ProgramInfo extends Vue {
       if (isOk) {
         return await this.nicoliveProgramService.endProgram();
       }
-    } catch (e) {
-      // TODO
-      console.warn(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        // 終了済み番組を終了しようとした場合は黙って番組情報を更新する
+        if (caught.type === 'http_error' && caught.reason === '409') {
+          return this.refreshProgram();
+        }
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isEnding = false;
+    }
+  }
+
+  private async refreshProgram() {
+    try {
+      return await this.nicoliveProgramService.refreshProgram();
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     }
   }
 

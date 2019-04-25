@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
 
 @Component({})
 export default class ToolBar extends Vue {
@@ -22,9 +22,12 @@ export default class ToolBar extends Vue {
     try {
       this.isExtending = true;
       return await this.nicoliveProgramService.extendProgram();
-    } catch (e) {
-      // TODO
-      console.warn(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.isExtending = false;
     }

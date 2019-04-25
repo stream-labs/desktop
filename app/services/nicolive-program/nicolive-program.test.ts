@@ -1,5 +1,4 @@
 import { createSetupFunction } from 'util/test-setup';
-import { flatMap } from 'lodash';
 import { Subject } from 'rxjs';
 import { BehaviorSubject } from '../../../node_modules/rxjs/BehaviorSubject';
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
@@ -46,8 +45,8 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveProgramStateService: {
       updated: {
-        subscribe() {}
-      }
+        subscribe() {},
+      },
     },
     WindowsService: {
       getWindow() {
@@ -57,21 +56,24 @@ const setup = createSetupFunction({
           getSize: () => [800, 600],
           setSize: () => {},
           isMaximized: () => false,
-        }
-      }
+        };
+      },
     },
     UserService: {
       userLoginState: {
-        subscribe() {}
+        subscribe() {},
       },
       isLoggedIn: () => true,
     },
-  }
+  },
 });
 
 jest.mock('services/windows', () => ({ WindowsService: {} }));
 jest.mock('services/user', () => ({ UserService: {} }));
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
+jest.mock('services/i18n', () => ({
+  $t: (x: any) => x,
+}));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
@@ -157,7 +159,13 @@ test('fetchProgramで結果が空ならエラー', async () => {
   instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [] });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toThrow('no suitable schedule');
+  await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "no_suitable_program",
+  "type": "logic",
+}
+`);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
@@ -222,14 +230,20 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toEqual(value);
+  await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "404",
+  "type": "http_error",
+}
+`);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).not.toHaveBeenCalled();
 });
 
-test('fetchProgramで番組があったがコミュ情報がエラー', async () => {
+test('fetchProgramでコミュ情報がエラーでも番組があったら先に進む', async () => {
   setup();
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
@@ -250,11 +264,26 @@ test('fetchProgramで番組があったがコミュ情報がエラー', async ()
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toEqual(value);
+  await expect(instance.fetchProgram()).resolves.toBeUndefined();
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "communityID": "co1",
+    "communityName": "(コミュニティの取得に失敗しました)",
+    "communitySymbol": "",
+    "description": "番組詳細情報",
+    "endTime": 150,
+    "isMemberOnly": undefined,
+    "programID": "lv1",
+    "startTime": 100,
+    "status": "onAir",
+    "title": "番組タイトル",
+  },
+]
+`);
 });
 
 test('refreshProgram:成功', async () => {
@@ -294,7 +323,13 @@ test('refreshProgram:失敗', async () => {
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.refreshProgram()).rejects.toEqual(value);
+  await expect(instance.refreshProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -331,7 +366,13 @@ test('endProgram:失敗', async () => {
   instance.client.endProgram = jest.fn().mockResolvedValue({ ok: false, value });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.endProgram()).rejects.toEqual(value);
+  await expect(instance.endProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "endProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -367,7 +408,13 @@ test('extendProgram:失敗', async () => {
   instance.client.extendProgram = jest.fn().mockResolvedValue({ ok: false, value });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.extendProgram()).rejects.toEqual(value);
+  await expect(instance.extendProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "extendProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -464,7 +511,7 @@ describe('refreshStatisticsPolling', () => {
 
       instance.updateStatistics = jest.fn();
 
-      instance.refreshStatisticsPolling({...state, ...suite.prev}, {...state, ...suite.next});
+      instance.refreshStatisticsPolling({ ...state, ...suite.prev }, { ...state, ...suite.next });
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearInterval).toHaveBeenCalledTimes(1);
@@ -651,7 +698,7 @@ describe('refreshProgramStatusTimer', () => {
       instance.updateStatistics = jest.fn();
       const state = instance.state;
 
-      instance.refreshProgramStatusTimer({...state, ...suite.prev}, {...state, ...suite.next});
+      instance.refreshProgramStatusTimer({ ...state, ...suite.prev }, { ...state, ...suite.next });
       switch (suite.result) {
         case 'REFRESH':
           expect(window.clearTimeout).toHaveBeenCalledTimes(1);
@@ -756,7 +803,7 @@ describe('refreshWindowSize', () => {
         injectee: {
           UserService: {
             userLoginState,
-            isLoggedIn: () => suite.persistentIsLoggedIn
+            isLoggedIn: () => suite.persistentIsLoggedIn,
           },
           NicoliveProgramStateService: {
             updated,
@@ -770,9 +817,9 @@ describe('refreshWindowSize', () => {
                 setSize,
                 isMaximized: () => false,
               };
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       const { NicoliveProgramService } = require('./nicolive-program');
@@ -806,9 +853,9 @@ describe('updateWindowSize', () => {
   const SMALL_WIDTH = BASE_WIDTH - 1; // 800より小さくしておくと便利
 
   const initSuites: {
-    prev: PanelState | null,
-    next: PanelState,
-    smallerThanMinWidth: boolean,
+    prev: PanelState | null;
+    next: PanelState;
+    smallerThanMinWidth: boolean;
   }[] = [
     [null, 'INACTIVE', true],
     [null, 'INACTIVE', false],
@@ -823,7 +870,9 @@ describe('updateWindowSize', () => {
   }));
 
   for (const suite of initSuites) {
-    test(`${stateName[suite.prev]}→${stateName[suite.next]} 最小幅より${suite.smallerThanMinWidth ? '小さい' : '大きい'}`, () => {
+    test(`${stateName[suite.prev]}→${stateName[suite.next]} 最小幅より${
+      suite.smallerThanMinWidth ? '小さい' : '大きい'
+    }`, () => {
       setup();
       const { NicoliveProgramService } = require('./nicolive-program');
       const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
@@ -837,11 +886,7 @@ describe('updateWindowSize', () => {
         isMaximized: () => false,
       };
 
-      NicoliveProgramService.updateWindowSize(
-        win,
-        suite.prev,
-        suite.next
-      );
+      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
       expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
       expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
 
@@ -875,37 +920,32 @@ describe('updateWindowSize', () => {
   const WIDTH_DIFF = 32;
 
   for (const suite of suites) {
-    test(
-      `${stateName[suite.prev]}→${stateName[suite.next]} ${suite.isMaximized ? '最大化中は幅が変わらない' : '変化量を維持して幅を更新する'}`,
-      () => {
-        setup();
-        const { NicoliveProgramService } = require('./nicolive-program');
-        const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
+    test(`${stateName[suite.prev]}→${stateName[suite.next]} ${
+      suite.isMaximized ? '最大化中は幅が変わらない' : '変化量を維持して幅を更新する'
+    }`, () => {
+      setup();
+      const { NicoliveProgramService } = require('./nicolive-program');
+      const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
 
-        const win = {
-          getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
-          getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
-          setMinimumSize: jest.fn(),
-          setSize: jest.fn(),
-          isMaximized: () => suite.isMaximized,
-        };
+      const win = {
+        getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
+        getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
+        setMinimumSize: jest.fn(),
+        setSize: jest.fn(),
+        isMaximized: () => suite.isMaximized,
+      };
 
-        NicoliveProgramService.updateWindowSize(
-          win,
-          suite.prev,
-          suite.next
-        );
+      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
 
-        expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-        expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
+      expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
+      expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
 
-        if (suite.isMaximized) {
-          expect(win.setSize).toHaveBeenCalledTimes(0);
-        } else {
-          expect(win.setSize).toHaveBeenCalledTimes(1);
-          expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF, BASE_HEIGHT);
-        }
+      if (suite.isMaximized) {
+        expect(win.setSize).toHaveBeenCalledTimes(0);
+      } else {
+        expect(win.setSize).toHaveBeenCalledTimes(1);
+        expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF, BASE_HEIGHT);
       }
-    );
+    });
   }
 });
