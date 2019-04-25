@@ -129,6 +129,11 @@ module.exports = {
           outputPath: 'fonts/',
           publicPath: 'bundles/fonts/'
         }
+      },
+      // Used for loading WebGL shaders
+      {
+        test: /\.(vert|frag)$/,
+        loader: 'raw-loader'
       }
     ]
   },
