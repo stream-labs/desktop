@@ -12,6 +12,7 @@ const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
 const cp = require('child_process');
+const { purgeUrls } = require('./cache-purge');
 
 /**
  * CONFIGURATION
@@ -192,9 +193,6 @@ async function runScript() {
   checkEnv('AWS_SECRET_ACCESS_KEY');
   checkEnv('SENTRY_AUTH_TOKEN');
 
-  /* Technically speaking, we allow any number of
-   * channels. Maybe in the future, we allow custom
-   * options here? */
   const isPreview = (await inq.prompt({
     type: 'list',
     name: 'releaseType',
@@ -389,11 +387,14 @@ async function runScript() {
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  console.log('Setting latest version...');
+  info('Setting chance...');
+  await setChance(newVersion, chance);
+
+  info('Setting latest version...');
   await setLatestVersion(newVersion, channel);
 
-  console.log('Setting chance...');
-  await setChance(newVersion, chance);
+  info('Purging Cloudflare cache...');
+  await purgeUrls([`https://slobs-cdn.streamlabs.com/${channel}.json`]);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`, false);
