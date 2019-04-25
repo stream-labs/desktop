@@ -72,6 +72,9 @@ const setup = createSetupFunction({
 jest.mock('services/windows', () => ({ WindowsService: {} }));
 jest.mock('services/user', () => ({ UserService: {} }));
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
+jest.mock('services/i18n', () => ({
+  $t: (x: any) => x,
+}));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
@@ -157,7 +160,13 @@ test('fetchProgramで結果が空ならエラー', async () => {
   instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [] });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toThrow('no suitable schedule');
+  await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "no_suitable_program",
+  "type": "logic",
+}
+`);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
@@ -222,14 +231,20 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toEqual(value);
+  await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "404",
+  "type": "http_error",
+}
+`);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).not.toHaveBeenCalled();
 });
 
-test('fetchProgramで番組があったがコミュ情報がエラー', async () => {
+test('fetchProgramでコミュ情報がエラーでも番組があったら先に進む', async () => {
   setup();
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
@@ -250,11 +265,26 @@ test('fetchProgramで番組があったがコミュ情報がエラー', async ()
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.fetchProgram()).rejects.toEqual(value);
+  await expect(instance.fetchProgram()).resolves.toBeUndefined();
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "communityID": "co1",
+    "communityName": false,
+    "communitySymbol": false,
+    "description": "番組詳細情報",
+    "endTime": 150,
+    "isMemberOnly": undefined,
+    "programID": "lv1",
+    "startTime": 100,
+    "status": "onAir",
+    "title": "番組タイトル",
+  },
+]
+`);
 });
 
 test('refreshProgram:成功', async () => {
@@ -294,7 +324,13 @@ test('refreshProgram:失敗', async () => {
 
   (instance as any).setState = jest.fn();
 
-  await expect(instance.refreshProgram()).rejects.toEqual(value);
+  await expect(instance.refreshProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "fetchProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -331,7 +367,13 @@ test('endProgram:失敗', async () => {
   instance.client.endProgram = jest.fn().mockResolvedValue({ ok: false, value });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.endProgram()).rejects.toEqual(value);
+  await expect(instance.endProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "endProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -367,7 +409,13 @@ test('extendProgram:失敗', async () => {
   instance.client.extendProgram = jest.fn().mockResolvedValue({ ok: false, value });
   (instance as any).setState = jest.fn();
 
-  await expect(instance.extendProgram()).rejects.toEqual(value);
+  await expect(instance.extendProgram()).rejects.toMatchInlineSnapshot(`
+NicoliveProgramServiceFailure {
+  "method": "extendProgram",
+  "reason": "500",
+  "type": "http_error",
+}
+`);
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
