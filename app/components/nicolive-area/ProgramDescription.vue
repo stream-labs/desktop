@@ -111,6 +111,7 @@
 
 .program-description-text {
   padding: 16px;
+  overflow-wrap: break-word;
 
   .dark-mode & {
     color: @text-secondary;

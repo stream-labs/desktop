@@ -130,6 +130,7 @@
   flex-direction: column;
   flex-grow: 1;
   flex-basis: 0;
+  border-top: 1px solid @bg-secondary;
 }
 
 </style>
