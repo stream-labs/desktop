@@ -1,5 +1,5 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
+import { NicoliveClient, CreateResult, EditResult, isOk, FailedResult } from './NicoliveClient';
 import { ProgramSchedules, CommonErrorResponse } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
@@ -51,7 +51,11 @@ export class NicoliveProgramServiceFailure {
     public reason: string
   ) {}
 
-  static fromClientError(method: string, res: {value: CommonErrorResponse}) {
+  static fromClientError(method: string, res: FailedResult) {
+    if (res.value instanceof Error) {
+      console.error(res.value);
+      return new this('network_error', method, 'network_error');
+    }
     return new this('http_error', method, res.value.meta.status.toString(10));
   }
 
@@ -105,7 +109,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.userService.userLoginState.subscribe({
       next: user => {
         this.setState({ isLoggedIn: Boolean(user) });
-        if (!user) { 
+        if (!user) {
           this.setState(NicoliveProgramService.programInitialState);
         }
       }
@@ -241,11 +245,15 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
     if (!isOk(communityResponse)) {
       // コミュニティ情報が取れなくても配信はできてよいはず
-      console.error(
-        'fetchCommunity',
-        communityResponse.value.meta.status,
-        communityResponse.value.meta.errorMessage || ''
-      );
+      if (communityResponse.value instanceof Error) {
+        console.error('fetchCommunity', communityResponse.value);
+      } else {
+        console.error(
+          'fetchCommunity',
+          communityResponse.value.meta.status,
+          communityResponse.value.meta.errorMessage || ''
+        );
+      }
     }
 
     const community = isOk(communityResponse) && communityResponse.value;
