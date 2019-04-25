@@ -70,11 +70,11 @@
         },
         "401": {
           "title": "You do not have the authority to end the program",
-          "message": "Make sure you are logged in \nMake sure you are logged in with the correct account."
+          "message": "You could not end the program because the account you are logged into does not have authority to end the program.\nMake sure you are logged in with the correct account."
         },
         "403": {
           "title": "You do not have the authority to end the program",
-          "message": "Make sure you are logged in \nMake sure you are logged in with the correct account."
+          "message": "You could not end the program because the account you are logged into does not have authority to end the program.\nMake sure you are logged in with the correct account."
         }
       },
       "extendProgram": {
