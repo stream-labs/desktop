@@ -107,6 +107,7 @@
       border-color: @white;
     }
   }
+}
 
 .program-description-text {
   padding: 16px;
