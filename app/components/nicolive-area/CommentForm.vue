@@ -8,6 +8,7 @@
       v-model="operatorCommentValue"
       @keydown.enter="sendOperatorComment($event)"
       class="comment-input"
+      maxlength="80"
     />
     <button type="submit" :disabled="isCommentSending" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
     <div class="comment-disabled-message" v-if="programStatus === 'end'">
