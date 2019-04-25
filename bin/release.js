@@ -394,7 +394,10 @@ async function runScript() {
   await setLatestVersion(newVersion, channel);
 
   info('Purging Cloudflare cache...');
-  await purgeUrls([`https://slobs-cdn.streamlabs.com/${channel}.json`]);
+  await purgeUrls([
+    `https://slobs-cdn.streamlabs.com/${channel}.json`,
+    `https://slobs-cdn.streamlabs.com/${channel}.yml`
+  ]);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`, false);
