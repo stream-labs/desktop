@@ -5,7 +5,8 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, remote } from 'electron';
+import { $t } from 'services/i18n';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -126,6 +127,36 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   @mutation()
   private SET_STATE(nextState: INicoliveProgramState): void {
     this.state = nextState;
+  }
+
+  static async openErrorDialog({ title, message }: { title: string, message: string }): Promise<void> {
+    return new Promise<void>(resolve => {
+      remote.dialog.showMessageBox(
+        remote.getCurrentWindow(),
+        {
+          type: 'warning',
+          title,
+          message,
+          buttons: [$t('common.close')],
+          noLink: true,
+        },
+        _ => resolve()
+      );
+    });
+  }
+
+  static async openErrorDialogFromFailure(failure: NicoliveProgramServiceFailure): Promise<void> {
+    if (failure.type === 'logic') {
+      return this.openErrorDialog({
+        title: $t(`nicolive-program.errors.logic.${failure.method}.${failure.reason}.title`),
+        message: $t(`nicolive-program.errors.logic.${failure.method}.${failure.reason}.message`)
+      });
+    }
+
+    return this.openErrorDialog({
+      title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`),
+      message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`)
+    });
   }
 
   /**
