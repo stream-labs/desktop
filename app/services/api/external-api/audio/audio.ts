@@ -1,13 +1,12 @@
-import {
-  AudioSource as InternalAudioSource,
-  AudioService as InternalAudioService,
-} from 'services/audio';
+import { AudioService as InternalAudioService } from 'services/audio';
 import { Inject } from 'util/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
-import { ServiceHelper } from 'services/stateful-service';
-import { ISerializable } from '../../rpc-api';
+import { AudioSource } from './audio-source';
 import * as obs from '../../../../../obs-api';
 
+/**
+ * Provides API for manage audio sources
+ */
 @Singleton()
 export class AudioService {
   @Fallback()
@@ -51,38 +50,4 @@ export interface IAudioSourceModel {
   syncOffset: number;
   muted: boolean;
   mixerHidden: boolean;
-}
-
-@ServiceHelper()
-export class AudioSource implements ISerializable {
-  @Inject() private audioService: InternalAudioService;
-  @Fallback() private audioSource: InternalAudioSource;
-
-  constructor(private sourceId: string) {
-    this.audioSource = this.audioService.getSource(sourceId);
-  }
-
-  /**
-   * serialize source
-   */
-  getModel(): IAudioSourceModel {
-    return {
-      sourceId: this.audioSource.sourceId,
-      fader: this.audioSource.fader,
-      audioMixers: this.audioSource.audioMixers,
-      monitoringType: this.audioSource.monitoringType,
-      forceMono: this.audioSource.forceMono,
-      syncOffset: this.audioSource.syncOffset,
-      muted: this.audioSource.muted,
-      mixerHidden: this.audioSource.mixerHidden,
-    };
-  }
-
-  setDeflection(deflection: number) {
-    return this.audioSource.setDeflection(deflection);
-  }
-
-  setMuted(muted: boolean) {
-    return this.audioSource.setMuted(muted);
-  }
 }

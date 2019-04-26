@@ -1,4 +1,4 @@
-import { InjectFromExternalApi, Singleton, Fallback } from 'services/api/external-api';
+import { InjectFromExternalApi } from 'services/api/external-api';
 import { ServiceHelper } from 'services/stateful-service';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
@@ -6,11 +6,11 @@ import {
   SelectionService as InternalSelectionService,
 } from 'services/selection';
 import { ScenesService } from './scenes';
-import { Source, SourcesService } from 'services/api/external-api/sources/sources';
-import { Inject } from 'util/injector';
+import { SourcesService } from 'services/api/external-api/sources/sources';
+import { Source } from 'services/api/external-api/sources/source';
 import { Scene } from './scene';
 import { SceneItem } from './scene-item';
-import { SceneItemFolder } from './scene-folder';
+import { SceneItemFolder } from './scene-item-folder';
 import { SceneNode } from './scene-node';
 
 export interface ISelectionModel {
@@ -21,7 +21,7 @@ export interface ISelectionModel {
 /**
  * Allows call bulk actions with scene items and folders.
  * Selection can contain items only for one scene.
- * @see Scene.getSelection() to fetch a selection object
+ * @see Scene.getSelection() to fetch a new selection object
  * @see SelectionService to make items active
  */
 @ServiceHelper()
@@ -307,19 +307,5 @@ export class Selection implements ISceneItemActions {
 
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     return this.selection.scale(scale, offset);
-  }
-}
-
-/**
- * Allows select/deselect items
- */
-@Singleton()
-export class SelectionService extends Selection {
-  @Fallback()
-  @Inject('SelectionService')
-  internalSelectionService: InternalSelectionService;
-
-  get selection() {
-    return this.internalSelectionService;
   }
 }

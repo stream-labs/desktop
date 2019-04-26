@@ -1,19 +1,20 @@
 import { ServiceHelper } from 'services/stateful-service';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
-import { Source, SourcesService } from 'services/api/external-api/sources/sources';
+import { SourcesService } from 'services/api/external-api/sources/sources';
+import { Source } from 'services/api/external-api/sources/source';
 import { Inject } from 'util/injector';
 import { Scene as InternalScene, ScenesService as InternalScenesService } from 'services/scenes';
 import { TSourceType } from 'services/sources';
 import { Selection } from './selection';
 import { ISceneNodeAddOptions, ScenesService } from './scenes';
-import { ISceneNode, SceneNode } from './scene-node';
+import { ISceneNodeModel, SceneNode } from './scene-node';
 import { SceneItem } from './scene-item';
-import { SceneItemFolder } from './scene-folder';
+import { SceneItemFolder } from './scene-item-folder';
 
-export interface IScene {
+export interface ISceneModel {
   id: string;
   name: string;
-  nodes: ISceneNode[];
+  nodes: ISceneNodeModel[];
 }
 
 @ServiceHelper()
@@ -29,7 +30,7 @@ export class Scene {
     this.scene = this.internalScenesService.getScene(sceneId);
   }
 
-  getModel(): IScene {
+  getModel(): ISceneModel {
     return {
       id: this.scene.id,
       name: this.scene.name,

@@ -5,78 +5,19 @@ $(() => {
   var projectName = 'Streamlabs-OBS';
   if (isHomePage()) document.querySelector('h1').innerHTML = projectName;
 
-  // patch header
-  var $header = document.querySelector('h1');
-  $header.innerHTML = patchHeaderText($header.innerHTML);
-
   // hide index
   var $index = document.querySelector('.tsd-index-group');
   if ($index) $index.style.display = 'none';
 
-  // hide sources
-  document.querySelectorAll('.tsd-sources').forEach(item => item.style.display = 'none');
-
   patchNavigation();
   removeConstructors();
-  // patchBreadcrumbs();
-  // patchSeeTags();
-  // patchHierarchyBlock();
-  // patchImplementedByBlock();
-  // patchLegend();
+  hideBreadcrumbs();
+  patchHierarchyBlock();
+  patchLegend();
 
   console.log('monkeypatch applied');
-
 });
 
-
-
-function patchLinkText(linkText) {
-
-  // no need to patch if no quotes
-  if (linkText.charAt(0) !== '"') return linkText;
-
-  // remove quotes
-  linkText = linkText.replace(/"/g, '');
-
-  // remove paths
-  linkText = linkText.split('/').pop();
-
-  // transform string like "scenes-api" to "ScenesService"
-
-  linkText = linkText.replace(/<wbr>/g, '');
-  linkText = linkText.replace('-api', '');
-  linkText = humps.camelize(linkText);
-  linkText = linkText.charAt(0).toUpperCase() + linkText.substring(1) + 'Service';
-
-  return linkText;
-}
-
-
-
-function getRootInterfaceName(linkText) {
-  return 'I' + patchLinkText(linkText) + 'Api';
-}
-
-function getRootInterfaceHref(linkText) {
-  var filename = linkText.replace(/[\/\-"]/g, '_').replace(/<wbr>/g, '');
-  return (isHomePage() ? 'interfaces/' : './') +
-    filename + '.' +
-    getRootInterfaceName(linkText).toLowerCase() + '.html';
-}
-
-function getRootInterfaceLink(linkText) {
-  return '<a href="' + getRootInterfaceHref(linkText) + '">' + getRootInterfaceName(linkText) + '</a>';
-}
-
-
-function patchHeaderText(headerText) {
-  // replace header only for files with "-api" postfix
-  if (!headerText.match('-api')) return headerText;
-
-  if (!headerText.match('External module')) return headerText;
-  const linkText = headerText.match('".+"')[0];
-  return patchLinkText(linkText) + ': ' + getRootInterfaceLink(linkText, '../');
-}
 
 function patchHierarchyBlock() {
   var $hierarchy = document.querySelector('.tsd-panel.tsd-hierarchy');
@@ -115,6 +56,8 @@ function patchNavigation() {
     if (!match) return;
 
     const [fullMatch, folder, item] = match;
+    if (item == 'index') return; // skip index files
+
     const isService = folder === item;
     let newText = item.substr(0, 1).toUpperCase() + item.substring(1);
     if (isService) newText = newText + 'Service';
@@ -123,9 +66,9 @@ function patchNavigation() {
     // get link href
     const prefix = isHomePage() ? 'classes/' : '../classes/';
     const href = prefix + '_'+
-     humps.decamelize(folder) + '_' +
-     humps.decamelize(item) + '_.' +
-     humps.decamelize(newText).replace(/_/g, '') +
+     humps.decamelize(humps.camelize(folder)) + '_' +
+     humps.decamelize(humps.camelize(item)) + '_.' +
+     humps.decamelize(humps.camelize(newText)).replace(/_/g, '')  +
      '.html';
 
     // create new `li` element
@@ -153,40 +96,22 @@ function patchNavigation() {
 
   // insert navigation links for services
   const $servicesLabel = document.createElement('li');
+  $servicesLabel.classList.add('nav-header');
   $servicesLabel.innerHTML = 'Services';
   $navigation.appendChild($servicesLabel);
   servicesLinks.forEach($li => $navigation.appendChild($li));
 
   // insert navigation links for classes
   const $classesLabel = document.createElement('li');
+  $classesLabel.classList.add('nav-header');
   $classesLabel.innerHTML = 'Classes';
   $navigation.appendChild($classesLabel);
-  classesLinks.forEach($li => $navigation.appen/dChild($li));
-}
-
-function patchImplementedByBlock() {
-  var $implementedBy = document.querySelector('.tsd-panel.tsd-implemented-by');
-  if (!$implementedBy) return;
-
-  // show block only on service page
-  if (!isServicePage()) {
-    $implementedBy.style.display = 'none';
-    return;
-  }
-
-  // remove links to classes
-  $implementedBy.querySelector('a').removeAttribute('href');
-
-  // add comment
-  var $comment = document.createElement('div');
-  $comment.classList.add('tsd-block-comment');
-  $comment.innerHTML = 'Use this name as <code>resource</code> in JSONRPC request';
-  $implementedBy.appendChild($comment);
+  classesLinks.forEach($li => $navigation.appendChild($li));
 }
 
 
 function patchLegend() {
-  // patch legend
+  // hide unrelated legend
   const whitelist = [
     'Type alias',
     'Enumeration',
@@ -200,10 +125,7 @@ function patchLegend() {
   ];
 
   document.querySelectorAll('.tsd-legend span').forEach(legend => {
-    if (
-      !whitelist.includes(legend.innerHTML) ||
-      legend.parentElement.classList.contains('tsd-parent-kind-class')
-    ) {
+    if (!whitelist.includes(legend.innerHTML)) {
       legend.parentElement.style.display = 'none';
     }
   });
@@ -211,38 +133,8 @@ function patchLegend() {
 }
 
 
-function patchBreadcrumbs() {
-  document.querySelectorAll('.tsd-breadcrumb li a').forEach(breadcrumb => {
-    breadcrumb.innerHTML = patchLinkText(breadcrumb.innerHTML);
-
-    if (breadcrumb.href.match('globals.html')) {
-      breadcrumb.href = breadcrumb.href.replace('globals', 'index');
-      breadcrumb.innerHTML = 'Home';
-    }
-  });
-}
-
-
-function patchSeeTags() {
-  document.querySelectorAll('.tsd-comment-tags dt').forEach($el => {
-    if ($el.innerHTML !== 'see') return;
-    var $tag = $el.parentElement.querySelector('p');
-    var isServiceName = $tag.innerHTML.match(/[a-zA-Z]+Service$/);
-    if (!isServiceName) return;
-    var serviceName = $tag.innerHTML;
-    var href = getLinkToService(serviceName);
-    $tag.innerHTML = '<a href="' + href + '">' + serviceName + '</a>';
-  });
-}
-
-
-function getLinkToService(serviceName) {
-  var shortName = serviceName.replace('Service', '');
-  var filename = '_' +
-    humps.decamelize(shortName) + '_' +
-    humps.decamelize(shortName + '_api') + '_.' +
-    'i' + serviceName.toLowerCase() + 'api.html';
-  return (isHomePage() ? 'interfaces/' : './') + filename;
+function hideBreadcrumbs() {
+  document.querySelector('.tsd-breadcrumb').remove();
 }
 
 function removeConstructors() {

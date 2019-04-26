@@ -1,10 +1,10 @@
 import { ServiceHelper } from 'services/stateful-service';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
-import { ISourceModel, Source, SourcesService } from 'services/api/external-api/sources/sources';
-import { ISceneNode, SceneNode } from './scene-node';
+import { Source, SourcesService } from 'services/api/external-api/sources';
+import { ISceneNodeModel, SceneNode } from './scene-node';
 
-export interface ISceneItem extends ISceneItemSettings, ISceneNode {
+export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
   sourceId: string;
 }
@@ -78,7 +78,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
   /**
    * returns serialized representation of scene-item
    */
-  getModel(): ISceneItem {
+  getModel(): ISceneItemModel {
     return {
       ...super.getModel(),
       sourceId: this.getSource().sourceId,
@@ -133,6 +133,9 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
     return this.sceneItem.remove();
   }
 
+  /**
+   * set scale and adjust the item position according to the origin parameter
+   */
   setScale(newScaleModel: IVec2, origin?: IVec2) {
     return this.sceneItem.setScale(newScaleModel, origin);
   }

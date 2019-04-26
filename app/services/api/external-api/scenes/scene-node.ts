@@ -7,12 +7,12 @@ import {
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { ScenesService } from './scenes';
 import { Scene } from './scene';
-import { SceneItemFolder } from './scene-folder';
+import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
 
 export declare type TSceneNodeType = 'folder' | 'item';
 
-export interface ISceneNode {
+export interface ISceneNodeModel {
   id: string;
   sceneId: string;
   sceneNodeType: TSceneNodeType;
@@ -37,7 +37,7 @@ export abstract class SceneNode {
   /**
    * returns serialized representation on scene-node
    */
-  getModel(): ISceneNode {
+  getModel(): ISceneNodeModel {
     return {
       id: this.sceneNode.id,
       sceneId: this.sceneNode.sceneId,
