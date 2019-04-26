@@ -11,6 +11,8 @@ const plugins = [];
 module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
+    updater: './updater/ui.js',
+    'guest-api': './guest-api',
   },
 
   mode: 'development',
