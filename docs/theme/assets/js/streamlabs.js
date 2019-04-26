@@ -17,11 +17,12 @@ $(() => {
   document.querySelectorAll('.tsd-sources').forEach(item => item.style.display = 'none');
 
   patchNavigation();
-  patchBreadcrumbs();
-  patchSeeTags();
-  patchHierarchyBlock();
-  patchImplementedByBlock();
-  patchLegend();
+  removeConstructors();
+  // patchBreadcrumbs();
+  // patchSeeTags();
+  // patchHierarchyBlock();
+  // patchImplementedByBlock();
+  // patchLegend();
 
   console.log('monkeypatch applied');
 
@@ -99,22 +100,68 @@ function isHomePage() {
 
 function patchNavigation() {
 
-  document.querySelectorAll('.tsd-navigation.primary li a').forEach(link => {
-    var linkText = link.innerHTML;
+  const servicesLinks = [];
+  const classesLinks = [];
+  const $navigation = document.querySelector('.tsd-navigation.primary ul');
 
-    // hide all links without "-api" postfix and some blacklisted services
-    if (
-      !linkText.match(/<wbr>api/) ||
-      linkText.match(/obs-<wbr>api/) ||
-      linkText.match(/guest-<wbr>api/) ||
-      linkText.match(/server-<wbr>api/)
-    ) {
-      link.parentElement.style.display = 'none';
+  // create navigation links
+  $navigation.querySelectorAll('li a').forEach(link => {
+    let linkText = link.innerHTML;
+
+    linkText = linkText.replace(/"/g, '').replace(/<wbr>/g, '');
+
+    // get link text
+    const match = linkText.match(/([-\w]+)\/([-\w]+)/);
+    if (!match) return;
+
+    const [fullMatch, folder, item] = match;
+    const isService = folder === item;
+    let newText = item.substr(0, 1).toUpperCase() + item.substring(1);
+    if (isService) newText = newText + 'Service';
+    newText = humps.pascalize(newText);
+
+    // get link href
+    const prefix = isHomePage() ? 'classes/' : '../classes/';
+    const href = prefix + '_'+
+     humps.decamelize(folder) + '_' +
+     humps.decamelize(item) + '_.' +
+     humps.decamelize(newText).replace(/_/g, '') +
+     '.html';
+
+    // create new `li` element
+    const li = document.createElement('li');
+    li.classList.add('tsd-kind-external-module');
+    if (link.parentElement.classList.contains('current')) {
+      li.classList.add('current');
     }
 
-    link.innerHTML = patchLinkText(linkText);
-    link.href = getRootInterfaceHref(linkText);
+    // create new `a` element
+    const a = document.createElement('a');
+    a.href = href;
+    a.innerHTML = newText;
+    li.appendChild(a);
+
+    if (isService) {
+      servicesLinks.push(li);
+    } else {
+      classesLinks.push(li);
+    }
   });
+
+  // delete old navigation links
+  $navigation.innerHTML = '';
+
+  // insert navigation links for services
+  const $servicesLabel = document.createElement('li');
+  $servicesLabel.innerHTML = 'Services';
+  $navigation.appendChild($servicesLabel);
+  servicesLinks.forEach($li => $navigation.appendChild($li));
+
+  // insert navigation links for classes
+  const $classesLabel = document.createElement('li');
+  $classesLabel.innerHTML = 'Classes';
+  $navigation.appendChild($classesLabel);
+  classesLinks.forEach($li => $navigation.appen/dChild($li));
 }
 
 function patchImplementedByBlock() {
@@ -148,7 +195,8 @@ function patchLegend() {
     'Interface with type parameter',
     'Property',
     'Method',
-    'Index signature'
+    'Index signature',
+    'Class'
   ];
 
   document.querySelectorAll('.tsd-legend span').forEach(legend => {
@@ -195,4 +243,10 @@ function getLinkToService(serviceName) {
     humps.decamelize(shortName + '_api') + '_.' +
     'i' + serviceName.toLowerCase() + 'api.html';
   return (isHomePage() ? 'interfaces/' : './') + filename;
+}
+
+function removeConstructors() {
+  document
+    .querySelectorAll('section.tsd-kind-constructor')
+    .forEach(el => el.parentElement.remove());
 }
