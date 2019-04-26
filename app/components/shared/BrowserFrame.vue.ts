@@ -26,10 +26,13 @@ export default class BrowserFrame extends Vue {
   openRemote: boolean;
 
   @Prop()
-  languageCookie: boolean;
+  injectLanguage: boolean;
 
   @Prop({ default: electron.remote.getCurrentWindow().id })
   windowId: number;
+
+  @Prop()
+  preload: string;
 
   private view: Electron.BrowserView;
 
@@ -38,17 +41,25 @@ export default class BrowserFrame extends Vue {
   }
 
   created() {
-    this.initView();
     this.attachView(this.windowId);
   }
 
   destroyed() {
-    this.deinitView();
     this.detachView(this.windowId);
   }
 
   private attachView(electronWindowId: number) {
-    if (!this.view) return;
+    this.view = new electron.remote.BrowserView({
+      webPreferences: {
+        partition: this.partition,
+        nodeIntegration: false,
+        preload: this.preload,
+      },
+    });
+
+    this.setupListeners();
+
+    this.view.webContents.loadURL(this.url);
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
@@ -60,20 +71,16 @@ export default class BrowserFrame extends Vue {
     }, 100);
   }
 
-  private initView() {
-    if (this.view) return;
+  private detachView(electronWindowId: number) {
+    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    this.view = new electron.remote.BrowserView({
-      webPreferences: {
-        partition: this.partition,
-        nodeIntegration: false,
-      },
-    });
+    // @ts-ignore: this method was added in our fork
+    win.removeBrowserView(this.view);
 
-    this.injectLanguageCookie();
-    this.setupListeners();
-
-    this.view.webContents.loadURL(this.url);
+    // @ts-ignore: typings are incorrect
+    this.view.destroy();
+    this.view = null;
+    clearInterval(this.resizeInterval);
   }
 
   private setupListeners() {
@@ -82,38 +89,26 @@ export default class BrowserFrame extends Vue {
         electron.remote.shell.openExternal(targetUrl);
       }
     });
+
     this.view.webContents.on('did-finish-load', () => {
       this.$emit('did-finish-load');
     });
+
+    this.view.webContents.on('dom-ready', this.injectLanguageCookie);
   }
 
   private injectLanguageCookie() {
-    if (this.languageCookie) {
+    if (this.injectLanguage) {
       const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
       const locale = i18nService.state.locale;
       this.view.webContents.executeJavaScript(`
       var langCode = $.cookie('langCode');
       if (langCode !== '${locale}') {
          $.cookie('langCode', '${locale}');
+         window.location.reload();
       }
       `);
     }
-  }
-
-  private deinitView() {
-    // @ts-ignore: typings are incorrect
-    this.view.destroy();
-    this.view = null;
-    clearInterval(this.resizeInterval);
-  }
-
-  private detachView(electronWindowId: number) {
-    if (!this.view) return;
-
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-
-    // @ts-ignore: this method was added in our fork
-    win.removeBrowserView(this.chatView);
   }
 
   private checkResize() {
