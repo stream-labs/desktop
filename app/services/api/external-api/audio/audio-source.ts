@@ -1,16 +1,36 @@
-import { ServiceHelper } from '../../../stateful-service';
-import { ISerializable } from '../../rpc-api';
-import { Inject } from '../../../../util/injector';
+import { ServiceHelper } from 'services/stateful-service';
+import { ISerializable } from 'services/api/rpc-api';
+import { Inject } from 'util/injector';
 import {
   AudioService as InternalAudioService,
   AudioSource as InternalAudioSource,
 } from 'services/audio';
-import { Fallback } from '../../external-api';
-import { IAudioSourceModel } from './audio';
+import { SourcesService as InternalSourcesService } from 'services/sources';
+import { Fallback } from 'services/api/external-api';
+import * as obs from '../../../../../obs-api';
+
+export interface IFader {
+  db: number;
+  deflection: number;
+  mul: number;
+}
+
+export interface IAudioSourceModel {
+  sourceId: string;
+  name: string;
+  fader: IFader;
+  audioMixers: number;
+  monitoringType: obs.EMonitoringType;
+  forceMono: boolean;
+  syncOffset: number;
+  muted: boolean;
+  mixerHidden: boolean;
+}
 
 @ServiceHelper()
 export class AudioSource implements ISerializable {
   @Inject() private audioService: InternalAudioService;
+  @Inject() private sourcesService: InternalSourcesService;
   @Fallback() private audioSource: InternalAudioSource;
 
   constructor(private sourceId: string) {
@@ -18,7 +38,9 @@ export class AudioSource implements ISerializable {
   }
 
   getModel(): IAudioSourceModel {
+    const sourceModel = this.sourcesService.getSource(this.sourceId).getModel();
     return {
+      name: sourceModel.name,
       sourceId: this.audioSource.sourceId,
       fader: this.audioSource.fader,
       audioMixers: this.audioSource.audioMixers,

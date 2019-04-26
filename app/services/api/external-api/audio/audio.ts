@@ -34,20 +34,3 @@ export class AudioService {
       .map(source => this.getSource(source.sourceId));
   }
 }
-
-export interface IFader {
-  db: number;
-  deflection: number;
-  mul: number;
-}
-
-export interface IAudioSourceModel {
-  sourceId: string;
-  fader: IFader;
-  audioMixers: number;
-  monitoringType: obs.EMonitoringType;
-  forceMono: boolean;
-  syncOffset: number;
-  muted: boolean;
-  mixerHidden: boolean;
-}
