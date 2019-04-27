@@ -1,5 +1,5 @@
 <template>
-  <browser-frame :url="url" :partition="partition" :languageCookie="true"/>
+  <browser-frame :url="url" :partition="partition" affinity="streamlabs"/>
 </template>
 
 <script lang='ts' src="./Chatbot.vue.ts"></script>

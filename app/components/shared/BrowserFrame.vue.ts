@@ -31,6 +31,9 @@ export default class BrowserFrame extends Vue {
   @Prop()
   preload: string;
 
+  @Prop()
+  affinity: string;
+
   private view: Electron.BrowserView;
 
   get id() {
@@ -51,6 +54,7 @@ export default class BrowserFrame extends Vue {
         partition: this.partition,
         nodeIntegration: false,
         preload: this.preload,
+        affinity: this.affinity,
       },
     });
 
@@ -84,6 +88,8 @@ export default class BrowserFrame extends Vue {
     this.view.webContents.on('new-window', (evt, targetUrl) => {
       if (this.openRemote) {
         electron.remote.shell.openExternal(targetUrl);
+      } else {
+        this.$emit('new-window', [evt, targetUrl]);
       }
     });
 

@@ -10,6 +10,7 @@ import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import BrowserFrame from 'components/shared/BrowserFrame.vue';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -20,6 +21,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     Mixer,
     Display,
     ResizeBar,
+    BrowserFrame,
   },
 })
 export default class Live extends Vue {
@@ -29,17 +31,15 @@ export default class Live extends Vue {
   @Inject() navigationService: NavigationService;
 
   $refs: {
-    webview: Electron.WebviewTag;
+    webview: BrowserFrame;
   };
 
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
   mounted() {
-    I18nService.setWebviewLocale(this.$refs.webview);
-
-    this.$refs.webview.addEventListener('new-window', e => {
-      const match = e.url.match(/dashboard\/([^\/^\?]*)/);
+    this.$refs.webview.$on('new-window', (event: Electron.Event, url: string) => {
+      const match = url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         this.popout();
@@ -73,6 +73,10 @@ export default class Live extends Vue {
 
   get recenteventsUrl() {
     return this.userService.recentEventsUrl();
+  }
+
+  get partition(){
+    return this.userService.state.auth.apiToken;
   }
 
   get height() {
