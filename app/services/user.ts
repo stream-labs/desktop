@@ -18,7 +18,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
@@ -208,12 +208,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  dashboardUrl(subPage: string) {
+  dashboardUrl(subPage: string, hideLeftNav: boolean = false) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
+    const locale = i18nService.state.locale;
+    const hideNav = hideLeftNav ? 'true' : 'false';
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&l=${locale}&mode=${nightMode}&hidenav=${hideNav}&r=${subPage}`;
   }
 
   appStoreUrl(appId?: string) {

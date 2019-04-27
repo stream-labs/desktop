@@ -25,9 +25,6 @@ export default class BrowserFrame extends Vue {
   @Prop()
   openRemote: boolean;
 
-  @Prop()
-  injectLanguage: boolean;
-
   @Prop({ default: electron.remote.getCurrentWindow().id })
   windowId: number;
 
@@ -93,22 +90,6 @@ export default class BrowserFrame extends Vue {
     this.view.webContents.on('did-finish-load', () => {
       this.$emit('did-finish-load');
     });
-
-    this.view.webContents.on('dom-ready', this.injectLanguageCookie);
-  }
-
-  private injectLanguageCookie() {
-    if (this.injectLanguage) {
-      const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
-      const locale = i18nService.state.locale;
-      this.view.webContents.executeJavaScript(`
-      var langCode = $.cookie('langCode');
-      if (langCode !== '${locale}') {
-         $.cookie('langCode', '${locale}');
-         window.location.reload();
-      }
-      `);
-    }
   }
 
   private checkResize() {

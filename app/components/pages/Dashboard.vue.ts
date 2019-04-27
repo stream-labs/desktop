@@ -5,10 +5,14 @@ import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import { I18nService } from 'services/i18n';
-import electron from 'electron';
 import { NavigationService, TAppPage } from 'services/navigation';
+import BrowserFrame from 'components/shared/BrowserFrame.vue';
 
-@Component({})
+@Component({
+  components: {
+    BrowserFrame,
+  },
+})
 export default class Dashboard extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
@@ -18,12 +22,12 @@ export default class Dashboard extends Vue {
   @Prop() params: Dictionary<string>;
 
   $refs: {
-    dashboard: Electron.WebviewTag;
+    dashboard: BrowserFrame;
   };
 
   mounted() {
-    this.$refs.dashboard.addEventListener('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
+    this.$refs.dashboard.$on('did-finish-load', () => {
+      this.guestApiService.exposeApi(this.$refs.dashboard.id, {
         testAudio: this.testAudio,
         getStatus: this.getStatus,
         getDevices: this.getDevices,
@@ -33,11 +37,6 @@ export default class Dashboard extends Vue {
         navigate: this.navigate,
       });
     });
-
-    I18nService.setWebviewLocale(this.$refs.dashboard);
-    this.$refs.dashboard.addEventListener('new-window', e => {
-      electron.remote.shell.openExternal(e.url);
-    });
   }
 
   get loggedIn() {
@@ -46,6 +45,10 @@ export default class Dashboard extends Vue {
 
   get dashboardUrl() {
     return this.userService.dashboardUrl(this.params.subPage || '');
+  }
+
+  get partition() {
+    return this.userService.state.auth.apiToken;
   }
 
   async getStatus() {

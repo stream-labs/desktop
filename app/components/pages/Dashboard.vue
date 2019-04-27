@@ -1,17 +1,5 @@
 <template>
-<div>
-  <div class="dashboard-container">
-    <webview
-      class="dashboard"
-      v-show="loggedIn"
-      id="dashboardWebview"
-      :src="dashboardUrl"
-      ref="dashboard"
-      preload="bundles/guest-api">
-    </webview>
-    <!-- <p v-else>User Not Logged In, Display something here????</p> -->
-  </div>
-</div>
+<browser-frame ref="dashboard" v-show="loggedIn" :url="dashboardUrl" :partition="partition" preload="bundles/guest-api" :openRemote="true"/>
 </template>
 
 <script lang="ts" src="./Dashboard.vue.ts"></script>
