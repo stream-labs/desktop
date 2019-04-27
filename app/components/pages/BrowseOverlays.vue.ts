@@ -14,8 +14,13 @@ import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
+import BrowserFrame from 'components/shared/BrowserFrame.vue';
 
-@Component({})
+@Component({
+  components: {
+    BrowserFrame,
+  },
+})
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
@@ -34,26 +39,24 @@ export default class BrowseOverlays extends Vue {
   };
 
   $refs: {
-    overlaysWebview: Electron.WebviewTag;
+    overlaysWebview: BrowserFrame;
   };
 
   mounted() {
-    this.$refs.overlaysWebview.addEventListener('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.overlaysWebview.getWebContents().id, {
+    this.$refs.overlaysWebview.$on('did-finish-load', () => {
+      this.guestApiService.exposeApi(this.$refs.overlaysWebview.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
       });
     });
 
-    this.$refs.overlaysWebview.addEventListener('new-window', e => {
-      const protocol = urlLib.parse(e.url).protocol;
+    this.$refs.overlaysWebview.$on('new-window', (event: Electron.Event, url: string) => {
+      const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(e.url);
+        electron.remote.shell.openExternal(url);
       }
     });
-
-    I18nService.setWebviewLocale(this.$refs.overlaysWebview);
   }
 
   async installOverlay(
@@ -105,5 +108,9 @@ export default class BrowseOverlays extends Vue {
 
   get overlaysUrl() {
     return this.userService.overlaysUrl(this.params.type, this.params.id);
+  }
+
+  get partition() {
+    return this.userService.state.auth.apiToken;
   }
 }

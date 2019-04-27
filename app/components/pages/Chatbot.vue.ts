@@ -13,7 +13,7 @@ export default class Chatbot extends Vue {
   @Inject() userService: UserService;
 
   get partition() {
-    return this.userService.state.auth.apiToken;
+    return this.userService.state.auth.partition;
   }
 
   get url() {

@@ -75,8 +75,8 @@ export default class Live extends Vue {
     return this.userService.recentEventsUrl();
   }
 
-  get partition(){
-    return this.userService.state.auth.apiToken;
+  get partition() {
+    return this.userService.state.auth.partition;
   }
 
   get height() {

@@ -48,7 +48,7 @@ export default class Dashboard extends Vue {
   }
 
   get partition() {
-    return this.userService.state.auth.apiToken;
+    return this.userService.state.auth.partition;
   }
 
   async getStatus() {

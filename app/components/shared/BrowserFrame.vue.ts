@@ -72,6 +72,10 @@ export default class BrowserFrame extends Vue {
     }, 100);
   }
 
+  public openDevTools() {
+    this.view.webContents.openDevTools({ mode: 'detach' });
+  }
+
   private detachView(electronWindowId: number) {
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
