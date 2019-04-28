@@ -3,7 +3,7 @@
 <div class="live-container">
   <div class="flex__column">
     <div class="flex__item mission-control-container">
-      <browser-frame name="recentEventsFrame" :persistant="true" class="mission-control" id="recentEventsWebview" ref="webview" :url="recenteventsUrl" :partition="partition" affinity="streamlabs"/>
+      <browser-frame name="recentEventsFrame" :persistent="true" class="mission-control" id="recentEventsWebview" ref="webview" :url="recenteventsUrl" :partition="partition" affinity="streamlabs"/>
     </div>
     <resize-bar
       class="flex__item live-page-resizer"

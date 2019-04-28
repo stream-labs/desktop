@@ -39,7 +39,7 @@ export default class BrowserFrame extends Vue {
   name: string;
 
   @Prop()
-  persistant: boolean;
+  persistent: boolean;
 
   private view: Electron.BrowserView;
 
@@ -63,7 +63,7 @@ export default class BrowserFrame extends Vue {
     } else {
       this.view = currentView.view;
 
-      if (this.persistant) {
+      if (this.persistent ) {
         this.browserFrameService.showView(this.name);
         this.checkResize();
       }
@@ -75,7 +75,7 @@ export default class BrowserFrame extends Vue {
   }
 
   destroyed() {
-    if (this.persistant) {
+    if (this.persistent) {
       this.browserFrameService.hideView(this.name);
     } else {
       this.browserFrameService.removeView(this.name);
