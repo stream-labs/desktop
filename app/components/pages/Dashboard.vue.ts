@@ -26,16 +26,18 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.$refs.dashboard.$once('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.dashboard.id, {
-        testAudio: this.testAudio,
-        getStatus: this.getStatus,
-        getDevices: this.getDevices,
-        enableMask: this.enableMask,
-        updateSettings: this.updateSettings,
-        getDownloadProgress: this.getDownloadProgress,
-        navigate: this.navigate,
-      });
+    this.$refs.dashboard.onFinishLoad(this.onViewLoaded);
+  }
+
+  onViewLoaded() {
+    this.guestApiService.exposeApi(this.$refs.dashboard.id, {
+      testAudio: this.testAudio,
+      getStatus: this.getStatus,
+      getDevices: this.getDevices,
+      enableMask: this.enableMask,
+      updateSettings: this.updateSettings,
+      getDownloadProgress: this.getDownloadProgress,
+      navigate: this.navigate,
     });
   }
 

@@ -43,20 +43,23 @@ export default class BrowseOverlays extends Vue {
   };
 
   mounted() {
-    this.$refs.overlaysWebview.$on('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.overlaysWebview.id, {
-        installOverlay: this.installOverlay,
-        installWidgets: this.installWidgets,
-      });
-    });
+    this.$refs.overlaysWebview.onFinishLoad(this.onViewLoaded);
+    this.$refs.overlaysWebview.$on('new-window', this.onNewWindow);
+  }
 
-    this.$refs.overlaysWebview.$on('new-window', (event: Electron.Event, url: string) => {
-      const protocol = urlLib.parse(url).protocol;
-
-      if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(url);
-      }
+  onViewLoaded() {
+    this.guestApiService.exposeApi(this.$refs.overlaysWebview.id, {
+      installOverlay: this.installOverlay,
+      installWidgets: this.installWidgets,
     });
+  }
+
+  onNewWindow(event: Electron.Event, url: string) {
+    const protocol = urlLib.parse(url).protocol;
+
+    if (protocol === 'http:' || protocol === 'https:') {
+      electron.remote.shell.openExternal(url);
+    }
   }
 
   async installOverlay(

@@ -63,7 +63,7 @@ export default class BrowserFrame extends Vue {
     } else {
       this.view = currentView.view;
 
-      if (this.persistent ) {
+      if (this.persistent) {
         this.browserFrameService.showView(this.name);
         this.checkResize();
       }
@@ -84,6 +84,10 @@ export default class BrowserFrame extends Vue {
     clearInterval(this.resizeInterval);
   }
 
+  onFinishLoad(callback: Function) {
+    this.view.webContents.on('did-finish-load', callback);
+  }
+
   public openDevTools() {
     this.browserFrameService.getView(this.name).view.webContents.openDevTools({ mode: 'detach' });
   }
@@ -95,10 +99,6 @@ export default class BrowserFrame extends Vue {
       } else {
         this.$emit('new-window', [evt, targetUrl]);
       }
-    });
-
-    view.webContents.on('did-finish-load', () => {
-      this.$emit('did-finish-load');
     });
   }
 

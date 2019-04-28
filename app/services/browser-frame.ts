@@ -1,7 +1,8 @@
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { mutation } from './stateful-service';
+import merge from 'lodash/merge';
 import electron from 'electron';
-
+import path from 'path';
 // state
 interface IBrowserFrameData {
   view: Electron.BrowserView;
@@ -28,8 +29,8 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
     browserViews: {},
   };
 
-  init() {
-    this.RESET();
+  get initialState() {
+    return merge({}, BrowserFrameService.defaultState);
   }
 
   getView(name: string) {
@@ -37,7 +38,12 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
   }
 
   addView(name: string, config: IBrowserFrameConfig) {
+    if (config.preload) {
+      config.preload = path.resolve(electron.remote.app.getAppPath(), config.preload);
+    }
+
     this.ADD(name, config);
+
     return this.state.browserViews[name].view;
   }
 
@@ -111,7 +117,7 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
   private REMOVE(name: string) {
     const data = this.state.browserViews[name];
 
-    if (data) {
+    if (data && data.view) {
       const win = electron.remote.BrowserWindow.fromId(data.windowId);
 
       // @ts-ignore: this method was added in our fork
