@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import electron from 'electron';
+import electron, { BrowserView } from 'electron';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
-import { I18nService } from 'services/i18n';
+import { BrowserFrameService } from 'services/browser-frame';
 
 @Component({})
 export default class BrowserFrame extends Vue {
   @Inject() userService: UserService;
+  @Inject() browserFrameService: BrowserFrameService;
 
   $refs: {
     embedLocation: HTMLDivElement;
@@ -34,6 +35,12 @@ export default class BrowserFrame extends Vue {
   @Prop()
   affinity: string;
 
+  @Prop()
+  name: string;
+
+  @Prop()
+  persistant: boolean;
+
   private view: Electron.BrowserView;
 
   get id() {
@@ -41,55 +48,48 @@ export default class BrowserFrame extends Vue {
   }
 
   created() {
-    this.attachView(this.windowId);
-  }
+    const currentView = this.browserFrameService.getView(this.name);
 
-  destroyed() {
-    this.detachView(this.windowId);
-  }
-
-  private attachView(electronWindowId: number) {
-    this.view = new electron.remote.BrowserView({
-      webPreferences: {
-        partition: this.partition,
-        nodeIntegration: false,
-        preload: this.preload,
+    if (!currentView) {
+      this.view = this.browserFrameService.addView(this.name, {
         affinity: this.affinity,
-      },
-    });
+        partition: this.partition,
+        preload: this.preload,
+        url: this.url,
+        windowId: this.windowId,
+      });
 
-    this.setupListeners();
+      this.setupListeners(this.view);
+    } else {
+      this.view = currentView.view;
 
-    this.view.webContents.loadURL(this.url);
-
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-
-    // @ts-ignore: This method was added in our fork
-    win.addBrowserView(this.view);
+      if (this.persistant) {
+        this.browserFrameService.showView(this.name);
+        this.checkResize();
+      }
+    }
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
     }, 100);
   }
 
-  public openDevTools() {
-    this.view.webContents.openDevTools({ mode: 'detach' });
-  }
-
-  private detachView(electronWindowId: number) {
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-
-    // @ts-ignore: this method was added in our fork
-    win.removeBrowserView(this.view);
-
-    // @ts-ignore: typings are incorrect
-    this.view.destroy();
-    this.view = null;
+  destroyed() {
+    if (this.persistant) {
+      this.browserFrameService.hideView(this.name);
+    } else {
+      this.browserFrameService.removeView(this.name);
+    }
+    //
     clearInterval(this.resizeInterval);
   }
 
-  private setupListeners() {
-    this.view.webContents.on('new-window', (evt, targetUrl) => {
+  public openDevTools() {
+    this.browserFrameService.getView(this.name).view.webContents.openDevTools({ mode: 'detach' });
+  }
+
+  private setupListeners(view: BrowserView) {
+    view.webContents.on('new-window', (evt, targetUrl) => {
       if (this.openRemote) {
         electron.remote.shell.openExternal(targetUrl);
       } else {
@@ -97,7 +97,7 @@ export default class BrowserFrame extends Vue {
       }
     });
 
-    this.view.webContents.on('did-finish-load', () => {
+    view.webContents.on('did-finish-load', () => {
       this.$emit('did-finish-load');
     });
   }
@@ -116,8 +116,6 @@ export default class BrowserFrame extends Vue {
   }
 
   private setBounds(position: IVec2, size: IVec2) {
-    if (!this.view) return;
-
     this.view.setBounds({
       x: Math.round(position.x),
       y: Math.round(position.y),

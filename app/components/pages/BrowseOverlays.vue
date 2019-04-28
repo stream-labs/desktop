@@ -3,6 +3,7 @@
     ref="overlaysWebview"
     class="overlays"
     id="overlaysWebview"
+    name='overlayFrame'
     :url="overlaysUrl"
     :partition="partition"
     affinity="streamlabs"

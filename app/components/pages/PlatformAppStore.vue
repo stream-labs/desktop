@@ -1,6 +1,7 @@
 <template>
   <browser-frame
     ref="appStoreWebview"
+    name="appStoreFrame"
     v-if="loggedIn"
     class="app-store"
     id="appStoreWebview"

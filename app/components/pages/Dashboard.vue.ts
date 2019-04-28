@@ -26,7 +26,7 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.$refs.dashboard.$on('did-finish-load', () => {
+    this.$refs.dashboard.$once('did-finish-load', () => {
       this.guestApiService.exposeApi(this.$refs.dashboard.id, {
         testAudio: this.testAudio,
         getStatus: this.getStatus,
