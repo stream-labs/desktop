@@ -50,7 +50,8 @@ module.exports = {
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")',
     'request': 'require("request")',
-    'archiver': 'require("archiver")'
+    'archiver': 'require("archiver")',
+    'extract-zip': 'require("extract-zip")'
   },
 
   module: {

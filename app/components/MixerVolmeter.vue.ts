@@ -159,12 +159,14 @@ export default class MixerVolmeter extends Vue {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
-
     const bg = this.customizationService.themeBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
+
+    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
 
     this.gl.enableVertexAttribArray(this.positionLocation);
     this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
@@ -198,6 +200,8 @@ export default class MixerVolmeter extends Vue {
   }
 
   private drawVolmeterC2d(peaks: number[]) {
+    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
+
     const bg = this.customizationService.themeBackground;
     this.ctx.fillStyle = this.rgbToCss([bg.r, bg.g, bg.b]);
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
