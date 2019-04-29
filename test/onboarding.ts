@@ -12,7 +12,7 @@ const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
-test('Go through unboarding', async (t: TExecutionContext) => {
+test('Go through onboarding', async (t: TExecutionContext) => {
   const app = t.context.app;
   await focusMain(t);
 
