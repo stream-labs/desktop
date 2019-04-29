@@ -7,7 +7,6 @@
     id="appStoreWebview"
     :url="appStoreUrl"
     :partition="partition"
-    affinity="streamlabs"
     preload="bundles/guest-api"
   />
 </template>

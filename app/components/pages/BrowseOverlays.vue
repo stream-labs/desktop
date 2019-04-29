@@ -6,7 +6,6 @@
     name='overlayFrame'
     :url="overlaysUrl"
     :partition="partition"
-    affinity="streamlabs"
     preload="bundles/guest-api"
   />
 </template>

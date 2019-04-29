@@ -7,7 +7,6 @@
     :partition="partition"
     preload="bundles/guest-api"
     :openRemote="true"
-    affinity="streamlabs"
   />
 </template>
 
