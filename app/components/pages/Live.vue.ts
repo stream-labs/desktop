@@ -37,18 +37,16 @@ export default class Live extends Vue {
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
-  mounted() {
-    this.$refs.webview.$on('new-window', (event: Electron.Event, url: string) => {
-      const match = url.match(/dashboard\/([^\/^\?]*)/);
+  onNewWindow(event: Electron.Event, url: string) {
+    const match = url.match(/dashboard\/([^\/^\?]*)/);
 
-      if (match && match[1] === 'recent-events') {
-        this.popout();
-      } else if (match) {
-        this.navigationService.navigate('Dashboard', {
-          subPage: match[1],
-        });
-      }
-    });
+    if (match && match[1] === 'recent-events') {
+      this.popout();
+    } else if (match) {
+      this.navigationService.navigate('Dashboard', {
+        subPage: match[1],
+      });
+    }
   }
 
   popout() {

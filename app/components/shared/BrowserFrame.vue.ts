@@ -4,6 +4,7 @@ import electron, { BrowserView } from 'electron';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import { BrowserFrameService } from 'services/browser-frame';
+import { IRequestHandler, GuestApiService } from 'services/guest-api';
 
 @Component({})
 export default class BrowserFrame extends Vue {
@@ -41,12 +42,14 @@ export default class BrowserFrame extends Vue {
   @Prop()
   persistent: boolean;
 
+  @Prop()
+  requestHandler: IRequestHandler;
+
+  @Prop()
+  onNewWindow: (event: Electron.Event, url: string) => void;
+
   private containerId: number;
   private view: Electron.BrowserView;
-
-  get id() {
-    return this.view.webContents.id;
-  }
 
   created() {
     this.containerId = this.browserFrameService.mountView({
@@ -56,11 +59,12 @@ export default class BrowserFrame extends Vue {
       persistent: this.persistent,
       url: this.url,
       windowId: this.windowId,
+      requestHandler: this.requestHandler,
+      openRemote: this.openRemote,
+      onNewWindow: this.onNewWindow,
     });
 
     this.view = this.browserFrameService.getView(this.containerId, this.windowId);
-
-    this.setupListeners(this.view);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -70,26 +74,6 @@ export default class BrowserFrame extends Vue {
   destroyed() {
     this.browserFrameService.unmountView(this.containerId, this.windowId);
     clearInterval(this.resizeInterval);
-  }
-
-  onFinishLoad(callback: Function) {
-    this.view.webContents.on('did-finish-load', callback);
-  }
-
-  openDevTools() {
-    this.view.webContents.openDevTools({ mode: 'detach' });
-  }
-
-  private setupListeners(view: BrowserView) {
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', (evt, targetUrl) => {
-      if (this.openRemote) {
-        electron.remote.shell.openExternal(targetUrl);
-      } else {
-        this.$emit('new-window', evt, targetUrl);
-      }
-    });
   }
 
   private checkResize() {

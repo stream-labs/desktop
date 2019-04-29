@@ -2,14 +2,13 @@ import electron from 'electron';
 import path from 'path';
 import { Service } from './service';
 import find from 'lodash/find';
+import { IRequestHandler, GuestApiService } from './guest-api';
+import { Inject } from 'util/injector';
 
 // state
 interface IBrowserFrameData {
   container: Electron.BrowserView;
   config: IBrowserFrameConfig;
-}
-interface IBrowserFrame {
-  [id: string]: IBrowserFrameData;
 }
 
 interface IBrowserFrameConfig {
@@ -19,9 +18,14 @@ interface IBrowserFrameConfig {
   url: string;
   persistent: boolean;
   windowId: number;
+  requestHandler: IRequestHandler;
+  openRemote: boolean;
+  onNewWindow: (event: Electron.Event, url: string) => void;
 }
 
 export class BrowserFrameService extends Service {
+  @Inject() guestApiService: GuestApiService;
+
   private browserViews: IBrowserFrameData[] = [];
 
   getView(containerId: number, windowId: number) {
@@ -53,12 +57,13 @@ export class BrowserFrameService extends Service {
         },
       });
 
+      data.config = config;
+
+      this.setupListeners(data);
+
       data.container.webContents.loadURL(config.url);
 
-      this.browserViews.push({
-        config,
-        container: data.container,
-      });
+      this.browserViews.push(data);
     }
 
     const win = electron.remote.BrowserWindow.fromId(config.windowId);
@@ -92,6 +97,41 @@ export class BrowserFrameService extends Service {
       }
     }
   }
+
+  private setupListeners(data: IBrowserFrameData) {
+    electron.ipcRenderer.send('webContents-preventPopup', data.container.webContents.id);
+
+    if (data.config.onNewWindow) {
+      data.container.webContents.on('new-window', data.config.onNewWindow);
+    } else {
+      data.container.webContents.on('new-window', this.onNewWindow.bind(this));
+    }
+
+    data.container.webContents.on('did-finish-load', this.onFinishLoad.bind(this));
+
+    console.log(data.config.requestHandler);
+  }
+
+  private onNewWindow(event: Electron.Event, targetUrl: string) {
+    const data = this.browserViews.find(
+      value => value.container.id === electron.remote.BrowserView.fromWebContents(event.sender).id,
+    );
+
+    if (data.config.openRemote) {
+      electron.remote.shell.openExternal(targetUrl);
+    }
+  }
+
+  private onFinishLoad(event: Electron.Event) {
+    const data = this.browserViews.find(
+      value => value.container.id === electron.remote.BrowserView.fromWebContents(event.sender).id,
+    );
+    if (data.config.requestHandler) {
+      this.guestApiService.exposeApi(data.container.webContents.id, data.config.requestHandler);
+    }
+  }
+
+  private openRemotely(evt: Electron.Event, targetUrl: string) {}
 
   private destroyView(containerId: number) {
     const data = this.browserViews.find(cont => cont.container.id === containerId);

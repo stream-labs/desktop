@@ -7,6 +7,8 @@
     :url="overlaysUrl"
     :partition="partition"
     preload="bundles/guest-api"
+    :requestHandler="requestHandler"
+    :openRemote="true"
   />
 </template>
 

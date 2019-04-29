@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
-import { GuestApiService } from 'services/guest-api';
+import { GuestApiService, IRequestHandler } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
@@ -42,25 +42,10 @@ export default class BrowseOverlays extends Vue {
     overlaysWebview: BrowserFrame;
   };
 
-  mounted() {
-    this.$refs.overlaysWebview.onFinishLoad(this.onViewLoaded);
-    this.$refs.overlaysWebview.$on('new-window', this.onNewWindow);
-  }
-
-  onViewLoaded() {
-    this.guestApiService.exposeApi(this.$refs.overlaysWebview.id, {
-      installOverlay: this.installOverlay,
-      installWidgets: this.installWidgets,
-    });
-  }
-
-  onNewWindow(event: Electron.Event, url: string) {
-    const protocol = urlLib.parse(url).protocol;
-
-    if (protocol === 'http:' || protocol === 'https:') {
-      electron.remote.shell.openExternal(url);
-    }
-  }
+  requestHandler: IRequestHandler = {
+    installOverlay: this.installOverlay,
+    installWidgets: this.installWidgets,
+  };
 
   async installOverlay(
     url: string,

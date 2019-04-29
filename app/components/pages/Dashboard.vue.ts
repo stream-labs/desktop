@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
-import { GuestApiService } from 'services/guest-api';
+import { GuestApiService, IRequestHandler } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import { I18nService } from 'services/i18n';
 import { NavigationService, TAppPage } from 'services/navigation';
@@ -25,21 +25,15 @@ export default class Dashboard extends Vue {
     dashboard: BrowserFrame;
   };
 
-  mounted() {
-    this.$refs.dashboard.onFinishLoad(this.onViewLoaded);
-  }
-
-  onViewLoaded() {
-    this.guestApiService.exposeApi(this.$refs.dashboard.id, {
-      testAudio: this.testAudio,
-      getStatus: this.getStatus,
-      getDevices: this.getDevices,
-      enableMask: this.enableMask,
-      updateSettings: this.updateSettings,
-      getDownloadProgress: this.getDownloadProgress,
-      navigate: this.navigate,
-    });
-  }
+  requestHandler: IRequestHandler = {
+    testAudio: this.testAudio,
+    getStatus: this.getStatus,
+    getDevices: this.getDevices,
+    enableMask: this.enableMask,
+    updateSettings: this.updateSettings,
+    getDownloadProgress: this.getDownloadProgress,
+    navigate: this.navigate,
+  };
 
   get loggedIn() {
     return this.userService.isLoggedIn();

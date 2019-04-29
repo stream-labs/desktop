@@ -8,6 +8,7 @@
     :url="appStoreUrl"
     :partition="partition"
     preload="bundles/guest-api"
+    :requestHandler="requestHandler"
   />
 </template>
 

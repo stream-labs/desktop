@@ -7,6 +7,7 @@
     :partition="partition"
     preload="bundles/guest-api"
     :openRemote="true"
+    :requestHandler="requestHandler"
   />
 </template>
 

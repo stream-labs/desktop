@@ -10,6 +10,7 @@
           ref="webview"
           :url="recenteventsUrl"
           :partition="partition"
+          :onNewWindow="onNewWindow"
         />
       </div>
       <resize-bar

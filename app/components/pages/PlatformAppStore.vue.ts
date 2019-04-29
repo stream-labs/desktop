@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
-import { GuestApiService } from 'services/guest-api';
+import { GuestApiService, IRequestHandler } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -32,19 +32,12 @@ export default class PlatformAppStore extends Vue {
     appStoreWebview: BrowserFrame;
   };
 
-  mounted() {
-    this.$refs.appStoreWebview.$on('did-finish-load', () => {
-      if (Utils.isDevMode()) {
-        this.$refs.appStoreWebview.openDevTools();
-      }
-      this.guestApiService.exposeApi(this.$refs.appStoreWebview.id, {
-        reloadProductionApps: this.reloadProductionApps,
-        openLinkInBrowser: this.openLinkInBrowser,
-        onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
-        navigateToApp: this.navigateToApp,
-      });
-    });
-  }
+  requestHandler: IRequestHandler = {
+    reloadProductionApps: this.reloadProductionApps,
+    openLinkInBrowser: this.openLinkInBrowser,
+    onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
+    navigateToApp: this.navigateToApp,
+  };
 
   async onPaypalAuthSuccessHandler(callback: Function) {
     this.platformAppStoreService.bindsPaypalSuccessCallback(callback);
