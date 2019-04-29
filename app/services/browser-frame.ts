@@ -3,6 +3,7 @@ import { mutation } from './stateful-service';
 import merge from 'lodash/merge';
 import electron from 'electron';
 import path from 'path';
+import { Service } from './service';
 // state
 interface IBrowserFrameData {
   view: Electron.BrowserView;
@@ -20,21 +21,11 @@ interface IBrowserFrameConfig {
   windowId: number;
 }
 
-interface IBrowserFrameServiceState {
-  browserViews: IBrowserFrame;
-}
-
-export class BrowserFrameService extends PersistentStatefulService<IBrowserFrameServiceState> {
-  static defaultState: IBrowserFrameServiceState = {
-    browserViews: {},
-  };
-
-  get initialState() {
-    return merge({}, BrowserFrameService.defaultState);
-  }
+export class BrowserFrameService extends Service {
+  private browserViews: IBrowserFrame = {};
 
   getView(name: string) {
-    return this.state.browserViews[name];
+    return this.browserViews[name];
   }
 
   addView(name: string, config: IBrowserFrameConfig) {
@@ -42,47 +33,7 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
       config.preload = path.resolve(electron.remote.app.getAppPath(), config.preload);
     }
 
-    this.ADD(name, config);
-
-    return this.state.browserViews[name].view;
-  }
-
-  hideView(name: string) {
-    const data = this.state.browserViews[name];
-
-    if (data) {
-      const win = electron.remote.BrowserWindow.fromId(data.windowId);
-      // @ts-ignore: this method was added in our fork
-      win.removeBrowserView(data.view);
-    }
-  }
-
-  showView(name: string) {
-    const data = this.state.browserViews[name];
-
-    if (data) {
-      const win = electron.remote.BrowserWindow.fromId(data.windowId);
-
-      // @ts-ignore: this method was added in our fork
-      win.addBrowserView(data.view);
-    }
-  }
-
-  removeView(name: string) {
-    this.REMOVE(name);
-  }
-
-  //
-  // Mutations
-  //
-  @mutation()
-  private RESET() {
-    this.state.browserViews = {};
-  }
-
-  @mutation()
-  private ADD(name: string, config: IBrowserFrameConfig) {
-    const inuse = this.state.browserViews[name];
+    const inuse = this.browserViews[name];
 
     if (!inuse) {
       const view = new electron.remote.BrowserView({
@@ -105,7 +56,7 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
         windowId: config.windowId,
       };
 
-      this.state.browserViews[name] = data;
+      this.browserViews[name] = data;
 
       return data.view;
     }
@@ -113,9 +64,29 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
     return inuse.view;
   }
 
-  @mutation()
-  private REMOVE(name: string) {
-    const data = this.state.browserViews[name];
+  hideView(name: string) {
+    const data = this.browserViews[name];
+
+    if (data) {
+      const win = electron.remote.BrowserWindow.fromId(data.windowId);
+      // @ts-ignore: this method was added in our fork
+      win.removeBrowserView(data.view);
+    }
+  }
+
+  showView(name: string) {
+    const data = this.browserViews[name];
+
+    if (data) {
+      const win = electron.remote.BrowserWindow.fromId(data.windowId);
+
+      // @ts-ignore: this method was added in our fork
+      win.addBrowserView(data.view);
+    }
+  }
+
+  removeView(name: string) {
+    const data = this.browserViews[name];
 
     if (data && data.view) {
       const win = electron.remote.BrowserWindow.fromId(data.windowId);
@@ -125,7 +96,7 @@ export class BrowserFrameService extends PersistentStatefulService<IBrowserFrame
 
       // @ts-ignore: This method was added in our fork
       data.view.destroy();
-      delete this.state.browserViews[name];
+      delete this.browserViews[name];
     }
   }
 }
