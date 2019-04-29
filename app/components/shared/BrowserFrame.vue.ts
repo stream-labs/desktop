@@ -41,6 +41,7 @@ export default class BrowserFrame extends Vue {
   @Prop()
   persistent: boolean;
 
+  private containerId: number;
   private view: Electron.BrowserView;
 
   get id() {
@@ -48,26 +49,18 @@ export default class BrowserFrame extends Vue {
   }
 
   created() {
-    const currentView = this.browserFrameService.getView(this.name);
+    this.containerId = this.browserFrameService.mountView({
+      affinity: this.affinity,
+      partition: this.partition,
+      preload: this.preload,
+      persistent: this.persistent,
+      url: this.url,
+      windowId: this.windowId,
+    });
 
-    if (!currentView) {
-      this.view = this.browserFrameService.addView(this.name, {
-        affinity: this.affinity,
-        partition: this.partition,
-        preload: this.preload,
-        url: this.url,
-        windowId: this.windowId,
-      });
+    this.view = this.browserFrameService.getView(this.containerId, this.windowId);
 
-      this.setupListeners(this.view);
-    } else {
-      this.view = currentView.view;
-
-      if (this.persistent) {
-        this.browserFrameService.showView(this.name);
-        this.checkResize();
-      }
-    }
+    this.setupListeners(this.view);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -75,12 +68,7 @@ export default class BrowserFrame extends Vue {
   }
 
   destroyed() {
-    if (this.persistent) {
-      this.browserFrameService.hideView(this.name);
-    } else {
-      this.browserFrameService.removeView(this.name);
-    }
-    //
+    this.browserFrameService.unmountView(this.containerId, this.windowId);
     clearInterval(this.resizeInterval);
   }
 
@@ -88,16 +76,19 @@ export default class BrowserFrame extends Vue {
     this.view.webContents.on('did-finish-load', callback);
   }
 
-  public openDevTools() {
-    this.browserFrameService.getView(this.name).view.webContents.openDevTools({ mode: 'detach' });
+  openDevTools() {
+    this.view.webContents.openDevTools({ mode: 'detach' });
   }
 
   private setupListeners(view: BrowserView) {
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
     view.webContents.on('new-window', (evt, targetUrl) => {
+
       if (this.openRemote) {
         electron.remote.shell.openExternal(targetUrl);
       } else {
-        this.$emit('new-window', [evt, targetUrl]);
+        this.$emit('new-window', evt, targetUrl);
       }
     });
   }
@@ -111,17 +102,12 @@ export default class BrowserFrame extends Vue {
       this.currentPosition = { x: rect.left, y: rect.top };
       this.currentSize = { x: rect.width, y: rect.height };
 
-      this.setBounds(this.currentPosition, this.currentSize);
+      this.browserFrameService.setViewBounds(
+        this.containerId,
+        this.currentPosition,
+        this.currentSize,
+      );
     }
-  }
-
-  private setBounds(position: IVec2, size: IVec2) {
-    this.view.setBounds({
-      x: Math.round(position.x),
-      y: Math.round(position.y),
-      width: Math.round(size.x),
-      height: Math.round(size.y),
-    });
   }
 
   private rectChanged(rect: ClientRect) {

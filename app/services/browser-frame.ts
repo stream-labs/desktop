@@ -1,13 +1,12 @@
-import { PersistentStatefulService } from './persistent-stateful-service';
-import { mutation } from './stateful-service';
-import merge from 'lodash/merge';
 import electron from 'electron';
 import path from 'path';
 import { Service } from './service';
+import find from 'lodash/find';
+
 // state
 interface IBrowserFrameData {
-  view: Electron.BrowserView;
-  windowId: number;
+  container: Electron.BrowserView;
+  config: IBrowserFrameConfig;
 }
 interface IBrowserFrame {
   [id: string]: IBrowserFrameData;
@@ -18,25 +17,34 @@ interface IBrowserFrameConfig {
   preload?: string;
   affinity?: string;
   url: string;
+  persistent: boolean;
   windowId: number;
 }
 
 export class BrowserFrameService extends Service {
-  private browserViews: IBrowserFrame = {};
+  private browserViews: IBrowserFrameData[] = [];
 
-  getView(name: string) {
-    return this.browserViews[name];
+  getView(containerId: number, windowId: number) {
+    const data = this.browserViews.find(
+      value => value.config.windowId === windowId && value.container.id === containerId,
+    );
+    return data.container;
   }
 
-  addView(name: string, config: IBrowserFrameConfig) {
+  mountView(config: IBrowserFrameConfig) {
     if (config.preload) {
       config.preload = path.resolve(electron.remote.app.getAppPath(), config.preload);
     }
 
-    const inuse = this.browserViews[name];
+    let data = this.browserViews.find(value => value.config.url === config.url);
 
-    if (!inuse) {
-      const view = new electron.remote.BrowserView({
+    if (!data) {
+      data = {
+        container: null,
+        config: null,
+      };
+
+      data.container = new electron.remote.BrowserView({
         webPreferences: {
           partition: config.partition,
           nodeIntegration: false,
@@ -45,58 +53,73 @@ export class BrowserFrameService extends Service {
         },
       });
 
-      view.webContents.loadURL(config.url);
-      const win = electron.remote.BrowserWindow.fromId(config.windowId);
+      data.container.webContents.loadURL(config.url);
 
-      // @ts-ignore: This method was added in our fork
-      win.addBrowserView(view);
-
-      const data: IBrowserFrameData = {
-        view,
-        windowId: config.windowId,
-      };
-
-      this.browserViews[name] = data;
-
-      return data.view;
+      this.browserViews.push({
+        config,
+        container: data.container,
+      });
     }
 
-    return inuse.view;
+    const win = electron.remote.BrowserWindow.fromId(config.windowId);
+
+    // @ts-ignore: This method was added in our fork
+    win.addBrowserView(data.container);
+
+    return data.container.id;
   }
 
-  hideView(name: string) {
-    const data = this.browserViews[name];
+  unmountView(containerId: number, windowId: number) {
+    const data = this.browserViews.find(value => value.container.id === containerId);
 
-    if (data) {
-      const win = electron.remote.BrowserWindow.fromId(data.windowId);
+    if (data && data.container) {
+      const win = electron.remote.BrowserWindow.fromId(data.config.windowId);
+
       // @ts-ignore: this method was added in our fork
-      win.removeBrowserView(data.view);
+      win.removeBrowserView(data.container);
+
+      if (data.config.windowId === windowId) {
+        /*data.transform.next({
+          ...transform,
+          mounted: false,
+          electronWindowId: null,
+          slobsWindowId: null,
+        });*/
+
+        if (!data.config.persistent) {
+          this.destroyView(containerId);
+        }
+      }
     }
   }
 
-  showView(name: string) {
-    const data = this.browserViews[name];
+  private destroyView(containerId: number) {
+    const data = this.browserViews.find(cont => cont.container.id === containerId);
 
-    if (data) {
-      const win = electron.remote.BrowserWindow.fromId(data.windowId);
+    if (!data) return;
 
-      // @ts-ignore: this method was added in our fork
-      win.addBrowserView(data.view);
-    }
+    this.browserViews = this.browserViews.filter(c => c.container.id !== containerId);
+
+    //  @ts-ignore: Method from our own branch
+    data.container.destroy();
   }
 
-  removeView(name: string) {
-    const data = this.browserViews[name];
+  setViewBounds(containerId: number, pos: IVec2, size: IVec2) {
+    const data = this.browserViews.find(value => value.container.id === containerId);
 
-    if (data && data.view) {
-      const win = electron.remote.BrowserWindow.fromId(data.windowId);
+    if (!data) return;
 
-      // @ts-ignore: this method was added in our fork
-      win.removeBrowserView(data.view);
+    data.container.setBounds({
+      x: Math.round(pos.x),
+      y: Math.round(pos.y),
+      width: Math.round(size.x),
+      height: Math.round(size.y),
+    });
 
-      // @ts-ignore: This method was added in our fork
-      data.view.destroy();
-      delete this.browserViews[name];
-    }
+    /*data.transform.next({
+      ...info.transform.getValue(),
+      pos,
+      size,
+    });*/
   }
 }
