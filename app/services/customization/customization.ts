@@ -82,7 +82,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setTheme(theme: string) {
-    document.getElementsByTagName('body')[0].classList.replace(this.currentTheme, theme);
     return this.setSettings({ theme });
   }
 

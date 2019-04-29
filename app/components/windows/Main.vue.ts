@@ -158,8 +158,6 @@ export default class Main extends Vue {
 
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
-
-    document.getElementsByTagName('body')[0].classList.add(this.theme);
   }
 
   destroyed() {
@@ -173,7 +171,9 @@ export default class Main extends Vue {
   windowResizeTimeout: number;
 
   windowSizeHandler() {
-    this.onResizeStartHandler();
+    if (!this.windowsService.state.main.hideStyleBlockers) {
+      this.onResizeStartHandler();
+    }
     this.windowWidth = window.innerWidth;
 
     clearTimeout(this.windowResizeTimeout);
