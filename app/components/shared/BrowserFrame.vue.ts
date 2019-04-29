@@ -84,7 +84,6 @@ export default class BrowserFrame extends Vue {
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
     view.webContents.on('new-window', (evt, targetUrl) => {
-
       if (this.openRemote) {
         electron.remote.shell.openExternal(targetUrl);
       } else {
