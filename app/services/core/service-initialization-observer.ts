@@ -1,4 +1,4 @@
-import { Service } from '../services/service';
+import { Service } from './service';
 
 /**
  * Service with InitAfter decorator will be created after the observable

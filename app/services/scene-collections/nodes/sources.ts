@@ -2,7 +2,7 @@ import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { AudioService } from 'services/audio';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../core/injector';
 import * as obs from '../../../../obs-api';
 import { ScenesService } from 'services/scenes';
 

@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import { PersistentStatefulService } from '../persistent-stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../stateful-service';
+import { mutation } from '../core/stateful-service';
 import { remote } from 'electron';
 
 import {

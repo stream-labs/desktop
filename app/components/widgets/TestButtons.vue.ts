@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { WidgetsService } from 'services/widgets';
 import { FacemasksService } from 'services/facemasks';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 
 @Component({})
 export default class TestButtons extends Vue {

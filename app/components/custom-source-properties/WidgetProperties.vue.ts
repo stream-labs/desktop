@@ -4,7 +4,7 @@ import { ISourceApi } from 'services/sources';
 import { WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 
 @Component({})

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { HotkeysService, IHotkeysSet } from '../services/hotkeys';
 import { ScenesService } from '../services/scenes';
 import { SourcesService } from '../services/sources';

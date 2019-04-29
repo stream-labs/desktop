@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
-import { Inject } from '../../util/injector';
+import { Inject, Service } from 'services';
 import { GuestApiService } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
-import { Service } from 'services/stateful-service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';

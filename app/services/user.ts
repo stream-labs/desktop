@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import defer from 'lodash/defer';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Inject } from 'util/injector';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation } from 'services/stateful-service';
+import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';

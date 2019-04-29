@@ -6,7 +6,7 @@ import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import debounce from 'lodash/debounce';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';

@@ -1,5 +1,5 @@
-import { Service } from '../service';
-import { Inject } from '../../util/injector';
+import { Service } from '../core/service';
+import { Inject } from '../core/injector';
 
 // modules
 import {

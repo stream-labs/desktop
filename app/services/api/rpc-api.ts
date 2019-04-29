@@ -1,6 +1,6 @@
 import uuid from 'uuid/v4';
 import 'reflect-metadata';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import traverse from 'traverse';
 import { Observable, Subject, Subscription } from 'rxjs';
 import {

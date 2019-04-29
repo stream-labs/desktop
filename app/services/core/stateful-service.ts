@@ -3,8 +3,6 @@ import { Store, Module } from 'vuex';
 import { Service } from './service';
 import Utils from 'services/utils';
 
-export * from './service';
-
 export function mutation(options = { unsafe: false }) {
   return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
     return registerMutation(target, methodName, descriptor, options);
@@ -87,7 +85,7 @@ function registerMutation(
   return Object.getOwnPropertyDescriptor(target, methodName);
 }
 
-function inheritMutations(target: any) {
+export function inheritMutations(target: any) {
   const baseClassProto = Object.getPrototypeOf(target.prototype).constructor.prototype;
   if (baseClassProto.originalMethods) {
     Object.keys(baseClassProto.originalMethods).forEach(methodName => {
@@ -150,44 +148,6 @@ export function getModule(ModuleContainer: any): Module<any, any> {
     state: ModuleContainer.initialState
       ? JSON.parse(JSON.stringify(ModuleContainer.initialState))
       : {},
-  };
-}
-
-/**
- * Classes with ServiceHelper decorator saves constructor's
- * arguments to send them with each called mutation.
- * We need to save constructor arguments to create the same
- * class instance in another window.
- * Caveats:
- * - constructor arguments must be able to be serialized
- * - constructor must not have side effects
- */
-// tslint:disable-next-line:function-name
-export function ServiceHelper(): ClassDecorator {
-  return function(target: any) {
-    const original = target;
-
-    // create new constructor that will save arguments in instance
-    const f: any = function(this: any, ...args: any[]) {
-      original.apply(this, args);
-      this.constructorArgs = args;
-      this.isHelper = true;
-      this.helperName = target.name;
-      this._resourceId = this.helperName + JSON.stringify(this.constructorArgs);
-      return this;
-    };
-
-    // copy prototype so intanceof operator still works
-    f.prototype = original.prototype;
-
-    // vuex modules names related to constructor name
-    // so we need to save the name
-    Object.defineProperty(f, 'name', { value: target.name });
-
-    inheritMutations(f);
-
-    // return new constructor (will override original)
-    return f;
   };
 }
 

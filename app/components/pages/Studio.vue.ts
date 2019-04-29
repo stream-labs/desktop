@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';
 import StudioEditor from 'components/StudioEditor.vue';
 import StudioControls from 'components/StudioControls.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';

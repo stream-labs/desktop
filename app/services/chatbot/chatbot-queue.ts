@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
-import { PersistentStatefulService } from '../persistent-stateful-service';
-import { Inject } from 'util/injector';
-import { mutation } from '../stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
+import { Inject } from 'services/core/injector';
+import { mutation } from '../core/stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import io from 'socket.io-client';
 import { ChatbotBaseApiService } from './chatbot-base';

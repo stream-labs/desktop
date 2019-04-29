@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from '../stateful-service';
+import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import uuid from 'uuid/v4';
 

@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import SceneSelector from 'components/SceneSelector.vue';
 import Mixer from 'components/Mixer.vue';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import Display from 'components/shared/Display.vue';
 import { CustomizationService } from 'services/customization';
 import VTooltip from 'v-tooltip';

@@ -1,8 +1,7 @@
 import { ScenesService, Scene } from './index';
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper, Inject } from 'services';
 import Utils from '../utils';
-import { Inject } from 'util/injector';
 import { Selection, SelectionService } from 'services/selection';
 import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'services/scenes';
 import { SceneItemNode } from './scene-node';

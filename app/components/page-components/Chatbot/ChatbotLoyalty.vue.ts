@@ -5,7 +5,7 @@ import ChatbotPagination from 'components/page-components/Chatbot/shared/Chatbot
 import { IChatbotLoyalty } from 'services/chatbot';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
 import { EmptySection } from 'streamlabs-beaker';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 
 @Component({

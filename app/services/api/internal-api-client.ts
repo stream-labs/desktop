@@ -2,7 +2,7 @@ import electron from 'electron';
 import { Observable, Subject } from 'rxjs';
 import { IJsonRpcEvent, IJsonRpcResponse, IMutation, JsonrpcService } from 'services/api/jsonrpc';
 import * as traverse from 'traverse';
-import { Service } from '../service';
+import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
 const { ipcRenderer } = electron;
