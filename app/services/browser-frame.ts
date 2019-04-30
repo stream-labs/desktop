@@ -124,8 +124,6 @@ export class BrowserFrameService extends Service {
     }
   }
 
-  private openRemotely(evt: Electron.Event, targetUrl: string) {}
-
   private destroyView(containerId: number) {
     const data = this.browserViews.find(cont => cont.container.id === containerId);
 
