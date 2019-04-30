@@ -14,6 +14,7 @@ import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
 import { ErrorField } from 'vee-validate';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -26,11 +27,9 @@ import { ErrorField } from 'vee-validate';
   },
 })
 export default class SourceProperties extends Vue {
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() windowsService: WindowsService;
+  @Inject() customizationService: CustomizationService;
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
@@ -50,6 +49,10 @@ export default class SourceProperties extends Vue {
 
   destroyed() {
     this.sourcesSubscription.unsubscribe();
+  }
+
+  get hideStyleBlockers() {
+    return this.windowsService.state.child.hideStyleBlockers;
   }
 
   get propertiesManagerUI() {

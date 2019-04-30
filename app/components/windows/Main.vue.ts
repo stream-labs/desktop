@@ -168,10 +168,21 @@ export default class Main extends Vue {
 
   hasLiveDock = true;
 
+  windowResizeTimeout: number;
+
   windowSizeHandler() {
+    if (!this.windowsService.state.main.hideStyleBlockers) {
+      this.onResizeStartHandler();
+    }
     this.windowWidth = window.innerWidth;
 
+    clearTimeout(this.windowResizeTimeout);
+
     this.hasLiveDock = this.windowWidth >= 1100;
+    this.windowResizeTimeout = window.setTimeout(
+      () => this.windowsService.updateStyleBlockers('main', false),
+      200,
+    );
   }
 
   handleResize() {
@@ -179,16 +190,14 @@ export default class Main extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     offset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.customizationService.setSettings({
-      hideStyleBlockingElements: false,
-    });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {

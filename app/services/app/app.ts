@@ -217,7 +217,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
-      this.customizationService.setSettings({ hideStyleBlockingElements: true });
+      this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -268,10 +268,7 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(
-      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
-      500,
-    );
+    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
     if (error) throw error;
     return returningValue;
   }

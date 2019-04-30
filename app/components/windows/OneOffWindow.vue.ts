@@ -16,6 +16,14 @@ export default class OneOffWindow extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
 
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
   get options() {
     return this.windowsService.state[this.windowId];
   }
@@ -26,5 +34,19 @@ export default class OneOffWindow extends Vue {
 
   get theme() {
     return this.customizationService.currentTheme;
+  }
+
+  windowResizeTimeout: number;
+
+  windowSizeHandler() {
+    if (!this.windowsService.state[this.windowId].hideStyleBlockers) {
+      this.windowsService.updateStyleBlockers(this.windowId, true);
+    }
+    clearTimeout(this.windowResizeTimeout);
+
+    this.windowResizeTimeout = window.setTimeout(
+      () => this.windowsService.updateStyleBlockers(this.windowId, false),
+      200,
+    );
   }
 }

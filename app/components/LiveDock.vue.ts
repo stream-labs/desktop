@@ -16,6 +16,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
+import { WindowsService } from 'services/windows';
 
 @Component({
   components: {
@@ -33,6 +34,7 @@ export default class LiveDock extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() appService: AppService;
   @Inject() chatService: ChatService;
+  @Inject() windowsService: WindowsService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -86,7 +88,7 @@ export default class LiveDock extends Vue {
   @Watch('streamingStatus')
   onStreamingStatusChange() {
     if (this.streamingStatus === EStreamingState.Starting) {
-      this.expand();
+      this.setCollapsed(false);
     }
   }
 
@@ -98,16 +100,14 @@ export default class LiveDock extends Vue {
     return this.customizationService.state.livedockCollapsed;
   }
 
-  collapse() {
+  setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.customizationService.setLiveDockCollapsed(true);
-    setTimeout(() => (this.canAnimate = false), 300);
-  }
-
-  expand() {
-    this.canAnimate = true;
-    this.customizationService.setLiveDockCollapsed(false);
-    setTimeout(() => (this.canAnimate = false), 300);
+    this.windowsService.updateStyleBlockers('main', true);
+    this.customizationService.setSettings({ livedockCollapsed });
+    setTimeout(() => {
+      this.canAnimate = false;
+      this.windowsService.updateStyleBlockers('main', false);
+    }, 300);
   }
 
   get isStreaming() {
@@ -193,8 +193,8 @@ export default class LiveDock extends Vue {
     this.chatService.refreshChat();
   }
 
-  get hideStyleBlockingElements() {
-    return this.customizationService.state.hideStyleBlockingElements;
+  get hideStyleBlockers() {
+    return this.windowsService.state.main.hideStyleBlockers;
   }
 
   get hasChatApps() {

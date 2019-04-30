@@ -71,6 +71,10 @@ export default class WidgetEditor extends Vue {
   animating = false;
   canShowEditor = false;
 
+  get hideStyleBlockers() {
+    return this.windowsService.state.child.hideStyleBlockers;
+  }
+
   get loaded() {
     return !!this.settingsState.data;
   }
