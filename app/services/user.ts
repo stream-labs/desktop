@@ -7,7 +7,6 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
@@ -35,7 +34,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private platformAppsService: PlatformAppsService;
 
@@ -276,8 +274,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Attempt to sync scense before logging out
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
-    // signs out of chatbot
-    await this.chatbotApiService.Base.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 

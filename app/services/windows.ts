@@ -49,32 +49,6 @@ import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
-import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
-import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
-import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
-import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
-import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
-import ChatbotSymbolProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
-import ChatbotLinkProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
-import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
-import ChatbotParagraphProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotParagraphProtectionWindow.vue';
-import ChatbotEmoteProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotEmoteProtectionWindow.vue';
-import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
-import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
-import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
-import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
-import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
-import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
-import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
-import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
-import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
-import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
-import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
-import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
-import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
-import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
-
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
@@ -123,32 +97,6 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-
-    ChatbotCustomCommandWindow,
-    ChatbotDefaultCommandWindow,
-    ChatbotTimerWindow,
-    ChatbotAlertsWindow,
-    ChatbotGamblePreferencesWindow,
-    ChatbotCapsProtectionWindow,
-    ChatbotSymbolProtectionWindow,
-    ChatbotLinkProtectionWindow,
-    ChatbotWordProtectionWindow,
-    ChatbotParagraphProtectionWindow,
-    ChatbotEmoteProtectionWindow,
-    ChatbotQuoteWindow,
-    ChatbotQuotePreferencesWindow,
-    ChatbotQueuePreferencesWindow,
-    ChatbotCommandPreferencesWindow,
-    ChatbotMediaRequestPreferencesWindow,
-    ChatbotLoyaltyWindow,
-    ChatbotLoyaltyAddAllWindow,
-    ChatbotLoyaltyPreferencesWindow,
-    ChatbotHeistPreferencesWindow,
-    ChatbotPollProfileWindow,
-    ChatbotPollPreferencesWindow,
-    ChatbotBettingProfileWindow,
-    ChatbotBettingPreferencesWindow,
-    ChatbotRegularWindow,
   };
 }
 
