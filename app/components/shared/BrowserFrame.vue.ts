@@ -49,7 +49,6 @@ export default class BrowserFrame extends Vue {
   onNewWindow: (event: Electron.Event, url: string) => void;
 
   private containerId: number;
-  private view: Electron.BrowserView;
 
   created() {
     this.containerId = this.browserFrameService.mountView({
@@ -63,8 +62,6 @@ export default class BrowserFrame extends Vue {
       openRemote: this.openRemote,
       onNewWindow: this.onNewWindow,
     });
-
-    this.view = this.browserFrameService.getView(this.containerId, this.windowId);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();

@@ -28,13 +28,6 @@ export class BrowserFrameService extends Service {
 
   private browserViews: IBrowserFrameData[] = [];
 
-  getView(containerId: number, windowId: number) {
-    const data = this.browserViews.find(
-      value => value.config.windowId === windowId && value.container.id === containerId,
-    );
-    return data.container;
-  }
-
   mountView(config: IBrowserFrameConfig) {
     if (config.preload) {
       config.preload = path.resolve(electron.remote.app.getAppPath(), config.preload);
