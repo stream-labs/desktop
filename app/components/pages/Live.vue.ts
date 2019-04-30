@@ -10,6 +10,7 @@ import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { WindowsService } from 'services/windows';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -27,6 +28,7 @@ export default class Live extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() i18nService: I18nService;
   @Inject() navigationService: NavigationService;
+  @Inject() windowsService: WindowsService;
 
   $refs: {
     webview: Electron.WebviewTag;
@@ -59,7 +61,7 @@ export default class Live extends Vue {
     return (
       this.customizationService.state.livePreviewEnabled &&
       !this.performanceModeEnabled &&
-      !this.customizationService.state.hideStyleBlockingElements
+      !this.windowsService.state.main.hideStyleBlockers
     );
   }
 
@@ -99,10 +101,10 @@ export default class Live extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 }
