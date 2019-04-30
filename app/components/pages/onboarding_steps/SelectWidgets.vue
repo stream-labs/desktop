@@ -113,6 +113,32 @@
             </selectable-widget>
 
             <selectable-widget
+              v-show="platform === 'facebook'"
+              :selected="selectedWidgets.includes(widgetTypes.StarsGoal)"
+              :inspected="inspectedWidget === widgetTypes.StarsGoal"
+              name="Stars Goal"
+              :description="$t('Give your viewers a stars target to help you reach')"
+              @toggle="toggleWidget(widgetTypes.StarsGoal)"
+              @inspect="inspectWidget(widgetTypes.StarsGoal)"
+              @close="closeInspection">
+              <img slot="icon" src="../../../../media/images/icons/donation-goal.png">
+              <video slot="body" autoplay loop muted src="../../../../media/mp4/donation-goal.mp4"></video>
+            </selectable-widget>
+
+            <selectable-widget
+              v-show="platform === 'facebook'"
+              :selected="selectedWidgets.includes(widgetTypes.SupporterGoal)"
+              :inspected="inspectedWidget === widgetTypes.SupporterGoal"
+              name="Supporter Goal"
+              :description="$t('Give your viewers a supporter target to help you reach')"
+              @toggle="toggleWidget(widgetTypes.SupporterGoal)"
+              @inspect="inspectWidget(widgetTypes.SupporterGoal)"
+              @close="closeInspection">
+              <img slot="icon" src="../../../../media/images/icons/donation-goal.png">
+              <video slot="body" autoplay loop muted src="../../../../media/mp4/donation-goal.mp4"></video>
+            </selectable-widget>
+
+            <selectable-widget
               v-show="platform === 'youtube'"
               :selected="selectedWidgets.includes(widgetTypes.SubscriberGoal)"
               :inspected="inspectedWidget === widgetTypes.SubscriberGoal"

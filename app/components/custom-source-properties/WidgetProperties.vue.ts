@@ -33,6 +33,8 @@ export default class WidgetProperties extends Vue {
       [WidgetType.FollowerGoal]: 'followergoal',
       [WidgetType.SubscriberGoal]: 'followergoal',
       [WidgetType.BitGoal]: 'bitgoal',
+      [WidgetType.StarsGoal]: 'starsgoal',
+      [WidgetType.SupporterGoal]: 'supportergoal',
       [WidgetType.DonationTicker]: 'donationticker',
       [WidgetType.ChatBox]: 'chatbox',
       [WidgetType.EventList]: 'eventlist',

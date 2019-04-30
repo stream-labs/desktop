@@ -98,6 +98,8 @@ export { BitGoalService } from 'services/widgets/settings/bit-goal';
 export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
+export { StarsGoalService } from 'services/widgets/settings/stars-goal';
+export { SupporterGoalService } from 'services/widgets/settings/supporter-goal';
 export { ViewerCountService } from 'services/widgets/settings/viewer-count';
 export { StreamBossService } from 'services/widgets/settings/stream-boss';
 export { DonationTickerService } from 'services/widgets/settings/donation-ticker';
