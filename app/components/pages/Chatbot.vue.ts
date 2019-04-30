@@ -8,7 +8,7 @@ export default class Chatbot extends Vue {
   @Inject() userService: UserService;
 
   get chatbotUrl() {
-    return this.userService.dashboardUrl('cloudbot');
+    return this.userService.dashboardUrl('cloudbot', true);
   }
 
   get loggedIn() {
