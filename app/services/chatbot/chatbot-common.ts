@@ -13,6 +13,7 @@ import {
   IChatbotLoyalty,
   IPollProfile,
   IBettingProfile,
+  IManagedUser,
 } from './chatbot-interfaces';
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -28,6 +29,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     loyaltyToUpdate: null,
     pollProfileToUpdate: null,
     bettingProfileToUpdate: null,
+    regularToUpdate: null,
   };
 
   hideModBanner() {
@@ -57,7 +59,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotCustomCommandWindow',
-      title: $t('Chatbot Custom Command Window'),
+      title: $t('Cloudbot Custom Command Window'),
       size: {
         width: 650,
         height: 600,
@@ -71,7 +73,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotDefaultCommandWindow',
-      title: $t('Chatbot Default Commmand Window'),
+      title: $t('Cloudbot Default Commmand Window'),
       size: {
         width: 650,
         height: 650,
@@ -85,7 +87,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotTimerWindow',
-      title: $t('Chatbot Timer Window'),
+      title: $t('Cloudbot Timer Window'),
       size: {
         width: 650,
         height: 500,
@@ -96,7 +98,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openChatbotAlertsWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotAlertsWindow',
-      title: $t('Chatbot Alerts Preferences'),
+      title: $t('Cloudbot Alerts Preferences'),
       size: {
         width: 1000,
         height: 700,
@@ -107,7 +109,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openCapsProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotCapsProtectionWindow',
-      title: $t('Chatbot Caps Protection Preferences'),
+      title: $t('Cloudbot Caps Protection Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -118,7 +120,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openSymbolProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSymbolProtectionWindow',
-      title: $t('Chatbot Symbol Protection Preferences'),
+      title: $t('Cloudbot Symbol Protection Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -129,7 +131,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openLinkProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLinkProtectionWindow',
-      title: $t('Chatbot Link Protection Preferences'),
+      title: $t('Cloudbot Link Protection Preferences'),
       size: {
         width: 650,
         height: 650,
@@ -140,7 +142,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openWordProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotWordProtectionWindow',
-      title: $t('Chatbot Word Protection Preferences'),
+      title: $t('Cloudbot Word Protection Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -151,7 +153,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openEmoteProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotEmoteProtectionWindow',
-      title: $t('Chatbot Emote Protection Preferences'),
+      title: $t('Cloudbot Emote Protection Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -162,7 +164,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openParagraphProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotParagraphProtectionWindow',
-      title: $t('Chatbot Paragraph Protection Preferences'),
+      title: $t('Cloudbot Paragraph Protection Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -176,7 +178,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotQuoteWindow',
-      title: $t('Chatbot Quote Window'),
+      title: $t('Cloudbot Quote Window'),
       size: {
         width: 650,
         height: 500,
@@ -190,7 +192,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotLoyaltyWindow',
-      title: $t('Chatbot Loyalty Window'),
+      title: $t('Cloudbot Loyalty Window'),
       size: {
         width: 475,
         height: 229,
@@ -201,7 +203,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openLoyaltyAddAllWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLoyaltyAddAllWindow',
-      title: $t('Chatbot Add Loyalty'),
+      title: $t('Cloudbot Add Loyalty'),
       size: {
         width: 475,
         height: 192,
@@ -212,7 +214,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openLoyaltyPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLoyaltyPreferencesWindow',
-      title: $t('Chatbot Loyalty Preferences'),
+      title: $t('Cloudbot Loyalty Preferences'),
       size: {
         width: 650,
         height: 580,
@@ -223,7 +225,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openQueuePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQueuePreferencesWindow',
-      title: $t('Chatbot Queue Preferences'),
+      title: $t('Cloudbot Queue Preferences'),
       size: {
         width: 650,
         height: 500,
@@ -234,7 +236,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openCommandPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotCommandPreferencesWindow',
-      title: $t('Chatbot Command Preferences'),
+      title: $t('Cloudbot Command Preferences'),
       size: {
         width: 650,
         height: 410,
@@ -249,10 +251,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
 
     this.windowsService.showWindow({
       componentName: 'ChatbotPollProfileWindow',
-      title: $t('Chatbot Profile'),
+      title: $t('Cloudbot Profile'),
       size: {
         width: 650,
-        height: 500,
+        height: 650,
       },
     });
   }
@@ -264,10 +266,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
 
     this.windowsService.showWindow({
       componentName: 'ChatbotBettingProfileWindow',
-      title: $t('Chatbot Profile'),
+      title: $t('Cloudbot Profile'),
       size: {
         width: 650,
-        height: 500,
+        height: 650,
       },
     });
   }
@@ -275,7 +277,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openPollPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotPollPreferencesWindow',
-      title: $t('Chatbot Poll Preferences'),
+      title: $t('Cloudbot Poll Preferences'),
       size: {
         width: 650,
         height: 600,
@@ -286,7 +288,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openBettingPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotBettingPreferencesWindow',
-      title: $t('Chatbot Betting Preferences'),
+      title: $t('Cloudbot Betting Preferences'),
       size: {
         width: 650,
         height: 600,
@@ -297,7 +299,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
-      title: $t('Chatbot Quote Preferences'),
+      title: $t('Cloudbot Quote Preferences'),
       size: {
         width: 650,
         height: 300,
@@ -308,7 +310,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openMediaRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotMediaRequestPreferencesWindow',
-      title: $t('Chatbot Media Share Preferences'),
+      title: $t('Cloudbot Media Share Preferences'),
       size: {
         width: 650,
         height: 600,
@@ -319,7 +321,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openHeistPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotHeistPreferencesWindow',
-      title: $t('Chatbot Heist Preferences'),
+      title: $t('Cloudbot Heist Preferences'),
       size: {
         width: 650,
         height: 600,
@@ -330,7 +332,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   openGamblePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotGamblePreferencesWindow',
-      title: $t('Chatbot Gamble Preferences'),
+      title: $t('Cloudbot Gamble Preferences'),
       size: {
         width: 650,
         height: 575,
@@ -345,6 +347,19 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       size: {
         width: 750,
         height: 550,
+      },
+    });
+  }
+
+  openRegularWindow(user?: IManagedUser) {
+    this.SET_REGULAR_TO_UPDATE(user);
+
+    this.windowsService.showWindow({
+      componentName: 'ChatbotRegularWindow',
+      title: $t('Cloudbot Regular Window'),
+      size: {
+        width: 650,
+        height: 325,
       },
     });
   }
@@ -392,5 +407,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private SET_BETTING_PROFILE_TO_UPDATE(profile: IBettingProfile) {
     Vue.set(this.state, 'bettingProfileToUpdate', profile);
+  }
+
+  @mutation()
+  private SET_REGULAR_TO_UPDATE(user: IManagedUser) {
+    Vue.set(this.state, 'regularToUpdate', user);
   }
 }

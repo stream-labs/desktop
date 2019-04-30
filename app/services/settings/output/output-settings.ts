@@ -1,4 +1,3 @@
-import { invert } from 'lodash';
 import { Service } from 'services/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'util/injector';

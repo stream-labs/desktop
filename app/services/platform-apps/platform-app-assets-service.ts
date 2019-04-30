@@ -12,6 +12,7 @@ import { TransitionsService } from '../transitions';
 import { Inject } from 'util/injector';
 import { downloadFileAlt, getChecksum } from 'util/requests';
 import { InitAfter } from 'util/service-observer';
+import { AppService } from 'services/app';
 
 const mkdirp = util.promisify(mkdirpModule);
 const mkdtemp = util.promisify(fs.mkdtemp);
@@ -60,6 +61,7 @@ export interface AssetUpdateInfo extends Asset {
 export class PlatformAppAssetsService extends PersistentStatefulService<AssetsServiceState> {
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private appService: AppService;
 
   static defaultState: AssetsServiceState = {};
 
@@ -174,7 +176,21 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * @param appId Application ID
    */
   async getAssetsTargetDirectory(appId: string): Promise<string> {
-    return ensureAssetsDir(this.getApp(appId));
+    return this.ensureAssetsDir(this.getApp(appId));
+  }
+
+  /**
+   * Ensure the App instance has an assets key and that the assets directory exist
+   *
+   * @param app App instance
+   * @returns Assets directory path for this app
+   */
+  async ensureAssetsDir(app: ILoadedApp): Promise<string> {
+    const appAssetsDir = path.join(this.appService.appDataDirectory, 'Media', 'Apps', app.id);
+
+    await mkdirp(appAssetsDir);
+
+    return appAssetsDir;
   }
 
   /**
@@ -277,23 +293,3 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
     this.transitionsService.setPropertiesFormData(transitionId, settings);
   }
 }
-
-/**
- * Ensure the App instance has an assets key and that the assets directory exist
- *
- * @param app App instance
- * @returns Assets directory path for this app
- */
-const ensureAssetsDir = async (app: ILoadedApp): Promise<string> => {
-  const appAssetsDir = path.join(
-    // prettier-ignore
-    electron.remote.app.getPath('userData'),
-    'Media',
-    'Apps',
-    app.id,
-  );
-
-  await mkdirp(appAssetsDir);
-
-  return appAssetsDir;
-};

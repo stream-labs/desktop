@@ -58,6 +58,7 @@ const HAS_DONOR_MESSAGE = [
   'justGiving',
   'tiltify',
   'treat',
+  'stars',
 ];
 
 @Component({

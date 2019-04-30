@@ -26,7 +26,6 @@ const rimraf = require('rimraf');
 const path = require('path');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
-const obs = require('obs-studio-node');
 const pid = require('process').pid;
 const crashHandler = require('crash-handler');
 const electronLog = require('electron-log');
@@ -34,8 +33,6 @@ const electronLog = require('electron-log');
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
-
-app.disableHardwareAcceleration();
 
 /* Determine the current release channel we're
  * on based on name. The channel will always be
@@ -59,6 +56,9 @@ const releaseChannel = (() => {
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+
+  // catch and log unhandled errors/rejected promises
+  electronLog.catchErrors();
 
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
@@ -112,20 +112,7 @@ function startApp() {
   crashHandler.startCrashHandler(app.getAppPath());
   crashHandler.registerProcess(pid, false);
 
-  { // Initialize obs-studio-server
-    // Set up environment variables for IPC.
-    process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
-    process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
-    // Host a new IPC Server and connect to it.
-    obs.IPC.host(process.env.SLOBS_IPC_PATH);
-    obs.NodeObs.SetWorkingDirectory(path.join(
-      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-      'node_modules',
-      'obs-studio-node')
-    );
-  }
-
-  const bt = require('backtrace-node');
+  const Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox('Something Went Wrong',
@@ -135,22 +122,13 @@ function startApp() {
     app.exit();
   }
 
-  function handleUnhandledException(err) {
-    bt.report(err, {}, handleFinishedReport);
-  }
-
   if (pjson.env === 'production') {
-    bt.initialize({
-      disableGlobalHandler: true,
-      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-      attributes: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
 
-    process.on('uncaughtException', handleUnhandledException);
+    Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+      release: process.env.SLOBS_VERSION
+    }).install(function (err, initialErr, eventId) {
+      handleFinishedReport();
+    });
 
     crashReporter.start({
       productName: 'streamlabs-obs',
@@ -181,6 +159,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    transparent: true,
   });
 
   mainWindowState.manage(mainWindow);
@@ -233,7 +212,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    transparent: true,
   });
 
   childWindow.setMenu(null);
@@ -325,9 +305,9 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
+app.requestSingleInstanceLock();
 
-// This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(argv => {
+app.on('second-instance', (event, argv) => {
   // Check for protocol links in the argv of the other process
   argv.forEach(arg => {
     if (arg.match(/^slobs:\/\//)) {
@@ -344,10 +324,6 @@ const shouldQuit = app.makeSingleInstance(argv => {
     mainWindow.focus();
   }
 });
-
-if (shouldQuit) {
-  app.exit();
-}
 
 app.on('ready', () => {
     if (
@@ -377,10 +353,6 @@ app.on('ready', () => {
   } else {
     startApp();
   }
-});
-
-app.on('quit', (e, exitCode) => {
-  obs.IPC.disconnect();
 });
 
 ipcMain.on('openDevTools', () => {
@@ -516,4 +488,10 @@ ipcMain.on('getMainWindowWebContentsId', e => {
 ipcMain.on('requestPerformanceStats', e => {
   const stats = app.getAppMetrics();
   e.sender.send('performanceStatsResponse', stats);
+});
+
+ipcMain.on('showErrorAlert', () => {
+  if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    mainWindow.send('showErrorAlert');
+  }
 });

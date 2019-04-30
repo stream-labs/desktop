@@ -26,6 +26,7 @@ import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
+import EditTransform from 'components/windows/EditTransform';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -74,6 +75,7 @@ import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/wind
 import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
 import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
 import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
+import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -106,6 +108,7 @@ export function getComponents() {
     MediaGallery,
     PlatformAppPopOut,
     FacemaskSettings,
+    EditTransform,
 
     BitGoal,
     DonationGoal,
@@ -149,6 +152,7 @@ export function getComponents() {
     ChatbotPollPreferencesWindow,
     ChatbotBettingProfileWindow,
     ChatbotBettingPreferencesWindow,
+    ChatbotRegularWindow,
   };
 }
 
@@ -169,6 +173,11 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+
+  // Will be true when the UI is performing animations, transitions, or property changes that affect
+  // the display of elements we cannot draw over. During this time such elements, for example
+  // BrowserViews and the OBS Display, will be hidden until the operation is complete.
+  hideStyleBlockers: boolean;
 }
 
 interface IWindowsState {
@@ -179,6 +188,7 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
   isShown: true,
+  hideStyleBlockers: false,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -192,11 +202,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
+      hideStyleBlockers: true,
       title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
+      hideStyleBlockers: false,
       isShown: false,
     },
   };
@@ -223,9 +235,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    const bounds = window.getBounds();
-    const currentDisplay = electron.screen.getDisplayMatching(bounds);
-    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    if (window) {
+      const bounds = window.getBounds();
+      const currentDisplay = electron.screen.getDisplayMatching(bounds);
+      this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    }
   }
 
   showWindow(options: Partial<IWindowOptions>) {
@@ -305,7 +319,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return windowId;
     }
 
-    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+    this.CREATE_ONE_OFF_WINDOW(windowId, { ...DEFAULT_WINDOW_OPTIONS, ...options });
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
@@ -314,6 +328,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
+      transparent: true,
     }));
 
     newWindow.setMenu(null);
@@ -376,6 +391,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
+  updateStyleBlockers(windowId: string, hideStyleBlockers: boolean) {
+    this.UPDATE_HIDE_STYLE_BLOCKERS(windowId, hideStyleBlockers);
+  }
+
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
@@ -419,6 +438,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
     this.state[windowId].scaleFactor = scaleFactor;
+  }
+
+  @mutation()
+  private UPDATE_HIDE_STYLE_BLOCKERS(windowId: string, hideStyleBlockers: boolean) {
+    this.state[windowId].hideStyleBlockers = hideStyleBlockers;
   }
 
   @mutation()

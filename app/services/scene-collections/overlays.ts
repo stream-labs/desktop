@@ -11,17 +11,17 @@ import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
 import { Inject } from '../../util/injector';
-import electron from 'electron';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import unzip from 'unzip-stream';
+import extractZip from 'extract-zip';
 import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
 import { SceneSourceNode } from './nodes/overlays/scene';
+import { AppService } from 'services/app';
 
 const NODE_TYPES = {
   RootNode,
@@ -46,6 +46,7 @@ export interface IDownloadProgress {
 export class OverlaysPersistenceService extends Service {
   @Inject() private scenesService: ScenesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private appService: AppService;
 
   /**
    * Downloads the requested overlay into a temporary directory
@@ -88,11 +89,13 @@ export class OverlaysPersistenceService extends Service {
     this.ensureOverlaysDirectory();
 
     await new Promise((resolve, reject) => {
-      const inStream = fs.createReadStream(overlayFilePath);
-      const outStream = unzip.Extract({ path: assetsPath });
-
-      outStream.on('close', resolve);
-      inStream.pipe(outStream);
+      extractZip(overlayFilePath, { dir: assetsPath }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
 
     const configPath = path.join(assetsPath, 'config.json');
@@ -134,6 +137,6 @@ export class OverlaysPersistenceService extends Service {
   }
 
   get overlaysDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Overlays');
+    return path.join(this.appService.appDataDirectory, 'Overlays');
   }
 }

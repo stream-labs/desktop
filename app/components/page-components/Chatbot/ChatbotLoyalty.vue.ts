@@ -2,18 +2,23 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
-import { ILoyaltyData, IChatbotLoyalty } from 'services/chatbot';
+import { IChatbotLoyalty } from 'services/chatbot';
 import ChatbotGenericModalWindow from './windows/ChatbotGenericModalWindow.vue';
+import { EmptySection } from 'streamlabs-beaker';
+import { Inject } from 'util/injector';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
     ChatbotPagination,
     ChatbotGenericModalWindow,
+    EmptySection,
   },
 })
 export default class ChatbotLoyalty extends ChatbotBase {
   searchQuery = '';
   loyaltyToDelete: IChatbotLoyalty = null;
+  @Inject() customizationService: CustomizationService;
 
   mounted() {
     this.fetchLoyalty(1);
@@ -34,6 +39,10 @@ export default class ChatbotLoyalty extends ChatbotBase {
 
   get DELETE_LOYALTY_MODAL() {
     return 'delete-loyalty';
+  }
+
+  get nightMode() {
+    return this.customizationService.isDarkTheme;
   }
 
   onOpenLoyaltyPreferencesHandler() {

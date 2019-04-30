@@ -5,13 +5,14 @@ import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
 import { Subject } from 'rxjs';
+import TsxComponent from 'components/tsx-component';
 
 /**
  * VeeValidate doesn't support slots https://github.com/baianat/vee-validate/issues/325
  * this components allows to manage validation across slots
  */
 @Component({})
-export default class ValidatedForm extends Vue {
+export default class ValidatedForm extends TsxComponent<{ name: string }> {
   @Prop() name: string;
 
   validated = new Subject<ErrorField[]>();

@@ -64,12 +64,6 @@
     padding-left: 0;
   }
 }
-.chatbot-empty-placeholder__container {
-  .flex();
-  .flex--column();
-  .flex--center();
-  .padding-vertical--20;
-}
 .settings-container {
   margin-top: 45px;
 }

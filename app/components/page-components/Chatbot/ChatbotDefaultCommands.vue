@@ -1,26 +1,26 @@
 <template>
   <div>
     <!-- batch actions -->
-    <div class="align-items--inline align-items--top text-align--right padding--10">
-      <button
-        @click="onResetDefaultCommandsHandler"
-        class="chatbot__button--reset button button--default margin--10"
-      >{{ $t('Reset Commands') }}</button>
+    <div class="flex flex--space-between margin--10">
       <input
         v-model="searchQuery"
         type="text"
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
       >
+      <button
+        @click="onResetDefaultCommandsHandler"
+        class="chatbot__button--reset button button--soft-warning margin--10"
+      >{{ $t('Reset Commands') }}</button>
     </div>
 
     <!-- slugs -->
-    <CollapsibleSection
-      class="margin--20"
+    <div
+      class="command-slug__container"
       v-for="(commands, slugName, index) in filteredSlugs"
-      :title="$t(slugName)"
       :key="index"
     >
+      <h2>{{$t(slugName)}}</h2>
       <!-- commands in slug -->
       <table>
         <thead>
@@ -32,15 +32,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(command, commandName, index) in commands"
-            :key="index"
-          >
+          <tr v-for="(command, commandName, index) in commands" :key="index">
             <td>{{ command.command }}</td>
             <td>{{ $t(command.description) }}</td>
             <td>
               {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) :
-              (command.permission ?$t(chatbotPermissionsEnums[command.permission.level]) : '-') }}
+              (command.permission ?$t(getPermission(command.permission.level)) : '-') }}
             </td>
             <td>
               <div class="align-items--inline">
@@ -58,7 +55,7 @@
           </tr>
         </tbody>
       </table>
-    </CollapsibleSection>
+    </div>
   </div>
 </template>
 
@@ -66,6 +63,15 @@
 
 <style lang="less" scoped>
 @import '../../../styles/index';
+.command-slug__container {
+  .margin(2.5);
+  .margin-bottom(4);
+
+  h2 {
+    .margin-bottom(1);
+  }
+}
+
 table {
   table-layout: fixed;
   width: 100%;

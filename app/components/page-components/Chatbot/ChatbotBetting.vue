@@ -12,9 +12,8 @@
         @click="onOpenBettingPreferencesHandler">{{ $t('Betting Preferences') }}</button>
       </div>
       <!-- profiles -->
-      <div class="chatbot-profile__container">
+      <div class="chatbot-profile__container"  v-if="profiles">
         <ChatbotPollProfile
-          v-if="profiles"
           v-for="profile in profiles"
           :key="profile.title"
           :profile="profile"

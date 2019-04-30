@@ -2,7 +2,6 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
-import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
 
@@ -20,11 +19,7 @@ type TCommandSlug =
   | 'gamble'
   | 'quotes';
 
-@Component({
-  components: {
-    CollapsibleSection,
-  },
-})
+@Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
@@ -52,9 +47,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       return pickBy(
         mapValues(section, (command, key) => {
           const found = command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1;
-          return found && ['!skip', '!wrongvideo'].indexOf(command.command) === -1
-            ? command
-            : undefined;
+          return found && ['!skip'].indexOf(command.command) === -1 ? command : undefined;
         }),
         (x, y) => {
           return x !== undefined;

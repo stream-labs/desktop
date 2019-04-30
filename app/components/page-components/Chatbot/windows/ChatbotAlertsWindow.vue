@@ -153,11 +153,7 @@ table thead tr th {
 
 tbody tr {
   .transition;
-
-  td {
-    color: black;
-  }
-
+  
   td:last-child {
     width: 100px;
     .align-items--inline;

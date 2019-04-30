@@ -49,6 +49,7 @@
         <ChatbotLoyalty v-if="selectedTab === 'Loyalty'"/>
         <ChatbotPoll v-if="selectedTab === 'Poll'" />
         <ChatbotBetting v-if="selectedTab === 'Betting'" />
+        <ChatbotUserManagement v-if="selectedTab === 'User Management'" />
       </transition>
     </div>
   </div>

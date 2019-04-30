@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { uniqBy, without } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
+import without from 'lodash/without';
 import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { TransitionsService } from 'services/transitions';

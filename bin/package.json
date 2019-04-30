@@ -12,9 +12,10 @@
     "inquirer": "6.2.0",
     "js-yaml": "3.12.0",
     "progress": "2.0.0",
+    "request": "^2.88.0",
     "semver": "5.5.0",
     "sentry-cli-binary": "1.25.0",
-    "signtool": "^1.0.0",
-    "shelljs": "0.8.2"
+    "shelljs": "0.8.2",
+    "signtool": "^1.0.0"
   }
 }

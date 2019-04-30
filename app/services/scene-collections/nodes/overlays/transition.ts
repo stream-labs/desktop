@@ -1,7 +1,7 @@
 import { Node } from '../node';
 import { ETransitionType, TransitionsService } from 'services/transitions';
 import { Inject } from 'util/injector';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import path from 'path';
 import fs from 'fs';
 

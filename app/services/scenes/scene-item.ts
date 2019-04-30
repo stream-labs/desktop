@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
@@ -179,19 +179,23 @@ export class SceneItem extends SceneItemNode {
   }
 
   nudgeLeft() {
-    this.setTransform({ position: { x: this.transform.position.x - 1 } });
+    this.setDeltaPos('x', -1);
   }
 
   nudgeRight() {
-    this.setTransform({ position: { x: this.transform.position.x + 1 } });
+    this.setDeltaPos('x', 1);
   }
 
   nudgeUp() {
-    this.setTransform({ position: { y: this.transform.position.y - 1 } });
+    this.setDeltaPos('y', -1);
   }
 
   nudgeDown() {
-    this.setTransform({ position: { y: this.transform.position.y + 1 } });
+    this.setDeltaPos('y', 1);
+  }
+
+  setDeltaPos(dir: 'x' | 'y', delta: number) {
+    this.setTransform({ position: { [dir]: this.transform.position[dir] + delta } });
   }
 
   setVisibility(visible: boolean) {
@@ -282,6 +286,13 @@ export class SceneItem extends SceneItemNode {
   scaleWithOffset(scaleDelta: IVec2, offset: IVec2) {
     const origin = this.getBoundingRect().getOriginFromOffset(offset);
     this.scale(scaleDelta, origin);
+  }
+
+  unilateralScale(dimension: 'x' | 'y', scale: number) {
+    const scaleX = dimension === 'x' ? scale : 1;
+    const scaleY = dimension === 'y' ? scale : 1;
+    const scaleDelta = v2(scaleX, scaleY);
+    this.scale(scaleDelta, AnchorPositions[AnchorPoint.NorthWest]);
   }
 
   flipY() {

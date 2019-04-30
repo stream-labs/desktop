@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { AppService } from 'services/app';
 
 /**
  * If we start up and the app is in anything other than the
@@ -33,6 +34,7 @@ export class CrashReporterService extends Service {
 
   @Inject() streamingService: StreamingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() appService: AppService;
 
   streamingSubscription: Subscription;
 
@@ -101,7 +103,7 @@ export class CrashReporterService extends Service {
   }
 
   private get appStateFile() {
-    return path.join(electron.remote.app.getPath('userData'), 'appState');
+    return path.join(this.appService.appDataDirectory, 'appState');
   }
 
   private readStateFile(): ICrashReporterState {

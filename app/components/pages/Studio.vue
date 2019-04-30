@@ -11,10 +11,13 @@
       </div>
     </div>
   </div>
-  <div v-else class="no-preview">
+  <div v-else class="no-preview" :style="{ height: `calc(100% - ${height + 18}px)` }">
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
+    </div>
+    <div ref="placeholder" class="placeholder" v-else>
+      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" />
     </div>
   </div>
   <resize-bar
@@ -37,6 +40,7 @@
 @import "../../styles/index";
 
 .studio-page {
+  height: 100%;
   flex-direction: column;
   .padding-bottom(2);
 }
@@ -75,17 +79,45 @@
   height: 100%;
 }
 
+.placeholder {
+  background: var(--section);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  img {
+    position: relative;
+    top: 5px;
+    height: calc(100% - 10px);
+    width: auto;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+
+  img.vertical {
+    width: calc(100% - 10px);
+    height: auto;
+    top: 50%;
+    left: 5px;
+    transform: translate(0, -50%);
+  }
+}
+
 .no-preview {
+  width: 100%;
+  height: 100%;
   position: relative;
   flex-grow: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
 
   .message {
     max-width: 50%;
+
     .button {
       margin-top: 20px;
-      display: block
+      display: block;
     }
   }
 }

@@ -33,12 +33,15 @@ import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
+import path from 'path';
+import Utils from 'services/utils';
 
 const crashHandler = window['require']('crash-handler');
 
 interface IAppState {
   loading: boolean;
   argv: string[];
+  errorAlert: boolean;
 }
 
 /**
@@ -61,9 +64,10 @@ export class AppService extends StatefulService<IAppState> {
   static initialState: IAppState = {
     loading: true,
     argv: electron.remote.process.argv,
+    errorAlert: false,
   };
 
-  private autosaveInterval: number;
+  readonly appDataDirectory = electron.remote.app.getPath('userData');
 
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
@@ -87,14 +91,33 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
+    if (Utils.isDevMode()) {
+      electron.ipcRenderer.on('showErrorAlert', () => {
+        this.SET_ERROR_ALERT(true);
+      });
+    }
+
+    // This is used for debugging
+    window['obs'] = obs;
+
+    // Host a new OBS server instance
+    obs.IPC.host(`slobs-${uuid()}`);
+    obs.NodeObs.SetWorkingDirectory(
+      path.join(
+        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        'node_modules',
+        'obs-studio-node',
+      ),
+    );
+
     crashHandler.registerProcess(this.pid, false);
 
     await this.obsUserPluginsService.initialize();
 
-    // Initialize OBS
+    // Initialize OBS API
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
-      electron.remote.process.env.SLOBS_IPC_USERDATA,
+      this.appDataDirectory,
       electron.remote.process.env.SLOBS_VERSION,
     );
 
@@ -194,7 +217,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
-      this.customizationService.setSettings({ hideStyleBlockingElements: true });
+      this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -245,10 +268,7 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(
-      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
-      500,
-    );
+    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
     if (error) throw error;
     return returningValue;
   }
@@ -261,6 +281,11 @@ export class AppService extends StatefulService<IAppState> {
   @mutation()
   private FINISH_LOADING() {
     this.state.loading = false;
+  }
+
+  @mutation()
+  private SET_ERROR_ALERT(errorAlert: boolean) {
+    this.state.errorAlert = errorAlert;
   }
 
   @mutation()

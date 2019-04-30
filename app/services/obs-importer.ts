@@ -12,6 +12,7 @@ import { Inject } from 'util/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
+import { AppService } from 'services/app';
 
 interface Source {
   name?: string;
@@ -78,6 +79,7 @@ export class ObsImporterService extends Service {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() audioService: AudioService;
   @Inject() settingsService: SettingsService;
+  @Inject() appService: AppService;
 
   async load(selectedprofile: string) {
     if (!this.isOBSinstalled()) return;
@@ -339,7 +341,7 @@ export class ObsImporterService extends Service {
       if (file === 'basic.ini' || file === 'streamEncoder.json' || file === 'recordEncoder.json') {
         const obsFilePath = path.join(profileDirectory, file);
 
-        const appData = electron.remote.app.getPath('userData');
+        const appData = this.appService.appDataDirectory;
         const currentFilePath = path.join(appData, file);
 
         const readData = fs.readFileSync(obsFilePath);

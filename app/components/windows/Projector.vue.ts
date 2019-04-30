@@ -23,6 +23,10 @@ export default class Projector extends Vue {
 
   sourcesSubscription: Subscription;
 
+  get hideStyleBlockers() {
+    return this.windowsService.state[this.windowId].hideStyleBlockers;
+  }
+
   get windowId() {
     return Util.getCurrentUrlParams().windowId;
   }
