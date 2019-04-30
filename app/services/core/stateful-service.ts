@@ -73,7 +73,7 @@ function registerMutation(
     ...descriptor,
 
     value(...args: any[]) {
-      const constructorArgs = this['constructorArgs'];
+      const constructorArgs = this['_constructorArgs'];
       const store = StatefulService.getStore();
       store.commit(mutationName, {
         args,

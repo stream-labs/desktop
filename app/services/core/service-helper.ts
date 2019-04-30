@@ -9,7 +9,6 @@
  */
 import { inheritMutations } from './stateful-service';
 
-// tslint:disable-next-line:function-name
 export function ServiceHelper(): ClassDecorator {
   return function(target: any) {
     const original = target;
@@ -17,10 +16,9 @@ export function ServiceHelper(): ClassDecorator {
     // create new constructor that will save arguments in instance
     const f: any = function(this: any, ...args: any[]) {
       original.apply(this, args);
-      this.constructorArgs = args;
-      this.isHelper = true;
-      this.helperName = target.name;
-      this._resourceId = this.helperName + JSON.stringify(this.constructorArgs);
+      this._isHelper = true;
+      this._constructorArgs = args;
+      this._resourceId = target.name + JSON.stringify(args);
       return this;
     };
 

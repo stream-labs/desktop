@@ -57,7 +57,7 @@ export class InternalApiClient {
 
         const serviceName = target.constructor.name;
         const methodName = property;
-        const isHelper = target['isHelper'];
+        const isHelper = target['_isHelper'];
 
         const handler = (...args: any[]) => {
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(

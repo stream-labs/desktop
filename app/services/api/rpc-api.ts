@@ -93,59 +93,83 @@ export abstract class RpcApi extends Service {
 
   /**
    *  Handles requests to services, but doesn't handle exceptions
-   *  TODO: add more comments and try to refactor
+   *  Returns serializable response with mutations
    */
   private handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
-    let response: IJsonRpcResponse<any>;
     const methodName = request.method;
-    const { resource: resourceId, args, fetchMutations, compactMode } = request.params;
+    const { resource: resourceId, args, fetchMutations } = request.params;
 
-    if (fetchMutations) this.startBufferingMutations();
-
+    // check that the resource and the called method exist
+    // return JSON-RPC error if it's not true
     const resource = this.getResource(resourceId);
+    let errorResponse: IJsonRpcResponse<any>;
     if (!resource) {
-      response = this.jsonrpc.createError(request, {
+      errorResponse = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.INVALID_PARAMS,
         message: `resource not found: ${resourceId}`,
       });
     } else if (!resource[methodName]) {
-      response = this.jsonrpc.createError(request, {
+      errorResponse = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
         message: methodName,
       });
     }
+    if (errorResponse) return errorResponse;
 
-    if (response) {
-      if (this.mutationsBufferingEnabled) this.stopBufferingMutations();
-      return response;
+    // if both resource and method exist
+    // execute request and record all mutations to the buffer
+    if (fetchMutations) this.startBufferingMutations();
+    const payload =
+      typeof resource[methodName] === 'function'
+        ? resource[methodName].apply(resource, args)
+        : resource[methodName];
+    const response = this.serializePayload(resource, payload, request);
+    if (fetchMutations) response.mutations = this.stopBufferingMutations();
+    return response;
+  }
+
+  /**
+   * Result of the API calls can be unserializable objects like Promises, RxJs Observables, Services
+   * This method returns a safe-to-transfer serializable response
+   */
+  private serializePayload(
+    resource: any,
+    responsePayload: any,
+    request: IJsonRpcRequest,
+  ): IJsonRpcResponse<any> {
+    // primitive types are serializable so send them as is
+    if (!(responsePayload instanceof Object)) {
+      return this.jsonrpc.createResponse(request.id, responsePayload);
     }
 
-    let responsePayload: any;
+    // if response is RxJs Observable than subscribe to it and return subscription
+    if (responsePayload instanceof Observable) {
+      // each subscription has unique id
+      const subscriptionId = `${request.params.resource}.${request.method}`;
 
-    if (resource[methodName] instanceof Observable) {
-      const subscriptionId = `${resourceId}.${methodName}`;
-      responsePayload = {
-        _type: 'SUBSCRIPTION',
-        resourceId: subscriptionId,
-        emitter: 'STREAM',
-      };
+      // create the subscription if it doesn't exist
       if (!this.subscriptions[subscriptionId]) {
-        this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
+        const subscriptionName = subscriptionId.split('.')[1];
+        this.subscriptions[subscriptionId] = resource[subscriptionName].subscribe((data: any) => {
           this.serviceEvent.next(
             this.jsonrpc.createEvent({ data, emitter: 'STREAM', resourceId: subscriptionId }),
           );
         });
       }
-    } else if (typeof resource[methodName] === 'function') {
-      responsePayload = resource[methodName].apply(resource, args);
-    } else {
-      responsePayload = resource[methodName];
+      // return subscription
+      // the API client can use subscriptionId to listen events from this subscription
+      return this.jsonrpc.createResponse(request.id, {
+        _type: 'SUBSCRIPTION',
+        resourceId: subscriptionId,
+        emitter: 'STREAM',
+      });
     }
 
-    const isPromise = !!(responsePayload && responsePayload.then);
-
+    // if payload is Promise, than subscribe to this promise
+    // and send events when promise will be resolved or rejected
+    const isPromise = !!responsePayload.then;
     if (isPromise) {
-      const promiseId = uuid();
+      const promiseId = uuid(); // the API client app can use this id for waiting this Promise
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
@@ -153,45 +177,45 @@ export abstract class RpcApi extends Service {
         data => this.sendPromiseMessage({ data, promiseId, isRejected: true }),
       );
 
-      response = this.jsonrpc.createResponse(request, {
+      // notify the API client that the Promise is created
+      return this.jsonrpc.createResponse(request.id, {
         _type: 'SUBSCRIPTION',
         resourceId: promiseId,
         emitter: 'PROMISE',
       });
-    } else if (responsePayload && responsePayload.isHelper === true) {
-      const helper = responsePayload;
-
-      response = this.jsonrpc.createResponse(request, {
-        _type: 'HELPER',
-        resourceId: helper._resourceId,
-        ...(!compactMode ? this.getResourceModel(helper) : {}),
-      });
-    } else if (responsePayload && responsePayload instanceof Service) {
-      response = this.jsonrpc.createResponse(request, {
-        _type: 'SERVICE',
-        resourceId: responsePayload.serviceName,
-        ...(!compactMode ? this.getResourceModel(responsePayload) : {}),
-      });
-    } else {
-      // payload can contain helpers-objects
-      // we have to wrap them in IpcProxy too
-      traverse(responsePayload).forEach((item: any) => {
-        if (item && item.isHelper === true) {
-          const helper = this.getResource(item._resourceId);
-          return {
-            _type: 'HELPER',
-            resourceId: helper._resourceId,
-            ...(!compactMode ? this.getResourceModel(helper) : {}),
-          };
-        }
-      });
-
-      response = this.jsonrpc.createResponse(request, responsePayload);
     }
 
-    if (fetchMutations) response.mutations = this.stopBufferingMutations();
+    // if responsePayload is a Service than serialize it
+    if (responsePayload instanceof Service) {
+      return this.jsonrpc.createResponse(request.id, {
+        _type: 'SERVICE',
+        resourceId: responsePayload.serviceName,
+        ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
+      });
+    }
 
-    return response;
+    // if responsePayload is a ServiceHelper than serialize it
+    if (responsePayload._isHelper === true) {
+      return this.jsonrpc.createResponse(request.id, {
+        _type: 'HELPER',
+        resourceId: responsePayload._resourceId,
+        ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
+      });
+    }
+
+    // payload may contain arrays or objects that may have ServiceHelper objects inside
+    // so we have to try to find these ServiceHelpers and serialize them too
+    traverse(responsePayload).forEach((item: any) => {
+      if (item && item._isHelper === true) {
+        const helper = this.getResource(item._resourceId);
+        return {
+          _type: 'HELPER',
+          resourceId: helper._resourceId,
+          ...(!request.params.compactMode ? this.getResourceModel(helper) : {}),
+        };
+      }
+    });
+    return this.jsonrpc.createResponse(request.id, responsePayload);
   }
 
   /**
