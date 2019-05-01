@@ -280,7 +280,13 @@ async function runScript() {
     executeCmd(`git checkout ${targetBranch}`);
     executeCmd('git pull');
     executeCmd(`git reset --hard origin/${targetBranch}`);
+  }
 
+  const currentVersion = executeCmd('git describe --tags --abbrev=0', { silent: true })
+    .trim()
+    .replace(/^v/, '');
+
+  if (sourceBranch !== targetBranch) {
     // Merge the source branch into the target branch
     info(`Merging ${sourceBranch} into ${targetBranch}...`);
     executeCmd(`git merge ${sourceBranch}`);
@@ -299,7 +305,6 @@ async function runScript() {
   executeCmd('yarn compile:production');
 
   const pjson = JSON.parse(fs.readFileSync('package.json'));
-  const currentVersion = pjson.version;
 
   info(`The current application version is ${currentVersion}`);
 
@@ -362,7 +367,7 @@ async function runScript() {
   })).chance;
 
   const changelog = executeCmd(
-    "git log $(git describe --tags --abbrev=0)..HEAD --oneline | cut -d' ' -f 2-",
+    `git log v${currentVersion}..HEAD --oneline | cut -d' ' -f 2-`,
     { exit: false, silent: true }
   );
 
