@@ -362,7 +362,7 @@ async function runScript() {
   })).chance;
 
   const changelog = executeCmd(
-    'git log $(git describe --tags --abbrev=0)..HEAD --oneline | cut -d' ' -f 2-',
+    "git log $(git describe --tags --abbrev=0)..HEAD --oneline | cut -d' ' -f 2-",
     { exit: false, silent: true }
   );
 
