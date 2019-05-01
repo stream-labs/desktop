@@ -156,7 +156,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await t.context.app.client.waitForExist('.main-loading', 5000, true);
-    if (await t.context.app.client.isExisting('a=Setup later')) { // onboarding screen
+    if (await t.context.app.client.isExisting('a=Setup later')) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('a=Setup later');
 
@@ -169,7 +169,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await t.context.app.client.isExisting('button=Twitch');
       }
     }
-
 
     // disable the popups that prevents context menu to be shown
     const client = await getClient();
@@ -188,14 +187,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await options.afterStartCb(t);
     }
 
-<<<<<<< HEAD
     return app;
   };
 
   stopApp = async function stopApp(clearCache = true) {
-=======
-  async function stopApp() {
->>>>>>> staging
     try {
       await app.stop();
     } catch (e) {
