@@ -43,7 +43,7 @@ export class InternalApiClient {
       get: (target, property, receiver) => {
         if (!target[property]) return target[property];
 
-        if (target[property].isHelper) {
+        if (target[property]._isHelper) {
           return this.applyIpcProxy(target[property]);
         }
 
