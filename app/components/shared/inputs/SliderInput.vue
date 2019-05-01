@@ -7,16 +7,14 @@
     :data-name="options.name"
   >
     <slider
-      style="width: 100%;"
       :value="localValue"
       @input="value => updateLocalValue(value)"
       :max="max"
       :min="options.min"
       :interval="options.interval"
-      :tooltip="options.displayValue || 'always'"
+      :tooltip="options.displayValue === false ? 'none' : 'always'"
       :suffix="usePercentages ? '%' : ''"
       :data="options.data"
-      ref="slider"
     />
     <input
       v-if="options.hasValueBox && !options.usePercentages"

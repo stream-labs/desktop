@@ -100,6 +100,6 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
 
   @debounce(500)
   private onResizeHandler() {
-    if (this.$refs.slider) this.$refs.slider.refresh();
+    if (this.$refs.slider) this.$refs.slider.getValue();
   }
 }
