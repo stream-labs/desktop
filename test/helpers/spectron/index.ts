@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUserName, releaseUserInPool } from './user';
+import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
 
@@ -16,14 +16,15 @@ const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 
-async function focusWindow(t: any, regex: RegExp) {
+export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return;
+    if (url.match(regex)) return true;
   }
+  return false;
 }
 
 // Focuses the main window
@@ -187,10 +188,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await options.afterStartCb(t);
     }
 
+<<<<<<< HEAD
     return app;
   };
 
   stopApp = async function stopApp(clearCache = true) {
+=======
+  async function stopApp() {
+>>>>>>> staging
     try {
       await app.stop();
     } catch (e) {
@@ -263,8 +268,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!testPassed) {
       failedTests.push(testName);
-      const userName = getUserName();
-      if (userName) console.log(`Test failed for the account: ${userName}`);
+      const user = getUser();
+      if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
   });

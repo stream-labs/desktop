@@ -34,8 +34,6 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-app.disableHardwareAcceleration();
-
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -161,6 +159,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    transparent: true,
   });
 
   mainWindowState.manage(mainWindow);
@@ -213,7 +212,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    transparent: true,
   });
 
   childWindow.setMenu(null);
@@ -305,9 +305,9 @@ app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 app.setAsDefaultProtocolClient('slobs');
 
+app.requestSingleInstanceLock();
 
-// This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(argv => {
+app.on('second-instance', (event, argv) => {
   // Check for protocol links in the argv of the other process
   argv.forEach(arg => {
     if (arg.match(/^slobs:\/\//)) {
@@ -324,10 +324,6 @@ const shouldQuit = app.makeSingleInstance(argv => {
     mainWindow.focus();
   }
 });
-
-if (shouldQuit) {
-  app.exit();
-}
 
 app.on('ready', () => {
     if (
