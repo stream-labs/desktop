@@ -12,6 +12,7 @@ const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
 const cp = require('child_process');
+const { purgeUrls } = require('./cache-purge');
 
 /**
  * CONFIGURATION
@@ -34,7 +35,11 @@ function executeCmd(cmd, exit = true) {
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
-    if (exit) sh.exit(1);
+    if (exit) {
+      sh.exit(1);
+    } else {
+      throw new Error(`Failed to execute command: ${cmd}`);
+    }
   }
 }
 
@@ -192,9 +197,6 @@ async function runScript() {
   checkEnv('AWS_SECRET_ACCESS_KEY');
   checkEnv('SENTRY_AUTH_TOKEN');
 
-  /* Technically speaking, we allow any number of
-   * channels. Maybe in the future, we allow custom
-   * options here? */
   const isPreview = (await inq.prompt({
     type: 'list',
     name: 'releaseType',
@@ -215,8 +217,21 @@ async function runScript() {
   let targetBranch;
 
   if (isPreview) {
-    // Preview releases always happen from staging
-    sourceBranch = 'staging';
+    sourceBranch = (await inq.prompt({
+      type: 'list',
+      name: 'branch',
+      message: 'Which branch would you like to release from?',
+      choices: [
+        {
+          name: 'staging',
+          value: 'staging'
+        },
+        {
+          name: 'preview (during code freeze)',
+          value: 'preview'
+        }
+      ]
+    })).branch;
     targetBranch = 'preview';
   } else {
     sourceBranch = (await inq.prompt({
@@ -389,19 +404,33 @@ async function runScript() {
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  console.log('Setting latest version...');
-  await setLatestVersion(newVersion, channel);
-
-  console.log('Setting chance...');
+  info('Setting chance...');
   await setChance(newVersion, chance);
 
-  info(`Merging ${targetBranch} back into staging...`);
-  executeCmd(`git checkout staging`, false);
-  executeCmd(`git merge ${targetBranch}`, false);
-  executeCmd('git push origin HEAD', false);
+  info('Setting latest version...');
+  await setLatestVersion(newVersion, channel);
+
+  info('Purging Cloudflare cache...');
+  await purgeUrls([
+    `https://slobs-cdn.streamlabs.com/${channel}.json`,
+    `https://slobs-cdn.streamlabs.com/${channel}.yml`
+  ]);
 
   info('Finalizing release with sentry...');
   sentryCli(`finalize "${newVersion}`);
+
+  info(`Merging ${targetBranch} back into staging...`);
+  try {
+    executeCmd(`git checkout staging`, false);
+    executeCmd(`git merge ${targetBranch}`, false);
+    executeCmd('git push origin HEAD', false);
+  } catch (e) {
+    error(e);
+    error(
+      `The release was successfully pushed, but ${targetBranch} was not successfully ` +
+      'merged back into staging.  Please renconcile these branches manually.'
+    )
+  }
 
   info(`Version ${newVersion} released successfully!`);
 }

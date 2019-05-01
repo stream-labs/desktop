@@ -166,7 +166,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     Object.keys(settings).forEach(key => {
       let testSuccess = false;
       REGEX_TESTERS.forEach(test => {
-        const newKey = /^show/.test(key)
+        const newKey = /show/.test(key)
           ? key.replace(test.tester, 'show_')
           : key.replace(test.tester, '');
         if (test.tester.test(key)) {
@@ -370,6 +370,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         settingsObj[`${prefix}_variations`] = settings[setting].variations;
         settingsObj[`${bitsPrefix}_enabled`] = settings[setting].enabled;
         settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
+        if (bitsPrefix === 'facebook_stars') {
+          settingsObj.facebook_show_stars_message = settings[setting].showMessage;
+        }
         const flattenedDefault =
           prefix === 'sub'
             ? this.unshapeSubs(defaultVariation)
