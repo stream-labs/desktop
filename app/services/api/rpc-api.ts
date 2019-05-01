@@ -142,7 +142,7 @@ export abstract class RpcApi extends Service {
       return this.jsonrpc.createResponse(request.id, responsePayload);
     }
 
-    // if response is RxJs Observable than subscribe to it and return subscription
+    // if response is RxJs Observable then subscribe to it and return subscription
     if (responsePayload instanceof Observable) {
       // each subscription has unique id
       const subscriptionId = `${request.params.resource}.${request.method}`;
@@ -165,7 +165,7 @@ export abstract class RpcApi extends Service {
       });
     }
 
-    // if payload is Promise, than subscribe to this promise
+    // if payload is Promise, then subscribe to this promise
     // and send events when promise will be resolved or rejected
     const isPromise = !!responsePayload.then;
     if (isPromise) {
@@ -185,7 +185,7 @@ export abstract class RpcApi extends Service {
       });
     }
 
-    // if responsePayload is a Service than serialize it
+    // if responsePayload is a Service then serialize it
     if (responsePayload instanceof Service) {
       return this.jsonrpc.createResponse(request.id, {
         _type: 'SERVICE',
@@ -194,7 +194,7 @@ export abstract class RpcApi extends Service {
       });
     }
 
-    // if responsePayload is a ServiceHelper than serialize it
+    // if responsePayload is a ServiceHelper then serialize it
     if (responsePayload._isHelper === true) {
       return this.jsonrpc.createResponse(request.id, {
         _type: 'HELPER',
