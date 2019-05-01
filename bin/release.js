@@ -448,7 +448,7 @@ async function runScript() {
   }
 
   info(`Version ${newVersion} released successfully!`);
-  info(`Changes in version ${newVersion}:`);
+  info(`Streamlabs OBS ${newVersion}:`);
   info(changelog);
 }
 
