@@ -30,17 +30,22 @@ function error(msg) {
   sh.echo(colors.red(`ERROR: ${msg}`));
 }
 
-function executeCmd(cmd, exit = true) {
-  const result = sh.exec(cmd);
+function executeCmd(cmd, options = {}) {
+  // Default is to exit on failure
+  if (options.exit == null) options.exit = true;
+
+  const result = options.silent ? sh.exec(cmd, { silent: true }) : sh.exec(cmd);
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
-    if (exit) {
+    if (options.exit) {
       sh.exit(1);
     } else {
       throw new Error(`Failed to execute command: ${cmd}`);
     }
   }
+
+  return result.stdout;
 }
 
 function sentryCli(cmd) {
@@ -356,6 +361,11 @@ async function runScript() {
     message: 'What percentage of the userbase would you like to recieve the update?'
   })).chance;
 
+  const changelog = executeCmd(
+    'git log $(git describe --tags --abbrev=0)..HEAD --oneline | cut -d' ' -f 2-',
+    { exit: false, silent: true }
+  );
+
   info('Committing changes...');
   executeCmd('git add -A');
   executeCmd(`git commit -m "Release version ${newVersion}"`);
@@ -421,9 +431,9 @@ async function runScript() {
 
   info(`Merging ${targetBranch} back into staging...`);
   try {
-    executeCmd(`git checkout staging`, false);
-    executeCmd(`git merge ${targetBranch}`, false);
-    executeCmd('git push origin HEAD', false);
+    executeCmd(`git checkout staging`, { exit: false });
+    executeCmd(`git merge ${targetBranch}`, { exit: false });
+    executeCmd('git push origin HEAD', { exit: false });
   } catch (e) {
     error(e);
     error(
@@ -433,6 +443,8 @@ async function runScript() {
   }
 
   info(`Version ${newVersion} released successfully!`);
+  info(`Changes in version ${newVersion}:`);
+  info(changelog);
 }
 
 runScript().then(() => {
