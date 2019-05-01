@@ -49,17 +49,19 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     if (Util.isIpc()) return;
 
     const minorVersionRegex = /^\d+\.\d+[^\.]/;
-    console.log(electron.remote.process.env.SLOBS_VERSION.match(minorVersionRegex));
-    const currentMinorVersion = electron.remote.process.env.SLOBS_VERSION;
+    const currentMinorVersion = electron.remote.process.env.SLOBS_VERSION.match(minorVersionRegex);
+    if (!currentMinorVersion) return;
+
+    const currentMinorVersionRegex = new RegExp(currentMinorVersion[0]);
 
     // If the notes don't match the current version, we shouldn't
     // show them.
-    if (notes.version !== currentVersion) return;
+    if (!currentMinorVersionRegex.test(notes.version)) return;
 
     // The user has already seen the current patch notes
-    if (currentVersion === this.state.lastVersionSeen) return;
+    if (currentMinorVersionRegex.test(this.state.lastVersionSeen)) return;
 
-    this.SET_LAST_VERSION_SEEN(currentVersion);
+    this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION);
 
     // Only show the actual patch notes if they weren't onboarded
     if (!onboarded) this.navigationService.navigate('PatchNotes');
