@@ -1,10 +1,13 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { mutation } from 'services/stateful-service';
+import { mutation, Service } from 'services/stateful-service';
 import electron from 'electron';
 import Util from 'services/utils';
 import { notes } from './notes';
 import { NavigationService } from 'services/navigation';
 import { Inject } from 'util/injector';
+import { $t } from 'services/i18n';
+import { NotificationsService, ENotificationType } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
@@ -19,6 +22,8 @@ export interface IPatchNotes {
 
 export class PatchNotesService extends PersistentStatefulService<IPatchNotesState> {
   @Inject() navigationService: NavigationService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
@@ -64,7 +69,19 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION);
 
     // Only show the actual patch notes if they weren't onboarded
-    if (!onboarded) this.navigationService.navigate('PatchNotes');
+    if (!onboarded) {
+      this.notificationsService.push({
+        type: ENotificationType.SUCCESS,
+        lifeTime: 8000,
+        showTime: false,
+        message: $t('Streamlabs OBS has updated! Click here to see what changed.'),
+        action: this.jsonrpcService.createRequest(
+          Service.getResourceId(this.navigationService),
+          'navigate',
+          'PatchNotes',
+        ),
+      });
+    }
   }
 
   get notes() {
