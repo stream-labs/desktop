@@ -157,7 +157,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    return fetch(request).then(handleResponse);;
+    return fetch(request).then(handleResponse);
   }
 
   protected getHost(): string {

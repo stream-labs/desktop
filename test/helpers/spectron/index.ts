@@ -5,7 +5,6 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
-import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
 
 export const test = avaTest as TestInterface<ITestContext>;
 
