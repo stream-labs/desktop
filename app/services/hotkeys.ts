@@ -221,10 +221,10 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
         .setVisibility(false),
   },
   PUSH_TO_SOURCE_SHOW: {
-    name: 'PUSH_TO_SOUCE_SHOW',
+    name: 'PUSH_TO_SOURCE_SHOW',
     description: sceneItemId => {
       const sceneItem = getScenesService().getSceneItem(sceneItemId);
-      return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
+      return $t('Push to Show %{sourcename}', { sourcename: sceneItem.source.name });
     },
     shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
     up: sceneItemId =>
@@ -237,10 +237,10 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
         .setVisibility(true),
   },
   PUSH_TO_SOURCE_HIDE: {
-    name: 'PUSH_TO_SOUCE_HIDE',
+    name: 'PUSH_TO_SOURCE_HIDE',
     description: sceneItemId => {
       const sceneItem = getScenesService().getSceneItem(sceneItemId);
-      return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
+      return $t('Push to Hide %{sourcename}', { sourcename: sceneItem.source.name });
     },
     shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
     up: sceneItemId =>
