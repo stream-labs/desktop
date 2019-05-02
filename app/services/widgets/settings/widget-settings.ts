@@ -157,10 +157,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    electronLog.log('REQUEST TO', method, req.url, JSON.stringify(req.body));
-    const result = await fetch(request).then(handleResponse);
-    electronLog.log('RESPONSE FROM', method, req.url, result);
-    return result;
+    return fetch(request).then(handleResponse);;
   }
 
   protected getHost(): string {

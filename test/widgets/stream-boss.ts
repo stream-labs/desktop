@@ -26,7 +26,6 @@ test('Set stream-boss health', async t => {
   t.pass();
 });
 
-// TODO: flaky
 test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;

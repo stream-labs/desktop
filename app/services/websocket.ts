@@ -159,7 +159,5 @@ export class WebsocketService extends Service {
     if (this.appService.state.argv.includes('--network-logging')) {
       electronLog.log(`WS: ${message}`);
     }
-
-    electronLog.log('WEBSOCKET', message, args);
   }
 }
