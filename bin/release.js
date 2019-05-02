@@ -12,6 +12,7 @@ const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
 const cp = require('child_process');
+const { purgeUrls } = require('./cache-purge');
 
 /**
  * CONFIGURATION
@@ -29,13 +30,22 @@ function error(msg) {
   sh.echo(colors.red(`ERROR: ${msg}`));
 }
 
-function executeCmd(cmd, exit = true) {
-  const result = sh.exec(cmd);
+function executeCmd(cmd, options = {}) {
+  // Default is to exit on failure
+  if (options.exit == null) options.exit = true;
+
+  const result = options.silent ? sh.exec(cmd, { silent: true }) : sh.exec(cmd);
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
-    if (exit) sh.exit(1);
+    if (options.exit) {
+      sh.exit(1);
+    } else {
+      throw new Error(`Failed to execute command: ${cmd}`);
+    }
   }
+
+  return result.stdout;
 }
 
 function sentryCli(cmd) {
@@ -192,9 +202,6 @@ async function runScript() {
   checkEnv('AWS_SECRET_ACCESS_KEY');
   checkEnv('SENTRY_AUTH_TOKEN');
 
-  /* Technically speaking, we allow any number of
-   * channels. Maybe in the future, we allow custom
-   * options here? */
   const isPreview = (await inq.prompt({
     type: 'list',
     name: 'releaseType',
@@ -215,8 +222,21 @@ async function runScript() {
   let targetBranch;
 
   if (isPreview) {
-    // Preview releases always happen from staging
-    sourceBranch = 'staging';
+    sourceBranch = (await inq.prompt({
+      type: 'list',
+      name: 'branch',
+      message: 'Which branch would you like to release from?',
+      choices: [
+        {
+          name: 'staging',
+          value: 'staging'
+        },
+        {
+          name: 'preview (during code freeze)',
+          value: 'preview'
+        }
+      ]
+    })).branch;
     targetBranch = 'preview';
   } else {
     sourceBranch = (await inq.prompt({
@@ -260,7 +280,13 @@ async function runScript() {
     executeCmd(`git checkout ${targetBranch}`);
     executeCmd('git pull');
     executeCmd(`git reset --hard origin/${targetBranch}`);
+  }
 
+  const currentVersion = executeCmd('git describe --tags --abbrev=0', { silent: true })
+    .trim()
+    .replace(/^v/, '');
+
+  if (sourceBranch !== targetBranch) {
     // Merge the source branch into the target branch
     info(`Merging ${sourceBranch} into ${targetBranch}...`);
     executeCmd(`git merge ${sourceBranch}`);
@@ -279,7 +305,6 @@ async function runScript() {
   executeCmd('yarn compile:production');
 
   const pjson = JSON.parse(fs.readFileSync('package.json'));
-  const currentVersion = pjson.version;
 
   info(`The current application version is ${currentVersion}`);
 
@@ -341,6 +366,11 @@ async function runScript() {
     message: 'What percentage of the userbase would you like to recieve the update?'
   })).chance;
 
+  const changelog = executeCmd(
+    `git log v${currentVersion}..HEAD --oneline | cut -d' ' -f 2-`,
+    { exit: false, silent: true }
+  );
+
   info('Committing changes...');
   executeCmd('git add -A');
   executeCmd(`git commit -m "Release version ${newVersion}"`);
@@ -389,21 +419,37 @@ async function runScript() {
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  console.log('Setting latest version...');
-  await setLatestVersion(newVersion, channel);
-
-  console.log('Setting chance...');
+  info('Setting chance...');
   await setChance(newVersion, chance);
 
-  info(`Merging ${targetBranch} back into staging...`);
-  executeCmd(`git checkout staging`, false);
-  executeCmd(`git merge ${targetBranch}`, false);
-  executeCmd('git push origin HEAD', false);
+  info('Setting latest version...');
+  await setLatestVersion(newVersion, channel);
+
+  info('Purging Cloudflare cache...');
+  await purgeUrls([
+    `https://slobs-cdn.streamlabs.com/${channel}.json`,
+    `https://slobs-cdn.streamlabs.com/${channel}.yml`
+  ]);
 
   info('Finalizing release with sentry...');
   sentryCli(`finalize "${newVersion}`);
 
+  info(`Merging ${targetBranch} back into staging...`);
+  try {
+    executeCmd(`git checkout staging`, { exit: false });
+    executeCmd(`git merge ${targetBranch}`, { exit: false });
+    executeCmd('git push origin HEAD', { exit: false });
+  } catch (e) {
+    error(e);
+    error(
+      `The release was successfully pushed, but ${targetBranch} was not successfully ` +
+      'merged back into staging.  Please renconcile these branches manually.'
+    )
+  }
+
   info(`Version ${newVersion} released successfully!`);
+  info(`Streamlabs OBS ${newVersion}:`);
+  info(changelog);
 }
 
 runScript().then(() => {

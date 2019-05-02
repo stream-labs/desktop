@@ -37,7 +37,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     this.SET_BANNER(newBanner);
   }
 
-  bannerExists() {
+  get bannerExists() {
     return this.state.id !== null;
   }
 

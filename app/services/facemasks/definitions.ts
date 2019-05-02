@@ -53,6 +53,12 @@ export interface IUserFacemaskSettings {
   facemasks?: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
+  donations_enabled: boolean;
+  subs_enabled: boolean;
+  sub_duration?: number;
+  bits_enabled: boolean;
+  bits_duration?: number;
+  bits_price: number;
 }
 
 export interface IFacemaskDonation {
