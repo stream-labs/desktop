@@ -72,8 +72,9 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     if (!onboarded) {
       this.notificationsService.push({
         type: ENotificationType.SUCCESS,
-        lifeTime: 8000,
+        lifeTime: 30000,
         showTime: false,
+        playSound: false,
         message: $t('Streamlabs OBS has updated! Click here to see what changed.'),
         action: this.jsonrpcService.createRequest(
           Service.getResourceId(this.navigationService),
