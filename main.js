@@ -159,6 +159,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    backgroundColor: '#17242D',
   });
 
   mainWindowState.manage(mainWindow);
@@ -211,7 +212,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    backgroundColor: '#17242D',
   });
 
   childWindow.setMenu(null);
