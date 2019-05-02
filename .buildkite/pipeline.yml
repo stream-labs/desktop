@@ -3,4 +3,4 @@ steps:
     command: 'yarn install && yarn compile && yarn test --match="Main and child window visibility"'
     plugins:
       - docker#v3.2.0:
-        image: "node:10"
+          image: "node:10"
