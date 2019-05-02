@@ -1,4 +1,4 @@
-import { Service } from '../core/service';
+import { Service, Inject } from 'services';
 import { RootNode } from './nodes/overlays/root';
 import { ScenesNode } from './nodes/overlays/scenes';
 import { SlotsNode } from './nodes/overlays/slots';
@@ -10,11 +10,10 @@ import { TransitionNode } from './nodes/overlays/transition';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
-import { Inject } from '../core/injector';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import extractZip from 'extract-zip';
+import unzip from 'unzip-stream';
 import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
@@ -89,13 +88,11 @@ export class OverlaysPersistenceService extends Service {
     this.ensureOverlaysDirectory();
 
     await new Promise((resolve, reject) => {
-      extractZip(overlayFilePath, { dir: assetsPath }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      const inStream = fs.createReadStream(overlayFilePath);
+      const outStream = unzip.Extract({ path: assetsPath });
+
+      outStream.on('close', resolve);
+      inStream.pipe(outStream);
     });
 
     const configPath = path.join(assetsPath, 'config.json');
