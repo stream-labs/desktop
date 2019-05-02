@@ -1,6 +1,6 @@
 steps:
   - label: "Streamlabs OBS Tests"
-  - command: yarn install && yarn compile && yarn test --match="Main and child window visibility"
+  - command: 'yarn install && yarn compile && yarn test --match="Main and child window visibility"'
   plugins:
     - docker#v3.1.0:
       image: "node:10"
