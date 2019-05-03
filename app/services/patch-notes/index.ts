@@ -46,12 +46,8 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
    * @param onboarded Whether the user was onboarded this session
    */
   showPatchNotesIfRequired(onboarded: boolean) {
-    // Don't show the patch notes in dev mode
-    if (Util.isDevMode()) return;
-
-    // We do not show patch notes for preview
-    if (Util.isPreview()) return;
-    if (Util.isIpc()) return;
+    // Don't show the patch notes in dev mode or preview
+    if (Util.isDevMode() || Util.isPreview() || Util.isIpc()) return;
 
     const minorVersionRegex = /^\d+\.\d+[^\.]/;
     const currentMinorVersion = electron.remote.process.env.SLOBS_VERSION.match(minorVersionRegex);
@@ -59,12 +55,14 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
 
     const currentMinorVersionRegex = new RegExp(currentMinorVersion[0]);
 
-    // If the notes don't match the current version, we shouldn't
-    // show them.
-    if (!currentMinorVersionRegex.test(notes.version)) return;
-
-    // The user has already seen the current patch notes
-    if (currentMinorVersionRegex.test(this.state.lastVersionSeen)) return;
+    if (
+      // If the notes don't match the current version, we shouldn't show them.
+      !currentMinorVersionRegex.test(notes.version) ||
+      // The user has already seen the current patch notes
+      currentMinorVersionRegex.test(this.state.lastVersionSeen)
+    ) {
+      return;
+    }
 
     this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION);
 
