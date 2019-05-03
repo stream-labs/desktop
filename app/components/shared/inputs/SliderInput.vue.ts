@@ -23,23 +23,20 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Prop() readonly title: string;
   @Prop() readonly metadata: ISliderMetadata;
 
-  usePercentages: boolean = false;
-  interval: number;
+  usePercentages: boolean = this.options.usePercentages || false;
+  interval: number = this.options.usePercentages
+    ? this.options.interval * 100 || 1
+    : this.options.interval || 1;
   isFullyMounted = false;
 
   // The displaying value on and within the ui components.
-  localValue: number | string = this.value || 0;
+  localValue: number | string = this.options.usePercentages
+    ? this.value * 100 || this.min
+    : this.value || this.min || 0;
 
   $refs: { slider: any };
 
   mounted() {
-    // setup defaults
-    this.interval = this.options.interval || 1;
-    this.usePercentages = this.options.usePercentages || false;
-    this.localValue = this.usePercentages ? this.value * 100 : this.value;
-
-    console.log(this.max);
-
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => this.onResizeHandler(), 500);
     new ResizeSensor(this.$el, () => this.onResizeHandler());
@@ -61,6 +58,10 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
+  }
+
+  get min() {
+    return this.usePercentages ? this.options.min * 100 : this.options.min;
   }
 
   get max() {
@@ -100,6 +101,6 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
 
   @debounce(500)
   private onResizeHandler() {
-    if (this.$refs.slider) this.$refs.slider.getValue();
+    if (this.$refs.slider) this.$refs.slider.refresh();
   }
 }

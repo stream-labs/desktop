@@ -10,9 +10,9 @@
       :value="localValue"
       @input="value => updateLocalValue(value)"
       :max="max"
-      :min="options.min"
-      :interval="options.interval"
-      :tooltip="options.displayValue === false ? 'none' : 'always'"
+      :min="min"
+      :interval="interval"
+      :tooltip="options.displayValue || 'always'"
       :suffix="usePercentages ? '%' : ''"
       :data="options.data"
     />
