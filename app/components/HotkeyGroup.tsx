@@ -1,18 +1,15 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import Hotkey from './shared/Hotkey.vue';
+import Hotkey, { IKeyedBinding } from './shared/Hotkey.vue';
 import { IHotkey } from 'services/hotkeys';
 import cx from 'classnames';
+import { Subject } from 'rxjs';
 
-@Component({
-  props: {
-    title: String,
-    hotkeys: Array,
-  },
-})
+@Component({})
 export default class HotkeyGroup extends Vue {
   @Prop() hotkeys: IHotkey[];
   @Prop() title: string;
+  @Prop() mouseKeyPressed: Subject<IKeyedBinding>;
   collapsed = false;
 
   header(h: Function) {
@@ -29,6 +26,7 @@ export default class HotkeyGroup extends Vue {
   }
 
   render(h: Function) {
+    console.log('Rendering hot key group: ', this.title, this.mouseKeyPressed);
     return (
       <div class="section">
         {this.header(h)}
@@ -39,7 +37,7 @@ export default class HotkeyGroup extends Vue {
           >
             {this.hotkeys.map(hotkey => (
               <div key={hotkey.actionName + hotkey.sceneId + hotkey.sceneItemId + hotkey.sourceId}>
-                <Hotkey hotkey={hotkey} />
+                <Hotkey hotkey={hotkey} mouseKeyPressed={this.mouseKeyPressed} />
               </div>
             ))}
           </div>

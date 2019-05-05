@@ -53,23 +53,23 @@ test('Binds a hotkey', async t => {
   t.is(binding, 'Ctrl+B');
 });
 
-test('Binds a mouse button', async t => {
-  const { app } = t.context;
+// test('Binds a mouse button', async t => {
+//   const { app } = t.context;
 
-  await openHotkeySettings(t);
+//   await openHotkeySettings(t);
 
-  // Bind a hotkey to Start Recording
-  await app.client.selectByValue(
-    '.hotkey[data-test-id=Start_Recording] .Hotkey-select',
-    'RightMouseButton',
-  );
-  await app.client.click('button=Done');
+//   // Bind a hotkey to Start Recording
+//   await app.client.selectByValue(
+//     '.hotkey[data-test-id=Start_Recording] .Hotkey-select',
+//     'RightMouseButton',
+//   );
+//   await app.client.click('button=Done');
 
-  // Check that the binding persisted
-  await openHotkeySettings(t);
-  const binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
-  t.is(binding, 'RightMouseButton');
-});
+//   // Check that the binding persisted
+//   await openHotkeySettings(t);
+//   const binding = await app.client.getValue('.hotkey[data-test-id=Start_Recording] .Hotkey-input');
+//   t.is(binding, 'RightMouseButton');
+// });
 
 const openHotkeySettings = async (t: TExecutionContext) => {
   const { app } = t.context;

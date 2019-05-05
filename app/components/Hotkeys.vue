@@ -12,7 +12,8 @@
       v-for="(sourceHotkeys, sourceId) in hotkeySet.sources"
       :key="sourceId"
       :title="sourcesService.getSource(sourceId).name"
-      :hotkeys="sourceHotkeys"/>
+      :hotkeys="sourceHotkeys"
+      :mouseKeyPressed="mouseKeyPressed" />
   </div>
 </div>
 </template>

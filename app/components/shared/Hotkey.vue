@@ -13,15 +13,9 @@
             class="Hotkey-input"
             :value="getBindingString(binding.binding)"
             @keydown="e => handleKeydown(e, index)"
+            @focus="setFocus(true, index)"
+            @blur="setFocus(false, index)"
           />
-          <select class="Hotkey-select" @change="e => changedMouseSelect(e, index)">
-            <option>(None)</option>
-            <option :selected="binding.binding.key == 'LeftMouseButton'" :value="'LeftMouseButton'">Left Mouse</option>
-            <option :selected="binding.binding.key == 'MiddleMouseButton'" :value="'MiddleMouseButton'">Middle Mouse</option>
-            <option :selected="binding.binding.key == 'RightMouseButton'" :value="'RightMouseButton'">Right Mouse</option>
-            <option :selected="binding.binding.key == 'X1MouseButton'" :value="'X1MouseButton'">Mouse Back</option>
-            <option :selected="binding.binding.key == 'X2MouseButton'" :value="'X2MouseButton'">Mouse Forward</option>
-          </select>
           <i class="Hotkey-control fa fa-plus" @click="addBinding(index);" />
           <i class="Hotkey-control fa fa-minus" @click="removeBinding(index);" />
         </div>
@@ -66,13 +60,6 @@
 
 .Hotkey-input {
   display:flex;
-}
-
-.Hotkey-select {
-  display:flex;
-  height: unset;
-  margin: 0;
-  max-width: 150px;
 }
 
 .Hotkey-control {

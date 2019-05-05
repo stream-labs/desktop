@@ -24,7 +24,7 @@ export interface IKeyBinding {
 /**
  * Node libuiohook is a native addon for binding global hotkeys
  */
-interface INodeLibuiohook {
+export interface INodeLibuiohook {
   registerCallback(binding: IKeyBinding): boolean;
   unregisterCallback(binding: IKeyBinding): void;
   unregisterAllCallbacks(): void;

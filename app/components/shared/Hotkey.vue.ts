@@ -1,23 +1,40 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
 import TsxComponent from 'components/tsx-component';
+import { Subject } from 'rxjs';
 
 /**
  * Represents a binding that has a unique key for CSS animations
  */
-interface IKeyedBinding {
+export interface IKeyedBinding {
   binding: IBinding;
   key: string;
 }
 
 @Component({})
-export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
+export default class HotkeyComponent extends TsxComponent<{
+  hotkey: IHotkey;
+  mouseKeyPressed: Subject<IKeyedBinding>;
+}> {
   @Prop() hotkey: IHotkey;
+  @Prop() mouseKeyPressed: Subject<IKeyedBinding>;
 
   description = this.hotkey.description;
   bindings: IKeyedBinding[] = [];
+  isFocused: boolean = false;
+  focusedIndex: number = -1;
 
   created() {
+    if (this.mouseKeyPressed) {
+      this.mouseKeyPressed.subscribe(x => {
+        if (this.isFocused) {
+          const binding = this.bindings[this.focusedIndex];
+          binding.binding = x.binding;
+
+          this.setBindings();
+        }
+      });
+    }
     if (this.hotkey.bindings.length === 0) {
       this.bindings = [this.createBindingWithKey(this.getBlankBinding())];
     } else {
@@ -27,47 +44,28 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
     }
   }
 
+  beforeDestroy() {
+    if (this.mouseKeyPressed) {
+      this.mouseKeyPressed.unsubscribe();
+    }
+  }
+
+  setFocus(value: boolean, index: number) {
+    this.isFocused = value;
+    this.focusedIndex = value ? index : -1;
+  }
+
   handleKeydown(event: KeyboardEvent, index: number) {
     event.preventDefault();
 
     const binding = this.bindings[index];
-
-    const isMouseBinding = this.isMouseKey(binding);
-
-    if (this.isModifierPress(event) && !isMouseBinding) return;
+    
+    if (this.isModifierPress(event)) return;
 
     binding.binding = {
-      key: isMouseBinding ? binding.binding.key : event.code,
+      key: event.code,
       modifiers: this.getModifiers(event),
     };
-
-    this.setBindings();
-  }
-
-  isMouseKey(binding: IKeyedBinding) {
-    return (
-      binding.binding.key === 'LeftMouseButton' ||
-      binding.binding.key === 'RightMouseButton' ||
-      binding.binding.key === 'MiddleMouseButton' ||
-      binding.binding.key === 'X1MouseButton' ||
-      binding.binding.key === 'X2MouseButton'
-    );
-  }
-
-  changedMouseSelect(event: any, index: number) {
-    event.preventDefault();
-    const newValue = event.target.value;
-
-    const binding = this.bindings[index];
-
-    if (newValue === '(None)') {
-      binding.binding = this.getBlankBinding();
-    } else {
-      binding.binding = {
-        key: newValue,
-        modifiers: binding.binding.modifiers,
-      };
-    }
 
     this.setBindings();
   }
@@ -158,6 +156,17 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
     if (binding.modifiers.meta) keys.push('Win');
 
     let key = binding.key;
+    switch (binding.key) {
+      case 'MiddleMouseButton': 
+        key = 'Middle Mouse Button';
+        break;
+      case 'X1MouseButton':
+        key = 'Back Mouse Button';
+        break;
+      case 'X2MouseButton':
+        key = 'Forward Mouse Button';
+        break;
+    }
 
     const matchDigit = binding.key.match(/^Digit([0-9])$/);
     if (matchDigit) key = matchDigit[1];
