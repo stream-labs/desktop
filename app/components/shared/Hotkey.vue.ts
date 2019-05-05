@@ -59,7 +59,7 @@ export default class HotkeyComponent extends TsxComponent<{
     event.preventDefault();
 
     const binding = this.bindings[index];
-    
+
     if (this.isModifierPress(event)) return;
 
     binding.binding = {
@@ -157,7 +157,7 @@ export default class HotkeyComponent extends TsxComponent<{
 
     let key = binding.key;
     switch (binding.key) {
-      case 'MiddleMouseButton': 
+      case 'MiddleMouseButton':
         key = 'Middle Mouse Button';
         break;
       case 'X1MouseButton':
