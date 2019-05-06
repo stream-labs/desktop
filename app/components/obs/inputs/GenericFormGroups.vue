@@ -41,7 +41,7 @@
 
 .expand-enter-active,
 .expand-leave-active {
-  transition: all .5s ease;
+  transition: all 0.5s ease;
 }
 
 .expand-enter-to {
@@ -51,7 +51,7 @@
 
 .expand-leave,
 .expand-leave-to {
-  transition: all .275s ease;
+  transition: all 0.275s ease;
 }
 
 .expand-leave {

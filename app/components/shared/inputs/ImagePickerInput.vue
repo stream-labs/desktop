@@ -21,18 +21,19 @@
   width: 100%;
   max-width: 370px;
   display: grid;
-  grid-template-columns: repeat( auto-fit, 64px);
+  grid-template-columns: repeat(auto-fit, 64px);
   grid-column-gap: 8px;
 }
 
 .widget-layout-picker__option {
+  .transition();
+  .radius();
+
   width: 64px;
   height: 64px;
   border: 1px solid var(--solid-input);
   background-color: var(--solid-input);
-  .transition();
   position: relative;
-  .radius();
   cursor: pointer;
 
   img {

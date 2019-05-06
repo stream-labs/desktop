@@ -42,13 +42,17 @@
 @import "../styles/index";
 
 .editable-scene-collection {
+  .radius();
+
   height: 35px;
   padding: 5px;
-  .radius;
   font-size: 14px;
   cursor: pointer;
 
-  span, a, input, i {
+  span,
+  a,
+  input,
+  i {
     margin-right: 8px;
   }
 
@@ -78,7 +82,7 @@
   max-width: 230px;
   color: var(--title);
 
-  >div {
+  > div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

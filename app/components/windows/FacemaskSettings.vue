@@ -133,6 +133,7 @@
 <script lang="ts" src="./FacemaskSettings.vue.ts"></script>
 <style lang="less" scoped>
   @import '../../styles/index';
+
   .row {
     flex-wrap: nowrap;
     width: 100%;
@@ -145,6 +146,7 @@
     color: var(--white);
     border-radius: 4px;
     padding: 6px;
+
     a {
       color: white;
     }

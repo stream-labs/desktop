@@ -62,13 +62,15 @@
 
 .slider-input {
   .margin-left(3);
+
   width: 60px;
 }
 
 .slider {
-  background: transparent;
   .padding-v-sides();
   .padding-h-sides(@0) !important;
+
+  background: transparent;
   margin: 0;
   flex-grow: 1;
   height: auto;
@@ -89,7 +91,7 @@
 }
 
 .vue-slider-dot {
-  &:after {
+  &::after {
     content: '';
     display: block;
     position: absolute;
@@ -110,7 +112,7 @@
   top: 40px !important;
   .transition;
 
-  &:before {
+  &::before {
     display: none;
   }
 }

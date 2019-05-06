@@ -61,6 +61,7 @@
 
 <style lang="less" scoped>
 @import '../styles/mixins';
+
 .actions {
   .flex();
   .flex--space-between();

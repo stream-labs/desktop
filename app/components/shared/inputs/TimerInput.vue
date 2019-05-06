@@ -99,7 +99,7 @@
     box-shadow: none;
     font-size: 14px;
     background: var(--dropdown-bg);
-    font-family: 'Roboto';
+    font-family: 'Roboto', sans-serif;
     border: 1px solid var(--input-border);
     position: relative;
     display: flex;
@@ -153,13 +153,14 @@
   }
 
   .timer-dropdown {
+    .radius();
+
     position: absolute;
     overflow-y: hidden;
     width: 90px;
     padding: 0;
     z-index: 10;
     left: 0;
-    .radius();
     height: 200px;
   }
 
@@ -178,6 +179,7 @@
 
   .time-slot {
     .padding-h-sides();
+
     display: block;
   }
 

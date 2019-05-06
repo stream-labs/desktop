@@ -33,6 +33,7 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
+
 .media-share-placeholder {
   display: flex;
   justify-content: center;
@@ -53,7 +54,6 @@
 .media-share-placeholder__img--night {
   display: none;
 }
-
 
 .night-theme {
   .media-share-placeholder__img--day {

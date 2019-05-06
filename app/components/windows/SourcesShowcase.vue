@@ -194,6 +194,7 @@
 
 .source-info {
   .padding(2);
+
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -226,6 +227,7 @@ h2 {
 
 .sources {
   .padding(2);
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 16px;
@@ -256,13 +258,14 @@ h2 {
 }
 
 .source {
-  cursor: pointer;
   .transition();
+  .radius();
+
+  cursor: pointer;
   padding: 4px 8px;
   margin-top: 8px;
   background-color: var(--section);
   width: 49%;
-  .radius();
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 100%;
@@ -271,8 +274,9 @@ h2 {
 
   &:hover,
   &.source--active {
-    color: var(--title);
     .weight(@medium);
+
+    color: var(--title);
     background-color: var(--button);
   }
 
@@ -296,9 +300,10 @@ h2 {
 
 .source-info__media {
   .radius();
+  .padding-left(2);
+
   overflow: hidden;
   text-align: center;
-  .padding-left(2);
   align-items: center;
   align-content: center;
   max-height: 150px;

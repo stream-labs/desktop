@@ -51,7 +51,8 @@
 }
 
 .source-info__media {
-  .radius;
+  .radius();
+
   overflow: hidden;
   text-align: center;
   padding-left: 20px;
@@ -76,8 +77,9 @@
 }
 
 .source-support__list {
-  margin-bottom: 0;
   .margin-left(2);
+
+  margin-bottom: 0;
   display: flex;
   flex-wrap: wrap;
   flex: 250px;

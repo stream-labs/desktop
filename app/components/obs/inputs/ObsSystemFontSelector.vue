@@ -43,7 +43,7 @@
   right: 0;
   width: 0;
   border: 0;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
   cursor: pointer;
   outline: none;
 }

@@ -18,23 +18,26 @@
 
 <style lang="less">
 @import "../../styles/index";
+
 .dropdown-menu {
-  top: 5px !important;
-  background-color: var(--background);
   .radius();
   .padding();
+  .shadow();
+
+  top: 5px !important;
+  background-color: var(--background);
   max-height: 166px;
   overflow-y: auto;
   z-index: 200000;
-  .shadow();
 }
 
 .dropdown-menu__toggle {
+  .weight(@medium);
+
   display: flex;
   align-items: center;
   text-transform: capitalize;
   font-size: 14px;
-  .weight(@medium);
   color: var(--title);
 
   span {
@@ -47,8 +50,9 @@
   .fa,
   i {
     .margin-left();
-    padding: 3px; // easier to click
     .icon-hover();
+
+    padding: 3px; // easier to click
   }
 
   &:focus {
@@ -57,11 +61,12 @@
 }
 
 .dropdown-menu__separator {
+  .margin-v-sides();
+
   width: 100%;
   height: 1px;
   background-color: var(--midtone);
-  opacity: .2;
-  .margin-v-sides();
+  opacity: 0.2;
 }
 
 .dropdown-menu__item {

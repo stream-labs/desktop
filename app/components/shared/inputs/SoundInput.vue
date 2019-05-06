@@ -26,6 +26,7 @@
 
 .media-box {
   .radius();
+
   position: relative;
   width: 100%;
   height: 30px;
@@ -55,8 +56,10 @@
   }
 }
 
-.change-media, i {
+.change-media,
+i {
   transition: 0.1s all linear;
+
   &:hover {
     cursor: pointer;
     color: var(--white);
@@ -73,6 +76,7 @@
 
 .url-uploader {
   .radius();
+
   background-color: var(--background);
   padding: 12px;
   position: absolute;

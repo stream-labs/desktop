@@ -85,6 +85,7 @@
 
 .help-page {
   .padding(3);
+
   display: grid;
   grid-column-gap: 24px;
   grid-template-columns: 1fr 1fr;
@@ -98,15 +99,17 @@
 
 .callout {
   .radius();
-  border: 0;
   .margin-bottom(3);
+
+  border: 0;
   grid-column-start: 1;
   grid-column-end: 3;
 }
 
 .callout--discord {
-  background-color: @discord;
   .padding(2);
+
+  background-color: @discord;
   color: var(--white);
   display: flex;
   align-items: center;
@@ -138,9 +141,10 @@
 }
 
 .help-item {
-  background-color: var(--section);
   .radius(2);
   .padding(2);
+
+  background-color: var(--section);
   display: grid;
   grid-template-columns: 1fr 242px;
   grid-column-gap: 24px;
@@ -153,12 +157,13 @@
 
 .help-item__thumbnail {
   .radius(2);
+
   overflow: hidden;
   position: relative;
   height: 136px;
 
-  &:before {
-    font-family: 'Font Awesome 5 Free';
+  &::before {
+    font-family: 'Font Awesome 5 Free', sans-serif;
     font-weight: 900;
     content: '\f04b';
     color: var(--white);
@@ -190,13 +195,14 @@
 }
 
 .help-view-more {
-  background-color: var(--section);
   .radius();
   .padding(2);
-  text-align: center;
   .weight(@medium);
-  cursor: pointer;
   .margin-top(3);
+
+  background-color: var(--section);
+  text-align: center;
+  cursor: pointer;
 }
 
 .help-item__more-info {
@@ -211,15 +217,16 @@
 }
 
 .help-item__more-info-content {
+  .radius();
+  .padding(3);
+  .shadow();
+
   width: 60%;
   height: auto;
   max-height: 400px;
-  .radius();
   background-color: var(--section);
-  .padding(3);
   position: relative;
   z-index: 10;
-  .shadow();
 
   .icon-close {
     .absolute(16px, 16px, auto, auto);

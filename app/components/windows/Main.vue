@@ -121,7 +121,6 @@
   right: 0;
   z-index: 999999;
   background-color: var(--background);
-
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
     top: 34px;

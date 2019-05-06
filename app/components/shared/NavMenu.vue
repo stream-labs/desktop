@@ -10,11 +10,12 @@
 @import "../../styles/index";
 
 .nav-menu:not(.nav-menu--child) {
+  .padding-top(2);
+  .padding-right(3);
+
   flex: 0 0 240px;
   display: flex;
   flex-direction: column;
-  .padding-top(2);
-  .padding-right(3);
   margin-left: @0;
 }
 

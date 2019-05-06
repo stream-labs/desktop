@@ -94,14 +94,14 @@
 
   &.patch-notes-container--closing {
     overflow: visible;
-    animation: fadeOut 1s ease-in .75s forwards;
+    animation: fadeOut 1s ease-in 0.75s forwards;
 
     .patch-notes-chest {
-      animation: expandChest .5s ease-in .25s 1 forwards;
+      animation: expandChest 0.5s ease-in 0.25s 1 forwards;
     }
 
     .patch-notes-button {
-      animation: hideButton .25s ease-in 1 forwards;
+      animation: hideButton 0.25s ease-in 1 forwards;
     }
   }
 
@@ -124,9 +124,11 @@
   0% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
+
   100% {
     transform: translateY(0);
   }
@@ -145,7 +147,7 @@
 
 @keyframes expandChest {
   0% {
-    transform: scale(1)
+    transform: scale(1);
   }
 
   100% {
@@ -168,6 +170,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }

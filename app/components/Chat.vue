@@ -6,8 +6,10 @@
 
 <style lang="less" scoped>
 @import '../styles/index';
+
 .chat {
   .flex--grow();
+
   overflow: hidden; // webview content can affect external UI without this rule
 }
 

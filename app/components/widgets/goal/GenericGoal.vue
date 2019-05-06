@@ -51,9 +51,10 @@
 @import "../../../styles/index";
 
 .goal-row {
+  .padding();
+
   display: flex;
   justify-content: space-between;
-  .padding();
   border-bottom: 1px solid var(--border);
 }
 

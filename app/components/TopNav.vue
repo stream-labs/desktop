@@ -65,7 +65,7 @@
         <img class="theme-toggle__icon theme-toggle__icon--sun" v-tooltip.right="sunTooltip" src="../../media/images/sun.png"/>	
       </button>	
     </div>
-    <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999">
+    <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999;">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item" v-if="isDevMode">
@@ -117,6 +117,7 @@
 
 .top-nav-item {
   .margin-left(2);
+
   display: flex;
   align-items: center;
 
@@ -153,10 +154,11 @@
 @import '../styles/badges';
 
 .top-nav {
+  .padding-h-sides(2);
+
   display: flex;
   flex-direction: row;
   align-items: center;
-  .padding-h-sides(2);
   position: relative;
   max-width: none;
   background-color: var(--background);
@@ -165,9 +167,10 @@
   z-index: 1;
 
   // block the nav buttons while loading
-  &.loading:after {
-    content: '';
+  &.loading::after {
     .absolute(0, 0, 0, 0);
+
+    content: '';
     background-color: black;
     opacity: 0;
   }

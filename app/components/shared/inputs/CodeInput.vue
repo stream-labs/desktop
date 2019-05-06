@@ -13,6 +13,7 @@
 <style lang="less">
   @import '~codemirror/theme/material.css';
   @import '~codemirror/lib/codemirror.css';
+
   .CodeMirror {
     font-size: 10pt;
     min-height: 425px;

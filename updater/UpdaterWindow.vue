@@ -23,11 +23,11 @@ export default {
 .UpdaterWindow {
   height: 100%;
   padding: 32px;
-  background-color: #17242D;
-  color: #ffffff;
+  background-color: #17242d;
+  color: #fff;
   font-size: 18px;
   text-align: center;
-  -webkit-app-region: drag
+  -webkit-app-region: drag;
 }
 
 .updater-window__img {

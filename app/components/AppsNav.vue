@@ -55,10 +55,11 @@
 }
 
 .apps-nav {
+  .padding-h-sides();
+
   display: flex;
   flex-direction: row;
   align-items: center;
-  .padding-h-sides();
   max-width: none;
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
@@ -73,7 +74,8 @@
 
   &:hover {
     // show arrows
-    .left, .right { opacity: 1}
+    .left,
+    .right { opacity: 1; }
   }
 }
 
@@ -97,8 +99,9 @@
 
 .app-tab {
   .padding();
-  color: var(--paragraph);
   .weight(@medium);
+
+  color: var(--paragraph);
   cursor: pointer;
 
   &.is-active {
@@ -111,18 +114,20 @@
 }
 
 .left {
-  transition: opacity @transition-time;
   .absolute(0, auto, 0, 0);
+
+  transition: opacity @transition-time;
   padding-top: 8px;
   width: 20px;
-  background-image: linear-gradient(to right, var(--background) 80% , transparent);
+  background-image: linear-gradient(to right, var(--background) 80%, transparent);
   z-index: 1;
   opacity: 0;
 }
 
 .right {
-  transition: opacity @transition-time;
   .absolute(0, 0, 0, auto);
+
+  transition: opacity @transition-time;
   padding-top: 8px;
   width: 20px;
   background-image: linear-gradient(to left, var(--background) 80%, transparent);

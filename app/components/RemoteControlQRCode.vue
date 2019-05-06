@@ -54,22 +54,21 @@ input {
 }
 
 .fader {
- position: relative;
- overflow: hidden;
- cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 
-
- span {
-   position: absolute;
-   top: 100px;
-   left: 70px;
-   display: block;
-   color: white;
-   font-size: 16px;
-   background: rgba(0,0,0,0.7);
-   padding: 10px;
-   box-shadow: 0 0 10px 6px rgba(0,0,0,0.7);
- }
+  span {
+    position: absolute;
+    top: 100px;
+    left: 70px;
+    display: block;
+    color: white;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.7);
+  }
 }
 
 .blur {

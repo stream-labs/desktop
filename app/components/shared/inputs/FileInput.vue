@@ -31,6 +31,7 @@
 
   .input-error {
     .absolute(100%);
+
     white-space: nowrap;
   }
 }

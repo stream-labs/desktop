@@ -104,7 +104,6 @@
       width: 140px;
       margin-right: auto;
       position: relative;
-
     }
 
     .multiselect__select {

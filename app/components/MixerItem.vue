@@ -53,7 +53,7 @@
   .padding-v-sides();
 
   .source-name {
-    flex: 1
+    flex: 1;
   }
 
   .db-value {

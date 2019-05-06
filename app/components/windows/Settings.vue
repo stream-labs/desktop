@@ -41,18 +41,20 @@
 @import "../../styles/index";
 
 .settings {
+  .transition();
+
   display: flex;
   align-content: stretch;
   align-items: stretch;
   flex: 1;
-  .transition();
   margin: -16px;
 }
 
 .settings-container {
-  flex-grow: 1;
   .padding-right(2);
   .padding-top(2);
+
+  flex-grow: 1;
   overflow: auto;
 }
 </style>

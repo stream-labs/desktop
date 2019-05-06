@@ -60,17 +60,20 @@
 
 <style lang="less" scoped>
 @import '../../styles/index';
+
 .live-container {
+  .padding(2);
+
   display: flex;
   height: 100%;
   width: 100%;
-  .padding(2);
   box-sizing: border-box;
 }
 
 .mission-control-container {
-  flex: 1;
   .radius();
+
+  flex: 1;
   overflow: hidden;
   position: relative;
 }
@@ -100,11 +103,12 @@
 }
 
 .live-display-wrapper {
-  max-width: 100%;
   .radius();
+  .border();
+
+  max-width: 100%;
   background-color: var(--section);
   position: relative;
-  .border();
   border-top: 0;
   height: calc(~'100% - 29px');
 }

@@ -33,54 +33,55 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 
-  .number-input {
-    position: relative;
-    display: block;
+.number-input {
+  position: relative;
+  display: block;
 
-    .arrows {
-      .absolute(0, 8px, 0, auto);
-      width: 30px;
-      color: var(--icon);
-      opacity: .7;
-      cursor: pointer;
-      .transition();
+  .arrows {
+    .absolute(0, 8px, 0, auto);
+    .transition();
 
-      &:hover {
-        opacity: 1;
+    width: 30px;
+    color: var(--icon);
+    opacity: 0.7;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    .arrow {
+      display: flex !important;
+
+      .fa {
+        position: relative;
+        font-size: 9px;
       }
 
-      .arrow {
-        display: flex !important;
+      &:active {
+        color: black;
+      }
 
-        .fa {
-          position: relative;
-          font-size: 9px;
-        }
+      &.arrow-up {
+        .absolute(6px, 0, auto, auto);
+      }
 
-        &:active {
-          color: black;
-        }
-
-        &.arrow-up {
-          .absolute(6px, 0px, auto, auto);
-        }
-
-        &.arrow-down {
-          .absolute(auto, 0px, 6px, auto);
-        }
+      &.arrow-down {
+        .absolute(auto, 0, 6px, auto);
       }
     }
   }
+}
 
-  .number-input.full-width {
-    width: 100%;
+.number-input.full-width {
+  width: 100%;
+}
+
+.number-input.disabled {
+  opacity: 0.5;
+
+  input {
+    cursor: not-allowed;
   }
-
-  .number-input.disabled {
-    opacity: 0.5;
-
-    input {
-      cursor: not-allowed;
-    }
-  }
+}
 </style>

@@ -42,6 +42,7 @@
 
 <style lang="less">
 @import '../../../styles/index';
+
 // 3rd Party Component
 .multiselect__content-wrapper {
   left: -50%;

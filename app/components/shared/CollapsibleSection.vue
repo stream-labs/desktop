@@ -38,14 +38,16 @@
   }
 
   h2 {
+    .margin--none();
+
     color: var(--title);
-    .margin--none;
     text-transform: capitalize;
   }
 
   .icon-down {
     .transition();
     .margin-right(1);
+
     font-size: 5px;
   }
 }

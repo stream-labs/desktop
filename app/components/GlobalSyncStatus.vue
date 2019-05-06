@@ -14,10 +14,10 @@
 .global-sync-status {
   padding-right: 12px;
 
-  &:before {
+  &::before {
     content: '|';
     padding-right: 12px;
-    opacity: .5;
+    opacity: 0.5;
     color: var(--icon);
   }
 }
