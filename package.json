@@ -97,7 +97,7 @@
     "serial": true
   },
   "dependencies": {
-    "@streamlabs/game-overlay": "https://s3-us-west-2.amazonaws.com/obs-studio-deployment/game-overlay-v0.0.5.tar.gz",
+    "@streamlabs/game-overlay": "https://s3-us-west-2.amazonaws.com/obs-studio-deployment/game-overlay-v0.0.9.tar.gz",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz",
