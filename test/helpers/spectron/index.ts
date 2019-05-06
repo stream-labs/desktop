@@ -48,6 +48,10 @@ export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
 }
 
+export async function waitForLoader(t: any) {
+  await t.context.app.client.waitForExist('.main-loading', 10000, true);
+}
+
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
@@ -154,7 +158,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await t.context.app.client.waitForExist('.main-loading', 5000, true);
+    await waitForLoader(t);
     if (await t.context.app.client.isExisting('a=Setup later')) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('a=Setup later');

@@ -7,7 +7,6 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
@@ -18,7 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
@@ -35,7 +34,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private platformAppsService: PlatformAppsService;
 
@@ -208,12 +206,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  dashboardUrl(subPage: string) {
+  dashboardUrl(subPage: string, hidenav: boolean = false) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const hideNav = hidenav ? 'true' : 'false';
+    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
+    const locale = i18nService.state.locale;
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
@@ -273,8 +274,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Attempt to sync scense before logging out
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
-    // signs out of chatbot
-    await this.chatbotApiService.Base.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 
