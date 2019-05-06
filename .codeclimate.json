@@ -45,7 +45,7 @@
     "stylelint": {
       "enabled": true,
       "config": ".stylelintrc",
-      "exclude_patterns": ["**/*.vue", "docs/"]
+      "exclude_patterns": ["docs/"]
     }
   },
   "exclude_patterns": [
