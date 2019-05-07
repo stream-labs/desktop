@@ -60,6 +60,8 @@ import { I18nService } from 'services/i18n';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
+import { InformationsService } from 'services/informations';
+import { InformationsStateService } from 'services/informations/state';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 
@@ -125,6 +127,8 @@ export class ServicesManager extends Service {
     OutageNotificationsService,
     QuestionaireService,
     MonitorCaptureCroppingService,
+    InformationsService,
+    InformationsStateService,
     NicoliveProgramService,
     NicoliveProgramStateService,
   };

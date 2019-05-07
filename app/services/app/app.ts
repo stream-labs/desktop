@@ -20,6 +20,7 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
+import { InformationsService } from 'services/informations';
 
 interface IAppState {
   loading: boolean;
@@ -57,6 +58,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private questionaireService: QuestionaireService;
+  @Inject() private informationsService: InformationsService;
 
   @track('app_start')
   load() {
@@ -90,6 +92,8 @@ export class AppService extends StatefulService<IAppState> {
       this.patchNotesService.showPatchNotesIfRequired(onboarded);
 
       this.FINISH_LOADING();
+
+      this.informationsService;
     });
   }
 

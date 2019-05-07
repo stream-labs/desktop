@@ -29,6 +29,7 @@ import {
   ISettingsAccessor,
   OptimizeSettings,
   OptimizedSettings,
+  SettingsKeyAccessor,
   Optimizer,
   OptimizationKey
 } from './optimizer';
@@ -442,8 +443,9 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
-    const best = getBestSettingsForNiconico({ bitrate });
-    const opt = new Optimizer(this);
+    const accessor = new SettingsKeyAccessor(this);
+    const best = getBestSettingsForNiconico({ bitrate }, accessor);
+    const opt = new Optimizer(accessor, best);
 
     const current = opt.getCurrentSettings();
 
@@ -460,13 +462,13 @@ export class SettingsService extends StatefulService<ISettingsState>
   optimizeForNiconico(best: OptimizeSettings) {
     const MAX_TRY = 4;
 
-    const opt = new Optimizer(this);
-
     for (let retry = 0; retry < MAX_TRY; ++retry) {
+      const accessor = new SettingsKeyAccessor(this);
+      const opt = new Optimizer(accessor, best);
       opt.optimize(best);
 
       // 確実に書き込めたか確認するため、読み込み直す
-      opt.clearCache();
+      accessor.clearCache();
       const delta = [...opt.getDifferenceFromCurrent(best)]
       if (delta.length === 0) {
         // send to Sentry

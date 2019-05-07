@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SettingsKeyAccessor#optimizeInfo 1`] = `
+Array [
+  Array [
+    "Output",
+    Array [
+      Object {
+        "currentValue": "Advanced",
+        "key": "outputMode",
+        "name": "Mode",
+        "newValue": "Simple",
+      },
+      Object {
+        "currentValue": 5808,
+        "key": "videoBitrate",
+        "name": "VBitrate",
+      },
+      Object {
+        "currentValue": "obs_x264",
+        "key": "encoder",
+        "name": "StreamEncoder",
+      },
+      Object {
+        "currentValue": undefined,
+        "key": "simpleUseAdvanced",
+        "name": "UseAdvanced",
+        "newValue": true,
+      },
+      Object {
+        "currentValue": undefined,
+        "key": "encoderPreset",
+        "name": "Preset",
+        "newValue": "ultrafast",
+      },
+      Object {
+        "currentValue": "128",
+        "key": "audioBitrate",
+        "name": "ABitrate",
+        "newValue": "192",
+      },
+    ],
+  ],
+  Array [
+    "Video",
+    Array [
+      Object {
+        "currentValue": "1280x720",
+        "key": "quality",
+        "name": "Output",
+      },
+      Object {
+        "currentValue": "Common FPS Values",
+        "key": "fpsType",
+        "name": "FPSType",
+      },
+      Object {
+        "currentValue": "30",
+        "key": "fpsCommon",
+        "name": "FPSCommon",
+      },
+    ],
+  ],
+]
+`;
+
+exports[`filterKeyDescriptions 1`] = `
+Array [
+  Object {
+    "category": "Output",
+    "dependents": Array [
+      Object {
+        "params": Array [
+          Object {
+            "category": "Output",
+            "dependents": Array [
+              Object {
+                "params": Array [
+                  Object {
+                    "category": "Output",
+                    "key": "simpleUseAdvanced",
+                    "lookupValueName": true,
+                    "setting": "UseAdvanced",
+                    "subCategory": "Streaming",
+                  },
+                ],
+                "value": "obs_x264",
+              },
+              Object {
+                "params": Array [
+                  Object {
+                    "category": "Output",
+                    "key": "simpleUseAdvanced",
+                    "lookupValueName": true,
+                    "setting": "UseAdvanced",
+                    "subCategory": "Streaming",
+                  },
+                ],
+                "value": "obs_qsv11",
+              },
+              Object {
+                "params": Array [
+                  Object {
+                    "category": "Output",
+                    "key": "simpleUseAdvanced",
+                    "lookupValueName": true,
+                    "setting": "UseAdvanced",
+                    "subCategory": "Streaming",
+                  },
+                ],
+                "value": "ffmpeg_nvenc",
+              },
+            ],
+            "key": "encoder",
+            "lookupValueName": true,
+            "setting": "StreamEncoder",
+            "subCategory": "Streaming",
+          },
+        ],
+        "value": "Simple",
+      },
+    ],
+    "key": "outputMode",
+    "lookupValueName": true,
+    "setting": "Mode",
+    "subCategory": "Untitled",
+  },
+]
+`;

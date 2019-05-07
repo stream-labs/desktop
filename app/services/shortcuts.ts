@@ -26,6 +26,9 @@ export class ShortcutsService extends Service {
       // ignore key events from webview
       if ((e.target as HTMLElement).tagName === 'WEBVIEW') return;
 
+      // 入力欄操作中はショートカットキーを反応させない
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+
       const shortcutName = ShortcutsService.getShortcutName(e);
       const handler = this.shortcuts.get(shortcutName);
 

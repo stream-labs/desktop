@@ -87,6 +87,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
+document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
