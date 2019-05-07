@@ -19,6 +19,9 @@ if (-NOT(Get-Command "choco" -errorAction SilentlyContinue)) {
 echo "Install Nodejs"
 choco install nodejs --version 10.15.3
 
+echo "Install Yarn"
+choco install yarn
+
 echo "Install Git for Windows"
 choco choco install git.install
 
