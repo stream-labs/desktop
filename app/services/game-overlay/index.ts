@@ -150,7 +150,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
     this.windows.chat.loadURL(
       await getPlatformService(this.userService.platform.type).getChatUrl(
-        this.customizationService.isDarkTheme() ? 'night' : 'day',
+        this.customizationService.isDarkTheme ? 'night' : 'day',
       ),
     );
 
