@@ -106,7 +106,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => {
+        this.userService.updatePlatformToken(response.access_token);
+        this.setupStreamSettings(this.userService.state.auth);
+      });
   }
 
   @requiresToken()
@@ -168,9 +171,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(() => true);
+    return fetch(request).then(handlePlatformResponse);
   }
 
   @requiresToken()
