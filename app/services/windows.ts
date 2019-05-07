@@ -50,32 +50,6 @@ import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
-import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
-import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
-import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
-import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
-import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
-import ChatbotSymbolProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
-import ChatbotLinkProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
-import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
-import ChatbotParagraphProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotParagraphProtectionWindow.vue';
-import ChatbotEmoteProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotEmoteProtectionWindow.vue';
-import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
-import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
-import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
-import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
-import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
-import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
-import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
-import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
-import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
-import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
-import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
-import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
-import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
-import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
-
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
@@ -125,32 +99,6 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-
-    ChatbotCustomCommandWindow,
-    ChatbotDefaultCommandWindow,
-    ChatbotTimerWindow,
-    ChatbotAlertsWindow,
-    ChatbotGamblePreferencesWindow,
-    ChatbotCapsProtectionWindow,
-    ChatbotSymbolProtectionWindow,
-    ChatbotLinkProtectionWindow,
-    ChatbotWordProtectionWindow,
-    ChatbotParagraphProtectionWindow,
-    ChatbotEmoteProtectionWindow,
-    ChatbotQuoteWindow,
-    ChatbotQuotePreferencesWindow,
-    ChatbotQueuePreferencesWindow,
-    ChatbotCommandPreferencesWindow,
-    ChatbotMediaRequestPreferencesWindow,
-    ChatbotLoyaltyWindow,
-    ChatbotLoyaltyAddAllWindow,
-    ChatbotLoyaltyPreferencesWindow,
-    ChatbotHeistPreferencesWindow,
-    ChatbotPollProfileWindow,
-    ChatbotPollPreferencesWindow,
-    ChatbotBettingProfileWindow,
-    ChatbotBettingPreferencesWindow,
-    ChatbotRegularWindow,
   };
 }
 
@@ -171,6 +119,11 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+
+  // Will be true when the UI is performing animations, transitions, or property changes that affect
+  // the display of elements we cannot draw over. During this time such elements, for example
+  // BrowserViews and the OBS Display, will be hidden until the operation is complete.
+  hideStyleBlockers: boolean;
 }
 
 interface IWindowsState {
@@ -181,6 +134,7 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
   isShown: true,
+  hideStyleBlockers: false,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -194,11 +148,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
+      hideStyleBlockers: true,
       title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
+      hideStyleBlockers: false,
       isShown: false,
     },
   };
@@ -315,7 +271,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return windowId;
     }
 
-    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+    this.CREATE_ONE_OFF_WINDOW(windowId, { ...DEFAULT_WINDOW_OPTIONS, ...options });
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
@@ -324,6 +280,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
+      backgroundColor: '#17242D',
     }));
 
     newWindow.setMenu(null);
@@ -403,6 +360,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
+  updateStyleBlockers(windowId: string, hideStyleBlockers: boolean) {
+    this.UPDATE_HIDE_STYLE_BLOCKERS(windowId, hideStyleBlockers);
+  }
+
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
@@ -446,6 +407,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
     this.state[windowId].scaleFactor = scaleFactor;
+  }
+
+  @mutation()
+  private UPDATE_HIDE_STYLE_BLOCKERS(windowId: string, hideStyleBlockers: boolean) {
+    this.state[windowId].hideStyleBlockers = hideStyleBlockers;
   }
 
   @mutation()

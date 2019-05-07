@@ -34,8 +34,6 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-app.disableHardwareAcceleration();
-
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -58,6 +56,9 @@ const releaseChannel = (() => {
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+
+  // catch and log unhandled errors/rejected promises
+  electronLog.catchErrors();
 
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
@@ -158,6 +159,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    backgroundColor: '#17242D',
   });
 
   mainWindowState.manage(mainWindow);
@@ -210,7 +212,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    backgroundColor: '#17242D',
   });
 
   childWindow.setMenu(null);
@@ -299,6 +302,9 @@ if (process.env.SLOBS_CACHE_DIR) {
   );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
+if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
 app.setAsDefaultProtocolClient('slobs');
 
@@ -492,5 +498,7 @@ ipcMain.on('requestPerformanceStats', e => {
 });
 
 ipcMain.on('showErrorAlert', () => {
-  mainWindow.send('showErrorAlert');
+  if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    mainWindow.send('showErrorAlert');
+  }
 });

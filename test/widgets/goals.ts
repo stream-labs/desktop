@@ -5,7 +5,7 @@ import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 import { sleep } from '../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync', networkLogging: true });
+useSpectron({ appArgs: '--nosync' });
 
 testGoal('Donation Goal');
 testGoal('Follower Goal');
@@ -16,6 +16,14 @@ function testGoal(goalType: string) {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
     await addSource(t, goalType, goalType, false);
+
+    // end goal if it's already exist
+    if (await client.isVisible('button=End Goal')) {
+      await client.click('button=End Goal');
+    }
+
+    await client.waitForVisible('button=Start Goal');
+
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
       title: 'My Goal',
@@ -50,7 +58,7 @@ function testGoal(goalType: string) {
     };
 
     await formMonkey.fill(testSet1);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
     t.true(await formMonkey.includes(testSet1));
 
     const testSet2 = {
@@ -63,9 +71,7 @@ function testGoal(goalType: string) {
       font: 'Open Sans',
     };
 
-    await formMonkey.fill(testSet2);
-    await waitForWidgetSettingsSync(t);
+    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
     t.true(await formMonkey.includes(testSet2));
   });
-
 }

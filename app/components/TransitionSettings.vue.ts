@@ -43,7 +43,8 @@ export default class SceneTransitions extends Vue {
   }
 
   get nameModel(): string {
-    return this.transition.name;
+    return this.transitionsService.state.transitions.find(tran => tran.id === this.transitionId)
+      .name;
   }
 
   set nameModel(name: string) {

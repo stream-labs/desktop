@@ -98,7 +98,7 @@
     <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
   </validated-form>
   <validated-form slot="message-properties" :key="`message-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="selectedVariation.showMessage" :metadata="metadata.showMessage" />
+    <v-form-group v-if="wData.settings[selectedAlert]" v-model="wData.settings[selectedAlert].showMessage" :metadata="metadata.showMessage" />
     <div v-if="selectedVariation.settings.message">
       <v-form-group v-model="selectedVariation.settings.message.minAmount" :metadata="metadata.minAmount" />
       <v-form-group v-model="selectedVariation.settings.message.font" :metadata="metadata.fontFamily" />

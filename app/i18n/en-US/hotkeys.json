@@ -6,6 +6,8 @@
   "Switch to scene": "Switch to scene",
   "Show %{sourcename}": "Show %{sourcename}",
   "Hide %{sourcename}": "Hide %{sourcename}",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Mute",
   "Unmute": "Unmute",
   "Push to Mute": "Push to Mute",

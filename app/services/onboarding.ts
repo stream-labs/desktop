@@ -6,7 +6,6 @@ import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 type TOnboardingStep =
   | 'Connect'
-  | 'SelectWidgets'
   | 'OptimizeA'
   | 'OptimizeB'
   | 'OptimizeC'
@@ -55,14 +54,6 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   ObsImport: {
     isEligible: service => {
       return !service.options.isLogin;
-    },
-    next: 'SelectWidgets',
-  },
-
-  SelectWidgets: {
-    isEligible: service => {
-      if (service.options.isLogin) return false;
-      return service.userService.isLoggedIn();
     },
     next: 'OptimizeBrandDevice',
   },

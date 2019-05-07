@@ -58,6 +58,7 @@ const HAS_DONOR_MESSAGE = [
   'justGiving',
   'tiltify',
   'treat',
+  'stars',
 ];
 
 @Component({
@@ -222,6 +223,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
           duration,
           enabled: this.facemaskEnabled,
           device: this.facemasksService.getEnabledDevice(),
+          donations_enabled: this.facemasksService.state.settings.donations_enabled,
+          subs_enabled: this.facemasksService.state.settings.donations_enabled,
+          bits_enabled: this.facemasksService.state.settings.donations_enabled,
+          bits_price: this.facemasksService.state.settings.bits_price,
         })
         .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
     }
