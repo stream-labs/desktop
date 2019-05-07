@@ -34,9 +34,6 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
-if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
-
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -305,6 +302,9 @@ if (process.env.SLOBS_CACHE_DIR) {
   );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
+if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
 app.setAsDefaultProtocolClient('slobs');
 
