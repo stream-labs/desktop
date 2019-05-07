@@ -82,7 +82,11 @@ export class OutageNotificationsService extends Service {
     const msg = await this.fetchMessageJson();
 
     // There are no urgent messages to display to the user
-    if (!msg || msg.disabled || !msg.platforms.includes(this.userService.platform.type)) {
+    if (
+      !msg ||
+      msg.disabled ||
+      (msg.platforms && !msg.platforms.includes(this.userService.platform.type))
+    ) {
       this.clearNotification();
       return;
     }
