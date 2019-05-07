@@ -34,6 +34,9 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
+const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
+if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
+
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
