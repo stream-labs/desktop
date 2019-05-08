@@ -13,6 +13,7 @@ import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
+import { EditorCommandsService } from 'services/editor-commands';
 
 interface IResizeRegion {
   name: string;
@@ -41,6 +42,7 @@ export default class StudioEditor extends Vue {
   @Inject() private selectionService: SelectionService;
   @Inject() private transitionsService: TransitionsService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   renderedWidth = 0;
   renderedHeight = 0;
@@ -358,8 +360,9 @@ export default class StudioEditor extends Vue {
       }
     }
 
-    // scale all selected items
-    this.selectionService.scaleWithOffset(
+    this.editorCommandsService.executeCommand(
+      'ResizeItemsCommand',
+      this.selectionService.getActiveSelection(),
       { x: scaleXDelta, y: scaleYDelta },
       this.selectionService.getBoundingRect().getOffsetFromOrigin(AnchorPositions[opts.anchor]),
     );
