@@ -5,6 +5,7 @@ useSpectron();
 
 test('Main and child window visibility', async t => {
   const app = t.context.app;
+  t.fail('Test failure');
   await focusMain(t);
   t.true(await app.browserWindow.isVisible());
   await focusChild(t);
