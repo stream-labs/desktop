@@ -62,7 +62,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     experimental: {
       // put experimental features here
     },
-    hideStyleBlockingElements: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -70,9 +69,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   init() {
     super.init(CustomizationService.migrations);
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-
-    // Hide these elements until the app is finished loading
-    this.setSettings({ hideStyleBlockingElements: true });
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {

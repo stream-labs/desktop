@@ -272,7 +272,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.registerSubscriptionEvent({
         subscriberId: event.message[0].subscriber_twitch_id,
         subPlan: event.message[0].sub_plan,
-        name: event.message[0].name,
+        name: event.message[0].name.toLowerCase(),
       });
     }
 
@@ -301,7 +301,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.playSubscriptionEvent({
         subscriberId: event.message.subscriber_twitch_id,
         subPlan: event.message.sub_plan,
-        name: event.message.name,
+        name: event.message.name.toLowerCase(),
       });
     }
 

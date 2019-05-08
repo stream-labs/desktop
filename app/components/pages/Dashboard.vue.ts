@@ -4,7 +4,6 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
-import { I18nService } from 'services/i18n';
 import electron from 'electron';
 import { NavigationService, TAppPage } from 'services/navigation';
 
@@ -14,7 +13,6 @@ export default class Dashboard extends Vue {
   @Inject() guestApiService: GuestApiService;
   @Inject() facemasksService: FacemasksService;
   @Inject() navigationService: NavigationService;
-  @Inject() i18nService: I18nService;
   @Prop() params: Dictionary<string>;
 
   $refs: {
@@ -34,7 +32,6 @@ export default class Dashboard extends Vue {
       });
     });
 
-    I18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
       electron.remote.shell.openExternal(e.url);
     });

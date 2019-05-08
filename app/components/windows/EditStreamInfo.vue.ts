@@ -360,6 +360,7 @@ export default class EditStreamInfo extends Vue {
 
   get gameMetadata() {
     return {
+      name: 'game',
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
