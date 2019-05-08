@@ -39,10 +39,12 @@ export default class NameFolder extends Vue {
     if (!this.name) {
       this.error = $t('The source name is required');
     } else if (this.options.renameId) {
-      const folder = this.scenesService
-        .getScene(this.options.sceneId)
-        .getFolder(this.options.renameId);
-      folder.setName(this.name);
+      this.editorCommandsService.executeCommand(
+        'RenameFolderCommand',
+        this.options.sceneId,
+        this.options.renameId,
+        this.name,
+      );
       this.windowsService.closeChildWindow();
     } else {
       const scene = this.scenesService.getScene(this.options.sceneId);
