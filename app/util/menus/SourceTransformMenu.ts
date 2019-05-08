@@ -4,6 +4,7 @@ import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ECenteringType } from 'services/editor-commands/commands/center-items';
+import { EFlipAxis } from 'services/editor-commands/commands/flip-items';
 
 export class SourceTransformMenu extends Menu {
   @Inject() private selectionService: SelectionService;
@@ -82,12 +83,22 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: 'Flip Vertical',
-      click: () => this.selectionService.flipY(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'FlipItemsCommand',
+          this.selectionService.getActiveSelection(),
+          EFlipAxis.Vertical,
+        ),
     });
 
     this.append({
       label: 'Flip Horizontal',
-      click: () => this.selectionService.flipX(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'FlipItemsCommand',
+          this.selectionService.getActiveSelection(),
+          EFlipAxis.Horizontal,
+        ),
     });
 
     this.append({ type: 'separator' });

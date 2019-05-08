@@ -5,3 +5,4 @@ export { NudgeItemsCommand } from './nudge-items';
 export { StretchToScreenCommand } from './stretch-to-screen';
 export { FitToScreenCommand } from './fit-to-screen';
 export { CenterItemsCommand } from './center-items';
+export { FlipItemsCommand } from './flip-items';
