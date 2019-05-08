@@ -5,6 +5,7 @@ import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
+import { EditorCommandsService } from 'services/editor-commands';
 import electron from 'electron';
 
 const { webFrame, screen } = electron;
@@ -57,10 +58,10 @@ interface IDragHandlerOptions {
 // Encapsulates logic for dragging sources in the overlay editor
 export class DragHandler {
   @Inject() private settingsService: SettingsService;
-  @Inject() private scenesService: ScenesService;
   @Inject() private videoService: VideoService;
   @Inject() private windowsService: WindowsService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   // Settings
   snapEnabled: boolean;
@@ -177,10 +178,16 @@ export class DragHandler {
     const deltaX = rect.x - this.draggedSource.transform.position.x;
     const deltaY = rect.y - this.draggedSource.transform.position.y;
 
-    this.selectionService.getItems().forEach(item => {
-      const pos = item.transform.position;
-      item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
-    });
+    this.editorCommandsService.executeCommand(
+      'ResizeItemsCommand',
+      this.selectionService.getActiveSelection(),
+      { x: deltaX, y: deltaY },
+    );
+
+    // this.selectionService.getItems().forEach(item => {
+    //   const pos = item.transform.position;
+    //   item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
+    // });
   }
 
   private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {

@@ -12,6 +12,7 @@ import {
   ScenesService,
   TSceneNode,
   TSceneNodeModel,
+  ITransform,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { Inject } from 'util/injector';
@@ -43,7 +44,10 @@ export class SelectionService extends StatefulService<ISelectionState> {
   };
 
   updated = new Subject<ISelectionState>();
-  private sceneId: string;
+
+  private get sceneId() {
+    return this.scenesService.activeSceneId;
+  }
 
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
@@ -72,7 +76,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
   getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
-  getTransform: () => { crop: any; position: any; scale: any };
+  getTransform: () => ITransform;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
   copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
@@ -183,6 +187,10 @@ export class SelectionService extends StatefulService<ISelectionState> {
       });
 
     this.updated.next(this.state);
+  }
+
+  getActiveSelection() {
+    return new Selection(this.sceneId, this.getIds());
   }
 
   /**
