@@ -312,7 +312,14 @@ export class ScenesService extends StatefulService<IScenesState> {
     });
   }
 
-  showNameFolder(options: { renameId?: string; itemsToGroup?: string[]; parentId?: string } = {}) {
+  showNameFolder(
+    options: {
+      sceneId?: string;
+      renameId?: string;
+      itemsToGroup?: string[];
+      parentId?: string;
+    } = {},
+  ) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
       title: options.renameId ? $t('Rename Folder') : $t('Name Folder'),

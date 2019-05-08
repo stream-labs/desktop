@@ -125,7 +125,11 @@ export default class SourceSelector extends Vue {
         const parent = this.selectionService.getClosestParent();
         if (parent) parentId = parent.id;
       }
-      this.scenesService.showNameFolder({ itemsToGroup, parentId });
+      this.scenesService.showNameFolder({
+        itemsToGroup,
+        parentId,
+        sceneId: this.scenesService.activeScene.id,
+      });
     }
   }
 

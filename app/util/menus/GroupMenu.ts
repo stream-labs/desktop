@@ -24,6 +24,7 @@ export class GroupMenu extends Menu {
       label: $t('Group into Folder'),
       click: () => {
         this.scenesService.showNameFolder({
+          sceneId: this.scenesService.activeSceneId,
           itemsToGroup: this.selectionService.getIds(),
           parentId: nodesFolders[0],
         });
