@@ -8,3 +8,4 @@ export { CenterItemsCommand } from './center-items';
 export { FlipItemsCommand } from './flip-items';
 export { ResetTransformCommand } from './reset-transform';
 export { RotateItemsCommand } from './rotate-items';
+export { ReorderItemsCommand } from './reorder-items';

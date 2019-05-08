@@ -8,6 +8,8 @@ import { EditMenu } from '../util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-items';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -57,6 +59,7 @@ export default class SourceSelector extends Vue {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -167,11 +170,26 @@ export default class SourceSelector extends Vue {
     const destNode = this.scene.getNode(position.node.data.id);
 
     if (position.placement === 'before') {
-      nodesToMove.placeBefore(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderItemsCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.Before,
+      );
     } else if (position.placement === 'after') {
-      nodesToMove.placeAfter(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderItemsCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.After,
+      );
     } else if (position.placement === 'inside') {
-      nodesToMove.setParent(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderItemsCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.Inside,
+      );
     }
     this.selectionService.select(nodesToMove.getIds());
   }
