@@ -3,3 +3,4 @@ export { ResizeItemsCommand } from './resize-items';
 export { CropItemsCommand } from './crop-items';
 export { NudgeItemsCommand } from './nudge-items';
 export { StretchToScreenCommand } from './stretch-to-screen';
+export { FitToScreenCommand } from './fit-to-screen';

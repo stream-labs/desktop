@@ -38,7 +38,11 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: $t('Fit to Screen'),
-      click: () => this.selectionService.fitToScreen(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'FitToScreenCommand',
+          this.selectionService.getActiveSelection(),
+        ),
     });
 
     this.append({ type: 'separator' });
