@@ -28,6 +28,7 @@
       <remote-control-settings v-if="categoryName === 'Remote Control'" />
       <GenericFormGroups
         v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
+        :categoryName="categoryName"
         v-model="settingsData"
         @input="save" />
     </div>

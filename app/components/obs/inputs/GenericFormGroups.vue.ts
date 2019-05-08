@@ -2,14 +2,17 @@ import Vue from 'vue';
 import GenericForm from './GenericForm.vue';
 import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { ISettingsSubCategory } from '../../../services/settings';
+import { ISettingsSubCategory, SettingsService } from '../../../services/settings';
+import { Inject } from 'util/injector';
 
 @Component({
   components: { AdvancedOutputTabs, GenericForm },
 })
 export default class GenericFormGroups extends Vue {
-  @Prop()
-  value: ISettingsSubCategory[];
+  @Inject() settingsService: SettingsService;
+
+  @Prop() value: ISettingsSubCategory[];
+  @Prop() categoryName: string;
 
   collapsedGroups: Dictionary<boolean> = {};
 
@@ -28,13 +31,6 @@ export default class GenericFormGroups extends Vue {
   }
 
   get isAdvancedOutput() {
-    // TODO: improve this check after backend changes required to enable ECategoryType detection
-    return (
-      this.value[0] &&
-      this.value[0].parameters.length &&
-      this.value[0].parameters[0].value === 'Advanced' &&
-      this.value[1] &&
-      this.value[1].nameSubCategory === 'Streaming'
-    );
+    return this.settingsService.isTabbedForm(this.categoryName);
   }
 }
