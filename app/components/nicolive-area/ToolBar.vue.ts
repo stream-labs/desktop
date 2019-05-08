@@ -9,8 +9,7 @@ export default class ToolBar extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  // TODO: あとでまとめる
-  manualExtentionTooltip = '30分延長する';
+  manualExtentionTooltip = $t('common.manualExtendButton');
 
   format(timeInSeconds: number): string {
     return NicoliveProgramService.format(timeInSeconds);
