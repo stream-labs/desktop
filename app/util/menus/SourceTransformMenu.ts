@@ -3,6 +3,7 @@ import { SelectionService } from 'services/selection';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ECenteringType } from 'services/editor-commands/commands/center-items';
 
 export class SourceTransformMenu extends Menu {
   @Inject() private selectionService: SelectionService;
@@ -49,17 +50,32 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: $t('Center on Screen'),
-      click: () => this.selectionService.centerOnScreen(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'CenterItemsCommand',
+          this.selectionService.getActiveSelection(),
+          ECenteringType.Screen,
+        ),
     });
 
     this.append({
       label: $t('Center Horizontal'),
-      click: () => this.selectionService.centerOnHorizontal(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'CenterItemsCommand',
+          this.selectionService.getActiveSelection(),
+          ECenteringType.Horizontal,
+        ),
     });
 
     this.append({
       label: $t('Center Vertical'),
-      click: () => this.selectionService.centerOnVertical(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'CenterItemsCommand',
+          this.selectionService.getActiveSelection(),
+          ECenteringType.Vertical,
+        ),
     });
 
     this.append({ type: 'separator' });
