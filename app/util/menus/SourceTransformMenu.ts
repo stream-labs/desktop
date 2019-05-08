@@ -109,17 +109,32 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: $t('Rotate 90 Degrees CW'),
-      click: () => this.selectionService.rotate(90),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'RotateItemsCommand',
+          this.selectionService.getActiveSelection(),
+          90,
+        ),
     });
 
     this.append({
       label: $t('Rotate 90 Degrees CCW'),
-      click: () => this.selectionService.rotate(-90),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'RotateItemsCommand',
+          this.selectionService.getActiveSelection(),
+          -90,
+        ),
     });
 
     this.append({
       label: $t('Rotate 180 Degrees'),
-      click: () => this.selectionService.rotate(180),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'RotateItemsCommand',
+          this.selectionService.getActiveSelection(),
+          180,
+        ),
     });
   }
 }
