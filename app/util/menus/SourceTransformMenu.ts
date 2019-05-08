@@ -1,14 +1,12 @@
 import { Menu } from './Menu';
-import { ScenesService } from 'services/scenes';
-import { VideoService } from 'services/video';
 import { SelectionService } from 'services/selection';
-import { Inject } from '../injector';
+import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 export class SourceTransformMenu extends Menu {
-  @Inject() private scenesService: ScenesService;
-  @Inject() private videoService: VideoService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   constructor() {
     super();
@@ -31,7 +29,11 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: $t('Stretch to Screen'),
-      click: () => this.selectionService.stretchToScreen(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'StretchToScreenCommand',
+          this.selectionService.getActiveSelection(),
+        ),
     });
 
     this.append({

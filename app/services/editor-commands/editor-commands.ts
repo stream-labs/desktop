@@ -67,6 +67,7 @@ export class EditorCommandsService extends Service {
     this.undoHistory.push(instance);
   }
 
+  @shortcut('Ctrl+Z')
   undo() {
     const command = this.undoHistory.pop();
 
@@ -76,6 +77,7 @@ export class EditorCommandsService extends Service {
     }
   }
 
+  @shortcut('Ctrl+Y')
   redo() {
     const command = this.redoHistory.pop();
 
