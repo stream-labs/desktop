@@ -8,7 +8,7 @@ import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
 import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
-import { SelectionService } from 'services/selection';
+import { SelectionService, Selection } from 'services/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
@@ -294,10 +294,12 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getItem(source.sceneItemId).setTransform({
-      position: { x: rect.x, y: rect.y },
-      crop: rect.crop,
-    });
+    this.editorCommandsService.executeCommand(
+      'CropItemsCommand',
+      new Selection(this.scene.id, source.sceneItemId),
+      rect.crop,
+      { x: rect.x, y: rect.y },
+    );
   }
 
   resize(
