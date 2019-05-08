@@ -12,6 +12,8 @@ import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 import { AppService } from 'services/app';
+import fs from 'fs';
+import path from 'path';
 
 @Component({
   components: { BoolInput },
@@ -99,5 +101,36 @@ export default class ExtraSettings extends Vue {
 
   get isRecordingOrStreaming() {
     return this.streamingService.isStreaming || this.streamingService.isRecording;
+  }
+
+  // Avoid file IO by keeping track of file state in memory while
+  // this component is mounted.
+  disableHA: boolean = null;
+
+  get disableHardwareAcceleration() {
+    if (this.disableHA == null) {
+      this.disableHA = fs.existsSync(this.disableHAFilePath);
+    }
+
+    return this.disableHA;
+  }
+
+  set disableHardwareAcceleration(val: boolean) {
+    try {
+      if (val) {
+        // Touch the file
+        fs.closeSync(fs.openSync(this.disableHAFilePath, 'w'));
+        this.disableHA = true;
+      } else {
+        fs.unlinkSync(this.disableHAFilePath);
+        this.disableHA = false;
+      }
+    } catch (e) {
+      console.error('Error setting hardware acceleration', e);
+    }
+  }
+
+  get disableHAFilePath() {
+    return path.join(this.appService.appDataDirectory, 'HADisable');
   }
 }

@@ -33,12 +33,12 @@ export default class Studio extends Vue {
 
   mounted() {
     this.sizeCheckInterval = window.setInterval(() => {
-      if (this.studioMode) {
+      if (this.studioMode && this.$refs.studioModeContainer) {
         const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
 
         this.stacked = clientWidth / clientHeight <= 16 / 9;
       }
-      if (!this.displayEnabled && !this.performanceMode) {
+      if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
         const { clientWidth, clientHeight } = this.$refs.placeholder;
         this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
       }

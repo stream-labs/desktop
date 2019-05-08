@@ -220,6 +220,38 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
         .getSceneItem(sceneItemId)
         .setVisibility(false),
   },
+  PUSH_TO_SOURCE_SHOW: {
+    name: 'PUSH_TO_SOURCE_SHOW',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Show %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
+  },
+  PUSH_TO_SOURCE_HIDE: {
+    name: 'PUSH_TO_SOURCE_HIDE',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Hide %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+  },
 };
 
 /**
