@@ -24,7 +24,11 @@ export class SourceTransformMenu extends Menu {
 
     this.append({
       label: $t('Reset Transform'),
-      click: () => this.selectionService.resetTransform(),
+      click: () =>
+        this.editorCommandsService.executeCommand(
+          'ResetTransformCommand',
+          this.selectionService.getActiveSelection(),
+        ),
     });
 
     this.append({ type: 'separator' });
