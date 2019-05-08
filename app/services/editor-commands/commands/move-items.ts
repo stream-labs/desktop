@@ -6,9 +6,9 @@ export class MoveItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
-  execute() {
+  modifyTransform() {
     this.selection.getItems().forEach(item => {
-      this.setTransform(item, {
+      item.setTransform({
         position: {
           x: item.transform.position.x + this.deltaPosition.x,
           y: item.transform.position.y + this.deltaPosition.y,
