@@ -2,12 +2,18 @@ import { Service } from 'services/service';
 import { Command } from './commands/command';
 import * as commands from './commands';
 import { CombinableCommand } from './commands/combinable-command';
+import { shortcut } from 'services/shortcuts';
+import { SelectionService } from 'services/selection';
+import { Inject } from 'util/injector';
+import { ENudgeDirection } from './commands/nudge-items';
 
 const COMMANDS = { ...commands };
 
 const COMBINE_TIMEOUT = 500;
 
 export class EditorCommandsService extends Service {
+  @Inject() selectionService: SelectionService;
+
   // TODO: Stateful service for visual command history?
   undoHistory: Command[] = [];
   redoHistory: Command[] = [];
@@ -77,5 +83,42 @@ export class EditorCommandsService extends Service {
       command.execute();
       this.undoHistory.push(command);
     }
+  }
+
+  // Shortcuts for undo-able editor commands go here:
+  @shortcut('ArrowLeft')
+  nudgeActiveItemsLeft() {
+    this.executeCommand(
+      'NudgeItemsCommand',
+      this.selectionService.getActiveSelection(),
+      ENudgeDirection.Left,
+    );
+  }
+
+  @shortcut('ArrowRight')
+  nudgeActiveItemRight() {
+    this.executeCommand(
+      'NudgeItemsCommand',
+      this.selectionService.getActiveSelection(),
+      ENudgeDirection.Right,
+    );
+  }
+
+  @shortcut('ArrowUp')
+  nudgeActiveItemsUp() {
+    this.executeCommand(
+      'NudgeItemsCommand',
+      this.selectionService.getActiveSelection(),
+      ENudgeDirection.Up,
+    );
+  }
+
+  @shortcut('ArrowDown')
+  nudgeActiveItemsDown() {
+    this.executeCommand(
+      'NudgeItemsCommand',
+      this.selectionService.getActiveSelection(),
+      ENudgeDirection.Down,
+    );
   }
 }

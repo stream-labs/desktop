@@ -140,26 +140,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
     );
   }
 
-  @shortcut('ArrowLeft')
-  nudgeActiveItemsLeft() {
-    return this.getSelection().nudgeActiveItemsLeft.call(this);
-  }
-
-  @shortcut('ArrowRight')
-  nudgeActiveItemRight() {
-    return this.getSelection().nudgeActiveItemRight.call(this);
-  }
-
-  @shortcut('ArrowUp')
-  nudgeActiveItemsUp() {
-    return this.getSelection().nudgeActiveItemsUp.call(this);
-  }
-
-  @shortcut('ArrowDown')
-  nudgeActiveItemsDown() {
-    return this.getSelection().nudgeActiveItemsDown.call(this);
-  }
-
   openEditTransform() {
     const windowHeight = this.isSceneItem() ? 460 : 300;
     this.windowsService.showWindow({
@@ -657,19 +637,19 @@ export class Selection {
     this.getNodes().forEach(node => node.remove());
   }
 
-  nudgeActiveItemsLeft() {
+  nudgeLeft() {
     this.getItems().forEach(item => item.nudgeLeft());
   }
 
-  nudgeActiveItemRight() {
+  nudgeRight() {
     this.getItems().forEach(item => item.nudgeRight());
   }
 
-  nudgeActiveItemsUp() {
+  nudgeUp() {
     this.getItems().forEach(item => item.nudgeUp());
   }
 
-  nudgeActiveItemsDown() {
+  nudgeDown() {
     this.getItems().forEach(item => item.nudgeDown());
   }
 
