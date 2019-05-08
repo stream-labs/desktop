@@ -1,1 +1,1 @@
-export { ResizeItemsCommand } from './resize-items';
+export { MoveItemsCommand } from './move-items';

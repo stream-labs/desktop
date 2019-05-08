@@ -179,15 +179,10 @@ export class DragHandler {
     const deltaY = rect.y - this.draggedSource.transform.position.y;
 
     this.editorCommandsService.executeCommand(
-      'ResizeItemsCommand',
+      'MoveItemsCommand',
       this.selectionService.getActiveSelection(),
       { x: deltaX, y: deltaY },
     );
-
-    // this.selectionService.getItems().forEach(item => {
-    //   const pos = item.transform.position;
-    //   item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
-    // });
   }
 
   private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {

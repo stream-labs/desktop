@@ -2,7 +2,7 @@ import { CombinableCommand } from './combinable-command';
 import { Selection } from 'services/selection';
 import isEqual from 'lodash/isEqual';
 
-export class ResizeItemsCommand extends CombinableCommand {
+export class MoveItemsCommand extends CombinableCommand {
   constructor(private selection: Selection, private deltaPosition: IVec2) {
     super();
   }
@@ -29,14 +29,14 @@ export class ResizeItemsCommand extends CombinableCommand {
     });
   }
 
-  shouldCombine(other: ResizeItemsCommand) {
+  shouldCombine(other: MoveItemsCommand) {
     return (
       other.selection.sceneId === this.selection.sceneId &&
       isEqual(other.selection.getIds(), this.selection.getIds())
     );
   }
 
-  combine(other: ResizeItemsCommand) {
+  combine(other: MoveItemsCommand) {
     this.deltaPosition.x += other.deltaPosition.x;
     this.deltaPosition.y += other.deltaPosition.y;
   }
