@@ -1,4 +1,5 @@
 yarn install
 yarn compile
 yarn test --match="Main and child window visibility"
-echo 'completed';
+echo "completed $LastExitCode";
+exit $LastExitCode
