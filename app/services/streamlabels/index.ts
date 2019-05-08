@@ -9,7 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import rimraf from 'rimraf';
-import { without } from 'lodash';
+import without from 'lodash/without';
+import { AppService } from 'services/app';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -68,6 +69,7 @@ export class StreamlabelsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() websocketService: WebsocketService;
+  @Inject() appService: AppService;
 
   /**
    * Represents the raw strings that should be
@@ -390,7 +392,7 @@ export class StreamlabelsService extends Service {
   }
 
   private get streamlabelsDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Streamlabels');
+    return path.join(this.appService.appDataDirectory, 'Streamlabels');
   }
 
   private getStreamlabelsPath(filename: string) {

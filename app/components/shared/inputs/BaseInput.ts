@@ -10,12 +10,14 @@ export abstract class BaseInput<
   TMetadataType extends IInputMetadata
 > extends TsxComponent<{
   metadata: TMetadataType;
-  value: TValueType;
-  title: string;
+  value?: TValueType;
+  title?: string;
+  onInput?: Function;
 }> {
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;
+  onInput: Function = null;
 
   /**
    * true if the component listens and re-emits child-inputs events
@@ -25,7 +27,7 @@ export abstract class BaseInput<
   /**
    * uuid serves to link input field and validator message
    */
-  readonly uuid = this.options.uuid || uuid();
+  private readonly uuid = uuid();
 
   /**
    * contains ValidatedForm if exist
@@ -56,6 +58,8 @@ export abstract class BaseInput<
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
+
+    if (this.onInput) this.onInput(eventData);
 
     const needToSendEventToForm =
       (this.form && !this.parentInput) ||
@@ -88,6 +92,7 @@ export abstract class BaseInput<
     const metadata = this.metadata || ({} as TMetadataType);
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
+    options.uuid = metadata.uuid || this.uuid;
     return options;
   }
 

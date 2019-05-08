@@ -34,4 +34,8 @@ export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
       : event.target.value;
     this.emitInput(val);
   }
+
+  handleEnter(ev: Event) {
+    if (this.options.blockReturn) ev.preventDefault();
+  }
 }

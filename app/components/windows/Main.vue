@@ -1,7 +1,7 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
-  <div class="main-spacer"></div>
+  <div class="main-spacer" :class="{ 'main-spacer--error': errorAlert }"></div>
   <news-banner/>
   <div
     class="main-contents"
@@ -22,7 +22,7 @@
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
 
-      <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <top-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
 
       <component
@@ -44,9 +44,9 @@
       <live-dock class="live-dock" />
     </div>
   </div>
-  <div class="main-loading" :class="{ hidden: !showLoadingSpinner }">
-    <custom-loader></custom-loader>
-  </div>
+  <transition name="loader">
+    <div class="main-loading" v-if="showLoadingSpinner"><custom-loader></custom-loader></div>
+  </transition>
 </div>
 </template>
 
@@ -100,6 +100,10 @@
   height: 4px;
   flex: 0 0 4px;
   .bg--teal();
+
+  &.main-spacer--error {
+    background-color: @red;
+  }
 }
 
 .main-page-container {
@@ -117,8 +121,6 @@
   right: 0;
   z-index: 999999;
   background-color: var(--background);
-  transform: translate(0);
-  transition: opacity 0.5s ease-out, transform 0.5s step-start, z-index 0.5s step-start;
 
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
@@ -126,11 +128,14 @@
   }
 }
 
-.main-loading.hidden {
+.loader-enter-active,
+.loader-leave-active {
+  transition: opacity 0.5s ease-out;
+}
+
+.loader-enter,
+.loader-leave-to {
   opacity: 0;
-  transform: translate(500%);
-  z-index: -999999;
-  transition-timing-function: ease-out, step-end, step-end;
 }
 
 .live-dock {

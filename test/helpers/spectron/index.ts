@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUserName, releaseUserInPool } from './user';
+import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 
 export const test = avaTest as TestInterface<ITestContext>;
@@ -15,14 +15,15 @@ const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 
-async function focusWindow(t: any, regex: RegExp) {
+export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return;
+    if (url.match(regex)) return true;
   }
+  return false;
 }
 
 // Focuses the main window
@@ -45,6 +46,10 @@ export async function focusLibrary(t: any) {
 // Close current focused window
 export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
+}
+
+export async function waitForLoader(t: any) {
+  await t.context.app.client.waitForExist('.main-loading', 10000, true);
 }
 
 interface ITestRunnerOptions {
@@ -133,8 +138,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
     `;
-    await focusChild(t);
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
@@ -147,8 +150,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
+
+    await waitForLoader(t);
     if (options.skipOnboarding) {
-      await focusMain(t);
       await t.context.app.client.click('a=Setup later');
 
       // This will only show up if OBS is installed
@@ -165,6 +169,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
+    // disable animations in the child window
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+
     context = t.context;
     appIsRunning = true;
 
@@ -173,11 +182,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  async function stopApp(t: TExecutionContext) {
+  async function stopApp() {
     try {
-      await context.app.stop();
+      await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
+      console.error(e);
     }
     appIsRunning = false;
     await checkErrorsInLogFile();
@@ -235,7 +245,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp(t);
+        await stopApp();
       }
     } catch (e) {
       testPassed = false;
@@ -243,15 +253,15 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!testPassed) {
       failedTests.push(testName);
-      const userName = getUserName();
-      if (userName) console.log(`Test failed for the account: ${userName}`);
+      const user = getUser();
+      if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
   });
 
   test.after.always(async t => {
     if (appIsRunning) {
-      await stopApp(t);
+      await stopApp();
       if (!testPassed) failedTests.push(testName);
     }
 

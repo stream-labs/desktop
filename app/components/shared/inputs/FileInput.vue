@@ -5,7 +5,7 @@
       type="text"
       readonly
       :value="value"
-      :name="uuid"
+      :name="options.uuid"
       class="file-input__input"
       v-validate="validate">
     <button

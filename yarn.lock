@@ -2723,11 +2723,6 @@ cipher-base@^1.0.0, cipher-base@^1.0.1:
   dependencies:
     inherits "^2.0.1"
 
-circular-dependency-plugin@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/circular-dependency-plugin/-/circular-dependency-plugin-3.0.0.tgz#9b68692e35b0e3510998d0164b6ae5011bea5760"
-  integrity sha1-m2hpLjWw41EJmNAWS2rlARvqV2A=
-
 clamp@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
@@ -3196,9 +3191,9 @@ cosmiconfig@^5.0.6:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.30/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz#3574c2a9a2bee9a9462eec39c4b9000f4bc1f497"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.30/iojs-v2.0.8-crash-handler.tar.gz#65345b746a0488d4b32fc5c462156313bc1d2ed3"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -3806,10 +3801,10 @@ electron-download@^4.1.0:
     semver "^5.4.1"
     sumchecker "^2.0.2"
 
-electron-log@^2.2.17:
-  version "2.2.17"
-  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.17.tgz#e71e2ebb949fc96ded7cdb99eeee7202e48981d2"
-  integrity sha512-v+Af5W5z99ehhaLOfE9eTSXUwjzh2wFlQjz51dvkZ6ZIrET6OB/zAZPvsuwT6tm3t5x+M1r+Ed3U3xtPZYAyuQ==
+electron-log@^3.0.4:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-3.0.5.tgz#9bdd307f1f1aec85c0873babd6bdfffb1a661436"
+  integrity sha512-wWOPNBVGh7NJx/OLXdgtuYrqxoG9ZWO+kZYloIHi66B5W9EgXZw71jdZ1ddeWNg4CkABypa8tkrRGqCKF+9tYg==
 
 electron-osx-sign@0.4.11:
   version "0.4.11"
@@ -3889,11 +3884,6 @@ emoji-regex@^7.0.1:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
   integrity sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==
-
-emojione@3.1.7:
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/emojione/-/emojione-3.1.7.tgz#2d3c725c696f179c9dde3acb655c621ee9429b1e"
-  integrity sha1-LTxyXGlvF5yd3jrLZVxiHulCmx4=
 
 emojis-list@^2.0.0:
   version "2.1.0"
@@ -4274,9 +4264,9 @@ extsprintf@^1.2.0:
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
 
-"facemask-plugin@https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.8.tar.gz":
-  version "0.8.8"
-  resolved "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.8.tar.gz#d34814376e1e4863eb8b1604924ca4bf5619e2bd"
+"facemask-plugin@https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.9.tar.gz":
+  version "0.8.9"
+  resolved "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.8.9.tar.gz#1fb1639229379eb552e1d1c5ddde0952da37cf63"
 
 fast-deep-equal@^1.0.0:
   version "1.1.0"
@@ -4614,6 +4604,11 @@ fuse.js@3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.2.1.tgz#6320cb94ce56ec9755c89ade775bcdbb0358d425"
   integrity sha1-YyDLlM5W7JdVyJred1vNuwNY1CU=
+
+fuse.js@^3.2.0, fuse.js@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.4.4.tgz#f98f55fcb3b595cf6a3e629c5ffaf10982103e95"
+  integrity sha512-pyLQo/1oR5Ywf+a/tY8z4JygnIglmRxVUOiyFAbd11o9keUDpUJSMGRWJngcnkURj30kDHPmhoKY8ChJiz3EpQ==
 
 g-status@^2.0.2:
   version "2.0.2"
@@ -7116,9 +7111,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.18-iojs-v2.0.8.tar.gz":
-  version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.18-iojs-v2.0.8.tar.gz#3283b88c8d78fd6901b121f7f5914cf489f94e19"
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.27-iojs-v2.0.8.tar.gz":
+  version "0.3.99"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.27-iojs-v2.0.8.tar.gz#8b7569c435a3a7fd23ec88447cef0be4b7f0e6b4"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -7938,6 +7933,14 @@ raven@^2.6.4:
     stack-trace "0.0.10"
     timed-out "4.0.1"
     uuid "3.3.2"
+
+raw-loader@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-2.0.0.tgz#e2813d9e1e3f80d1bbade5ad082e809679e20c26"
+  integrity sha512-kZnO5MoIyrojfrPWqrhFNLZemIAX8edMOCp++yC5RKxzFB3m92DqKNhKlU6+FvpOhWtvyh3jOaD7J6/9tpdIKg==
+  dependencies:
+    loader-utils "^1.1.0"
+    schema-utils "^1.0.0"
 
 rc@^1.0.1, rc@^1.1.2, rc@^1.1.6, rc@^1.1.7, rc@^1.2.1:
   version "1.2.8"
@@ -9080,17 +9083,18 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.3.54:
-  version "0.3.54"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.54.tgz#7f0cc14e25e6c144d187caef1428030a88a0746b"
-  integrity sha512-GgNPNpOxllY/Zzv2rcXgktdMp+TeRJhdOYgYSEQ/uWXvuIIfpzm4y3bNMo469AOX6kZGiI8usnOAnuiBno9cvQ==
+streamlabs-beaker@^0.4.6:
+  version "0.4.37"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.37.tgz#44cde495d329a34dcf39300a4f5180572a5ed131"
+  integrity sha512-0qe2+EqZT8DOybnrKrmnjI0XXs3o+NOh05dxpa4bSTdtuGCDYusYgpRpFEoaFitYycFmEEdGfmBWDNFLsFHN0Q==
   dependencies:
+    fuse.js "^3.4.4"
     google-fonts-webpack-plugin "^0.4.4"
     v-tooltip "^2.0.0-rc.33"
-    vee-validate "^2.1.7"
     vue "^2.6.6"
     vue-class-component "^6.0.0"
     vue-color "^2.7.0"
+    vue-fuse "^2.0.2"
     vue-js-modal "^1.3.28"
     vue-mq "^1.0.1"
     vue-property-decorator "^7.0.0"
@@ -10218,7 +10222,7 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-vee-validate@2.2.0, vee-validate@^2.1.7:
+vee-validate@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.0.tgz#0dcb6251a50cde9a3a1e924c917cc3d0a543b661"
   integrity sha512-s72VQcl1DWTNQKQyHtUDcU536dIx/GYDnCObDj4AXDZtWnqM3rXbgp7FCT3D2q9HFKw7IykW9bVrClhPBeQnrw==
@@ -10283,6 +10287,14 @@ vue-color@2.7.0, vue-color@^2.7.0:
     lodash.throttle "^4.0.0"
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
+
+vue-fuse@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vue-fuse/-/vue-fuse-2.0.2.tgz#beb18d578052f7027a81edf12e9d3a394ca38d14"
+  integrity sha512-5oLkKy8NX9jX+s2FkkY+1cjATgNcEw/wSLEIhK/5iNAr0deBiSyd8Pu1xJJcZwBai6HEUTFbhqYilfeprQ7m1w==
+  dependencies:
+    fuse.js "^3.2.0"
+    vue "^2.5.17"
 
 vue-hot-reload-api@^2.2.0:
   version "2.2.4"
@@ -10409,6 +10421,11 @@ vue@2.6.9, vue@^2.5.11, vue@^2.5.21, vue@^2.6.6:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.9.tgz#415c1cc1a5ed00c8f0acdd0a948139d12b7ea6b3"
   integrity sha512-t1+tvH8hybPM86oNne3ZozCD02zj/VoZIiojOBPJLjwBn7hxYU5e1gBObFpq8ts1NEn1VhPf/hVXBDAJ3X5ljg==
 
+vue@^2.5.17:
+  version "2.6.10"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
+  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
+
 vuedraggable@2.8.5:
   version "2.8.5"
   resolved "https://registry.yarnpkg.com/vuedraggable/-/vuedraggable-2.8.5.tgz#ffa72ed225d006f313b43c22d2e52046b15e9678"
@@ -10518,6 +10535,13 @@ webpack-cli@3.1.2:
     supports-color "^5.5.0"
     v8-compile-cache "^2.0.2"
     yargs "^12.0.2"
+
+webpack-merge@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-4.2.1.tgz#5e923cf802ea2ace4fd5af1d3247368a633489b4"
+  integrity sha512-4p8WQyS98bUJcCvFMbdGZyZmsKuWjWVnVHnAS3FFg0HDaRVrPbkivx2RYCre8UiemD67RsiFFLfn4JhLAin8Vw==
+  dependencies:
+    lodash "^4.17.5"
 
 webpack-sources@^0.2.0:
   version "0.2.3"

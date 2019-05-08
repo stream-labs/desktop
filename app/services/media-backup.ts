@@ -6,7 +6,8 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import electron from 'electron';
-import { getChecksum, isUrl } from 'util/requests';
+import { getChecksum, isUrl, handleErrors } from 'util/requests';
+import { AppService } from 'services/app';
 
 const uuid = window['require']('uuid/v4');
 
@@ -47,6 +48,7 @@ const ONE_GIGABYTE = Math.pow(10, 9);
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() appService: AppService;
 
   static initialState: IMediaBackupState = { files: [] };
 
@@ -272,22 +274,11 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     });
   }
 
-  private getFileData(id: number) {
-    return new Promise<IMediaFileDataResponse>((resolve, reject) => {
-      request(
-        {
-          url: `${this.apiBase}/${id}`,
-          headers: this.authedHeaders,
-        },
-        (err, res, body) => {
-          if (Math.floor(res.statusCode / 100) === 2) {
-            resolve(JSON.parse(body));
-          } else {
-            reject(res);
-          }
-        },
-      );
-    });
+  private getFileData(id: number): Promise<IMediaFileDataResponse> {
+    const req = new Request(`${this.apiBase}/${id}`, { headers: new Headers(this.authedHeaders) });
+    return fetch(req)
+      .then(handleErrors)
+      .then(r => r.json());
   }
 
   private downloadFile(url: string, serverId: number, filename: string) {
@@ -345,7 +336,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   }
 
   private get mediaDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Media');
+    return path.join(this.appService.appDataDirectory, 'Media');
   }
 
   @mutation()

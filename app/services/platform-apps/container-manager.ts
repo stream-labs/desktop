@@ -1,6 +1,7 @@
 import { ILoadedApp, EAppPageSlot } from '.';
 import electron from 'electron';
-import { trim, compact } from 'lodash';
+import trim from 'lodash/trim';
+import compact from 'lodash/compact';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import url from 'url';
@@ -43,7 +44,8 @@ export class PlatformContainerManager {
     this.unregisterApp(app);
 
     app.manifest.pages.forEach(page => {
-      if (page.persistent) {
+      // Background pages are always persistent
+      if (page.persistent || page.slot === EAppPageSlot.Background) {
         this.createContainer(app, page.slot, true);
       }
     });

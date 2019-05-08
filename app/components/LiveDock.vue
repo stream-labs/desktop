@@ -6,7 +6,7 @@
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
-    @click="expand">
+    @click="setCollapsed(false)">
     <i :class="{
       'icon-down icon-left': !onLeft,
       'icon-down icon-right': onLeft
@@ -19,7 +19,7 @@
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
-        @click="collapse">
+        @click="setCollapsed(true)">
         <i
           :class="{
           'icon-down icon-left': onLeft,
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="!hideStyleBlockingElements && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+      <div class="live-dock-chat" v-if="!hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -96,9 +96,8 @@
         />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
-        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
-        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
-        <span v-if="!hideStyleBlockingElements">{{ $t('Your chat is currently offline') }}</span>
+        <img class="live-dock-chat__img--offline" :src="offlineImageSrc">
+        <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>
@@ -233,10 +232,6 @@
   .flex--center();
   .flex--column();
   margin-bottom: 16px;
-}
-
-.live-dock-chat__img--offline-night {
-  display: none;
 }
 
 .live-dock-pulse {

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
 import { SourcesService, ISource, Source } from 'services/sources';
