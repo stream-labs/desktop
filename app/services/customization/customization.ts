@@ -67,7 +67,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
 
   init() {
-    super.init(CustomizationService.migrations);
+    super.init();
+    this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
   }
 

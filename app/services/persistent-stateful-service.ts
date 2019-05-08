@@ -29,7 +29,7 @@ export abstract class PersistentStatefulService<TState extends object> extends S
     return `PersistentStatefulService-${this.name}`;
   }
 
-  init(migrations: IMigration[] = []) {
+  init() {
     this.store.watch(
       () => {
         return JSON.stringify(this.state);
@@ -44,10 +44,9 @@ export abstract class PersistentStatefulService<TState extends object> extends S
         localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
       },
     );
-    this.state = this.runMigrations(PersistentStatefulService.initialState, migrations);
   }
 
-  private runMigrations(persistedState: any, migrations: IMigration[]) {
+  runMigrations(persistedState: any, migrations: IMigration[]) {
     const migratedState = cloneDeep(persistedState);
     migrations.forEach(migration => {
       if (!persistedState[migration.oldKey]) return;
