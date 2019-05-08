@@ -116,6 +116,14 @@ export abstract class RpcApi extends Service {
     }
     if (errorResponse) return errorResponse;
 
+    // args may contain ServiceHelper objects
+    // deserialize them
+    traverse(args).forEach((item: any) => {
+      if (item && item._type === 'HELPER') {
+        return this.getResource(item.resourceId);
+      }
+    });
+
     // if both resource and method exist
     // execute request and record all mutations to the buffer
     if (fetchMutations) this.startBufferingMutations();
