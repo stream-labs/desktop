@@ -39,7 +39,9 @@ export class SceneItemFolder extends SceneItemNode {
   }
 
   ungroup() {
-    this.getItems().forEach(item => item.setParent(this.parentId));
+    this.getItems()
+      .reverse()
+      .forEach(item => item.setParent(this.parentId));
     this.remove();
   }
 

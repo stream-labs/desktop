@@ -3,10 +3,12 @@ import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { Inject } from '../injector';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 export class GroupMenu extends Menu {
   @Inject() private scenesService: ScenesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   constructor() {
     super();
@@ -35,7 +37,11 @@ export class GroupMenu extends Menu {
     this.append({
       label: $t('Ungroup Folder'),
       click: () => {
-        this.selectionService.getFolders()[0].ungroup();
+        this.editorCommandsService.executeCommand(
+          'RemoveFolderCommand',
+          this.scenesService.activeSceneId,
+          this.selectionService.getFolders()[0].id,
+        );
       },
       enabled: this.selectionService.isSceneFolder(),
     });

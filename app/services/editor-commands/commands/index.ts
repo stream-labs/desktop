@@ -11,3 +11,4 @@ export { RotateItemsCommand } from './rotate-items';
 export { ReorderItemsCommand } from './reorder-items';
 export { CreateFolderCommand } from './create-folder';
 export { RenameFolderCommand } from './rename-folder';
+export { RemoveFolderCommand } from './remove-folder';
