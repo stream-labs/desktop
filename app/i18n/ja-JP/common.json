@@ -59,5 +59,6 @@
   "notifications": "通知",
   "help": "ヘルプ",
   "simpleMode": "シンプルモード",
-  "twitter": "Twitter"
+  "twitter": "Twitterに投稿する",
+  "manualExtendButton": "30分延長する"
 }

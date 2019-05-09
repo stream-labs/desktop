@@ -52,12 +52,13 @@
   "selectAll": "Select All",
   "selectOption": "Select Option",
   "browse": "Browse",
-  "numberOfVisitors": "Number of visitors",
-  "numberOfComments": "Number of comments",
-  "numberOfadPoint": "Number of nicoad point",
-  "numberOfgiftPoint": "Number of gift point",
+  "numberOfVisitors": "Number of Visitors",
+  "numberOfComments": "Number of Comments",
+  "numberOfadPoint": "Niconico Advertisement Point",
+  "numberOfgiftPoint": "Gift Point",
   "notifications": "Notifications",
   "help": "Help",
   "simpleMode": "Simple Mode",
-  "twitter": "Twitter"
+  "twitter": "Post to Twitter",
+  "manualExtendButton": "Extend 30 minutes"
 }
