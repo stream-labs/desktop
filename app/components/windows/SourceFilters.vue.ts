@@ -5,12 +5,14 @@ import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { SourceFiltersService } from 'services/source-filters';
 import { ISourcesServiceApi } from 'services/sources';
+import { EditorCommandsService } from 'services/editor-commands';
 
 import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import { Subscription } from 'rxjs';
 
 interface IFilterNodeData {
   visible: boolean;
@@ -30,6 +32,7 @@ export default class SourceFilters extends Vue {
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   windowOptions = this.windowsService.getChildWindowQueryParams() as {
     sourceId: string;
@@ -43,6 +46,23 @@ export default class SourceFilters extends Vue {
     this.sourceId,
     this.selectedFilterName,
   );
+
+  addFilterSub: Subscription;
+  removeFilterSub: Subscription;
+
+  mounted() {
+    this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() =>
+      this.refreshFilters(),
+    );
+    this.removeFilterSub = this.sourceFiltersService.filterRemoved.subscribe(() => {
+      this.refreshFilters();
+    });
+  }
+
+  destroyed() {
+    this.addFilterSub.unsubscribe();
+    this.removeFilterSub.unsubscribe();
+  }
 
   @Watch('selectedFilterName')
   updateProperties() {
@@ -87,8 +107,12 @@ export default class SourceFilters extends Vue {
   }
 
   removeFilter() {
-    this.sourceFiltersService.remove(this.sourceId, this.selectedFilterName);
-    this.filters = this.sourceFiltersService.getFilters(this.sourceId);
+    this.editorCommandsService.executeCommand(
+      'RemoveFilterCommand',
+      this.sourceId,
+      this.selectedFilterName,
+    );
+
     this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
   }
 
@@ -124,6 +148,10 @@ export default class SourceFilters extends Vue {
       this.selectedFilterName,
       targetInd - sourceInd,
     );
+    this.filters = this.sourceFiltersService.getFilters(this.sourceId);
+  }
+
+  private refreshFilters() {
     this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 }

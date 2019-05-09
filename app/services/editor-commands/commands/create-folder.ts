@@ -26,6 +26,7 @@ export class CreateFolderCommand extends Command {
         folder.id,
         EPlaceType.Inside,
       );
+      this.moveToFolderSubCommand.execute();
     }
   }
 
