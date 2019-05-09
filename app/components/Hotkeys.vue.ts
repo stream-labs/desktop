@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
-import { HotkeysService, IHotkeysSet, IHotkey } from '../services/hotkeys';
+import { Inject } from 'services';
+import { HotkeysService, IHotkeysSet, IHotkey } from 'services/hotkeys';
 import { ScenesService } from '../services/scenes';
 import { SourcesService } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup';

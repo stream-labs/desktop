@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import clamp from 'lodash/clamp';
 import { DragHandler } from 'util/DragHandler';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';

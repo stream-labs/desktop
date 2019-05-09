@@ -1,5 +1,5 @@
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';

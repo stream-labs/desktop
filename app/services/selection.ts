@@ -1,6 +1,6 @@
 import uniq from 'lodash/uniq';
 import electron from 'electron';
-import { mutation, ServiceHelper, StatefulService } from 'services/stateful-service';
+import { mutation, ServiceHelper, StatefulService, Inject } from 'services';
 import {
   IPartialTransform,
   ISceneItem,
@@ -15,7 +15,6 @@ import {
   ITransform,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
-import { Inject } from 'util/injector';
 import { shortcut } from 'services/shortcuts';
 import { Subject } from 'rxjs';
 import Utils from 'services/utils';

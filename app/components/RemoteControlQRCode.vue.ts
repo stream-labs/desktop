@@ -2,7 +2,7 @@ import { remote } from 'electron';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { ITcpServerServiceApi } from 'services/api/tcp-server';
 import { HostsService } from 'services/hosts';
 

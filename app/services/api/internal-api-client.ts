@@ -2,7 +2,7 @@ import electron from 'electron';
 import { Observable, Subject } from 'rxjs';
 import { IJsonRpcEvent, IJsonRpcResponse, IMutation, JsonrpcService } from 'services/api/jsonrpc';
 import * as traverse from 'traverse';
-import { Service } from '../service';
+import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
 const { ipcRenderer } = electron;
@@ -43,7 +43,7 @@ export class InternalApiClient {
       get: (target, property, receiver) => {
         if (!target[property]) return target[property];
 
-        if (target[property].isHelper) {
+        if (target[property]._isHelper) {
           return this.applyIpcProxy(target[property]);
         }
 
@@ -57,7 +57,7 @@ export class InternalApiClient {
 
         const serviceName = target.constructor.name;
         const methodName = property;
-        const isHelper = target['isHelper'];
+        const isHelper = target['_isHelper'];
 
         const handler = (...args: any[]) => {
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(

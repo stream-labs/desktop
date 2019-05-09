@@ -1,4 +1,4 @@
-import { getResource } from 'util/injector';
+import { getResource } from 'services/core/injector';
 import { AppService } from './app';
 
 // tslint:disable-next-line:function-name

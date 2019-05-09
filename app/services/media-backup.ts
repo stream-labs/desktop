@@ -1,8 +1,8 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import request from 'request';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import electron from 'electron';

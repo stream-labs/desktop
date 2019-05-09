@@ -1,6 +1,6 @@
 import { Menu } from './Menu';
 import { SelectionService } from 'services/selection';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ECenteringType } from 'services/editor-commands/commands/center-items';
