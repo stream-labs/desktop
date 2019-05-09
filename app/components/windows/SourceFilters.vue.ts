@@ -54,8 +54,11 @@ export default class SourceFilters extends Vue {
     this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() =>
       this.refreshFilters(),
     );
-    this.removeFilterSub = this.sourceFiltersService.filterRemoved.subscribe(() => {
+    this.removeFilterSub = this.sourceFiltersService.filterRemoved.subscribe(filter => {
       this.refreshFilters();
+      if (this.selectedFilterName === filter.name) {
+        this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
+      }
     });
   }
 
@@ -112,8 +115,6 @@ export default class SourceFilters extends Vue {
       this.sourceId,
       this.selectedFilterName,
     );
-
-    this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
   }
 
   toggleVisibility(filterName: string) {

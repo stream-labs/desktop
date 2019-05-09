@@ -13,3 +13,4 @@ export { CreateFolderCommand } from './create-folder';
 export { RenameFolderCommand } from './rename-folder';
 export { RemoveFolderCommand } from './remove-folder';
 export { RemoveFilterCommand } from './remove-filter';
+export { AddFilterCommand } from './add-filter';
