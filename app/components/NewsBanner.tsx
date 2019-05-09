@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { shell } from 'electron';
 import { AnnouncementsService } from 'services/announcements';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Component, Watch } from 'vue-property-decorator';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { $t } from 'services/i18n';

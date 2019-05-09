@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { SettingsService, ISettingsState } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 export class ObsSettingsModule extends Module {
   moduleName = 'ObsSettings';

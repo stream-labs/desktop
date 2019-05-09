@@ -1,8 +1,7 @@
 import 'reflect-metadata';
-import { Service } from 'services/service';
-import Utils from './services/utils';
-import { ObserveList } from './util/service-observer';
-import { StatefulService } from './services/stateful-service';
+import { Service } from 'services/core/service';
+import Utils from 'services/utils';
+import { ObserveList, StatefulService } from 'services/core';
 
 import * as appServices from './app-services';
 import { InternalApiClient } from 'services/api/internal-api-client';

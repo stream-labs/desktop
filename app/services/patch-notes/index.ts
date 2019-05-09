@@ -1,10 +1,8 @@
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { mutation, Service } from 'services/stateful-service';
+import { PersistentStatefulService, mutation, Service, Inject } from 'services';
 import electron from 'electron';
 import Util from 'services/utils';
 import { notes } from './notes';
 import { NavigationService } from 'services/navigation';
-import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';

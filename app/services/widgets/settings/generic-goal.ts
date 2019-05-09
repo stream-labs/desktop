@@ -2,7 +2,7 @@ import { IWidgetData } from 'services/widgets';
 import { formMetadata, metadata } from 'components/shared/inputs/index';
 import { $t } from 'services/i18n';
 import { BaseGoalService } from './base-goal';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 
 export interface IGoalData extends IWidgetData {
   goal: {

@@ -1,6 +1,6 @@
 import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { formMetadata } from '../../../components/shared/inputs';
 import { $t } from '../../i18n';
