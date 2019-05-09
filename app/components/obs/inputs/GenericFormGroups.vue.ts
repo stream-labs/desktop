@@ -3,7 +3,7 @@ import GenericForm from './GenericForm.vue';
 import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ISettingsSubCategory, SettingsService } from '../../../services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 @Component({
   components: { AdvancedOutputTabs, GenericForm },
