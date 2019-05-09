@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
+import { clipboard } from 'electron';
 
 @Component({})
 export default class TopNav extends Vue {
@@ -41,5 +42,10 @@ export default class TopNav extends Vue {
     } finally {
       this.isEditing = false;
     }
+  }
+
+  copyProgramURL() {
+    if (this.isFetching) throw new Error('fetchProgram is running');
+    clipboard.writeText(`https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`);
   }
 }
