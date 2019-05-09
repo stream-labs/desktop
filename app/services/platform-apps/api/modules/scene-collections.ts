@@ -1,6 +1,6 @@
 import { Module, apiMethod, EApiPermissions } from './module';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 export interface ISceneCollectionSchema {
   name: string;

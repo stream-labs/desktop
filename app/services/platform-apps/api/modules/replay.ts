@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
 import { StreamingService, EReplayBufferState } from 'services/streaming';
 import { SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { FileReturnWrapper } from 'services/guest-api';
 import uuid from 'uuid/v4';

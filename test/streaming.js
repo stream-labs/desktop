@@ -3,9 +3,8 @@ import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
-import { sleep } from './helpers/sleep';
 
-useSpectron({ appArgs: '--nosync', pauseIfFailed: true });
+useSpectron({ appArgs: '--nosync' });
 
 test('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
@@ -33,7 +32,7 @@ test('Streaming to Twitch without auth', async t => {
   await focusMain(t);
   await app.client.click('button=Go Live');
 
-  await app.client.waitForExist('button=End Stream', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -58,7 +57,7 @@ test('Streaming to Twitch', async t => {
 
   // check we're streaming
   await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -85,7 +84,7 @@ test('Streaming to Facebook', async t => {
 
   // check we're streaming
   await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -110,7 +109,7 @@ test('Streaming to Mixer', async t => {
 
   // check we're streaming
   await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -134,6 +133,6 @@ test('Streaming to Youtube', async t => {
 
   // check we're streaming
   await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });

@@ -1,6 +1,6 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import electron from 'electron';
 

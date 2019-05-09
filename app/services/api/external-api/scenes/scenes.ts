@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { Singleton, Fallback } from 'services/api/external-api';
 import { ScenesService as InternalScenesService } from 'services/scenes/index';
 import { ISourceAddOptions } from 'services/api/external-api/sources/sources';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IScene, Scene } from './scene';
 import { ISceneItem } from './scene-item';
 

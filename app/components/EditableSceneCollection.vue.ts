@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { $t } from 'services/i18n';
 

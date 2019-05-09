@@ -40,6 +40,11 @@
           name="navigate_to_live"
           :metadata="{ title: $t('Navigate to Live tab when going live') }"
         />
+        <bool-input
+          v-model="disableHardwareAcceleration"
+          name="disable_ha"
+          :metadata="{ title: $t('Disable hardware acceleration (requires restart)') }"
+        />
         <div class="actions">
           <div class="input-container">
             <button class="button button--default" @click="restartStreamlabelsSession">
