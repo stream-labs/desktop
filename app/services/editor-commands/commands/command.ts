@@ -1,6 +1,6 @@
 export abstract class Command {
   abstract description: string;
 
-  abstract execute(): void;
-  abstract rollback(): void;
+  abstract execute(): void | Promise<void>;
+  abstract rollback(): void | Promise<void>;
 }

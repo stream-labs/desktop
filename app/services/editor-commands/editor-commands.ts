@@ -18,6 +18,7 @@ interface ICommandMetadata {
 interface IEditorCommandsServiceState {
   undoMetadata: ICommandMetadata[];
   redoMetadata: ICommandMetadata[];
+  operationInProgress: boolean;
 }
 
 export class EditorCommandsService extends StatefulService<IEditorCommandsServiceState> {
@@ -26,6 +27,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   static initialState: IEditorCommandsServiceState = {
     undoMetadata: [],
     redoMetadata: [],
+    operationInProgress: false,
   };
 
   // IMPORTANT: Must be kept in sync with metadata stored in
@@ -59,7 +61,12 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     this.CLEAR_REDO_METADATA();
 
     const instance: Command = new (COMMANDS[commandType] as any)(...commandArgs);
-    instance.execute();
+    const ret = instance.execute();
+
+    if (ret instanceof Promise) {
+      this.SET_OPERATION_IN_PROGRESS(true);
+      ret.then(() => this.SET_OPERATION_IN_PROGRESS(false));
+    }
 
     if (instance instanceof CombinableCommand) {
       if (this.combineActive) {
@@ -82,15 +89,25 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
     this.undoHistory.push(instance);
     this.PUSH_UNDO_METADATA({ description: instance.description });
+
+    return ret;
   }
 
   @shortcut('Ctrl+Z')
   undo() {
+    if (this.state.operationInProgress) return;
+
     const command = this.undoHistory.pop();
     this.POP_UNDO_METADATA();
 
     if (command) {
-      command.rollback();
+      const ret = command.rollback();
+
+      if (ret instanceof Promise) {
+        this.SET_OPERATION_IN_PROGRESS(true);
+        ret.then(() => this.SET_OPERATION_IN_PROGRESS(false));
+      }
+
       this.redoHistory.push(command);
       this.PUSH_REDO_METADATA({ description: command.description });
     }
@@ -98,11 +115,19 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   @shortcut('Ctrl+Y')
   redo() {
+    if (this.state.operationInProgress) return;
+
     const command = this.redoHistory.pop();
     this.POP_REDO_METADATA();
 
     if (command) {
-      command.execute();
+      const ret = command.execute();
+
+      if (ret instanceof Promise) {
+        this.SET_OPERATION_IN_PROGRESS(true);
+        ret.then(() => this.SET_OPERATION_IN_PROGRESS(false));
+      }
+
       this.undoHistory.push(command);
       this.PUSH_UNDO_METADATA({ description: command.description });
     }
@@ -176,5 +201,10 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   @mutation()
   private CLEAR_REDO_METADATA() {
     this.state.redoMetadata = [];
+  }
+
+  @mutation()
+  private SET_OPERATION_IN_PROGRESS(val: boolean) {
+    this.state.operationInProgress = val;
   }
 }

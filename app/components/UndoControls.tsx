@@ -18,9 +18,15 @@ export default class UndoControls extends TsxComponent<{}> {
   render(h: Function) {
     return (
       <div>
-        Undo: {this.nextUndo && this.nextUndo.description}
-        <br />
-        Redo: {this.nextRedo && this.nextRedo.description}
+        {this.editorCommandsService.state.operationInProgress ? (
+          <div>IN PROGRESS</div>
+        ) : (
+          <div>
+            Undo: {this.nextUndo && this.nextUndo.description}
+            <br />
+            Redo: {this.nextRedo && this.nextRedo.description}
+          </div>
+        )}
       </div>
     );
   }
