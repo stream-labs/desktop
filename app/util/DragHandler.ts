@@ -1,5 +1,5 @@
 import { SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ScenesService, SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';

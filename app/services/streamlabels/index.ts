@@ -1,6 +1,6 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';

@@ -7,7 +7,7 @@ import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import { FacemasksService } from 'services/facemasks';
 

@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';
 import StudioEditor from 'components/StudioEditor.vue';
 import StudioControls from 'components/StudioControls.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
@@ -33,12 +33,12 @@ export default class Studio extends Vue {
 
   mounted() {
     this.sizeCheckInterval = window.setInterval(() => {
-      if (this.studioMode) {
+      if (this.studioMode && this.$refs.studioModeContainer) {
         const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
 
         this.stacked = clientWidth / clientHeight <= 16 / 9;
       }
-      if (!this.displayEnabled && !this.performanceMode) {
+      if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
         const { clientWidth, clientHeight } = this.$refs.placeholder;
         this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
       }

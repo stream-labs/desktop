@@ -1,4 +1,4 @@
-import { ServiceHelper, mutation } from 'services/stateful-service';
+import { ServiceHelper, mutation, Inject } from 'services';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
@@ -13,7 +13,6 @@ import {
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
-import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';

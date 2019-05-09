@@ -1,7 +1,7 @@
 import fs from 'fs';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { authorizedHeaders, downloadFile } from '../../util/requests';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { WindowsService } from 'services/windows';

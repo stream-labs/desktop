@@ -4,7 +4,7 @@ import { metadata } from 'components/shared/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { PlatformAppsService } from 'services/platform-apps';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 @Component({
   components: { VFormGroup, ValidatedForm },

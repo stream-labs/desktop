@@ -1,6 +1,6 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import { UserService } from './user';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import electron from 'electron';
 import fs from 'fs';
 import path from 'path';

@@ -4,7 +4,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { CustomizationService } from 'services/customization';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ISliderMetadata } from './index';
 import { isString } from 'util';
 
