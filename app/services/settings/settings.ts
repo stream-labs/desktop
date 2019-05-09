@@ -137,8 +137,13 @@ export class SettingsService extends StatefulService<ISettingsState>
     return categories;
   }
 
+  isTabbedForm(categoryName: string) {
+    return obs.NodeObs.OBS_settings_getSettings(categoryName).type === 1;
+  }
+
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
-    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName).data;
+    if (!settings) settings = [];
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
