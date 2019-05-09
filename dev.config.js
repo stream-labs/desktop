@@ -1,12 +1,10 @@
 const merge = require('webpack-merge');
 const baseConfig = require('./base.config.js');
 const path = require('path');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const { CheckerPlugin } = require('awesome-typescript-loader')
 
-const plugins = [];
-
-// only makes sense with transpileOnly mode which is currently broken
-// const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-// plugins.push(new ForkTsCheckerWebpackPlugin({ vue: true }))
+const plugins = [new HardSourceWebpackPlugin(), new CheckerPlugin()];
 
 module.exports = merge.smart(baseConfig, {
   entry: {
@@ -23,25 +21,18 @@ module.exports = merge.smart(baseConfig, {
     rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
-        options: {
-          experimentalWatchApi: true,
-          // transpileOnly: true,
-        },
+        loader: 'awesome-typescript-loader',
+        options: { useCache: true, forceIsolatedModules: true, reportedFiles: ['app/**/*.ts'] },
         exclude: /node_modules|vue\/src/
       },
       {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
-        use: [
-          { loader: 'babel-loader' },
+        loader: [
+          'babel-loader',
           {
-            loader: 'ts-loader',
-            options: {
-              appendTsxSuffixTo: [/\.vue$/],
-              experimentalWatchApi: true,
-              // transpileOnly: true,
-            }
+            loader: 'awesome-typescript-loader',
+            options: { forceIsolatedModules: true, reportedFiles: ['app/components/**/*.tsx'] }
           }
         ],
         exclude: /node_modules/,

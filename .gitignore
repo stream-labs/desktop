@@ -19,3 +19,4 @@ plugins/
 yarn-error.log
 .opt-in
 .env
+.awcache/
