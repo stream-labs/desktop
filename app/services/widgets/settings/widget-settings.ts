@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { HostsService } from 'services/hosts';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../core/injector';
 import { UserService } from 'services/user';
 import { handleResponse, authorizedHeaders } from '../../../util/requests';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'services/widgets';
 import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { WebsocketService } from 'services/websocket';
 import electronLog from 'electron-log';
 

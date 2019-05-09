@@ -5,7 +5,7 @@ import { AudioSource } from '../services/audio';
 import { CustomizationService } from 'services/customization';
 import { SliderInput } from 'components/shared/inputs/inputs';
 import MixerVolmeter from './MixerVolmeter.vue';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 
 @Component({
   components: { SliderInput, MixerVolmeter },

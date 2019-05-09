@@ -1,5 +1,5 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 
 interface INavigation {

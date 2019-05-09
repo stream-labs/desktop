@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
 import { StatefulService } from './stateful-service';
-import Utils from './utils';
+import Utils from '../utils';
 
 // Extends StatefulService with code that will persist the
 // state across executions of the application.

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron, { clipboard } from 'electron';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { WindowsService } from '../../services/windows';
 import { MediaGalleryService, IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
 import { $t } from 'services/i18n';

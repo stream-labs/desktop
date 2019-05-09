@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 import each from 'lodash/each';
 import electron from 'electron';
-import { getModule, StatefulService } from '../services/stateful-service';
+import { getModule, StatefulService } from '../services/core/stateful-service';
 import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';

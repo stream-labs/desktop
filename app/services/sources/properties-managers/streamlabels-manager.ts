@@ -1,5 +1,5 @@
 import { DefaultManager, IDefaultManagerSettings } from './default-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
 import { UserService } from 'services/user';
 

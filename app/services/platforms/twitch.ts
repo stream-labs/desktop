@@ -1,4 +1,4 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import {
   IPlatformService,
   IPlatformAuth,
@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { StreamInfoService } from 'services/stream-info';

@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from './core/stateful-service';
 import { Subject } from 'rxjs';
 
 export type TAppPage =

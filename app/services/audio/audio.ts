@@ -1,13 +1,11 @@
 import Vue from 'vue';
 import omit from 'lodash/omit';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, StatefulService, ServiceHelper, InitAfter, Inject } from 'services';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
-import { Inject } from 'util/injector';
-import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
 import {
   IObsBitmaskInput,

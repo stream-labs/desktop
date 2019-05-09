@@ -1,7 +1,7 @@
 import { Node } from '../node';
 import { SceneItem } from 'services/scenes';
 import { FontLibraryService } from 'services/font-library';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import path from 'path';
 
 interface ISchema {

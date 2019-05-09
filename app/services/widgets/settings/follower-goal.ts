@@ -1,7 +1,7 @@
 import { GenericGoalService } from './generic-goal';
 import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 
 @InheritMutations()
 export class FollowerGoalService extends GenericGoalService {

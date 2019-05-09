@@ -1,5 +1,5 @@
 import { PropertiesManager } from './properties-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WidgetsService, WidgetType } from 'services/widgets';
 
 export interface IWidgetManagerSettings {
