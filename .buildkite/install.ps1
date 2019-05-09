@@ -1,5 +1,4 @@
-# CI installation script
-# Run this script as administrator:
+# Run this script as administrator to setup enviroment on new CI machine:
 # powershell install.ps1 your_buildkite_token your_buildkite_token your_password
 
 $token=$args[0]
@@ -20,7 +19,7 @@ if (-NOT(Get-Command "choco" -errorAction SilentlyContinue)) {
   choco feature enable -n allowGlobalConfirmation
 }
 
-echo "Install Visual C++ Redistributable (needed for node-win32-np module)"
+echo "Install Visual C++ Redistributable (required for node-win32-np module)"
 choco install vcredist2015
 
 echo "Install Nodejs"
@@ -48,16 +47,5 @@ Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
 
 echo "Add Buildkite agent to startup"
 Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartBuildkite' -Value "$buildkitAgentPath start";
-
-#echo "Install NSSM Serivce Manager"
-#choco install nssm
-#echo "Register Buildkite Agent as a service"
-#nssm install buildkite-agent "C:\buildkite-agent\bin\buildkite-agent.exe" "start"
-#nssm set buildkite-agent AppStdout "C:\buildkite-agent\buildkite-agent.log"
-#nssm set buildkite-agent AppStderr "C:\buildkite-agent\buildkite-agent.log"
-#nssm stop buildkite-agent
-#nssm start buildkite-agent
-#echo "Checking Agent status"
-#nssm status buildkite-agent
 
 echo "Installation completed. Restart PC to take effect"
