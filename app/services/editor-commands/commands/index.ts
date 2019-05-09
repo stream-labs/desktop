@@ -15,3 +15,5 @@ export { RemoveFolderCommand } from './remove-folder';
 export { RemoveFilterCommand } from './remove-filter';
 export { AddFilterCommand } from './add-filter';
 export { RenameSceneCommand } from './rename-scene';
+export { RemoveNodesCommand } from './remove-nodes';
+export { RemoveItemCommand } from './remove-item';

@@ -227,13 +227,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.scenes.forEach(scene => scene.setLockOnAllItems(locked));
   }
 
-  getSourceScenes(sourceId: string): Scene[] {
-    const resultScenes: Scene[] = [];
+  getSourceItemCount(sourceId: string): number {
+    let count = 0;
+
     this.scenes.forEach(scene => {
-      const items = scene.getItems().filter(sceneItem => sceneItem.sourceId === sourceId);
-      if (items.length > 0) resultScenes.push(scene);
+      scene.getItems().forEach(sceneItem => {
+        if (sceneItem.sourceId === sourceId) count += 1;
+      });
     });
-    return resultScenes;
+
+    return count;
   }
 
   makeSceneActive(id: string): boolean {

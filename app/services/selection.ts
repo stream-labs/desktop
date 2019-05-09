@@ -22,6 +22,7 @@ import { Source } from 'services/sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { Rect } from 'util/rect';
 import { WindowsService } from 'services/windows';
+import { EditorCommandsService } from 'services/editor-commands';
 
 interface ISelectionState {
   selectedIds: string[];
@@ -50,6 +51,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
 
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   init() {
     this.scenesService.sceneSwitched.subscribe(() => {
@@ -132,7 +134,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
       },
       ok => {
         if (!ok) return;
-        return this.getSelection().remove.call(this);
+        this.editorCommandsService.executeCommand('RemoveNodesCommand', this.getActiveSelection());
       },
     );
   }
