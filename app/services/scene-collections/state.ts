@@ -1,11 +1,11 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { FileManagerService } from 'services/file-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 
 interface ISceneCollectionsManifest {

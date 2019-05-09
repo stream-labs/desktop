@@ -29,9 +29,9 @@ export async function waitForWidgetSettingsSync(t: TExecutionContext, fn: Functi
     // execute code
     await fn();
 
-    // catching events for 5s
+    // catching events for 15s
     listener.pipe(first()).subscribe(ev => resolve(ev));
-    await sleep(5000);
+    await sleep(15000);
 
     reject('No widget events received');
   });

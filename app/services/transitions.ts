@@ -1,6 +1,6 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../obs-api';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { IListOption } from 'components/shared/inputs';
 import { WindowsService } from 'services/windows';

@@ -1,6 +1,6 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';

@@ -1,5 +1,5 @@
 import throttle from 'lodash/throttle';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
 import { SourcesService } from '../sources';
@@ -13,9 +13,9 @@ import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
-import { mutation, StatefulService } from '../stateful-service';
+import { mutation, StatefulService } from '../core/stateful-service';
 import { WidgetSource } from './widget-source';
-import { InitAfter } from '../../util/service-observer';
+import { InitAfter } from '../core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';

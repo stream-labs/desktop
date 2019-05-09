@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService, EStreamingState } from '../services/streaming';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';

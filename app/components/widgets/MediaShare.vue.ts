@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import { MediaShareService, IMediaShareData } from 'services/widgets/settings/media-share';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';

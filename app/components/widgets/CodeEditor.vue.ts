@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { BoolInput, CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';

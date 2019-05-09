@@ -5,13 +5,13 @@ import util from 'util';
 import mkdirpModule from 'mkdirp';
 import { tmpdir } from 'os';
 import fs from 'fs';
-import { mutation } from '../stateful-service';
-import { PersistentStatefulService } from '../persistent-stateful-service';
+import { mutation } from '../core/stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
 import { TransitionsService } from '../transitions';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { downloadFileAlt, getChecksum } from 'util/requests';
-import { InitAfter } from 'util/service-observer';
+import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 
 const mkdirp = util.promisify(mkdirpModule);

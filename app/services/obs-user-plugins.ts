@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';

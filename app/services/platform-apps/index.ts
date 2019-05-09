@@ -1,10 +1,10 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
 import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { EApiPermissions } from './api/modules/module';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';

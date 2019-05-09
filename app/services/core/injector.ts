@@ -1,4 +1,4 @@
-import { ServicesManager } from '../services-manager';
+import { ServicesManager } from 'services-manager';
 
 /**
  * inject a service as a getter
