@@ -366,7 +366,7 @@ export default class StudioEditor extends Vue {
       'ResizeItemsCommand',
       this.selectionService.getActiveSelection(),
       { x: scaleXDelta, y: scaleYDelta },
-      this.selectionService.getBoundingRect().getOffsetFromOrigin(AnchorPositions[opts.anchor]),
+      AnchorPositions[opts.anchor],
     );
   }
 

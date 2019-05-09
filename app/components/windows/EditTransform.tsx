@@ -8,6 +8,9 @@ import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 import { NumberInput } from 'components/shared/inputs/inputs';
 import { WindowsService } from 'services/windows';
+import { EditorCommandsService } from 'services/editor-commands';
+import { v2 } from 'util/vec2';
+import { AnchorPositions, AnchorPoint } from 'util/ScalableRectangle';
 
 const dirMap = (dir: string) =>
   ({
@@ -21,23 +24,29 @@ const dirMap = (dir: string) =>
 export default class EditTransform extends TsxComponent<{}> {
   @Inject() selectionService: SelectionService;
   @Inject() windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
+
+  selection = this.selectionService.getActiveSelection();
 
   // We only care about the attributes of the rectangle not the functionality
-  originRect = { ...this.selectionService.getBoundingRect() };
-  rect = { ...this.selectionService.getBoundingRect() };
+  originRect = { ...this.selection.getBoundingRect() };
+  rect = { ...this.selection.getBoundingRect() };
 
   $refs: {
     validForm: ValidatedForm;
   };
 
   get transform() {
-    return this.selectionService.getTransform();
+    return this.selection.getItems()[0].transform;
   }
 
-  setTransform(key: string, subkey: string) {
+  setCrop(cropEdge: string) {
     return async (value: string) => {
       if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
-      this.selectionService.setTransform({ [key]: { [subkey]: Number(value) } });
+
+      this.editorCommandsService.executeCommand('CropItemsCommand', this.selection, {
+        [cropEdge]: Number(value),
+      });
     };
   }
 
@@ -45,28 +54,41 @@ export default class EditTransform extends TsxComponent<{}> {
     return async (value: string) => {
       if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
       const delta = Number(value) - Math.round(this.rect[dir]);
-      this.selectionService.setDeltaPos(dir as 'x' | 'y', delta);
+
+      this.editorCommandsService.executeCommand('MoveItemsCommand', this.selection, {
+        [dir]: delta,
+      });
+
       this.rect[dir] += delta;
     };
   }
 
   setScale(dir: string) {
-    const scaleKey: 'x' | 'y' = dir === 'width' ? 'x' : 'y';
     return async (value: string) => {
       if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
       if (Number(value) === this.rect[dir]) return;
       const scale = Number(value) / this.rect[dir];
-      this.selectionService.unilateralScale(scaleKey, scale);
+      const scaleX = dir === 'width' ? scale : 1;
+      const scaleY = dir === 'height' ? scale : 1;
+      const scaleDelta = v2(scaleX, scaleY);
+
+      this.editorCommandsService.executeCommand(
+        'ResizeItemsCommand',
+        this.selection,
+        scaleDelta,
+        AnchorPositions[AnchorPoint.NorthWest],
+      );
+
       this.rect[dir] = Number(value);
     };
   }
 
   rotate(deg: number) {
-    return () => this.selectionService.rotate(deg);
+    return () => this.selection.rotate(deg);
   }
 
   reset() {
-    this.selectionService.resetTransform();
+    this.selection.resetTransform();
     this.rect = { ...this.originRect };
   }
 
@@ -75,14 +97,14 @@ export default class EditTransform extends TsxComponent<{}> {
   }
 
   cropForm(h: Function) {
-    return this.transform ? (
+    return this.selection.isSceneItem() ? (
       <HFormGroup metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map(dir => (
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <NumberInput
               value={this.transform.crop[dir]}
               metadata={{ isInteger: true, min: 0 }}
-              onInput={this.setTransform('crop', dir)}
+              onInput={this.setCrop(dir)}
             />
             <span style="margin-left: 8px;">{dirMap(dir)}</span>
           </div>

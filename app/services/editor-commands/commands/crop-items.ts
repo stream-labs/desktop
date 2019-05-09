@@ -8,7 +8,7 @@ export class CropItemsCommand extends ModifyTransformCommand {
    * @param crop The crop to apply
    * @param position Optionally the items can be moved as well
    */
-  constructor(selection: Selection, private crop: ICrop, private position?: IVec2) {
+  constructor(selection: Selection, private crop: Partial<ICrop>, private position?: IVec2) {
     super(selection);
   }
 

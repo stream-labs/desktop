@@ -75,7 +75,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
   getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
-  getTransform: () => ITransform;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
   copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
@@ -96,7 +95,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
   resetTransform: () => void;
   scale: (scale: IVec2, origin?: IVec2) => void;
   scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
-  unilateralScale: (dimension: 'x' | 'y', sale: number) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -341,12 +339,6 @@ export class Selection {
     return this.state.lastSelectedId;
   }
 
-  getTransform() {
-    if (!this.isSceneItem()) return;
-    const item = this.getNodes()[0] as SceneItem;
-    return item.state.transform;
-  }
-
   getSize(): number {
     return this.state.selectedIds.length;
   }
@@ -586,10 +578,6 @@ export class Selection {
    */
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
-  }
-
-  unilateralScale(dimension: 'x' | 'y', scale: number) {
-    this.getItems().forEach(item => item.unilateralScale(dimension, scale));
   }
 
   setDeltaPos(dir: 'x' | 'y', delta: number) {
