@@ -192,6 +192,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     return this.getScene(id);
   }
 
+  canRemoveScene() {
+    return Object.keys(this.state.scenes).length > 1;
+  }
+
   removeScene(id: string, force = false): IScene {
     if (!force && Object.keys(this.state.scenes).length < 2) {
       return null;
