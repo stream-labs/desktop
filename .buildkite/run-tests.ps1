@@ -14,5 +14,5 @@ Start-Job -Name "RestartPC" -ScriptBlock {
   Sleep 5
   Restart-Computer
 }
-
+Sleep 10
 exit $exitCode
