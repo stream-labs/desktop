@@ -29,7 +29,6 @@ import { ShortcutsService } from './services/shortcuts';
 import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
-import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
@@ -63,6 +62,8 @@ import { QuestionaireService } from 'services/questionaire';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 import { InformationsService } from 'services/informations';
 import { InformationsStateService } from 'services/informations/state';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramStateService } from 'services/nicolive-program/state';
 
 const { ipcRenderer } = electron;
 
@@ -108,7 +109,6 @@ export class ServicesManager extends Service {
     UsageStatisticsService,
     IpcServerService,
     TcpServerService,
-    StreamInfoService,
     VideoEncodingOptimizationService,
     DismissablesService,
     SceneCollectionsService,
@@ -129,6 +129,8 @@ export class ServicesManager extends Service {
     MonitorCaptureCroppingService,
     InformationsService,
     InformationsStateService,
+    NicoliveProgramService,
+    NicoliveProgramStateService,
   };
 
   private instances: Dictionary<Service> = {};

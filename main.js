@@ -31,6 +31,7 @@ const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
+const { URL } = require('url');
 
 app.disableHardwareAcceleration();
 
@@ -470,6 +471,42 @@ ipcMain.on('window-preventClose', (event, id) => {
 ipcMain.on('window-allowClose', (event, id) => {
   const window = BrowserWindow.fromId(id);
   window.removeListener('close', preventClose);
+});
+
+/**
+ * 番組作成・編集画面からログアウトを封じる処理
+ * rendererプロセスからは遷移前に止められないのでここに実装がある
+ * @see https://github.com/electron/electron/pull/11679#issuecomment-359180722
+ **/
+function preventLogout(e, url) {
+  const urlObj = new URL(url);
+  const isLogout = (
+    /^https?:$/.test(urlObj.protocol) &&
+    /^live2?\.nicovideo\.jp$/.test(urlObj.hostname) &&
+    /^\/logout$/.test(urlObj.pathname)
+  );
+  if (isLogout) {
+    e.preventDefault();
+  }
+}
+
+ipcMain.on('window-preventLogout', (event, id) => {
+  const window = BrowserWindow.fromId(id);
+  window.webContents.on('will-navigate', preventLogout);
+});
+
+/**
+ * 番組作成・編集画面からの新ウィンドウ表示を封じる処理
+ * rendererプロセスからは処理を止められないのでここに実装がある
+ * @see https://github.com/electron/electron/pull/11679#issuecomment-359180722
+ **/
+function preventNewWindow(e) {
+  e.preventDefault();
+}
+
+ipcMain.on('window-preventNewWindow', (event, id) => {
+  const window = BrowserWindow.fromId(id);
+  window.webContents.on('new-window', preventNewWindow);
 });
 
 // The main process acts as a hub for various windows

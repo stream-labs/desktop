@@ -2,7 +2,6 @@ import { StatefulService, mutation } from 'services/stateful-service';
 import { ObsApiService, EOutputCode } from 'services/obs-api';
 import { Inject } from 'util/injector';
 import moment from 'moment';
-import { padStart } from 'lodash';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs/Subject';
@@ -16,7 +15,6 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
-import { StreamInfoService } from 'services/stream-info';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
@@ -49,7 +47,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() customizationService: CustomizationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -69,6 +66,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   };
 
   init() {
+    super.init();
+
     this.obsApiService.nodeObs.OBS_service_connectOutputSignals(
       (info: IOBSOutputSignalInfo) => {
         this.handleOBSOutputSignal(info);
@@ -332,10 +331,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private formattedDurationSince(timestamp: moment.Moment) {
     const duration = moment.duration(moment().diff(timestamp));
-    const seconds = padStart(duration.seconds().toString(), 2, '0');
-    const minutes = padStart(duration.minutes().toString(), 2, '0');
+    const seconds = duration.seconds().toString().padStart(2, '0');
+    const minutes = duration.minutes().toString().padStart(2, '0');
     const dayHours = duration.days() * 24;
-    const hours = padStart((dayHours + duration.hours()).toString(), 2, '0');
+    const hours = (dayHours + duration.hours()).toString().padStart(2, '0');
 
     return `${hours}:${minutes}:${seconds}`;
   }

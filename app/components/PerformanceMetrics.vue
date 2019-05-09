@@ -1,19 +1,5 @@
 <template>
   <div class="performance-metrics flex">
-    <span v-if="isLoggedIn" class="performance-metric-wrapper viewer_count" v-tooltip.right="visitorTooltip">
-      <i class="performance-metric-icon icon-visitor"/>
-      <span class="performance-metric">
-        <span class="performance-metric__value">{{ viewerCount }}</span>
-      </span>
-    </span>
-
-    <span v-if="isLoggedIn" class="performance-metric-wrapper comment_count" v-tooltip.right="commentTooltip">
-      <i class="performance-metric-icon icon-comment"/>
-      <span class="performance-metric">
-        <span class="performance-metric__value">{{ commentCount }}</span>
-      </span>
-    </span>
-
     <span class="performance-metric-wrapper resolution">
       <i class="performance-metric-icon icon-display"/>
       <span class="performance-metric">

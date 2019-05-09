@@ -13,7 +13,6 @@ jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
 }));
 jest.mock('services/customization', () => ({}));
-jest.mock('services/stream-info', () => ({}));
 jest.mock('services/user', () => ({}));
 
 function noop() {}

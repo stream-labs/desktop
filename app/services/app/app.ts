@@ -9,7 +9,6 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
-import { StreamInfoService } from 'services/stream-info';
 import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/ipc-server';
 import { TcpServerService } from 'services/tcp-server';
@@ -38,7 +37,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() hotkeysService: HotkeysService;
   @Inject() userService: UserService;
   @Inject() shortcutsService: ShortcutsService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
   @Inject() outageNotificationsService: OutageNotificationsService;
@@ -85,9 +83,6 @@ export class AppService extends StatefulService<IAppState> {
       });
 
       this.shortcutsService;
-
-      // Pre-fetch stream info
-      this.streamInfoService;
 
       this.performanceMonitorService.start();
 

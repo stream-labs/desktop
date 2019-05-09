@@ -24,6 +24,8 @@ export abstract class PersistentStatefulService<
   }
 
   init() {
+    super.init();
+
     this.store.watch(
       () => {
         return JSON.stringify(this.state);
