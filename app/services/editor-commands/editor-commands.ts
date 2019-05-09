@@ -1,10 +1,10 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { Command } from './commands/command';
 import * as commands from './commands';
 import { CombinableCommand } from './commands/combinable-command';
 import { shortcut } from 'services/shortcuts';
 import { SelectionService } from 'services/selection';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
 
 const COMMANDS = { ...commands };

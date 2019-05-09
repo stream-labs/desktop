@@ -1,6 +1,6 @@
 import { Command } from './command';
 import { ScenesService } from 'services/scenes';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 export class RenameFolderCommand extends Command {
   @Inject() scenesService: ScenesService;

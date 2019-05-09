@@ -1,5 +1,5 @@
 import { Command } from './command';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
 
 export class RemoveFolderCommand extends Command {

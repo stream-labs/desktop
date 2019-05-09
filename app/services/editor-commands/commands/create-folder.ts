@@ -1,6 +1,6 @@
 import { Command } from './command';
 import { Selection } from 'services/selection';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
 import { ReorderItemsCommand, EPlaceType } from './reorder-items';
 
