@@ -8,7 +8,7 @@ $exitCode = $LastExitCode;
 
 Start-Job -Name "RestartPC" -ScriptBlock {
   $wshell = New-Object -ComObject wscript.shell;
-  $wshell.AppActivate("C:\buildkite-agent\bin\buildkite-agent.exe")
+  $wshell.AppActivate("Administrator: C:\buildkite-agent\bin\buildkite-agent.exe")
   Sleep 1
   $wshell.SendKeys("^(C)")
   Sleep 5
