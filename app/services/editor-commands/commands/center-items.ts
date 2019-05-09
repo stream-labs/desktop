@@ -12,6 +12,10 @@ export class CenterItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Fit ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     switch (this.centeringType) {
       case ECenteringType.Screen:

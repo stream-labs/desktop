@@ -12,6 +12,10 @@ export class RemoveFolderCommand extends Command {
     super();
   }
 
+  get description() {
+    return `Remove ${this.name}`;
+  }
+
   execute() {
     const folder = this.scenesService.getScene(this.sceneId).getFolder(this.folderId);
     this.name = folder.name;

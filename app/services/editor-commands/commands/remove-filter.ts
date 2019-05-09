@@ -12,6 +12,10 @@ export class RemoveFilterCommand extends Command {
     super();
   }
 
+  get description() {
+    return `Remove ${this.removedFilter.name}`;
+  }
+
   execute() {
     this.removedFilter = this.sourceFiltersService
       .getFilters(this.sourceId)

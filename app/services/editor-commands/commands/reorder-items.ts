@@ -23,6 +23,10 @@ export class ReorderItemsCommand extends Command {
     });
   }
 
+  get description() {
+    return `Reorder ${this.selection.getNodes()[0].name}`;
+  }
+
   execute() {
     switch (this.placeType) {
       case EPlaceType.After:

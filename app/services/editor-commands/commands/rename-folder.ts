@@ -11,6 +11,10 @@ export class RenameFolderCommand extends Command {
     super();
   }
 
+  get description() {
+    return `Rename ${this.oldName}`;
+  }
+
   execute() {
     const folder = this.scenesService.getScene(this.sceneId).getFolder(this.folderId);
     this.oldName = folder.name;

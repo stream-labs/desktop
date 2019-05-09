@@ -13,6 +13,10 @@ export class NudgeItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Nudge ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     switch (this.direction) {
       case ENudgeDirection.Up:

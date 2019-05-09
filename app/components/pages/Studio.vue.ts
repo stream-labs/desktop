@@ -9,6 +9,7 @@ import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
+import UndoControls from 'components/UndoControls';
 
 @Component({
   components: {
@@ -17,6 +18,7 @@ import { WindowsService } from 'services/windows';
     Display,
     StudioModeControls,
     ResizeBar,
+    UndoControls,
   },
 })
 export default class Studio extends Vue {

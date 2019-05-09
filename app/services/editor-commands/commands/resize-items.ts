@@ -6,6 +6,10 @@ export class ResizeItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Resize ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     this.selection.scaleWithOffset(this.deltaScale, this.offset);
   }

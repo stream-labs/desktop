@@ -9,6 +9,10 @@ export class AddFilterCommand extends Command {
     super();
   }
 
+  get description() {
+    return `Add ${this.name}`;
+  }
+
   execute() {
     this.sourceFiltersService.add(this.sourceId, this.type, this.name);
   }

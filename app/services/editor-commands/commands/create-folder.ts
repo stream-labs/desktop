@@ -14,6 +14,10 @@ export class CreateFolderCommand extends Command {
     super();
   }
 
+  get description() {
+    return `Create ${this.name}`;
+  }
+
   execute() {
     const folder = this.scenesService
       .getScene(this.sceneId)

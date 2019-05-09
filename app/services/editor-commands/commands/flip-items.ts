@@ -11,6 +11,10 @@ export class FlipItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Flip ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     switch (this.centeringType) {
       case EFlipAxis.Vertical:

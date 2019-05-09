@@ -6,6 +6,10 @@ export class MoveItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Move ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     this.selection.getItems().forEach(item => {
       item.setTransform({

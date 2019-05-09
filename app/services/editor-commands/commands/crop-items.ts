@@ -12,6 +12,10 @@ export class CropItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Crop ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     this.selection.getItems().forEach(item => {
       item.setTransform({

@@ -6,6 +6,10 @@ export class RotateItemsCommand extends ModifyTransformCommand {
     super(selection);
   }
 
+  get description() {
+    return `Rotate ${this.selection.getNodes()[0].name}`;
+  }
+
   modifyTransform() {
     this.selection.rotate(this.degrees);
   }

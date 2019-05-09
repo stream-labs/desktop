@@ -1,4 +1,4 @@
-import { Service } from 'services/core/service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { Command } from './commands/command';
 import * as commands from './commands';
 import { CombinableCommand } from './commands/combinable-command';
@@ -11,10 +11,25 @@ const COMMANDS = { ...commands };
 
 const COMBINE_TIMEOUT = 500;
 
-export class EditorCommandsService extends Service {
+interface ICommandMetadata {
+  description: string;
+}
+
+interface IEditorCommandsServiceState {
+  undoMetadata: ICommandMetadata[];
+  redoMetadata: ICommandMetadata[];
+}
+
+export class EditorCommandsService extends StatefulService<IEditorCommandsServiceState> {
   @Inject() selectionService: SelectionService;
 
-  // TODO: Stateful service for visual command history?
+  static initialState: IEditorCommandsServiceState = {
+    undoMetadata: [],
+    redoMetadata: [],
+  };
+
+  // IMPORTANT: Must be kept in sync with metadata stored in
+  // this service's vuex state.
   undoHistory: Command[] = [];
   redoHistory: Command[] = [];
 
@@ -41,6 +56,7 @@ export class EditorCommandsService extends Service {
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
+    this.CLEAR_REDO_METADATA();
 
     const instance: Command = new (COMMANDS[commandType] as any)(...commandArgs);
     instance.execute();
@@ -65,26 +81,39 @@ export class EditorCommandsService extends Service {
     }
 
     this.undoHistory.push(instance);
+    this.PUSH_UNDO_METADATA({ description: instance.description });
   }
 
   @shortcut('Ctrl+Z')
   undo() {
     const command = this.undoHistory.pop();
+    this.POP_UNDO_METADATA();
 
     if (command) {
       command.rollback();
       this.redoHistory.push(command);
+      this.PUSH_REDO_METADATA({ description: command.description });
     }
   }
 
   @shortcut('Ctrl+Y')
   redo() {
     const command = this.redoHistory.pop();
+    this.POP_REDO_METADATA();
 
     if (command) {
       command.execute();
       this.undoHistory.push(command);
+      this.PUSH_UNDO_METADATA({ description: command.description });
     }
+  }
+
+  get nextUndo() {
+    return this.state.undoMetadata[this.state.undoMetadata.length - 1];
+  }
+
+  get nextRedo() {
+    return this.state.redoMetadata[this.state.redoMetadata.length - 1];
   }
 
   // Shortcuts for undo-able editor commands go here:
@@ -122,5 +151,30 @@ export class EditorCommandsService extends Service {
       this.selectionService.getActiveSelection(),
       ENudgeDirection.Down,
     );
+  }
+
+  @mutation()
+  PUSH_UNDO_METADATA(undo: ICommandMetadata) {
+    this.state.undoMetadata.push(undo);
+  }
+
+  @mutation()
+  POP_UNDO_METADATA() {
+    this.state.undoMetadata.pop();
+  }
+
+  @mutation()
+  PUSH_REDO_METADATA(redo: ICommandMetadata) {
+    this.state.redoMetadata.push(redo);
+  }
+
+  @mutation()
+  POP_REDO_METADATA() {
+    this.state.redoMetadata.pop();
+  }
+
+  @mutation()
+  CLEAR_REDO_METADATA() {
+    this.state.redoMetadata = [];
   }
 }
