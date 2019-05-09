@@ -60,6 +60,17 @@ export class InternalApiClient {
         const isHelper = target['_isHelper'];
 
         const handler = (...args: any[]) => {
+          // args may contain ServiceHelper objects
+          // serialize them
+          traverse(args).forEach((item: any) => {
+            if (item && item._isHelper) {
+              return {
+                _type: 'HELPER',
+                resourceId: item._resourceId,
+              };
+            }
+          });
+
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(
