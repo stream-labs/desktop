@@ -43,6 +43,7 @@ test('Twitch Tags', async t => {
   await app.client.click('button=End Stream');
 
   // Go to Edit Stream Info to assert tags have persisted on Twitch
+  await app.client.waitForVisible('button=Go Live', 20000);
   await app.client.click('button=Go Live');
   await focusChild(t);
   await app.client.waitForVisible(tagsControlSelector);

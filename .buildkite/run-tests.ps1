@@ -1,10 +1,12 @@
 echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
 
+# ensure we have big anought resolution
+Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
 yarn install
 yarn compile
 yarn test-flaky
 
-#Restart-Computer
 $exitCode = $LastExitCode;
 
 echo 'Start shutdown job';
