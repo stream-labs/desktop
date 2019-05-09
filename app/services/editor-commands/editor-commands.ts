@@ -37,7 +37,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   combineTimeout: number;
 
-  setCombineTimeout() {
+  private setCombineTimeout() {
     this.combineActive = true;
 
     if (this.combineTimeout) clearTimeout(this.combineTimeout);
@@ -154,27 +154,27 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   }
 
   @mutation()
-  PUSH_UNDO_METADATA(undo: ICommandMetadata) {
+  private PUSH_UNDO_METADATA(undo: ICommandMetadata) {
     this.state.undoMetadata.push(undo);
   }
 
   @mutation()
-  POP_UNDO_METADATA() {
+  private POP_UNDO_METADATA() {
     this.state.undoMetadata.pop();
   }
 
   @mutation()
-  PUSH_REDO_METADATA(redo: ICommandMetadata) {
+  private PUSH_REDO_METADATA(redo: ICommandMetadata) {
     this.state.redoMetadata.push(redo);
   }
 
   @mutation()
-  POP_REDO_METADATA() {
+  private POP_REDO_METADATA() {
     this.state.redoMetadata.pop();
   }
 
   @mutation()
-  CLEAR_REDO_METADATA() {
+  private CLEAR_REDO_METADATA() {
     this.state.redoMetadata = [];
   }
 }

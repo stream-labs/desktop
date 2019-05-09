@@ -7,6 +7,7 @@ import { ScenesService } from 'services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: { ModalLayout },
@@ -15,17 +16,11 @@ export default class NameScene extends Vue {
   name = '';
   error = '';
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
-
-  @Inject()
-  selectionService: SelectionService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: ISourcesServiceApi;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {
     sceneToDuplicate?: string; // id of scene
@@ -55,7 +50,12 @@ export default class NameScene extends Vue {
     if (!this.name) {
       this.error = $t('The scene name is required');
     } else if (this.options.rename) {
-      this.scenesService.getScene(this.options.rename).setName(this.name);
+      this.editorCommandsService.executeCommand(
+        'RenameSceneCommand',
+        this.options.rename,
+        this.name,
+      );
+
       this.windowsService.closeChildWindow();
     } else {
       const newScene = this.scenesService.createScene(this.name, {
