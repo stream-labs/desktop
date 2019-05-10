@@ -6,6 +6,7 @@ import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import EditableSceneCollection from 'components/EditableSceneCollection.vue';
 import Fuse from 'fuse.js';
+import { ObsImporterService } from 'services/obs-importer';
 
 @Component({
   components: {
@@ -16,6 +17,7 @@ import Fuse from 'fuse.js';
 export default class ManageSceneCollections extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() obsImporterService: ObsImporterService;
 
   searchQuery = '';
 
@@ -26,6 +28,10 @@ export default class ManageSceneCollections extends Vue {
 
   create() {
     this.sceneCollectionsService.create({ needsRename: true });
+  }
+
+  importFromObs() {
+    this.obsImporterService.import();
   }
 
   get collections() {
