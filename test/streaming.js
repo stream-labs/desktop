@@ -61,8 +61,8 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-
-test('Streaming to Facebook', async t => {
+// TODO: flaky
+test.skip('Streaming to Facebook', async t => {
 
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;
