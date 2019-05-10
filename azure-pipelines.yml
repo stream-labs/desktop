@@ -2,13 +2,9 @@ trigger:
 - staging
 
 pool:
-  vmImage: 'windows-2019'
+  name: 'Default'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
 
 - bash: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
@@ -19,7 +15,7 @@ steps:
 - bash: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- bash: 'yarn test-flaky'
+- bash: 'yarn test-flaky --match="Main and child window visibility"'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
