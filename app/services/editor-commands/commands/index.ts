@@ -18,3 +18,6 @@ export { RenameSceneCommand } from './rename-scene';
 export { RemoveNodesCommand } from './remove-nodes';
 export { RemoveItemCommand } from './remove-item';
 export { RemoveSceneCommand } from './remove-scene';
+export { MuteSourceCommand } from './mute-source';
+export { SetDeflectionCommand } from './set-deflection';
+export { HideItemsCommand } from './hide-items';

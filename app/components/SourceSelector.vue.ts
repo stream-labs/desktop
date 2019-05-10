@@ -228,7 +228,7 @@ export default class SourceSelector extends Vue {
   toggleVisibility(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
-    selection.setSettings({ visible });
+    this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
   }
 
   visibilityClassesForSource(sceneNodeId: string) {
