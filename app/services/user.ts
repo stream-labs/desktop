@@ -334,10 +334,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async getUserExtraContext() {
     let osInfo, cpu, graphics, osUuid, result;
     try{
-      graphics = await systemInfoGraphics();
-      cpu = await systemInfoCpu();
-      osInfo = await systemInfoOsInfo();
-      osUuid = await systemInfoUuid();
+      [graphics, cpu, osInfo, osUuid] = await Promise.all([
+        systemInfoGraphics(),
+        systemInfoCpu(),
+        systemInfoOsInfo(),
+        systemInfoUuid(),
+      ]);
 
       result = {
         platform: this.platform.type,
