@@ -6,16 +6,16 @@ pool:
 
 steps:
 
-- bash: yarn install --frozen-lockfile --check-files
+- script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
 
-- bash: 'yarn lint'
+- script: 'yarn lint'
   displayName: 'TSLint'
 
-- bash: 'yarn compile:ci'
+- script: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- bash: 'yarn test-flaky --match="Main and child window visibility"'
+- script: 'yarn test-flaky --match="Main and child window visibility"'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
