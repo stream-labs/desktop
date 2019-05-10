@@ -36,7 +36,7 @@ test('Recording', async t => {
     await app.client.click('.record-button');
     await app.client.waitForVisible('.record-button:not(.active)');
 
-    // wait to ensure that output setting are editable
+    // Wait to ensure that output setting are editable
     await sleep(2000);
   }
 
