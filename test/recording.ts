@@ -37,7 +37,7 @@ test('Recording', async t => {
     await app.client.waitForVisible('.record-button:not(.active)');
 
     // wait to ensure that output setting are editable
-    await sleep(1000);
+    await sleep(2000);
   }
 
   // Check that every file was created
