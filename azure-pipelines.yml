@@ -1,5 +1,5 @@
 trigger:
-- staging
+- azure
 
 pool:
   name: 'Default'
