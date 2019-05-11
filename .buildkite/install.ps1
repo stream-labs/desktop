@@ -1,9 +1,7 @@
 # Run this script as administrator to setup enviroment on new CI machine:
-# powershell install.ps1 your_buildkite_token your_buildkite_token your_password
+# powershell install.ps1 your_azure_pipeline_token host_user host_password
 
 $token=$args[0]
-$username=$args[1]
-$password=$args[2]
 
 $buildkitAgentPath = "C:\buildkite-agent\bin\buildkite-agent.exe"
 
@@ -34,18 +32,14 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
-echo "Install Buildkite Agent"
-$env:buildkiteAgentToken = $token
-Set-ExecutionPolicy Bypass -Scope Process -Force
-iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/buildkite/agent/master/install.ps1'))
+echo "Donwload and install Azure Agent"
+cd /
+Remove-Item agent -Recurse -ErrorAction Ignore
+mkdir agent ; cd agent;
+Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
+Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
 
-echo "Setup auto-login when system starts"
-$RegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
-Set-ItemProperty $RegPath "AutoAdminLogon" -Value "1" -type String
-Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
-Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
-
-echo "Add Buildkite agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartBuildkite' -Value "$buildkitAgentPath start";
+echo "Configure Azure Agent"
+.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --once --runAsAutoLogon --windowsLogonAccount $username --windowsLogonPassword $password --agent "$env:computername $(Get-Random)"
 
 echo "Installation completed. Restart PC to take effect"

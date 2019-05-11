@@ -22,3 +22,6 @@ steps:
     CI: true
     BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
     SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+
+- pwsh: "Start-Process powershell -ArgumentList '-file \".buildkite/reboot.ps1\"'"
+  displayName: "Reboot"
