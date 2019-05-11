@@ -1,4 +1,4 @@
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper } from 'services/core';
 import { SceneItemFolder as InternalSceneItemFolder } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { SourcesService } from 'services/api/external-api/sources/sources';

@@ -2,7 +2,7 @@ import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { SelectionService } from 'services/selection';
-import { Inject } from '../injector';
+import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n';
 
 export class SourceTransformMenu extends Menu {

@@ -1,5 +1,5 @@
-import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Service } from 'services/core/service';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { getPlatformService } from 'services/platforms';
 import { CustomizationService, ICustomizationSettings } from 'services/customization';

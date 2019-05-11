@@ -1,5 +1,5 @@
-import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Service } from 'services/core/service';
+import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
