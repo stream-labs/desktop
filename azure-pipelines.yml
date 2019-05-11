@@ -9,8 +9,8 @@ steps:
 - script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
 
-- script: 'yarn lint'
-  displayName: 'TSLint'
+#- script: 'yarn lint'
+#  displayName: 'TSLint'
 
 - script: 'yarn compile:ci'
   displayName: 'Compile Assets'
@@ -25,3 +25,4 @@ steps:
 
 - pwsh: "Start-Process powershell -ArgumentList '-file \".buildkite/reboot.ps1\"'"
   displayName: "Reboot"
+  condition: always()

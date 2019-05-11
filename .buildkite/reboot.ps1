@@ -8,12 +8,14 @@
 # https://buildkite.com/docs/agent/v3#signal-handling
 # Hovewer this aproach doesn't work in Windows
 # Workaround here is send a Ctrl+C keys to the buildkite-agent window
-$agentPid = (Get-Process | Where-Object {$_.ProcessName -eq "buildkite-agent"}).Id
-$wshell = New-Object -ComObject wscript.shell;
-$wshell.AppActivate($agentPid)
-Sleep 1
-$wshell.SendKeys("^(C)")
-
-# give bulidekite-agent some time for gracefully exit and reboot the PC
-Sleep 5
-Restart-Computer;
+#$agentPid = (Get-Process | Where-Object {$_.ProcessName -eq "buildkite-agent"}).Id
+#$wshell = New-Object -ComObject wscript.shell;
+#$wshell.AppActivate($agentPid)
+#Sleep 1
+#$wshell.SendKeys("^(C)")
+#
+## give bulidekite-agent some time for gracefully exit and reboot the PC
+#Sleep 5
+#Restart-Computer;
+Sleep 5;
+Restart-Computer
