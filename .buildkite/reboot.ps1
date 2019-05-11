@@ -17,5 +17,5 @@
 ## give bulidekite-agent some time for gracefully exit and reboot the PC
 #Sleep 5
 #Restart-Computer;
-Sleep 5;
+# Sleep 5;
 Restart-Computer
