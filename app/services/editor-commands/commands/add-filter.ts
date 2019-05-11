@@ -5,7 +5,12 @@ import { Inject } from 'services/core/injector';
 export class AddFilterCommand extends Command {
   @Inject() private sourceFiltersService: SourceFiltersService;
 
-  constructor(private sourceId: string, private type: TSourceFilterType, private name: string) {
+  constructor(
+    private sourceId: string,
+    private type: TSourceFilterType,
+    private name: string,
+    private settings?: Dictionary<any>,
+  ) {
     super();
   }
 
@@ -14,7 +19,7 @@ export class AddFilterCommand extends Command {
   }
 
   execute() {
-    this.sourceFiltersService.add(this.sourceId, this.type, this.name);
+    this.sourceFiltersService.add(this.sourceId, this.type, this.name, this.settings);
   }
 
   rollback() {

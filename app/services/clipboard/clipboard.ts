@@ -17,6 +17,8 @@ import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IClipboardServiceApi } from './clipboard-api';
+import { EditorCommandsService } from 'services/editor-commands';
+import { IFilterData } from 'services/editor-commands/commands/paste-filters';
 const { clipboard } = electron;
 
 interface ISceneNodeInfo {
@@ -91,6 +93,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private selectionService: SelectionService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   init() {
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
@@ -139,15 +142,30 @@ export class ClipboardService extends StatefulService<IClipboardState>
     const source = this.selectionService.getItems()[0];
     if (!source) return;
 
+    const filterData: IFilterData[] = [];
+
     if (this.hasFiltersInUnloadedClipboard()) {
-      this.pasteFiltersFromUnloadedClipboard();
-      return;
+      this.state.unloadedCollectionClipboard.filters.forEach(filter => {
+        filterData.push({
+          name: this.sourceFiltersService.suggestName(source.sourceId, filter.name),
+          type: filter.type,
+          settings: filter.settings,
+        });
+      });
+    } else {
+      this.state.filterIds.forEach(fromSourceId => {
+        const filters = this.sourceFiltersService.getFilters(fromSourceId);
+        filters.forEach(filter => {
+          filterData.push({
+            name: this.sourceFiltersService.suggestName(source.sourceId, filter.name),
+            type: filter.type,
+            settings: filter.settings,
+          });
+        });
+      });
     }
-    this.state.filterIds.forEach(fromSourceId => {
-      const fromSource = this.sourcesService.getSource(fromSourceId);
-      if (!fromSource) return;
-      this.sourceFiltersService.copyFilters(fromSource.sourceId, source.sourceId);
-    });
+
+    this.editorCommandsService.executeCommand('PasteFiltersCommand', source.sourceId, filterData);
   }
 
   hasData(): boolean {
@@ -306,13 +324,6 @@ export class ClipboardService extends StatefulService<IClipboardState>
     } else {
       scene.createAndAddSource(text, 'text_gdiplus', { text });
     }
-  }
-
-  private pasteFiltersFromUnloadedClipboard() {
-    const source = this.selectionService.getItems()[0];
-    this.state.unloadedCollectionClipboard.filters.forEach(filter => {
-      this.sourceFiltersService.add(source.sourceId, filter.type, filter.name, filter.settings);
-    });
   }
 
   private beforeCollectionSwitchHandler() {

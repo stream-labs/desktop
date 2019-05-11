@@ -159,12 +159,6 @@ export class SourceFiltersService extends Service {
     return filterReference;
   }
 
-  copyFilters(fromSourceId: string, toSourceId: string) {
-    this.getFilters(fromSourceId).forEach(filter => {
-      this.add(toSourceId, filter.type, this.suggestName(toSourceId, filter.name), filter.settings);
-    });
-  }
-
   suggestName(sourceId: string, filterName: string): string {
     return namingHelpers.suggestName(filterName, (name: string) =>
       this.getObsFilter(sourceId, name),
