@@ -7,26 +7,22 @@ pool:
 steps:
 - script: "echo step1"
 
-#- script: yarn install --frozen-lockfile --check-files
-#  displayName: 'Install Dependencies'
+- script: yarn install --frozen-lockfile --check-files
+  displayName: 'Install Dependencies'
 
-#- script: 'yarn lint'
-#  displayName: 'TSLint'
+- script: 'yarn lint'
+  displayName: 'TSLint'
 
-#- script: 'yarn compile:ci'
-#  displayName: 'Compile Assets'
+- script: 'yarn compile:ci'
+  displayName: 'Compile Assets'
 
-#- script: 'yarn test --match="Main and child window visibility"'
-#  displayName: 'Run Tests'
-#  env:
-#    SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-#    CI: true
-#    BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-#    SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
-
-#- script: "powershell Start-Process powershell -ArgumentList '-file \".buildkite/reboot.ps1\"'"
-#  displayName: "Reboot"
-#  condition: always()
+- script: 'yarn test --match="Main and child window visibility"'
+  displayName: 'Run Tests'
+  env:
+    SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+    CI: true
+    BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+    SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
 - script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
   displayName: "Schedule reboot"
