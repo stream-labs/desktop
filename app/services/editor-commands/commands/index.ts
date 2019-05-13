@@ -50,3 +50,4 @@ export { RemoveTransitionCommand } from './remove-transition';
 // Connections
 export { CreateConnectionCommand } from './create-connection';
 export { RemoveConnectionCommand } from './remove-connection';
+export { EditConnectionCommand } from './edit-connection';
