@@ -88,7 +88,7 @@ export interface ITestContext {
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 let startApp: (t: TExecutionContext) => Promise<any>;
-let stopApp: (clearCash?: boolean) => Promise<any>;
+let stopApp: (clearCache?: boolean) => Promise<any>;
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopApp(false);
