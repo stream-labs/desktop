@@ -19,7 +19,7 @@ steps:
 - script: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- script: 'yarn test --match="Main and child window visibility"'
+- script: 'yarn test-flaky'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
