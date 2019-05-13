@@ -9,7 +9,11 @@ workspace:
 
 steps:
 
+- powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+  displayName: 'Get RDP address'
+
 - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+  displayName: 'Setup Screen Resolution'
 
 - script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
