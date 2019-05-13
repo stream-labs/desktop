@@ -8,7 +8,6 @@ workspace:
   clean: resources
 
 steps:
-- script: "echo step1"
 
 - script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
@@ -28,5 +27,5 @@ steps:
     SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
 - script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
-  displayName: "Schedule reboot"
+  displayName: "Schedule Reboot"
   condition: always()

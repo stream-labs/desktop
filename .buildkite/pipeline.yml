@@ -1,3 +1,0 @@
-steps:
-  - label: "Streamlabs OBS Tests"
-    command: 'powershell .buildkite/run-tests.ps1'
