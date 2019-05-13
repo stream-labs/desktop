@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { WindowsService } from 'services/windows';
 import { IWidgetData, IWidgetsServiceApi, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs';

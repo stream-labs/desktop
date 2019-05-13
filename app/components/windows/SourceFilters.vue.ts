@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SlVueTree, { ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { SourceFiltersService } from 'services/source-filters';
 import { ISourcesServiceApi } from 'services/sources';

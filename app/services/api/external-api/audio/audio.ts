@@ -2,9 +2,9 @@ import {
   AudioSource as InternalAudioSource,
   AudioService as InternalAudioService,
 } from 'services/audio';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Fallback, InjectFromExternalApi, Singleton } from 'services/api/external-api';
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper } from 'services/core';
 import { ISerializable } from '../../rpc-api';
 import * as obs from '../../../../../obs-api';
 import { SourcesService } from 'services/api/external-api/sources/sources';
