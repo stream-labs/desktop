@@ -55,6 +55,8 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     commandType: TCommand,
     ...commandArgs: ConstructorParameters<(typeof COMMANDS)[TCommand]>
   ) {
+    console.log('executing command');
+
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];

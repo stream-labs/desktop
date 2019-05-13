@@ -64,6 +64,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   studioModeChanged = new Subject<boolean>();
 
+  transitionPropertiesChanged = new Subject<string>();
+
   /**
    * This transition is used to render the left (EDIT) display
    * while in studio mode
@@ -292,7 +294,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   setPropertiesFormData(id: string, formData: TObsFormData) {
-    return this.propertiesManagers[id].setPropertiesFormData(formData);
+    this.propertiesManagers[id].setPropertiesFormData(formData);
+    this.transitionPropertiesChanged.next(id);
   }
 
   createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions = {}) {
@@ -325,6 +328,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.propertiesManagers[id] = new DefaultManager(this.obsTransitions[id], {});
 
     this.UPDATE_TRANSITION(id, { type: newType });
+    this.transitionPropertiesChanged.next(id);
   }
 
   renameTransition(id: string, newName: string) {

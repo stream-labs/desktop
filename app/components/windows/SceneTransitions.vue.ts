@@ -10,6 +10,7 @@ import Tabs, { ITab } from 'components/Tabs.vue';
 import { ScenesService } from 'services/scenes';
 import ConnectionSettings from 'components/ConnectionSettings.vue';
 import VModal from 'vue-js-modal';
+import { EditorCommandsService } from 'services/editor-commands';
 
 Vue.use(VModal);
 
@@ -25,6 +26,7 @@ export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   inspectedTransition = '';
   inspectedConnection = '';
@@ -84,10 +86,12 @@ export default class SceneTransitions extends Vue {
   }
 
   addTransition() {
-    const transition = this.transitionsService.createTransition(
+    const transition = this.editorCommandsService.executeCommand(
+      'CreateTransitionCommand',
       ETransitionType.Cut,
       'New Transition',
     );
+
     this.editTransition(transition.id);
   }
 

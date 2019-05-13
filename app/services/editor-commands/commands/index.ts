@@ -6,7 +6,7 @@ export { CreateSceneCommand } from './create-scene';
 export { RenameSceneCommand } from './rename-scene';
 export { RemoveSceneCommand } from './remove-scene';
 
-// Scene Nodes
+// Scene Nodes (Items or Folders)
 export { RemoveNodesCommand } from './remove-nodes';
 
 // Scene Items
@@ -41,3 +41,7 @@ export { EditFilterPropertiesCommand } from './edit-filter-properties';
 export { MuteSourceCommand } from './mute-source';
 export { SetDeflectionCommand } from './set-deflection';
 export { EditSourcePropertiesCommand } from './edit-source-properties';
+
+// Transitions
+export { CreateTransitionCommand } from './create-transition';
+export { EditTransitionCommand} from './edit-transition';
