@@ -28,3 +28,4 @@ Register-ScheduledJob -Name RestartPC -scriptblock {
 Restart-Computer
 shutdown -r -t (Get-Date).AddSeconds(5) /d p:4:1
 shutdown /r /t 10 /c "Reboot after CI Job finished" /f /d p:4:1
+
