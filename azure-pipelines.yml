@@ -4,6 +4,9 @@ trigger:
 pool:
   name: 'Default'
 
+workspace:
+  clean: resources
+
 steps:
 - script: "echo step1"
 
