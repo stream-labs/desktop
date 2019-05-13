@@ -9,6 +9,8 @@ workspace:
 
 steps:
 
+- powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
 - script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
 
