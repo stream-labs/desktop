@@ -27,7 +27,6 @@ import {
   graphics as systemInfoGraphics,
   osInfo as systemInfoOsInfo,
   uuid as systemInfoUuid,
-  Systeminformation,
 } from 'systeminformation';
 import {
   totalmem as nodeTotalMem,
@@ -333,7 +332,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async getUserExtraContext() {
-    let result;
     try{
       const [graphics, cpu, osInfo, osUuid] = await Promise.all([
         systemInfoGraphics(),
@@ -342,7 +340,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         systemInfoUuid(),
       ]);
 
-      result = {
+      return {
         platform: this.platform.type,
         cpuModel: nodeCpus()[0].model,
         cpuCores: `physical:${cpu.physicalCores} logical:${cpu.cores}`,
@@ -354,7 +352,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         memUsage: nodeMemUsage(),
       };
     } catch (err) {
-      result = {
+      return {
         platform: this.platform.type,
         cpuModel: nodeCpus()[0].model,
         cpuCores: `logical:${nodeCpus().length}`,
@@ -365,7 +363,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         exceptionWhenGetSystemInfo: err
       };
     }
-    return result;
   }
 
   popoutRecentEvents() {
