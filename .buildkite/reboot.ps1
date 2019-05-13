@@ -18,4 +18,13 @@
 #Sleep 5
 #Restart-Computer;
 # Sleep 5;
+
+Register-ScheduledJob -Name RestartPC -scriptblock {
+  Add-Type -AssemblyName System.Windows.Forms
+  [System.Windows.Forms.MessageBox]::Show('Hello')
+  Unregister-ScheduledJob -Name RestartPC
+} -Trigger (New-JobTrigger -Once -At (Get-Date).AddSeconds(5))
+
 Restart-Computer
+shutdown -r -t (Get-Date).AddSeconds(5) /d p:4:1
+shutdown /r /t 10 /c "Reboot after CI Job finished" /f /d p:4:1
