@@ -1,13 +1,13 @@
-import { InjectFromExternalApi } from 'services/api/external-api';
-import { ServiceHelper } from 'services/stateful-service';
+import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
+import { ServiceHelper } from 'services/core';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
   Selection as InternalSelection,
   SelectionService as InternalSelectionService,
 } from 'services/selection';
 import { ScenesService } from './scenes';
-import { SourcesService } from 'services/api/external-api/sources/sources';
-import { Source } from 'services/api/external-api/sources/source';
+import { Source, SourcesService } from 'services/api/external-api/sources';
+
 import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
@@ -28,7 +28,7 @@ export interface ISelectionModel {
 export class Selection implements ISceneItemActions {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;
-  private internalSelection: InternalSelection;
+  @Fallback() private internalSelection: InternalSelection;
 
   constructor(public sceneId?: string, itemsList: string[] = []) {
     if (!this.sceneId) return;

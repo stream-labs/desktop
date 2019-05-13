@@ -2718,11 +2718,6 @@ cipher-base@^1.0.0, cipher-base@^1.0.1:
   dependencies:
     inherits "^2.0.1"
 
-circular-dependency-plugin@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/circular-dependency-plugin/-/circular-dependency-plugin-3.0.0.tgz#9b68692e35b0e3510998d0164b6ae5011bea5760"
-  integrity sha1-m2hpLjWw41EJmNAWS2rlARvqV2A=
-
 clamp@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
@@ -3191,9 +3186,9 @@ cosmiconfig@^5.0.6:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.32/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.28/iojs-v2.0.8-crash-handler.tar.gz#3574c2a9a2bee9a9462eec39c4b9000f4bc1f497"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.32/iojs-v2.0.8-crash-handler.tar.gz#ed16993a367a255b6117abe4de9eaa5ba9cfea5c"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -4604,6 +4599,11 @@ fuse.js@3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.2.1.tgz#6320cb94ce56ec9755c89ade775bcdbb0358d425"
   integrity sha1-YyDLlM5W7JdVyJred1vNuwNY1CU=
+
+fuse.js@^3.2.0, fuse.js@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.4.4.tgz#f98f55fcb3b595cf6a3e629c5ffaf10982103e95"
+  integrity sha512-pyLQo/1oR5Ywf+a/tY8z4JygnIglmRxVUOiyFAbd11o9keUDpUJSMGRWJngcnkURj30kDHPmhoKY8ChJiz3EpQ==
 
 g-status@^2.0.2:
   version "2.0.2"
@@ -7121,9 +7121,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.22-iojs-v2.0.8.tar.gz":
-  version "0.3.21"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.22-iojs-v2.0.8.tar.gz#fbc7ff8153b9a17664db628640f6d3d9afd7e95b"
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.31-iojs-v2.0.8.tar.gz":
+  version "0.3.99"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.31-iojs-v2.0.8.tar.gz#51132f7cd4d668fb488df7276aa60ebabab95514"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -9098,17 +9098,18 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.3.56:
-  version "0.3.82"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.3.82.tgz#ad511ee434be5b9377cc9de5402a0254bab0e9bf"
-  integrity sha512-jddvSJvxjkyvvnET87HDfIQJ9emT3ZWHsMsJiigk43o1PUyvQ9kAQzV8F9OOlXn4SuwZ3/tyT89lzTZXr+lZPw==
+streamlabs-beaker@^0.4.6:
+  version "0.4.37"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.37.tgz#44cde495d329a34dcf39300a4f5180572a5ed131"
+  integrity sha512-0qe2+EqZT8DOybnrKrmnjI0XXs3o+NOh05dxpa4bSTdtuGCDYusYgpRpFEoaFitYycFmEEdGfmBWDNFLsFHN0Q==
   dependencies:
+    fuse.js "^3.4.4"
     google-fonts-webpack-plugin "^0.4.4"
     v-tooltip "^2.0.0-rc.33"
-    vee-validate "^2.1.7"
     vue "^2.6.6"
     vue-class-component "^6.0.0"
     vue-color "^2.7.0"
+    vue-fuse "^2.0.2"
     vue-js-modal "^1.3.28"
     vue-mq "^1.0.1"
     vue-property-decorator "^7.0.0"
@@ -10245,7 +10246,7 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
-vee-validate@2.2.0, vee-validate@^2.1.7:
+vee-validate@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.0.tgz#0dcb6251a50cde9a3a1e924c917cc3d0a543b661"
   integrity sha512-s72VQcl1DWTNQKQyHtUDcU536dIx/GYDnCObDj4AXDZtWnqM3rXbgp7FCT3D2q9HFKw7IykW9bVrClhPBeQnrw==
@@ -10310,6 +10311,14 @@ vue-color@2.7.0, vue-color@^2.7.0:
     lodash.throttle "^4.0.0"
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
+
+vue-fuse@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vue-fuse/-/vue-fuse-2.0.2.tgz#beb18d578052f7027a81edf12e9d3a394ca38d14"
+  integrity sha512-5oLkKy8NX9jX+s2FkkY+1cjATgNcEw/wSLEIhK/5iNAr0deBiSyd8Pu1xJJcZwBai6HEUTFbhqYilfeprQ7m1w==
+  dependencies:
+    fuse.js "^3.2.0"
+    vue "^2.5.17"
 
 vue-hot-reload-api@^2.2.0:
   version "2.2.4"
@@ -10436,6 +10445,11 @@ vue@2.6.9, vue@^2.5.11, vue@^2.5.21, vue@^2.6.6:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.9.tgz#415c1cc1a5ed00c8f0acdd0a948139d12b7ea6b3"
   integrity sha512-t1+tvH8hybPM86oNne3ZozCD02zj/VoZIiojOBPJLjwBn7hxYU5e1gBObFpq8ts1NEn1VhPf/hVXBDAJ3X5ljg==
 
+vue@^2.5.17:
+  version "2.6.10"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
+  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
+
 vuedraggable@2.8.5:
   version "2.8.5"
   resolved "https://registry.yarnpkg.com/vuedraggable/-/vuedraggable-2.8.5.tgz#ffa72ed225d006f313b43c22d2e52046b15e9678"
@@ -10545,6 +10559,13 @@ webpack-cli@3.1.2:
     supports-color "^5.5.0"
     v8-compile-cache "^2.0.2"
     yargs "^12.0.2"
+
+webpack-merge@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/webpack-merge/-/webpack-merge-4.2.1.tgz#5e923cf802ea2ace4fd5af1d3247368a633489b4"
+  integrity sha512-4p8WQyS98bUJcCvFMbdGZyZmsKuWjWVnVHnAS3FFg0HDaRVrPbkivx2RYCre8UiemD67RsiFFLfn4JhLAin8Vw==
+  dependencies:
+    lodash "^4.17.5"
 
 webpack-sources@^0.2.0:
   version "0.2.3"

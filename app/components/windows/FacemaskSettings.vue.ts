@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput, ToggleInput, SliderInput } from 'components/shared/inputs/inputs';
 import { ProgressBar, ItemGrid, VirtualItem } from 'streamlabs-beaker';

@@ -3,9 +3,8 @@ import {
   SourcesService as InternalSourcesService,
   TSourceType,
 } from 'services/sources';
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper, Inject } from 'services';
 import { ISerializable } from '../../rpc-api';
-import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ISourceModel {

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
@@ -70,6 +70,10 @@ export default class WidgetEditor extends Vue {
   readonly settingsState = this.widget.getSettingsService().state;
   animating = false;
   canShowEditor = false;
+
+  get hideStyleBlockers() {
+    return this.windowsService.state.child.hideStyleBlockers;
+  }
 
   get loaded() {
     return !!this.settingsState.data;

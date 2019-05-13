@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
   IPlatformAuth,
@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
@@ -106,7 +106,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => {
+        this.userService.updatePlatformToken(response.access_token);
+        this.setupStreamSettings(this.userService.state.auth);
+      });
   }
 
   @requiresToken()
@@ -168,9 +171,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(() => true);
+    return fetch(request).then(handlePlatformResponse);
   }
 
   @requiresToken()

@@ -1,13 +1,13 @@
 import Vue from 'vue';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { SourcesService } from 'services/sources';
 import { ISource } from 'services/sources/sources-api';
 import { Source } from 'services/sources/source';
 import { SourceFiltersService } from 'services/source-filters';
-import { mutation } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { mutation } from 'services/core/stateful-service';
+import { Inject } from 'services/core/injector';
 import { WebsocketService, TSocketEvent, IAlertPlayingSocketEvent } from 'services/websocket';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
@@ -272,7 +272,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.registerSubscriptionEvent({
         subscriberId: event.message[0].subscriber_twitch_id,
         subPlan: event.message[0].sub_plan,
-        name: event.message[0].name,
+        name: event.message[0].name.toLowerCase(),
       });
     }
 
@@ -301,7 +301,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.playSubscriptionEvent({
         subscriberId: event.message.subscriber_twitch_id,
         subPlan: event.message.sub_plan,
-        name: event.message.name,
+        name: event.message.name.toLowerCase(),
       });
     }
 

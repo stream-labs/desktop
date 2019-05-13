@@ -1,6 +1,5 @@
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper, Inject } from 'services';
 import { ISerializable } from 'services/api/rpc-api';
-import { Inject } from 'util/injector';
 import {
   AudioService as InternalAudioService,
   AudioSource as InternalAudioSource,

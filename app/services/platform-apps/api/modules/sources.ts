@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
 import { SourcesService, TSourceType, Source, TPropertiesManager } from 'services/sources';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';

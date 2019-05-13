@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../../services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import { BrandDeviceService } from 'services/auto-config/brand-device';
 

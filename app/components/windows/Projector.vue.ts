@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
@@ -22,6 +22,10 @@ export default class Projector extends Vue {
   oldBounds: electron.Rectangle;
 
   sourcesSubscription: Subscription;
+
+  get hideStyleBlockers() {
+    return this.windowsService.state[this.windowId].hideStyleBlockers;
+  }
 
   get windowId() {
     return Util.getCurrentUrlParams().windowId;

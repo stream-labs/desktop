@@ -7,7 +7,7 @@ import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import { FacemasksService } from 'services/facemasks';
 
@@ -223,6 +223,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
           duration,
           enabled: this.facemaskEnabled,
           device: this.facemasksService.getEnabledDevice(),
+          donations_enabled: this.facemasksService.state.settings.donations_enabled,
+          subs_enabled: this.facemasksService.state.settings.donations_enabled,
+          bits_enabled: this.facemasksService.state.settings.donations_enabled,
+          bits_price: this.facemasksService.state.settings.bits_price,
         })
         .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
     }

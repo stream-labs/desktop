@@ -1,10 +1,10 @@
 import uuid from 'uuid/v4';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -217,7 +217,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   async runInLoadingMode(fn: () => Promise<any> | void) {
     if (!this.state.loading) {
-      this.customizationService.setSettings({ hideStyleBlockingElements: true });
+      this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -268,10 +268,7 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(
-      () => this.customizationService.setSettings({ hideStyleBlockingElements: false }),
-      500,
-    );
+    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
     if (error) throw error;
     return returningValue;
   }

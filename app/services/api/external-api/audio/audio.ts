@@ -1,8 +1,7 @@
 import { AudioService as InternalAudioService } from 'services/audio';
-import { Inject } from 'util/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { AudioSource } from './audio-source';
-import * as obs from '../../../../../obs-api';
+import { Inject } from 'services';
 
 /**
  * Provides API for manage audio sources

@@ -1,11 +1,11 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings/index';
-import { mutation } from 'services/stateful-service';
-import { Inject } from '../../../util/injector';
+import { mutation } from 'services/core/stateful-service';
+import { Inject } from '../../core/injector';
 import {
   JsonrpcService,
   E_JSON_RPC_ERROR,

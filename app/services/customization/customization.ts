@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
-import { PersistentStatefulService } from '../persistent-stateful-service';
-import { mutation } from '../stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
+import { mutation } from '../core/stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
@@ -52,7 +52,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     experimental: {
       // put experimental features here
     },
-    hideStyleBlockingElements: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -60,9 +59,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   init() {
     super.init();
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-
-    // Hide these elements until the app is finished loading
-    this.setSettings({ hideStyleBlockingElements: true });
 
     if (this.state.nightMode != null) {
       const theme = this.state.nightMode ? 'night-theme' : 'day-theme';

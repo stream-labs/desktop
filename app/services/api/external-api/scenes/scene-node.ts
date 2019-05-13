@@ -1,4 +1,4 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import {
   Scene as InternalScene,
   SceneItemNode as InternalSceneNode,

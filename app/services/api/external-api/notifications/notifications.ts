@@ -1,5 +1,5 @@
 import { NotificationsService as InternalNotificationsService } from 'services/notifications';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { IJsonRpcRequest } from 'services/api/jsonrpc';
 

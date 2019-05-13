@@ -2,7 +2,7 @@ import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 import { BaseGoalService } from './base-goal';
 import { formMetadata } from 'components/shared/inputs';
 

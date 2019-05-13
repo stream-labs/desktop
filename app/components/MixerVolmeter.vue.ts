@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
 import { AudioSource } from 'services/audio';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
@@ -71,8 +71,8 @@ export default class MixerVolmeter extends Vue {
     if (this.gl) {
       this.initWebglRendering();
     } else {
-      // This machine does not support hardware acceleration, so fall back
-      // to canvas 2D rendering.
+      // This machine does not support hardware acceleration, or it has been
+      // disabled, so we fall back to canvas 2D rendering.
       this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
   }
@@ -159,12 +159,14 @@ export default class MixerVolmeter extends Vue {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
-
     const bg = this.customizationService.themeBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
+
+    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
 
     this.gl.enableVertexAttribArray(this.positionLocation);
     this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
@@ -198,6 +200,8 @@ export default class MixerVolmeter extends Vue {
   }
 
   private drawVolmeterC2d(peaks: number[]) {
+    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
+
     const bg = this.customizationService.themeBackground;
     this.ctx.fillStyle = this.rgbToCss([bg.r, bg.g, bg.b]);
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
