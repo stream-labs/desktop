@@ -158,17 +158,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  toggleStreaming(ctx?: StreamingContext) {
+  async toggleStreaming(ctx?: StreamingContext) {
     this.context = ctx;
 
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      if (this.userService.isLoggedIn && this.userService.platform) {
-        const service = getPlatformService(this.userService.platform.type);
-        service.beforeGoLive().then(() => this.finishStartStreaming());
-        return;
+      try {
+        if (this.userService.isLoggedIn && this.userService.platform) {
+          const service = getPlatformService(this.userService.platform.type);
+          await service.beforeGoLive();
+        }
+        this.finishStartStreaming();
+        return Promise.resolve();
+      } catch (e) {
+        return Promise.reject(e);
       }
-      this.finishStartStreaming();
-      return;
     }
 
     if (
@@ -179,7 +182,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
 
-      if (shouldConfirm && !confirm(confirmText)) return;
+      if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
@@ -199,12 +202,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       this.announcementsService.updateBanner();
 
-      return;
+      return Promise.resolve();
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       obs.NodeObs.OBS_service_stopStreaming(true);
-      return;
+      return Promise.resolve();
     }
   }
 

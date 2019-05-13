@@ -53,7 +53,7 @@ export class StreamingService implements ISerializable {
     return this.streamingService.toggleRecording();
   }
 
-  toggleStreaming(): void {
+  toggleStreaming(): Promise<never> | Promise<void> {
     return this.streamingService.toggleStreaming();
   }
 }

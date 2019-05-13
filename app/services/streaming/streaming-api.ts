@@ -66,7 +66,7 @@ export interface IStreamingServiceApi {
   /**
    * Toggle the streaming state
    */
-  toggleStreaming(): void;
+  toggleStreaming(): Promise<never> | Promise<void>;
 
   /**
    * @deprecated

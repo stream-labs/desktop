@@ -180,7 +180,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
-      });
+      })
+      .catch(resp => Promise.reject(resp.error.message));
   }
 
   prepopulateInfo() {
@@ -234,17 +235,15 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       .then(json => json.live_views);
   }
 
-  fbGoLive() {
-    return new Promise(resolve => {
-      if (this.state.streamUrl && this.settingsService.state.Stream.service === 'Facebook Live') {
-        const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
-        this.setSettingsWithKey(streamKey);
-        this.SET_STREAM_URL(null);
-        resolve();
-      } else {
-        return this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve();
-      }
-    });
+  async fbGoLive() {
+    if (this.state.streamUrl && this.settingsService.state.Stream.service === 'Facebook Live') {
+      const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
+      this.setSettingsWithKey(streamKey);
+      this.SET_STREAM_URL(null);
+      Promise.resolve();
+    } else {
+      return this.state.activePage ? this.createLiveVideo() : Promise.resolve();
+    }
   }
 
   putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {

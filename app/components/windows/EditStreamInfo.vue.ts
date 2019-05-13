@@ -299,9 +299,19 @@ export default class EditStreamInfo extends Vue {
     this.updateAndGoLive();
   }
 
-  goLive() {
-    this.streamingService.toggleStreaming();
-    this.windowsService.closeChildWindow();
+  async goLive() {
+    try {
+      await this.streamingService.toggleStreaming();
+      this.windowsService.closeChildWindow();
+    } catch (e) {
+      this.$toasted.show(e, {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      this.updatingInfo = false;
+    }
   }
 
   cancel() {
