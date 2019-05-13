@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 import electron from 'electron';
 import { ErrorField } from 'vee-validate';
 import { CustomizationService } from 'services/customization';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: {
@@ -30,6 +31,7 @@ export default class SourceProperties extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() windowsService: WindowsService;
   @Inject() customizationService: CustomizationService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
@@ -60,8 +62,10 @@ export default class SourceProperties extends Vue {
   }
 
   onInputHandler(properties: TObsFormData, changedIndex: number) {
-    const source = this.sourcesService.getSource(this.sourceId);
-    source.setPropertiesFormData([properties[changedIndex]]);
+    this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', this.sourceId, [
+      properties[changedIndex],
+    ]);
+
     this.refresh();
   }
 

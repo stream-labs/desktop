@@ -76,11 +76,13 @@ export default class SourceFilters extends Vue {
   }
 
   save() {
-    this.sourceFiltersService.setPropertiesFormData(
+    this.editorCommandsService.executeCommand(
+      'EditFilterPropertiesCommand',
       this.sourceId,
       this.selectedFilterName,
       this.properties,
     );
+
     this.updateProperties();
   }
 

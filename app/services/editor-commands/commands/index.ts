@@ -35,7 +35,9 @@ export { RemoveFolderCommand } from './remove-folder';
 export { AddFilterCommand } from './add-filter';
 export { RemoveFilterCommand } from './remove-filter';
 export { PasteFiltersCommand } from './paste-filters';
+export { EditFilterPropertiesCommand } from './edit-filter-properties';
 
 // Sources
 export { MuteSourceCommand } from './mute-source';
 export { SetDeflectionCommand } from './set-deflection';
+export { EditSourcePropertiesCommand } from './edit-source-properties';
