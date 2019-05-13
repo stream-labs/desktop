@@ -113,7 +113,7 @@ export default class SceneTransitions extends Vue {
   }
 
   makeDefault(id: string) {
-    this.transitionsService.setDefaultTransition(id);
+    this.editorCommandsService.executeCommand('SetDefaultTransitionCommand', id);
   }
 
   // CONNECTIONS

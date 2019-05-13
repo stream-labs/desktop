@@ -46,6 +46,7 @@ export { EditSourcePropertiesCommand } from './edit-source-properties';
 export { CreateTransitionCommand } from './create-transition';
 export { EditTransitionCommand } from './edit-transition';
 export { RemoveTransitionCommand } from './remove-transition';
+export { SetDefaultTransitionCommand } from './set-default-transition';
 
 // Connections
 export { CreateConnectionCommand } from './create-connection';
