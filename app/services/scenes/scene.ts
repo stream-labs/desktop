@@ -156,6 +156,10 @@ export class Scene {
     if (options.select == null) options.select = true;
     if (options.select) this.selectionService.select(sceneItemId);
 
+    if (options.initialTransform) {
+      sceneItem.setTransform(options.initialTransform);
+    }
+
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
   }

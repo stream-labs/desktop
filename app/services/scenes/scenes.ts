@@ -25,6 +25,7 @@ export interface ISceneNodeAddOptions {
   id?: string; // A new ID will be assigned if one is not provided
   sourceAddOptions?: ISourceAddOptions;
   select?: boolean; // Immediately select this source
+  initialTransform?: IPartialTransform;
 }
 
 export interface ISceneItemInfo {
