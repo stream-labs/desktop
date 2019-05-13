@@ -109,7 +109,7 @@ export default class SceneTransitions extends Vue {
       return;
     }
 
-    this.transitionsService.deleteTransition(id);
+    this.editorCommandsService.executeCommand('RemoveTransitionCommand', id);
   }
 
   makeDefault(id: string) {

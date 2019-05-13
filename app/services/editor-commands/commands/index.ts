@@ -44,4 +44,7 @@ export { EditSourcePropertiesCommand } from './edit-source-properties';
 
 // Transitions
 export { CreateTransitionCommand } from './create-transition';
-export { EditTransitionCommand} from './edit-transition';
+export { EditTransitionCommand } from './edit-transition';
+export { RemoveTransitionCommand } from './remove-transition';
+
+// Connections
