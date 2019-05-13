@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { TransitionsService, ETransitionType } from 'services/transitions';
+import { TransitionsService, ETransitionType, ITransitionConnection } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import ModalLayout from 'components/ModalLayout.vue';
 import TransitionSettings from 'components/TransitionSettings.vue';
@@ -123,11 +123,14 @@ export default class SceneTransitions extends Vue {
   }
 
   addConnection() {
-    const connection = this.transitionsService.addConnection(
+    // TODO: Return types for executeCommand
+    const connection = this.editorCommandsService.executeCommand(
+      'CreateConnectionCommand',
       this.scenesService.scenes[0].id,
       this.scenesService.scenes[1].id,
       this.transitions[0].id,
-    );
+    ) as ITransitionConnection;
+
     this.editConnection(connection.id);
   }
 
@@ -137,7 +140,7 @@ export default class SceneTransitions extends Vue {
   }
 
   deleteConnection(id: string) {
-    this.transitionsService.deleteConnection(id);
+    this.editorCommandsService.executeCommand('RemoveConnectionCommand', id);
   }
 
   getTransitionName(id: string) {

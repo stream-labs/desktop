@@ -36,7 +36,7 @@ interface ITransition {
   duration: number;
 }
 
-interface ITransitionConnection {
+export interface ITransitionConnection {
   id: string;
   fromSceneId: string;
   toSceneId: string;
@@ -372,8 +372,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     return this.state.transitions.find(tran => tran.id === id);
   }
 
-  addConnection(fromId: string, toId: string, transitionId: string) {
-    const id = uuid();
+  addConnection(fromId: string, toId: string, transitionId: string, connectionId?: string) {
+    const id = connectionId || uuid();
     this.ADD_CONNECTION({
       id,
       transitionId,

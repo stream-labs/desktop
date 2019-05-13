@@ -48,3 +48,5 @@ export { EditTransitionCommand } from './edit-transition';
 export { RemoveTransitionCommand } from './remove-transition';
 
 // Connections
+export { CreateConnectionCommand } from './create-connection';
+export { RemoveConnectionCommand } from './remove-connection';
