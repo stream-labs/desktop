@@ -4,7 +4,6 @@
 $token=$args[0]
 $username=$args[1]
 $password=$args[2]
-
 $agentPath = "C:\agent\run.cmd"
 
 if (-Not($token) -Or -Not($username) -Or -Not($password)) {
