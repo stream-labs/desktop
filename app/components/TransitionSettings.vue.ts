@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';

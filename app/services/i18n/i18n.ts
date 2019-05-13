@@ -1,8 +1,8 @@
 import electron from 'electron';
 import VueI18n from 'vue-i18n';
-import { PersistentStatefulService } from '../persistent-stateful-service';
-import { mutation } from 'services/stateful-service';
-import { Inject } from '../../util/injector';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
+import { mutation } from 'services/core/stateful-service';
+import { Inject } from '../core/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { I18nServiceApi } from './i18n-api';

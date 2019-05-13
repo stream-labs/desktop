@@ -1,6 +1,6 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import Util from 'services/utils';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we

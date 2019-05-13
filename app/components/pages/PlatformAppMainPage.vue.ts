@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import PlatformAppPageView from '../PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 @Component({
   components: { PlatformAppPageView },

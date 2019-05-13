@@ -1,5 +1,4 @@
-import electron from 'electron';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import {
   E_JSON_RPC_ERROR,
   IJsonRpcResponse,
@@ -8,8 +7,6 @@ import {
   IJsonrpcServiceApi,
 } from './jsonrpc-api';
 import uuid from 'uuid/v4';
-
-const { ipcRenderer } = electron;
 
 export class JsonrpcService extends Service implements IJsonrpcServiceApi {
   static createError(

@@ -1,7 +1,7 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import Utils from './utils';
 import { AppService } from './app';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 
 type TShortcutHandler = (event: KeyboardEvent) => void;
 

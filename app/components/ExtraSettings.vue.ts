@@ -3,7 +3,7 @@ import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { BoolInput } from 'components/shared/inputs/inputs';
 import { CacheUploaderService } from 'services/cache-uploader';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { StreamlabelsService } from 'services/streamlabels';
 import { OnboardingService } from 'services/onboarding';

@@ -4,13 +4,13 @@ import {
   IStreamingEncoderSettings,
 } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { IEncoderProfile } from './definitions';
 import cloneDeep from 'lodash/cloneDeep';
 import { camelize, handleErrors } from '../../util/requests';
 import { UrlService } from '../hosts';
-import { mutation } from 'services/stateful-service';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { mutation } from 'services/core/stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 
 export * from './definitions';
 

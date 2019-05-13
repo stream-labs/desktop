@@ -109,7 +109,7 @@ function openDevTools() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  crashHandler.startCrashHandler(app.getAppPath());
+  crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString());
   crashHandler.registerProcess(pid, false);
 
   const Raven = require('raven');

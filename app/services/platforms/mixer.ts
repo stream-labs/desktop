@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
   IPlatformAuth,
@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import electron from 'electron';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';

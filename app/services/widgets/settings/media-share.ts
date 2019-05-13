@@ -1,6 +1,6 @@
 import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
-import { InheritMutations } from '../../stateful-service';
+import { InheritMutations } from '../../core/stateful-service';
 
 export interface IMediaShareSettings extends IWidgetSettings {
   advanced_settings: {
