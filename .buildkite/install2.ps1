@@ -5,7 +5,7 @@ $token=$args[0]
 $username=$args[1]
 $password=$args[2]
 
-$buildkitAgentPath = "C:\buildkite-agent\bin\buildkite-agent.exe"
+$agentPath = "C:\agent\run.cmd"
 
 if (-Not($token) -Or -Not($username) -Or -Not($password)) {
   echo "Provide a buildkite token, system user name and password";
@@ -46,6 +46,6 @@ Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
 Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
 
 echo "Add Buildkite agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartBuildkite' -Value "$buildkitAgentPath start";
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartBuildkite' -Value "$agentPath --once";
 
 echo "Installation completed. Restart PC to take effect"

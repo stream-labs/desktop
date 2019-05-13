@@ -2,11 +2,13 @@
 # powershell install.ps1 your_azure_pipeline_token host_user host_password
 
 $token=$args[0]
+$username=$args[1]
+$password=$args[2]
 
-$buildkitAgentPath = "C:\buildkite-agent\bin\buildkite-agent.exe"
+$agentPath = "C:\agent\run.cmd"
 
 if (-Not($token) -Or -Not($username) -Or -Not($password)) {
-  echo "Provide a buildkite token, system user name and password";
+  echo "Provide a token, system user name and password";
   echo "Installation canceled";
   exit;
 }
@@ -40,6 +42,16 @@ Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts
 Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
 
 echo "Configure Azure Agent"
-.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --once --runAsAutoLogon --windowsLogonAccount $username --windowsLogonPassword $password --agent "$env:computername $(Get-Random)"
+.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $(Get-Random)"
+
+
+echo "Setup auto-login when system starts"
+$RegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+Set-ItemProperty $RegPath "AutoAdminLogon" -Value "1" -type String
+Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
+Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
+
+echo "Add agent to startup"
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value "$agentPath --once";
 
 echo "Installation completed. Restart PC to take effect"
