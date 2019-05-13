@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core';
 import { GameOverlayService } from 'services/game-overlay';
 import { StreamInfoService } from 'services/stream-info';
 import ModalLayout from '../ModalLayout.vue';

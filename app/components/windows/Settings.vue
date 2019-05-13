@@ -33,7 +33,8 @@
         v-model="settingsData"
         @input="save" />
     </div>
-  </modal-layout>
+  </div>
+</modal-layout>
 </template>
 
 <script lang="ts" src="./Settings.vue.ts"></script>

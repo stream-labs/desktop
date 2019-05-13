@@ -2,14 +2,13 @@ import electron from 'electron';
 import { fromEvent, Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
 import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
-import { Inject } from 'util/injector';
-import { InitAfter } from 'util/service-observer';
+import { Inject, InitAfter } from 'services/core/';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { getPlatformService } from '../platforms';
 import { WindowsService } from '../windows';
-import { PersistentStatefulService } from '../persistent-stateful-service';
-import { mutation } from '../stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { mutation } from 'services/core/stateful-service';
 
 const { BrowserWindow } = electron.remote;
 
@@ -37,7 +36,7 @@ const makeDraggable = `
    * Restore input for specific elements, list items, links, buttons and inputs.
    * Custom selectors are for: Recent Events body/tables, Twitch room selector, chat and bottom section
    *
-   */    
+   */
   document.styleSheets[0].addRule("li, a, button, input, .mission-control-wrapper, .accordions, .room-selector .rooms-header .tw-flex, .chat-room", "-webkit-app-region: no-drag", 1);
 `;
 

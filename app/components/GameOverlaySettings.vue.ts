@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { BoolInput } from './shared/inputs/inputs';
 import { GameOverlayService } from 'services/game-overlay';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core';
 
 @Component({ components: { BoolInput } })
 export default class GameOverlaySettings extends Vue {
