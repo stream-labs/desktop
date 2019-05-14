@@ -8,6 +8,7 @@ export { RemoveSceneCommand } from './remove-scene';
 
 // Scene Nodes (Items or Folders)
 export { RemoveNodesCommand } from './remove-nodes';
+export { CopyNodesCommand } from './copy-nodes';
 
 // Scene Items
 export { MoveItemsCommand } from './move-items';

@@ -121,10 +121,14 @@ export class ClipboardService extends StatefulService<IClipboardState>
         this.pasteItemsFromUnloadedClipboard();
         return;
       }
-      const insertedItems = this.scenesService
-        .getScene(this.state.itemsSceneId)
-        .getSelection(this.state.sceneNodesIds)
-        .copyTo(this.scenesService.activeSceneId, null, duplicateSources);
+
+      const insertedItems = this.editorCommandsService.executeCommand(
+        'CopyNodesCommand',
+        this.scenesService.getScene(this.state.itemsSceneId).getSelection(this.state.sceneNodesIds),
+        this.scenesService.activeSceneId,
+        duplicateSources,
+      );
+
       if (insertedItems.length) this.selectionService.select(insertedItems);
     } else if (this.hasSystemClipboard()) {
       this.pasteFromSystemClipboard();
