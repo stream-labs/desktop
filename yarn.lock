@@ -7106,9 +7106,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.31-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.34-iojs-v2.0.8.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.31-iojs-v2.0.8.tar.gz#51132f7cd4d668fb488df7276aa60ebabab95514"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.34-iojs-v2.0.8.tar.gz#cb418902631d092b57bad3ac14ba6793558f3f70"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -9089,7 +9089,6 @@ streamlabs-beaker@^0.4.50:
     vue "^2.6.6"
     vue-class-component "^6.0.0"
     vue-color "^2.7.0"
-    vue-fuse "^2.0.2"
     vue-js-modal "^1.3.28"
     vue-mq "^1.0.1"
     vue-property-decorator "^7.0.0"
