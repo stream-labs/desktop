@@ -14,7 +14,7 @@ module.exports = merge.smart(baseConfig, {
   },
 
   mode: 'development',
-  devtool: 'cheap-module-source-map',
+  devtool: 'source-map',
   watchOptions: { ignored: /node_modules/ },
 
   module: {
