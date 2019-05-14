@@ -24,7 +24,7 @@ steps:
 - script: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- script: 'yarn test --match="Populates video settings*" '
+- script: 'yarn test-flaky'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
