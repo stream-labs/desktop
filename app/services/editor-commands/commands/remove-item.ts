@@ -61,7 +61,10 @@ export class RemoveItemCommand extends Command {
     // If this was the last item using this source, the underlying source
     // will automatically be removed. In this case, we need to store enough
     // information to bring it back intio existence in the rollback function.
-    if (this.scenesService.getSourceItemCount(item.sourceId) === 1) {
+    if (
+      this.scenesService.getSourceItemCount(item.sourceId) === 1 &&
+      item.source.type !== 'scene'
+    ) {
       this.sourceReviver = new SourceReviver(item.source);
       await this.sourceReviver.save({});
     }

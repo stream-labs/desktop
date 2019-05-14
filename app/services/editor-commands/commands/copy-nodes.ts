@@ -35,6 +35,8 @@ export class CopyNodesCommand extends Command {
     const scene = this.scenesService.getScene(this.destSceneId);
     const insertedNodes: TSceneNode[] = [];
 
+    const initialNodeOrder = scene.getNodesIds();
+
     // Duplicate necessary sources if needed
     if (this.duplicateSources) {
       this.sourceIdsMap = {};
@@ -85,7 +87,7 @@ export class CopyNodesCommand extends Command {
         .getNodesIds()
         .map(origNodeId => this.nodeIdsMap[origNodeId]),
     );
-    scene.setNodesOrder(order);
+    scene.setNodesOrder(order.concat(initialNodeOrder));
 
     return insertedNodes;
   }

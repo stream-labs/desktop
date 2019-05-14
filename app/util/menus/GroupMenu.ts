@@ -59,13 +59,18 @@ export class GroupMenu extends Menu {
     this.append({
       label: $t('Ungroup Scene'),
       click: () => {
-        const scene = this.scenesService.getScene(selectedItem.getSource().sourceId);
-        scene
-          .getSelection()
-          .selectAll()
-          .copyTo(this.scenesService.activeSceneId);
-        selectedItem.remove();
-        scene.remove();
+        // const scene = this.scenesService.getScene(selectedItem.getSource().sourceId);
+        // scene
+        //   .getSelection()
+        //   .selectAll()
+        //   .copyTo(this.scenesService.activeSceneId);
+        // selectedItem.remove();
+        // scene.remove();
+        this.editorCommandsService.executeCommand(
+          'UngroupSceneCommand',
+          selectedItem.id,
+          this.scenesService.activeSceneId,
+        );
       },
       enabled: (() => {
         return !!(selectionSize === 1 && selectedItem && selectedItem.getSource().type === 'scene');
