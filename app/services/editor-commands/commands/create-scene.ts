@@ -24,6 +24,7 @@ export class CreateSceneCommand extends Command {
   private sceneId: string;
   private removeNodesSubcommand: RemoveNodesCommand;
   private copyNodesSubcommand: CopyNodesCommand;
+  private sceneSourceId: string;
 
   description: string;
 
@@ -63,7 +64,8 @@ export class CreateSceneCommand extends Command {
       const originScene = this.scenesService.getScene(this.options.groupFromOrigin.originSceneId);
       const originSelection = originScene.getSelection(this.options.groupFromOrigin.originItemIds);
 
-      const item = originScene.addSource(this.sceneId);
+      const item = originScene.addSource(this.sceneId, { id: this.sceneSourceId });
+      this.sceneSourceId = item.id;
       item.setContentCrop();
 
       this.removeNodesSubcommand = new RemoveNodesCommand(originSelection);
