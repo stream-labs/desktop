@@ -24,7 +24,7 @@ steps:
 - script: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- script: 'yarn test-flaky'
+- script: 'yarn test --match="Twitch Tags" --match="Twitch Tags" --match="Populates video settings" --match="Streaming to Twitch" --match="Streaming to Youtube"'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
