@@ -12835,6 +12835,11 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
   integrity sha1-rifbOPZgp64uHDt9G8KQgZuFGeY=
 
+systeminformation@^4.1.6:
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-4.1.6.tgz#9ee8883178c4977d1910beb3eef6bf250f7fe3b2"
+  integrity sha512-8Q8wPRvnZX0WRxPVVGN6Q/51GeDBhqruNhFzAjoCPaf4/l0hxTLj8XPjeAME8/Y9I5Y4bdA4fx0QjxvuFhlD8A==
+
 table@^3.7.8:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/table/-/table-3.8.3.tgz#2bbc542f0fda9861a755d3947fefd8b3f513855f"

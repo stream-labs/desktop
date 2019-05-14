@@ -109,6 +109,7 @@
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
     "socket.io-client": "2.0.3",
+    "systeminformation": "^4.1.6",
     "uuid": "^3.3.2",
     "vue-svg-loader": "^0.5.0"
   },
