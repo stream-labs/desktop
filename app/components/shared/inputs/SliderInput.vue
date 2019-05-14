@@ -41,4 +41,8 @@
 .slider-container.has-tooltip {
   padding-bottom: 16px;
 }
+
+.slider-input {
+  width: 50px;
+}
 </style>
