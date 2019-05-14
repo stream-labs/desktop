@@ -2892,11 +2892,6 @@ commander@^2.14.1, commander@^2.9.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
   integrity sha512-6tvAOO+D6OENvRAh524Dh9jcfKTYDQAqvqezbCW82xj5X0pSrcpxtvRKHLG0yBY6SD7PSDrJaj+0AiOcKVd1Xg==
 
-commander@~2.13.0:
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
-  integrity sha512-MVuS359B+YzaWqjCL/c+22gfryv+mCBPHAv3zyVI2GN8EY6IRP8VwtasXn8jyyhvvq84R4ImN1OKRtcbIasjYA==
-
 commander@~2.17.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
@@ -9083,10 +9078,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.4.6:
-  version "0.4.37"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.37.tgz#44cde495d329a34dcf39300a4f5180572a5ed131"
-  integrity sha512-0qe2+EqZT8DOybnrKrmnjI0XXs3o+NOh05dxpa4bSTdtuGCDYusYgpRpFEoaFitYycFmEEdGfmBWDNFLsFHN0Q==
+streamlabs-beaker@^0.4.50:
+  version "0.4.51"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.51.tgz#987e8fccf6d7c50df785cc066f16f3349efc4c9d"
+  integrity sha512-J73a+LS7yNa/M/utu7aYEAhzPT6n3tKIeBYFyUIV7pycWyiAlNUZ2c4jd9jEOEvYm0sgo59E00YIGSkbu+7thg==
   dependencies:
     fuse.js "^3.4.4"
     google-fonts-webpack-plugin "^0.4.4"
@@ -9100,7 +9095,7 @@ streamlabs-beaker@^0.4.6:
     vue-property-decorator "^7.0.0"
     vue-router "^3.0.1"
     vue-select "^2.5.1"
-    vue-slider-component "^2.8.0"
+    vue-slider-component "^2.8"
     vuejs-paginate "^2.1.0"
 
 string-argv@^0.0.2:
@@ -9887,14 +9882,6 @@ typescript@3.2.x:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.4.tgz#c585cb952912263d915b462726ce244ba510ef3d"
   integrity sha512-0RNDbSdEokBeEAkgNbxJ+BLwSManFy9TeXz8uW+48j/xhEXv1ePME60olyzw2XzUqUBNAYFeJadIqAgNqIACwg==
 
-uglify-es@3.3.9:
-  version "3.3.9"
-  resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.9.tgz#0c1c4f0700bed8dbc124cdb304d2592ca203e677"
-  integrity sha512-r+MU0rfv4L/0eeW3xZrd16t4NZfK8Ld4SWVglYBb7ez5uXFWHuVRs6xCTrf1yirs9a4j4Y27nn7SRfO6v67XsQ==
-  dependencies:
-    commander "~2.13.0"
-    source-map "~0.6.1"
-
 uglify-js@^3.1.4:
   version "3.4.9"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.9.tgz#af02f180c1207d76432e473ed24a28f4a782bae3"
@@ -10375,10 +10362,15 @@ vue-select@^2.5.1:
   resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-2.6.0.tgz#362aed6f39bd4deefae1012f63208af77412a7d6"
   integrity sha512-Zg8nb1rWz4RCWnN9Pd+HIOG7s21u32ZGpI9bDVbLJ1JPp5H4mtOww4pesr5vMjV+rHD8cE+NDfn0zZp5loghWQ==
 
-vue-slider-component@2.2.7, vue-slider-component@^2.8.0:
+vue-slider-component@2.2.7:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.2.7.tgz#2551696ad01f3246ba48e6cdbb4b4cb70bcc52d6"
   integrity sha1-JVFpatAfMka6SObNu0tMtwvMUtY=
+
+vue-slider-component@^2.8:
+  version "2.8.16"
+  resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.8.16.tgz#b2036f816ed64fa4fcd6741219b80c5063b4fd60"
+  integrity sha512-06gDoheKMU8TdqjoofIJaYfXw3uuWOXF2I14d/F5yW/8iOxnoI4Ks9WSXy8RWY+gs62GBE6tQXHDSX/H6IOaAw==
 
 vue-spinner@1.0.3:
   version "1.0.3"
