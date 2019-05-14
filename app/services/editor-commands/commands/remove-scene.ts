@@ -14,7 +14,7 @@ export class RemoveSceneCommand extends Command {
   constructor(private sceneId: string) {
     super();
     this.sceneName = this.scenesService.getScene(this.sceneId).name;
-    this.sceneOrder = this.scenesService.state.displayOrder;
+    this.sceneOrder = this.scenesService.state.displayOrder.slice();
   }
 
   get description() {
@@ -24,16 +24,18 @@ export class RemoveSceneCommand extends Command {
   async execute() {
     const scene = this.scenesService.getScene(this.sceneId);
 
-    this.removeNodesSubcommand = new RemoveNodesCommand(scene.getSelection(scene.getNodesIds()));
-    await this.removeNodesSubcommand.execute();
+    if (scene.getNodesIds().length) {
+      this.removeNodesSubcommand = new RemoveNodesCommand(scene.getSelection(scene.getNodesIds()));
+      await this.removeNodesSubcommand.execute();
+    }
 
     scene.remove();
   }
 
   async rollback() {
     this.scenesService.createScene(this.sceneName, { sceneId: this.sceneId });
-    this.scenesService.setSceneOrder(this.sceneOrder);
+    this.scenesService.setSceneOrder(this.sceneOrder.slice());
 
-    await this.removeNodesSubcommand.rollback();
+    if (this.removeNodesSubcommand) await this.removeNodesSubcommand.rollback();
   }
 }

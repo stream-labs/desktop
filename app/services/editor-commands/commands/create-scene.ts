@@ -2,14 +2,16 @@ import { Command } from './command';
 import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { RemoveNodesCommand } from './remove-nodes';
+import { CopyNodesCommand } from './copy-nodes';
+import { Selection } from 'services/selection';
 
 ////////////////////
 // TODO: IN PROGRESS
 ////////////////////
 
-interface ISceneCreateOptions {
+export interface ISceneCreateOptions {
   // The following 2 options are mutually exclusive
-  duplicateSourcesFromScene?: string;
+  duplicateItemsFromScene?: string;
   groupFromOrigin?: {
     originSceneId: string;
     originItemIds: string[];
@@ -21,6 +23,7 @@ export class CreateSceneCommand extends Command {
 
   private sceneId: string;
   private removeNodesSubcommand: RemoveNodesCommand;
+  private copyNodesSubcommand: CopyNodesCommand;
 
   description: string;
 
@@ -32,27 +35,42 @@ export class CreateSceneCommand extends Command {
   async execute() {
     const scene = this.scenesService.createScene(this.name, {
       sceneId: this.sceneId,
-      duplicateSourcesFromScene: this.options.duplicateSourcesFromScene,
     });
     this.sceneId = scene.id;
 
-    // Move in items from the origin and add the scene back to the origin
-    // with a content crop.
+    let nodesToCopy: Selection;
+
+    if (this.options.duplicateItemsFromScene) {
+      nodesToCopy = this.scenesService
+        .getScene(this.options.duplicateItemsFromScene)
+        .getSelection()
+        .selectAll();
+    }
+
+    if (this.options.groupFromOrigin) {
+      nodesToCopy = this.scenesService
+        .getScene(this.options.groupFromOrigin.originSceneId)
+        .getSelection(this.options.groupFromOrigin.originItemIds);
+    }
+
+    if (nodesToCopy) {
+      this.copyNodesSubcommand =
+        this.copyNodesSubcommand || new CopyNodesCommand(nodesToCopy, this.sceneId);
+      this.copyNodesSubcommand.execute();
+    }
+
     if (this.options.groupFromOrigin) {
       const originScene = this.scenesService.getScene(this.options.groupFromOrigin.originSceneId);
       const originSelection = originScene.getSelection(this.options.groupFromOrigin.originItemIds);
 
-      // Copy these items to the new scene
-      originSelection.copyTo(this.sceneId);
-
-      // Add the new scene back to the original and crop it
       const item = originScene.addSource(this.sceneId);
       item.setContentCrop();
 
-      // Remove the items from the origin scene
       this.removeNodesSubcommand = new RemoveNodesCommand(originSelection);
       await this.removeNodesSubcommand.execute();
     }
+
+    return scene.id;
   }
 
   async rollback() {
@@ -60,6 +78,8 @@ export class CreateSceneCommand extends Command {
       // Restore the items to the original scene
       await this.removeNodesSubcommand.rollback();
     }
+
+    if (this.copyNodesSubcommand) this.copyNodesSubcommand.rollback();
 
     this.scenesService.removeScene(this.sceneId);
   }

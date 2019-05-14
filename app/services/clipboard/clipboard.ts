@@ -9,6 +9,7 @@ import {
   SceneItemFolder,
   ISceneItemSettings,
   Scene,
+  TSceneNode,
 } from 'services/scenes';
 import { ISource, Source, SourcesService, TPropertiesManager } from 'services/sources';
 import { shortcut } from 'services/shortcuts';
@@ -122,12 +123,13 @@ export class ClipboardService extends StatefulService<IClipboardState>
         return;
       }
 
+      // TODO: Return types for executeCommand
       const insertedItems = this.editorCommandsService.executeCommand(
         'CopyNodesCommand',
         this.scenesService.getScene(this.state.itemsSceneId).getSelection(this.state.sceneNodesIds),
         this.scenesService.activeSceneId,
         duplicateSources,
-      );
+      ) as TSceneNode[];
 
       if (insertedItems.length) this.selectionService.select(insertedItems);
     } else if (this.hasSystemClipboard()) {
