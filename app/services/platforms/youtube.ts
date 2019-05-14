@@ -13,6 +13,7 @@ import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { $t } from 'services/i18n';
 import { handlePlatformResponse, requiresToken } from './utils';
+import { StreamInfoService } from '../stream-info';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -26,6 +27,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+  @Inject() streamInfoService: StreamInfoService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
@@ -226,15 +228,17 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return fetch(req).then(handlePlatformResponse);
   }
 
-  fetchNewToken(): Promise<void> {
+  async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/youtube/token`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
+    await fetch(request)
       .then(handlePlatformResponse)
       .then(response => this.userService.updatePlatformToken(response.access_token));
+
+    await this.streamInfoService.refreshStreamInfo();
   }
 
   @requiresToken()
