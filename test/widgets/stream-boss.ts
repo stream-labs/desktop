@@ -37,6 +37,7 @@ test('Stream Boss Manage Battle settings', async t => {
 
   const testSet1 = {
     boss_heal: false,
+    fade_time: 5,
     skin: 'noimg',
     follow_multiplier: 1,
     bit_multiplier: 2,
@@ -49,6 +50,7 @@ test('Stream Boss Manage Battle settings', async t => {
 
   const testSet2 = {
     boss_heal: true,
+    fade_time: 10,
     skin: 'default',
     follow_multiplier: 5,
     bit_multiplier: 1,
