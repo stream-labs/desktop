@@ -66,6 +66,7 @@ export class SourceFiltersService extends Service {
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
   filterUpdated = new Subject<ISourceFilterIdentifier>();
+  filtersReordered = new Subject<void>();
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
@@ -233,6 +234,7 @@ export class SourceFiltersService extends Service {
     while (i--) {
       obsInput.setFilterOrder(obsFilter, movement);
     }
+    this.filtersReordered.next();
   }
 
   showSourceFilters(sourceId: string, selectedFilterName = '') {

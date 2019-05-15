@@ -50,6 +50,7 @@ export default class SourceFilters extends Vue {
   addFilterSub: Subscription;
   removeFilterSub: Subscription;
   updateFilterSub: Subscription;
+  reorderFilterSub: Subscription;
 
   mounted() {
     this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() =>
@@ -66,12 +67,16 @@ export default class SourceFilters extends Vue {
         this.updateProperties();
       }
     });
+    this.reorderFilterSub = this.sourceFiltersService.filtersReordered.subscribe(() =>
+      this.refreshFilters(),
+    );
   }
 
   destroyed() {
     this.addFilterSub.unsubscribe();
     this.removeFilterSub.unsubscribe();
     this.updateFilterSub.unsubscribe();
+    this.reorderFilterSub.unsubscribe();
   }
 
   @Watch('selectedFilterName')
@@ -153,12 +158,13 @@ export default class SourceFilters extends Vue {
     } else if (sourceInd > targetInd) {
       targetInd = position.placement === 'before' ? targetInd : targetInd + 1;
     }
-    this.sourceFiltersService.setOrder(
+
+    this.editorCommandsService.executeCommand(
+      'ReorderFiltersCommand',
       this.sourceId,
       this.selectedFilterName,
       targetInd - sourceInd,
     );
-    this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 
   private refreshFilters() {
