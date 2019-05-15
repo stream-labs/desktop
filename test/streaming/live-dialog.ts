@@ -6,7 +6,8 @@ import { setOutputResolution } from '../helpers/spectron/output';
 
 useSpectron({ appArgs: '--nosync' });
 
-test('Shows optimized encoder for specific games', async t => {
+// TODO: flaky on CI
+test.skip('Shows optimized encoder for specific games', async t => {
   const { app } = t.context;
   await logIn(t);
 
