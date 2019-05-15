@@ -38,19 +38,26 @@ export default class SourceProperties extends Vue {
   properties: TObsFormData = [];
   hasErrors = false;
 
-  sourcesSubscription: Subscription;
+  sourceRemovedSub: Subscription;
+  sourceUpdatedSub: Subscription;
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
-    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+    this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.sourceId === this.sourceId) {
         electron.remote.getCurrentWindow().close();
+      }
+    });
+    this.sourceUpdatedSub = this.sourcesService.sourceUpdated.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        this.refresh();
       }
     });
   }
 
   destroyed() {
-    this.sourcesSubscription.unsubscribe();
+    this.sourceRemovedSub.unsubscribe();
+    this.sourceUpdatedSub.unsubscribe();
   }
 
   get hideStyleBlockers() {
@@ -65,8 +72,6 @@ export default class SourceProperties extends Vue {
     this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', this.sourceId, [
       properties[changedIndex],
     ]);
-
-    this.refresh();
   }
 
   refresh() {
