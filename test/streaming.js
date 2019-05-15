@@ -3,8 +3,8 @@ import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
-import { sleep } from './helpers/sleep';
 import { setOutputResolution } from './helpers/spectron/output';
+
 
 useSpectron({ appArgs: '--nosync' });
 
