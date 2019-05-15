@@ -19,12 +19,6 @@ export type GameOverlayState = {
 };
 
 /**
- * We need to show the windows so the overlay system can capture its contents.
- * Workaround is to render them offscreen via positioning.
- */
-const OFFSCREEN_OFFSET = 5000;
-
-/**
  * JavaScript code to make windows draggable without a titlebar.
  */
 const makeDraggable = `
@@ -160,7 +154,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         // @ts-ignore
         webPreferences: {},
         parent: this.overlayWindow,
-        x: containerX - 600,
+        x: containerX + 600,
         y: containerY + 300,
         width: 600,
         height: 300,
@@ -268,12 +262,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
       });
+      win.webContents.setFrameRate(10);
     });
   }
 
   private getWindowContainerStartingPosition() {
     const display = this.windowsService.getMainWindowDisplay();
 
-    return [display.workArea.width / 2 + 200 + OFFSCREEN_OFFSET, display.workArea.height / 2 - 300];
+    return [ 200, display.workArea.height / 2 - 300];
   }
 }
