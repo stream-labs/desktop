@@ -1,12 +1,13 @@
-import { Command } from './command';
+import { CombinableCommand } from './combinable-command';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { SourceFiltersService } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
 
-export class EditFilterPropertiesCommand extends Command {
+export class EditFilterPropertiesCommand extends CombinableCommand {
   @Inject() private sourceFiltersService: SourceFiltersService;
 
   beforeFormData: TObsFormData;
+  afterFormData: TObsFormData;
 
   description: string;
 
@@ -26,7 +27,16 @@ export class EditFilterPropertiesCommand extends Command {
       this.filterName,
     );
 
-    this.sourceFiltersService.setPropertiesFormData(this.sourceId, this.filterName, this.formData);
+    this.sourceFiltersService.setPropertiesFormData(
+      this.sourceId,
+      this.filterName,
+      this.afterFormData || this.formData,
+    );
+
+    this.afterFormData = this.sourceFiltersService.getPropertiesFormData(
+      this.sourceId,
+      this.filterName,
+    );
   }
 
   rollback() {
@@ -35,5 +45,13 @@ export class EditFilterPropertiesCommand extends Command {
       this.filterName,
       this.beforeFormData,
     );
+  }
+
+  shouldCombine(other: EditFilterPropertiesCommand) {
+    return this.sourceId === other.sourceId && this.filterName === other.filterName;
+  }
+
+  combine(other: EditFilterPropertiesCommand) {
+    this.afterFormData = other.afterFormData;
   }
 }
