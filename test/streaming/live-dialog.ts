@@ -74,7 +74,7 @@ test('Shows optimized encoder for specific games', async t => {
   t.is('Software (x264)', await app.client.getValue('[data-name=Encoder] input'));
   t.is('2500', await getFormInput(t, 'Bitrate'));
 
-  await app.client.click('button=Done');
+  await app.client.click('button=2');
   await focusMain(t);
   await app.client.click('button=End Stream');
   await app.client.isExisting('button=Go Live');
