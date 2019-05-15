@@ -106,25 +106,24 @@ export default class EditStreamInfo extends Vue {
       }
     });
 
-    if (this.streamInfoService.state.channelInfo) {
-      this.populatingModels = true;
-      if (this.isFacebook || this.isYoutube) {
-        const service = getPlatformService(this.userService.platform.type);
-        await service
-          .prepopulateInfo()
-          .then((info: IChannelInfo) => {
-            if (!info) return;
-            return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-          })
-          .then(() => this.populateModels());
-      } else {
-        await this.populateModels();
-      }
-      this.populatingModels = false;
-    } else {
-      // If the stream info pre-fetch failed, we should try again now
-      this.refreshStreamInfo();
+    this.populatingModels = true;
+    // If the stream info pre-fetch failed, we should try again now
+    if (!this.streamInfoService.state.channelInfo) {
+      await this.refreshStreamInfo();
     }
+    if (this.isFacebook || this.isYoutube) {
+      const service = getPlatformService(this.userService.platform.type);
+      await service
+        .prepopulateInfo()
+        .then((info: IChannelInfo) => {
+          if (!info) return;
+          return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
+        })
+        .then(() => this.populateModels());
+    } else {
+      await this.populateModels();
+    }
+    this.populatingModels = false;
 
     if (this.isTwitch && this.streamInfoService.state.channelInfo) {
       this.twitchService
@@ -310,7 +309,7 @@ export default class EditStreamInfo extends Vue {
 
   // This should have been pre-fetched, but we can force a refresh
   refreshStreamInfo() {
-    this.streamInfoService.refreshStreamInfo().then(() => {
+    return this.streamInfoService.refreshStreamInfo().then(() => {
       if (this.streamInfoService.state.channelInfo) this.populateModels();
     });
   }
