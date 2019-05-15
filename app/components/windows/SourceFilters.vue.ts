@@ -63,6 +63,7 @@ export default class SourceFilters extends Vue {
       }
     });
     this.updateFilterSub = this.sourceFiltersService.filterUpdated.subscribe(filter => {
+      this.refreshFilters();
       if (this.selectedFilterName === filter.name && this.sourceId === filter.sourceId) {
         this.updateProperties();
       }
@@ -94,8 +95,6 @@ export default class SourceFilters extends Vue {
       this.selectedFilterName,
       this.properties,
     );
-
-    this.updateProperties();
   }
 
   done() {
@@ -133,12 +132,12 @@ export default class SourceFilters extends Vue {
 
   toggleVisibility(filterName: string) {
     const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.sourceFiltersService.setVisibility(
+    this.editorCommandsService.executeCommand(
+      'EnableFilterCommand',
       this.sourceId,
       sourceFilter.name,
       !sourceFilter.visible,
     );
-    this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 
   makeActive(filterDescr: any[]) {

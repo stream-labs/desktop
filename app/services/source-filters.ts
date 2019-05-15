@@ -194,6 +194,7 @@ export class SourceFiltersService extends Service {
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
     this.getObsFilter(sourceId, filterName).enabled = visible;
+    this.filterUpdated.next({ sourceId, name: filterName });
   }
 
   getAddNewFormData(sourceId: string) {
