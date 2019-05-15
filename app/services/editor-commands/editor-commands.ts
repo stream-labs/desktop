@@ -7,6 +7,7 @@ import { SelectionService } from 'services/selection';
 import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
 import { SceneCollectionsService } from 'services/scene-collections';
+import electron from 'electron';
 
 const COMMANDS = { ...commands };
 
@@ -51,7 +52,6 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     if (this.combineTimeout) clearTimeout(this.combineTimeout);
 
     this.combineTimeout = window.setTimeout(() => {
-      console.log('COMBINE TIMEOUT');
       this.combineActive = false;
       this.combineTimeout = null;
     }, COMBINE_TIMEOUT);
@@ -61,8 +61,6 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     commandType: TCommand,
     ...commandArgs: ConstructorParameters<(typeof COMMANDS)[TCommand]>
   ) {
-    console.log('executing command');
-
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
@@ -109,11 +107,23 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     this.POP_UNDO_METADATA();
 
     if (command) {
-      const ret = command.rollback();
+      let ret: any;
+
+      try {
+        ret = command.rollback();
+      } catch (e) {
+        this.handleUndoRedoError(true, e);
+        return;
+      }
 
       if (ret instanceof Promise) {
         this.SET_OPERATION_IN_PROGRESS(true);
-        ret.then(() => this.SET_OPERATION_IN_PROGRESS(false));
+        ret
+          .then(() => this.SET_OPERATION_IN_PROGRESS(false))
+          .catch(e => {
+            this.SET_OPERATION_IN_PROGRESS(false);
+            this.handleUndoRedoError(true, e);
+          });
       }
 
       this.redoHistory.push(command);
@@ -129,16 +139,38 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     this.POP_REDO_METADATA();
 
     if (command) {
-      const ret = command.execute();
+      let ret: any;
+
+      try {
+        ret = command.execute();
+      } catch (e) {
+        this.handleUndoRedoError(false, e);
+        return;
+      }
 
       if (ret instanceof Promise) {
         this.SET_OPERATION_IN_PROGRESS(true);
-        ret.then(() => this.SET_OPERATION_IN_PROGRESS(false));
+        ret
+          .then(() => this.SET_OPERATION_IN_PROGRESS(false))
+          .catch(e => {
+            this.SET_OPERATION_IN_PROGRESS(false);
+            this.handleUndoRedoError(false, e);
+          });
       }
 
       this.undoHistory.push(command);
       this.PUSH_UNDO_METADATA({ description: command.description });
     }
+  }
+
+  private handleUndoRedoError(undo: boolean, e: any) {
+    console.error('Error performing undo operation', e);
+    electron.remote.dialog.showMessageBox({
+      title: 'Error',
+      message: `An error occurred while ${undo ? 'undoing' : 'redoing'} the operation.`,
+      type: 'error',
+    });
+    this.clear();
   }
 
   /**
