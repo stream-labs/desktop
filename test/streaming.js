@@ -4,6 +4,7 @@ import { setFormInput } from './helpers/spectron/forms';
 import { fillForm } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
 import { sleep } from './helpers/sleep';
+import { setOutputResolution } from './helpers/spectron/output';
 
 useSpectron({ appArgs: '--nosync' });
 
@@ -30,6 +31,7 @@ test('Streaming to Twitch without auth', async t => {
   );
   await app.client.click('button=Done');
 
+  await setOutputResolution(t, '100x100');
   await focusMain(t);
   await app.client.click('button=Go Live');
 
@@ -43,6 +45,8 @@ test('Streaming to Twitch', async t => {
   // login into the account
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
+
+  await setOutputResolution(t, '100x100');
 
   // open EditStreamInfo window
   await focusMain(t);
@@ -68,6 +72,9 @@ test.skip('Streaming to Facebook', async t => {
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;
   const app = t.context.app;
+
+  // decrease resolution to reduce CPU usage
+  await setOutputResolution(t, '100x100');
 
   // open EditStreamInfo window
   await focusMain(t);
@@ -95,6 +102,9 @@ test('Streaming to Mixer', async t => {
   if (!(await logIn(t, 'mixer'))) return;
   const app = t.context.app;
 
+  // decrease resolution to reduce CPU usage
+  await setOutputResolution(t, '100x100');
+
   // open EditStreamInfo window
   await focusMain(t);
   await app.client.click('button=Go Live');
@@ -119,6 +129,9 @@ test('Streaming to Youtube', async t => {
   // login into the account
   if (!(await logIn(t, 'youtube'))) return;
   const app = t.context.app;
+
+  // decrease resolution to reduce CPU usage
+  await setOutputResolution(t, '100x100');
 
   // open EditStreamInfo window
   await focusMain(t);

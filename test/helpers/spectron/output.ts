@@ -24,3 +24,20 @@ export async function setTemporaryRecordingPath(t: TExecutionContext): Promise<s
   await focusMain(t);
   return tmpDir;
 }
+
+export async function setOutputResolution(t: TExecutionContext, resolution: string) {
+  const { app } = t.context;
+
+  await focusMain(t);
+  await app.client.click('.top-nav .icon-settings');
+
+  await focusChild(t);
+  await app.client.click('li=Video');
+
+  await setFormInput(t, 'Output (Scaled) Resolution', resolution);
+  await ((app.client.keys(['Enter']) as any) as Promise<any>);
+
+  await app.client.click('button=Done');
+
+  await focusMain(t);
+}

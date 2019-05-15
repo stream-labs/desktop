@@ -2,13 +2,16 @@ import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { getFormInput } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
 import { logIn } from '../helpers/spectron/user';
+import { setOutputResolution } from '../helpers/spectron/output';
 
 useSpectron({ appArgs: '--nosync' });
 
-// TODO: to high CPU usage on CI
-test.skip('Shows optimized encoder for specific games', async t => {
+test('Shows optimized encoder for specific games', async t => {
   const { app } = t.context;
   await logIn(t);
+
+  // decrease resolution to reduce CPU usage
+  await setOutputResolution(t, '100x100');
 
   await focusMain(t);
   await app.client.waitForExist('button=Go Live');
