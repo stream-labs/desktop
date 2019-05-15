@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { fromEvent, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
 import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
 import { Inject, InitAfter } from 'services/core/';
@@ -102,6 +102,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        offscreen: true,
       },
     };
 
@@ -251,8 +252,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   private createWindowOverlays() {
     Object.values(this.windows).forEach(win => {
-      win.showInactive();
-
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId.toString() === '-1') {
@@ -263,8 +262,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const [x, y] = win.getPosition();
       const { width, height } = win.getBounds();
 
-      overlay.setPosition(overlayId, x - OFFSCREEN_OFFSET, y, width, height);
+      overlay.setPosition(overlayId, x, y, width, height);
       overlay.setTransparency(overlayId, 255);
+
+      win.webContents.on('paint', (event, dirty, image) => {
+        overlay.paintOverlay(overlayId, width, height, image.getBitmap());
+      });
     });
   }
 
