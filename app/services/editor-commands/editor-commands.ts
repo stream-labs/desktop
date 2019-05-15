@@ -139,8 +139,16 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     return this.state.undoMetadata[this.state.undoMetadata.length - 1];
   }
 
+  get nextUndoDescription() {
+    return this.nextUndo ? this.nextUndo.description : '';
+  }
+
   get nextRedo() {
     return this.state.redoMetadata[this.state.redoMetadata.length - 1];
+  }
+
+  get nextRedoDescription() {
+    return this.nextRedo ? this.nextRedo.description : '';
   }
 
   // Shortcuts for undo-able editor commands go here:

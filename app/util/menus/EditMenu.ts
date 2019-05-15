@@ -13,6 +13,7 @@ import { ProjectorService } from 'services/projector';
 import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -31,6 +32,7 @@ export class EditMenu extends Menu {
   @Inject() private selectionService: SelectionService;
   @Inject() private projectorService: ProjectorService;
   @Inject() private audioService: AudioService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
 
@@ -232,6 +234,20 @@ export class EditMenu extends Menu {
     this.append({
       label: $t('Create Output Projector'),
       click: () => this.projectorService.createProjector(),
+    });
+
+    this.append({ type: 'separator' });
+
+    this.append({
+      label: `Undo ${this.editorCommandsService.nextUndoDescription}`,
+      click: () => this.editorCommandsService.undo(),
+      enabled: this.editorCommandsService.nextUndo != null,
+    });
+
+    this.append({
+      label: `Redo ${this.editorCommandsService.nextRedoDescription}`,
+      click: () => this.editorCommandsService.redo(),
+      enabled: this.editorCommandsService.nextRedo != null,
     });
 
     if (this.options.showAudioMixerMenu) {
