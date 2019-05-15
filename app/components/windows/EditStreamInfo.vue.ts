@@ -106,12 +106,11 @@ export default class EditStreamInfo extends Vue {
       }
     });
 
+    this.populatingModels = true;
     // If the stream info pre-fetch failed, we should try again now
-    if (this.streamInfoService.state.channelInfo) {
+    if (!this.streamInfoService.state.channelInfo) {
       await this.refreshStreamInfo();
     }
-
-    this.populatingModels = true;
     if (this.isFacebook || this.isYoutube) {
       const service = getPlatformService(this.userService.platform.type);
       await service
@@ -310,7 +309,7 @@ export default class EditStreamInfo extends Vue {
 
   // This should have been pre-fetched, but we can force a refresh
   refreshStreamInfo() {
-    this.streamInfoService.refreshStreamInfo().then(() => {
+    return this.streamInfoService.refreshStreamInfo().then(() => {
       if (this.streamInfoService.state.channelInfo) this.populateModels();
     });
   }
