@@ -49,6 +49,7 @@ export default class SourceFilters extends Vue {
 
   addFilterSub: Subscription;
   removeFilterSub: Subscription;
+  updateFilterSub: Subscription;
 
   mounted() {
     this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() =>
@@ -60,11 +61,17 @@ export default class SourceFilters extends Vue {
         this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
       }
     });
+    this.updateFilterSub = this.sourceFiltersService.filterUpdated.subscribe(filter => {
+      if (this.selectedFilterName === filter.name && this.sourceId === filter.sourceId) {
+        this.updateProperties();
+      }
+    });
   }
 
   destroyed() {
     this.addFilterSub.unsubscribe();
     this.removeFilterSub.unsubscribe();
+    this.updateFilterSub.unsubscribe();
   }
 
   @Watch('selectedFilterName')

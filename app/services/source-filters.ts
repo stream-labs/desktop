@@ -65,6 +65,7 @@ export class SourceFiltersService extends Service {
 
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
+  filterUpdated = new Subject<ISourceFilterIdentifier>();
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
@@ -175,6 +176,7 @@ export class SourceFiltersService extends Service {
   setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
+    this.filterUpdated.next({ sourceId, name: filterName });
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
