@@ -6,6 +6,7 @@ import { shortcut } from 'services/shortcuts';
 import { SelectionService } from 'services/selection';
 import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 const COMMANDS = { ...commands };
 
@@ -22,7 +23,8 @@ interface IEditorCommandsServiceState {
 }
 
 export class EditorCommandsService extends StatefulService<IEditorCommandsServiceState> {
-  @Inject() selectionService: SelectionService;
+  @Inject() private selectionService: SelectionService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   static initialState: IEditorCommandsServiceState = {
     undoMetadata: [],
@@ -38,6 +40,10 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   combineActive = false;
 
   combineTimeout: number;
+
+  init() {
+    this.sceneCollectionsService.collectionWillSwitch.subscribe(() => this.clear());
+  }
 
   private setCombineTimeout() {
     this.combineActive = true;
@@ -135,6 +141,16 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     }
   }
 
+  /**
+   * Clears the undo and redo histories entirely
+   */
+  private clear() {
+    this.undoHistory = [];
+    this.redoHistory = [];
+    this.CLEAR_UNDO_METADATA();
+    this.CLEAR_REDO_METADATA();
+  }
+
   get nextUndo() {
     return this.state.undoMetadata[this.state.undoMetadata.length - 1];
   }
@@ -196,6 +212,11 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   @mutation()
   private POP_UNDO_METADATA() {
     this.state.undoMetadata.pop();
+  }
+
+  @mutation()
+  private CLEAR_UNDO_METADATA() {
+    this.state.undoMetadata = [];
   }
 
   @mutation()

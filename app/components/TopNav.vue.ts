@@ -16,11 +16,13 @@ import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
+import UndoControls from 'components/UndoControls';
 Vue.use(VueResize);
 
 @Component({
   components: {
     Login,
+    UndoControls,
   },
 })
 export default class TopNav extends Vue {
