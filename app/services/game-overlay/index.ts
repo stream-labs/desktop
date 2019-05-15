@@ -50,7 +50,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   windows: {
     chat: Electron.BrowserWindow;
     recentEvents: Electron.BrowserWindow;
-    overlayControls: Electron.BrowserWindow;
+    // overlayControls: Electron.BrowserWindow;
   } = {} as any;
   overlayWindow: Electron.BrowserWindow;
   onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
@@ -111,7 +111,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.windows.recentEvents = new BrowserWindow({
       ...commonWindowOptions,
       width: 600,
-      x: containerX - 600,
+      x: containerX,
       y: containerY,
       parent: this.overlayWindow,
     });
@@ -148,26 +148,26 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ),
     );
 
-    this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
-      {
-        ...commonWindowOptions,
-        // @ts-ignore
-        webPreferences: {},
-        parent: this.overlayWindow,
-        x: containerX + 600,
-        y: containerY + 300,
-        width: 600,
-        height: 300,
-        // OneOffWindow options
-        isFullScreen: true,
-        componentName: 'OverlayWindow',
-      },
-      'overlay',
-    );
+    // this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
+    //   {
+    //     ...commonWindowOptions,
+    //     // @ts-ignore
+    //     webPreferences: {},
+    //     parent: this.overlayWindow,
+    //     x: containerX - 600,
+    //     y: containerY + 300,
+    //     width: 600,
+    //     height: 300,
+    //     // OneOffWindow options
+    //     isFullScreen: true,
+    //     componentName: 'OverlayWindow',
+    //   },
+    //   'overlay',
+    // );
 
-    this.windows.overlayControls.webContents.once('dom-ready', async () => {
-      this.onWindowsReady.next(this.windows.overlayControls);
-    });
+    // this.windows.overlayControls.webContents.once('dom-ready', async () => {
+    //   this.onWindowsReady.next(this.windows.overlayControls);
+    // });
 
     for (const view of Object.values(this.windows)) {
       view.webContents.once('dom-ready', async () => {
@@ -179,6 +179,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   showOverlay() {
     overlay.show();
     this.TOGGLE_OVERLAY(true);
+
+    // Force a refresh to trigger a paint event
+    Object.values(this.windows).forEach(win => win.webContents.invalidate());
   }
 
   hideOverlay() {
@@ -269,6 +272,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private getWindowContainerStartingPosition() {
     const display = this.windowsService.getMainWindowDisplay();
 
-    return [ 200, display.workArea.height / 2 - 300];
+    return [display.workArea.height / 2 + 200, display.workArea.height / 2 - 300];
   }
 }
