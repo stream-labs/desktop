@@ -256,13 +256,13 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Hide',
         click: () => {
-          this.audioService.getSource(this.source.sourceId).setHidden(true);
+          this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
         label: 'Unhide All',
-        click: () => this.audioService.unhideAllSourcesForCurrentScene(),
+        click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }
   }
