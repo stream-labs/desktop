@@ -39,7 +39,7 @@ export { RemoveFilterCommand } from './remove-filter';
 export { PasteFiltersCommand } from './paste-filters';
 export { EditFilterPropertiesCommand } from './edit-filter-properties';
 export { ReorderFiltersCommand } from './reorder-filters';
-export { EnableFilterCommand } from './enable-filter';
+export { ToggleFilterCommand } from './toggle-filter';
 
 // Sources
 export { MuteSourceCommand } from './mute-source';

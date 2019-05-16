@@ -131,13 +131,7 @@ export default class SourceFilters extends Vue {
   }
 
   toggleVisibility(filterName: string) {
-    const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.editorCommandsService.executeCommand(
-      'EnableFilterCommand',
-      this.sourceId,
-      sourceFilter.name,
-      !sourceFilter.visible,
-    );
+    this.editorCommandsService.executeCommand('ToggleFilterCommand', this.sourceId, filterName);
   }
 
   makeActive(filterDescr: any[]) {

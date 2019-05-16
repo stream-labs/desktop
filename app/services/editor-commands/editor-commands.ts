@@ -77,16 +77,14 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     if (instance instanceof CombinableCommand) {
       if (this.combineActive) {
         const previousCommand = this.undoHistory[this.undoHistory.length - 1];
-        if (previousCommand.constructor === instance.constructor) {
-          // This check is actually redundant since we just checked the constructor
-          // is the same above, but TypeScript isn't that smart.
-          if (previousCommand instanceof CombinableCommand) {
-            if (previousCommand.shouldCombine(instance)) {
-              previousCommand.combine(instance);
-              this.setCombineTimeout();
-              return;
-            }
-          }
+        if (
+          previousCommand.constructor === instance.constructor &&
+          previousCommand instanceof CombinableCommand &&
+          previousCommand.shouldCombine(instance)
+        ) {
+          previousCommand.combine(instance);
+          this.setCombineTimeout();
+          return;
         }
       }
 
@@ -164,7 +162,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   }
 
   private handleUndoRedoError(undo: boolean, e: any) {
-    console.error('Error performing undo operation', e);
+    console.error(`Error performing ${undo ? 'undo' : 'redo'} operation`, e);
     electron.remote.dialog.showMessageBox({
       title: 'Error',
       message: `An error occurred while ${undo ? 'undoing' : 'redoing'} the operation.`,
