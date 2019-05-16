@@ -27,7 +27,8 @@ export class CopyNodesCommand extends Command {
     private duplicateSources = false,
   ) {
     super();
-    this.description = `Paste ${this.selection.getNodes()[0].name}`;
+    const nodes = this.selection.getNodes();
+    this.description = `Paste ${nodes[0] ? nodes[0].name : ''}`;
   }
 
   execute() {
