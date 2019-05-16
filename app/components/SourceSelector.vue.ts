@@ -9,7 +9,7 @@ import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vu
 import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
-import { EPlaceType } from 'services/editor-commands/commands/reorder-items';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -175,21 +175,21 @@ export default class SourceSelector extends Vue {
 
     if (position.placement === 'before') {
       this.editorCommandsService.executeCommand(
-        'ReorderItemsCommand',
+        'ReorderNodesCommand',
         nodesToMove,
         destNode.id,
         EPlaceType.Before,
       );
     } else if (position.placement === 'after') {
       this.editorCommandsService.executeCommand(
-        'ReorderItemsCommand',
+        'ReorderNodesCommand',
         nodesToMove,
         destNode.id,
         EPlaceType.After,
       );
     } else if (position.placement === 'inside') {
       this.editorCommandsService.executeCommand(
-        'ReorderItemsCommand',
+        'ReorderNodesCommand',
         nodesToMove,
         destNode.id,
         EPlaceType.Inside,

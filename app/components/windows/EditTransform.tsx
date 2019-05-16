@@ -29,7 +29,6 @@ export default class EditTransform extends TsxComponent<{}> {
   selection = this.selectionService.getActiveSelection();
 
   // We only care about the attributes of the rectangle not the functionality
-  originRect = { ...this.selection.getBoundingRect() };
   rect = { ...this.selection.getBoundingRect() };
 
   $refs: {
@@ -40,7 +39,7 @@ export default class EditTransform extends TsxComponent<{}> {
     return this.selection.getItems()[0].transform;
   }
 
-  setCrop(cropEdge: string) {
+  setCrop(cropEdge: keyof ICrop) {
     return async (value: string) => {
       if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
 
@@ -84,12 +83,13 @@ export default class EditTransform extends TsxComponent<{}> {
   }
 
   rotate(deg: number) {
-    return () => this.selection.rotate(deg);
+    return () =>
+      this.editorCommandsService.executeCommand('RotateItemsCommand', this.selection, deg);
   }
 
   reset() {
-    this.selection.resetTransform();
-    this.rect = { ...this.originRect };
+    this.editorCommandsService.executeCommand('ResetTransformCommand', this.selection);
+    this.rect = this.selection.getBoundingRect();
   }
 
   cancel() {
@@ -99,7 +99,7 @@ export default class EditTransform extends TsxComponent<{}> {
   cropForm(h: Function) {
     return this.selection.isSceneItem() ? (
       <HFormGroup metadata={{ title: $t('Crop') }}>
-        {['left', 'right', 'top', 'bottom'].map(dir => (
+        {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <NumberInput
               value={this.transform.crop[dir]}

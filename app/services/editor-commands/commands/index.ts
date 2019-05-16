@@ -10,6 +10,7 @@ export { UngroupSceneCommand } from './ungroup-scene';
 // Scene Nodes (Items or Folders)
 export { RemoveNodesCommand } from './remove-nodes';
 export { CopyNodesCommand } from './copy-nodes';
+export { ReorderNodesCommand } from './reorder-nodes';
 
 // Scene Items
 export { MoveItemsCommand } from './move-items';
@@ -22,7 +23,6 @@ export { CenterItemsCommand } from './center-items';
 export { FlipItemsCommand } from './flip-items';
 export { ResetTransformCommand } from './reset-transform';
 export { RotateItemsCommand } from './rotate-items';
-export { ReorderItemsCommand } from './reorder-items';
 export { RemoveItemCommand } from './remove-item';
 export { HideItemsCommand } from './hide-items';
 export { CreateExistingItemCommand } from './create-existing-item';

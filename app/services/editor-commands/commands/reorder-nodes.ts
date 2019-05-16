@@ -7,7 +7,7 @@ export enum EPlaceType {
   Inside = 'inside',
 }
 
-export class ReorderItemsCommand extends Command {
+export class ReorderNodesCommand extends Command {
   initialNodeOrder: string[];
   initialParentMap: Dictionary<string> = {};
 

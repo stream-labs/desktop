@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { SourcesNode } from 'services/scene-collections/nodes/sources';
 import { Source } from 'services/sources';
 import { ResetTransformCommand } from './reset-transform';
-import { ReorderItemsCommand, EPlaceType } from './reorder-items';
+import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -28,7 +28,7 @@ export class RemoveItemCommand extends Command {
   private sourceReviver: SourceReviver;
 
   private resetTransformSubcommand: ResetTransformCommand;
-  private reorderItemsSubcommand: ReorderItemsCommand;
+  private reorderNodesSubcommand: ReorderNodesCommand;
 
   constructor(private sceneItemId: string) {
     super();
@@ -51,12 +51,12 @@ export class RemoveItemCommand extends Command {
 
     // Save even more work by moving this item top the top of the
     // stack and then rolling it back to restore.
-    this.reorderItemsSubcommand = new ReorderItemsCommand(
+    this.reorderNodesSubcommand = new ReorderNodesCommand(
       scene.getSelection(this.sceneItemId),
       void 0,
       EPlaceType.After,
     );
-    this.reorderItemsSubcommand.execute();
+    this.reorderNodesSubcommand.execute();
 
     // If this was the last item using this source, the underlying source
     // will automatically be removed. In this case, we need to store enough
@@ -81,7 +81,7 @@ export class RemoveItemCommand extends Command {
 
     scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
 
-    this.reorderItemsSubcommand.rollback();
+    this.reorderNodesSubcommand.rollback();
     this.resetTransformSubcommand.rollback();
   }
 }
