@@ -3205,9 +3205,9 @@ cosmiconfig@^5.0.6:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.30/iojs-v2.0.8-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.32/iojs-v2.0.8-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.30/iojs-v2.0.8-crash-handler.tar.gz#65345b746a0488d4b32fc5c462156313bc1d2ed3"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.32/iojs-v2.0.8-crash-handler.tar.gz#ed16993a367a255b6117abe4de9eaa5ba9cfea5c"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -7215,9 +7215,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.29-iojs-v2.0.8.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.34-iojs-v2.0.8.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.29-iojs-v2.0.8.tar.gz#2305a14a92321f32d80b67f5fd5ae7845f7e678e"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.34-iojs-v2.0.8.tar.gz#cb418902631d092b57bad3ac14ba6793558f3f70"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -10402,12 +10402,11 @@ vue-color@2.7.0, vue-color@^2.7.0:
     tinycolor2 "^1.1.2"
 
 vue-fuse@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/vue-fuse/-/vue-fuse-2.0.2.tgz#beb18d578052f7027a81edf12e9d3a394ca38d14"
-  integrity sha512-5oLkKy8NX9jX+s2FkkY+1cjATgNcEw/wSLEIhK/5iNAr0deBiSyd8Pu1xJJcZwBai6HEUTFbhqYilfeprQ7m1w==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/vue-fuse/-/vue-fuse-2.1.0.tgz#a8e785cbb80d216d99cf652f32d3cdad243a15df"
+  integrity sha512-hx4QZkeIATmFlKyq6QSWcFFHPJC0vmsusnZP1GkBSEXh1eH7WV8Pde9O0XFvXWIzCH4Dr+Dox25EKu+iAy4bSg==
   dependencies:
     fuse.js "^3.2.0"
-    vue "^2.5.17"
 
 vue-hot-reload-api@^2.2.0:
   version "2.2.4"
@@ -10533,11 +10532,6 @@ vue@2.6.9, vue@^2.5.11, vue@^2.5.21, vue@^2.6.6:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.9.tgz#415c1cc1a5ed00c8f0acdd0a948139d12b7ea6b3"
   integrity sha512-t1+tvH8hybPM86oNne3ZozCD02zj/VoZIiojOBPJLjwBn7hxYU5e1gBObFpq8ts1NEn1VhPf/hVXBDAJ3X5ljg==
-
-vue@^2.5.17:
-  version "2.6.10"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
-  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
 
 vuedraggable@2.8.5:
   version "2.8.5"
