@@ -7,6 +7,8 @@ import compact from 'lodash/compact';
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
 
+  description: string;
+
   /**
    * Maps original source ids to new source ids for deterministic
    * generation of of sources with consistent ids.
@@ -25,10 +27,7 @@ export class CopyNodesCommand extends Command {
     private duplicateSources = false,
   ) {
     super();
-  }
-
-  get description() {
-    return `Paste ${this.selection.getNodes()[0].name}`;
+    this.description = `Paste ${this.selection.getNodes()[0].name}`;
   }
 
   execute() {
