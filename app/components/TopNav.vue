@@ -58,12 +58,13 @@
   </div>
 
   <div class="top-nav-right">
-    <div class="top-nav-item">	
-      <button @click="toggleNightTheme" class="theme-toggle">	
-        <div class="theme-toggle__bg"></div>	
-        <img class="theme-toggle__icon theme-toggle__icon--moon" v-tooltip.right="moonTooltip" src="../../media/images/moon.png"/>	
-        <img class="theme-toggle__icon theme-toggle__icon--sun" v-tooltip.right="sunTooltip" src="../../media/images/sun.png"/>	
-      </button>	
+    <undo-controls class="top-nav-item" />
+    <div class="top-nav-item">
+      <button @click="toggleNightTheme" class="theme-toggle">
+        <div class="theme-toggle__bg"></div>
+        <img class="theme-toggle__icon theme-toggle__icon--moon" v-tooltip.right="moonTooltip" src="../../media/images/moon.png"/>
+        <img class="theme-toggle__icon theme-toggle__icon--sun" v-tooltip.right="sunTooltip" src="../../media/images/sun.png"/>
+      </button>
     </div>
     <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999">
       <a class="link" @click="openDevTools">Dev Tools</a>

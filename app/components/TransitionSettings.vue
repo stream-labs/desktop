@@ -9,7 +9,7 @@
     v-model="durationModel"
     :metadata="{ type: 'number', isInteger: true, title: $t('Duration'), name: 'duration', fullWidth: true }"
   />
-  <GenericForm v-model="properties" @input="saveProperties"></GenericForm>
+  <GenericForm :value="properties" @input="saveProperties"></GenericForm>
 </div>
 </template>
 
