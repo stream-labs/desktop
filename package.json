@@ -179,7 +179,7 @@
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
     "spectron": "^5.0.0",
-    "streamlabs-beaker": "^0.4.6",
+    "streamlabs-beaker": "^0.4.97",
     "style-loader": "0.21.0",
     "stylelint": "^9.10.1",
     "stylelint-config-css-modules": "^1.3.0",
@@ -222,9 +222,5 @@
     "webpack-cli": "3.1.2",
     "webpack-merge": "^4.2.1",
     "which": "1.3.1"
-  },
-  "resolutions": {
-    "uglify-es": "3.3.9",
-    "vue-slider-component": "2.2.7"
   }
 }

@@ -6,33 +6,17 @@
     data-type="slider"
     :data-name="options.name"
   >
-    <vue-slider
-      class="slider w-form-group__input"
-      :value="localValue"
+    <slider
+      :value="value"
       @input="value => updateLocalValue(value)"
-      :max="options.max"
-      :min="options.min"
-      :interval="options.interval"
+      :max="max"
+      :min="min"
+      :interval="interval"
       :tooltip="options.displayValue || 'always'"
       :speed="0"
-      :height="4"
-      :formatter="formatter"
-      :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
-      :piecewiseLabel="options.piecewiseLabel"
+      :suffix="usePercentages ? '%' : ''"
       :data="options.data"
-      ref="slider"
-      :piecewiseStyle="{
-        position: 'absolute',
-        backgroundColor: sliderColor[theme],
-        height: '2px',
-        width: '2px',
-        'borderRadius': '1px',
-        top: '12px'
-    }"
-      :labelStyle="{ color: sliderColor[theme]  }"
-      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
-      :sliderStyle="options.sliderStyle"
-      :dotSize="options.dotSize"
+      :simpleTheme="options.simpleTheme"
     />
     <input
       v-if="options.hasValueBox && !options.usePercentages"
@@ -47,9 +31,7 @@
 
 <script lang="ts" src="./SliderInput.vue.ts"></script>
 
-<style lang="less">
-@import '../../../styles/index';
-
+<style lang="less" scoped>
 .slider-container {
   width: 100%;
   display: flex;
@@ -62,5 +44,8 @@
 
 .slider-input {
   width: 50px;
+  margin-left: 16px;
+  position: relative;
+  top: -8px;
 }
 </style>
