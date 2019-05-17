@@ -58,6 +58,7 @@
   </div>
 
   <div class="top-nav-right">
+    <undo-controls class="top-nav-item" />
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <div class="theme-toggle__bg"></div>

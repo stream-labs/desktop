@@ -15,6 +15,7 @@ import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
+import { Subject } from 'rxjs';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -50,12 +51,22 @@ export interface ISourceFilter {
   settings: Dictionary<TObsValue>;
 }
 
+export interface ISourceFilterIdentifier {
+  sourceId: string;
+  name: string;
+}
+
 export class SourceFiltersService extends Service {
   @Inject()
   sourcesService: SourcesService;
 
   @Inject()
   windowsService: WindowsService;
+
+  filterAdded = new Subject<ISourceFilterIdentifier>();
+  filterRemoved = new Subject<ISourceFilterIdentifier>();
+  filterUpdated = new Subject<ISourceFilterIdentifier>();
+  filtersReordered = new Subject<void>();
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
@@ -146,13 +157,8 @@ export class SourceFiltersService extends Service {
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
+    this.filterAdded.next({ sourceId, name: filterName });
     return filterReference;
-  }
-
-  copyFilters(fromSourceId: string, toSourceId: string) {
-    this.getFilters(fromSourceId).forEach(filter => {
-      this.add(toSourceId, filter.type, this.suggestName(toSourceId, filter.name), filter.settings);
-    });
   }
 
   suggestName(sourceId: string, filterName: string): string {
@@ -165,11 +171,13 @@ export class SourceFiltersService extends Service {
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const source = this.sourcesService.getSource(sourceId);
     source.getObsInput().removeFilter(obsFilter);
+    this.filterRemoved.next({ sourceId, name: filterName });
   }
 
   setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
+    this.filterUpdated.next({ sourceId, name: filterName });
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
@@ -186,6 +194,7 @@ export class SourceFiltersService extends Service {
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
     this.getObsFilter(sourceId, filterName).enabled = visible;
+    this.filterUpdated.next({ sourceId, name: filterName });
   }
 
   getAddNewFormData(sourceId: string) {
@@ -226,6 +235,7 @@ export class SourceFiltersService extends Service {
     while (i--) {
       obsInput.setFilterOrder(obsFilter, movement);
     }
+    this.filtersReordered.next();
   }
 
   showSourceFilters(sourceId: string, selectedFilterName = '') {

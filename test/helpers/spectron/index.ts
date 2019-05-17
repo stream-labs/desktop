@@ -248,11 +248,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await stopApp();
       }
     } catch (e) {
-      testPassed = false;
+      fail('Test finalization failed');
     }
 
     if (!testPassed) {
-      failedTests.push(testName);
+      fail();
       const user = getUser();
       if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
@@ -260,17 +260,18 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.after.always(async t => {
-    if (appIsRunning) {
-      await stopApp();
-      if (!testPassed) failedTests.push(testName);
-    }
-
+    if (appIsRunning) await stopApp();
     if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 
-  function fail(msg: string) {
+  /**
+   * mark tests as failed and add it to the failedTests list
+   */
+  function fail(msg?: string) {
     testPassed = false;
-    failMsg = msg;
+    if (msg) failMsg = msg;
+    const lastFailedTest = failedTests.slice(-1)[0];
+    if (testName !== lastFailedTest) failedTests.push(testName);
   }
 }
 
