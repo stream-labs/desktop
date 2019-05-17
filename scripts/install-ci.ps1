@@ -34,6 +34,9 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
+echo "Install Visual Studio 2017 Build Tools"
+choco install choco install visualstudio2017buildtools
+
 echo "Donwload and install Azure Agent"
 cd /
 Remove-Item agent -Recurse -ErrorAction Ignore
