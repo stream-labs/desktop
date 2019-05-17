@@ -217,6 +217,7 @@ export class SourceFiltersService extends Service {
   getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
     const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    if (!formData) return [];
 
     // Show SLOBS frontend display names for the sidechain source options
     formData.forEach(input => {
