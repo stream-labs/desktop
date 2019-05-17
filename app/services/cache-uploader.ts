@@ -52,6 +52,17 @@ export class CacheUploaderService extends Service {
         });
       });
 
+      // Modify the stream key in service.json in a reversible way when uploading user caches
+      // to avoid accidentally streaming to a customer's account when debugging
+      const serviceJson = JSON.parse(
+        fs.readFileSync(path.join(this.cacheDir, 'service.json'), 'utf8'),
+      );
+      serviceJson.settings.key = `[delete_me]${serviceJson.settings.key}`;
+      fs.writeFileSync(
+        path.join(this.cacheDir, 'service-protected.json'),
+        JSON.stringify(serviceJson, null, 2),
+      );
+
       archive.pipe(output);
       this.addDirIfExists(archive, 'node-obs');
       this.addDirIfExists(archive, 'SceneConfigs');
@@ -60,7 +71,7 @@ export class CacheUploaderService extends Service {
       this.addFileIfExists(archive, 'log.log');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
-      archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
+      archive.file(path.join(cacheDir, 'service-protected.json'), { name: 'service.json' });
       archive.file(path.join(cacheDir, 'streamEncoder.json'), { name: 'streamEncoder.json' });
       archive.file(path.join(cacheDir, 'recordEncoder.json'), { name: 'recordEncoder.json' });
       archive.file(path.join(cacheDir, 'window-state.json'), { name: 'window-state.json' });
