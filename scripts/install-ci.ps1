@@ -34,6 +34,9 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
+echo "Install CMake"
+choco install cmake
+
 echo "Donwload and install Azure Agent"
 cd /
 Remove-Item agent -Recurse -ErrorAction Ignore
