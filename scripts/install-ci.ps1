@@ -35,7 +35,7 @@ echo "Install Git for Windows"
 choco install git.install
 
 echo "Install CMake"
-choco install cmake
+choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
 echo "Donwload and install Azure Agent"
 cd /
