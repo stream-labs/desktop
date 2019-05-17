@@ -6,15 +6,33 @@
     data-type="slider"
     :data-name="options.name"
   >
-    <slider
+    <vue-slider
+      class="slider w-form-group__input"
       :value="localValue"
       @input="value => updateLocalValue(value)"
-      :max="max"
-      :min="min"
-      :interval="interval"
+      :max="options.max"
+      :min="options.min"
+      :interval="options.interval"
       :tooltip="options.displayValue || 'always'"
-      :suffix="usePercentages ? '%' : ''"
+      :speed="0"
+      :height="4"
+      :formatter="formatter"
+      :piecewise="options.piecewise || (options.interval && options.interval >= 1)"
+      :piecewiseLabel="options.piecewiseLabel"
       :data="options.data"
+      ref="slider"
+      :piecewiseStyle="{
+        position: 'absolute',
+        backgroundColor: sliderColor[theme],
+        height: '2px',
+        width: '2px',
+        'borderRadius': '1px',
+        top: '12px'
+    }"
+      :labelStyle="{ color: sliderColor[theme]  }"
+      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
+      :sliderStyle="options.sliderStyle"
+      :dotSize="options.dotSize"
     />
     <input
       v-if="options.hasValueBox && !options.usePercentages"
