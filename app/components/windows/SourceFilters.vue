@@ -43,7 +43,7 @@
       <div class="modal-container--side-nav">
         <div v-if="selectedFilterName">
           <GenericForm v-if="properties.length" v-model="properties" @input="save" :key="selectedFilterName"></GenericForm>
-          <div v-else>{{ $t("No settings available for this filter") }}</div>
+          <div v-else>{{ $t("No settings are available for this filter") }}</div>
         </div>
         <div v-if="!selectedFilterName">
           {{ $t('No filters applied') }}
