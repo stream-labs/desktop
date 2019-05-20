@@ -27,6 +27,7 @@ export default class MixerItem extends Vue {
       max: 1,
       interval: 0.01,
       displayValue: 'false',
+      simpleTheme: true,
     };
   }
 
