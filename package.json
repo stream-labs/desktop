@@ -84,7 +84,6 @@
       "include": "installer.nsh"
     },
     "win": {
-      "certificateSubjectName": "Streamlabs (General Workings, Inc.)",
       "rfc3161TimeStampServer": "http://timestamp.digicert.com"
     }
   },

@@ -334,6 +334,7 @@ if (shouldQuit) {
 
 app.on('ready', () => {
     if (
+      false &&
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
     const updateInfo = {

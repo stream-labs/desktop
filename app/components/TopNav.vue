@@ -32,6 +32,14 @@
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span class="tab-button__text">{{ $t('App Store') }}</span>
+    </button>
+    <button
+      v-if="creatorSitesVisible"
+      @click="navigateCreatorSites"
+      class="tab-button"
+      :class="{ 'is-active': page === 'CreatorSites' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="icon-store"/> <span class="tab-button__text">{{ $t('Creator Site') }}</span>
       <span class="badge badge--new">{{ $t('New') }}</span>
     </button>
     <button
