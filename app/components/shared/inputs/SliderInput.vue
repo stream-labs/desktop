@@ -45,7 +45,5 @@
 .slider-input {
   width: 50px;
   margin-left: 16px;
-  position: relative;
-  top: -8px;
 }
 </style>
