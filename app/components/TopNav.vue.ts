@@ -136,6 +136,11 @@ export default class TopNav extends Vue {
     this.customizationService.setTheme(newTheme);
   }
 
+  get modeToggleIcon() {
+    const icon = this.customizationService.currentTheme === 'night-theme' ? 'moon' : 'sun';
+    return require(`../../media/images/${icon}.png`);
+  }
+
   openDiscord() {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
