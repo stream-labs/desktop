@@ -9,6 +9,8 @@ const branches = [
   CONFIG.baseBranch
 ];
 
+const redirectIo = { stdio: [0, 1, 2] }
+
 const returnCode = (function main() {
 
   log('use branches', branches);
@@ -33,7 +35,7 @@ const returnCode = (function main() {
 
     log('project compilation');
     try {
-      execSync('yarn compile:ci');
+      execSync('yarn compile:ci', redirectIo);
     } catch (e) {
       err('compilation failed', e);
       return 1;
@@ -42,7 +44,7 @@ const returnCode = (function main() {
     log('tests compilation');
 
     try {
-      execSync('yarn compile-tests');
+      execSync('yarn compile-tests', redirectIo);
     } catch (e) {
       err('compilation failed', e);
       return 1;
@@ -50,7 +52,7 @@ const returnCode = (function main() {
 
     log('creating screenshots');
     try {
-      execSync(`yarn ava test-dist/test/screentest/tests`);
+      execSync(`yarn ava test-dist/test/screentest/tests --match="Settings*"`, redirectIo);
     } catch (e) {
       err('creating screenshots failed');
       return 1;
@@ -63,7 +65,7 @@ const returnCode = (function main() {
 
   log('comparing screenshots');
   try {
-    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`, redirectIo);
   } catch (e) {
     err('comparing screenshots failed');
     return 1;
@@ -92,7 +94,7 @@ function checkoutBranch(branchName) {
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
     log(`checkout ${branchName}`);
-    execSync(`git checkout ${branchName}`);
+    execSync(`git checkout ${branchName}`, redirectIo);
     log('run yarn install');
     execSync('yarn install');
     log('run yarn install-plugins');
