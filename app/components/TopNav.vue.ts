@@ -177,8 +177,7 @@ export default class TopNav extends Vue {
   }
 
   get creatorSitesVisible() {
-    return true;
-    // return this.userService.isLoggedIn() && this.featureIsEnabled(EAvailableFeatures.creatorSites);
+    return this.userService.isLoggedIn() && this.featureIsEnabled(EAvailableFeatures.creatorSites);
   }
 
   get loading() {
