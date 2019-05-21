@@ -1,5 +1,7 @@
 const path = require('path');
-const plugins = [];
+const { CheckerPlugin } = require('awesome-typescript-loader')
+
+const plugins = [new CheckerPlugin()];
 
 // uncomment and install to watch circular dependencies
 // const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -58,20 +60,24 @@ module.exports = {
             video: 'src',
             source: 'src'
           },
+          loaders: { ts: 'awesome-typescript-loader' }
         }
       },
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
-        options: { experimentalWatchApi: true },
+        loader: 'awesome-typescript-loader',
+        options: { useCache: true, reportedFiles: ['app/**/*.ts'] },
         exclude: /node_modules|vue\/src/
       },
       {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
-        use: [
-          { loader: 'babel-loader' },
-          { loader: 'ts-loader', options: { appendTsxSuffixTo: [/\.vue$/], experimentalWatchApi: true } }
+        loader: [
+          'babel-loader',
+          {
+            loader: 'awesome-typescript-loader',
+            options: { useCache: true, reportedFiles: ['app/components/**/*.tsx'] }
+          }
         ],
         exclude: /node_modules/,
       },
