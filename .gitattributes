@@ -2,3 +2,23 @@ plugins/obs-browser.7z filter=lfs diff=lfs merge=lfs -text
 plugins/obs-facemask-plugin.7z filter=lfs diff=lfs merge=lfs -text
 *.7z filter=lfs diff=lfs merge=lfs -text
 * text eol=lf
+
+# (binary is a macro for -text -diff)
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.flv binary
+*.fla binary
+*.gz binary
+*.zip binary
+*.7z binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
