@@ -13,6 +13,9 @@ const COMMANDS = { ...commands };
 
 const COMBINE_TIMEOUT = 500;
 
+// Tha maximum number of undo actions to store
+const MAX_HISTORY_SIZE = 500;
+
 interface ICommandMetadata {
   description: string;
 }
@@ -93,6 +96,11 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
     this.undoHistory.push(instance);
     this.PUSH_UNDO_METADATA({ description: instance.description });
+
+    if (this.undoHistory.length > MAX_HISTORY_SIZE) {
+      this.undoHistory.shift();
+      this.SHIFT_UNDO_METADATA();
+    }
 
     return ret;
   }
@@ -247,6 +255,11 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   @mutation()
   private CLEAR_UNDO_METADATA() {
     this.state.undoMetadata = [];
+  }
+
+  @mutation()
+  private SHIFT_UNDO_METADATA() {
+    this.state.undoMetadata.shift();
   }
 
   @mutation()

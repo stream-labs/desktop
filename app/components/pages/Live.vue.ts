@@ -100,6 +100,11 @@ export default class Live extends Vue {
     return 50;
   }
 
+  get sleepingKevin() {
+    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
+  }
+
   onResizeStartHandler() {
     this.windowsService.updateStyleBlockers('main', true);
   }

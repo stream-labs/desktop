@@ -25,9 +25,6 @@ choco install vcredist2015
 echo "Install Nodejs"
 choco install nodejs --version=10.15.3
 
-echo "Instal global npm packages"
-npm install webpack webpack-cli rimraf -g
-
 echo "Install Yarn"
 choco install yarn
 
