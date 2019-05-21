@@ -328,6 +328,7 @@
 
   .subsection__content.custom {
     overflow: visible;
+    padding: 8px;
   }
 
   .source-property {

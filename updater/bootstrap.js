@@ -300,7 +300,7 @@ async function entry(info) {
 
     const update_spawned = cp.spawn(`${updaterStartCommand}`, updaterArgs, {
         cwd: info.tempDir,
-        detached: false,
+        detached: true,
         shell: true
     });
 

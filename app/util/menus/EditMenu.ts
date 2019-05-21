@@ -13,6 +13,7 @@ import { ProjectorService } from 'services/projector';
 import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -31,6 +32,7 @@ export class EditMenu extends Menu {
   @Inject() private selectionService: SelectionService;
   @Inject() private projectorService: ProjectorService;
   @Inject() private audioService: AudioService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
 
@@ -158,6 +160,7 @@ export class EditMenu extends Menu {
         label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
+            sceneId: this.scenesService.activeSceneId,
             renameId: this.selectionService.getFolders()[0].id,
           }),
       });
@@ -233,19 +236,33 @@ export class EditMenu extends Menu {
       click: () => this.projectorService.createProjector(),
     });
 
+    this.append({ type: 'separator' });
+
+    this.append({
+      label: `Undo ${this.editorCommandsService.nextUndoDescription}`,
+      click: () => this.editorCommandsService.undo(),
+      enabled: this.editorCommandsService.nextUndo != null,
+    });
+
+    this.append({
+      label: `Redo ${this.editorCommandsService.nextRedoDescription}`,
+      click: () => this.editorCommandsService.redo(),
+      enabled: this.editorCommandsService.nextRedo != null,
+    });
+
     if (this.options.showAudioMixerMenu) {
       this.append({ type: 'separator' });
 
       this.append({
         label: 'Hide',
         click: () => {
-          this.audioService.getSource(this.source.sourceId).setHidden(true);
+          this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
         label: 'Unhide All',
-        click: () => this.audioService.unhideAllSourcesForCurrentScene(),
+        click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }
   }

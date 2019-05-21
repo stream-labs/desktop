@@ -33,37 +33,6 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
-.media-share-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  span {
-    color: var(--icon);
-    font-size: 12px;
-  }
-}
-
-.media-share-placeholder__img {
-  margin-bottom: 20px;
-  width: 40%;
-}
-
-.media-share-placeholder__img--night {
-  display: none;
-}
-
-
-.night-theme {
-  .media-share-placeholder__img--day {
-    display: none;
-  }
-
-  .media-share-placeholder__img--night {
-    display: block;
-  }
-}
 
 .banned-media-button {
   display: block;

@@ -64,13 +64,7 @@
 
   &:hover {
     .resize-line {
-      background-color: @light-5;
-    }
-
-    .night-theme {
-      .resize-line {
-        background-color: @dark-5;
-      }
+      background-color: var(--midtone);
     }
   }
 }
