@@ -80,7 +80,7 @@ function sendFailedTestsToAnalytics(failedTests) {
         resolve();
         return;
       }
-      log('Failed tests has been sent to analitycs');
+      log('Failed tests has been sent to analytics');
       resolve();
     };
 
