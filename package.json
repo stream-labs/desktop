@@ -118,9 +118,9 @@
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
-    "@babel/core": "7.1.6",
-    "@babel/plugin-proposal-decorators": "7.1.6",
-    "@babel/preset-env": "7.4.4",
+    "@babel/core": "7.4.5",
+    "@babel/plugin-proposal-decorators": "7.4.4",
+    "@babel/preset-env": "7.4.5",
     "@commitlint/cli": "7.2.1",
     "@commitlint/config-conventional": "7.1.2",
     "@sentry/browser": "4.4.1",
