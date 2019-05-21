@@ -47,6 +47,7 @@ export { SetDeflectionCommand } from './set-deflection';
 export { EditSourcePropertiesCommand } from './edit-source-properties';
 export { HideMixerSourceCommand } from './hide-mixer-source';
 export { UnhideMixerSourcesCommand } from './unhide-mixer-sources';
+export { SetAudioSettingsCommand } from './set-audio-settings';
 
 // Transitions
 export { CreateTransitionCommand } from './create-transition';
