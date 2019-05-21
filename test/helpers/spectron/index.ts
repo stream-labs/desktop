@@ -87,6 +87,14 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
+let startApp: (t: TExecutionContext) => Promise<any>;
+let stopApp: (clearCache?: boolean) => Promise<any>;
+
+export async function restartApp(t: TExecutionContext): Promise<Application> {
+  await stopApp(false);
+  return await startApp(t);
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -100,7 +108,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  async function startApp(t: TExecutionContext) {
+  startApp = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -150,18 +158,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-
     await waitForLoader(t);
-    if (options.skipOnboarding) {
-      await t.context.app.client.click('a=Setup later');
+    if (await t.context.app.client.isExisting('a=Setup later')) {
+      if (options.skipOnboarding) {
+        await t.context.app.client.click('a=Setup later');
 
-      // This will only show up if OBS is installed
-      if (await t.context.app.client.isExisting('button=Start Fresh')) {
-        await t.context.app.client.click('button=Start Fresh');
+        // This will only show up if OBS is installed
+        if (await t.context.app.client.isExisting('button=Start Fresh')) {
+          await t.context.app.client.click('button=Start Fresh');
+        }
+      } else {
+        // Wait for the connect screen before moving on
+        await t.context.app.client.isExisting('button=Twitch');
       }
-    } else {
-      // Wait for the connect screen before moving on
-      await t.context.app.client.isExisting('button=Twitch');
     }
 
     // disable the popups that prevents context menu to be shown
@@ -180,9 +189,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.afterStartCb) {
       await options.afterStartCb(t);
     }
-  }
 
-  async function stopApp() {
+    return app;
+  };
+
+  stopApp = async function stopApp(clearCache = true) {
     try {
       await app.stop();
     } catch (e) {
@@ -192,10 +203,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
+
+    if (!clearCache) return;
     await new Promise(resolve => {
       rimraf(context.cacheDir, resolve);
     });
-  }
+  };
 
   /**
    * test should be considered as failed if it writes exceptions in to the log file
