@@ -164,7 +164,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
       .forEach(obsSceneItem => {
         obsSceneItem.selected = activeObsIds.includes(obsSceneItem.id);
       });
-
     this.updated.next(this.state);
   }
 
