@@ -42,6 +42,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   registeredSubscriptions = {};
   registeredBits = {};
   downloadProgress = {};
+  isDownloading = false;
 
   static defaultState: Interfaces.IFacemasksServiceState = {
     modtimeMap: {},
@@ -385,10 +386,20 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.SET_ACTIVE(false);
       return;
     }
-
+    
     if (!this.checkForPlugin()) {
       this.SET_ACTIVE(false);
       this.notifyPluginMissing();
+      return;
+    }
+    
+    if (settings.device.name && settings.device.value) {
+      this.setupFilter();
+    } else {
+      this.SET_ACTIVE(false);
+    }
+
+    if (this.isDownloading) {
       return;
     }
 
@@ -406,11 +417,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
     uuids = uuids.concat(t3).concat(t2);
 
-    if (settings.device.name && settings.device.value) {
-      this.setupFilter();
-    } else {
-      this.SET_ACTIVE(false);
-    }
+    this.isDownloading = true;
 
     const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
     const downloads = missingMasks.map(mask =>
@@ -422,10 +429,12 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     Promise.all(downloads)
       .then(responses => {
         this.ensureModtimes(settings.facemasks);
+        this.isDownloading = false;
       })
       .catch(err => {
         console.log(err);
         this.notifyFailure();
+        this.isDownloading = false;
       });
   }
 
