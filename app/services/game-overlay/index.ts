@@ -274,7 +274,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
-      console.log('preview ', overlayId);
+      console.log('preview ', overlayId, win.getNativeWindowHandle());
 
       if (overlayId.toString() === '-1') {
         this.overlayWindow.hide();
@@ -293,7 +293,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     Object.values(this.windows).forEach(win => {
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
-      console.log('real ', overlayId);
+      console.log('real ', overlayId, win.getNativeWindowHandle());
 
       if (overlayId.toString() === '-1') {
         this.overlayWindow.hide();
