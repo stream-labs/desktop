@@ -16,6 +16,7 @@ export type GameOverlayState = {
   isEnabled: boolean;
   isShowing: boolean;
   isPreviewEnabled: boolean;
+  previewMode: boolean;
 };
 
 /**
@@ -45,6 +46,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     isEnabled: false,
     isShowing: false,
     isPreviewEnabled: true,
+    previewMode: false,
   };
 
   windows: {
@@ -69,7 +71,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
   }
 
-  async createOverlay() {
+  async createOverlay(previewMode?: boolean) {
     overlay.start();
 
     this.onWindowsReadySubscription = this.onWindowsReady
@@ -79,7 +81,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       )
       .subscribe({
         complete: () => {
-          this.createWindowOverlays();
+          return previewMode ? this.showDraggableWindowOverlays() : this.createWindowOverlays();
         },
       });
 
@@ -96,7 +98,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        offscreen: true,
+        offscreen: !previewMode,
       },
     };
 
@@ -148,6 +150,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ),
     );
 
+    // Unneeded window without interactivity
     // this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
     //   {
     //     ...commonWindowOptions,
@@ -216,6 +219,19 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.SET_ENABLED(shouldEnable);
   }
 
+  async setPreviewMode(previewMode: boolean) {
+    await this.destroyOverlay();
+    if (this.state.isEnabled && !previewMode) {
+      await this.createOverlay();
+    } else if (previewMode) {
+      await this.createOverlay(true);
+    }
+
+    this.state.isShowing ? this.hideOverlay() : this.showOverlay();
+
+    this.SET_PREVIEW_MODE(previewMode);
+  }
+
   setPreviewEnabled(shouldEnable: boolean = true) {
     this.SET_PREVIEW_ENABLED(shouldEnable);
   }
@@ -235,21 +251,30 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.state.isEnabled = shouldEnable;
   }
 
+  @mutation()
+  private SET_PREVIEW_MODE(previewMode: boolean = true) {
+    this.state.previewMode = previewMode;
+  }
+
   async destroy() {
     await this.lifecycle.destroy();
   }
 
   async destroyOverlay() {
     if (this.state.isEnabled) {
-      overlay.stop();
+      await overlay.stop();
       this.onWindowsReadySubscription.unsubscribe();
       Object.values(this.windows).forEach(win => win.destroy());
     }
   }
 
-  private createWindowOverlays() {
+  private showDraggableWindowOverlays() {
     Object.values(this.windows).forEach(win => {
+      win.show();
+
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
+
+      console.log('preview ', overlayId);
 
       if (overlayId.toString() === '-1') {
         this.overlayWindow.hide();
@@ -261,6 +286,25 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       overlay.setPosition(overlayId, x, y, width, height);
       overlay.setTransparency(overlayId, 255);
+    });
+  }
+
+  private createWindowOverlays() {
+    Object.values(this.windows).forEach(win => {
+      const overlayId = overlay.addHWND(win.getNativeWindowHandle());
+
+      console.log('real ', overlayId);
+
+      if (overlayId.toString() === '-1') {
+        this.overlayWindow.hide();
+        throw new Error('Error creating overlay');
+      }
+
+      const [x, y] = win.getPosition();
+      const { width, height } = win.getBounds();
+
+      overlay.setPosition(overlayId, x, y, width, height);
+      overlay.setTransparency(overlayId, 220);
 
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
