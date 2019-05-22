@@ -8,6 +8,9 @@
         <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
       </div>
 
+      <button class="button button--action" @click="importFromObs">
+        {{ $t('Import from OBS') }}
+      </button>
       <button class="button button--action" @click="create">
         <i class="fa fa-plus" />
         {{ $t('Create New') }}

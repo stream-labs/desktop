@@ -16,11 +16,13 @@ import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
+import UndoControls from 'components/UndoControls';
 Vue.use(VueResize);
 
 @Component({
   components: {
     Login,
+    UndoControls,
   },
 })
 export default class TopNav extends Vue {
@@ -132,6 +134,11 @@ export default class TopNav extends Vue {
     const newTheme =
       this.customizationService.currentTheme === 'night-theme' ? 'day-theme' : 'night-theme';
     this.customizationService.setTheme(newTheme);
+  }
+
+  get modeToggleIcon() {
+    const icon = this.customizationService.currentTheme === 'night-theme' ? 'moon' : 'sun';
+    return require(`../../media/images/${icon}.png`);
   }
 
   openDiscord() {

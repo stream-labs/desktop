@@ -3,10 +3,12 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, Scene } from 'services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
+import { ISceneCreateOptions } from 'services/editor-commands/commands/create-scene';
 
 @Component({
   components: { ModalLayout },
@@ -15,17 +17,11 @@ export default class NameScene extends Vue {
   name = '';
   error = '';
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
-
-  @Inject()
-  selectionService: SelectionService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: ISourcesServiceApi;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {
     sceneToDuplicate?: string; // id of scene
@@ -49,26 +45,40 @@ export default class NameScene extends Vue {
     if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
   }
 
-  submit() {
-    const activeScene = this.scenesService.activeScene;
-
+  async submit() {
     if (!this.name) {
       this.error = $t('The scene name is required');
     } else if (this.options.rename) {
-      this.scenesService.getScene(this.options.rename).setName(this.name);
+      this.editorCommandsService.executeCommand(
+        'RenameSceneCommand',
+        this.options.rename,
+        this.name,
+      );
+
       this.windowsService.closeChildWindow();
     } else {
-      const newScene = this.scenesService.createScene(this.name, {
-        duplicateSourcesFromScene: this.options.sceneToDuplicate,
-      });
-      if (this.options.itemsToGroup) {
-        activeScene.getSelection(this.options.itemsToGroup).moveTo(newScene.id);
-        const sceneItem = activeScene.addSource(newScene.id);
-        this.selectionService.select(sceneItem.sceneItemId);
-        sceneItem.setContentCrop();
-      } else {
-        newScene.makeActive();
+      const options: ISceneCreateOptions = {};
+
+      if (this.options.sceneToDuplicate) {
+        options.duplicateItemsFromScene = this.options.sceneToDuplicate;
       }
+
+      if (this.options.itemsToGroup) {
+        options.groupFromOrigin = {
+          originSceneId: this.scenesService.activeSceneId,
+          originItemIds: this.options.itemsToGroup,
+        };
+      }
+
+      // TODO: Return values for executeCommand
+      const newSceneId = (await this.editorCommandsService.executeCommand(
+        'CreateSceneCommand',
+        this.name,
+        options,
+      )) as string;
+
+      this.scenesService.getScene(newSceneId).makeActive();
+
       this.windowsService.closeChildWindow();
     }
   }

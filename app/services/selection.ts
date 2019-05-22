@@ -12,6 +12,7 @@ import {
   ScenesService,
   TSceneNode,
   TSceneNodeModel,
+  ITransform,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { shortcut } from 'services/shortcuts';
@@ -21,6 +22,7 @@ import { Source } from 'services/sources';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { Rect } from 'util/rect';
 import { WindowsService } from 'services/windows';
+import { EditorCommandsService } from 'services/editor-commands';
 
 interface ISelectionState {
   selectedIds: string[];
@@ -42,10 +44,14 @@ export class SelectionService extends StatefulService<ISelectionState> {
   };
 
   updated = new Subject<ISelectionState>();
-  private sceneId: string;
+
+  private get sceneId() {
+    return this.scenesService.activeSceneId;
+  }
 
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   init() {
     this.scenesService.sceneSwitched.subscribe(() => {
@@ -71,7 +77,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
   getBoundingRect: () => Rect;
   getLastSelected: () => SceneItem;
   getLastSelectedId: () => string;
-  getTransform: () => { crop: any; position: any; scale: any };
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
   copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
@@ -92,7 +97,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
   resetTransform: () => void;
   scale: (scale: IVec2, origin?: IVec2) => void;
   scaleWithOffset: (scale: IVec2, offset: IVec2) => void;
-  unilateralScale: (dimension: 'x' | 'y', sale: number) => void;
   flipY: () => void;
   flipX: () => void;
   stretchToScreen: () => void;
@@ -130,29 +134,9 @@ export class SelectionService extends StatefulService<ISelectionState> {
       },
       ok => {
         if (!ok) return;
-        return this.getSelection().remove.call(this);
+        this.editorCommandsService.executeCommand('RemoveNodesCommand', this.getActiveSelection());
       },
     );
-  }
-
-  @shortcut('ArrowLeft')
-  nudgeActiveItemsLeft() {
-    return this.getSelection().nudgeActiveItemsLeft.call(this);
-  }
-
-  @shortcut('ArrowRight')
-  nudgeActiveItemRight() {
-    return this.getSelection().nudgeActiveItemRight.call(this);
-  }
-
-  @shortcut('ArrowUp')
-  nudgeActiveItemsUp() {
-    return this.getSelection().nudgeActiveItemsUp.call(this);
-  }
-
-  @shortcut('ArrowDown')
-  nudgeActiveItemsDown() {
-    return this.getSelection().nudgeActiveItemsDown.call(this);
   }
 
   openEditTransform() {
@@ -180,8 +164,11 @@ export class SelectionService extends StatefulService<ISelectionState> {
       .forEach(obsSceneItem => {
         obsSceneItem.selected = activeObsIds.includes(obsSceneItem.id);
       });
-
     this.updated.next(this.state);
+  }
+
+  getActiveSelection() {
+    return new Selection(this.sceneId, this.getIds());
   }
 
   /**
@@ -351,12 +338,6 @@ export class Selection {
 
   getLastSelectedId(): string {
     return this.state.lastSelectedId;
-  }
-
-  getTransform() {
-    if (!this.isSceneItem()) return;
-    const item = this.getNodes()[0] as SceneItem;
-    return item.state.transform;
   }
 
   getSize(): number {
@@ -600,10 +581,6 @@ export class Selection {
     this.scale(scale, this.getBoundingRect().getOriginFromOffset(offset));
   }
 
-  unilateralScale(dimension: 'x' | 'y', scale: number) {
-    this.getItems().forEach(item => item.unilateralScale(dimension, scale));
-  }
-
   setDeltaPos(dir: 'x' | 'y', delta: number) {
     this.getItems().forEach(item => item.setDeltaPos(dir, delta));
   }
@@ -648,19 +625,19 @@ export class Selection {
     this.getNodes().forEach(node => node.remove());
   }
 
-  nudgeActiveItemsLeft() {
+  nudgeLeft() {
     this.getItems().forEach(item => item.nudgeLeft());
   }
 
-  nudgeActiveItemRight() {
+  nudgeRight() {
     this.getItems().forEach(item => item.nudgeRight());
   }
 
-  nudgeActiveItemsUp() {
+  nudgeUp() {
     this.getItems().forEach(item => item.nudgeUp());
   }
 
-  nudgeActiveItemsDown() {
+  nudgeDown() {
     this.getItems().forEach(item => item.nudgeDown());
   }
 

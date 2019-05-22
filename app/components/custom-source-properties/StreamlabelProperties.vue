@@ -191,12 +191,6 @@
 }
 
 .streamlabel-preview {
-  color: var(--black);
-}
-
-.night-theme {
-  .streamlabel-preview {
-    color: var(--white);
-  }
+  color: var(--title);
 }
 </style>
