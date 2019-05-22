@@ -96,7 +96,7 @@ function checkoutBranch(branchName) {
     log(`checkout ${branchName}`);
     execSync(`git checkout ${branchName}`, redirectIo);
     log('run yarn install');
-    execSync('yarn install');
+    execSync('yarn install --frozen-lockfile --check-files');
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }

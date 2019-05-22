@@ -1,37 +1,68 @@
 trigger:
 - staging
 
-pool:
-  name: 'Default'
+jobs:
+  - job: Tests
 
-workspace:
-  clean: resources
+    pool:
+      name: 'Default'
 
-steps:
+    workspace:
+      clean: resources
 
-- powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-  displayName: 'Get RDP address'
+    steps:
 
-- powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-  displayName: 'Setup Screen Resolution'
+    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+      displayName: 'Get RDP address'
 
-- script: yarn install --frozen-lockfile --check-files
-  displayName: 'Install Dependencies'
+    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+      displayName: 'Setup Screen Resolution'
 
-- script: 'yarn lint'
-  displayName: 'TSLint'
+    - script: yarn install --frozen-lockfile --check-files
+      displayName: 'Install Dependencies'
 
-- script: 'yarn compile:ci'
-  displayName: 'Compile Assets'
+    - script: 'yarn lint'
+      displayName: 'TSLint'
 
-- script: 'yarn test-flaky'
-  displayName: 'Run Tests'
-  env:
-    SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-    CI: true
-    BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-    SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+    - script: 'yarn compile:ci'
+      displayName: 'Compile Assets'
 
-- script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
-  displayName: "Schedule Reboot"
-  condition: always()
+    - script: 'yarn test-flaky'
+      displayName: 'Run Tests'
+      env:
+        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+        CI: true
+        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+
+    - script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
+      displayName: "Schedule Reboot"
+      condition: always()
+
+  - job: Snapshots
+
+    pool:
+      name: 'Default'
+
+    workspace:
+      clean: resources
+
+    steps:
+
+    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+      displayName: 'Get RDP address'
+
+    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+      displayName: 'Setup Screen Resolution'
+
+    - script: 'yarn screentest --match="Settings*"'
+      displayName: 'Snapshot testing'
+      env:
+        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+        CI: true
+        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+
+    - script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
+      displayName: "Schedule Reboot"
+      condition: always()
