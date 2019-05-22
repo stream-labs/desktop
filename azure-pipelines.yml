@@ -55,6 +55,9 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
+    - script: yarn install --frozen-lockfile --check-files
+      displayName: 'Install Dependencies'
+
     - script: 'yarn screentest --match="Settings*"'
       displayName: 'Snapshot testing'
       env:
