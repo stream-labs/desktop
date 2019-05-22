@@ -69,7 +69,7 @@ jobs:
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: 'SnapshotsResults'
-        targetPath: 'test.html'
+        targetPath: $(Build.SourcesDirectory)/test.html
 
     - script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
       displayName: "Schedule Reboot"
