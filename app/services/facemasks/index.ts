@@ -386,13 +386,13 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.SET_ACTIVE(false);
       return;
     }
-    
+
     if (!this.checkForPlugin()) {
       this.SET_ACTIVE(false);
       this.notifyPluginMissing();
       return;
     }
-    
+
     if (settings.device.name && settings.device.value) {
       this.setupFilter();
     } else {
