@@ -99,6 +99,7 @@
     "serial": true
   },
   "dependencies": {
+    "@octokit/rest": "^16.26.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.32/iojs-v2.0.8-crash-handler.tar.gz",

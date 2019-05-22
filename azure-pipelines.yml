@@ -66,11 +66,6 @@ jobs:
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
-    - task: CopyFiles@2
-      inputs:
-        contents: 'test.html'
-        targetFolder: $(Build.ArtifactStagingDirectory)
-
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: 'SnapshotsResults'
