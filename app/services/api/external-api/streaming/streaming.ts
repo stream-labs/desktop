@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
+import * as obs from '../../../../../obs-api';
 
 enum EStreamingState {
   Offline = 'offline',
@@ -35,6 +36,10 @@ interface IStreamingState {
   replayBufferStatusTime: string;
 }
 
+/**
+ * Provides API to start/stop streaming and recording.
+ * Allows watching for streaming status.
+ */
 @Singleton()
 export class StreamingService implements ISerializable {
   @Fallback()
@@ -45,6 +50,9 @@ export class StreamingService implements ISerializable {
     return this.streamingService.streamingStatusChange;
   }
 
+  /**
+   * returns current streaming/recording status
+   */
   getModel(): IStreamingState {
     return this.streamingService.getModel();
   }
@@ -55,5 +63,17 @@ export class StreamingService implements ISerializable {
 
   toggleStreaming(): void {
     return this.streamingService.toggleStreaming();
+  }
+
+  startReplayBuffer(): void {
+    return this.streamingService.startReplayBuffer();
+  }
+
+  stopReplayBuffer(): void {
+    return this.streamingService.stopReplayBuffer();
+  }
+
+  saveReplay(): void {
+    return this.streamingService.saveReplay();
   }
 }

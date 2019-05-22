@@ -2,13 +2,10 @@
  * All resources for external-api must be registered in this file
  */
 
-export * from './sources/sources';
-export * from './scenes/scenes';
-export * from './scenes/scene';
-export * from './scenes/scene-item';
-export * from './scenes/scene-folder';
-export * from './scenes/selection';
-export * from './streaming/streaming';
-export * from './scene-collections/scene-collections';
-export * from './audio/audio';
-export * from './notifications/notifications';
+export * from './sources';
+export * from './scenes';
+export * from './selection';
+export * from './streaming';
+export * from './scene-collections';
+export * from './audio';
+export * from './notifications';

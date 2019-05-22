@@ -23,7 +23,7 @@ interface INotificationOptions {
   showTime?: boolean;
 }
 
-export interface INotification extends INotificationOptions {
+export interface INotificationModel extends INotificationOptions {
   id: number;
   type: ENotificationType;
   message: string;
@@ -45,11 +45,11 @@ export class NotificationsService {
   @Inject()
   protected notificationsService: InternalNotificationsService;
 
-  push(notifyInfo: INotificationOptions): INotification {
+  push(notifyInfo: INotificationOptions): INotificationModel {
     return this.notificationsService.push(notifyInfo);
   }
 
-  getNotification(id: number): INotification {
+  getNotification(id: number): INotificationModel {
     return this.notificationsService.getNotification(id);
   }
 
@@ -57,15 +57,15 @@ export class NotificationsService {
     return this.notificationsService.applyAction(notificationId);
   }
 
-  getAll(type: ENotificationType): INotification[] {
+  getAll(type: ENotificationType): INotificationModel[] {
     return this.notificationsService.getAll(type);
   }
 
-  getUnread(type: ENotificationType): INotification[] {
+  getUnread(type: ENotificationType): INotificationModel[] {
     return this.notificationsService.getUnread(type);
   }
 
-  getRead(type: ENotificationType): INotification[] {
+  getRead(type: ENotificationType): INotificationModel[] {
     return this.notificationsService.getRead(type);
   }
 
