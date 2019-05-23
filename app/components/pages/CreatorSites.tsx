@@ -8,12 +8,14 @@ import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { GuestApiService } from 'services/guest-api';
 import Utils from 'services/utils';
+import { NavigationService } from 'services/navigation';
 
 @Component({})
 export default class CreatorSites extends TsxComponent<{}> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() guestApiService: GuestApiService;
+  @Inject() navigationService: NavigationService;
 
   $refs: {
     creatorSitesWebview: WebviewTag;
@@ -31,6 +33,9 @@ export default class CreatorSites extends TsxComponent<{}> {
       this.guestApiService.exposeApi(this.$refs.creatorSitesWebview.getWebContents().id, {
         remoteAppReady: async () => {
           this.remoteAppReady = true;
+        },
+        navigateToDashboard: async () => {
+          this.navigationService.navigate('Dashboard');
         },
       });
 
