@@ -2,7 +2,7 @@ import electron from 'electron';
 import { Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
 import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
-import { Inject, InitAfter } from 'services/core/';
+import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { getPlatformService } from '../platforms';
@@ -71,9 +71,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   lifecycle: LoginLifecycle;
 
   async initialize() {
-    if (!this.state.isEnabled) {
-      return;
-    }
+    if (!this.state.isEnabled) return;
 
     this.lifecycle = await this.userService.withLifecycle({
       init: this.createOverlay,
@@ -82,7 +80,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
   }
 
-  async createOverlay(previewMode?: boolean) {
+  async createOverlay() {
     overlay.start();
 
     this.onWindowsReadySubscription = this.onWindowsReady
@@ -90,51 +88,68 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         take(Object.keys(this.windows).length),
         delay(5000), // so recent events has time to load
       )
-      .subscribe({
-        complete: () => this.createWindowOverlays(),
-      });
+      .subscribe({ complete: () => this.createWindowOverlays() });
 
     const [containerX, containerY] = this.getWindowContainerStartingPosition();
 
+    this.createBrowserWindows(containerX, containerY);
+    await this.configureWindows(containerX, containerY);
+
+    for (const view of Object.values(this.windows)) {
+      view.webContents.once('dom-ready', async () => {
+        await view.webContents.executeJavaScript(makeDraggable);
+      });
+    }
+  }
+
+  createBrowserWindows(containerX: number, containerY: number) {
     const commonWindowOptions = {
       backgroundColor: this.customizationService.themeBackground,
       show: false,
       frame: false,
       width: 300,
       height: 300,
-      skipTaskbar: true,
-      thickFrame: false,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: !previewMode,
-      },
-    };
-
-    this.overlayWindow = new BrowserWindow({
-      ...commonWindowOptions,
-      height: 600,
-      width: 600,
       x: containerX,
       y: containerY,
-    });
+      skipTaskbar: true,
+      thickFrame: false,
+      webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
+    };
+
+    this.overlayWindow = new BrowserWindow({ ...commonWindowOptions, height: 600, width: 600 });
 
     this.windows.recentEvents = new BrowserWindow({
       ...commonWindowOptions,
       width: 600,
-      x: containerX,
-      y: containerY,
       parent: this.overlayWindow,
     });
 
     this.windows.chat = new BrowserWindow({
       ...commonWindowOptions,
-      x: containerX,
-      y: containerY,
       height: 600,
       parent: this.overlayWindow,
     });
 
+    // Unneeded window without interactivity
+    // this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
+    //   {
+    //     ...commonWindowOptions,
+    //     // @ts-ignore
+    //     webPreferences: {},
+    //     parent: this.overlayWindow,
+    //     x: containerX - 600,
+    //     y: containerY + 300,
+    //     width: 600,
+    //     height: 300,
+    //     // OneOffWindow options
+    //     isFullScreen: true,
+    //     componentName: 'OverlayWindow',
+    //   },
+    //   'overlay',
+    // );
+  }
+
+  async configureWindows(containerX: number, containerY: number) {
     this.windows.recentEvents.webContents.once('did-finish-load', () => {
       this.onWindowsReady.next(this.windows.recentEvents);
     });
@@ -159,33 +174,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ),
     );
 
-    // Unneeded window without interactivity
-    // this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
-    //   {
-    //     ...commonWindowOptions,
-    //     // @ts-ignore
-    //     webPreferences: {},
-    //     parent: this.overlayWindow,
-    //     x: containerX - 600,
-    //     y: containerY + 300,
-    //     width: 600,
-    //     height: 300,
-    //     // OneOffWindow options
-    //     isFullScreen: true,
-    //     componentName: 'OverlayWindow',
-    //   },
-    //   'overlay',
-    // );
-
     // this.windows.overlayControls.webContents.once('dom-ready', async () => {
     //   this.onWindowsReady.next(this.windows.overlayControls);
     // });
-
-    for (const view of Object.values(this.windows)) {
-      view.webContents.once('dom-ready', async () => {
-        await view.webContents.executeJavaScript(makeDraggable);
-      });
-    }
   }
 
   showOverlay() {
