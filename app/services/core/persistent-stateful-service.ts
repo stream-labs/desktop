@@ -49,9 +49,9 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   runMigrations(persistedState: any, migrations: IMigration[]) {
     const migratedState = cloneDeep(persistedState);
     migrations.forEach(migration => {
-      if (!persistedState[migration.oldKey]) return;
+      if (persistedState[migration.oldKey] == null) return;
       migratedState[migration.newKey] = migration.transform(persistedState[migration.oldKey]);
-      migratedState[migration.oldKey] = null;
+      delete migratedState[migration.oldKey];
     });
 
     return migratedState;
