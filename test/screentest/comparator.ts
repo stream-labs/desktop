@@ -1,3 +1,6 @@
+/**
+ * Compare screenshots and create diff
+ */
 const fs = require('fs');
 const PNG = require('pngjs').PNG;
 const pixelmatch = require('pixelmatch');
@@ -137,7 +140,7 @@ const parsedImages: { [imageName: string]: IParsedImage } = {};
 
   // create a json and html reporting file
 
-  const stateStr = JSON.stringify(state);
+  const stateStr = JSON.stringify(state, null, 2);
 
   fs.writeFile(`${CONFIG.dist}/state.json`, stateStr, () => {
     console.log('state.json is created');

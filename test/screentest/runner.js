@@ -60,10 +60,18 @@ const returnCode = (function main() {
 
   }
 
-  checkoutBranch(branches[0]);
+  checkoutBranch(branches[0], true);
 
 
   log('comparing screenshots');
+  try {
+    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`, redirectIo);
+  } catch (e) {
+    err('comparing screenshots failed');
+    return 1;
+  }
+
+  log('switch screenshots');
   try {
     execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`, redirectIo);
   } catch (e) {
@@ -89,14 +97,17 @@ function err(...args) {
   console.error(...args);
 }
 
-function checkoutBranch(branchName) {
+function checkoutBranch(branchName, skipModulesInstallation = false) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
     log(`checkout ${branchName}`);
     execSync(`git checkout ${branchName}`, redirectIo);
-    log('run yarn install');
-    execSync('yarn install --frozen-lockfile --check-files');
+
+    if (!skipModulesInstallation) {
+      log('run yarn install');
+      execSync('yarn install --frozen-lockfile --check-files');
+    }
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }

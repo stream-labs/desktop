@@ -99,6 +99,8 @@
     "serial": true
   },
   "dependencies": {
+    "@octokit/app": "^3.0.0",
+    "@octokit/request": "^4.1.0",
     "@octokit/rest": "^16.26.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
