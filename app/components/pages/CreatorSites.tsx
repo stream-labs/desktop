@@ -66,13 +66,13 @@ export default class CreatorSites extends TsxComponent<{}> {
 
   get webviewStyles() {
     return {
-      // We can't mess with `display` per Electron docs, it doesn't trigger network either if we do
-      visibility: this.remoteAppReady ? 'visible' : 'hidden',
       position: 'absolute',
       top: '-2px',
       right: 0,
       bottom: 0,
-      left: 0,
+      opacity: this.remoteAppReady ? 1 : 0,
+      width: '100%',
+      transition: 'opacity 0.5s ease-in',
     };
   }
 
