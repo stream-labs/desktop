@@ -9384,10 +9384,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.0.tgz#d5c752825e5367e786f78e18e445ea223a155952"
   integrity sha1-1cdSgl5TZ+eG944Y5EXqIjoVWVI=
 
-streamlabs-beaker@^0.4.110:
-  version "0.4.110"
-  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.110.tgz#3b5e838025c9a763bcccae99ee96507d2a95ba3c"
-  integrity sha512-5m5fEn3aDvWvKAd/U6GX9zumC2yb42kXSosIUkAk9YIZdmTCmE8JaCgNnsP/lbYJEUKJnDjgT/JM3+lP+qPNBQ==
+streamlabs-beaker@^0.4.111:
+  version "0.4.111"
+  resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.4.111.tgz#d66cbc4d05c055dbb793e10750f4be954b3f693c"
+  integrity sha512-xxd54B/5MpJd1kv5xMOYsYNdG0p13R6mWr/hL5uHMWDWGFHRKhnol+q72qN6F0wa5JJG9l9GhrHM2w9ncI5LHw==
 
 string-argv@^0.0.2:
   version "0.0.2"
