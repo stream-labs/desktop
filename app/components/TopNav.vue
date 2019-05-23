@@ -32,6 +32,14 @@
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span class="tab-button__text">{{ $t('App Store') }}</span>
+    </button>
+    <button
+      v-if="creatorSitesVisible"
+      @click="navigateCreatorSites"
+      class="tab-button"
+      :class="{ 'is-active': page === 'CreatorSites' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="icon-store"/> <span class="tab-button__text">{{ $t('Creator Site') }}</span>
       <span class="badge badge--new">{{ $t('New') }}</span>
     </button>
     <button
@@ -58,12 +66,17 @@
   </div>
 
   <div class="top-nav-right">
-    <div class="top-nav-item">	
-      <button @click="toggleNightTheme" class="theme-toggle">	
-        <div class="theme-toggle__bg"></div>	
-        <img class="theme-toggle__icon theme-toggle__icon--moon" v-tooltip.right="moonTooltip" src="../../media/images/moon.png"/>	
-        <img class="theme-toggle__icon theme-toggle__icon--sun" v-tooltip.right="sunTooltip" src="../../media/images/sun.png"/>	
-      </button>	
+    <undo-controls class="top-nav-item" />
+    <div class="top-nav-item">
+      <button @click="toggleNightTheme" class="theme-toggle">
+        <div class="theme-toggle__bg"></div>
+        <img
+          class="theme-toggle__icon"
+          :class="{ active: customizationService.currentTheme === 'night-theme' }"
+          v-tooltip.right="moonTooltip"
+          :src="modeToggleIcon"
+        />
+      </button>
     </div>
     <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999">
       <a class="link" @click="openDevTools">Dev Tools</a>
@@ -208,26 +221,13 @@
   position: relative;
   display: flex;
   align-items: center;
-
-  .fa {
-    overflow: hidden;
-    position: relative;
-  }
-
-  .fa-sun-o {
-    color: var(--new);
-  }
-
-  .fa-moon-o {
-    display: none;
-  }
 }
 
 .theme-toggle__bg {
   height: 14px;
   width: 30px;
   padding: 0 16px;
-  background: #e3e8eb;
+  background: var(--input-border);
   position: relative;
   border-radius: 10px;
 }
@@ -235,48 +235,12 @@
 .theme-toggle__icon {
   position: absolute;
   top: -2px;
-}
-
-.theme-toggle__icon--sun {
   width: 19px;
   right: -2px;
 }
 
-.theme-toggle__icon--moon {
-  width: 18px;
-  display: none;
+.theme-toggle__icon.active {
   left: -2px;
-}
-
-.night-theme {
-  .theme-toggle {
-    .fa-sun-o {
-      display: none;
-    }
-
-    .fa-moon-o {
-      color: var(--white);
-      opacity: 1;
-      display: block;
-    }
-  }
-
-  .user__name {
-    &:hover {
-      color: var(--white);
-    }
-  }
-
-  .theme-toggle__bg {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-
-  .theme-toggle__icon--moon {
-    display: block;
-  }
-
-  .theme-toggle__icon--sun {
-    display: none;
-  }
+  right: auto;
 }
 </style>

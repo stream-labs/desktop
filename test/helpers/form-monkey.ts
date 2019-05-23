@@ -232,9 +232,10 @@ export class FormMonkey {
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
     await sleep(500); // slider has an initialization delay
 
-    const dotSelector = `${sliderInputSelector} .vue-slider-dot`;
+    const dotSelector = `${sliderInputSelector} .vue-slider-dot-handle`;
+
     let moveOffset = await this.client.getElementSize(
-      `${sliderInputSelector} .vue-slider-wrap`,
+      `${sliderInputSelector} .vue-slider`,
       'width',
     );
 
@@ -242,6 +243,7 @@ export class FormMonkey {
     await this.client.moveToObject(dotSelector);
     await this.client.buttonDown(0);
     await this.client.moveToObject(`${sliderInputSelector} .vue-slider`, 0, 0);
+    await sleep(100); // wait for transitions
     await this.client.buttonUp(0);
     await this.client.moveToObject(dotSelector);
     await this.client.buttonDown();
@@ -262,6 +264,9 @@ export class FormMonkey {
         await this.client.moveTo(null, Math.round(moveOffset), 0);
       }
 
+      // wait for transitions
+      await sleep(100);
+
       moveOffset = moveOffset / 2;
       if (moveOffset < 0.5) throw new Error('Slider position setup failed');
     }
@@ -269,7 +274,7 @@ export class FormMonkey {
 
   async getSliderValue(sliderInputSelector: string): Promise<number> {
     // fetch the value from the slider's tooltip
-    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip`));
+    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`));
   }
 
   async setInputValue(selector: string, value: string) {

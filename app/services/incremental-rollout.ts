@@ -8,6 +8,7 @@ import Utils from 'services/utils';
 export enum EAvailableFeatures {
   chatbot = 'slobs--chatbot',
   platform = 'slobs--platform',
+  creatorSites = 'slobs--creator-sites',
 }
 
 interface IIncrementalRolloutServiceState {

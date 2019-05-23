@@ -155,4 +155,11 @@
   top: 0;
   right: 0;
 }
+
+/deep/ .creator-sites-container .s-loader {
+  .s-loader__bg {
+    position: unset;
+    z-index: unset;
+  }
+}
 </style>

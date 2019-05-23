@@ -16,11 +16,13 @@ import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
+import UndoControls from 'components/UndoControls';
 Vue.use(VueResize);
 
 @Component({
   components: {
     Login,
+    UndoControls,
   },
 })
 export default class TopNav extends Vue {
@@ -71,6 +73,10 @@ export default class TopNav extends Vue {
 
   navigatePlatformAppStore() {
     this.navigationService.navigate('PlatformAppStore');
+  }
+
+  navigateCreatorSites() {
+    this.navigationService.navigate('CreatorSites');
   }
 
   navigateOverlays() {
@@ -134,6 +140,11 @@ export default class TopNav extends Vue {
     this.customizationService.setTheme(newTheme);
   }
 
+  get modeToggleIcon() {
+    const icon = this.customizationService.currentTheme === 'night-theme' ? 'moon' : 'sun';
+    return require(`../../media/images/${icon}.png`);
+  }
+
   openDiscord() {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
@@ -163,6 +174,10 @@ export default class TopNav extends Vue {
       this.userService.isLoggedIn() &&
       this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
     );
+  }
+
+  get creatorSitesVisible() {
+    return this.userService.isLoggedIn() && this.featureIsEnabled(EAvailableFeatures.creatorSites);
   }
 
   get loading() {

@@ -45,6 +45,7 @@ export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
 export { HardwareService } from 'services/hardware';
 export { Prefab, PrefabsService } from 'services/prefabs';
+export { EditorCommandsService } from 'services/editor-commands';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
