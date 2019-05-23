@@ -55,8 +55,9 @@ export default class CreatorSites extends TsxComponent<{}> {
   }
 
   get creatorSitesUrl() {
-    return `https://beta.streamlabs.com/editor/slobs?auth_token=${this.userService.apiToken}`;
-    //return `http://${this.hostsService.streamlabs}/editor/slobs/${this.userService.apiToken}`;
+    const host = Utils.useLocalHost() ? 'http://streamlabs.site' : 'https://streamlabs.com';
+
+    return `${host}/editor/slobs?auth_token=${this.userService.apiToken}`;
   }
 
   get containerStyles() {
