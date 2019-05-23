@@ -124,7 +124,7 @@ test('findSuitableProgram', () => {
 
 test.each([['CREATED', 1], ['RESERVED', 0], ['OTHER', 0]])(
   'createProgram with %s',
-  async (result, fetchProgramCalled) => {
+  async (result: string, fetchProgramCalled: number) => {
     setup();
     const { NicoliveProgramService } = require('./nicolive-program');
     const instance = NicoliveProgramService.instance as NicoliveProgramService;
@@ -138,18 +138,21 @@ test.each([['CREATED', 1], ['RESERVED', 0], ['OTHER', 0]])(
   }
 );
 
-test.each([['EDITED', 1], ['OTHER', 0]])('editProgram with %s', async (result, refreshProgramCalled) => {
-  setup();
-  const m = require('./nicolive-program');
-  const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
+test.each([['EDITED', 1], ['OTHER', 0]])(
+  'editProgram with %s',
+  async (result: string, refreshProgramCalled: number) => {
+    setup();
+    const m = require('./nicolive-program');
+    const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
 
-  instance.client.editProgram = jest.fn().mockResolvedValue(result);
-  instance.refreshProgram = jest.fn();
+    instance.client.editProgram = jest.fn().mockResolvedValue(result);
+    instance.refreshProgram = jest.fn();
 
-  await expect(instance.editProgram()).resolves.toBe(result);
-  expect(instance.client.editProgram).toHaveBeenCalledTimes(1);
-  expect(instance.refreshProgram).toHaveBeenCalledTimes(refreshProgramCalled);
-});
+    await expect(instance.editProgram()).resolves.toBe(result);
+    expect(instance.client.editProgram).toHaveBeenCalledTimes(1);
+    expect(instance.refreshProgram).toHaveBeenCalledTimes(refreshProgramCalled);
+  }
+);
 
 test('fetchProgramで結果が空ならエラー', async () => {
   setup();
