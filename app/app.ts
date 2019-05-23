@@ -21,6 +21,7 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
+import { isError } from 'util';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -163,6 +164,8 @@ electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowI
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
+  // TODO: Suppress N-API error until we upgrade electron to v4.x
+  if (/N\-API is an experimental feature/.test(args[0])) return;
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);

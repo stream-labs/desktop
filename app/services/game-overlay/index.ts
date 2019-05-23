@@ -278,14 +278,15 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async destroy() {
+    if (!this.lifecycle) return;
     await this.lifecycle.destroy();
   }
 
   async destroyOverlay() {
     if (this.state.isEnabled) {
       await overlay.stop();
-      this.onWindowsReadySubscription.unsubscribe();
-      Object.values(this.windows).forEach(win => win.destroy());
+      if (this.onWindowsReadySubscription) this.onWindowsReadySubscription.unsubscribe();
+      if (this.windows) Object.values(this.windows).forEach(win => win.destroy());
     }
   }
 
