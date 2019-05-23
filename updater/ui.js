@@ -51,8 +51,8 @@ const i18n = new VueI18n({
         changeLog: `更新内容`,
         mandatoryUpdate: `必須アップデートです`,
         skippableUpdate: `スキップ可能なアップデートです`,
-        download: 'ダウンロードして更新',
-        skip: '更新せずに N Air を起動'
+        download: '更新する',
+        skip: 'あとで'
       },
       downloading: {
         message: 'バージョン{version}を{br}ダウンロードしています'
