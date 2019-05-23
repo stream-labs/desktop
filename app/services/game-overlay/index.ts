@@ -17,6 +17,11 @@ export type GameOverlayState = {
   isShowing: boolean;
   isPreviewEnabled: boolean;
   previewMode: boolean;
+  opacity: number;
+  windowIds: {
+    chat: number;
+    recentEvents: number;
+  };
 };
 
 /**
@@ -47,6 +52,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     isShowing: false,
     isPreviewEnabled: true,
     previewMode: false,
+    opacity: 100,
+    windowIds: {
+      chat: null,
+      recentEvents: null,
+      // overlayControls: null,
+    },
   };
 
   windows: {
@@ -80,9 +91,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         delay(5000), // so recent events has time to load
       )
       .subscribe({
-        complete: () => {
-          return previewMode ? this.showDraggableWindowOverlays() : this.createWindowOverlays();
-        },
+        complete: () => this.createWindowOverlays(),
       });
 
     const [containerX, containerY] = this.getWindowContainerStartingPosition();
@@ -208,28 +217,39 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
-    if (shouldStart) {
-      this.createOverlay();
-    }
-
-    if (shouldStop) {
-      this.destroyOverlay();
-    }
+    if (shouldStart) this.createOverlay();
+    if (shouldStop) this.destroyOverlay();
 
     this.SET_ENABLED(shouldEnable);
   }
 
-  async setPreviewMode(previewMode: boolean) {
-    await this.destroyOverlay();
-    if (this.state.isEnabled && !previewMode) {
-      await this.createOverlay();
-    } else if (previewMode) {
-      await this.createOverlay(true);
-    }
-
-    this.state.isShowing ? this.hideOverlay() : this.showOverlay();
-
+  setPreviewMode(previewMode: boolean) {
+    if (!this.state.isEnabled) return;
     this.SET_PREVIEW_MODE(previewMode);
+    if (previewMode) {
+      Object.values(this.windows).forEach(win => win.show());
+    } else {
+      Object.keys(this.windows).forEach(key => {
+        const win: electron.BrowserWindow = this.windows[key];
+        const overlayId = this.state.windowIds[key];
+
+        const [x, y] = win.getPosition();
+        const { width, height } = win.getBounds();
+
+        overlay.setPosition(overlayId, x, y, width, height);
+        win.hide();
+      });
+    }
+  }
+
+  setOverlayOpacity(percentage: number) {
+    this.SET_OPACITY(percentage);
+    if (!this.state.isEnabled) return;
+    Object.keys(this.windows).forEach(key => {
+      const overlayId = this.state.windowIds[key];
+
+      overlay.setTransparency(overlayId, percentage * 2.55);
+    });
   }
 
   setPreviewEnabled(shouldEnable: boolean = true) {
@@ -256,6 +276,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.state.previewMode = previewMode;
   }
 
+  @mutation()
+  private SET_WINDOW_ID(window: string, id: number) {
+    this.state.windowIds[window] = id;
+  }
+
+  @mutation()
+  private SET_OPACITY(val: number) {
+    this.state.opacity = val;
+  }
+
   async destroy() {
     await this.lifecycle.destroy();
   }
@@ -268,43 +298,23 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     }
   }
 
-  private showDraggableWindowOverlays() {
-    Object.values(this.windows).forEach(win => {
-      win.show();
-
-      const overlayId = overlay.addHWND(win.getNativeWindowHandle());
-
-      console.log('preview ', overlayId, win.getNativeWindowHandle());
-
-      if (overlayId.toString() === '-1') {
-        this.overlayWindow.hide();
-        throw new Error('Error creating overlay');
-      }
-
-      const [x, y] = win.getPosition();
-      const { width, height } = win.getBounds();
-
-      overlay.setPosition(overlayId, x, y, width, height);
-      overlay.setTransparency(overlayId, 255);
-    });
-  }
-
   private createWindowOverlays() {
-    Object.values(this.windows).forEach(win => {
+    Object.keys(this.windows).forEach((key: string) => {
+      const win: electron.BrowserWindow = this.windows[key];
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
-
-      console.log('real ', overlayId, win.getNativeWindowHandle());
 
       if (overlayId.toString() === '-1') {
         this.overlayWindow.hide();
         throw new Error('Error creating overlay');
       }
 
+      this.SET_WINDOW_ID(key, overlayId);
+
       const [x, y] = win.getPosition();
       const { width, height } = win.getBounds();
 
       overlay.setPosition(overlayId, x, y, width, height);
-      overlay.setTransparency(overlayId, 220);
+      overlay.setTransparency(overlayId, this.state.opacity);
 
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
