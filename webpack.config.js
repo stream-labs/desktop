@@ -1,7 +1,11 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
 const path = require('path');
 
-const plugins = [];
+const plugins = [
+  new VueLoaderPlugin()
+];
 
 
 // uncomment to watch circular dependencies
@@ -125,7 +129,10 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        loader: 'vue-svg-loader'
+        use: [
+          'babel-loader',
+          'vue-svg-loader'
+        ]
       }
     ]
   },

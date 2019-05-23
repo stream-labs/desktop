@@ -1,6 +1,6 @@
 import { Service } from 'services/service';
 import electron from 'electron';
-import url from 'url';
+import { URL, URLSearchParams } from 'url';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 
@@ -41,7 +41,7 @@ export class ProtocolLinksService extends Service {
   }
 
   private handleLink(link: string) {
-    const parsed = new url.URL(link);
+    const parsed = new URL(link);
     const info: IProtocolLinkInfo = {
       base: parsed.host,
       path: parsed.pathname,
