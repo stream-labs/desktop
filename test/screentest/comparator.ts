@@ -1,5 +1,5 @@
 /**
- * Compare screenshots and create diff
+ * Compare screenshots and create diffs
  */
 const fs = require('fs');
 const PNG = require('pngjs').PNG;

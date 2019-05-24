@@ -1,119 +1,66 @@
+require('dotenv').config();
+
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const env = process.env;
 const { GithubClient } = require('../../scripts/github-client');
+const CONFIG = require('test/screentest/config.json');
 
-const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
-
+// list branches for making screenshots from
 const branches = [
   'current',
   CONFIG.baseBranch
 ];
 
-const redirectIo = { stdio: [0, 1, 2] }
+/**
+ * exec sync or die
+ */
+function exec(cmd) {
+  try {
+    console.log('RUN', cmd);
+    return execSync(cmd, { stdio: [0, 1, 2] });
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+}
 
-const returnCode = (function main() {
+const commitSHA = exec('git rev-parse HEAD');
 
-  log('update check');
-  updateCheck();
+(async function main() {
 
-  log('use branches', branches);
+  // send the status to the GitHub check
+  await updateCheck();
 
-  const dir = CONFIG.dist;
-  rimraf.sync(dir);
-
-  // create dir
-  let currentPath = '';
-  dir.split('/').forEach(dirName => {
-    currentPath += dirName;
-    if (!fs.existsSync(currentPath)) fs.mkdirSync(currentPath);
-    currentPath += '/';
-  });
+  rimraf.sync(CONFIG.dist);
+  fs.mkdirSync(CONFIG.dist, { recursive: true });
 
 
-
+  // make screenshots for each branch
   for (const branchName of branches) {
-
     checkoutBranch(branchName);
-
-
-    log('project compilation');
-    try {
-      execSync('yarn compile:ci', redirectIo);
-    } catch (e) {
-      err('compilation failed', e);
-      return 1;
-    }
-
-    log('tests compilation');
-
-    try {
-      execSync('yarn compile-tests', redirectIo);
-    } catch (e) {
-      err('compilation failed', e);
-      return 1;
-    }
-
-    log('creating screenshots');
-    try {
-      execSync(`yarn ava test-dist/test/screentest/tests --match="Settings*"`, redirectIo);
-    } catch (e) {
-      err('creating screenshots failed');
-      return 1;
-    }
-
+    exec('yarn ava test-dist/test/screentest/tests --match="Settings*"');
   }
 
+  // compare screenshots
   checkoutBranch(branches[0], true);
+  execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
-
-  log('comparing screenshots');
-  try {
-    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`, redirectIo);
-  } catch (e) {
-    err('comparing screenshots failed');
-    return 1;
-  }
-
-  log('switch screenshots');
-  try {
-    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`, redirectIo);
-  } catch (e) {
-    err('comparing screenshots failed');
-    return 1;
-  }
-
-  return 0;
+  // send the status to the GitHub check
+  await updateCheck();
 })();
 
-if (returnCode !== 0) {
-  process.exit(1);
-}
 
-checkoutBranch(branches[0]);
-
-
-function log(...args) {
-  console.log(...args);
-}
-
-function err(...args) {
-  console.error(...args);
-}
-
-function checkoutBranch(branchName, skipModulesInstallation = false) {
+function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
-    log(`checkout ${branchName}`);
-    execSync(`git checkout ${branchName}`, redirectIo);
-
-    if (!skipModulesInstallation) {
-      log('run yarn install');
-      execSync('yarn install --frozen-lockfile --check-files');
-    }
+    exec(`git checkout ${branchName}`);
+    exec('yarn install --frozen-lockfile --check-files');
   }
+  // save current branch name to the file
+  // screenshoter needs will use this value
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 
@@ -121,7 +68,10 @@ function checkoutBranch(branchName, skipModulesInstallation = false) {
 
 async function updateCheck() {
 
-  console.log('run update');
+  if (env.STREAMLABS_BOT_ID) {
+    console.info('STREAMLABS_BOT_ID is not set. Skipping GitCheck status update');
+    return;
+  }
 
   console.log(
     env.STREAMLABS_BOT_ID,
@@ -137,17 +87,18 @@ async function updateCheck() {
     env.BUILD_REPOSITORY_NAME
   );
 
-  await github.login();
-
-  console.log('commit', env.Build.SourceVersion);
-  await github.postCheck({
-    head_sha: env.Build.SourceVersion,
-    status: 'in_progress',
-    output: {
-      title: 'This is a title ' + new Date()
-    }
-  });
-
+  try {
+    await github.login();
+    await github.postCheck({
+      head_sha: commitSHA,
+      status: 'in_progress',
+      output: {
+        title: 'This is a title ' + new Date()
+      }
+    });
+  } catch (e) {
+    console.error('Unable to update GithubCheck status');
+  }
 
 }
 

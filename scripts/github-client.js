@@ -15,6 +15,8 @@ module.exports.GithubClient = class GithubClient {
   }
 
   async login() {
+
+
     const app = new App({ id: this.appId, privateKey: this.privateKey });
     const jwt = app.getSignedJsonWebToken();
 
