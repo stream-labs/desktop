@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron, focusMain, focusChild, TExecutionContext } from './helpers/spectron/index';
+import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
 import { logIn } from './helpers/spectron/user';
 import { spawn, execSync, spawnSync } from 'child_process';
 import { sleep } from './helpers/sleep';
@@ -12,7 +11,7 @@ const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
-test('Go through onboarding', async (t: TExecutionContext) => {
+test('Go through onboarding', async t => {
   const app = t.context.app;
   await focusMain(t);
 
@@ -37,7 +36,7 @@ test('Go through onboarding', async (t: TExecutionContext) => {
 });
 
 
-test('OBS Importer', async (t: TExecutionContext) => {
+test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // extract OBS config to the cache dir
