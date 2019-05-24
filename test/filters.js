@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron, focusChild } from './helpers/spectron/index';
+import { useSpectron, focusChild, test } from './helpers/spectron/index';
 import { addFilter, openFiltersWindow, removeFilter } from './helpers/spectron/filters';
 import { addSource } from './helpers/spectron/sources';
 

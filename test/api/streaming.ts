@@ -1,5 +1,4 @@
-import test from 'ava';
-import { TExecutionContext, useSpectron } from '../helpers/spectron';
+import { TExecutionContext, useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import {
   IStreamingServiceApi,
