@@ -30,9 +30,3 @@
 </template>
 
 <script lang="ts" src="./ObsColorInput.vue.ts"></script>
-
-<style lang="less">
-@import "../../../styles/index";
-
-
-</style>

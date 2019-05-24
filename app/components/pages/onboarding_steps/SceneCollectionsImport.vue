@@ -23,6 +23,8 @@
 @import '../../../styles/index';
 
 .scene-collections-list {
+  .radius();
+
   margin-left: 0;
   padding: 10px;
   width: 100%;
@@ -30,7 +32,6 @@
   color: var(--paragraph);
   list-style: none;
   overflow: auto;
-  .radius();
   background: var(--section);
 }
 </style>

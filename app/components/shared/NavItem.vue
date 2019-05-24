@@ -21,13 +21,14 @@
 @import "../../styles/index";
 
 .nav-item {
+  .margin-bottom();
+  .text-transform();
+
   cursor: pointer;
   list-style: none;
   border-left: 1px solid transparent;
   padding-left: 46px;
   font-size: 14px;
-  .margin-bottom();
-  .text-transform();
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
@@ -38,8 +39,9 @@
   }
 
   &.active {
-    opacity: 1;
     .weight(@medium);
+
+    opacity: 1;
     border-color: var(--nav-border);
     color: var(--title);
 

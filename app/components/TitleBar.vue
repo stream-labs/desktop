@@ -42,8 +42,9 @@
 }
 
 .titlebar-action {
-  cursor: pointer;
   .icon-hover();
+
+  cursor: pointer;
   margin-right: 16px;
 }
 </style>

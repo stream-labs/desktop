@@ -17,9 +17,10 @@
 @import "../../styles/index";
 
 .help-tip {
+  .radius();
+
   position: absolute;
   background: var(--teal);
-  .radius();
   color: var(--white);
   top: -8px;
   right: 102px;
@@ -40,11 +41,12 @@
 }
 
 .help-tip__close {
+  .transition();
+
   position: absolute;
   right: 10px;
   cursor: pointer;
-  opacity: .6;
-  .transition();
+  opacity: 0.6;
 
   &:hover {
     opacity: 1;
@@ -53,12 +55,13 @@
 
 .help-tip__title {
   .weight(@medium);
+
   font-size: 16px;
   display: flex;
   align-items: center;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 
   .fa {
     margin-right: 8px;
@@ -67,18 +70,23 @@
 }
 
 @keyframes bounce {
-   from, 3%, 6%, 10%, to {
-    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  from,
+  3%,
+  6%,
+  10%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     transform: translateX(0);
   }
 
-  4%, 5% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+  4%,
+  5% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     transform: translateX(30px);
   }
 
   8% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     transform: translateX(15px);
   }
 
