@@ -4,7 +4,7 @@ const { request } = require("@octokit/request");
 /**
  * A wrapper for the Github API
  */
-export class GithubClient {
+module.exports.GithubClient = class GithubClient {
 
   constructor (appId, privateKey, owner, repo) {
     this.appId = appId;

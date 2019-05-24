@@ -2,6 +2,7 @@ const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const env = process.env;
+const { GithubClient } = require('../../scripts/github-client');
 
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
@@ -116,9 +117,6 @@ function checkoutBranch(branchName, skipModulesInstallation = false) {
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 
-
-
-import { GithubClient } from '../../scripts/github-client';
 
 
 async function updateCheck() {
