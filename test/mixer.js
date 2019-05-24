@@ -1,5 +1,4 @@
- import test from 'ava';
-import { useSpectron, focusMain } from './helpers/spectron/index';
+import { useSpectron, focusMain, test } from './helpers/spectron/index';
 import { addSource, selectSource, clickRemoveSource, addExistingSource} from './helpers/spectron/sources';
 import { addScene } from './helpers/spectron/scenes';
 

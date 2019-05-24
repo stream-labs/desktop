@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
 import { ScenesService } from 'services/scenes';

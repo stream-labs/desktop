@@ -71,7 +71,7 @@
   display: inline-block;
   width: 16px;
   text-align: center;
-  opacity: .26;
+  opacity: 0.26;
   margin-left: 8px;
   color: var(--icon);
 }
@@ -81,7 +81,7 @@ i.disabled {
   opacity: 0.26;
   cursor: inherit;
 
-   :hover {
+  &:hover {
     opacity: inherit;
   }
 }
@@ -89,6 +89,7 @@ i.disabled {
 .sl-vue-tree.sl-vue-tree-root {
   flex-grow: 1;
   overflow: auto;
+  border-color: var(--section);
 }
 
 .sl-vue-tree-node-item {
@@ -98,19 +99,16 @@ i.disabled {
 
     .source-selector-action {
       .transition();
+
       opacity: 1;
       color: var(--icon);
     }
   }
 }
 
-.sl-vue-tree.sl-vue-tree-root {
-  border-color: var(--section);
-}
-
 .title-container {
   display: inline-block;
-  color: var(--icon);
+  color: var(--title);
 }
 
 .layer-icon {
@@ -124,9 +122,5 @@ i.disabled {
     font-size: 12px;
     font-weight: 700;
   }
-}
-
-.title-container {
-  color: var(--title);
 }
 </style>

@@ -58,12 +58,13 @@
 }
 
 .notification {
-  height: 30px;
-  max-width: 100%;
-  line-height: 30px;
   .padding-left();
   .padding-right();
   .radius();
+
+  height: 30px;
+  max-width: 100%;
+  line-height: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -99,7 +100,7 @@
   white-space: nowrap;
   margin-right: 10px;
 
-  &:before {
+  &::before {
     content: '|';
     padding-right: 12px;
     opacity: 0.5;
@@ -124,6 +125,7 @@
     opacity: 0;
     top: 50px;
   }
+
   to {
     opacity: 1;
     top: 0;
@@ -134,6 +136,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
     display: none;
