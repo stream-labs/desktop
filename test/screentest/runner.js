@@ -1,6 +1,7 @@
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
+const env = process.env;
 
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
@@ -14,7 +15,7 @@ const redirectIo = { stdio: [0, 1, 2] }
 const returnCode = (function main() {
 
   log('update check');
-  execSync('node ./update-github-check.js', redirectIo);
+  updateCheck();
 
   log('use branches', branches);
 
@@ -114,4 +115,40 @@ function checkoutBranch(branchName, skipModulesInstallation = false) {
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
+
+
+
+import { GithubClient } from '../../scripts/github-client';
+
+
+async function updateCheck() {
+
+  console.log((
+    env.STREAMLABS_BOT_ID,
+      env.STREAMLABS_BOT_KEY,
+      'stream-labs',
+      env.BUILD_REPOSITORY_NAME
+  ))
+
+  const github = new GithubClient(
+    env.STREAMLABS_BOT_ID,
+    env.STREAMLABS_BOT_KEY,
+    'stream-labs',
+    env.BUILD_REPOSITORY_NAME
+  );
+
+  await github.login();
+
+  console.log('commit', env.Build.SourceVersion);
+  await github.postCheck({
+    head_sha: env.Build.SourceVersion,
+    status: 'in_progress',
+    output: {
+      title: 'This is a title ' + new Date()
+    }
+  });
+
+
+}
+
 
