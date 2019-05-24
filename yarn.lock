@@ -1179,56 +1179,56 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@sentry/browser@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.4.1.tgz#3473ca9e61926c2e896abe84bddfb2651004fb5a"
-  integrity sha512-P3VoG5tPavva1wqOIeOyOlqyw9+f0Z/OTxLsYgRxHxG7TrDGeZeWPfusI1KaoiK6sDD4FX3PVzfRAXaqa+mE1A==
+"@sentry/browser@4.6.6":
+  version "4.6.6"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.6.6.tgz#58ac3de9956c8a7033f3830c3ee9e011c2bd133a"
+  integrity sha512-+9VsQ+oQYU+PYlLJG2ex7JCMSVQbnUvWPI2uZOofWdI9sWIPUub3boWItMzRQNQ1T4S3FZd4FqAWNFd3azdnBw==
   dependencies:
-    "@sentry/core" "4.4.1"
-    "@sentry/types" "4.4.1"
-    "@sentry/utils" "4.4.1"
+    "@sentry/core" "4.6.6"
+    "@sentry/types" "4.5.3"
+    "@sentry/utils" "4.6.5"
     tslib "^1.9.3"
 
-"@sentry/core@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-4.4.1.tgz#8836813d9d309059913b464cee6d23da09cc4056"
-  integrity sha512-4sn4Ro7PUpYTkkG4Bn5Q6WytBCOYxpi4vrvOy27EdAGmyjjZ7iRIrkN4q+yhVtu99y+vV6q/0MBfeALc2E6Ckg==
+"@sentry/core@4.6.6":
+  version "4.6.6"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-4.6.6.tgz#dea96a88533a3bdbdcc86ae18e35272c57e0fd20"
+  integrity sha512-7z9HKLTNr3zVBR3tBRheTxkkkuK2IqISUc5Iyo3crN2OecOLtpptT96f5XjLndBEL2ab39eCBPpA5OFjbpzrIA==
   dependencies:
-    "@sentry/hub" "4.4.1"
-    "@sentry/minimal" "4.4.1"
-    "@sentry/types" "4.4.1"
-    "@sentry/utils" "4.4.1"
+    "@sentry/hub" "4.6.5"
+    "@sentry/minimal" "4.6.5"
+    "@sentry/types" "4.5.3"
+    "@sentry/utils" "4.6.5"
     tslib "^1.9.3"
 
-"@sentry/hub@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-4.4.1.tgz#3f82405131bf10ef9e751e2760d63bfff809fa4a"
-  integrity sha512-fhHIW8KtirG7LAb9V02/IwMfDx7f4CaRDP9kZ7DFjZF2z9RWPCgfn39YoZrAy6r95DaBvNYXABE07ooxn0Tgkw==
+"@sentry/hub@4.6.5":
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-4.6.5.tgz#451def7bc8d90d9cc007f58f364b3ce305c4701a"
+  integrity sha512-v9vee8s8C1fK/DPtNOzv6r+AMbPDOWfnasouNcBUkbQUSN5wUNyCDvt51QbWaw5kMMY5TSqjdVqY6gXQZI0APQ==
   dependencies:
-    "@sentry/types" "4.4.1"
-    "@sentry/utils" "4.4.1"
+    "@sentry/types" "4.5.3"
+    "@sentry/utils" "4.6.5"
     tslib "^1.9.3"
 
-"@sentry/minimal@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-4.4.1.tgz#332e97395a20a01e398ae6614a8fb857f2566c31"
-  integrity sha512-fDQfeHzAvqHHSl/ELWU495khqWaqqF6/pAXsBW2BlGTqO8E4ErOWvayJgkXSWy54NlHg0073aJlwIU+4i2jmtA==
+"@sentry/minimal@4.6.5":
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-4.6.5.tgz#64433d2c9fda69eedbb61855a7ff8905f7b19218"
+  integrity sha512-tf+J+uUNmSgzC7d9JSN8Ekw1HeBAX87Efa/jyFbzLvaw80oibvTiLSLqDjQ9PgvyIzBUuuPImkS2NpvPQGWFtg==
   dependencies:
-    "@sentry/hub" "4.4.1"
-    "@sentry/types" "4.4.1"
+    "@sentry/hub" "4.6.5"
+    "@sentry/types" "4.5.3"
     tslib "^1.9.3"
 
-"@sentry/types@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-4.4.1.tgz#d19f9b0450a543aa11b136681ea19612e3cc1611"
-  integrity sha512-2F/L03X2BpWfTrq+ZrL54Tb+y22Pvq9GYvRKO87Y/02huqHVdDhuIcsBXooOXExkk6T32LFYh/m2CASkLDtkFQ==
+"@sentry/types@4.5.3":
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-4.5.3.tgz#3350dce2b7f9b936a8c327891c12e3aef7bd8852"
+  integrity sha512-7ll1PAFNjrBNX9rzy3P2qAQrpQwHaDO3uKj735qsnGw34OtAS8Xr8WYrjI14f9fMPa/XIeWvMPb4GMic28V/ag==
 
-"@sentry/utils@4.4.1":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-4.4.1.tgz#cf80fe596d43dc04f51cb780e0cf70017a8c1eb1"
-  integrity sha512-164oCsQQFbedDd/dgXYiaefmuKZvtzb1vpkjqPUe3LjCmnyziCIhEfC5NiCP1Uk/ViA8PHOK66Kj0TuUjh814A==
+"@sentry/utils@4.6.5":
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-4.6.5.tgz#4c960524914311eb76bbd6ca7f80f4d98c04db7f"
+  integrity sha512-rTISJtRRbWsd3UE+TkA3QG1C0VzPKPW8w74tieBwYhtTCGmOHNwz2nDC/MZGbGj4OgDmNKKl4CCyQr88EX08hA==
   dependencies:
-    "@sentry/types" "4.4.1"
+    "@sentry/types" "4.5.3"
     tslib "^1.9.3"
 
 "@types/archiver@2.1.2":
