@@ -5,7 +5,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const env = process.env;
 const { GithubClient } = require('../../scripts/github-client');
-const CONFIG = require('test/screentest/config.json');
+const CONFIG = require('./config.json');
 
 // list branches for making screenshots from
 const branches = [
