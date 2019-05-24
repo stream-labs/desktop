@@ -26,7 +26,7 @@ function exec(cmd) {
   }
 }
 
-const commitSHA = exec('git rev-parse HEAD');
+const commitSHA = execSync('git rev-parse HEAD').toString();
 
 (async function main() {
 
@@ -68,7 +68,7 @@ function checkoutBranch(branchName) {
 
 async function updateCheck() {
 
-  if (env.STREAMLABS_BOT_ID) {
+  if (!env.STREAMLABS_BOT_ID) {
     console.info('STREAMLABS_BOT_ID is not set. Skipping GitCheck status update');
     return;
   }
@@ -93,11 +93,13 @@ async function updateCheck() {
       head_sha: commitSHA,
       status: 'in_progress',
       output: {
-        title: 'This is a title ' + new Date()
+        title: 'This is a title ' + new Date(),
+        summary: 'This is a summary text'
       }
     });
   } catch (e) {
     console.error('Unable to update GithubCheck status');
+    console.error(e);
   }
 
 }
