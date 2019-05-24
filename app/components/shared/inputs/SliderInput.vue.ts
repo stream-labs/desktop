@@ -1,15 +1,14 @@
-import VueSlider from 'vue-slider-component';
 import { debounce } from 'lodash-decorators';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
+import { Slider } from 'streamlabs-beaker';
 import { CustomizationService } from 'services/customization';
-import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 import { Inject } from 'services/core/injector';
 import { ISliderMetadata } from './index';
 import { isString } from 'util';
 
 @Component({
-  components: { VueSlider },
+  components: { Slider },
 })
 export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Inject() customizationService: CustomizationService;
@@ -17,30 +16,24 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Prop() readonly value: number;
   @Watch('value')
   private syncLocalValue(newVal: number) {
-    this.localValue = newVal;
+    this.localValue = this.usePercentages ? newVal * 100 : newVal;
   }
 
   @Prop() readonly title: string;
   @Prop() readonly metadata: ISliderMetadata;
 
-  usePercentages: boolean;
-  interval: number;
+  usePercentages: boolean = this.options.usePercentages || false;
+  interval: number = this.options.usePercentages
+    ? this.options.interval * 100 || 1
+    : this.options.interval || 1;
   isFullyMounted = false;
 
   // The displaying value on and within the ui components.
-  localValue: number | string = this.value || 0;
+  localValue: number | string = this.options.usePercentages
+    ? this.value * 100 || this.min
+    : this.value || this.min || 0;
 
   $refs: { slider: any };
-
-  mounted() {
-    // setup defaults
-    this.interval = this.options.interval || 1;
-    this.usePercentages = this.options.usePercentages || false;
-
-    // Hack to prevent transitions from messing up slider width
-    setTimeout(() => this.onResizeHandler(), 500);
-    new ResizeSensor(this.$el, () => this.onResizeHandler());
-  }
 
   /**
    * Updates the local value that is used during the display processs.
@@ -58,6 +51,14 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
+  }
+
+  get min() {
+    return this.usePercentages ? this.options.min * 100 : this.options.min;
+  }
+
+  get max() {
+    return this.usePercentages ? this.options.max * 100 : this.options.max;
   }
 
   @debounce(100)
@@ -87,17 +88,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
 
   // Javascript precision is weird
   roundNumber(num: number) {
-    return parseFloat(num.toFixed(6));
-  }
-
-  formatter(value: number) {
-    let formattedValue = String(value);
-    if (this.usePercentages) formattedValue = `${Math.round(value * 100)}%`;
-    return formattedValue;
-  }
-
-  @debounce(500)
-  private onResizeHandler() {
-    if (this.$refs.slider) this.$refs.slider.refresh();
+    const val = this.usePercentages ? num / 100 : num;
+    return parseFloat(val.toFixed(6));
   }
 }

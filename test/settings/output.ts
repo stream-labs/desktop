@@ -33,16 +33,8 @@ test('Populates simple output mode settings', async t => {
 
   // Test that we can switch encoders and all options are present
   for (const encoder of [
-    'Hardware (NVENC)',
-    'Hardware (NVENC) (new)',
-    'Hardware (QSV)',
-    'Software (x264)',
+    'Software (x264)', // CI doesn't have hardware support
   ]) {
-    // CI doesn't have hardware support
-    if (process.env.CI && encoder.startsWith('Hardware')) {
-      continue;
-    }
-
     await t.notThrowsAsync(
       setFormDropdown(t, 'Encoder', encoder),
       `${encoder} was not found as an option`,

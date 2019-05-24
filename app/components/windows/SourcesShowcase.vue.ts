@@ -16,6 +16,7 @@ import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets'
 import { PlatformAppsService, IAppSource } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { PrefabsService } from '../../services/prefabs';
+import { CustomizationService } from 'services/customization';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -48,6 +49,7 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() prefabsService: PrefabsService;
+  @Inject() customizationService: CustomizationService;
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
@@ -73,7 +75,8 @@ export default class SourcesShowcase extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  getSrc(type: string, theme: string) {
+  getSrc(type: string) {
+    const theme = this.demoMode;
     const dataSource = this.widgetData(type) ? this.widgetData : this.sourceData;
     return require(`../../../media/source-demos/${theme}/${dataSource(type).demoFilename}`);
   }
@@ -140,6 +143,10 @@ export default class SourcesShowcase extends Vue {
     } else {
       this.selectWidget(this.inspectedSourceType as WidgetType);
     }
+  }
+
+  get demoMode() {
+    return this.customizationService.isDarkTheme ? 'night' : 'day';
   }
 
   get availableSources(): ISourceDefinition[] {

@@ -36,7 +36,7 @@ interface ITransition {
   duration: number;
 }
 
-interface ITransitionConnection {
+export interface ITransitionConnection {
   id: string;
   fromSceneId: string;
   toSceneId: string;
@@ -63,6 +63,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   studioModeChanged = new Subject<boolean>();
+
+  transitionPropertiesChanged = new Subject<string>();
 
   /**
    * This transition is used to render the left (EDIT) display
@@ -292,7 +294,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   setPropertiesFormData(id: string, formData: TObsFormData) {
-    return this.propertiesManagers[id].setPropertiesFormData(formData);
+    this.propertiesManagers[id].setPropertiesFormData(formData);
+    this.transitionPropertiesChanged.next(id);
   }
 
   createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions = {}) {
@@ -325,6 +328,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.propertiesManagers[id] = new DefaultManager(this.obsTransitions[id], {});
 
     this.UPDATE_TRANSITION(id, { type: newType });
+    this.transitionPropertiesChanged.next(id);
   }
 
   renameTransition(id: string, newName: string) {
@@ -368,8 +372,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     return this.state.transitions.find(tran => tran.id === id);
   }
 
-  addConnection(fromId: string, toId: string, transitionId: string) {
-    const id = uuid();
+  addConnection(fromId: string, toId: string, transitionId: string, connectionId?: string) {
+    const id = connectionId || uuid();
     this.ADD_CONNECTION({
       id,
       transitionId,

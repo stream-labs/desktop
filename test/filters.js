@@ -242,3 +242,16 @@ test('Adding and removing a Chroma Key filter', async t => {
   t.false(await app.client.isExisting('label=Brightness'));
   t.false(await app.client.isExisting('label=Gamma'));
 });
+
+
+test('Adding and removing a Invert Polarity filter', async t => {
+  const sourceName = 'Color Source';
+  const filterName = 'Invert Polarity';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+
+  // this filter does't have settings. Just check we have no errors
+  await openFiltersWindow(t, sourceName);
+  t.pass();
+});

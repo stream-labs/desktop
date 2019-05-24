@@ -14,6 +14,7 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
@@ -87,6 +88,14 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
+let startApp: (t: TExecutionContext) => Promise<any>;
+let stopApp: (clearCache?: boolean) => Promise<any>;
+
+export async function restartApp(t: TExecutionContext): Promise<Application> {
+  await stopApp(false);
+  return await startApp(t);
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -100,7 +109,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  async function startApp(t: TExecutionContext) {
+  startApp = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -150,18 +159,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-
     await waitForLoader(t);
-    if (options.skipOnboarding) {
-      await t.context.app.client.click('a=Setup later');
+    if (await t.context.app.client.isExisting('a=Setup later')) {
+      if (options.skipOnboarding) {
+        await t.context.app.client.click('a=Setup later');
 
-      // This will only show up if OBS is installed
-      if (await t.context.app.client.isExisting('button=Start Fresh')) {
-        await t.context.app.client.click('button=Start Fresh');
+        // This will only show up if OBS is installed
+        if (await t.context.app.client.isExisting('button=Start Fresh')) {
+          await t.context.app.client.click('button=Start Fresh');
+        }
+      } else {
+        // Wait for the connect screen before moving on
+        await t.context.app.client.isExisting('button=Twitch');
       }
-    } else {
-      // Wait for the connect screen before moving on
-      await t.context.app.client.isExisting('button=Twitch');
     }
 
     // disable the popups that prevents context menu to be shown
@@ -180,9 +190,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.afterStartCb) {
       await options.afterStartCb(t);
     }
-  }
 
-  async function stopApp() {
+    return app;
+  };
+
+  stopApp = async function stopApp(clearCache = true) {
     try {
       await app.stop();
     } catch (e) {
@@ -192,10 +204,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
+
+    if (!clearCache) return;
     await new Promise(resolve => {
       rimraf(context.cacheDir, resolve);
     });
-  }
+  };
 
   /**
    * test should be considered as failed if it writes exceptions in to the log file
@@ -220,8 +234,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   test.beforeEach(async t => {
+    // consider this test as failed until it's not successfully finished
+    // so we can catch failures for tests with timeouts
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
+    failedTests.push(testName);
+    saveFailedTestsToFile(failedTests);
+
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
@@ -248,37 +267,49 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await stopApp();
       }
     } catch (e) {
-      testPassed = false;
+      fail('Test finalization failed');
     }
 
-    if (!testPassed) {
-      failedTests.push(testName);
+    if (testPassed) {
+      // consider this test succeed and remove from the `failedTests` list
+      removeFailedTestFromFile(failedTests.pop());
+    } else {
+      fail();
       const user = getUser();
       if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
-  });
-
-  test.after.always(async t => {
-    if (appIsRunning) {
-      await stopApp();
-      if (!testPassed) failedTests.push(testName);
-    }
-
     if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 
-  function fail(msg: string) {
+  test.after.always(async t => {
+    if (appIsRunning) await stopApp();
+    if (failedTests.length) saveFailedTestsToFile(failedTests);
+  });
+
+  /**
+   * mark tests as failed and add it to the failedTests list
+   */
+  function fail(msg?: string) {
     testPassed = false;
-    failMsg = msg;
+    if (msg) failMsg = msg;
+    const lastFailedTest = failedTests.slice(-1)[0];
+    if (testName !== lastFailedTest) failedTests.push(testName);
   }
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
-  const filePath = 'test-dist/failed-tests.json';
-  if (fs.existsSync(filePath)) {
+  if (fs.existsSync(FAILED_TESTS_PATH)) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
+    failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
   }
-  fs.writeFileSync(filePath, JSON.stringify(failedTests));
+  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+}
+
+function removeFailedTestFromFile(testName: string) {
+  if (fs.existsSync(FAILED_TESTS_PATH)) {
+    const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
+    failedTests.splice(failedTests.indexOf(testName), 1);
+    fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
 }

@@ -3,10 +3,12 @@ import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 export class GroupMenu extends Menu {
   @Inject() private scenesService: ScenesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   constructor() {
     super();
@@ -24,6 +26,7 @@ export class GroupMenu extends Menu {
       label: $t('Group into Folder'),
       click: () => {
         this.scenesService.showNameFolder({
+          sceneId: this.scenesService.activeSceneId,
           itemsToGroup: this.selectionService.getIds(),
           parentId: nodesFolders[0],
         });
@@ -34,7 +37,11 @@ export class GroupMenu extends Menu {
     this.append({
       label: $t('Ungroup Folder'),
       click: () => {
-        this.selectionService.getFolders()[0].ungroup();
+        this.editorCommandsService.executeCommand(
+          'RemoveFolderCommand',
+          this.scenesService.activeSceneId,
+          this.selectionService.getFolders()[0].id,
+        );
       },
       enabled: this.selectionService.isSceneFolder(),
     });
@@ -52,13 +59,11 @@ export class GroupMenu extends Menu {
     this.append({
       label: $t('Ungroup Scene'),
       click: () => {
-        const scene = this.scenesService.getScene(selectedItem.getSource().sourceId);
-        scene
-          .getSelection()
-          .selectAll()
-          .copyTo(this.scenesService.activeSceneId);
-        selectedItem.remove();
-        scene.remove();
+        this.editorCommandsService.executeCommand(
+          'UngroupSceneCommand',
+          selectedItem.id,
+          this.scenesService.activeSceneId,
+        );
       },
       enabled: (() => {
         return !!(selectionSize === 1 && selectedItem && selectedItem.getSource().type === 'scene');

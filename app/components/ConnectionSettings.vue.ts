@@ -5,6 +5,7 @@ import { TransitionsService } from 'services/transitions';
 import { ScenesService } from 'services/scenes';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: { VFormGroup },
@@ -12,6 +13,7 @@ import { $t } from 'services/i18n';
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() scenesService: ScenesService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   @Prop() connectionId: string;
 
@@ -20,7 +22,9 @@ export default class SceneTransitions extends Vue {
   }
 
   set fromSceneModel(value: string) {
-    this.transitionsService.updateConnection(this.connectionId, { fromSceneId: value });
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+      fromSceneId: value,
+    });
   }
 
   get toSceneModel(): string {
@@ -28,7 +32,9 @@ export default class SceneTransitions extends Vue {
   }
 
   set toSceneModel(value: string) {
-    this.transitionsService.updateConnection(this.connectionId, { toSceneId: value });
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+      toSceneId: value,
+    });
   }
 
   get transitionModel(): string {
@@ -36,11 +42,13 @@ export default class SceneTransitions extends Vue {
   }
 
   set transitionModel(value: string) {
-    this.transitionsService.updateConnection(this.connectionId, { transitionId: value });
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+      transitionId: value,
+    });
   }
 
   get connection() {
-    return this.transitionsService.getConnection(this.connectionId);
+    return this.transitionsService.state.connections.find(conn => conn.id === this.connectionId);
   }
 
   get sceneOptions() {

@@ -56,6 +56,11 @@
               {{ $t('Run Auto Optimizer') }}
             </button>
           </div>
+          <div class="input-container">
+            <button class="button button--action" @click="importFromObs">
+              {{ $t('Import from OBS') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

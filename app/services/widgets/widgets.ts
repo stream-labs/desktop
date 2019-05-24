@@ -20,6 +20,7 @@ import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
+import { EditorCommandsService } from 'services/editor-commands';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -37,6 +38,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   @Inject() sourcesService: SourcesService;
   @Inject() hostsService: HostsService;
   @Inject() videoService: VideoService;
+  @Inject() editorCommandsService: EditorCommandsService;
 
   protected init() {
     // sync widgetSources with sources
@@ -78,7 +80,18 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         return this.sourcesService.getSourcesByName(name).length;
       });
 
-    const source = this.sourcesService.createSource(
+    // Calculate initial position
+    const rect = new ScalableRectangle({ x: 0, y: 0, width: widget.width, height: widget.height });
+
+    rect.withAnchor(widget.anchor, () => {
+      rect.x = widget.x * this.videoService.baseWidth;
+      rect.y = widget.y * this.videoService.baseHeight;
+    });
+
+    // TODO: Handle return value type properly
+    const item = this.editorCommandsService.executeCommand(
+      'CreateNewItemCommand',
+      this.scenesService.activeSceneId,
       suggestedName,
       'browser_source',
       {
@@ -91,36 +104,22 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         height: widget.height,
       },
       {
-        propertiesManager: 'widget',
-        propertiesManagerSettings: {
-          widgetType: type,
+        sourceAddOptions: {
+          propertiesManager: 'widget',
+          propertiesManagerSettings: {
+            widgetType: type,
+          },
+        },
+        initialTransform: {
+          position: {
+            x: rect.x,
+            y: rect.y,
+          },
         },
       },
-    );
+    ) as SceneItem;
 
-    const sceneItem = scene.addSource(source.sourceId);
-
-    // Give a couple seconds for the resize to propagate
-    setTimeout(() => {
-      const source = scene.getItem(sceneItem.sceneItemId);
-
-      // Set the default transform
-      const rect = new ScalableRectangle(source.getRectangle());
-
-      rect.withAnchor(widget.anchor, () => {
-        rect.x = widget.x * this.videoService.baseWidth;
-        rect.y = widget.y * this.videoService.baseHeight;
-      });
-
-      source.setTransform({
-        position: {
-          x: rect.x,
-          y: rect.y,
-        },
-      });
-    }, 1500);
-
-    return sceneItem;
+    return item;
   }
 
   getWidgetSource(sourceId: string): WidgetSource {

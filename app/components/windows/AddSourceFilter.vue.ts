@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/core/injector';
-import { WindowsService } from '../../services/windows';
-import { SourceFiltersService } from '../../services/source-filters';
+import { Inject } from 'services/core/injector';
+import { WindowsService } from 'services/windows';
+import { SourceFiltersService } from 'services/source-filters';
+import { EditorCommandsService } from 'services/editor-commands';
 
 import ModalLayout from '../ModalLayout.vue';
 import { $t } from 'services/i18n';
@@ -12,8 +13,8 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
   components: { ModalLayout, VFormGroup },
 })
 export default class AddSourceFilter extends Vue {
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   @Inject('SourceFiltersService')
   filtersService: SourceFiltersService;
@@ -32,7 +33,12 @@ export default class AddSourceFilter extends Vue {
     this.error = this.validateName(name);
     if (this.error) return;
 
-    this.filtersService.add(this.sourceId, this.form.type, name);
+    this.editorCommandsService.executeCommand(
+      'AddFilterCommand',
+      this.sourceId,
+      this.form.type,
+      name,
+    );
 
     this.filtersService.showSourceFilters(this.sourceId, name);
   }

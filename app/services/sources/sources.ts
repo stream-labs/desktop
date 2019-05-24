@@ -279,7 +279,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (source.type === 'scene') return;
 
-    if (this.scenesService.getSourceScenes(source.sourceId).length > 0) return;
+    if (this.scenesService.getSourceItemCount(source.sourceId) > 0) return;
     this.removeSource(source.sourceId);
   }
 

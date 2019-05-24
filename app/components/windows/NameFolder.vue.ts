@@ -5,6 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import { ScenesService } from '../../services/scenes';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: { ModalLayout },
@@ -12,11 +13,13 @@ import { $t } from 'services/i18n';
 export default class NameFolder extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {
     renameId?: string;
     itemsToGroup?: string[];
     parentId?: string;
+    sceneId?: string;
   } = this.windowsService.getChildWindowQueryParams();
 
   name = '';
@@ -24,7 +27,9 @@ export default class NameFolder extends Vue {
 
   mounted() {
     if (this.options.renameId) {
-      this.name = this.scenesService.activeScene.getFolder(this.options.renameId).name;
+      this.name = this.scenesService
+        .getScene(this.options.sceneId)
+        .getFolder(this.options.renameId).name;
     } else {
       this.name = this.scenesService.suggestName('New Folder');
     }
@@ -34,22 +39,24 @@ export default class NameFolder extends Vue {
     if (!this.name) {
       this.error = $t('The source name is required');
     } else if (this.options.renameId) {
-      const folder = this.scenesService.activeScene.getFolder(this.options.renameId);
-      folder.setName(this.name);
+      this.editorCommandsService.executeCommand(
+        'RenameFolderCommand',
+        this.options.sceneId,
+        this.options.renameId,
+        this.name,
+      );
       this.windowsService.closeChildWindow();
     } else {
-      const scene = this.scenesService.activeScene;
-      const newFolder = this.scenesService.activeScene.createFolder(this.name);
+      const scene = this.scenesService.getScene(this.options.sceneId);
 
-      if (this.options.itemsToGroup) {
-        this.scenesService.activeScene
-          .getSelection(this.options.itemsToGroup)
-          .moveTo(scene.id, newFolder.id);
-        if (this.options.parentId) {
-          newFolder.setParent(this.options.parentId);
-        }
-      }
-      newFolder.select();
+      this.editorCommandsService.executeCommand(
+        'CreateFolderCommand',
+        this.options.sceneId,
+        this.name,
+        this.options.itemsToGroup && this.options.itemsToGroup.length > 0
+          ? scene.getSelection(this.options.itemsToGroup)
+          : void 0,
+      );
 
       this.windowsService.closeChildWindow();
     }

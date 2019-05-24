@@ -15,6 +15,7 @@ import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import electron from 'electron';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -26,6 +27,7 @@ export default class SceneSelector extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() projectorService: ProjectorService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   searchQuery = '';
 
@@ -84,9 +86,15 @@ export default class SceneSelector extends Vue {
       },
       ok => {
         if (!ok) return;
-        if (!this.scenesService.removeScene(this.activeSceneId)) {
+        if (!this.scenesService.canRemoveScene()) {
           alert($t('There needs to be at least one scene.'));
+          return;
         }
+
+        this.editorCommandsService.executeCommand(
+          'RemoveSceneCommand',
+          this.scenesService.activeSceneId,
+        );
       },
     );
   }

@@ -2,27 +2,36 @@ trigger:
 - staging
 
 pool:
-  vmImage: 'windows-2019'
+  name: 'Default'
+
+workspace:
+  clean: resources
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
 
-- bash: yarn install --frozen-lockfile --check-files
+- powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+  displayName: 'Get RDP address'
+
+- powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+  displayName: 'Setup Screen Resolution'
+
+- script: yarn install --frozen-lockfile --check-files
   displayName: 'Install Dependencies'
 
-- bash: 'yarn lint'
+- script: 'yarn lint'
   displayName: 'TSLint'
 
-- bash: 'yarn compile:ci'
+- script: 'yarn compile:ci'
   displayName: 'Compile Assets'
 
-- bash: 'yarn test-flaky'
+- script: 'yarn test-flaky'
   displayName: 'Run Tests'
   env:
     SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
     CI: true
     BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
     SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+
+- script: "shutdown /r /t 10 /c \"Reboot after CI Job finished\" /f /d p:4:1"
+  displayName: "Schedule Reboot"
+  condition: always()

@@ -11,6 +11,7 @@ import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
+import electron from 'electron';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -49,6 +50,8 @@ export default class Live extends Vue {
         this.navigationService.navigate('Dashboard', {
           subPage: match[1],
         });
+      } else {
+        electron.remote.shell.openExternal(e.url);
       }
     });
   }
@@ -98,6 +101,11 @@ export default class Live extends Vue {
 
   get minHeight() {
     return 50;
+  }
+
+  get sleepingKevin() {
+    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
   }
 
   onResizeStartHandler() {

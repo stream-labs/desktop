@@ -14,6 +14,7 @@ import { $t } from 'services/i18n';
 import { AppService } from 'services/app';
 import fs from 'fs';
 import path from 'path';
+import { ObsImporterService } from 'services/obs-importer';
 
 @Component({
   components: { BoolInput },
@@ -27,6 +28,7 @@ export default class ExtraSettings extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() appService: AppService;
+  @Inject() obsImporterService: ObsImporterService;
 
   cacheUploading = false;
 
@@ -85,6 +87,10 @@ export default class ExtraSettings extends Vue {
   runAutoOptimizer() {
     this.onboardingService.start({ isOptimize: true });
     this.windowsService.closeChildWindow();
+  }
+
+  importFromObs() {
+    this.obsImporterService.import();
   }
 
   get isLoggedIn() {

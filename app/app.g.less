@@ -365,7 +365,7 @@ select {
 }
 
 .v--modal-overlay {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--modal-overlay);
 }
 
 .v--modal {
@@ -393,33 +393,4 @@ select {
 
 .toast-action {
   color: var(--white) !important;
-}
-
-// Night theme rules
-.night-theme {
-  .v--modal-overlay {
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  ::placeholder {
-    opacity: 0.4;
-  }
-
-  .checkbox {
-    label {
-      &::before {
-        background: transparent;
-        border-color: var(--teal-semi);
-      }
-    }
-  }
-
-  .slide-open__close {
-    &:hover {
-      .fa,
-      i {
-        color: var(--white);
-      }
-    }
-  }
 }

@@ -106,7 +106,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       title: $t('Settings'),
       queryParams: { categoryName },
       size: {
-        width: 800,
+        width: 830,
         height: 800,
       },
     });

@@ -3,6 +3,8 @@ import { NotificationsService, ENotificationType } from 'services/notifications'
 import { Inject } from 'services/core/injector';
 import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import electron from 'electron';
+import { UserService } from 'services/user';
+import { TPlatform } from 'services/platforms';
 
 interface IOutageNotification {
   /**
@@ -25,6 +27,9 @@ interface IOutageNotification {
    * This message should be ignored if disabled is true
    */
   disabled: boolean;
+
+  // An array of streaming platforms that this notification is relevent to
+  platforms: TPlatform[];
 }
 
 // Configuration
@@ -35,6 +40,7 @@ const POLLING_INTERVAL = 5 * 60 * 1000;
 export class OutageNotificationsService extends Service {
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
+  @Inject() userService: UserService;
 
   currentMessageId: string = null;
   currentNotificationId: number = null;
@@ -76,7 +82,11 @@ export class OutageNotificationsService extends Service {
     const msg = await this.fetchMessageJson();
 
     // There are no urgent messages to display to the user
-    if (!msg || msg.disabled) {
+    if (
+      !msg ||
+      msg.disabled ||
+      (msg.platforms && !msg.platforms.includes(this.userService.platform.type))
+    ) {
       this.clearNotification();
       return;
     }
