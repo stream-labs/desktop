@@ -140,5 +140,11 @@ module.exports = {
     minimize: false
   },
 
-  plugins
+  plugins,
+
+  stats: {
+    warningsFilter: [
+      "Can't resolve 'osx-temperature-sensor'",
+    ]
+  }
 };
