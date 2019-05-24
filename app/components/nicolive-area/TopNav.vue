@@ -8,7 +8,7 @@
         <a @click="editProgram" :disabled="isEditing" class="link"><i class="icon-edit"></i>番組編集</a>
       </div>
       <div class="top-nav-item">
-        <a @click="copyProgramURL" :disabled="isFetching" class="link"><i class="icon-clipboard-copy"></i>番組URLをコピー</a>
+        <a @click="copyProgramURL" class="link"><i class="icon-clipboard-copy"></i>番組URLをコピー</a>
       </div>
     </div>  
   </div>
