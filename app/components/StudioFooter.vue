@@ -52,13 +52,14 @@
 @import '../styles/index';
 
 .footer {
+  .padding-h-sides(2);
+  .padding-v-sides();
+
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
   position: relative;
-  .padding-h-sides(2);
-  .padding-v-sides();
   background-color: var(--section);
   max-width: none;
   flex: 0 0 auto;
@@ -106,6 +107,9 @@
 }
 
 .record-button {
+  .transition();
+  .weight(@bold);
+
   position: relative;
   width: 30px;
   height: 30px;
@@ -114,8 +118,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  .transition();
-  .weight(@bold);
   box-sizing: content-box;
   letter-spacing: 0.2px;
 
@@ -146,9 +148,11 @@
   0% {
     box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
   }
+
   70% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0.6);
   }
+
   100% {
     box-shadow: 0 0 2px 4px rgba(252, 62, 63, 0);
   }
@@ -162,16 +166,16 @@
   font-size: 0;
   white-space: nowrap;
 
-  >button {
+  > button {
     font-size: 12px;
   }
 
-  >button:nth-child(1) {
+  > button:nth-child(1) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  >button:nth-child(2) {
+  > button:nth-child(2) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }

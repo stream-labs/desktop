@@ -27,13 +27,14 @@
 }
 
 .widget-layout-picker__option {
+  .transition();
+  .radius();
+
   width: 56px;
   height: 56px;
   border: 1px solid var(--solid-input);
   background-color: var(--solid-input);
-  .transition();
   position: relative;
-  .radius();
   cursor: pointer;
 
   img {

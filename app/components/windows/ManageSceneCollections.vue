@@ -30,9 +30,10 @@
 @import "../../styles/index";
 
 .manage-scene-collections__header {
+  .flex();
+  .flex--space-between();
+
   margin-bottom: 20px;
-  .flex;
-  .flex--space-between;
   align-items: center;
 }
 
