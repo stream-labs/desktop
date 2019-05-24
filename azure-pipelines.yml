@@ -65,6 +65,8 @@ jobs:
         CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+        STREAMLABS_BOT_ID: $(streamlabsBotId)
+        STREAMLABS_BOT_KEY: $(streamlabsBotKey)
 
     - task: PublishPipelineArtifact@0
       inputs:

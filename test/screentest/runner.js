@@ -13,6 +13,9 @@ const redirectIo = { stdio: [0, 1, 2] }
 
 const returnCode = (function main() {
 
+  log('update check');
+  execSync('node ./update-github-check.js', redirectIo);
+
   log('use branches', branches);
 
   const dir = CONFIG.dist;

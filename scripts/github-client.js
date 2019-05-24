@@ -2,11 +2,11 @@ const { App } = require("@octokit/app");
 const { request } = require("@octokit/request");
 
 /**
- * Simplifies communication with gihub API
+ * A wrapper for the Github API
  */
 export class GithubClient {
 
-  constructor (appId, owner, repo, privateKey) {
+  constructor (appId, privateKey, owner, repo) {
     this.appId = appId;
     this.owner = owner;
     this.repo = repo;
