@@ -121,12 +121,14 @@ function checkoutBranch(branchName, skipModulesInstallation = false) {
 
 async function updateCheck() {
 
-  console.log((
+  console.log('run update');
+
+  console.log(
     env.STREAMLABS_BOT_ID,
       env.STREAMLABS_BOT_KEY,
       'stream-labs',
       env.BUILD_REPOSITORY_NAME
-  ))
+  );
 
   const github = new GithubClient(
     env.STREAMLABS_BOT_ID,
