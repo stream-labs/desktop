@@ -127,7 +127,7 @@
     "@types/archiver": "2.1.2",
     "@types/classnames": "^2.2.7",
     "@types/humps": "1.1.2",
-    "@types/lodash": "4.14.115",
+    "@types/lodash": "4.14.132",
     "@types/mime": "2.0.0",
     "@types/mkdirp": "0.5.2",
     "@types/node": "8.10.23",
