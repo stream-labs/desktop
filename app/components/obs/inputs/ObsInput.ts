@@ -452,11 +452,12 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   updatedFormData.forEach(prop => {
     if (prop.type !== 'OBS_PROPERTY_LIST') return;
     const listProp = prop as IObsListInput<TObsValue>;
+    if (!listProp.options.length) return;
     const optionExists = !!listProp.options.find(option => option.value === listProp.value);
     if (optionExists) return;
 
     needUpdatePropsAgain = true;
-    listProp.value = listProp.options[0] && listProp.options[0].value;
+    listProp.value = listProp.options[0].value;
   });
   if (needUpdatePropsAgain) setPropertiesFormData(obsSource, updatedFormData);
 }
