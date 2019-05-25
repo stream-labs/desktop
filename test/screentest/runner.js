@@ -105,6 +105,7 @@ async function updateCheck() {
       head_sha: commitSHA,
       conclusion,
       details_url: 'http://details.url',
+      completed_at: new Date().toISOString(),
       output: {
         title: title,
         summary: ''
