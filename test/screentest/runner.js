@@ -30,9 +30,6 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
 
 (async function main() {
 
-  // send the status to the GitHub check
-  await updateCheck();
-
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
@@ -40,7 +37,7 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
   // make screenshots for each branch
   for (const branchName of branches) {
     checkoutBranch(branchName);
-    exec('yarn ava test-dist/test/screentest/tests --match="Settings*"');
+    exec('yarn test test-dist/test/screentest/tests --match="Settings*"');
   }
 
   // compare screenshots
@@ -73,13 +70,28 @@ async function updateCheck() {
     return;
   }
 
-  console.log(
-    env.STREAMLABS_BOT_ID,
-      env.STREAMLABS_BOT_KEY,
-      'stream-labs',
-      env.BUILD_REPOSITORY_NAME
-  );
+  let testResults = null;
+  try {
+    testResults = require('../../test-dist/state.json');
+  } catch (e) {
+    console.error('No results found for screentest');
+  }
 
+  let conclusion = '';
+  let title = '';
+  if (!testResults) {
+    conclusion = 'failure';
+    title = 'Tests failed';
+  } else if (testResults.changedScreens) {
+    conclusion = 'action_required';
+    title = `Changes are detected in ${testResults.changedScreens} screenshots`;
+  } else {
+    conclusion = 'success';
+    title = `Checked ${testResults.totalScreens} screenshots, ${testResults.newScreens} new screenshots found`
+  }
+
+
+  console.info('Updating the GithubCheck check');
   const github = new GithubClient(
     env.STREAMLABS_BOT_ID,
     env.STREAMLABS_BOT_KEY,
@@ -91,10 +103,11 @@ async function updateCheck() {
     await github.login();
     await github.postCheck({
       head_sha: commitSHA,
-      status: 'in_progress',
+      conclusion,
+      details_url: 'http://details.url',
       output: {
-        title: 'This is a title ' + new Date(),
-        summary: 'This is a summary text'
+        title: title,
+        summary: ''
       }
     });
   } catch (e) {
