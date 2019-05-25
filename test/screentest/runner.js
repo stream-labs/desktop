@@ -72,7 +72,7 @@ async function updateCheck() {
 
   let testResults = null;
   try {
-    testResults = require('../../test-dist/state.json');
+    testResults = require('../../test-dist/screentest/state.json');
   } catch (e) {
     console.error('No results found for screentest');
   }
