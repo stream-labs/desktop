@@ -34,7 +34,10 @@ export type TSourceFilterType =
   | 'noise_gate_filter'
   | 'compressor_filter'
   | 'vst_filter'
-  | 'face_mask_filter';
+  | 'face_mask_filter'
+  | 'invert_polarity_filter'
+  | 'limiter_filter'
+  | 'expander_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -88,6 +91,9 @@ export class SourceFiltersService extends Service {
       { description: $t('Compressor'), value: 'compressor_filter' },
       { description: $t('VST 2.x Plugin'), value: 'vst_filter' },
       { description: $t('Face Mask Plugin'), value: 'face_mask_filter' },
+      { description: $t('Invert Polarity'), value: 'invert_polarity_filter' },
+      { description: $t('Limiter'), value: 'limiter_filter' },
+      { description: $t('Expander'), value: 'expander_filter' },
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -211,6 +217,7 @@ export class SourceFiltersService extends Service {
   getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
     const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    if (!formData) return [];
 
     // Show SLOBS frontend display names for the sidechain source options
     formData.forEach(input => {

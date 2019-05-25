@@ -1,5 +1,5 @@
-import test from 'ava';
 import { EVideoCodes } from 'obs-studio-node';
+import { test } from '../../helpers/spectron';
 import { apiInitErrorResultToMessage as rtm } from '../../../app/services/app';
 
 test('returns user-friendly error for ModuleNotFound status', t => {

@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron, focusMain, focusChild } from '../helpers/spectron/index';
+import { useSpectron, focusMain, focusChild, test } from '../helpers/spectron/index';
 import { addSource, clickRemoveSource, clickSourceProperties, selectSource } from '../helpers/spectron/sources';
 import { addFilter, openFilterProperties, closeFilterProperties, removeFilter } from '../helpers/spectron/filters';
 import { setFormInput, setFormDropdown, clickFormInput, setSliderPercent } from '../helpers/spectron/forms';
@@ -128,7 +127,7 @@ async function addMediaSource(t, sourceName) {
 
   // what media
   var mediaFile = 'vidyo4_720p_60fps.webm';
-  
+
   // set the source to an archive video
   await focusChild(t);
   var f = getFacemaskDataDir() + mediaFile;
@@ -237,13 +236,13 @@ async function updatePerformanceStats(t) {
 // TEST : testEachMask : Tests each mask and verifies results
 //
 async function testEachMask(t, sourceName, filterName, maskName) {
-	
+
   // set draw mode
   await setMaskJson(t, sourceName, filterName, maskName);
 
   //wait for apply
   await sleep(3000);
-  
+
   // check color at detected pixel
   const startTime = Date.now();
   while((Date.now() - startTime) < 5000) {
@@ -254,7 +253,7 @@ async function testEachMask(t, sourceName, filterName, maskName) {
 		t.fail();
 		break;
 	}
-		
+
 	if (receivedTestData.poseX < -15 || (receivedTestData.poseX > 5)
 		|| (receivedTestData.poseY < -5) || (receivedTestData.poseY > 5)
 		|| (receivedTestData.poseZ < 35) || (receivedTestData.poseZ > 550)) {
@@ -262,7 +261,7 @@ async function testEachMask(t, sourceName, filterName, maskName) {
 		t.fail();
 		break;
 	}
-	
+
 	//Check if applied mask is correct
 	if(receivedTestData.mask.localeCompare(maskName) != 0){
 		console.log("Invalid Mask, Expected: ", maskName, " Actual:", receivedTestData.mask);
@@ -440,13 +439,13 @@ test('Tracking', async t => {
   for (var i = 0; i < arrayLength; i++) {
 	if(!testTrackingAreas[i][2]) {
 		console.log("Missing area of tracking, X Y :",testTrackingAreas[i][0], testTrackingAreas[i][1]);
-		t.fail();                 
-    }                             
-  }                               
-                                  
-  t.pass();                       
-});                               
-                                
+		t.fail();
+    }
+  }
+
+  t.pass();
+});
+
 // ---------------------------------------------------------------------------
 // TEST : Drawing : Mask Basic
 // ---------------------------------------------------------------------------

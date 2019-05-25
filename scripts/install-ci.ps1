@@ -31,8 +31,11 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
+echo "Install CMake"
+choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+
 echo "Install Visual Studio 2017 Build Tools"
-choco install choco install visualstudio2017buildtools
+choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended"
 
 echo "Donwload and install Azure Agent"
 cd /

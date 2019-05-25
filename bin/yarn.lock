@@ -574,7 +574,7 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-request@^2.88.0:
+request@2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==
@@ -675,7 +675,7 @@ signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
-signtool@^1.0.0:
+signtool@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/signtool/-/signtool-1.0.0.tgz#a807636db3dc1e1a12dc76d5fbf03d1a49ae2453"
   integrity sha1-qAdjbbPcHhoS3HbV+/A9GkmuJFM=

@@ -27,6 +27,7 @@
 
 .media-box {
   .radius();
+
   position: relative;
   width: 100%;
   height: 120px;
@@ -93,6 +94,7 @@ i,
 
 .url-uploader {
   .radius();
+
   background-color: var(--background);
   padding: 12px;
   position: absolute;

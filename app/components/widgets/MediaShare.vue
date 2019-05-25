@@ -32,8 +32,6 @@
 <script lang="ts" src="./MediaShare.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
-
 .banned-media-button {
   display: block;
   margin: 0 auto;

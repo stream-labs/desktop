@@ -49,8 +49,8 @@
 
 /* The typing effect */
 @keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+  from { width: 0; }
+  to { width: 100%; }
 }
 
 // .delay {
@@ -58,7 +58,7 @@
 // }
 
 @keyframes delay {
-  0% { opacity:0; }
-  100% { opacity:0; }
+  0% { opacity: 0; }
+  100% { opacity: 0; }
 }
 </style>
