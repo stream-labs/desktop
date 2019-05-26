@@ -70,6 +70,7 @@ async function updateCheck() {
     return;
   }
 
+  // try to read test results from the file
   let testResults = null;
   try {
     testResults = require('../../test-dist/screentest/state.json');
