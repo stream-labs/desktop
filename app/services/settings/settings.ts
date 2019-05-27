@@ -442,9 +442,9 @@ export class SettingsService extends StatefulService<ISettingsState>
     };
   }
 
-  diffOptimizedSettings(bitrate: number): OptimizedSettings {
+  diffOptimizedSettings(options: {bitrate: number, useHardwareEncoder?: boolean}): OptimizedSettings {
     const accessor = new SettingsKeyAccessor(this);
-    const best = getBestSettingsForNiconico({ bitrate }, accessor);
+    const best = getBestSettingsForNiconico(options, accessor);
     const opt = new Optimizer(accessor, best);
 
     const current = opt.getCurrentSettings();

@@ -244,7 +244,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       });
     }
-    const settings = this.settingsService.diffOptimizedSettings(streamingSetting.bitrate);
+    const settings = this.settingsService.diffOptimizedSettings({
+      bitrate: streamingSetting.bitrate,
+      useHardwareEncoder: this.customizationService.optimizeWithHardwareEncoder,
+    });
     if (settings) {
       if (this.customizationService.showOptimizationDialogForNiconico) {
         this.windowsService.showWindow({

@@ -17,6 +17,7 @@
         </ul>
       </li>
     </ul>
+    <BoolInput :value="useHardwareEncoder" @input="setUseHardwareEncoder" />
     <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
   </div>
   <div slot="controls">
