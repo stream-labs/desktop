@@ -278,6 +278,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       }
     } catch (e) {
       fail('Test finalization failed');
+      console.error(e);
     }
 
     if (testPassed) {
