@@ -134,7 +134,7 @@
     "@types/request": "2.48.1",
     "@types/socket.io-client": "1.4.32",
     "@types/uuid": "3.4.4",
-    "@types/webdriverio": "4.13.0",
+    "@types/webdriverio": "4.13.3",
     "@xkeshi/vue-qrcode": "0.3.0",
     "ava": "1.4.1",
     "awesome-typescript-loader": "5.2.1",
