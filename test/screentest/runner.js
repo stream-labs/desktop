@@ -66,8 +66,8 @@ function checkoutBranch(branchName) {
 
 async function updateCheck() {
 
-  if (!env.STREAMLABS_BOT_ID) {
-    console.info('STREAMLABS_BOT_ID is not set. Skipping GitCheck status update');
+  if (!env.STREAMLABS_BOT_ID || !env.STREAMLABS_BOT_KEY) {
+    console.info('STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update');
     return;
   }
 
