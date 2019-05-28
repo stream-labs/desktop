@@ -26,6 +26,7 @@ function exec(cmd) {
   }
 }
 
+exec('git log');
 const commitSHA = execSync('git log').toString().split(' ')[1];
 
 (async function main() {
