@@ -105,7 +105,7 @@ async function updateCheck() {
 
   try {
     await github.login();
-    await github.postCheck({
+    const resp = await github.postCheck({
       name: 'Screenshots',
       head_sha: commitSHA,
       conclusion,
@@ -116,6 +116,7 @@ async function updateCheck() {
         summary: ''
       }
     });
+    console.log('response', resp);
   } catch (e) {
     console.error('Unable to update GithubCheck status');
     console.error(e);

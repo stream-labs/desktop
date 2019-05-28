@@ -39,7 +39,7 @@ jobs:
       displayName: "Schedule Reboot"
       condition: always()
 
-  - job: Snapshots
+  - job: Screenshots
 
     pool:
       name: 'Default'
@@ -61,10 +61,7 @@ jobs:
     - script: 'yarn screentest --match="Settings*"'
       displayName: 'Snapshot testing'
       env:
-        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
         STREAMLABS_BOT_ID: $(streamlabsBotId)
         STREAMLABS_BOT_KEY: $(streamlabsBotKey)
 
