@@ -30,6 +30,8 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
 
 (async function main() {
 
+  await updateCheck();
+
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
