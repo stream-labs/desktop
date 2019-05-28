@@ -8,12 +8,12 @@
     },
     "similar-code": {
       "config": {
-        "threshold": 75
+        "threshold": 150
       }
     },
     "identical-code": {
       "config": {
-        "threshold": 100
+        "threshold": 175
       }
     },
     "method-complexity": {
