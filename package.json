@@ -131,7 +131,7 @@
     "@types/mime": "2.0.1",
     "@types/mkdirp": "0.5.2",
     "@types/node": "8.10.48",
-    "@types/request": "2.47.1",
+    "@types/request": "2.48.1",
     "@types/socket.io-client": "1.4.32",
     "@types/uuid": "3.4.3",
     "@types/webdriverio": "4.13.0",
