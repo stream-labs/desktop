@@ -39,8 +39,6 @@ const commitSHA = env.CI ? lastCommits[1] : lastCommits[0];
 
 (async function main() {
 
-  await updateCheck();
-
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
@@ -114,18 +112,17 @@ async function updateCheck() {
 
   try {
     await github.login();
-    const resp = await github.postCheck({
+    await github.postCheck({
       name: 'Screenshots',
       head_sha: commitSHA,
       conclusion,
       completed_at: new Date().toISOString(),
-      details_url: env.BUILD_BUILD_URI || 'https://github.com/stream-labs/streamlabs-obs',
+      details_url: env.BUILD_URI || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
         title: title,
         summary: ''
       }
     });
-    console.log('response', resp);
   } catch (e) {
     console.error('Unable to update GithubCheck status');
     console.error(e);
