@@ -96,9 +96,14 @@ async function updateCheck() {
 
 
   console.info('Updating the GithubCheck check');
+
+  // AzurePipelines doesn't support multiline variables.
+  // All new-line characters are replaced with `;`
+  const botKey = env.STREAMLABS_BOT_KEY.replace(';', '\n');
+
   const github = new GithubClient(
     env.STREAMLABS_BOT_ID,
-    env.STREAMLABS_BOT_KEY,
+    botKey,
     'stream-labs',
     env.BUILD_REPOSITORY_NAME
   );
