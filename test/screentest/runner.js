@@ -38,7 +38,7 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
   for (const branchName of branches) {
     checkoutBranch(branchName);
     // TODO: run all tests, not only for settings
-    exec('yarn test test-dist/test/screentest/tests --match="Settings*"');
+    exec('yarn test test-dist/test/screentest/tests --timeout=3m --match="Settings*"');
   }
 
   // compare screenshots
