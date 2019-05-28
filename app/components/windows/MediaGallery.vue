@@ -49,11 +49,11 @@
               <li v-for="file in files" :key="file.href" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                 <div>
                   <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
-                    <video loop :src="file.href" style="height: 100%; width: 100%"></video>
+                    <video loop :src="file.href" style="height: 100%; width: 100%;"></video>
                   </div>
                   <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)" class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>
                   <div v-if="file.type == 'audio'" style="height: 132px;">
-                    <i class="icon-music" style="line-height: 132px; fontSize: 28px; textAlign: center; display: block"></i>
+                    <i class="icon-music" style="line-height: 132px; font-size: 28px; text-align: center; display: block;"></i>
                   </div>
                   <button class="copy-button button button--action" @click="handleCopy(file.href)">
                     <i class="icon-copy"></i> {{ $t('Copy URL') }}
@@ -94,7 +94,7 @@
   left: 0;
   padding: 30px;
   width: 100%;
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
 }
 
 .header {
@@ -181,9 +181,10 @@
 }
 
 .toolbar {
-  border: 1px solid var(--teal-semi);
   .padding();
-  .radius;
+  .radius();
+
+  border: 1px solid var(--teal-semi);
   background: var(--section);
   width: 100%;
 
@@ -240,7 +241,7 @@
 .busy-overlay {
   position: absolute;
   top: 0;
-  left: 0px;
+  left: 0;
   width: 100%;
   height: 100%;
   border: 1px solid var(--section);
@@ -316,9 +317,11 @@
 
   &.image {
     background: linear-gradient(rgba(55, 71, 79, 0), rgba(55, 71, 79, 0.3), rgba(55, 71, 79, 0.6), rgba(55, 71, 79, 0.9));
+
     .upload__title {
       color: var(--white);
     }
+
     .upload__size {
       color: var(--icon);
     }

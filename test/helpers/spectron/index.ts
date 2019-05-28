@@ -5,8 +5,17 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { uniq } from 'lodash';
 
-export const test = avaTest as TestInterface<ITestContext>;
+// save names of all running tests to use them in the retrying mechanism
+const pendingTests: string[] = [];
+export const test: TestInterface<ITestContext> = new Proxy(avaTest, {
+  apply: (target, thisArg, args) => {
+    const testName = args[0];
+    pendingTests.push(testName);
+    return target.apply(thisArg, args);
+  },
+});
 
 const path = require('path');
 const fs = require('fs');
@@ -106,7 +115,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   startApp = async function startApp(t: TExecutionContext): Promise<Application> {
@@ -233,13 +241,15 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  test.beforeEach(async t => {
-    // consider this test as failed until it's not successfully finished
+  test.before(async t => {
+    // consider all tests as failed until it's not successfully finished
     // so we can catch failures for tests with timeouts
+    saveFailedTestsToFile(pendingTests);
+  });
+
+  test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
-    failedTests.push(testName);
-    saveFailedTestsToFile(failedTests);
 
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
@@ -272,29 +282,27 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (testPassed) {
       // consider this test succeed and remove from the `failedTests` list
-      removeFailedTestFromFile(failedTests.pop());
+      removeFailedTestFromFile(testName);
     } else {
       fail();
       const user = getUser();
       if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
-    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 
   test.after.always(async t => {
-    if (appIsRunning) await stopApp();
-    if (failedTests.length) saveFailedTestsToFile(failedTests);
+    if (!appIsRunning) return;
+    await stopApp();
+    if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
   /**
-   * mark tests as failed and add it to the failedTests list
+   * mark tests as failed
    */
   function fail(msg?: string) {
     testPassed = false;
     if (msg) failMsg = msg;
-    const lastFailedTest = failedTests.slice(-1)[0];
-    if (testName !== lastFailedTest) failedTests.push(testName);
   }
 }
 
@@ -303,7 +311,7 @@ function saveFailedTestsToFile(failedTests: string[]) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
   }
-  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
 }
 
 function removeFailedTestFromFile(testName: string) {

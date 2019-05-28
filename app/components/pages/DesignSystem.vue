@@ -835,8 +835,9 @@
 }
 
 .design-system__menu {
+  .flex();
+
   flex: 0 0 200px;
-  .flex;
   flex-direction: column;
 
   .link {
@@ -861,15 +862,17 @@
 }
 
 .design-system__color-wrapper {
-  .flex;
+  .flex();
+
   align-items: center;
   margin-bottom: 8px;
 }
 
 .design-system__color {
+  .radius();
+
   width: 30px;
   height: 30px;
-  .radius;
   border: 1px solid transparent;
   margin-right: 8px;
 }

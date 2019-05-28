@@ -46,7 +46,7 @@
 .v-dropdown-container,
 .sp-result-message,
 .sp-message {
-  font-family: 'Roboto' !important;
+  font-family: 'Roboto', sans-serif !important;
 }
 
 .v-selectpage {
@@ -62,7 +62,7 @@
 }
 
 table.sp-table {
-  font-family: 'Roboto' !important;
+  font-family: 'Roboto', sans-serif !important;
 
   // Tag descriptions
   tbody tr td:nth-child(2) {
@@ -111,6 +111,7 @@ table.sp-table {
   background-color: @teal !important;
   box-shadow: none !important;
   border: none !important;
+  color: var(--white) !important;
 }
 
 .sp-header button {
@@ -130,13 +131,13 @@ table.sp-table {
 }
 
 .sp-caret {
-  border: 0px !important;
+  border: 0 !important;
   padding: 0 !important;
   top: 33% !important;
   right: 9px !important;
   // Match multiselect style
   &::before {
-    font-family: 'Font Awesome 5 Free';
+    font-family: 'Font Awesome 5 Free', sans-serif;
     font-weight: 900;
     content: '\F078';
     border: none;
@@ -146,8 +147,9 @@ table.sp-table {
     top: 2px;
   }
 }
+
 .sp-iconfont.sp-icon-close {
-  font-family: 'icomoon' !important;
+  font-family: 'icomoon', sans-serif !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -158,21 +160,17 @@ table.sp-table {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   font-size: 12px !important;
   position: relative;
   top: 1px;
-
-  &::before {
-    content: '\e956' !important;
-  }
-}
-
-.sp-iconfont.sp-icon-close {
   color: var(--link) !important;
 
   &:hover {
     color: var(--link-active) !important;
+  }
+
+  &::before {
+    content: '\e956' !important;
   }
 }
 
@@ -198,10 +196,6 @@ table.sp-table {
   // TODO: add scrollbars back, personally I think it looks nice without it
   // but since list inputs have them, consider adding for consistency.
   display: none;
-}
-
-.sp-selected-tag {
-  color: var(--white) !important;
 }
 
 // HACK: specificity hack for the hover color for options

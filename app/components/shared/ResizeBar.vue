@@ -16,6 +16,7 @@
 
 <style lang="less">
 @import "../../styles/index";
+
 .resize-bar {
   position: relative;
   z-index: 1001;
