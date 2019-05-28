@@ -61,5 +61,4 @@ module.exports.GithubClient = class GithubClient {
       },
     });
   }
-
-}
+};
