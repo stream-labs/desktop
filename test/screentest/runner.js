@@ -26,7 +26,7 @@ function exec(cmd) {
   }
 }
 
-const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
+const commitSHA = execSync('git log').toString().split(' ')[1];
 
 (async function main() {
 
