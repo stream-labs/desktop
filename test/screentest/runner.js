@@ -42,7 +42,6 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
   }
 
   // compare screenshots
-  checkoutBranch(branches[0], true);
   execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
   // send the status to the GitHub check
@@ -53,8 +52,8 @@ const commitSHA = execSync('git rev-parse HEAD').toString().replace('\n', '');
 function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
-  exec(`git checkout ${branchName}`);
   if (branchName !== 'current') {
+    exec(`git checkout ${branchName}`);
     exec('yarn install --frozen-lockfile --check-files');
     exec('yarn compile:ci');
   }
@@ -105,6 +104,7 @@ async function updateCheck() {
   try {
     await github.login();
     await github.postCheck({
+      name: 'Screenshots',
       head_sha: commitSHA,
       conclusion,
       completed_at: new Date().toISOString(),

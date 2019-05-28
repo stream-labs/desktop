@@ -41,8 +41,9 @@ module.exports.GithubClient = class GithubClient {
    * postCheck({
    *   head_sha: 'a9a4333436d7d2f9f82cbf33085d307084a7330f',
    *   status: "in_progress",
+   *   name: 'My Name',
    *   output: {
-   *     title: 'This is Snapshots Title',
+   *     title: 'My Title',
    *   }
    * })
    *
@@ -53,7 +54,6 @@ module.exports.GithubClient = class GithubClient {
     return await request("POST /repos/:owner/:repo/check-runs", {
       owner: "stream-labs",
       repo: "streamlabs-obs",
-      name: 'Snapshots',
       ...params,
       headers: {
         authorization: `token ${this.installationAccessToken}`,
