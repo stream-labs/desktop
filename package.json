@@ -136,7 +136,7 @@
     "@types/uuid": "3.4.4",
     "@types/webdriverio": "4.13.0",
     "@xkeshi/vue-qrcode": "0.3.0",
-    "ava": "v1.2.1",
+    "ava": "1.4.1",
     "awesome-typescript-loader": "5.2.1",
     "babel-helper-vue-jsx-merge-props": "2.0.0",
     "babel-loader": "8.0.4",
