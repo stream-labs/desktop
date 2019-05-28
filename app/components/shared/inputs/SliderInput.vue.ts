@@ -23,9 +23,6 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Prop() readonly metadata: ISliderMetadata;
 
   usePercentages: boolean = this.options.usePercentages || false;
-  interval: number = this.options.usePercentages
-    ? this.options.interval * 100 || 1
-    : this.options.interval || 1;
   isFullyMounted = false;
 
   // The displaying value on and within the ui components.
@@ -40,6 +37,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
    * @param value The value that will be displayed on the interface.
    */
   updateLocalValue(value: number) {
+    console.log(this.interval, this.options.interval);
     const parsedValue = Number(value);
 
     // Dislay a empty string if and only if the user deletes all of the input field.
@@ -51,6 +49,12 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
+  }
+
+  get interval() {
+    return this.options.usePercentages
+      ? this.options.interval * 100 || 1
+      : this.options.interval || 1;
   }
 
   get min() {
