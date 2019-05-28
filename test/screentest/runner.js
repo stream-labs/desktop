@@ -65,7 +65,6 @@ function checkoutBranch(branchName) {
 }
 
 
-
 async function updateCheck() {
 
   if (!env.STREAMLABS_BOT_ID || !env.STREAMLABS_BOT_KEY) {
