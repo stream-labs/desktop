@@ -26,8 +26,8 @@ function exec(cmd) {
   }
 }
 
-exec(`git log -n 1 staging ${env.BUILD_SOURCE_BRANCH || ''}`);
-const commitSHA = execSync(`git log -n 1 staging ${env.BUILD_SOURCE_BRANCH || ''}`)
+exec(`git log -n 1 ${env.BUILD_SOURCE_BRANCH || ''}`);
+const commitSHA = execSync(`git log -n 1 ${env.BUILD_SOURCE_BRANCH || ''}`)
   .toString()
   .split(' ')[1];
 
