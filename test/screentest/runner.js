@@ -54,9 +54,9 @@ function checkoutBranch(branchName) {
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
     exec(`git checkout ${branchName}`);
-    exec('yarn install --frozen-lockfile --check-files');
-    exec('yarn compile:ci');
   }
+  exec('yarn install --frozen-lockfile --check-files');
+  exec('yarn compile:ci');
   // save current branch name to the file
   // screenshoter needs will use this value
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
