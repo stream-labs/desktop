@@ -23,15 +23,10 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Prop() readonly metadata: ISliderMetadata;
 
   usePercentages: boolean = this.options.usePercentages || false;
-  interval: number = this.options.usePercentages
-    ? this.options.interval * 100 || 1
-    : this.options.interval || 1;
   isFullyMounted = false;
 
   // The displaying value on and within the ui components.
-  localValue: number | string = this.options.usePercentages
-    ? this.value * 100 || this.min
-    : this.value || this.min || 0;
+  localValue: number | string = this.initializeLocalValue();
 
   $refs: { slider: any };
 
@@ -51,6 +46,17 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
+  }
+
+  initializeLocalValue() {
+    if (this.value == null) return this.min || 0;
+    return this.options.usePercentages ? this.value * 100 : this.value;
+  }
+
+  get interval() {
+    return this.options.usePercentages
+      ? this.options.interval * 100 || 1
+      : this.options.interval || 1;
   }
 
   get min() {

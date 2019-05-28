@@ -47,20 +47,21 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     // Don't show the patch notes in dev mode or preview
     if (Util.isDevMode() || Util.isPreview() || Util.isIpc()) return;
 
-    const minorVersionRegex = /^\d+\.\d+[^\.]/;
+    const minorVersionRegex = /^(\d+\.\d+)\.\d+$/;
     const currentMinorVersion = electron.remote.process.env.SLOBS_VERSION.match(minorVersionRegex);
-    if (!currentMinorVersion) return;
+    const patchNotesMinorVesion = notes.version.match(minorVersionRegex);
+    const lastMinorVersionSeen = this.state.lastVersionSeen
+      ? this.state.lastVersionSeen.match(minorVersionRegex)
+      : null;
 
-    const currentMinorVersionRegex = new RegExp(currentMinorVersion[0]);
+    // One of the version strings was malformed
+    if (!currentMinorVersion || !patchNotesMinorVesion) return;
 
-    if (
-      // If the notes don't match the current version, we shouldn't show them.
-      !currentMinorVersionRegex.test(notes.version) ||
-      // The user has already seen the current patch notes
-      currentMinorVersionRegex.test(this.state.lastVersionSeen)
-    ) {
-      return;
-    }
+    // If the patch notes don't match the current verison, don't show them
+    if (currentMinorVersion[1] !== patchNotesMinorVesion[1]) return;
+
+    // The user has already seen the current patch notes
+    if (lastMinorVersionSeen && lastMinorVersionSeen[1] === currentMinorVersion[1]) return;
 
     this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION);
 
