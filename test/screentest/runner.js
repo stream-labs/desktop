@@ -26,10 +26,16 @@ function exec(cmd) {
   }
 }
 
-exec(`git log -n 1 ${env.BUILD_SOURCE_BRANCH || ''}`);
-const commitSHA = execSync(`git log -n 1 ${env.BUILD_SOURCE_BRANCH || ''}`)
+// fetching the commit SHA
+exec(`git log -n 2 --pretty=oneline`);
+const lastCommits = execSync('git log -n 2 --pretty=oneline')
   .toString()
-  .split(' ')[1];
+  .split('\n')
+  .map(log => log.split(' ')[0]);
+
+// the repo is in the detached state for CI
+// we need to take a one commit before to take a commit associated to the PR
+const commitSHA = env.CI ? lastCommits[1] : lastCommits[0];
 
 (async function main() {
 
