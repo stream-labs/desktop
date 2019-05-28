@@ -107,7 +107,7 @@ async function updateCheck() {
       head_sha: commitSHA,
       conclusion,
       completed_at: new Date().toISOString(),
-      details_url: env.BUILD_BUILD_URI || 'env.BUILD_BUILD_URI is not set',
+      details_url: env.BUILD_BUILD_URI || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
         title: title,
         summary: ''
