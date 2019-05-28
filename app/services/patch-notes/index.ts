@@ -45,7 +45,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
    */
   showPatchNotesIfRequired(onboarded: boolean) {
     // Don't show the patch notes in dev mode or preview
-    // if (Util.isDevMode() || Util.isPreview() || Util.isIpc()) return;
+    if (Util.isDevMode() || Util.isPreview() || Util.isIpc()) return;
 
     const minorVersionRegex = /^(\d+\.\d+)\.\d+$/;
     const currentMinorVersion = electron.remote.process.env.SLOBS_VERSION.match(minorVersionRegex);
