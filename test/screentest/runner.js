@@ -106,8 +106,8 @@ async function updateCheck() {
     await github.postCheck({
       head_sha: commitSHA,
       conclusion,
-      details_url: 'http://details.url',
       completed_at: new Date().toISOString(),
+      details_url: env.BUILD_BUILD_URI || 'env.BUILD_BUILD_URI is not set',
       output: {
         title: title,
         summary: ''
