@@ -16,7 +16,8 @@ module.exports.GithubClient = class GithubClient {
 
   async login() {
 
-
+    console.log('owner', this.owner);
+    console.log('repo', this.repo);
     const app = new App({ id: this.appId, privateKey: this.privateKey });
     const jwt = app.getSignedJsonWebToken();
 
