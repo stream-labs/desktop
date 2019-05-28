@@ -100,12 +100,8 @@ async function updateCheck() {
   // All new-line characters are replaced with `;`
   const botKey = env.STREAMLABS_BOT_KEY.replace(/;/g, '\n');
 
-  const github = new GithubClient(
-    env.STREAMLABS_BOT_ID,
-    botKey,
-    'stream-labs',
-    env.BUILD_REPOSITORY_NAME
-  );
+  const [owner, repo] = env.BUILD_REPOSITORY_NAME.split('/');
+  const github = new GithubClient(env.STREAMLABS_BOT_ID, botKey, owner, repo);
 
   try {
     await github.login();
