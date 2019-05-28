@@ -138,6 +138,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   isTabbedForm(categoryName: string) {
+    if (!categoryName) return false;
     return obs.NodeObs.OBS_settings_getSettings(categoryName).type === 1;
   }
 
