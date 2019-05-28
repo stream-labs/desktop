@@ -133,7 +133,7 @@
     "@types/node": "8.10.48",
     "@types/request": "2.48.1",
     "@types/socket.io-client": "1.4.32",
-    "@types/uuid": "3.4.3",
+    "@types/uuid": "3.4.4",
     "@types/webdriverio": "4.13.0",
     "@xkeshi/vue-qrcode": "0.3.0",
     "ava": "v1.2.1",
