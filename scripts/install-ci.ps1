@@ -31,6 +31,9 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
+echo "Install 7zip"
+choco install 7zip
+
 echo "Install CMake"
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
