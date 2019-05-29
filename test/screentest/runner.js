@@ -87,7 +87,8 @@ async function updateCheck() {
     title = `Changes are detected in ${testResults.changedScreens} screenshots`;
   } else {
     conclusion = 'success';
-    title = `Checked ${testResults.totalScreens} screenshots, ${testResults.newScreens} new screenshots found`
+    title = `${testResults.totalScreens} screenshots have been checked.` + `\n` +
+            `${testResults.newScreens} new screenshots have been found`;
   }
 
   // upload screenshots if any changes present
@@ -96,7 +97,7 @@ async function updateCheck() {
     screenshotsUrl = await uploadScreenshots();
   }
 
-  console.info('Updating the GithubCheck');
+  console.info('Updating the GithubCheck', conclusion, title);
 
   // AzurePipelines doesn't support multiline variables.
   // All new-line characters are replaced with `;`
@@ -151,7 +152,7 @@ function getCommitSHA() {
 }
 
 async function uploadScreenshots() {
-  if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || AWS_BUCKET) {
+  if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || !AWS_BUCKET) {
     console.error('Setup AWS_ACCESS_KEY AWS_SECRET_KEY AWS_BUCKET to upload screenshots');
     return;
   }
