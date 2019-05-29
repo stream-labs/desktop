@@ -65,6 +65,9 @@ jobs:
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         STREAMLABS_BOT_ID: $(streamlabsBotId)
         STREAMLABS_BOT_KEY: $(streamlabsBotKey)
+        AWS_BUCKET: $(awsBucket)
+        AWS_ACCESS_KEY: $(awsAccessKey)
+        AWS_SECRET_KEY: $(awsSecretKey)
 
     - task: PublishPipelineArtifact@0
       inputs:

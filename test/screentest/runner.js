@@ -17,11 +17,8 @@ const {
   STREAMLABS_BOT_KEY,
   BUILD_REPOSITORY_NAME,
   BUILD_BUILD_ID,
-  BUILD_BUILD_URI,
-} = process.env
+} = process.env;
 const CONFIG = require('./config.json');
-
-
 const commitSHA = getCommitSHA();
 
 (async function main() {
@@ -99,7 +96,7 @@ async function updateCheck() {
     screenshotsUrl = await uploadScreenshots();
   }
 
-  console.info('Updating the GithubCheck check');
+  console.info('Updating the GithubCheck');
 
   // AzurePipelines doesn't support multiline variables.
   // All new-line characters are replaced with `;`
