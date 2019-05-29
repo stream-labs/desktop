@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
