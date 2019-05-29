@@ -1,9 +1,12 @@
 # Run this script as administrator to setup enviroment on new CI machine:
-# powershell install.ps1 your_azure_token host_user host_password
+# powershell install.ps1 your_azure_token host_user host_password agent_pool?
 
 $token=$args[0]
 $username=$args[1]
 $password=$args[2]
+$pool=$args[2]
+if (-Not $pool) { $pool = 'Default' }
+
 $agentPath = "C:\agent\run.cmd"
 
 
@@ -46,7 +49,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression
 
 echo "Configure Azure Agent"
 $publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
-.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp"
+.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
 # But it doesn't allow to pass any arguments to the Agent
