@@ -50,8 +50,8 @@ module.exports.GithubClient = class GithubClient {
    */
   async postCheck(params) {
     return await request("POST /repos/:owner/:repo/check-runs", {
-      owner: "stream-labs",
-      repo: "streamlabs-obs",
+      owner: this.owner,
+      repo: this.repo,
       ...params,
       headers: {
         authorization: `token ${this.installationAccessToken}`,

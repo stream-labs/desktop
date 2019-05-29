@@ -146,7 +146,7 @@ function getCommitSHA() {
     .map(log => log.split(' ')[0]);
 
   // the repo is in the detached state for CI
-  // we need to take a one commit before to take a commit associated to the PR
+  // we need to take a one commit before to take a commit that has been associated to the PR
   return CI ? lastCommits[1] : lastCommits[0];
 }
 
