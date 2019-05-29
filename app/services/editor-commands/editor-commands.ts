@@ -208,38 +208,30 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   // Shortcuts for undo-able editor commands go here:
   @shortcut('ArrowLeft')
   nudgeActiveItemsLeft() {
-    this.executeCommand(
-      'NudgeItemsCommand',
-      this.selectionService.getActiveSelection(),
-      ENudgeDirection.Left,
-    );
+    this.nudgeActiveItems(ENudgeDirection.Left);
   }
 
   @shortcut('ArrowRight')
   nudgeActiveItemRight() {
-    this.executeCommand(
-      'NudgeItemsCommand',
-      this.selectionService.getActiveSelection(),
-      ENudgeDirection.Right,
-    );
+    this.nudgeActiveItems(ENudgeDirection.Right);
   }
 
   @shortcut('ArrowUp')
   nudgeActiveItemsUp() {
-    this.executeCommand(
-      'NudgeItemsCommand',
-      this.selectionService.getActiveSelection(),
-      ENudgeDirection.Up,
-    );
+    this.nudgeActiveItems(ENudgeDirection.Up);
   }
 
   @shortcut('ArrowDown')
   nudgeActiveItemsDown() {
-    this.executeCommand(
-      'NudgeItemsCommand',
-      this.selectionService.getActiveSelection(),
-      ENudgeDirection.Down,
-    );
+    this.nudgeActiveItems(ENudgeDirection.Down);
+  }
+
+  private nudgeActiveItems(direction: ENudgeDirection) {
+    const selection = this.selectionService.getActiveSelection();
+
+    if (!selection.getNodes().length) return;
+
+    this.executeCommand('NudgeItemsCommand', selection, direction);
   }
 
   @mutation()
