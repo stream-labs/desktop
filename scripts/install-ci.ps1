@@ -38,7 +38,7 @@ echo "Install CMake"
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
 echo "Install Visual Studio 2017 Build Tools"
-choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended"
+choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
 
 echo "Donwload and install Azure Agent"
 cd /
