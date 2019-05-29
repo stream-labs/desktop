@@ -45,7 +45,8 @@ Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts
 Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
 
 echo "Configure Azure Agent"
-.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $(Get-Random)"
+$publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
+.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp"
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
 # But it doesn't allow to pass any arguments to the Agent
