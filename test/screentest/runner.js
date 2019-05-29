@@ -3,47 +3,39 @@ require('dotenv').config();
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
-const env = process.env;
+const path = require('path');
+const AWS = require('aws-sdk');
+const uuid = require('uuid');
+const recursiveReadDir = require('recursive-readdir');
 const { GithubClient } = require('../../scripts/github-client');
+const {
+  AWS_ACCESS_KEY,
+  AWS_SECRET_KEY,
+  AWS_BUCKET,
+  CI,
+  STREAMLABS_BOT_ID,
+  STREAMLABS_BOT_KEY,
+  BUILD_REPOSITORY_NAME,
+  BUILD_BUILD_ID,
+  BUILD_BUILD_URI,
+} = process.env
 const CONFIG = require('./config.json');
 
-// list branches for making screenshots from
-const branches = [
-  'current',
-  CONFIG.baseBranch
-];
 
-/**
- * exec sync or die
- */
-function exec(cmd) {
-  try {
-    console.log('RUN', cmd);
-    return execSync(cmd, { stdio: [0, 1, 2] });
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-}
-
-// fetching the commit SHA
-exec(`git log -n 2 --pretty=oneline`);
-const lastCommits = execSync('git log -n 2 --pretty=oneline')
-  .toString()
-  .split('\n')
-  .map(log => log.split(' ')[0]);
-
-// the repo is in the detached state for CI
-// we need to take a one commit before to take a commit associated to the PR
-const commitSHA = env.CI ? lastCommits[1] : lastCommits[0];
+const commitSHA = getCommitSHA();
 
 (async function main() {
 
+  // prepare the dist dir
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
 
   // make screenshots for each branch
+  const branches = [
+    'current',
+    CONFIG.baseBranch
+  ];
   for (const branchName of branches) {
     checkoutBranch(branchName);
     // TODO: run all tests, not only for settings
@@ -51,9 +43,9 @@ const commitSHA = env.CI ? lastCommits[1] : lastCommits[0];
   }
 
   // compare screenshots
-  execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+  exec(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
-  // send the status to the GitHub check
+  // send the status to the GitHub check and upload screenshots
   await updateCheck();
 })();
 
@@ -74,7 +66,7 @@ function checkoutBranch(branchName) {
 
 async function updateCheck() {
 
-  if (!env.STREAMLABS_BOT_ID || !env.STREAMLABS_BOT_KEY) {
+  if (!STREAMLABS_BOT_ID || !STREAMLABS_BOT_KEY) {
     console.info('STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update');
     return;
   }
@@ -87,6 +79,7 @@ async function updateCheck() {
     console.error('No results found for screentest');
   }
 
+  // create a conclusion
   let conclusion = '';
   let title = '';
   if (!testResults) {
@@ -100,15 +93,20 @@ async function updateCheck() {
     title = `Checked ${testResults.totalScreens} screenshots, ${testResults.newScreens} new screenshots found`
   }
 
+  // upload screenshots if any changes present
+  let screenshotsUrl = '';
+  if (conclusion === 'action_required' || testResults.newScreens > 1) {
+    screenshotsUrl = await uploadScreenshots();
+  }
 
   console.info('Updating the GithubCheck check');
 
   // AzurePipelines doesn't support multiline variables.
   // All new-line characters are replaced with `;`
-  const botKey = env.STREAMLABS_BOT_KEY.replace(/;/g, '\n');
+  const botKey = STREAMLABS_BOT_KEY.replace(/;/g, '\n');
 
-  const [owner, repo] = env.BUILD_REPOSITORY_NAME.split('/');
-  const github = new GithubClient(env.STREAMLABS_BOT_ID, botKey, owner, repo);
+  const [owner, repo] = BUILD_REPOSITORY_NAME.split('/');
+  const github = new GithubClient(STREAMLABS_BOT_ID, botKey, owner, repo);
 
   try {
     await github.login();
@@ -117,7 +115,7 @@ async function updateCheck() {
       head_sha: commitSHA,
       conclusion,
       completed_at: new Date().toISOString(),
-      details_url: env.BUILD_URI || 'https://github.com/stream-labs/streamlabs-obs',
+      details_url: screenshotsUrl || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
         title: title,
         summary: ''
@@ -130,4 +128,65 @@ async function updateCheck() {
 
 }
 
+/**
+ * exec sync or die
+ */
+function exec(cmd) {
+  try {
+    console.log('RUN', cmd);
+    return execSync(cmd, { stdio: [0, 1, 2] });
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+}
 
+function getCommitSHA() {
+  // fetching the commit SHA
+  const lastCommits = execSync('git log -n 2 --pretty=oneline')
+    .toString()
+    .split('\n')
+    .map(log => log.split(' ')[0]);
+
+  // the repo is in the detached state for CI
+  // we need to take a one commit before to take a commit associated to the PR
+  return CI ? lastCommits[1] : lastCommits[0];
+}
+
+async function uploadScreenshots() {
+  if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || AWS_BUCKET) {
+    console.error('Setup AWS_ACCESS_KEY AWS_SECRET_KEY AWS_BUCKET to upload screenshots');
+    return;
+  }
+
+  console.info(`Uploading screenshots to the s3 bucket`);
+  const Bucket = AWS_BUCKET;
+  const awsCredentials = new AWS.Credentials(AWS_ACCESS_KEY, AWS_SECRET_KEY);
+  const s3Options = {credentials : awsCredentials};
+  const s3Client = new AWS.S3(s3Options);
+  const bucketDir = BUILD_BUILD_ID || uuid();
+
+  try {
+    const files = await recursiveReadDir(CONFIG.dist);
+    for (const filePath of files) {
+      console.info(`uploading ${filePath}`);
+      const relativePath = path.relative(CONFIG.dist, filePath).replace('\\', '/');
+      const stream = fs.createReadStream(filePath);
+      const params = {
+        Bucket,
+        Key : `${bucketDir}/${relativePath}`,
+        ContentType: 'text/html',
+        ACL : 'public-read',
+        Body : stream
+      };
+      await s3Client.upload(params).promise();
+    }
+    const url = `http://${Bucket}.s3.amazonaws.com/${bucketDir}/preview.html`;
+    console.info('Screenshots uploaded', url);
+    return url;
+  } catch (e) {
+    console.error('Failed to upload screenshots');
+    console.error(e);
+  }
+
+}
