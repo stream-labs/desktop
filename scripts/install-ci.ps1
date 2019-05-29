@@ -45,7 +45,7 @@ choco install visualstudio2017buildtools --package-parameters "--add Microsoft.V
 
 echo "Donwload and install Azure Agent"
 cd /
-Remove-Item agent -Recurse -ErrorAction Ignore
+Remove-Item -Recurse -Force agent
 mkdir agent ; cd agent;
 Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
 Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
