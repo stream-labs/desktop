@@ -4,7 +4,7 @@
 $token=$args[0]
 $username=$args[1]
 $password=$args[2]
-$pool=$args[2]
+$pool=$args[3]
 if (-Not $pool) { $pool = 'Default' }
 
 $agentPath = "C:\agent\run.cmd"
