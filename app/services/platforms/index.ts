@@ -101,7 +101,7 @@ export interface IPlatformService {
 
   afterGoLive?: (context?: StreamingContext) => Promise<void>;
 
-  prepopulateInfo?: () => Promise<any>;
+  prepopulateInfo: () => Promise<any>;
 
   scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
 }
