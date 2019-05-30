@@ -301,8 +301,7 @@ export class Scene {
   }
 
   /**
-   * Makes sure all scene items are in the correct order in OBS.  This
-   * is a slow operation if itemsToMove is not provided.
+   * Makes sure all scene items are in the correct order in OBS.
    */
   private reconcileNodeOrderWithObs() {
     const obsScene = this.getObsScene();
