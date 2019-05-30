@@ -303,20 +303,22 @@ export class Scene {
   /**
    * Makes sure all scene items are in the correct order in OBS.  This
    * is a slow operation if itemsToMove is not provided.
-   * @param itemsToMove optionally restrict to a set of items
    */
-  private reconcileNodeOrderWithObs(itemsToMove?: SceneItem[]) {
-    const items = itemsToMove ? itemsToMove : this.getItems();
+  private reconcileNodeOrderWithObs() {
+    const obsScene = this.getObsScene();
+    const destIds = this.getItems().map(item => item.obsSceneItemId);
+    const currentIds = this.getObsScene()
+      .getItems()
+      .reverse()
+      .map(item => item.id);
 
-    items.forEach(item => {
-      let currentIdx: number;
-      this.getObsScene()
-        .getItems()
-        .reverse()
-        .forEach((obsItem, idx) => {
-          if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
-        });
-      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
+    destIds.forEach(ind => {
+      if (destIds[ind] === currentIds[ind]) return;
+      const itemToMoveInd = currentIds.indexOf(destIds[ind]);
+      const itemToMove = currentIds[itemToMoveInd];
+      currentIds.splice(itemToMoveInd, 1);
+      currentIds.splice(ind, 0, itemToMove);
+      obsScene.moveItem(itemToMoveInd, ind);
     });
   }
 
