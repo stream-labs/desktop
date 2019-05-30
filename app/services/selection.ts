@@ -69,6 +69,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
   invert: () => Selection;
   getItems: () => SceneItem[];
   getNodes: () => TSceneNode[];
+  getNode: (id: string) => TSceneNode;
   getFolders: () => SceneItemFolder[];
   getVisualItems: () => SceneItem[];
   getIds: () => string[];
@@ -283,6 +284,15 @@ export class Selection {
     const scene = this.getScene();
     if (!this.getSize()) return [];
     return scene.getNodes().filter(node => this.state.selectedIds.includes(node.id));
+  }
+
+  /**
+   * return node specified from a given ID
+   */
+  getNode(id: string): TSceneNode {
+    const scene = this.getScene();
+    if (!this.getSize()) return null;
+    return scene.getNode(id);
   }
 
   /**
