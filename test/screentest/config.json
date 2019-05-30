@@ -1,5 +1,5 @@
 {
-  "baseBranch": "staging",
+  "baseBranch": "screentest2",
   "dist": "test-dist/screentest",
   "configs": {
     "resolution": {
