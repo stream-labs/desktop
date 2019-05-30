@@ -292,7 +292,7 @@ export class Scene {
 
     this.SET_NODES_ORDER(sceneNodesIds);
 
-    this.reconcileNodeOrderWithObs(itemsToMove);
+    this.reconcileNodeOrderWithObs();
   }
 
   setNodesOrder(order: string[]) {
