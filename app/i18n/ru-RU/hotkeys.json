@@ -6,11 +6,15 @@
   "Switch to scene": "Перейти на сцену",
   "Show %{sourcename}": "Показать %{sourcename}",
   "Hide %{sourcename}": "Скрыть %{sourcename}",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Заглушить",
   "Unmute": "Включить звук",
   "Push to Mute": "Нажмите, чтобы заглушить",
   "Push to Talk": "Нажмите, чтобы говорить",
   "Enable Studio Mode": "Включить режим Студии",
   "Disable Studio Mode": "Отключить режим Студии",
-  "Transition (Studio Mode)": "Переход (режим Студии)"
+  "Transition (Studio Mode)": "Переход (режим Студии)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
