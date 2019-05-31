@@ -102,7 +102,7 @@ export interface ISelection extends ISceneItemActions {
   /**
    * Check the item is selected
    */
-  isSelected(nodeOrNodeId: string | TSceneNodeModel): void;
+  isSelected(nodeOrNodeId: string | TSceneNodeModel): boolean;
   /**
    * Returns true if selection contains a single scene item
    */

@@ -7,7 +7,7 @@ import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
-const NAirObsLogo = require('../../../../media/images/n-air-obs-logo.svg');
+import NAirObsLogo from '../../../../media/images/n-air-obs-logo.svg';
 
 @Component({
   components: {
