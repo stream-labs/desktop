@@ -190,7 +190,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       return fetch(request)
         .then(handlePlatformResponse)
-        .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
+        .then(json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0);
     });
   }
 

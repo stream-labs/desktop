@@ -146,6 +146,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
   }
 
+  prepopulateInfo() {
+    return this.fetchChannelInfo();
+  }
+
   @requiresToken()
   fetchViewerCount(): Promise<number> {
     const headers = this.getHeaders();

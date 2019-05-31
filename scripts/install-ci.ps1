@@ -1,9 +1,12 @@
 # Run this script as administrator to setup enviroment on new CI machine:
-# powershell install.ps1 your_azure_token host_user host_password
+# powershell install.ps1 your_azure_token host_user host_password agent_pool?
 
 $token=$args[0]
 $username=$args[1]
 $password=$args[2]
+$pool=$args[3]
+if (-Not $pool) { $pool = 'Default' }
+
 $agentPath = "C:\agent\run.cmd"
 
 
@@ -31,21 +34,28 @@ choco install yarn
 echo "Install Git for Windows"
 choco install git.install
 
+echo "Install 7zip"
+choco install 7zip
+
 echo "Install CMake"
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
 echo "Install Visual Studio 2017 Build Tools"
-choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended"
+choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
 
 echo "Donwload and install Azure Agent"
 cd /
-Remove-Item agent -Recurse -ErrorAction Ignore
+Remove-Item -Recurse -Force -ErrorAction Ignore agent
 mkdir agent ; cd agent;
 Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
 Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
 
 echo "Configure Azure Agent"
-.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $(Get-Random)"
+$publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
+.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
+
+# Disable the lock screen to prevent the PC locking after end of the RDP session
+Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name 'NoLockScreen' -Value 1;
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
 # But it doesn't allow to pass any arguments to the Agent

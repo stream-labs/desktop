@@ -51,12 +51,13 @@
 }
 
 .modal-layout-content {
+  .padding(2);
+
   flex-grow: 1;
   height: 100%;
   display: flex;
   position: relative;
   overflow-x: hidden;
-  .padding(2);
 
   & > * {
     width: 100%;
@@ -91,10 +92,11 @@
 }
 
 .modal-layout-controls {
-  background-color: var(--section);
   .padding-v-sides();
   .padding-h-sides(2);
   .text-align(@right);
+
+  background-color: var(--section);
   flex-shrink: 0;
   z-index: 10;
 

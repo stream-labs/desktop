@@ -437,6 +437,7 @@ async function runScript() {
   info(`Merging ${targetBranch} back into staging...`);
   try {
     executeCmd(`git checkout staging`, { exit: false });
+    executeCmd('git pull'. { exit: false });
     executeCmd(`git merge ${targetBranch}`, { exit: false });
     executeCmd('git push origin HEAD', { exit: false });
   } catch (e) {

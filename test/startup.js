@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
+import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
 
 useSpectron();
 
