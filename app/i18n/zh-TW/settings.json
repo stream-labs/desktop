@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "運行自動最佳化",
   "Confirm stream title and game before going live": "請在直播前，確認實況標題及遊戲項目",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！你將「永久」失去所有場景、來源以及設定！",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "您的快取資料夾已被成功上傳。檔案名稱為 %{file} 已將其複製到剪貼簿上。可將其貼上Discord並標記開發人員。",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels 已被成功地重啟。",
   "This action will restart the application. Continue?": "這個動作將會重啟整個程式，繼續嗎？",
   "Show confirmation dialog when starting streams": "啟動串流時顯示確認對話框",
@@ -69,5 +69,14 @@
   "Default": "預設裝置",
   "Custom Encoder Settings": "自訂編碼器設定",
   "Audio Bitrate": "音訊位元率",
-  "Video Bitrate": "影片位元率"
+  "Video Bitrate": "影片位元率",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
