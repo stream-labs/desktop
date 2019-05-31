@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "Fejlesztjük a backend rendszereinket. A migrációs eljárás részeként arra kérünk, jelentkezz be újra. Amennyiben kérdésed van,",
   "contact support.": "lépj kapcsolatba az ügyfélszolgálattal.",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "A Streamlabs használatához jelentkezz be a Twitch vagy YouTube fiókoddal",
+  "Sign in with your streaming account to get started with Streamlabs": "Sign in with your streaming account to get started with Streamlabs",
   "Select an OBS profile to import": "Válaszd ki az importálni kívánt OBS profilt",
   "Import from OBS": "Importálás OBS-ből",
   "Start Fresh": "Kezdj Teljesen Újat",
@@ -35,5 +35,10 @@
   "Next": "Következő",
   "Scene Collections Import": "Jelenet Gyűjtemények Importálása",
   "The following scene collections have been imported from your Streamlabs account": "A következő jelenet gyűjteményeket importáltuk a Streamlabs fiókodból",
-  "Continue": "Tovább"
+  "Continue": "Tovább",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
