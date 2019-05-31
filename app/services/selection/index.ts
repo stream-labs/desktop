@@ -68,7 +68,6 @@ export class SelectionService extends StatefulService<ISelectionState> {
   invert: () => Selection;
   getItems: () => SceneItem[];
   getNodes: () => TSceneNode[];
-  getNode: (id: string) => TSceneNode;
   getFolders: () => SceneItemFolder[];
   getVisualItems: () => SceneItem[];
   getIds: () => string[];

@@ -223,7 +223,7 @@ export default class SourceSelector extends Vue {
 
   @Watch('lastSelectedId')
   expandSelectedFolders() {
-    const node = this.selectionService.getNode(this.lastSelectedId);
+    const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
     if (!node) return;
     this.expandedFoldersIds = node.getPath().slice(0, -1);
   }

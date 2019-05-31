@@ -108,15 +108,6 @@ export class Selection {
   }
 
   /**
-   * return node specified from a given ID
-   */
-  getNode(id: string): TSceneNode {
-    const scene = this.getScene();
-    if (!this.getSize()) return null;
-    return scene.getNode(id);
-  }
-
-  /**
    * return folders with the order as in the scene
    */
   getFolders(): SceneItemFolder[] {
