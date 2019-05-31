@@ -17,6 +17,7 @@
   "Create Output Projector": "출력 프로젝터 생성",
   "Studio Mode": "스튜디오 모드",
   "Are you sure you want to remove %{sceneName}?": "정말로 %{sceneName}을(를) 제거하시겠습니까?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "성능 모드 비활성화",
   "Scene Collections": "장면 모음",
   "The building blocks of your scene. Also contains widgets.": "장면의 요소들입니다. 또한 위젯들도 있습니다.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "현재 미디어 파일들이 클라우드에 동기화되고 있습니다. ",
   "It is recommended that you wait until this finishes before going live.": "방송하기 전에 작업이 끝날 떄까지 기다리는 것을 권장합니다.",
   "Go Live Anyway": "무시하고 방송하기",
-  "Wait": "기다리기"
+  "Wait": "기다리기",
+  "Add a new Scene.": "Add a new Scene.",
+  "Remove Scene.": "Remove Scene.",
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }
