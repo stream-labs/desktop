@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Run Auto Optimizer",
   "Confirm stream title and game before going live": "Confirm stream title and game before going live",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels session has been succesfully restarted!",
   "This action will restart the application. Continue?": "This action will restart the application. Continue?",
   "Show confirmation dialog when starting streams": "Show confirmation dialog when starting streams",
@@ -69,5 +69,14 @@
   "Default": "Default",
   "Custom Encoder Settings": "Custom Encoder Settings",
   "Audio Bitrate": "Audio Bitrate",
-  "Video Bitrate": "Video Bitrate"
+  "Video Bitrate": "Video Bitrate",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
