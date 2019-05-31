@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "Configurações visuais",
+  "Font Settings": "Configurações de fonte",
+  "Chatter": "Participante do bate-papo",
+  "Always Show Messages": "Sempre mostrar mensagens",
+  "Show Moderator Badges": "Exibir os distintivos de Moderador",
+  "Show Subscriber Badges": "Exibir os distintivos de Inscrito",
+  "Show Turbo Badges": "Mostrar os distintivos Turbo",
+  "Show Twitch Prime Badges": "Mostrar os distintivos Twitch Prime",
+  "Show Bits Badges": "Mostrar os Distintivos Bits",
+  "Show Top Coin Holder Badges": "Mostrar os Distintivos de Maior Acumulador de Moedas",
+  "Enable BetterTTV Emotes": "Habilitar os emotes do BetterTTV",
+  "Enable FrankerFaceZ Emotes": "Habilitar os emotes do FrankerFaceZ",
+  "Text Color": "Cor do Texto",
+  "Font Size": "Tamanho da fonte",
+  "Muted Chatters": "Participantes silenciados do bate-papo",
+  "Hide Commands": "Ocultar Comandos",
+  "Background Color": "Cor de Fundo"
+}
