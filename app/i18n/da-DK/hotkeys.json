@@ -6,11 +6,15 @@
   "Switch to scene": "Skift til scene",
   "Show %{sourcename}": "Vis %{sourcename}",
   "Hide %{sourcename}": "Skjul %{sourcename}",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Gør stum",
   "Unmute": "Fjern stum",
   "Push to Mute": "Tryk for at gøre stum",
   "Push to Talk": "Tryk for at tale",
   "Enable Studio Mode": "Aktiver Studio tilstand",
   "Disable Studio Mode": "Deaktiver Studio tilstand",
-  "Transition (Studio Mode)": "Skift over (Studio tilstand)"
+  "Transition (Studio Mode)": "Skift over (Studio tilstand)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
