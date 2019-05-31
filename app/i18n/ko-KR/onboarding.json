@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "우리는 벡 엔드 시스템을 개선하고 있읍니다. 이송을 하는 진행때문에 로그인을 다시하셔야 됍니다. 질문이있으시면",
   "contact support.": "지원팀에 문의해주세요.",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "Streamlabs를 시작하기 위해 Twitch나 Youtube 계정으로 로그인",
+  "Sign in with your streaming account to get started with Streamlabs": "Sign in with your streaming account to get started with Streamlabs",
   "Select an OBS profile to import": "가져올 OBS 프로파일 택하기",
   "Import from OBS": "OBS에서 가져오기",
   "Start Fresh": "새로 시작하기",
@@ -35,5 +35,10 @@
   "Next": "다음",
   "Scene Collections Import": "장면 모음 가져오기",
   "The following scene collections have been imported from your Streamlabs account": "해당 장면 모음들은 Streamlabs 계정에서 가져옴",
-  "Continue": "계속"
+  "Continue": "계속",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
