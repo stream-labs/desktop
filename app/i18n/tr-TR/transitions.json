@@ -1,5 +1,5 @@
 {
-  "Scene transition": "Sahne geçişleri",
+  "Scene Transitions": "Sahne Geçişleri",
   "Cut": "Kes",
   "Fade": "Soldurma",
   "Swipe": "Kaydır",
@@ -8,5 +8,20 @@
   "Luma Wipe": "Yavaş Silinme",
   "Stinger": "Anında",
   "Transition": "Sahne Geçişi",
-  "Duration": "Süre"
+  "Duration": "Süre",
+  "Add Transition": "Geçiş Ekle",
+  "You need at least 1 transition.": "En az 1 geçiş gerek.",
+  "Add Connection": "Bağlantıyı Ekle",
+  "Beginning Scene": "Başlangıç Sahnesi",
+  "Ending Scene": "Bitiş Sahnesi",
+  "Scene Transition": "Sahne Geçişi",
+  "Type": "Tür",
+  "Transition Type": "Geçiş Türü",
+  "Name": "İsim",
+  "Transition Name": "Geçiş Adı",
+  "Default": "Varsayılan",
+  "Deleted": "Silindi",
+  "This connection is redundant because another connection already connects these scenes.": "Başka bir bağlantı bu sahneleri bağladığı için bu bağlantı gereksizdir.",
+  "You need at least 2 scenes to edit transitions.": "Geçişleri düzenlemek için en az 2 sahne gerek.",
+  "This scene transition is managed by an App and cannot be edited.": "Bu sahne geçişi bir Uygulama tarafından yönetiliyor, dolayısıyla düzenlenemiyor."
 }
