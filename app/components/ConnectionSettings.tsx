@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
@@ -6,11 +6,10 @@ import { ScenesService } from 'services/scenes';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import { metadata } from './shared/inputs';
 
-@Component({
-  components: { VFormGroup },
-})
-export default class SceneTransitions extends Vue {
+@Component({})
+export default class SceneTransitions extends TsxComponent<{ connectionId: string }> {
   @Inject() transitionsService: TransitionsService;
   @Inject() scenesService: ScenesService;
   @Inject() private editorCommandsService: EditorCommandsService;
@@ -21,7 +20,7 @@ export default class SceneTransitions extends Vue {
     return this.connection.fromSceneId;
   }
 
-  set fromSceneModel(value: string) {
+  setFromSceneModel(value: string) {
     this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
       fromSceneId: value,
     });
@@ -31,7 +30,7 @@ export default class SceneTransitions extends Vue {
     return this.connection.toSceneId;
   }
 
-  set toSceneModel(value: string) {
+  setToSceneModel(value: string) {
     this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
       toSceneId: value,
     });
@@ -41,7 +40,7 @@ export default class SceneTransitions extends Vue {
     return this.connection.transitionId;
   }
 
-  set transitionModel(value: string) {
+  setTransitionModel(value: string) {
     this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
       transitionId: value,
     });
@@ -66,5 +65,39 @@ export default class SceneTransitions extends Vue {
       title: transition.name,
       value: transition.id,
     }));
+  }
+
+  render(h: Function) {
+    return (
+      <div>
+        <VFormGroup
+          value={this.fromSceneModel}
+          onInput={this.setFromSceneModel}
+          metadata={metadata.list({
+            title: $t('Beginning Scene'),
+            name: 'from',
+            options: this.sceneOptions,
+          })}
+        />
+        <VFormGroup
+          value={this.transitionModel}
+          onInput={this.setTransitionModel}
+          metadata={metadata.list({
+            title: $t('Scene Transition'),
+            name: 'transition',
+            options: this.transitionOptions,
+          })}
+        />
+        <VFormGroup
+          value={this.toSceneModel}
+          onInput={this.setToSceneModel}
+          metadata={metadata.list({
+            title: $t('Ending Scene'),
+            name: 'to',
+            options: this.sceneOptions,
+          })}
+        />
+      </div>
+    );
   }
 }
