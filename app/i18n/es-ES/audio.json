@@ -11,6 +11,6 @@
   "Advanced Audio Settings": "Ajustes de Audio Avanzados",
   "Volume ( % )": "Volumen (%)",
   "Sync Offset ( ms )": "Sincronización Offset ( ms )",
-  "Mixer": "Mezclador",
+  "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorizar niveles de audio. Si las barras se mueven está saliendo el audio."
 }
