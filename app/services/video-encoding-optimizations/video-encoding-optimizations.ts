@@ -168,11 +168,13 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
     console.log('Apply encoder settings', newStreamingSettings);
 
+    // apply new streaming settings
+    // also migrate simple settings to advanced settings if the current mode is Simple
     this.outputSettingsService.setSettings({
       mode: 'Advanced',
       streaming: newStreamingSettings,
-      // if current mode is Simple we need to pass recording settings as well to the Advanced mode
       recording: currentSettings.recording,
+      replayBuffer: currentSettings.replayBuffer,
     });
 
     this.isUsingEncodingOptimizations = true;
