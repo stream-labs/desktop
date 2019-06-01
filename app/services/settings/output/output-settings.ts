@@ -195,7 +195,7 @@ export class OutputSettingsService extends Service {
       inputResolution,
       streaming,
       recording,
-      replayBuffer
+      replayBuffer,
     };
   }
 
