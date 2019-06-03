@@ -10,12 +10,16 @@ import { $t } from 'services/i18n';
 export default class GameOverlaySettings extends TsxComponent<{}> {
   @Inject() gameOverlayService: GameOverlayService;
 
+  enabling = false;
+
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
   }
 
-  setEnableGameOverlay(val: boolean) {
-    this.gameOverlayService.setEnabled(val);
+  async setEnableGameOverlay(val: boolean) {
+    this.enabling = true;
+    await this.gameOverlayService.setEnabled(val);
+    this.enabling = false;
   }
 
   get enablePreview() {
@@ -55,33 +59,35 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     return (
       <div>
         <div class="section">
-          <div class="section-content">
-            <VFormGroup
-              value={this.enableGameOverlay}
-              onInput={this.setEnableGameOverlay}
-              metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
-            />
-            {/* <VFormGroup
+          {!this.enabling && (
+            <div class="section-content">
+              <VFormGroup
+                value={this.enableGameOverlay}
+                onInput={this.setEnableGameOverlay}
+                metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
+              />
+              {/* <VFormGroup
               value={this.enablePreview}
               onInput={this.setEnablePreview}
               metadata={metadata.toggle({ title: $t('Enable stream preview in overlay') })}
             /> */}
-            {this.enableGameOverlay && (
-              <VFormGroup
-                value={this.previewMode}
-                onInput={this.togglePreviewMode}
-                metadata={metadata.toggle({ title: $t('Toggle positioning mode') })}
-              />
-            )}
-            {this.enableGameOverlay && (
-              <VFormGroup
-                metadata={this.sliderMetadata}
-                value={this.overlayTransparency}
-                onInput={this.setOverlayTransparency}
-              />
-            )}
-            {$t("Don't forget to set a hotkey to toggle your overlay.")}
-          </div>
+              {this.enableGameOverlay && (
+                <VFormGroup
+                  value={this.previewMode}
+                  onInput={this.togglePreviewMode}
+                  metadata={metadata.toggle({ title: $t('Toggle positioning mode') })}
+                />
+              )}
+              {this.enableGameOverlay && (
+                <VFormGroup
+                  metadata={this.sliderMetadata}
+                  value={this.overlayTransparency}
+                  onInput={this.setOverlayTransparency}
+                />
+              )}
+              {$t("Don't forget to set a hotkey to toggle your overlay.")}
+            </div>
+          )}
         </div>
       </div>
     );

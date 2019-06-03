@@ -66,13 +66,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (!this.state.isEnabled) return;
 
     this.lifecycle = await this.userService.withLifecycle({
-      init: this.createOverlay,
+      init: this.initializeOverlay,
       destroy: this.destroyOverlay,
       context: this,
     });
   }
 
-  async createOverlay() {
+  async initializeOverlay() {
     overlay.start();
 
     this.onWindowsReadySubscription = this.onWindowsReady
@@ -214,7 +214,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
-    if (shouldStart) await this.createOverlay();
+    if (shouldStart) await this.initializeOverlay();
     if (shouldStop) this.destroyOverlay();
 
     this.SET_ENABLED(shouldEnable);
@@ -295,6 +295,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       await overlay.stop();
       if (this.onWindowsReadySubscription) this.onWindowsReadySubscription.unsubscribe();
       if (this.windows) Object.values(this.windows).forEach(win => win.destroy());
+      if (this.previewWindows) Object.values(this.previewWindows).forEach(win => win.destroy());
     }
   }
 
