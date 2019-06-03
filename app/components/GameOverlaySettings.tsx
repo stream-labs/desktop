@@ -61,7 +61,6 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
               onInput={this.setEnableGameOverlay}
               metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
             />
-            {$t("Don't forget to set a hotkey to toggle your overlay.")}
             {/* <VFormGroup
               value={this.enablePreview}
               onInput={this.setEnablePreview}
@@ -81,6 +80,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 onInput={this.setOverlayTransparency}
               />
             )}
+            {$t("Don't forget to set a hotkey to toggle your overlay.")}
           </div>
         </div>
       </div>

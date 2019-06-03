@@ -28,6 +28,7 @@ import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
+import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -83,6 +84,7 @@ export function getComponents() {
     FacemaskSettings,
     EditTransform,
     OverlayWindow,
+    OverlayPlaceholder,
 
     BitGoal,
     DonationGoal,

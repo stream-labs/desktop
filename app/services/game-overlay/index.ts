@@ -24,22 +24,6 @@ export type GameOverlayState = {
   };
 };
 
-/**
- * JavaScript code to make windows draggable without a titlebar.
- */
-const makeDraggable = `
-  document.querySelector('body').style['-webkit-app-region'] = 'drag';
-  // Twitch seems to be using React portals so "body" doesn't work.
-  const el = document.querySelector('.tw-absolute')
-  if (el) { el.style['-webkit-app-region'] = 'drag' };
-  /*
-   * Restore input for specific elements, list items, links, buttons and inputs.
-   * Custom selectors are for: Recent Events body/tables, Twitch room selector, chat and bottom section
-   *
-   */
-  document.styleSheets[0].addRule("li, a, button, input, .mission-control-wrapper, .accordions, .room-selector .rooms-header .tw-flex, .chat-room", "-webkit-app-region: no-drag", 1);
-`;
-
 @InitAfter('UserService')
 @InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
@@ -65,6 +49,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     recentEvents: Electron.BrowserWindow;
     // overlayControls: Electron.BrowserWindow;
   } = {} as any;
+
+  previewWindows: {
+    chat: Electron.BrowserWindow;
+    recentEvents: Electron.BrowserWindow;
+    // overlayControls: Electron.BrowserWindow;
+  } = {} as any;
+
   overlayWindow: Electron.BrowserWindow;
   onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
   onWindowsReadySubscription: Subscription;
@@ -94,12 +85,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     this.createBrowserWindows(containerX, containerY);
     await this.configureWindows(containerX, containerY);
-
-    for (const view of Object.values(this.windows)) {
-      view.webContents.once('dom-ready', async () => {
-        await view.webContents.executeJavaScript(makeDraggable);
-      });
-    }
   }
 
   createBrowserWindows(containerX: number, containerY: number) {
@@ -123,11 +108,27 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       width: 600,
       parent: this.overlayWindow,
     });
+    this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...commonWindowOptions,
+      // @ts-ignore
+      width: 600,
+      webPreferences: { offscreen: false },
+      isFullScreen: true,
+      componentName: 'OverlayPlaceholder',
+    });
 
     this.windows.chat = new BrowserWindow({
       ...commonWindowOptions,
       height: 600,
       parent: this.overlayWindow,
+    });
+    this.previewWindows.chat = this.windowsService.createOneOffWindowForOverlay({
+      ...commonWindowOptions,
+      // @ts-ignore
+      height: 600,
+      webPreferences: { offscreen: false },
+      isFullScreen: true,
+      componentName: 'OverlayPlaceholder',
     });
 
     // Unneeded window without interactivity
@@ -197,6 +198,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       return;
     }
 
+    if (this.state.previewMode) this.setPreviewMode(false);
+
     this.state.isShowing ? this.hideOverlay() : this.showOverlay();
   }
 
@@ -204,30 +207,32 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     return this.state.isEnabled;
   }
 
-  setEnabled(shouldEnable: boolean = true) {
+  async setEnabled(shouldEnable: boolean = true) {
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
-    if (shouldStart) this.createOverlay();
+    if (shouldStart) await this.createOverlay();
     if (shouldStop) this.destroyOverlay();
 
     this.SET_ENABLED(shouldEnable);
+    this.setPreviewEnabled(true);
   }
 
-  setPreviewMode(previewMode: boolean) {
+  async setPreviewMode(previewMode: boolean) {
+    if (this.state.isShowing) this.hideOverlay();
     if (!this.state.isEnabled) return;
     this.SET_PREVIEW_MODE(previewMode);
     if (previewMode) {
-      Object.values(this.windows).forEach(win => win.show());
+      Object.values(this.previewWindows).forEach(win => win.show());
     } else {
-      Object.keys(this.windows).forEach(key => {
-        const win: electron.BrowserWindow = this.windows[key];
+      Object.keys(this.previewWindows).forEach(async key => {
+        const win: electron.BrowserWindow = this.previewWindows[key];
         const overlayId = this.state.windowIds[key];
 
         const [x, y] = win.getPosition();
         const { width, height } = win.getBounds();
 
-        overlay.setPosition(overlayId, x, y, width, height);
+        await overlay.setPosition(overlayId, x, y, width, height);
         win.hide();
       });
     }
