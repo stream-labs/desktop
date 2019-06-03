@@ -304,7 +304,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const win: electron.BrowserWindow = this.windows[key];
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
-      if (overlayId.toString() === '-1') {
+      if (overlayId === -1 || overlayId == null) {
         this.overlayWindow.hide();
         throw new Error('Error creating overlay');
       }
