@@ -1,12 +1,17 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
+import styles from './OverlayPlaceholder.m.less';
 
 @Component({})
 export default class OverlayPlaceholder extends TsxComponent<{}> {
+  @Prop() title: string;
+
   render(h: Function) {
     return (
-      <div style="-webkit-app-region: drag; width: 100%; height: 100%;">
-        <div />
+      <div class={styles.container}>
+        <div class={styles.outline}>
+          <h1 class={styles.title}>{this.title}</h1>
+        </div>
       </div>
     );
   }

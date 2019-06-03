@@ -9,6 +9,7 @@ import { getPlatformService } from '../platforms';
 import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
+import { $t } from 'services/i18n';
 
 const { BrowserWindow } = electron.remote;
 
@@ -115,6 +116,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       webPreferences: { offscreen: false },
       isFullScreen: true,
       componentName: 'OverlayPlaceholder',
+      title: $t('Recent Events'),
     });
 
     this.windows.chat = new BrowserWindow({
@@ -129,6 +131,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       webPreferences: { offscreen: false },
       isFullScreen: true,
       componentName: 'OverlayPlaceholder',
+      title: $t('Chat'),
     });
 
     // Unneeded window without interactivity
