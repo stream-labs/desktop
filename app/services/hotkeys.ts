@@ -148,11 +148,6 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Toggle in-game overlay'),
     down: () => getGameOverlayService().toggleOverlay(),
   },
-  TOGGLE_OVERLAY_PREVIEW: {
-    name: 'TOGGLE_OVERLAY_PREVIEW',
-    description: () => $t('Toggle in-game overlay preview'),
-    down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
-  },
 };
 
 const SOURCE_ACTIONS: HotkeyGroup = {

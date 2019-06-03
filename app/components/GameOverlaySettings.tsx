@@ -2,16 +2,13 @@ import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { metadata } from 'components/shared/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import HotkeyGroup from 'components/HotkeyGroup';
 import { GameOverlayService } from 'services/game-overlay';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
-import { HotkeysService } from 'services/hotkeys';
 
 @Component({})
 export default class GameOverlaySettings extends TsxComponent<{}> {
   @Inject() gameOverlayService: GameOverlayService;
-  @Inject() hotkeysService: HotkeysService;
 
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
@@ -27,6 +24,14 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
 
   setEnablePreview(val: boolean) {
     this.gameOverlayService.setPreviewEnabled(val);
+  }
+
+  get previewMode() {
+    return this.gameOverlayService.state.previewMode;
+  }
+
+  togglePreviewMode() {
+    this.gameOverlayService.setPreviewMode(!this.previewMode);
   }
 
   overlayTransparency = this.gameOverlayService.state.opacity / 100;
@@ -46,12 +51,6 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     });
   }
 
-  get filteredHotkeySet() {
-    return this.hotkeysService
-      .getHotkeysSet()
-      .general.filter(hotkey => /OVERLAY/.test(hotkey.actionName));
-  }
-
   render(h: Function) {
     return (
       <div>
@@ -62,6 +61,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
               onInput={this.setEnableGameOverlay}
               metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
             />
+            {$t("Don't forget to set a hotkey to toggle your overlay.")}
             {/* <VFormGroup
               value={this.enablePreview}
               onInput={this.setEnablePreview}
@@ -69,13 +69,17 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
             /> */}
             {this.enableGameOverlay && (
               <VFormGroup
+                value={this.previewMode}
+                onInput={this.togglePreviewMode}
+                metadata={metadata.toggle({ title: $t('Toggle positioning mode') })}
+              />
+            )}
+            {this.enableGameOverlay && (
+              <VFormGroup
                 metadata={this.sliderMetadata}
                 value={this.overlayTransparency}
                 onInput={this.setOverlayTransparency}
               />
-            )}
-            {this.enableGameOverlay && (
-              <HotkeyGroup title={$t('Overlay Hotkeys')} hotkeys={this.filteredHotkeySet} />
             )}
           </div>
         </div>
