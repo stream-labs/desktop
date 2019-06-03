@@ -144,7 +144,6 @@ export class FileManagerService extends Service {
       await this.writeFile(filePath, file.data);
 
       if (version !== file.version) {
-        // TODO: throw here seems to be used as control flow
         throw new Error('Wrote out of date file!  Will retry...');
       }
 
@@ -182,14 +181,12 @@ export class FileManagerService extends Service {
 
       fs.writeFile(tmpPath, data, err => {
         if (err) {
-          console.error(err);
           reject(err);
           return;
         }
 
         fs.rename(tmpPath, filePath, err => {
           if (err) {
-            console.error(err);
             reject(err);
             return;
           }
