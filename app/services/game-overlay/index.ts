@@ -193,7 +193,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
-    if (overlay.getStatus() !== OverlayThreadStatus.Running) {
+    if (overlay.getStatus() !== OverlayThreadStatus.Running || !this.state.isEnabled) {
       return;
     }
 
@@ -306,7 +306,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const { width, height } = win.getBounds();
 
       overlay.setPosition(overlayId, x, y, width, height);
-      overlay.setTransparency(overlayId, this.state.opacity);
+      overlay.setTransparency(overlayId, this.state.opacity * 2.55);
 
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());

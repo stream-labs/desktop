@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { metadata } from 'components/shared/inputs';
@@ -63,11 +62,11 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
               onInput={this.setEnableGameOverlay}
               metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
             />
-            <VFormGroup
+            {/* <VFormGroup
               value={this.enablePreview}
               onInput={this.setEnablePreview}
               metadata={metadata.toggle({ title: $t('Enable stream preview in overlay') })}
-            />
+            /> */}
             {this.enableGameOverlay && (
               <VFormGroup
                 metadata={this.sliderMetadata}
@@ -75,7 +74,9 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 onInput={this.setOverlayTransparency}
               />
             )}
-            <HotkeyGroup title={$t('Overlay Hotkeys')} hotkeys={this.filteredHotkeySet} />
+            {this.enableGameOverlay && (
+              <HotkeyGroup title={$t('Overlay Hotkeys')} hotkeys={this.filteredHotkeySet} />
+            )}
           </div>
         </div>
       </div>
