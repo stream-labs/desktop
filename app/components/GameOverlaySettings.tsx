@@ -11,6 +11,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
   @Inject() gameOverlayService: GameOverlayService;
 
   enabling = false;
+  overlayTransparency = this.gameOverlayService.state.opacity / 100;
 
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
@@ -38,8 +39,6 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.gameOverlayService.setPreviewMode(!this.previewMode);
   }
 
-  overlayTransparency = this.gameOverlayService.state.opacity / 100;
-
   setOverlayTransparency(value: number) {
     this.overlayTransparency = value;
     this.gameOverlayService.setOverlayOpacity(value * 100);
@@ -53,6 +52,23 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
       interval: 0.1,
       usePercentages: true,
     });
+  }
+
+  extraOptions(h: Function) {
+    return (
+      <div>
+        <VFormGroup
+          value={this.previewMode}
+          onInput={this.togglePreviewMode}
+          metadata={metadata.toggle({ title: $t('Toggle positioning mode') })}
+        />
+        <VFormGroup
+          metadata={this.sliderMetadata}
+          value={this.overlayTransparency}
+          onInput={this.setOverlayTransparency}
+        />
+      </div>
+    );
   }
 
   render(h: Function) {
@@ -71,21 +87,8 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
               onInput={this.setEnablePreview}
               metadata={metadata.toggle({ title: $t('Enable stream preview in overlay') })}
             /> */}
-              {this.enableGameOverlay && (
-                <VFormGroup
-                  value={this.previewMode}
-                  onInput={this.togglePreviewMode}
-                  metadata={metadata.toggle({ title: $t('Toggle positioning mode') })}
-                />
-              )}
-              {this.enableGameOverlay && (
-                <VFormGroup
-                  metadata={this.sliderMetadata}
-                  value={this.overlayTransparency}
-                  onInput={this.setOverlayTransparency}
-                />
-              )}
-              {$t("Don't forget to set a hotkey to toggle your overlay.")}
+              {this.enableGameOverlay && this.extraOptions(h)}
+              {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}
             </div>
           )}
         </div>

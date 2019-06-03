@@ -19,10 +19,7 @@ export type GameOverlayState = {
   isPreviewEnabled: boolean;
   previewMode: boolean;
   opacity: number;
-  windowIds: {
-    chat: number;
-    recentEvents: number;
-  };
+  windowIds: { chat: number; recentEvents: number };
 };
 
 @InitAfter('UserService')
@@ -38,11 +35,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     isPreviewEnabled: true,
     previewMode: false,
     opacity: 100,
-    windowIds: {
-      chat: null,
-      recentEvents: null,
-      // overlayControls: null,
-    },
+    windowIds: { chat: null, recentEvents: null },
   };
 
   windows: {
