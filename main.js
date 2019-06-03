@@ -254,7 +254,9 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    if (!childWindow.isDestroyed()) {
+      childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    }
   });
 
   ipcMain.on('services-request', (event, payload) => {
