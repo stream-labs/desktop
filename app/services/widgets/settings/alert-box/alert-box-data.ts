@@ -119,27 +119,18 @@ export const conditions = () => ({
   ],
 });
 
-export const conditionData = () => [
-  {
-    type: 'RANDOM',
-    metadata: metadata.frequency({ title: $t('Variation Frequency') }),
-  },
-  {
-    type: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE',
-    metadata: metadata.list({
-      title: $t('Item Type'),
-      options: [
-        { value: 'perk', title: 'Perk' },
-        { value: 'sound', title: 'Sound' },
-        { value: 'code', title: 'Code' },
-      ],
-    }),
-  },
-  {
-    type: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME',
-    metadata: metadata.text({ title: $t('Item Name'), max: 50 }),
-  },
-];
+export const conditionData = () => ({
+  RANDOM: metadata.frequency({ title: $t('Variation Frequency') }),
+  LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
+    title: $t('Item Type'),
+    options: [
+      { value: 'perk', title: 'Perk' },
+      { value: 'sound', title: 'Sound' },
+      { value: 'code', title: 'Code' },
+    ],
+  }),
+  LOYALTY_STORE_REDEMPTION_ITEM_NAME: metadata.text({ title: $t('Item Name'), max: 50 }),
+});
 
 export const newVariation = (type: string): IAlertBoxVariation => ({
   condition: 'RANDOM',

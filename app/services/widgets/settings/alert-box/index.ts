@@ -52,13 +52,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   }
 
   conditionDataByCondition(type: string) {
-    const found = conditionData().find(metadata => metadata.type === type);
-
-    if (found) {
-      return found.metadata;
-    }
-
-    return metadata.number({ title: $t('Variation Amount') });
+    return conditionData()[type] || metadata.number({ title: $t('Variation Amount') });
   }
 
   newVariation(type: string): IAlertBoxVariation {
