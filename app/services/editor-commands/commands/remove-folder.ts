@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
+import { $t } from 'services/i18n';
 
 export class RemoveFolderCommand extends Command {
   @Inject() private scenesService: ScenesService;
@@ -13,7 +14,7 @@ export class RemoveFolderCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.name}`;
+    return $t('Remove %{folderName}', { folderName: this.name });
   }
 
   execute() {

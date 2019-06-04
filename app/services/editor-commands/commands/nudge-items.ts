@@ -1,5 +1,6 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export enum ENudgeDirection {
   Up = 'up',
@@ -14,7 +15,7 @@ export class NudgeItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return `Nudge ${this.selection.getNodes()[0].name}`;
+    return $t('Nudge %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

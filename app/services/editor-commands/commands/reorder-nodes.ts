@@ -1,5 +1,6 @@
 import { Command } from './command';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export enum EPlaceType {
   After = 'after',
@@ -24,7 +25,7 @@ export class ReorderNodesCommand extends Command {
   }
 
   get description() {
-    return `Reorder ${this.selection.getNodes()[0].name}`;
+    return $t('Reorder %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   execute() {

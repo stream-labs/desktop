@@ -2,6 +2,7 @@ import { CombinableCommand } from './combinable-command';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { SourceFiltersService } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class EditFilterPropertiesCommand extends CombinableCommand {
   @Inject() private sourceFiltersService: SourceFiltersService;
@@ -18,7 +19,7 @@ export class EditFilterPropertiesCommand extends CombinableCommand {
   ) {
     super();
 
-    this.description = `Edit ${this.filterName}`;
+    this.description = $t('Edit %{filterName}', { filterName: this.filterName });
   }
 
   execute() {

@@ -4,6 +4,7 @@ import { ScenesService } from 'services/scenes';
 import { CopyNodesCommand } from './copy-nodes';
 import { RemoveItemCommand } from './remove-item';
 import { RemoveSceneCommand } from './remove-scene';
+import { $t } from 'services/i18n';
 
 /**
  * This command is a little weird and dangerous, but
@@ -28,7 +29,7 @@ export class UngroupSceneCommand extends Command {
   constructor(private sourceSceneItemId: string, private destSceneId: string) {
     super();
     const sceneItem = this.scenesService.getSceneItem(sourceSceneItemId);
-    this.description = `Ungroup ${sceneItem.name}`;
+    this.description = $t('Ungroup %{sourceName}', { sourceName: sceneItem.name });
   }
 
   async execute() {
