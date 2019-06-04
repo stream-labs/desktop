@@ -44,6 +44,10 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.gameOverlayService.setOverlayOpacity(value * 100);
   }
 
+  resetPosition() {
+    this.gameOverlayService.resetPosition();
+  }
+
   get sliderMetadata() {
     return metadata.slider({
       title: $t('Overlay Opacity'),
@@ -67,6 +71,9 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
           value={this.overlayTransparency}
           onInput={this.setOverlayTransparency}
         />
+        <button class="button button--action" onClick={this.resetPosition}>
+          {$t('Reset Overlay Position')}
+        </button>
       </div>
     );
   }
