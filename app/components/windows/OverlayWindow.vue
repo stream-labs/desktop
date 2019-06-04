@@ -31,6 +31,7 @@
 .overlay-content {
   .flex();
   .flex--space-between();
+
   height: 90%;
 
   & > div {
@@ -42,15 +43,17 @@
   }
 
   & /deep/ .studio-controls-selector {
-    background: var(--section);
     .radius();
+
+    background: var(--section);
     flex-grow: 1;
     overflow-y: auto;
   }
 
   .live-preview {
-    width: 100%;
     .margin-horizontal--10();
+
+    width: 100%;
   }
 
   .overlay-scenes {
@@ -62,6 +65,7 @@
   .flex();
   .flex--center();
   .flex--space-between();
+
   top: 32px;
 }
 
@@ -80,6 +84,7 @@
 
 .live-display {
   .flex--justify-start();
+
   width: 100%;
 
   & /deep/ * {

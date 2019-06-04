@@ -36,7 +36,8 @@
 }
 
 .modal-layout.has-titlebar {
-  height: calc(~'100% - 30px'); // Compensate for titlebar living in ChildWindow
+  // Compensate for titlebar living in ChildWindow
+  height: calc(~'100% - 30px');
 }
 
 .modal-layout--w-side-menu {

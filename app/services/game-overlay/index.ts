@@ -55,6 +55,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   onWindowsReadySubscription: Subscription;
   lifecycle: LoginLifecycle;
 
+  commonWindowOptions = {};
+
   async initialize() {
     if (!this.state.isEnabled) return;
 
@@ -76,13 +78,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       .subscribe({ complete: () => this.createWindowOverlays() });
 
     const [containerX, containerY] = this.getWindowContainerStartingPosition();
-
-    this.createBrowserWindows(containerX, containerY);
-    await this.configureWindows(containerX, containerY);
-  }
-
-  createBrowserWindows(containerX: number, containerY: number) {
-    const commonWindowOptions = {
+    this.commonWindowOptions = {
       backgroundColor: this.customizationService.themeBackground,
       show: false,
       frame: false,
@@ -95,36 +91,28 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
     };
 
-    this.overlayWindow = new BrowserWindow({ ...commonWindowOptions, height: 600, width: 600 });
+    this.createBrowserWindows();
+    this.createPreviewWindows();
+    await this.configureWindows(containerX, containerY);
+  }
+
+  createBrowserWindows() {
+    this.overlayWindow = new BrowserWindow({
+      ...this.commonWindowOptions,
+      height: 600,
+      width: 600,
+    });
 
     this.windows.recentEvents = new BrowserWindow({
-      ...commonWindowOptions,
+      ...this.commonWindowOptions,
       width: 600,
       parent: this.overlayWindow,
-    });
-    this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
-      ...commonWindowOptions,
-      // @ts-ignore
-      width: 600,
-      webPreferences: { offscreen: false },
-      isFullScreen: true,
-      componentName: 'OverlayPlaceholder',
-      title: $t('Recent Events'),
     });
 
     this.windows.chat = new BrowserWindow({
-      ...commonWindowOptions,
+      ...this.commonWindowOptions,
       height: 600,
       parent: this.overlayWindow,
-    });
-    this.previewWindows.chat = this.windowsService.createOneOffWindowForOverlay({
-      ...commonWindowOptions,
-      // @ts-ignore
-      height: 600,
-      webPreferences: { offscreen: false },
-      isFullScreen: true,
-      componentName: 'OverlayPlaceholder',
-      title: $t('Chat'),
     });
 
     // Unneeded window without interactivity
@@ -144,6 +132,26 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     //   },
     //   'overlay',
     // );
+  }
+
+  createPreviewWindows() {
+    this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      width: 600,
+      webPreferences: { offscreen: false },
+      isFullScreen: true,
+      componentName: 'OverlayPlaceholder',
+      title: $t('Recent Events'),
+    });
+
+    this.previewWindows.chat = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      height: 600,
+      webPreferences: { offscreen: false },
+      isFullScreen: true,
+      componentName: 'OverlayPlaceholder',
+      title: $t('Chat'),
+    });
   }
 
   async configureWindows(containerX: number, containerY: number) {

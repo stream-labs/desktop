@@ -121,6 +121,9 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+  height?: number;
+  width?: number;
+  webPreferences?: { offscreen: boolean };
 
   // Will be true when the UI is performing animations, transitions, or property changes that affect
   // the display of elements we cannot draw over. During this time such elements, for example
