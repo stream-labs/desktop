@@ -93,6 +93,7 @@ interface IAppManifest {
   sources: IAppSource[];
   pages: IAppPage[];
   authorizationUrls: string[];
+  mediaDomains: string[];
 }
 
 interface IProductionAppResponse {
