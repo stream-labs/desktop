@@ -28,6 +28,7 @@ export const API_NAME_MAP = {
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
   facemaskdonation: 'facemasks',
+  loyalty_store_redemption: 'loyaltyStore',
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
