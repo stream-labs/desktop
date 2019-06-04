@@ -27,6 +27,18 @@ interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
+interface ISentryContext {
+  username: string;
+  platform: string;
+}
+
+export function setSentryContext(ctx: ISentryContext) {
+  Sentry.configureScope(scope => {
+    scope.setUser({ username: ctx.username });
+    scope.setExtra('platform', ctx.platform);
+  });
+}
+
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
@@ -64,6 +76,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
+
+  /**
+   * Used by child and 1-off windows to update their sentry contexts
+   */
+  sentryContext = new Subject<ISentryContext>();
 
   init() {
     super.init();
@@ -405,10 +422,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   setSentryContext() {
     if (!this.isLoggedIn()) return;
 
-    Sentry.configureScope(scope => {
-      scope.setUser({ username: this.username });
-      scope.setExtra('platform', this.platform.type);
-    });
+    setSentryContext(this.getSentryContext());
+
+    this.sentryContext.next(this.getSentryContext());
+  }
+
+  getSentryContext(): ISentryContext {
+    if (!this.isLoggedIn()) return null;
+
+    return {
+      username: this.username,
+      platform: this.platform.type,
+    };
   }
 
   popoutRecentEvents() {
