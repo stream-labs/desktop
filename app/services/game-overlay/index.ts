@@ -179,6 +179,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const position = this.determineStartPosition(key);
       const size = key === 'chat' ? { width: 300, height: 600 } : { width: 600, height: 300 };
       win.setBounds({ ...position, ...size });
+      this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
     this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
@@ -214,6 +215,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const pos = this.defaultPosition(key);
       const size = key === 'chat' ? { width: 300, height: 600 } : { width: 600, height: 300 };
       this.windows[key].setBounds({ ...pos, ...size });
+      this.previewWindows[key].setBounds({ ...pos, ...size });
       overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
     });
   }
