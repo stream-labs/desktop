@@ -21,7 +21,8 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
-import { isError } from 'util';
+import { UserService, setSentryContext } from 'services/user';
+import { getResource } from 'services';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -48,10 +49,14 @@ if (isProduction) {
   });
 }
 
+let usingSentry = false;
+
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
   !electron.remote.process.env.SLOBS_IPC
 ) {
+  usingSentry = true;
+
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
@@ -119,6 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       if (Utils.isChildWindow()) {
         ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
+
+      if (usingSentry) {
+        const userService = getResource<UserService>('UserService');
+
+        const ctx = userService.getSentryContext();
+        if (ctx) setSentryContext(ctx);
+        userService.sentryContext.subscribe(setSentryContext);
       }
     }
 
