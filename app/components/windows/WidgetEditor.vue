@@ -138,6 +138,7 @@
   }
 
   .subsection__content {
+    flex: 1;
     .input-wrapper {
       width: 100%;
     }

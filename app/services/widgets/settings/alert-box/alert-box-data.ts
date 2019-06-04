@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4';
 import { IAlertBoxVariation } from './alert-box-api';
 import { $t } from 'services/i18n';
+import { metadata } from 'components/widgets/inputs';
 
 export const API_NAME_MAP = {
   bit: 'bits',
@@ -28,6 +29,7 @@ export const API_NAME_MAP = {
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
   facemaskdonation: 'facemasks',
+  loyalty_store_redemption: 'loyaltystore',
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
@@ -111,7 +113,33 @@ export const conditions = () => ({
     { value: 'MERCH_PRODUCT', title: $t('Product') },
     { value: 'MERCH_PREORDER', title: $t('Preorder') },
   ],
+  loyaltystore: [
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: 'Item type is <type>' },
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: 'Item name is <name>' },
+  ],
 });
+
+export const conditionData = () => [
+  {
+    type: 'RANDOM',
+    metadata: metadata.frequency({ title: $t('Variation Frequency') }),
+  },
+  {
+    type: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE',
+    metadata: metadata.list({
+      title: $t('Item Type'),
+      options: [
+        { value: 'perk', title: 'Perk' },
+        { value: 'sound', title: 'Sound' },
+        { value: 'code', title: 'Code' },
+      ],
+    }),
+  },
+  {
+    type: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME',
+    metadata: metadata.text({ title: $t('Item Name'), max: 50 }),
+  },
+];
 
 export const newVariation = (type: string): IAlertBoxVariation => ({
   condition: 'RANDOM',
