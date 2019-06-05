@@ -280,7 +280,7 @@ export class ApiClient {
     }) as TResourceType;
   }
 
-  fetchNextEvent(): Promise<any> {
+  fetchNextEvent(): Promise<IJsonRpcEvent> {
     return new Promise((resolve, reject) => {
       this.eventReceived.pipe(first()).subscribe(event => resolve(event));
       setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
