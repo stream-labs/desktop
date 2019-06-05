@@ -72,5 +72,6 @@
   "Scheduled Date": "Data agendada",
   "Scheduled Time": "Hora agendada",
   "You are 10 minutes away from the 8 hour stream limit": "Está a 10 minutos do limite de transmissão de 8 horas",
-  "Stream has disconnected, attempting to reconnect.": "A stream foi desligada. A tentar religar."
+  "Stream has disconnected, attempting to reconnect.": "A stream foi desligada. A tentar religar.",
+  "Start typing to search": "Start typing to search"
 }
