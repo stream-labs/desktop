@@ -53,13 +53,18 @@ export default class Hotkeys extends Vue {
     return {
       general: this.hotkeySet.general,
       sources: mapValues(this.hotkeySet.sources, (hotkeys, sourceId) => {
-        return hotkeys.map(hotkey => {
-          return { ...hotkey, categoryName: this.sourcesService.getSource(sourceId).name };
+        return hotkeys.map((hotkey: IAugmentedHotkey) => {
+          // Mutating the original object is required for bindings to work
+          // TODO: We should refactor this to not rely on child components
+          // mutating the original objects.
+          hotkey.categoryName = this.sourcesService.getSource(sourceId).name;
+          return hotkey;
         });
       }),
       scenes: mapValues(this.hotkeySet.scenes, (hotkeys, sceneId) => {
-        return hotkeys.map(hotkey => {
-          return { ...hotkey, categoryName: this.scenesService.getScene(sceneId).name };
+        return hotkeys.map((hotkey: IAugmentedHotkey) => {
+          hotkey.categoryName = this.scenesService.getScene(sceneId).name;
+          return hotkey;
         });
       }),
     };

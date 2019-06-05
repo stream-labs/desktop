@@ -1,8 +1,7 @@
 // The stress test will not be run when normally running tests.
 
-import test from 'ava';
 import { uniqueId, sample } from 'lodash';
-import { useSpectron, focusMain, TExecutionContext, focusWindow, closeWindow } from '../helpers/spectron/index';
+import { useSpectron, focusMain, TExecutionContext, focusWindow, closeWindow, test } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/spectron/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';

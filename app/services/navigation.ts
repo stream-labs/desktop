@@ -12,7 +12,8 @@ export type TAppPage =
   | 'DesignSystem'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
-  | 'Help';
+  | 'Help'
+  | 'CreatorSites';
 
 interface INavigationState {
   currentPage: TAppPage;
