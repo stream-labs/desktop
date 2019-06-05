@@ -11,7 +11,7 @@ const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
-test('Go through onboarding', async t => {
+test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
   await focusMain(t);
 
@@ -30,11 +30,14 @@ test('Go through onboarding', async t => {
     await t.context.app.client.click('button=Start Fresh');
   }
 
-  await app.client.click('a=Setup later');
+  // Start auto config
+  await app.client.click('button=Start');
+  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
+  await app.client.click('button=Next');
 
-  t.pass();
+  // success?
+  t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
 });
-
 
 test('OBS Importer', async t => {
   const client = t.context.app.client;
