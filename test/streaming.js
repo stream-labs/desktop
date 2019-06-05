@@ -3,6 +3,7 @@ import { setFormInput } from './helpers/spectron/forms';
 import { fillForm } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
 import { setOutputResolution } from './helpers/spectron/output';
+import { sleep } from './helpers/sleep';
 
 
 useSpectron({ appArgs: '--nosync' });
