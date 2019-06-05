@@ -186,7 +186,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       }
     }
 
-    console.log('get settings form data', settings);
     return settings;
   }
 
