@@ -26,8 +26,9 @@ export default class AddSource extends Vue {
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  sourceAddOptions = this.windowsService.getChildWindowQueryParams()
-    .sourceAddOptions as ISourceAddOptions;
+  sourceAddOptions = (this.windowsService.getChildWindowQueryParams().sourceAddOptions || {
+    propertiesManagerSettings: {},
+  }) as ISourceAddOptions;
 
   get widgetType() {
     return this.sourceAddOptions.propertiesManagerSettings.widgetType;
