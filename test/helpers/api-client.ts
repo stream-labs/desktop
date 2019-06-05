@@ -1,6 +1,7 @@
-import { IJsonRpcRequest } from '../../app/services/api/jsonrpc';
-import { Subject } from 'rxjs';
+import { IJsonRpcEvent, IJsonRpcRequest } from '../../app/services/api/jsonrpc';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { isEqual } from 'lodash';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
@@ -15,7 +16,7 @@ let clientInstance: ApiClient = null;
 export type TConnectionStatus = 'disconnected' | 'pending' | 'connected';
 
 export class ApiClient {
-  eventReceived = new Subject<any>();
+  eventReceived = new Subject<IJsonRpcEvent>();
 
   private nextRequestId = 1;
   private socket = new net.Socket();
@@ -199,7 +200,7 @@ export class ApiClient {
         if (result._type === 'EVENT') {
           if (result.emitter === 'STREAM') {
             const eventSubject = this.subscriptions[message.result.resourceId];
-            this.eventReceived.next(result.data);
+            this.eventReceived.next(result);
             if (eventSubject) eventSubject.next(result.data);
           } else if (result.emitter === 'PROMISE') {
             // case when listenAllSubscriptions = true
@@ -286,33 +287,8 @@ export class ApiClient {
     });
   }
 
-  /**
-   * Wait for API event
-   * Skip events if constraint returned a false value
-   * @example
-   *  // wait for event that has a `fader` property
-   *  const event = await client.waitForEvent((event: any) => !!event.fader)
-   */
-  waitForEvent<TEvent extends Dictionary<any>>(
-    constraint: (event: TEvent) => boolean,
-  ): Promise<TEvent> {
-    return new Promise((resolve, reject) => {
-      const receivedEvents: any[] = []; // record all received events here just for logging
-      const subscr = this.eventReceived.subscribe(event => {
-        receivedEvents.push(event);
-        if (!constraint(event)) return;
-        subscr.unsubscribe();
-        resolve(event);
-      });
-
-      // stop waiting on timeout
-      setTimeout(() => {
-        subscr.unsubscribe();
-        let errorMessage = `Did not receive the event in ${PROMISE_TIMEOUT}ms`;
-        errorMessage += `\n received events:\n ${JSON.stringify(receivedEvents)}`;
-        reject(errorMessage);
-      }, PROMISE_TIMEOUT);
-    });
+  watchForEvents(eventNames: string[]): ApiEventWatcher {
+    return new ApiEventWatcher(this, eventNames);
   }
 
   private getResourceTypeName(resourceId: string): string {
@@ -343,4 +319,63 @@ export async function getClient() {
   }
 
   return clientInstance;
+}
+
+/**
+ * Watcher for testing API events
+ */
+class ApiEventWatcher {
+  receivedEvents: IJsonRpcEvent[] = [];
+  private subscriptions: Subscription[];
+  private eventReceived = new Subject();
+
+  constructor(private apiClient: ApiClient, private eventNames: string[]) {
+    // start watching for events
+    this.subscriptions = this.eventNames.map(eventName => {
+      const [resourceId, prop] = eventName.split('.');
+      const observable = this.apiClient.getResource(resourceId)[prop] as Observable<any>;
+      return observable.subscribe(() => void 0);
+    });
+
+    this.apiClient.eventReceived.subscribe(event => this.onEventHandler(event));
+  }
+
+  /**
+   * wait for API to emit events in the specific order
+   */
+  waitForSequence(eventNames: string[], timeout = 10000): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // compare already received events with required order
+      const checkSequence = () => {
+        if (isEqual(this.getReceivedEventNames(), eventNames)) {
+          resolve();
+          return true;
+        }
+      };
+
+      // check the situation when the all events are already received
+      if (checkSequence()) return;
+
+      // if events are not received then listen for them and wait until timeout
+      const subscription = this.eventReceived.subscribe(checkSequence);
+      setTimeout(() => {
+        subscription.unsubscribe();
+        reject(`Unexpected events sequence: \n${this.getReceivedEventNames().join('\n')}`);
+      }, timeout);
+    });
+  }
+
+  waitForAll(timeout?: number): Promise<void> {
+    return this.waitForSequence(this.eventNames, timeout);
+  }
+
+  private getReceivedEventNames(): string[] {
+    return this.receivedEvents.map(ev => ev.resourceId);
+  }
+
+  private onEventHandler(event: IJsonRpcEvent) {
+    if (!this.eventNames.includes(event.resourceId)) return;
+    this.receivedEvents.push(event);
+    this.eventReceived.next();
+  }
 }

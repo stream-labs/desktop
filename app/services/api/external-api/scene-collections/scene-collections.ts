@@ -48,8 +48,12 @@ export class SceneCollectionsService {
     return this.sceneCollectionsService.create(options);
   }
 
-  load(id: string) {
+  load(id: string): Promise<void> {
     return this.sceneCollectionsService.load(id);
+  }
+
+  rename(newName: string, id: string): Promise<void> {
+    return this.sceneCollectionsService.rename(newName, id);
   }
 
   get collectionAdded(): Observable<ISceneCollectionsManifestEntry> {
@@ -58,6 +62,10 @@ export class SceneCollectionsService {
 
   get collectionRemoved(): Observable<ISceneCollectionsManifestEntry> {
     return this.sceneCollectionsService.collectionRemoved;
+  }
+
+  get collectionWillSwitch(): Observable<void> {
+    return this.sceneCollectionsService.collectionWillSwitch;
   }
 
   get collectionSwitched(): Observable<ISceneCollectionsManifestEntry> {

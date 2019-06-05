@@ -16,6 +16,7 @@ import {
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
+import { SceneCollectionsService } from '../../scene-collections';
 
 const net = require('net');
 
@@ -382,9 +383,22 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
+      const eventName = event.result.resourceId.split('.')[1];
+
+      // these events will be sent to client even if isRequestsHandlingStopped = true
+      // isRequestsHandlingStopped = true usually when the app has the loading state
+      const whitelistedEvents: (keyof SceneCollectionsService)[] = [
+        'collectionWillSwitch',
+        'collectionAdded',
+        'collectionRemoved',
+        'collectionSwitched',
+        'collectionUpdated',
+      ];
+      const force = (whitelistedEvents as string[]).includes(eventName);
+
       const needToSendEvent =
         client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
-      if (needToSendEvent) this.sendResponse(client, event);
+      if (needToSendEvent) this.sendResponse(client, event, force);
     });
   }
 
@@ -465,17 +479,17 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     delete this.clients[client.id];
   }
 
-  private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
-    if (this.isRequestsHandlingStopped) return;
+  private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
+    if (this.isRequestsHandlingStopped && !force) return;
 
     this.log('send response', response);
 
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
-      // tslint:disable-next-line:prefer-template
-      client.socket.write(JSON.stringify(response) + '\n');
+      client.socket.write(`${JSON.stringify(response)}\n`);
     } catch (e) {
-      console.error('unable to send response', response, e);
+      // probably the client has been silently disconnected
+      console.info('unable to send response', response, e);
     }
   }
 
