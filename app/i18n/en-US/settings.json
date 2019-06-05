@@ -572,6 +572,7 @@
   "fontSize": "Font Size",
   "optimizeForNiconico": "optimize settings for niconico live service",
   "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams",
+  "optimizeWithHardwareEncoder": "use hardware encoder to optimize settings if available",
   "videoBitrate": "Video Bitrate (kbps)",
   "audioBitrate": "Audio Bitrate (kbps)",
   "keyframeInterval": "Keyframe Interval (in seconds)",

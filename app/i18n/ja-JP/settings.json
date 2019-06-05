@@ -572,6 +572,7 @@
   "fontSize": "フォントサイズ",
   "optimizeForNiconico": "配信開始時に配信設定をニコニコ生放送に最適化する",
   "showOptimizationDialogForNiconico": "配信開始時に最適化の確認ダイアログを表示する",
+  "optimizeWithHardwareEncoder": "ハードウェアエンコーダーを利用する",
   "videoBitrate": "映像ビットレート  (kbps)",
   "audioBitrate": "音声ビットレート  (kbps)",
   "keyframeInterval": "キーフレーム間隔(秒)",
