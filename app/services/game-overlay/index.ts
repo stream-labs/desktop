@@ -259,10 +259,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
     if (shouldStart) await this.initializeOverlay();
-    if (shouldStop) this.destroyOverlay();
+    if (shouldStop) await this.destroyOverlay();
 
     this.SET_ENABLED(shouldEnable);
-    this.setPreviewEnabled(true);
   }
 
   async setPreviewMode(previewMode: boolean) {
@@ -300,41 +299,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.SET_PREVIEW_ENABLED(shouldEnable);
   }
 
-  @mutation()
-  private SET_PREVIEW_ENABLED(isEnabled: boolean) {
-    this.state.isPreviewEnabled = isEnabled;
-  }
-
-  @mutation()
-  private TOGGLE_OVERLAY(isShowing: boolean) {
-    this.state.isShowing = isShowing;
-  }
-
-  @mutation()
-  private SET_ENABLED(shouldEnable: boolean = true) {
-    this.state.isEnabled = shouldEnable;
-  }
-
-  @mutation()
-  private SET_PREVIEW_MODE(previewMode: boolean = true) {
-    this.state.previewMode = previewMode;
-  }
-
-  @mutation()
-  private SET_WINDOW_ID(window: string, id: number) {
-    this.state.windowProperties[window].id = id;
-  }
-
-  @mutation()
-  private SET_WINDOW_POSITION(window: string, position: ICoordinates) {
-    this.state.windowProperties[window].position = position;
-  }
-
-  @mutation()
-  private SET_OPACITY(val: number) {
-    this.state.opacity = val;
-  }
-
   async destroy() {
     if (!this.lifecycle) return;
     await this.lifecycle.destroy();
@@ -343,10 +307,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   async destroyOverlay() {
     if (this.state.isEnabled) {
       await overlay.stop();
-      if (this.onWindowsReadySubscription) this.onWindowsReadySubscription.unsubscribe();
-      if (this.windows) Object.values(this.windows).forEach(win => win.destroy());
-      if (this.previewWindows) Object.values(this.previewWindows).forEach(win => win.destroy());
+      if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
+      if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
+      if (this.previewWindows) {
+        await Object.values(this.previewWindows).forEach(win => win.destroy());
+      }
     }
+    this.SET_PREVIEW_MODE(false);
+    this.TOGGLE_OVERLAY(false);
   }
 
   private createWindowOverlays() {
@@ -384,8 +352,42 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   private getWindowContainerStartingPosition() {
     const display = this.windowsService.getMainWindowDisplay();
-    console.log(display);
 
     return [display.workArea.height / 2 + 200, display.workArea.height / 2 - 300];
+  }
+
+  @mutation()
+  private SET_PREVIEW_ENABLED(isEnabled: boolean) {
+    this.state.isPreviewEnabled = isEnabled;
+  }
+
+  @mutation()
+  private TOGGLE_OVERLAY(isShowing: boolean) {
+    this.state.isShowing = isShowing;
+  }
+
+  @mutation()
+  private SET_ENABLED(shouldEnable: boolean = true) {
+    this.state.isEnabled = shouldEnable;
+  }
+
+  @mutation()
+  private SET_PREVIEW_MODE(previewMode: boolean = true) {
+    this.state.previewMode = previewMode;
+  }
+
+  @mutation()
+  private SET_WINDOW_ID(window: string, id: number) {
+    this.state.windowProperties[window].id = id;
+  }
+
+  @mutation()
+  private SET_WINDOW_POSITION(window: string, position: ICoordinates) {
+    this.state.windowProperties[window].position = position;
+  }
+
+  @mutation()
+  private SET_OPACITY(val: number) {
+    this.state.opacity = val;
   }
 }
