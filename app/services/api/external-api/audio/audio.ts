@@ -1,14 +1,11 @@
-import {
-  AudioSource as InternalAudioSource,
-  AudioService as InternalAudioService,
-} from 'services/audio';
-import { Inject } from 'services/core/injector';
-import { Fallback, InjectFromExternalApi, Singleton } from 'services/api/external-api';
-import { ServiceHelper } from 'services/core';
-import { ISerializable } from '../../rpc-api';
-import * as obs from '../../../../../obs-api';
-import { SourcesService } from 'services/api/external-api/sources/sources';
+import { AudioService as InternalAudioService } from 'services/audio';
+import { Fallback, Singleton } from 'services/api/external-api';
+import { AudioSource } from './audio-source';
+import { Inject } from 'services';
 
+/**
+ * Provides API for manage audio sources
+ */
 @Singleton()
 export class AudioService {
   @Fallback()
@@ -34,60 +31,5 @@ export class AudioService {
     return this.audioService
       .getSourcesForScene(sceneId)
       .map(source => this.getSource(source.sourceId));
-  }
-}
-
-export interface IFader {
-  db: number;
-  deflection: number;
-  mul: number;
-}
-
-export interface IAudioSourceModel {
-  name: string;
-  sourceId: string;
-  fader: IFader;
-  audioMixers: number;
-  monitoringType: obs.EMonitoringType;
-  forceMono: boolean;
-  syncOffset: number;
-  muted: boolean;
-  mixerHidden: boolean;
-}
-
-@ServiceHelper()
-export class AudioSource implements ISerializable {
-  @Inject() private audioService: InternalAudioService;
-  @InjectFromExternalApi() private sourcesService: SourcesService;
-  @Fallback() private audioSource: InternalAudioSource;
-
-  constructor(private sourceId: string) {
-    this.audioSource = this.audioService.getSource(sourceId);
-  }
-
-  /**
-   * serialize source
-   */
-  getModel(): IAudioSourceModel {
-    const sourceModel = this.sourcesService.getSource(this.sourceId).getModel();
-    return {
-      name: sourceModel.name,
-      sourceId: this.audioSource.sourceId,
-      fader: this.audioSource.fader,
-      audioMixers: this.audioSource.audioMixers,
-      monitoringType: this.audioSource.monitoringType,
-      forceMono: this.audioSource.forceMono,
-      syncOffset: this.audioSource.syncOffset,
-      muted: this.audioSource.muted,
-      mixerHidden: this.audioSource.mixerHidden,
-    };
-  }
-
-  setDeflection(deflection: number) {
-    return this.audioSource.setDeflection(deflection);
-  }
-
-  setMuted(muted: boolean) {
-    return this.audioSource.setMuted(muted);
   }
 }
