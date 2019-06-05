@@ -109,6 +109,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       y: containerY,
       skipTaskbar: true,
       thickFrame: false,
+      resizable: false,
       webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
     };
   }
@@ -155,6 +156,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
       ...this.commonWindowOptions,
       width: 600,
+      transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
       componentName: 'OverlayPlaceholder',
@@ -164,6 +166,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.previewWindows.chat = this.windowsService.createOneOffWindowForOverlay({
       ...this.commonWindowOptions,
       height: 600,
+      transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
       componentName: 'OverlayPlaceholder',
