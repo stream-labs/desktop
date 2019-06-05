@@ -38,7 +38,7 @@ jobs:
   - job: Screenshots
 
     pool:
-      name: 'Default'
+      name: 'Streamlabs OBS Backend'
 
     workspace:
       clean: resources
