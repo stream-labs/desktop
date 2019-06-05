@@ -1,4 +1,4 @@
-import { Service } from '../service';
+import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
 import { continentMap } from './continent-map';
 

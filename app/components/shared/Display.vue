@@ -7,7 +7,7 @@
 <style lang="less" scoped>
 .display {
   height: 100%;
-  background-color: black;
+  background-color: var(--section);
   flex-grow: 1;
 }
 </style>

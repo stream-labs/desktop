@@ -1,13 +1,12 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import defer from 'lodash/defer';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Inject } from 'util/injector';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation } from 'services/stateful-service';
+import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
@@ -18,7 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
@@ -28,6 +27,18 @@ interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
+interface ISentryContext {
+  username: string;
+  platform: string;
+}
+
+export function setSentryContext(ctx: ISentryContext) {
+  Sentry.configureScope(scope => {
+    scope.setUser({ username: ctx.username });
+    scope.setExtra('platform', ctx.platform);
+  });
+}
+
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
@@ -35,7 +46,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private platformAppsService: PlatformAppsService;
 
@@ -66,6 +76,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
+
+  /**
+   * Used by child and 1-off windows to update their sentry contexts
+   */
+  sentryContext = new Subject<ISentryContext>();
 
   init() {
     super.init();
@@ -202,24 +217,27 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
-      const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+      const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
 
       return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
     }
   }
 
-  dashboardUrl(subPage: string) {
+  dashboardUrl(subPage: string, hidenav: boolean = false) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
-    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const hideNav = hidenav ? 'true' : 'false';
+    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
+    const locale = i18nService.state.locale;
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
     const host = this.hostsService.platform;
     const token = this.apiToken;
-    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
     if (appId) {
@@ -231,7 +249,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
-    const uiTheme = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
@@ -273,8 +291,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Attempt to sync scense before logging out
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
-    // signs out of chatbot
-    await this.chatbotApiService.Base.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 
@@ -406,10 +422,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   setSentryContext() {
     if (!this.isLoggedIn()) return;
 
-    Sentry.configureScope(scope => {
-      scope.setUser({ username: this.username });
-      scope.setExtra('platform', this.platform.type);
-    });
+    setSentryContext(this.getSentryContext());
+
+    this.sentryContext.next(this.getSentryContext());
+  }
+
+  getSentryContext(): ISentryContext {
+    if (!this.isLoggedIn()) return null;
+
+    return {
+      username: this.username,
+      platform: this.platform.type,
+    };
   }
 
   popoutRecentEvents() {

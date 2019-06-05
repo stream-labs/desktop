@@ -1,6 +1,6 @@
 import { ArrayNode } from './array-node';
 import { HotkeysService, IHotkey, Hotkey } from '../../hotkeys';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../core/injector';
 
 interface IContext {
   sceneId?: string;

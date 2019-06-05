@@ -3,12 +3,12 @@ import { Component } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';
 import StudioEditor from 'components/StudioEditor.vue';
 import StudioControls from 'components/StudioControls.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
-import { AppService } from 'services/app';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { WindowsService } from 'services/windows';
 
 @Component({
   components: {
@@ -22,20 +22,25 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
-  @Inject() private appService: AppService;
+  @Inject() private windowsService: WindowsService;
 
-  $refs: { studioModeContainer: HTMLDivElement };
+  $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
   stacked = false;
+  verticalPlaceholder = false;
 
   sizeCheckInterval: number;
 
   mounted() {
     this.sizeCheckInterval = window.setInterval(() => {
-      if (this.studioMode) {
-        const rect = this.$refs.studioModeContainer.getBoundingClientRect();
+      if (this.studioMode && this.$refs.studioModeContainer) {
+        const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
 
-        this.stacked = rect.width / rect.height <= 16 / 9;
+        this.stacked = clientWidth / clientHeight <= 16 / 9;
+      }
+      if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
+        const { clientWidth, clientHeight } = this.$refs.placeholder;
+        this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
       }
     }, 1000);
   }
@@ -45,7 +50,7 @@ export default class Studio extends Vue {
   }
 
   get displayEnabled() {
-    return !this.customizationService.state.hideStyleBlockingElements && !this.performanceMode;
+    return !this.windowsService.state.main.hideStyleBlockers && !this.performanceMode;
   }
 
   get performanceMode() {
@@ -81,10 +86,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 }

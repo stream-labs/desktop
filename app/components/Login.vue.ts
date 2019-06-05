@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 
 @Component({})

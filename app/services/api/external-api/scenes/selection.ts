@@ -1,5 +1,5 @@
 import { InjectFromExternalApi, Singleton, Fallback } from 'services/api/external-api';
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper } from 'services/core';
 import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
 import {
   Selection as InternalSelection,
@@ -7,7 +7,7 @@ import {
 } from 'services/selection';
 import { ScenesService } from './scenes';
 import { Source, SourcesService } from 'services/api/external-api/sources/sources';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-folder';

@@ -1,12 +1,17 @@
 const inq = require('inquirer');
 const colors = require('colors/safe');
 const sh = require('shelljs');
-const https = require('https');
-const cp = require('child_process');
 const path = require('path');
+const cp = require('child_process');
+const request = require('request');
+const { purgeUrls } = require('./cache-purge');
 
 function info(msg) {
   sh.echo(colors.magenta(msg));
+}
+
+function error(msg) {
+  sh.echo(colors.red(msg));
 }
 
 function important(msg) {
@@ -35,6 +40,8 @@ function setRollout(version, rollout, bucket) {
   info('| Streamlabs OBS Interactive Rollout Script |');
   info('|-------------------------------------------|');
 
+  const urlsToPurge = [];
+
   const channel = (await inq.prompt({
     type: 'list',
     name: 'channel',
@@ -52,20 +59,30 @@ function setRollout(version, rollout, bucket) {
   })).channel;
 
   const version = await new Promise((resolve, reject) => {
-    https.get(`https://slobs-cdn.streamlabs.com/${channel}.json`, res => {
-      res.on('data', body => {
-        resolve(JSON.parse(body).version);
-      });
-    });
+    request.get(
+      { url: `https://slobs-cdn.streamlabs.com/${channel}.json` },
+      (err, res, body) => {
+        if (err || Math.floor(res.statusCode / 100) !== 2) {
+          reject(err || res.statusMessage);
+        } else {
+          resolve(JSON.parse(body).version);
+        }
+      }
+    );
   });
 
   important(`The latest version is ${version}`);
 
   const rollout = await new Promise((resolve, reject) => {
-    https.get(`https://slobs-cdn.streamlabs.com/${version}.chance`, res => {
-      res.on('data', body => {
+    const chanceUrl = `https://slobs-cdn.streamlabs.com/${version}.chance`;
+    urlsToPurge.push(chanceUrl);
+
+    request.get({ url: chanceUrl }, (err, res, body) => {
+      if (err || Math.floor(res.statusCode / 100) !== 2) {
+        reject(err || res.statusMessage);
+      } else {
         resolve(JSON.parse(body).chance);
-      });
+      }
     });
   });
 
@@ -86,12 +103,22 @@ function setRollout(version, rollout, bucket) {
     await setRollout(version, newRollout, 'streamlabs-obs');
     await setRollout(version, newRollout, 'slobs-cdn.streamlabs.com');
   } catch (e) {
-    info('Failed to set rollout');
+    console.log(e);
+    error('Failed to set rollout');
     sh.exit(1);
   }
 
-  info(`${version} is now at ${newRollout}% rollout!`);
+  info(`Purging cache: ${urlsToPurge}`);
 
+  try {
+    await purgeUrls(urlsToPurge);
+  } catch (e) {
+    console.log(e);
+    error('Failed to purge cache');
+    sh.exit(1);
+  }
+
+  important(`${version} is now at ${newRollout}% rollout!`);
 })().then(() => {
   sh.exit(0);
 });

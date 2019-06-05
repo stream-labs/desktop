@@ -1,6 +1,6 @@
 import electronLog from 'electron-log';
-import { Service } from './service';
-import { Inject } from 'util/injector';
+import { Service } from './core/service';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';

@@ -1,5 +1,5 @@
-import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Service } from 'services/core/service';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { getPlatformService } from 'services/platforms';
 import { CustomizationService, ICustomizationSettings } from 'services/customization';
@@ -85,7 +85,7 @@ export class ChatService extends Service {
 
   private async navigateToChat() {
     const service = getPlatformService(this.userService.platform.type);
-    const nightMode = this.customizationService.isDarkTheme() ? 'night' : 'day';
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
 
     // Youtube requires some special redirecting
     if (service instanceof YoutubeService) {
@@ -145,7 +145,7 @@ export class ChatService extends Service {
           `
           localStorage.setItem('bttv_clickTwitchEmotes', true);
           localStorage.setItem('bttv_darkenedMode', ${
-            this.customizationService.isDarkTheme() ? 'true' : 'false'
+            this.customizationService.isDarkTheme ? 'true' : 'false'
           });
 
           var bttvscript = document.createElement('script');

@@ -12,9 +12,10 @@
 @import "../styles/index";
 
 .studio-controls {
+  .padding-h-sides();
+
   height: 240px;
   width: 100%;
-  .padding-h-sides();
   margin: 0;
 }
 </style>
@@ -27,18 +28,20 @@
 }
 
 .studio-controls-panel {
+  .padding-h-sides();
+
   display: flex;
   flex-direction: column;
   height: 100%;
-  .padding-h-sides();
   position: relative;
 }
 
 .studio-controls-top {
+  .margin-bottom();
+
   display: flex;
   flex-direction: row;
   align-items: center;
-  .margin-bottom();
   justify-content: space-between;
   flex: 0 0 20px;
 }
@@ -49,8 +52,9 @@
 }
 
 .studio-controls-selector {
-  background: var(--section);
   .radius();
+
+  background: var(--section);
   flex-grow: 1;
   overflow-y: auto;
 }

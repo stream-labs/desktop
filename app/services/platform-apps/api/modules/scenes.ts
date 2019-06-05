@@ -7,7 +7,7 @@ import {
   NotImplementedError,
 } from './module';
 import { Scene, ScenesService, TSceneNode } from 'services/scenes';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 
 enum ESceneNodeType {

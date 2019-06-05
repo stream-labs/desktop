@@ -45,6 +45,7 @@ export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
 export { HardwareService } from 'services/hardware';
 export { Prefab, PrefabsService } from 'services/prefabs';
+export { EditorCommandsService } from 'services/editor-commands';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -53,24 +54,7 @@ export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
 export { UsageStatisticsService } from './services/usage-statistics';
-export {
-  ChatbotApiService,
-  ChatbotBaseApiService,
-  ChatbotAlertsApiService,
-  ChatbotCommonService,
-  ChatbotMediaRequestApiService,
-  ChatbotGambleApiService,
-  ChatbotCommandsApiService,
-  ChatbotTimerApiService,
-  ChatbotModToolsApiService,
-  ChatbotQuotesApiService,
-  ChatbotQueueApiService,
-  ChatbotHeistApiService,
-  ChatbotLoyaltyApiService,
-  ChatbotPollApiService,
-  ChatbotBettingApiService,
-  ChatbotImporterApiService,
-} from 'services/chatbot';
+
 export { MediaGalleryService } from 'services/media-gallery';
 export { GuestApiService } from 'services/guest-api';
 export { MediaBackupService } from 'services/media-backup';
@@ -107,6 +91,5 @@ export { TipJarService } from 'services/widgets/settings/tip-jar';
 export { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
-export { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';

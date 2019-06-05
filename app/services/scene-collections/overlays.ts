@@ -1,4 +1,4 @@
-import { Service } from '../service';
+import { Service, Inject } from 'services';
 import { RootNode } from './nodes/overlays/root';
 import { ScenesNode } from './nodes/overlays/scenes';
 import { SlotsNode } from './nodes/overlays/slots';
@@ -10,8 +10,6 @@ import { TransitionNode } from './nodes/overlays/transition';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
-import { Inject } from '../../util/injector';
-import electron from 'electron';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';

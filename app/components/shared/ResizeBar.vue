@@ -16,6 +16,7 @@
 
 <style lang="less">
 @import "../../styles/index";
+
 .resize-bar {
   position: relative;
   z-index: 1001;
@@ -64,13 +65,7 @@
 
   &:hover {
     .resize-line {
-      background-color: @light-5;
-    }
-
-    .night-theme {
-      .resize-line {
-        background-color: @dark-5;
-      }
+      background-color: var(--midtone);
     }
   }
 }

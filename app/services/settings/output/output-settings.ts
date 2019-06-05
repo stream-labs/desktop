@@ -1,6 +1,6 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 
 /**

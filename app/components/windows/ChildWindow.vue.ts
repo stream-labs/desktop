@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import TitleBar from '../TitleBar.vue';
@@ -18,7 +18,7 @@ export default class ChildWindow extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private appService: AppService;
 
-  components: { name: string; isShown: boolean; title: string }[] = [];
+  components: { name: string; isShown: boolean; title: string; hideStyleBlockers: boolean }[] = [];
   private refreshingTimeout = 0;
 
   mounted() {
@@ -57,7 +57,22 @@ export default class ChildWindow extends Vue {
     electron.remote.getCurrentWindow().setTitle(this.currentComponent.title);
   }
 
+  windowResizeTimeout: number;
+
+  windowSizeHandler() {
+    if (!this.windowsService.state.child.hideStyleBlockers) {
+      this.windowsService.updateStyleBlockers('child', true);
+    }
+    clearTimeout(this.windowResizeTimeout);
+
+    this.windowResizeTimeout = window.setTimeout(
+      () => this.windowsService.updateStyleBlockers('child', false),
+      200,
+    );
+  }
+
   private onWindowUpdatedHandler(options: IWindowOptions) {
+    window.removeEventListener('resize', this.windowSizeHandler);
     // If the window was closed, just clear the stack
     if (!options.isShown) {
       this.clearComponentStack();
@@ -65,16 +80,12 @@ export default class ChildWindow extends Vue {
     }
 
     if (options.preservePrevWindow) {
-      this.currentComponent.isShown = false;
-      this.components.push({ name: options.componentName, isShown: true, title: options.title });
-      this.setWindowTitle();
+      this.handlePreservePrevWindow(options);
       return;
     }
 
     if (options.isPreserved) {
-      this.components.pop();
-      this.currentComponent.isShown = true;
-      this.setWindowTitle();
+      this.handleIsPreservedWindow();
       return;
     }
 
@@ -85,8 +96,33 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(() => {
-      this.components.push({ name: options.componentName, isShown: true, title: options.title });
+      this.components.push({
+        name: options.componentName,
+        isShown: true,
+        title: options.title,
+        hideStyleBlockers: options.hideStyleBlockers,
+      });
       this.setWindowTitle();
+      window.addEventListener('resize', this.windowSizeHandler);
     }, 50);
+  }
+
+  private handlePreservePrevWindow(options: IWindowOptions) {
+    this.currentComponent.isShown = false;
+    this.components.push({
+      name: options.componentName,
+      isShown: true,
+      title: options.title,
+      hideStyleBlockers: options.hideStyleBlockers,
+    });
+    this.setWindowTitle();
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  private handleIsPreservedWindow() {
+    this.components.pop();
+    this.currentComponent.isShown = true;
+    this.setWindowTitle();
+    window.addEventListener('resize', this.windowSizeHandler);
   }
 }

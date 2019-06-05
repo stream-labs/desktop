@@ -98,7 +98,7 @@
     <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
   </validated-form>
   <validated-form slot="message-properties" :key="`message-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="selectedVariation.showMessage" :metadata="metadata.showMessage" />
+    <v-form-group v-if="wData.settings[selectedAlert]" v-model="wData.settings[selectedAlert].showMessage" :metadata="metadata.showMessage" />
     <div v-if="selectedVariation.settings.message">
       <v-form-group v-model="selectedVariation.settings.message.minAmount" :metadata="metadata.minAmount" />
       <v-form-group v-model="selectedVariation.settings.message.font" :metadata="metadata.fontFamily" />
@@ -141,10 +141,11 @@
 @import '../../styles/index';
 
 .left-accordion__button {
-  display: flex;
-  border-bottom: 1px solid var(--border);
   .padding();
   .weight(@medium);
+
+  display: flex;
+  border-bottom: 1px solid var(--border);
   position: relative;
   align-items: center;
 
@@ -171,13 +172,14 @@
 }
 
 .add-alert-dropdown {
+  .padding();
+
   position: absolute;
   left: 0;
   top: 50px;
   background-color: var(--background);
   z-index: 1;
   box-shadow: 0 2px var(--shadow);
-  .padding();
 
   .button {
     display: block;
@@ -208,6 +210,7 @@
 
 .variation-tile {
   .radius();
+
   width: 90%;
   margin: 8px auto;
   box-shadow: 0 2px var(--shadow);

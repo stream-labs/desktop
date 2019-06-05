@@ -1,5 +1,5 @@
 import { IWidgetApiSettings, IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 import { handleResponse } from 'util/requests';
 
 interface IBaseGoalData extends IWidgetData {
@@ -43,7 +43,7 @@ export abstract class BaseGoalService<
       url: apiSettings.goalUrl,
       method: 'POST',
       body: options,
-    }).then(handleResponse);
+    });
   }
 
   async resetGoal() {

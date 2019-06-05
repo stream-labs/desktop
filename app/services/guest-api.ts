@@ -1,4 +1,4 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import electron from 'electron';
 import { Subscription, Observable } from 'rxjs';
 

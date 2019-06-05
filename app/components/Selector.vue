@@ -27,12 +27,12 @@
 @import "../styles/index";
 
 .sortable-ghost {
-  opacity: .7;
+  opacity: 0.7;
   background-image: none;
 }
 
 .sortable-chosen {
-  opacity: .7;
+  opacity: 0.7;
   background-image: none;
 }
 
@@ -41,22 +41,24 @@
 }
 
 .selector-list {
+  .radius();
+
   list-style-type: none;
   margin: 0;
   overflow: auto;
-  .radius();
 }
 
 .selector-item {
+  .padding-h-sides(2);
+  .transition();
+
   display: flex;
   flex-direction: row;
   align-items: center;
-  .padding-h-sides(2);
   line-height: 30px;
   cursor: pointer;
   justify-content: space-between;
   color: var(--paragraph);
-  .transition();
   border: 1px solid transparent;
 
   &.selector-item--active {
@@ -89,7 +91,7 @@
   display: flex;
   flex-direction: row;
   font-size: 13px;
-  opacity: .2;
+  opacity: 0.2;
 }
 
 .selector-drag-handle {

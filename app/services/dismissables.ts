@@ -1,5 +1,5 @@
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { mutation } from './stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { mutation } from './core/stateful-service';
 import Vue from 'vue';
 
 export enum EDismissable {

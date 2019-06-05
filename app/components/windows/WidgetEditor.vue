@@ -26,7 +26,11 @@
 
       <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
         <div class="display">
-          <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
+          <display
+            v-if="!animating && !hideStyleBlockers"
+            :sourceId="widget.previewSourceId"
+            @click="createProjector"
+          />
         </div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
@@ -137,6 +141,7 @@
     .input-wrapper {
       width: 100%;
     }
+
     .input-label {
       width: 0;
       padding: 0;
@@ -156,9 +161,11 @@
   }
 
   .window-container {
-    overflow: hidden;
     .radius();
     .border();
+
+    overflow: hidden;
+    height: calc(~"100% - 66px");
   }
 
   .top-settings {
@@ -166,7 +173,8 @@
     display: flex;
     align-items: center;
 
-    > div, form {
+    > div,
+    form {
       display: flex;
       align-items: center;
     }
@@ -184,10 +192,6 @@
     .number-input {
       width: 60px !important;
     }
-  }
-
-  .window-container {
-    height: calc(~"100% - 66px");
   }
 
   .test-button {
@@ -215,8 +219,9 @@
     .code-editor {
       transform: translate(0, 100%);
     }
+
     .display {
-      transform: scale(0.82, .8) translate(-10%);
+      transform: scale(0.82, 0.8) translate(-10%);
     }
   }
 
@@ -225,10 +230,12 @@
       transform: translate(100%);
       transition-delay: 0ms;
     }
+
     .code-editor {
       transform: translate(0, 0);
       transition-delay: 300ms;
     }
+
     .display {
       transform: scale(1, 0.63) translate(0, -29%);
     }
@@ -239,6 +246,7 @@
       width: 80%;
       right: 0;
     }
+
     .display {
       transform: scale(0.7, 0.7) translate(-3.7%);
     }
@@ -271,6 +279,8 @@
   }
 
   .sidebar {
+    .transition();
+
     width: 30%;
     height: 100%;
     position: absolute;
@@ -280,7 +290,6 @@
     overflow: hidden;
     border-left: 1px solid var(--border);
     background-color: var(--background);
-    .transition();
     transition-delay: 300ms;
   }
 
@@ -301,17 +310,19 @@
   }
 
   .subsection__title {
-    width: 100%;
     .padding-h-sides(2);
     .padding-v-sides();
     .text-transform();
+    .margin-bottom(@0);
+
+    width: 100%;
     border-bottom: 1px solid var(--border);
     white-space: nowrap;
-    .margin-bottom(@0);
   }
 
   .subsection__content {
     .padding(2);
+
     overflow: hidden;
     overflow-y: auto;
     width: 100%;
@@ -324,6 +335,7 @@
 
   .subsection__content.custom {
     overflow: visible;
+    padding: 8px;
   }
 
   .source-property {
@@ -331,11 +343,12 @@
   }
 
   .settings-title {
+    .transition();
+    .padding-h-sides(2);
+
     margin: 0;
     list-style: none;
-    .transition();
     cursor: pointer;
-    .padding-h-sides(2);
     line-height: 32px;
 
     &:hover,
@@ -344,8 +357,9 @@
     }
 
     &.active {
-      color: var(--title);
       .weight(@medium);
+
+      color: var(--title);
     }
   }
 
@@ -360,15 +374,16 @@
   }
 
   .custom-code {
+    .margin-left();
+    .padding-left();
+    .transition();
+
     position: absolute;
     display: flex;
     top: 0;
     left: 215px;
     align-items: center;
     height: 24px;
-    .margin-left();
-    .padding-left();
-    .transition();
     border-left: 1px solid var(--border);
     margin: 12px 0;
 

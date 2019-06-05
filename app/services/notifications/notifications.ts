@@ -1,6 +1,6 @@
-import { Inject } from '../../util/injector';
-import { mutation } from '../stateful-service';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { Inject } from '../core/injector';
+import { mutation } from '../core/stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { IObsInput, TObsFormData } from 'components/obs/inputs/ObsInput';

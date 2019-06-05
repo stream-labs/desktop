@@ -6,7 +6,7 @@ import {
   ITransitionCreateOptions,
   TransitionsService,
 } from 'services/transitions';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { PlatformAppsService } from '../../index';
 import { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 

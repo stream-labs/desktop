@@ -2,12 +2,12 @@ import Vue from 'vue';
 import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
@@ -25,6 +25,7 @@ export interface ISceneNodeAddOptions {
   id?: string; // A new ID will be assigned if one is not provided
   sourceAddOptions?: ISourceAddOptions;
   select?: boolean; // Immediately select this source
+  initialTransform?: IPartialTransform;
 }
 
 export interface ISceneItemInfo {
@@ -192,6 +193,10 @@ export class ScenesService extends StatefulService<IScenesState> {
     return this.getScene(id);
   }
 
+  canRemoveScene() {
+    return Object.keys(this.state.scenes).length > 1;
+  }
+
   removeScene(id: string, force = false): IScene {
     if (!force && Object.keys(this.state.scenes).length < 2) {
       return null;
@@ -227,13 +232,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.scenes.forEach(scene => scene.setLockOnAllItems(locked));
   }
 
-  getSourceScenes(sourceId: string): Scene[] {
-    const resultScenes: Scene[] = [];
+  getSourceItemCount(sourceId: string): number {
+    let count = 0;
+
     this.scenes.forEach(scene => {
-      const items = scene.getItems().filter(sceneItem => sceneItem.sourceId === sourceId);
-      if (items.length > 0) resultScenes.push(scene);
+      scene.getItems().forEach(sceneItem => {
+        if (sceneItem.sourceId === sourceId) count += 1;
+      });
     });
-    return resultScenes;
+
+    return count;
   }
 
   makeSceneActive(id: string): boolean {
@@ -312,7 +320,14 @@ export class ScenesService extends StatefulService<IScenesState> {
     });
   }
 
-  showNameFolder(options: { renameId?: string; itemsToGroup?: string[]; parentId?: string } = {}) {
+  showNameFolder(
+    options: {
+      sceneId?: string;
+      renameId?: string;
+      itemsToGroup?: string[];
+      parentId?: string;
+    } = {},
+  ) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
       title: options.renameId ? $t('Rename Folder') : $t('Name Folder'),

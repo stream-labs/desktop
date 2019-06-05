@@ -17,7 +17,7 @@ import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
@@ -32,6 +32,7 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import CreatorSites from 'components/pages/CreatorSites';
 
 @Component({
   components: {
@@ -54,6 +55,7 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
     PlatformAppStore,
     Help,
     ResizeBar,
+    CreatorSites,
   },
 })
 export default class Main extends Vue {
@@ -168,10 +170,21 @@ export default class Main extends Vue {
 
   hasLiveDock = true;
 
+  windowResizeTimeout: number;
+
   windowSizeHandler() {
+    if (!this.windowsService.state.main.hideStyleBlockers) {
+      this.onResizeStartHandler();
+    }
     this.windowWidth = window.innerWidth;
 
+    clearTimeout(this.windowResizeTimeout);
+
     this.hasLiveDock = this.windowWidth >= 1100;
+    this.windowResizeTimeout = window.setTimeout(
+      () => this.windowsService.updateStyleBlockers('main', false),
+      200,
+    );
   }
 
   handleResize() {
@@ -179,16 +192,14 @@ export default class Main extends Vue {
   }
 
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     offset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.customizationService.setSettings({
-      hideStyleBlockingElements: false,
-    });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {

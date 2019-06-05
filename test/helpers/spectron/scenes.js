@@ -1,5 +1,5 @@
 // Scene helper functions
-import { focusMain, focusChild } from '.';
+import { focusMain, focusChild, waitForLoader } from '.';
 import { contextMenuClick } from './context-menu';
 import { dialogDismiss } from './dialog';
 
@@ -52,4 +52,16 @@ export async function openDuplicateWindow(t, sourceName) {
   await rightClickScene(t, sourceName);
   await contextMenuClick(t, 'Duplicate');
   await focusChild(t);
+}
+
+export async function switchCollection(t, collectionName) {
+  const app = t.context.app;
+  await focusMain(t);
+  await app.client.click('.scene-collections-wrapper .dropdown-menu__toggle');
+  await app.client.$(`.scene-collections-wrapper`).click(`div=${collectionName}`);
+  await waitForLoader(t);
+}
+
+export async function sceneExisting(t, name) {
+  return await t.context.app.client.$(`.studio-controls-selector`).isExisting(`div=${name}`);
 }

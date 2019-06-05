@@ -1,5 +1,5 @@
 import { StreamingService as InternalStreamingService } from 'services/streaming';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';

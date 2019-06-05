@@ -1,5 +1,5 @@
 {
-  "presets": ["@babel/preset-env"],
+  "presets": [["@babel/preset-env", { "modules": false }]],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": false }],
     "transform-class-properties",

@@ -1,4 +1,4 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import {
   Scene as InternalScene,
   SceneItemNode as InternalSceneNode,
@@ -43,7 +43,6 @@ export abstract class SceneNode {
       sceneId: this.sceneNode.sceneId,
       sceneNodeType: this.sceneNode.sceneNodeType,
       parentId: this.sceneNode.parentId,
-      childrenIds: this.sceneNode.childrenIds,
     };
   }
 

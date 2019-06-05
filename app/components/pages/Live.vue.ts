@@ -3,13 +3,15 @@ import { Component } from 'vue-property-decorator';
 import SceneSelector from 'components/SceneSelector.vue';
 import Mixer from 'components/Mixer.vue';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import Display from 'components/shared/Display.vue';
 import { CustomizationService } from 'services/customization';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { WindowsService } from 'services/windows';
+import electron from 'electron';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -27,6 +29,7 @@ export default class Live extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() i18nService: I18nService;
   @Inject() navigationService: NavigationService;
+  @Inject() windowsService: WindowsService;
 
   $refs: {
     webview: Electron.WebviewTag;
@@ -47,6 +50,8 @@ export default class Live extends Vue {
         this.navigationService.navigate('Dashboard', {
           subPage: match[1],
         });
+      } else {
+        electron.remote.shell.openExternal(e.url);
       }
     });
   }
@@ -59,7 +64,7 @@ export default class Live extends Vue {
     return (
       this.customizationService.state.livePreviewEnabled &&
       !this.performanceModeEnabled &&
-      !this.customizationService.state.hideStyleBlockingElements
+      !this.windowsService.state.main.hideStyleBlockers
     );
   }
 
@@ -98,11 +103,16 @@ export default class Live extends Vue {
     return 50;
   }
 
+  get sleepingKevin() {
+    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    return require(`../../../media/images/sleeping-kevin-${mode}.png`);
+  }
+
   onResizeStartHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: true });
+    this.windowsService.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler() {
-    this.customizationService.setSettings({ hideStyleBlockingElements: false });
+    this.windowsService.updateStyleBlockers('main', false);
   }
 }

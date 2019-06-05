@@ -1,5 +1,5 @@
 import Component from 'vue-class-component';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { IMediaGalleryMetadata } from './index';

@@ -189,16 +189,4 @@
   bottom: 20px;
   right: 20px;
 }
-
-.night-theme {
-  .transition-control {
-    &:hover {
-      color: var(--white);
-    }
-  }
-  .transition-control.disabled:hover {
-    cursor: not-allowed;
-    color: inherit;
-  }
-}
 </style>

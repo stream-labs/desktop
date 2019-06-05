@@ -1,5 +1,5 @@
 import { Module, apiMethod, apiEvent, EApiPermissions, IApiContext } from './module';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { INotificationsServiceApi } from 'services/notifications';
 

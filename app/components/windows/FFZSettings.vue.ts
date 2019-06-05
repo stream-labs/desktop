@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
@@ -24,7 +24,7 @@ export default class FFZSettings extends Vue {
     const webview = this.$refs.ffzSettings;
     const settings = this.customizationService.getSettings();
 
-    this.nightMode = this.customizationService.isDarkTheme();
+    this.nightMode = this.customizationService.isDarkTheme;
 
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);

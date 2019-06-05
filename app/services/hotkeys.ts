@@ -3,8 +3,8 @@ import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
-import { Inject } from 'util/injector';
-import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
+import { Inject } from 'services/core/injector';
+import { StatefulService, mutation, ServiceHelper } from 'services';
 import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
@@ -215,6 +215,38 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
     isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+  },
+  PUSH_TO_SOURCE_SHOW: {
+    name: 'PUSH_TO_SOURCE_SHOW',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Show %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
+  },
+  PUSH_TO_SOURCE_HIDE: {
+    name: 'PUSH_TO_SOURCE_HIDE',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Hide %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
     down: sceneItemId =>
       getScenesService()
         .getSceneItem(sceneItemId)

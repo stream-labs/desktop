@@ -22,7 +22,7 @@
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
 
-      <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <top-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading"></top-nav>
       <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
 
       <component
@@ -45,7 +45,7 @@
     </div>
   </div>
   <transition name="loader">
-    <div class="main-loading" v-if="applicationLoading"><custom-loader></custom-loader></div>
+    <div class="main-loading" v-if="showLoadingSpinner"><custom-loader></custom-loader></div>
   </transition>
 </div>
 </template>
@@ -121,7 +121,6 @@
   right: 0;
   z-index: 999999;
   background-color: var(--background);
-
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
     top: 34px;
@@ -154,5 +153,12 @@
 .live-dock-resize-bar--left {
   top: 0;
   right: 0;
+}
+
+/deep/ .creator-sites-container .s-loader {
+  .s-loader__bg {
+    position: unset;
+    z-index: unset;
+  }
 }
 </style>

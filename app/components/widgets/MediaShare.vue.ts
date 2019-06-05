@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import { MediaShareService, IMediaShareData } from 'services/widgets/settings/media-share';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -9,7 +9,6 @@ import { inputComponents } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import { $t } from 'services/i18n';
-import { ChatbotCommonService } from 'services/chatbot';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
@@ -21,12 +20,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
   },
 })
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
-  @Inject() chatbotCommonService: ChatbotCommonService;
-
-  openBlacklist() {
-    this.chatbotCommonService.openMediaRequestPreferencesWindow();
-  }
-
   pricePerSecTooltip = $t(
     'In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30' +
       ' would mean that for $10, media would play for 30 seconds. The default value is 0.10.',

@@ -3,9 +3,9 @@ import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
@@ -279,7 +279,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (source.type === 'scene') return;
 
-    if (this.scenesService.getSourceScenes(source.sourceId).length > 0) return;
+    if (this.scenesService.getSourceItemCount(source.sourceId) > 0) return;
     this.removeSource(source.sourceId);
   }
 

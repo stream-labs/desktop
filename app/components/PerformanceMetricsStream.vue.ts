@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { StreamingService } from '../services/streaming';
 import { PerformanceService } from '../services/performance';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { Component } from 'vue-property-decorator';
 
 @Component({})

@@ -32,7 +32,10 @@ export const API_NAME_MAP = {
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
   name: API_NAME_MAP[key],
-  tester: new RegExp(`^${key}s?_|show_${key}_`),
+  tester:
+    key === 'facebook_stars'
+      ? new RegExp(`^${key}_|facebook_show_stars_`)
+      : new RegExp(`^${key}s?_|show_${key}_`),
 }));
 
 export const conditions = () => ({

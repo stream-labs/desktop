@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';

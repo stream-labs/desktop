@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from 'services/user';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';

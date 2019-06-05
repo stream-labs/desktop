@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import Selector from './Selector.vue';
 import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
@@ -15,6 +15,7 @@ import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import electron from 'electron';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -26,6 +27,7 @@ export default class SceneSelector extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() projectorService: ProjectorService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   searchQuery = '';
 
@@ -84,9 +86,15 @@ export default class SceneSelector extends Vue {
       },
       ok => {
         if (!ok) return;
-        if (!this.scenesService.removeScene(this.activeSceneId)) {
+        if (!this.scenesService.canRemoveScene()) {
           alert($t('There needs to be at least one scene.'));
+          return;
         }
+
+        this.editorCommandsService.executeCommand(
+          'RemoveSceneCommand',
+          this.scenesService.activeSceneId,
+        );
       },
     );
   }

@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IPlatformAppManagerSettings } from 'services/sources/properties-managers/platform-app-manager';
 import { WindowsService } from 'services/windows';
 import electron from 'electron';

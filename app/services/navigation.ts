@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from './core/stateful-service';
 import { Subject } from 'rxjs';
 
 export type TAppPage =
@@ -12,7 +12,8 @@ export type TAppPage =
   | 'DesignSystem'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
-  | 'Help';
+  | 'Help'
+  | 'CreatorSites';
 
 interface INavigationState {
   currentPage: TAppPage;

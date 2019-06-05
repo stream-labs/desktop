@@ -1,7 +1,12 @@
 <template>
-  <span class="text-area-container" :class="{ 'full-width': options.fullWidth }" >
+  <span
+    class="text-area-container"
+    :class="{ 'full-width': options.fullWidth }"
+    data-role="input"
+    data-type="textArea"
+    :data-name="options.name"
+  >
     <textarea
-      v-if="options.blockReturn"
       type="text"
       :placeholder="options.placeholder"
       :value="value"
@@ -12,20 +17,7 @@
       :disabled="metadata.disabled"
       :rows="metadata.rows || 2"
       v-validate="validate"
-      @keydown.enter.prevent
-    />
-    <textarea
-      v-else
-      type="text"
-      :placeholder="options.placeholder"
-      :value="value"
-      @input="handleInput"
-      class="text-area radius"
-      :class="{ 'full-width': options.fullWidth  }"
-      :name="options.uuid"
-      :disabled="metadata.disabled"
-      :rows="metadata.rows || 2"
-      v-validate="validate"
+      @keydown.enter="handleEnter"
     />
   </span>
 </template>

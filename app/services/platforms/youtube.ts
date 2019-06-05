@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
   IChannelInfo,
@@ -8,7 +8,7 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { $t } from 'services/i18n';
@@ -190,7 +190,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       return fetch(request)
         .then(handlePlatformResponse)
-        .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
+        .then(json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0);
     });
   }
 

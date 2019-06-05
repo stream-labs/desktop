@@ -1,6 +1,6 @@
 import { Module, IApiContext, EApiPermissions, apiMethod } from './module';
 import { StreamlabelsService } from 'services/streamlabels';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 /**
  * Module to interact with stream labels.

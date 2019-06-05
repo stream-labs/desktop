@@ -6,7 +6,7 @@
   <div
     class="live-dock-chevron icon-button"
     v-if="collapsed"
-    @click="expand">
+    @click="setCollapsed(false)">
     <i :class="{
       'icon-down icon-left': !onLeft,
       'icon-down icon-right': onLeft
@@ -19,7 +19,7 @@
       class="live-dock-expanded-contents">
       <div
         class="live-dock-chevron icon-button"
-        @click="collapse">
+        @click="setCollapsed(true)">
         <i
           :class="{
           'icon-down icon-left': onLeft,
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div class="live-dock-chat" v-if="!hideStyleBlockingElements && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+      <div class="live-dock-chat" v-if="!hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
           <div v-if="hasChatApps" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -97,7 +97,7 @@
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="live-dock-chat__img--offline" :src="offlineImageSrc">
-        <span v-if="!hideStyleBlockingElements">{{ $t('Your chat is currently offline') }}</span>
+        <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
       </div>
     </div>
   </transition>
@@ -110,12 +110,13 @@
 @import '../styles/index';
 
 .live-dock {
+  .padding(2);
+
   position: relative;
   z-index: 1000;
   width: 28%;
   box-sizing: border-box;
   border-left: 1px solid var(--border);
-  .padding(2);
 
   &.can-animate {
     .transition();
@@ -141,8 +142,9 @@
 }
 
 .live-dock-chevron {
-  cursor: pointer;
   .absolute(@top: 0, @bottom: 0, @left: 0);
+
+  cursor: pointer;
   display: flex;
   align-items: center;
   height: 100%;
@@ -162,16 +164,18 @@
 }
 
 .live-dock-header {
+  .margin-bottom();
+
   display: flex;
   flex-direction: row;
-  .margin-bottom();
   align-items: center;
   justify-content: space-between;
 }
 
 .live-dock-text {
-  margin: 0 2px 0 4px;
   .weight(@medium);
+
+  margin: 0 2px 0 4px;
 }
 
 .live-dock-expanded-contents {
@@ -181,9 +185,10 @@
 }
 
 .live-dock-info {
+  .margin-bottom();
+
   display: flex;
   justify-content: space-between;
-  .margin-bottom();
 
   .live-dock-platform-tools {
     a {
@@ -227,10 +232,11 @@
 }
 
 .live-dock-chat__img--offline {
-  width: 60%;
   .flex();
   .flex--center();
   .flex--column();
+
+  width: 60%;
   margin-bottom: 16px;
 }
 

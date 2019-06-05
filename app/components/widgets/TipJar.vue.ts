@@ -1,5 +1,5 @@
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { TipJarService, ITipJarData } from 'services/widgets/settings/tip-jar';

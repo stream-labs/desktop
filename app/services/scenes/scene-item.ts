@@ -1,5 +1,5 @@
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper, Inject } from 'services';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
@@ -9,7 +9,6 @@ import {
   AnchorPositions,
   AnchorPoint,
 } from 'util/ScalableRectangle';
-import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 
@@ -286,13 +285,6 @@ export class SceneItem extends SceneItemNode {
   scaleWithOffset(scaleDelta: IVec2, offset: IVec2) {
     const origin = this.getBoundingRect().getOriginFromOffset(offset);
     this.scale(scaleDelta, origin);
-  }
-
-  unilateralScale(dimension: 'x' | 'y', scale: number) {
-    const scaleX = dimension === 'x' ? scale : 1;
-    const scaleY = dimension === 'y' ? scale : 1;
-    const scaleDelta = v2(scaleX, scaleY);
-    this.scale(scaleDelta, AnchorPositions[AnchorPoint.NorthWest]);
   }
 
   flipY() {

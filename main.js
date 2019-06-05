@@ -34,8 +34,6 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
-app.disableHardwareAcceleration();
-
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -58,6 +56,9 @@ const releaseChannel = (() => {
   // Set approximate maximum log size in bytes. When it exceeds,
   // the archived log will be saved as the log.old.log file
   electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+
+  // catch and log unhandled errors/rejected promises
+  electronLog.catchErrors();
 
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
@@ -108,7 +109,7 @@ function openDevTools() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  crashHandler.startCrashHandler(app.getAppPath());
+  crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString());
   crashHandler.registerProcess(pid, false);
 
   const Raven = require('raven');
@@ -124,7 +125,7 @@ function startApp() {
   if (pjson.env === 'production') {
 
     Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
-      release: process.env.SLOBS_VERSION 
+      release: process.env.SLOBS_VERSION
     }).install(function (err, initialErr, eventId) {
       handleFinishedReport();
     });
@@ -158,6 +159,7 @@ function startApp() {
     show: false,
     frame: false,
     title: 'Streamlabs OBS',
+    backgroundColor: '#17242D',
   });
 
   mainWindowState.manage(mainWindow);
@@ -210,7 +212,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    backgroundColor: '#17242D',
   });
 
   childWindow.setMenu(null);
@@ -251,7 +254,9 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    if (!childWindow.isDestroyed()) {
+      childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    }
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -299,6 +304,9 @@ if (process.env.SLOBS_CACHE_DIR) {
   );
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
+if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
 app.setAsDefaultProtocolClient('slobs');
 
@@ -492,5 +500,7 @@ ipcMain.on('requestPerformanceStats', e => {
 });
 
 ipcMain.on('showErrorAlert', () => {
-  mainWindow.send('showErrorAlert');
+  if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    mainWindow.send('showErrorAlert');
+  }
 });

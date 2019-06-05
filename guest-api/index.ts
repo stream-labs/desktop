@@ -4,17 +4,36 @@
  */
 
 import electron from 'electron';
-import {
-  IGuestApiRequest,
-  IGuestApiResponse,
-  IGuestApiCallback,
-  EResponseResultProcessing,
-} from '../app/services/guest-api';
 import uuid from 'uuid/v4';
 import fs from 'fs';
 import util from 'util';
 import mime from 'mime';
 import path from 'path';
+
+interface IGuestApiRequest {
+  id: string;
+  webContentsId: number;
+  methodPath: string[];
+  args: any[];
+}
+
+interface IGuestApiResponse {
+  id: string;
+  error: boolean;
+  result: any;
+  resultProcessing: EResponseResultProcessing;
+}
+
+interface IGuestApiCallback {
+  requestId: string;
+  callbackId: string;
+  args: any[];
+}
+
+enum EResponseResultProcessing {
+  None = 'none',
+  File = 'file',
+}
 
 (() => {
   const readFile = util.promisify(fs.readFile);

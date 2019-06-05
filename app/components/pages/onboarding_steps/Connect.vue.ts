@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import electron from 'electron';
 

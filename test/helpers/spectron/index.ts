@@ -3,10 +3,19 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUserName, releaseUserInPool } from './user';
+import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
+import { uniq } from 'lodash';
 
-export const test = avaTest as TestInterface<ITestContext>;
+// save names of all running tests to use them in the retrying mechanism
+const pendingTests: string[] = [];
+export const test: TestInterface<ITestContext> = new Proxy(avaTest, {
+  apply: (target, thisArg, args) => {
+    const testName = args[0];
+    pendingTests.push(testName);
+    return target.apply(thisArg, args);
+  },
+});
 
 const path = require('path');
 const fs = require('fs');
@@ -14,15 +23,17 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
-async function focusWindow(t: any, regex: RegExp) {
+export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return;
+    if (url.match(regex)) return true;
   }
+  return false;
 }
 
 // Focuses the main window
@@ -45,6 +56,10 @@ export async function focusLibrary(t: any) {
 // Close current focused window
 export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
+}
+
+export async function waitForLoader(t: any) {
+  await t.context.app.client.waitForExist('.main-loading', 10000, true);
 }
 
 interface ITestRunnerOptions {
@@ -82,6 +97,14 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
+let startApp: (t: TExecutionContext) => Promise<any>;
+let stopApp: (clearCache?: boolean) => Promise<any>;
+
+export async function restartApp(t: TExecutionContext): Promise<Application> {
+  await stopApp(false);
+  return await startApp(t);
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -92,10 +115,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  const failedTests: string[] = [];
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  async function startApp(t: TExecutionContext) {
+  startApp = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -133,8 +155,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
     `;
-    await focusChild(t);
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
@@ -147,17 +167,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await t.context.app.client.waitForVisible('a=Setup later'); // wait for the loader disappearing
-    if (options.skipOnboarding) {
-      await t.context.app.client.click('a=Setup later');
+    await waitForLoader(t);
+    if (await t.context.app.client.isExisting('a=Setup later')) {
+      if (options.skipOnboarding) {
+        await t.context.app.client.click('a=Setup later');
 
-      // This will only show up if OBS is installed
-      if (await t.context.app.client.isExisting('button=Start Fresh')) {
-        await t.context.app.client.click('button=Start Fresh');
+        // This will only show up if OBS is installed
+        if (await t.context.app.client.isExisting('button=Start Fresh')) {
+          await t.context.app.client.click('button=Start Fresh');
+        }
+      } else {
+        // Wait for the connect screen before moving on
+        await t.context.app.client.isExisting('button=Twitch');
       }
-    } else {
-      // Wait for the connect screen before moving on
-      await t.context.app.client.isExisting('button=Twitch');
     }
 
     // disable the popups that prevents context menu to be shown
@@ -165,27 +187,37 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
+    // disable animations in the child window
+    await focusChild(t);
+    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain(t);
+
     context = t.context;
     appIsRunning = true;
 
     if (options.afterStartCb) {
       await options.afterStartCb(t);
     }
-  }
 
-  async function stopApp(t: TExecutionContext) {
+    return app;
+  };
+
+  stopApp = async function stopApp(clearCache = true) {
     try {
-      await context.app.stop();
+      await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
+      console.error(e);
     }
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
+
+    if (!clearCache) return;
     await new Promise(resolve => {
       rimraf(context.cacheDir, resolve);
     });
-  }
+  };
 
   /**
    * test should be considered as failed if it writes exceptions in to the log file
@@ -209,9 +241,16 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
+  test.before(async t => {
+    // consider all tests as failed until it's not successfully finished
+    // so we can catch failures for tests with timeouts
+    saveFailedTestsToFile(pendingTests);
+  });
+
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
+
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
@@ -235,40 +274,51 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp(t);
+        await stopApp();
       }
     } catch (e) {
-      testPassed = false;
+      fail('Test finalization failed');
+      console.error(e);
     }
 
-    if (!testPassed) {
-      failedTests.push(testName);
-      const userName = getUserName();
-      if (userName) console.log(`Test failed for the account: ${userName}`);
+    if (testPassed) {
+      // consider this test succeed and remove from the `failedTests` list
+      removeFailedTestFromFile(testName);
+    } else {
+      fail();
+      const user = getUser();
+      if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
   });
 
   test.after.always(async t => {
-    if (appIsRunning) {
-      await stopApp(t);
-      if (!testPassed) failedTests.push(testName);
-    }
-
-    if (failedTests.length) saveFailedTestsToFile(failedTests);
+    if (!appIsRunning) return;
+    await stopApp();
+    if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
-  function fail(msg: string) {
+  /**
+   * mark tests as failed
+   */
+  function fail(msg?: string) {
     testPassed = false;
-    failMsg = msg;
+    if (msg) failMsg = msg;
   }
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
-  const filePath = 'test-dist/failed-tests.json';
-  if (fs.existsSync(filePath)) {
+  if (fs.existsSync(FAILED_TESTS_PATH)) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
+    failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
   }
-  fs.writeFileSync(filePath, JSON.stringify(failedTests));
+  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
+}
+
+function removeFailedTestFromFile(testName: string) {
+  if (fs.existsSync(FAILED_TESTS_PATH)) {
+    const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
+    failedTests.splice(failedTests.indexOf(testName), 1);
+    fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
 }

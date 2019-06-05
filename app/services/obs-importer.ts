@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
@@ -8,11 +8,12 @@ import { TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
+import { RunInLoadingMode } from 'services/app/app-decorators';
 
 interface Source {
   name?: string;
@@ -81,9 +82,13 @@ export class ObsImporterService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() appService: AppService;
 
-  async load(selectedprofile: string) {
-    if (!this.isOBSinstalled()) return;
+  @RunInLoadingMode()
+  async import() {
+    await this.load();
+  }
 
+  async load(selectedProfile?: string) {
+    if (!this.isOBSinstalled()) return;
     // Scene collections
     const collections = this.getSceneCollections();
     for (const collection of collections) {
@@ -91,7 +96,7 @@ export class ObsImporterService extends Service {
     }
 
     // Profile
-    this.importProfile(selectedprofile);
+    if (selectedProfile) this.importProfile(selectedProfile);
 
     // Select current scene collection
     const globalConfigFile = path.join(this.OBSconfigFileDirectory, 'global.ini');

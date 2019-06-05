@@ -21,18 +21,20 @@
   width: 100%;
   max-width: 370px;
   display: grid;
-  grid-template-columns: repeat( auto-fit, 64px);
-  grid-column-gap: 8px;
+  grid-template-columns: repeat(auto-fit, 56px);
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
 }
 
 .widget-layout-picker__option {
-  width: 64px;
-  height: 64px;
+  .transition();
+  .radius();
+
+  width: 56px;
+  height: 56px;
   border: 1px solid var(--solid-input);
   background-color: var(--solid-input);
-  .transition();
   position: relative;
-  .radius();
   cursor: pointer;
 
   img {

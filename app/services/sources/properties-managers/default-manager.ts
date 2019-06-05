@@ -1,5 +1,5 @@
 import { PropertiesManager } from './properties-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { MediaBackupService } from 'services/media-backup';
 import * as input from 'components/obs/inputs/ObsInput';
 import * as fi from 'node-fontinfo';

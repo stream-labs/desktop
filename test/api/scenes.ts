@@ -1,8 +1,9 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from '../../app/services/scenes';
 import { SceneBuilder } from '../helpers/scene-builder';
+import { sleep } from '../helpers/sleep';
+
 const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -62,13 +63,17 @@ test('Creating, fetching and removing scene-items', async t => {
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
 
-  let items = scene.getItems();
-  let itemsNames = items.map(item => item['name']);
+  let items = scene.getItems().map(item => item.getModel());
+  let itemsNames = items.map(item => item.name);
   t.deepEqual(itemsNames, ['Image2', 'Image1']);
 
   scene.removeItem(image2.sceneItemId);
-  items = scene.getItems();
-  itemsNames = items.map(item => item['name']);
+  items = scene.getItems().map(item => item.getModel());
+
+  // special check for the Streamdeck
+  t.falsy(items[0]['childrenIds'], 'Scene Items must not have children');
+
+  itemsNames = items.map(item => item.name);
   t.deepEqual(itemsNames, ['Image1']);
 });
 
@@ -161,8 +166,8 @@ test('SceneItem.setSettings()', async t => {
       top: 1.2,
       bottom: 5.6,
       left: 7.1,
-      right: 10,
-    },
+      right: 10
+    }
   });
 
   // crop values must be rounded
@@ -170,7 +175,7 @@ test('SceneItem.setSettings()', async t => {
     top: 1,
     bottom: 6,
     left: 7,
-    right: 10,
+    right: 10
   });
 });
 
@@ -185,7 +190,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 100, y: 100 },
     scale: { x: 100, y: 100 },
     crop: { top: 100, right: 100, bottom: 100, left: 100 },
-    rotation: 100,
+    rotation: 100
   });
 
   sceneItem.resetTransform();
@@ -194,7 +199,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 0, y: 0 },
     scale: { x: 1, y: 1 },
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
-    rotation: 0,
+    rotation: 0
   });
 });
 
@@ -222,6 +227,6 @@ test('SceneItem.addFile()', async t => {
         chatbox.mp4: ffmpeg_source
       text
         hello.txt: text_gdiplus
-  `),
+  `)
   );
 });

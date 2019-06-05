@@ -5,8 +5,11 @@ import { INumberMetadata } from './index';
 @Component({
   watch: {
     value(value) {
+      // TODO: This is a poor pattern. This component should not cache the
+      // displayValue and should instead compute it based on value to retain
+      // full reactivity with the underlying data
       // @ts-ignore
-      this.handleInput(value);
+      this.displayValue = this.value == null ? this.defaultDisplayValue : String(this.value);
     },
   },
 })

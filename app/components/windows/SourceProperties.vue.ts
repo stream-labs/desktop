@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
@@ -14,6 +14,8 @@ import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
 import { ErrorField } from 'vee-validate';
+import { CustomizationService } from 'services/customization';
+import { EditorCommandsService } from 'services/editor-commands';
 
 @Component({
   components: {
@@ -26,30 +28,40 @@ import { ErrorField } from 'vee-validate';
   },
 })
 export default class SourceProperties extends Vue {
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() windowsService: WindowsService;
+  @Inject() customizationService: CustomizationService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
   hasErrors = false;
 
-  sourcesSubscription: Subscription;
+  sourceRemovedSub: Subscription;
+  sourceUpdatedSub: Subscription;
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
-    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+    this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.sourceId === this.sourceId) {
         electron.remote.getCurrentWindow().close();
+      }
+    });
+    this.sourceUpdatedSub = this.sourcesService.sourceUpdated.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        this.refresh();
       }
     });
   }
 
   destroyed() {
-    this.sourcesSubscription.unsubscribe();
+    this.sourceRemovedSub.unsubscribe();
+    this.sourceUpdatedSub.unsubscribe();
+  }
+
+  get hideStyleBlockers() {
+    return this.windowsService.state.child.hideStyleBlockers;
   }
 
   get propertiesManagerUI() {
@@ -57,9 +69,9 @@ export default class SourceProperties extends Vue {
   }
 
   onInputHandler(properties: TObsFormData, changedIndex: number) {
-    const source = this.sourcesService.getSource(this.sourceId);
-    source.setPropertiesFormData([properties[changedIndex]]);
-    this.refresh();
+    this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', this.sourceId, [
+      properties[changedIndex],
+    ]);
   }
 
   refresh() {

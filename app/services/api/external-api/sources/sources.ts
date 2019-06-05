@@ -7,9 +7,9 @@ import {
   SourcesService as InternalSourcesService,
   TSourceType,
 } from 'services/sources';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper } from 'services/core';
 import { ISerializable } from '../../rpc-api';
 
 export interface ISourceAddOptions {

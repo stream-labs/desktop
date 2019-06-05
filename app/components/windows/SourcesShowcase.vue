@@ -13,8 +13,7 @@
       :description="inspectedSourceDefinition.description"
       :showSupport="!inspectedSourceDefinition.prefabId && !!sourceData(inspectedSourceDefinition.type).supportList"
     >
-      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(inspectedSourceDefinition.type, 'day')" />
-      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(inspectedSourceDefinition.type, 'night')"/>
+      <img v-if="sourceData(inspectedSourceDefinition.type).demoFilename" slot="media" class="source__demo" :src="getSrc(inspectedSourceDefinition.type)" />
       <ul slot="support-list" class="source-support__list">
         <li v-for="support in sourceData(inspectedSourceDefinition.type).supportList" :key="support">
           {{ support }}
@@ -30,14 +29,10 @@
       :name="widgetData(type).name"
       :description="widgetData(type).description"
     >
-      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--day" autoplay loop slot="media">
-        <source :src="getSrc(type, 'day')">
+      <video v-if="widgetData(type).demoVideo" class="source__demo" autoplay loop slot="media">
+        <source :src="getSrc(type)">
       </video>
-      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--night" autoplay loop slot="media">
-        <source :src="getSrc(type, 'night')">
-      </video>
-      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--day" slot="media" :src="getSrc(type, 'day')"/>
-      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--night" slot="media" :src="getSrc(type, 'night')"/>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo" slot="media" :src="getSrc(type)"/>
       <ul slot="support-list" class="source-support__list">
         <li v-for="support in widgetData(type).supportList" :key="support">
           {{ support }}
@@ -50,8 +45,7 @@
       :name="$t('Stream Label')"
       :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
       key="streamlabel-source-info">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
+      <img class="source__demo" slot="media" :src="require(`../../../media/source-demos/${demoMode}/source-stream-labels.png`)"/>
       <ul slot="support-list" class="source-support__list">
         <li>{{ $t('New Followers') }}</li>
         <li>{{ $t('New Subscribers') }}</li>
@@ -69,8 +63,7 @@
       :name="$t('Instant Replay')"
       :description="$t('Automatically plays your most recently captured replay in your stream.')"
       key="replay-source-info">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/media.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/media.png"/>
+      <img class="source__demo" slot="media" :src="require(`../../../media/source-demos/${demoMode}/media.png`)"/>
     </add-source-info>
 
     <add-source-info
@@ -79,7 +72,7 @@
       v-if="(inspectedSource === 'app_source') && (inspectedAppId === appSource.appId) && (inspectedAppSourceId === appSource.source.id)"
       :name="appSource.source.name"
       :description="appSource.source.about.description">
-      <img class="source__demo source__demo--night" slot="media" :src="getAppAssetUrl(appSource.appId, appSource.source.about.bannerImage)" />
+      <img class="source__demo" slot="media" :src="getAppAssetUrl(appSource.appId, appSource.source.about.bannerImage)" />
       <ul slot="support-list">
         <li v-for="(bullet, index) in appSource.source.about.bullets" :key="index">
           {{ bullet }}
@@ -100,8 +93,7 @@
           </ol>
         </div>
         <div class="source-info__media">
-          <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
-          <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/sources.png"/>
+          <img slot="media" class="source__demo" :src="require(`../../../media/source-demos/${demoMode}/sources.png`)"/>
         </div>
       </div>
     </div>
@@ -194,6 +186,7 @@
 
 .source-info {
   .padding(2);
+
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -226,6 +219,7 @@ h2 {
 
 .sources {
   .padding(2);
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 16px;
@@ -256,13 +250,14 @@ h2 {
 }
 
 .source {
-  cursor: pointer;
   .transition();
+  .radius();
+
+  cursor: pointer;
   padding: 4px 8px;
   margin-top: 8px;
   background-color: var(--section);
   width: 49%;
-  .radius();
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 100%;
@@ -271,8 +266,9 @@ h2 {
 
   &:hover,
   &.source--active {
-    color: var(--title);
     .weight(@medium);
+
+    color: var(--title);
     background-color: var(--button);
   }
 
@@ -296,9 +292,10 @@ h2 {
 
 .source-info__media {
   .radius();
+  .padding-left(2);
+
   overflow: hidden;
   text-align: center;
-  .padding-left(2);
   align-items: center;
   align-content: center;
   max-height: 150px;
@@ -319,23 +316,4 @@ h2 {
   margin-right: 10px;
   width: 30px;
 }
-
-.source__demo--day {
-  display: block;
-}
-
-.source__demo--night {
-  display: none;
-}
-
-.night-theme {
-  .source__demo--day {
-    display: none;
-  }
-
-  .source__demo--night {
-    display: block;
-  }
-}
-
 </style>

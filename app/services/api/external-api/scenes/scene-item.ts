@@ -1,4 +1,4 @@
-import { ServiceHelper } from 'services/stateful-service';
+import { ServiceHelper } from 'services/core';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { ISourceModel, Source, SourcesService } from 'services/api/external-api/sources/sources';
@@ -7,6 +7,7 @@ import { ISceneNode, SceneNode } from './scene-node';
 export interface ISceneItem extends ISceneItemSettings, ISceneNode {
   sceneItemId: string;
   sourceId: string;
+  name: string;
 }
 
 export interface ISceneItemSettings {
@@ -78,11 +79,13 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
   /**
    * returns serialized representation of scene-item
    */
-  getModel(): ISceneItem & ISourceModel {
+  getModel(): ISceneItem {
+    const sourceModel = this.getSource().getModel();
     return {
-      ...this.getSource().getModel(),
       ...super.getModel(),
+      sourceId: this.getSource().sourceId,
       sceneItemId: this.sceneItem.sceneItemId,
+      name: sourceModel.name,
       transform: this.sceneItem.transform,
       visible: this.sceneItem.visible,
       locked: this.sceneItem.locked,
