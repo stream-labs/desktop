@@ -72,5 +72,6 @@
   "Scheduled Date": "Geplantes Datum",
   "Scheduled Time": "Geplante Zeit",
   "You are 10 minutes away from the 8 hour stream limit": "Es trennen Sie 10 Minuten von 8-Stunden Stream-Limit",
-  "Stream has disconnected, attempting to reconnect.": "Der Stream wurde unterbrochen, und versucht sich erneut zu verbinden."
+  "Stream has disconnected, attempting to reconnect.": "Der Stream wurde unterbrochen, und versucht sich erneut zu verbinden.",
+  "Start typing to search": "Start typing to search"
 }
