@@ -35,7 +35,7 @@ const commitSHA = getCommitSHA();
   for (const branchName of branches) {
     checkoutBranch(branchName);
     // TODO: run all tests, not only for settings
-    exec('yarn test --timeout=3m test-dist/test/screentest/tests --match="Settings*" ');
+    exec('yarn test --timeout=3m test-dist/test/screentest/tests ');
   }
 
   // compare screenshots

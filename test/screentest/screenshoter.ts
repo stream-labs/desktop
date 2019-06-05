@@ -87,6 +87,7 @@ export function useScreentest(options: IScreentestOptions = { window: 'main' }) 
   if (!fs.existsSync(`${CONFIG.dist}/${branchName}`)) fs.mkdirSync(`${CONFIG.dist}/${branchName}/`);
 
   test.afterEach(async t => {
+    await sleep(500);
     await makeScreenshots(t, options);
   });
 }
