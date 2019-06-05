@@ -1,11 +1,9 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
-import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { PersistentStatefulService, Inject, mutation } from 'services/core';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings/index';
-import { mutation } from 'services/core/stateful-service';
-import { Inject } from '../../core/injector';
 import {
   JsonrpcService,
   E_JSON_RPC_ERROR,
@@ -16,7 +14,7 @@ import {
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
-import { SceneCollectionsService } from '../../scene-collections';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 const net = require('net');
 
@@ -385,8 +383,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       const client = this.clients[clientId];
       const eventName = event.result.resourceId.split('.')[1];
 
-      // these events will be sent to client even if isRequestsHandlingStopped = true
-      // isRequestsHandlingStopped = true usually when the app has the loading state
+      // these events will be sent to the client even if isRequestsHandlingStopped = true
+      // this allows to send this event even if the app is in the loading state
       const whitelistedEvents: (keyof SceneCollectionsService)[] = [
         'collectionWillSwitch',
         'collectionAdded',
