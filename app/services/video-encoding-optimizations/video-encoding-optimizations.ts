@@ -2,15 +2,14 @@ import {
   SettingsService,
   OutputSettingsService,
   IStreamingEncoderSettings,
+  EEncoderFamily,
 } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from '../core/injector';
+import { Inject, mutation, PersistentStatefulService } from 'services/core';
 import { IEncoderProfile } from './definitions';
 import cloneDeep from 'lodash/cloneDeep';
 import { camelize, handleErrors } from '../../util/requests';
 import { UrlService } from '../hosts';
-import { mutation } from 'services/core/stateful-service';
-import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 
 export * from './definitions';
 
@@ -80,9 +79,14 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     const settings = this.outputSettingsService.getSettings().streaming;
     const profiles = await this.fetchAvailableGameProfiles(game);
 
+    // We don't have settings for jim_nvenc encoder in DB
+    // use settings for nvenc instead
+    const encoder =
+      settings.encoder === EEncoderFamily.jim_nvenc ? EEncoderFamily.nvenc : settings.encoder;
+
     const filteredProfiles = profiles.filter(profile => {
       return (
-        profile.encoder === settings.encoder &&
+        profile.encoder === encoder &&
         profile.bitrateMax >= settings.bitrate &&
         profile.bitrateMin <= settings.bitrate &&
         (!settings.preset || settings.preset === profile.presetIn)
@@ -97,6 +101,9 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
         Math.abs(resToPx(profileZ.resolutionIn) - resInPx)
       );
     })[0];
+
+    // don't change the current encoder
+    profile.encoder = settings.encoder;
 
     return profile;
   }
@@ -143,7 +150,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     }
 
     if (profiles.length) this.CACHE_PROFILES(game, profiles);
-    return profiles;
+    return cloneDeep(profiles);
   }
 
   applyProfile(encoderProfile: IEncoderProfile) {
