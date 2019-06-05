@@ -21,7 +21,7 @@ const nameMap = () => ({
   mixer_subscriptions: $t('Mixer Subscriptions'),
   twitch_resubs: $t('Twitch Resubs'),
   youtube_subscribers: $t('Youtube Subscriptions'),
-  youtube_sponsors: $t('Youtube Sponsors'),
+  youtube_sponsors: $t('Youtube Memberships'),
   youtube_superchats: $t('Youtube Super Chats'),
   periscope_superhearts: $t('Periscope Super Hearts'),
   picarto_follows: $t('Picarto Follows'),

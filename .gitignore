@@ -20,3 +20,5 @@ yarn-error.log
 .opt-in
 .env
 .awcache/
+settings.cfg
+.gitignore
