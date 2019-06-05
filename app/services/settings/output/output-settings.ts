@@ -83,18 +83,25 @@ export interface IOutputSettings {
   inputResolution: string;
   streaming: IStreamingEncoderSettings;
   recording: IRecordingEncoderSettings;
+  replayBuffer: IReplayBufferSettings;
 }
 
 interface IOutputSettingsPatch {
   mode?: TOutputSettingsMode;
   streaming?: Partial<IStreamingEncoderSettings>;
   recording?: Partial<IRecordingEncoderSettings>;
+  replayBuffer?: Partial<IReplayBufferSettings>;
 }
 
 export interface IEncoderSettings {
   encoder: EEncoderFamily;
   outputResolution: string;
   bitrate: number;
+}
+
+export interface IReplayBufferSettings {
+  enabled: boolean;
+  time: number;
 }
 
 export interface IRecordingEncoderSettings extends IEncoderSettings {
@@ -181,12 +188,17 @@ export class OutputSettingsService extends Service {
 
     const streaming = this.getStreamingEncoderSettings(output, video);
     const recording = this.getRecordingEncoderSettings(output, video, mode, streaming);
+    const replayBuffer = {
+      enabled: this.settingsService.findSettingValue(output, 'Replay Buffer', 'RecRB'),
+      time: this.settingsService.findSettingValue(output, 'Replay Buffer', 'RecRBTime'),
+    };
 
     return {
       mode,
       inputResolution,
       streaming,
       recording,
+      replayBuffer,
     };
   }
 
@@ -325,6 +337,17 @@ export class OutputSettingsService extends Service {
 
     if (settingsPatch.recording) {
       this.setRecordingEncoderSettings(currentSettings, settingsPatch.recording);
+    }
+
+    if (settingsPatch.replayBuffer) this.setReplayBufferSettings(settingsPatch.replayBuffer);
+  }
+
+  private setReplayBufferSettings(replayBufferSettings: Partial<IReplayBufferSettings>) {
+    if (replayBufferSettings.enabled != null) {
+      this.settingsService.setSettingValue('Output', 'RecRB', replayBufferSettings.enabled);
+    }
+    if (replayBufferSettings.time != null) {
+      this.settingsService.setSettingValue('Output', 'RecRBTime', replayBufferSettings.time);
     }
   }
 
