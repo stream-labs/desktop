@@ -112,16 +112,12 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
    * returns profiles according to the game name
    */
   private async fetchAvailableGameProfiles(game: string): Promise<IEncoderProfile[]> {
-    if (!game) {
-      return [];
-    }
-
     let profiles: IEncoderProfile[] = [];
 
     if (game === this.state.lastLoadedGame) {
       profiles = this.state.lastLoadedProfiles;
     } else {
-      // try to fetch game-specific profile
+      // try to fetch a game-specific profile
 
       try {
         profiles = await fetch(
