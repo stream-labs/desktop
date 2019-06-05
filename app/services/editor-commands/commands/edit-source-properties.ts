@@ -2,6 +2,7 @@ import { CombinableCommand } from './combinable-command';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { SourcesService } from 'services/sources';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class EditSourcePropertiesCommand extends CombinableCommand {
   @Inject() sourcesService: SourcesService;
@@ -14,7 +15,9 @@ export class EditSourcePropertiesCommand extends CombinableCommand {
   constructor(private sourceId: string, private formData: TObsFormData) {
     super();
 
-    this.description = `Edit ${this.sourcesService.getSource(this.sourceId).name}`;
+    this.description = $t('Edit %{sourceName}', {
+      sourceName: this.sourcesService.getSource(this.sourceId).name,
+    });
   }
 
   execute() {

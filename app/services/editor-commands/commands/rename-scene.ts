@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class RenameSceneCommand extends Command {
   @Inject() scenesService: ScenesService;
@@ -12,7 +13,7 @@ export class RenameSceneCommand extends Command {
   }
 
   get description() {
-    return `Rename ${this.oldName}`;
+    return $t('Rename %{sceneName}', { sceneName: this.oldName });
   }
 
   execute() {

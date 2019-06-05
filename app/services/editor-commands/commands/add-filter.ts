@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class AddFilterCommand extends Command {
   @Inject() private sourceFiltersService: SourceFiltersService;
@@ -15,7 +16,7 @@ export class AddFilterCommand extends Command {
   }
 
   get description() {
-    return `Add ${this.name}`;
+    return $t('Add %{filterName}', { filterName: this.name });
   }
 
   execute() {

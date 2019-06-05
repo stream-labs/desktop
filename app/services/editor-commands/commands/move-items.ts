@@ -1,5 +1,6 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export class MoveItemsCommand extends ModifyTransformCommand {
   constructor(selection: Selection, private deltaPosition: Partial<IVec2>) {
@@ -7,7 +8,7 @@ export class MoveItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return `Move ${this.selection.getNodes()[0].name}`;
+    return $t('Move %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

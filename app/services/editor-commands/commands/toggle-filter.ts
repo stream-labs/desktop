@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { Inject } from 'services/core';
 import { SourceFiltersService } from 'services/source-filters';
+import { $t } from 'services/i18n';
 
 export class ToggleFilterCommand extends Command {
   @Inject() private sourceFiltersService: SourceFiltersService;
@@ -9,7 +10,8 @@ export class ToggleFilterCommand extends Command {
 
   constructor(private sourceId: string, private filterName: string) {
     super();
-    this.description = `${!this.filter.visible ? 'Enable' : 'Disable'} ${filterName}`;
+    const action = !this.filter.visible ? 'Enable %{filterName}' : 'Disable %{filterName}';
+    this.description = $t(action, { filterName });
   }
 
   execute() {

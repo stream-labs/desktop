@@ -4,6 +4,7 @@ import { Inject } from 'services/core/injector';
 import { RemoveNodesCommand } from './remove-nodes';
 import { CopyNodesCommand } from './copy-nodes';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 ////////////////////
 // TODO: IN PROGRESS
@@ -30,7 +31,7 @@ export class CreateSceneCommand extends Command {
 
   constructor(private name: string, private options: ISceneCreateOptions = {}) {
     super();
-    this.description = `Create ${name}`;
+    this.description = $t('Create %{sceneName}', { sceneName: name });
   }
 
   async execute() {

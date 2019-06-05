@@ -4,6 +4,7 @@ import { Inject } from 'services/core/injector';
 import { EditorCommandsService } from 'services/editor-commands';
 import styles from './UndoControls.m.less';
 import cx from 'classnames';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class UndoControls extends TsxComponent<{}> {
@@ -26,7 +27,9 @@ export default class UndoControls extends TsxComponent<{}> {
           })}
           onClick={() => this.editorCommandsService.undo()}
           v-tooltip={{
-            content: `Undo ${this.editorCommandsService.nextUndoDescription}`,
+            content: $t('Undo %{action}', {
+              action: this.editorCommandsService.nextUndoDescription,
+            }),
             placement: 'left',
           }}
         />
@@ -36,7 +39,9 @@ export default class UndoControls extends TsxComponent<{}> {
           })}
           onClick={() => this.editorCommandsService.redo()}
           v-tooltip={{
-            content: `Redo ${this.editorCommandsService.nextRedoDescription}`,
+            content: $t('Redo %{action}', {
+              action: this.editorCommandsService.nextRedoDescription,
+            }),
             placement: 'right',
           }}
         />

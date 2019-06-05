@@ -3,6 +3,7 @@ import { ETransitionType, TransitionsService } from 'services/transitions';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Inject } from 'services/core';
 import cloneDeep from 'lodash/cloneDeep';
+import { $t } from 'services/i18n';
 
 /**
  * Any or all of these can be modified
@@ -30,7 +31,9 @@ export class EditTransitionCommand extends Command {
     // Make sure our copy won't mutate for safe rollacks
     if (changes.formData != null) changes.formData = cloneDeep(changes.formData);
 
-    this.description = `Edit ${this.transitionsService.getTransition(this.transitionId).name}`;
+    this.description = $t('Edit %{transitionName}', {
+      transitionName: this.transitionsService.getTransition(this.transitionId).name,
+    });
   }
 
   execute() {

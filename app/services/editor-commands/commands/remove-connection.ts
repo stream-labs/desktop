@@ -1,11 +1,12 @@
 import { Command } from './command';
 import { Inject } from 'services/core';
 import { TransitionsService } from 'services/transitions';
+import { $t } from 'services/i18n';
 
 export class RemoveConnectionCommand extends Command {
   @Inject() private transitionsService: TransitionsService;
 
-  description = 'Remove a connection';
+  description = $t('Remove a connection');
 
   private fromId: string;
   private toId: string;

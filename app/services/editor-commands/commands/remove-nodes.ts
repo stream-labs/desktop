@@ -2,6 +2,7 @@ import { Command } from './command';
 import { Selection } from 'services/selection';
 import { RemoveFolderCommand } from './remove-folder';
 import { RemoveItemCommand } from './remove-item';
+import { $t } from 'services/i18n';
 
 export class RemoveNodesCommand extends Command {
   private removeFolderSubCommands: RemoveFolderCommand[];
@@ -15,7 +16,7 @@ export class RemoveNodesCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.selectionName}`;
+    return $t('Remove %{sourceName}', { sourceName: this.selectionName });
   }
 
   async execute() {
