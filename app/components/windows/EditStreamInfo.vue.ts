@@ -367,7 +367,6 @@ export default class EditStreamInfo extends Vue {
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
-      placeholder: $t('Search'),
       options: this.gameOptions,
       noResult: $t('No matching game(s) found.'),
     };

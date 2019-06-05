@@ -53,6 +53,7 @@
             @search-change="debouncedGameSearch"
             @input="onGameInput"
             :value="gameModel"
+            :placeholder="$t('Start typing to search')"
             :metadata="gameMetadata"
           />
         </h-form-group>
