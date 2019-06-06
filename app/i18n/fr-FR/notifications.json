@@ -1,5 +1,5 @@
 {
-  "You don't have any notifications": "Vous n'avez aucune notifications",
+  "You don't have any notifications": "Vous n'avez aucune notification",
   "Enable notifications": "Activer les notifications",
   "Enable sound": "Activer le son",
   "Skipped frames detected:": "Images ignorées detectées:",
@@ -15,5 +15,6 @@
   "Click to open your Notifications window": "Cliquer pour ouvrir la fenêtre de notifications",
   "Click to read your unread Notifications": "Cliquer pour lire les notifications non lues",
   "New Notifications": "Nouvelle notification",
-  "Log": "Historique"
+  "Log": "Historique",
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS has updated! Click here to see what changed."
 }
