@@ -1,88 +1,74 @@
 import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { fillForm } from '../../helpers/form-monkey';
-import { useScreentest } from '../screenshoter';
+import { makeScreenshots, useScreentest } from '../screenshoter';
+import { TPlatform } from '../../../app/services/platforms';
+import { setOutputResolution } from '../../helpers/spectron/output';
 
 useSpectron();
-useScreentest({ window: 'child' });
+useScreentest();
 
-test('Streaming to Twitch', async t => {
+// test streaming for each platform
+const platforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'mixer'];
+platforms.forEach(platform => {
+  test(`Streaming to ${platform}`, async t => {
+    // login into the account
+    if (!(await logIn(t, platform))) return;
+    const app = t.context.app;
 
-  // login into the account
-  if (!(await logIn(t, 'twitch'))) return;
-  const app = t.context.app;
+    // decrease resolution to reduce CPU usage
+    await setOutputResolution(t, '100x100');
 
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
+    // open EditStreamInfo window
+    await focusMain(t);
+    await app.client.click('button=Go Live');
+    await focusChild(t);
 
-  // set stream info
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
-    stream_title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+    // fill streaming data
+    switch (platform) {
+      case 'twitch':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          stream_title: 'SLOBS Test Stream',
+          game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+        });
+        break;
+
+      case 'facebook':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          stream_title: 'SLOBS Test Stream',
+          game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+          stream_description: 'SLOBS Test Stream Description',
+        });
+        break;
+
+      case 'mixer':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          stream_title: 'SLOBS Test Stream',
+          game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+        });
+        break;
+
+      case 'youtube':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          stream_title: 'SLOBS Test Stream',
+          stream_description: 'SLOBS Test Stream Description'
+        });
+        break;
+    }
+
+    await makeScreenshots('before_stream');
+
+    await app.client.click('button=Confirm & Go Live');
+
+    // check we're streaming
+    await focusMain(t);
+    await app.client.waitForExist('button=End Stream', 20 * 1000);
+
+    // open the editStreamInfo dialog
+    await app.client.click('.live-dock-info .icon-edit');
+    await focusChild(t);
+    await app.client.waitForExist('input', 20 * 1000);
+
+    await makeScreenshots('in_stream');
   });
-
-  t.pass();
-});
-
-test('Streaming to Facebook', async t => {
-
-  // login into the account
-  if (!(await logIn(t, 'facebook'))) return;
-  const app = t.context.app;
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
-    stream_title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-    stream_description: 'SLOBS Test Stream Description',
-  });
-
-  t.pass();
-});
-
-test('Streaming to Mixer', async t => {
-
-  // login into the account
-  if (!(await logIn(t, 'mixer'))) return;
-  const app = t.context.app;
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
-    stream_title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-  });
-
-  t.pass();
-});
-
-test('Streaming to Youtube', async t => {
-
-  // login into the account
-  if (!(await logIn(t, 'youtube'))) return;
-  const app = t.context.app;
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
-    stream_title: 'SLOBS Test Stream',
-    stream_description: 'SLOBS Test Stream Description'
-  });
-
-  t.pass();
 });

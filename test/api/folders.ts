@@ -1,22 +1,22 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { useSpectron, test, afterAppStart } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { Scene, SceneItemNode } from '../../app/services/scenes';
 
-useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
+useSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let scene: Scene;
 let getNode: (name: string) => SceneItemNode;
 let getNodeId: (name: string) => string;
 
-async function afterStart() {
+afterAppStart(async t => {
   const client = await getClient();
   sceneBuilder = new SceneBuilder(client);
   scene = sceneBuilder.scene;
   getNode = name => scene.getNodeByName(name);
   getNodeId = name => scene.getNodeByName(name).id;
-}
+});
 
 test('Place after and place before', async t => {
   sceneBuilder.build(`
