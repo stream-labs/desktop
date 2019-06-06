@@ -94,7 +94,7 @@ export function useScreentest() {
     screenshotsCaptured = false;
   });
 
-  test.afterEach(async t => {
+  test.afterEach(async (t: TExecutionContext) => {
     // if no screenshots have been captured wile test running
     // make screenshots before finishing the test
     if (!screenshotsCaptured) await makeScreenshots(t);
