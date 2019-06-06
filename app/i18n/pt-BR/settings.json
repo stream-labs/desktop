@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Executar o Otimizador Automático",
   "Confirm stream title and game before going live": "Confirme o título da transmissão e o jogo antes de entrar ao vivo",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "AVISO! Você perderá todas as cenas, fontes e configurações. Isto não poderá ser desfeito!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Seu diretório de cache foi enviado com sucesso. O nome do arquivo %{file} foi copiado para a área de transferência. Por favor, cole-o no Discord e marque um desenvolvedor.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "O seu diretório de cache carregou com êxito. O nome de arquivo %{file} foi copiado para a sua área de transferência.",
   "Streamlabels session has been succesfully restarted!": "A sessão do Streamlabels foi reiniciada com sucesso!",
   "This action will restart the application. Continue?": "Esta ação irá reiniciar o aplicativo. Continuar?",
   "Show confirmation dialog when starting streams": "Mostrar diálogo de confirmação quando iniciar transmissões",
@@ -69,5 +69,14 @@
   "Default": "Padrão",
   "Custom Encoder Settings": "Configurações personalizadas do Codificador",
   "Audio Bitrate": "Bitrate de Áudio",
-  "Video Bitrate": "Bitrate de Vídeo"
+  "Video Bitrate": "Bitrate de Vídeo",
+  "Scene item selection mode": "Modo de seleção do item de cena",
+  "Single click selects group. Double click selects item": "O clique único seleciona o grupo. O duplo clique seleciona o item",
+  "Double click selects group. Single click selects item": "O clique único seleciona o grupo. O duplo clique seleciona o item",
+  "Open FrankerFaceZ Settings": "Abrir as configurações FrankerFaceZ",
+  "FrankerFaceZ Settings": "Configurações FrankerFaceZ",
+  "API Token": "Token API",
+  "Face Mask Settings": "Configurações das Máscaras Faciais",
+  "Navigate to Live tab when going live": "Navegar para a guia quando estiver ao vivo",
+  "Save Replay": "Salvar o replay"
 }
