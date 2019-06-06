@@ -68,7 +68,6 @@ platforms.forEach(platform => {
     await app.client.click('.live-dock-info .icon-edit');
     await focusChild(t);
     await app.client.waitForExist('input', 20 * 1000);
-
     await makeScreenshots(t, 'in_stream');
     t.pass();
   });

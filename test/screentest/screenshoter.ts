@@ -50,6 +50,7 @@ export async function makeScreenshots(t: TExecutionContext, title = '') {
   windowService.updateMainWindowOptions({ title: 'Streamlabs OBS - screentest' });
 
   const windowId = await getFocusedWindowId(t);
+  console.log('Windowid=', windowId);
 
   configs = getConfigsVariations();
   const processedConfigs: string[] = [];
