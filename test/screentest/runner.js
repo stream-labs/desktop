@@ -19,6 +19,7 @@ const {
 } = process.env;
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
+const args = process.argv.slice(2);
 
 (async function main() {
 
@@ -34,12 +35,11 @@ const commitSHA = getCommitSHA();
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName);
-    // TODO: run all tests, not only for settings
-    exec('yarn test --timeout=3m test-dist/test/screentest/tests ');
+    exec(`yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests ${args.join(' ')}`);
   }
 
   // compare screenshots
-  exec(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+  exec(`node ${CONFIG.dist}/comparator.js ${branches[0]} ${branches[1]}`);
 
   // send the status to the GitHub check and upload screenshots
   await updateCheck();
@@ -52,10 +52,11 @@ function checkoutBranch(branchName) {
   if (branchName !== 'current') {
     exec(`git checkout ${branchName}`);
   }
+  rimraf.sync(CONFIG.compiledTestsDist);
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
   // save current branch name to the file
-  // screenshoter needs will use this value
+  // screenshoter.js will use this value
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 
