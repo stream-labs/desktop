@@ -4,7 +4,6 @@ import {
 
 /**
  * niconicoに最適な設定値を返す。
- * @param options ビットレート
  */
 export function getBestSettingsForNiconico(
     options: {
