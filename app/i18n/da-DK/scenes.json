@@ -17,6 +17,7 @@
   "Create Output Projector": "Opret output projektør",
   "Studio Mode": "Studio tilstand",
   "Are you sure you want to remove %{sceneName}?": "Er du sikker på at du vil fjerne %{sceneName}?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Deaktiver ydeevnetilstand",
   "Scene Collections": "Scenesamlinger",
   "The building blocks of your scene. Also contains widgets.": "Byggestenene i din scene. Indeholder også widgets.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "Dine mediefiler synkroniseres i øjeblikket med skyen. ",
   "It is recommended that you wait until this finishes before going live.": "Det anbefales, at du venter indtil de er færdige før du går live.",
   "Go Live Anyway": "Gå live alligevel",
-  "Wait": "Vent"
+  "Wait": "Vent",
+  "Add a new Scene.": "Add a new Scene.",
+  "Remove Scene.": "Remove Scene.",
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }
