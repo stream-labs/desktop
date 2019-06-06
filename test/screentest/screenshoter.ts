@@ -3,10 +3,11 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { afterAppStart, focusChild, focusMain } from '../helpers/spectron';
+import { afterAppStart, focusChild, focusMain, TExecutionContext } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
+import NativeImage = Electron.NativeImage;
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -15,7 +16,7 @@ let configs: Dictionary<any>[];
 let branchName: string;
 let screenshotsCaptured = false;
 
-async function applyConfig(t: any, config: Dictionary<any>) {
+async function applyConfig(t: TExecutionContext, config: Dictionary<any>) {
   const api = await getClient();
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
 
@@ -29,12 +30,12 @@ async function applyConfig(t: any, config: Dictionary<any>) {
   await sleep(1000);
 }
 
-async function getFocusedWindowId(t: any): Promise<string> {
+async function getFocusedWindowId(t: TExecutionContext): Promise<string> {
   const url = await t.context.app.client.getUrl();
   return url.match(/windowId=main$/) ? 'main' : 'child';
 }
 
-export async function makeScreenshots(t: any, title = '') {
+export async function makeScreenshots(t: TExecutionContext, title = '') {
   const api = await getClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
@@ -67,7 +68,7 @@ export async function makeScreenshots(t: any, title = '') {
     processedConfigs.push(configStr);
 
     await applyConfig(t, config);
-    await t.context.app.browserWindow.capturePage().then((imageBuffer: ArrayBuffer) => {
+    await t.context.app.browserWindow.capturePage().then((imageBuffer: NativeImage) => {
       const testName = t.title.replace('afterEach hook for ', '');
       const imageFileName = `${testName}_${title}_${configInd}.png`;
       fs.writeFileSync(`${CONFIG.dist}/${branchName}/${imageFileName}`, imageBuffer);

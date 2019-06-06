@@ -5,7 +5,7 @@ import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
 
-useSpectron();
+useSpectron({ appArgs: '--nosync' });
 useScreentest();
 
 // test streaming for each platform
@@ -51,12 +51,12 @@ platforms.forEach(platform => {
       case 'youtube':
         await fillForm(t, 'form[name=editStreamForm]', {
           stream_title: 'SLOBS Test Stream',
-          stream_description: 'SLOBS Test Stream Description'
+          stream_description: 'SLOBS Test Stream Description',
         });
         break;
     }
 
-    await makeScreenshots('before_stream');
+    await makeScreenshots(t, 'before_stream');
 
     await app.client.click('button=Confirm & Go Live');
 
@@ -69,6 +69,6 @@ platforms.forEach(platform => {
     await focusChild(t);
     await app.client.waitForExist('input', 20 * 1000);
 
-    await makeScreenshots('in_stream');
+    await makeScreenshots(t, 'in_stream');
   });
 });
