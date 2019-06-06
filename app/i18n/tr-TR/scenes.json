@@ -17,6 +17,7 @@
   "Create Output Projector": "Çıkış Projektörü Oluştur",
   "Studio Mode": "Stüdyo Modu",
   "Are you sure you want to remove %{sceneName}?": "%{sceneName} silmek istediğinize emin misiniz?",
+  "Are you sure you want to remove these %{count} items?": "%{count} ögeyi silmek istediğinizden emin misiniz?",
   "Disable Performance Mode": "Performans Modunu Etkisizleştir",
   "Scene Collections": "Sahne Koleksiyonları",
   "The building blocks of your scene. Also contains widgets.": "Sahnenizin yapı taşlarıdır. Ayrıca eklentileri de içerir.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "Medya dosyalarınız halihazırda bulut ile senkronize edilmiş durumda. ",
   "It is recommended that you wait until this finishes before going live.": "Canlı yayına geçmeden önce bu bitene kadar beklemeniz tavsiye edilir.",
   "Go Live Anyway": "Yine de Canlı yayına git",
-  "Wait": "Bekle"
+  "Wait": "Bekle",
+  "Add a new Scene.": "Yeni bir Sahne ekle.",
+  "Remove Scene.": "Sahneyi Sil.",
+  "Edit Scene Transitions.": "Sahne Geçişlerini Düzenle.",
+  "Rename Scene": "Sahneyi Yeniden Adlandır",
+  "Name Scene": "Sahneyi Adlandır",
+  "Rename Folder": "Klasörü Yeniden Adlandır",
+  "Name Folder": "Klasörü Adlandır"
 }
