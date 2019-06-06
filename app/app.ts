@@ -13,6 +13,7 @@ import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -80,7 +81,7 @@ if (
 
       return event;
     },
-    integrations: [new Sentry.Integrations.Vue({ Vue })],
+    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
@@ -177,6 +178,8 @@ electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowI
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
+  // TODO: Suppress N-API error until we upgrade electron to v4.x
+  if (/N\-API is an experimental feature/.test(args[0])) return;
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);

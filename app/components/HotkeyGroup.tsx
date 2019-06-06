@@ -1,8 +1,8 @@
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import Hotkey from './shared/Hotkey.vue';
 import { IHotkey } from 'services/hotkeys';
 import cx from 'classnames';
+import TsxComponent from './tsx-component';
 
 @Component({
   props: {
@@ -10,7 +10,7 @@ import cx from 'classnames';
     hotkeys: Array,
   },
 })
-export default class HotkeyGroup extends Vue {
+export default class HotkeyGroup extends TsxComponent<{ hotkeys: IHotkey[]; title?: string }> {
   @Prop() hotkeys: IHotkey[];
   @Prop() title: string;
   collapsed = false;

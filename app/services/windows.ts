@@ -27,6 +27,8 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
+import OverlayWindow from 'components/windows/OverlayWindow.vue';
+import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -81,6 +83,8 @@ export function getComponents() {
     PlatformAppPopOut,
     FacemaskSettings,
     EditTransform,
+    OverlayWindow,
+    OverlayPlaceholder,
 
     BitGoal,
     DonationGoal,
@@ -117,6 +121,10 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+  height?: number;
+  width?: number;
+  webPreferences?: { offscreen: boolean };
+  transparent?: boolean;
 
   // Will be true when the UI is performing animations, transitions, or property changes that affect
   // the display of elements we cannot draw over. During this time such elements, for example
@@ -217,6 +225,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateChildWindowOptions(options);
   }
 
+  getMainWindowDisplay() {
+    const window = this.windows.main;
+    const bounds = window.getBounds();
+    return electron.screen.getDisplayMatching(bounds);
+  }
+
   closeChildWindow() {
     const windowOptions = this.state.child;
 
@@ -293,6 +307,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
 
     return windowId;
+  }
+
+  createOneOffWindowForOverlay(
+    options: Partial<IWindowOptions>,
+    windowId?: string,
+  ): Electron.BrowserWindow {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    windowId = windowId || uuid();
+
+    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+
+    const newWindow = (this.windows[windowId] = new BrowserWindow(options));
+
+    const indexUrl = remote.getGlobal('indexUrl');
+    newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    return newWindow;
   }
 
   setOneOffFullscreen(windowId: string, fullscreen: boolean) {
