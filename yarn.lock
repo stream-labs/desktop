@@ -1290,6 +1290,12 @@
     "@sentry/types" "4.5.3"
     tslib "^1.9.3"
 
+"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.20d.tar.gz":
+  version "0.0.20-d"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.20d.tar.gz#204dbad5dd5dc6d2583ffe175fd7b18a049142bb"
+  dependencies:
+    nan "^2.12.1"
+
 "@types/archiver@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@types/archiver/-/archiver-2.1.3.tgz#3370bcfd205dcdef022531f0ae4c1dbce37912ca"
@@ -7272,9 +7278,9 @@ mute-stream@0.0.7:
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
 nan@^2.12.1:
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
-  integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
+  integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
 
 nan@^2.9.2:
   version "2.10.0"
