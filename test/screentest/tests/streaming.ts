@@ -70,5 +70,6 @@ platforms.forEach(platform => {
     await app.client.waitForExist('input', 20 * 1000);
 
     await makeScreenshots(t, 'in_stream');
+    t.pass();
   });
 });

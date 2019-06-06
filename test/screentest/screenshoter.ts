@@ -98,7 +98,6 @@ export function useScreentest() {
     // if no screenshots have been captured wile test running
     // make screenshots before finishing the test
     if (!screenshotsCaptured) await makeScreenshots(t);
-    t.pass();
   });
 
   afterAppStart(async t => {
