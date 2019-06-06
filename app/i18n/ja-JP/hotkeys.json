@@ -6,11 +6,15 @@
   "Switch to scene": "シーンに切り替える",
   "Show %{sourcename}": "%{sourcename} を表示します。",
   "Hide %{sourcename}": "%{sourcename} を非表示に",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "ミュート",
   "Unmute": "ミュート解除します。",
   "Push to Mute": "プッシュしてミュートする。",
   "Push to Talk": "プッシュして話す。",
   "Enable Studio Mode": "スタジオ モードを有効にします。",
   "Disable Studio Mode": "スタジオ モードを無効にします。",
-  "Transition (Studio Mode)": "遷移 (スタジオ モード)"
+  "Transition (Studio Mode)": "遷移 (スタジオ モード)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
