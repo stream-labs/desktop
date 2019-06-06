@@ -38,7 +38,7 @@ const args = process.argv.slice(2);
   }
 
   // compare screenshots
-  exec(`node ${CONFIG.dist}/comparator.js ${branches[0]} ${branches[1]}`);
+  exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
   // send the status to the GitHub check and upload screenshots
   await updateCheck();
