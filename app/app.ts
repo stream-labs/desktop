@@ -13,6 +13,7 @@ import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -80,7 +81,7 @@ if (
 
       return event;
     },
-    integrations: [new Sentry.Integrations.Vue({ Vue })],
+    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
