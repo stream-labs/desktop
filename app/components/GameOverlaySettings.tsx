@@ -11,7 +11,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
   @Inject() gameOverlayService: GameOverlayService;
 
   enabling = false;
-  overlayTransparency = this.gameOverlayService.state.opacity / 100;
+  overlayOpacity = this.gameOverlayService.state.opacity / 100;
 
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
@@ -23,14 +23,6 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.enabling = false;
   }
 
-  get enablePreview() {
-    return this.gameOverlayService.state.isPreviewEnabled;
-  }
-
-  setEnablePreview(val: boolean) {
-    this.gameOverlayService.setPreviewEnabled(val);
-  }
-
   get previewMode() {
     return this.gameOverlayService.state.previewMode;
   }
@@ -39,8 +31,8 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.gameOverlayService.setPreviewMode(!this.previewMode);
   }
 
-  setOverlayTransparency(value: number) {
-    this.overlayTransparency = value;
+  setOverlayOpacity(value: number) {
+    this.overlayOpacity = value;
     this.gameOverlayService.setOverlayOpacity(value * 100);
   }
 
@@ -68,8 +60,8 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
         />
         <VFormGroup
           metadata={this.sliderMetadata}
-          value={this.overlayTransparency}
-          onInput={this.setOverlayTransparency}
+          value={this.overlayOpacity}
+          onInput={this.setOverlayOpacity}
         />
         <button class="button button--action" onClick={this.resetPosition}>
           {$t('Reset Overlay Position')}
@@ -89,11 +81,6 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 onInput={this.setEnableGameOverlay}
                 metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
               />
-              {/* <VFormGroup
-              value={this.enablePreview}
-              onInput={this.setEnablePreview}
-              metadata={metadata.toggle({ title: $t('Enable stream preview in overlay') })}
-            /> */}
               {this.enableGameOverlay && this.extraOptions(h)}
               {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}
             </div>

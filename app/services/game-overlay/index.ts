@@ -10,18 +10,12 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { Polly } from 'aws-sdk';
 
 const { BrowserWindow } = electron.remote;
 
-interface ICoordinates {
-  x: number;
-  y: number;
-}
-
 interface IWindowProperties {
-  chat: { position: ICoordinates; id: number };
-  recentEvents: { position: ICoordinates; id: number };
+  chat: { position: IVec2; id: number };
+  recentEvents: { position: IVec2; id: number };
 }
 
 export type GameOverlayState = {
@@ -132,24 +126,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       height: 600,
       parent: this.overlayWindow,
     });
-
-    // Unneeded window without interactivity
-    // this.windows.overlayControls = this.windowsService.createOneOffWindowForOverlay(
-    //   {
-    //     ...commonWindowOptions,
-    //     // @ts-ignore
-    //     webPreferences: {},
-    //     parent: this.overlayWindow,
-    //     x: containerX - 600,
-    //     y: containerY + 300,
-    //     width: 600,
-    //     height: 300,
-    //     // OneOffWindow options
-    //     isFullScreen: true,
-    //     componentName: 'OverlayWindow',
-    //   },
-    //   'overlay',
-    // );
   }
 
   createPreviewWindows() {
@@ -191,10 +167,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         this.customizationService.isDarkTheme ? 'night' : 'day',
       ),
     );
-
-    // this.windows.overlayControls.webContents.once('dom-ready', async () => {
-    //   this.onWindowsReady.next(this.windows.overlayControls);
-    // });
   }
 
   determineStartPosition(window: string) {
@@ -206,8 +178,11 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         const extBounds = pos.x < bounds.x + bounds.width && pos.y < bounds.y + bounds.height;
         return intBounds && extBounds;
       });
+
       if (display) return pos;
     }
+    this.SET_WINDOW_POSITION(window, null);
+
     return this.defaultPosition(window);
   }
 
@@ -215,8 +190,11 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     Object.keys(this.windows).forEach((key: string) => {
       const overlayId = this.state.windowProperties[key].id;
       if (!overlayId) return;
+
+      this.SET_WINDOW_POSITION(key, null);
       const pos = this.defaultPosition(key);
       const size = key === 'chat' ? { width: 300, height: 600 } : { width: 600, height: 300 };
+
       this.windows[key].setBounds({ ...pos, ...size });
       this.previewWindows[key].setBounds({ ...pos, ...size });
       overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
@@ -224,9 +202,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   private defaultPosition(key: string) {
-    this.SET_WINDOW_POSITION(key, null);
     const [containerX, containerY] = this.getWindowContainerStartingPosition();
     const x = key === 'recentEvents' ? containerX - 600 : containerX;
+
     return { x, y: containerY };
   }
 
@@ -341,7 +319,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
       });
-      win.webContents.setFrameRate(10);
+      win.webContents.setFrameRate(1);
     });
   }
 
@@ -385,7 +363,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   @mutation()
-  private SET_WINDOW_POSITION(window: string, position: ICoordinates) {
+  private SET_WINDOW_POSITION(window: string, position: IVec2) {
     this.state.windowProperties[window].position = position;
   }
 
