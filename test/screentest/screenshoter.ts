@@ -24,7 +24,8 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
     t.context.app.browserWindow.setSize(config.resolution.width, config.resolution.height);
   }
 
-  await sleep(400);
+  // volmeters needs some time to resize
+  await sleep(1000);
 }
 
 export async function makeScreenshots(t: any, options: IScreentestOptions) {

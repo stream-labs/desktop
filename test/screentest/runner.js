@@ -27,7 +27,6 @@ const args = process.argv.slice(2);
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
-
   // make screenshots for each branch
   const branches = [
     'current',
