@@ -109,22 +109,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   createBrowserWindows() {
-    this.overlayWindow = new BrowserWindow({
-      ...this.commonWindowOptions,
-      height: 600,
-      width: 600,
-    });
-
     this.windows.recentEvents = new BrowserWindow({
       ...this.commonWindowOptions,
       width: 600,
-      parent: this.overlayWindow,
     });
 
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
-      parent: this.overlayWindow,
     });
   }
 
