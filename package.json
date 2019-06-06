@@ -123,7 +123,7 @@
     "@babel/preset-env": "7.4.5",
     "@commitlint/cli": "7.6.1",
     "@commitlint/config-conventional": "7.6.0",
-    "@sentry/browser": "4.6.6",
+    "@sentry/browser": "5.4.0",
     "@octokit/app": "3.0.0",
     "@octokit/request": "4.1.0",
     "@octokit/rest": "16.26.0",
