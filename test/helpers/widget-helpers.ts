@@ -26,11 +26,12 @@ export async function waitForWidgetSettingsSync(t: TExecutionContext, fn: Functi
     // start listen widgets SettingsUpdate events
     const listener = await getListener();
 
+    // catching events for 15s
+    listener.pipe(first()).subscribe(ev => resolve(ev));
+
     // execute code
     await fn();
 
-    // catching events for 15s
-    listener.pipe(first()).subscribe(ev => resolve(ev));
     await sleep(15000);
 
     reject('No widget events received');

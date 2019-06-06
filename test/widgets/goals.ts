@@ -38,8 +38,7 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=Start Goal');
   });
 
-  // TODO flaky test
-  test.skip(`${goalType} change settings`, async t => {
+  test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
 
@@ -58,7 +57,6 @@ function testGoal(goalType: string) {
       font: 'Roboto',
     };
 
-    await formMonkey.fill(testSet1);
     await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
     t.true(await formMonkey.includes(testSet1));
 
