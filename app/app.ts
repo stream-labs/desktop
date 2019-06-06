@@ -73,10 +73,14 @@ if (
         return splitArray[splitArray.length - 1];
       };
 
-      if (event.exception) {
+      if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
           frame.filename = normalize(frame.filename);
         });
+      }
+
+      if (event.request) {
+        event.request.url = normalize(event.request.url);
       }
 
       return event;
