@@ -1,5 +1,5 @@
 {
-  "Scene transition": "Jelenet átmenet",
+  "Scene Transitions": "Scene Transitions",
   "Cut": "Vágás",
   "Fade": "Áttűnés",
   "Swipe": "Lapozás",
@@ -8,5 +8,20 @@
   "Luma Wipe": "Áttörlés",
   "Stinger": "Saját Animáció",
   "Transition": "Átmenet",
-  "Duration": "Időtartam"
+  "Duration": "Időtartam",
+  "Add Transition": "Add Transition",
+  "You need at least 1 transition.": "You need at least 1 transition.",
+  "Add Connection": "Add Connection",
+  "Beginning Scene": "Beginning Scene",
+  "Ending Scene": "Ending Scene",
+  "Scene Transition": "Scene Transition",
+  "Type": "Type",
+  "Transition Type": "Transition Type",
+  "Name": "Név",
+  "Transition Name": "Transition Name",
+  "Default": "Alapértelmezett",
+  "Deleted": "Deleted",
+  "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
+  "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
+  "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited."
 }
