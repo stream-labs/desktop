@@ -230,6 +230,27 @@ async function getVersion(info) {
     return response.body.version;
 }
 
+async function is_need_to_update_version(latestVersion, info)
+{
+    let ret = true;
+    /* Latest version need to be greater than the current version! */
+    if (!latestVersion) {
+        log.info('Failed to fetch latest version!');
+        ret = false;
+    } else if (semver.eq(info.version, latestVersion)) {
+        log.info('Already latest version!');
+        ret = false;
+    } else if (semver.gt(info.version, latestVersion)) {
+        log.info('Latest version is less than current version!');
+        ret = false;
+    } else if (!await checkChance(info, latestVersion)) {
+        log.info('Failed the chance lottery. Better luck next time!');
+        ret = false;
+    }
+
+    return ret;
+}
+
 /* Note that we return true when we fail to fetch
  * version correctly! This is to make sure we don't
  * bork the user due to update error. It's better to
@@ -270,27 +291,8 @@ async function entry(info) {
     }
 
     const latestVersion = await getVersion(info);
-
-    /* Latest version need to be greater than the current version! */
-    if (!latestVersion) {
-        log.info('Failed to fetch latest version!');
+    if(! (await is_need_to_update_version(latestVersion, info)) )
         return false;
-    }
-
-    if (semver.eq(info.version, latestVersion)) {
-        log.info('Already latest version!');
-        return false;
-    }
-
-    if (semver.gt(info.version, latestVersion)) {
-        log.info('Latest version is less than current version!');
-        return false;
-    }
-
-    if (!await checkChance(info, latestVersion)) {
-        log.info('Failed the chance lottery. Better luck next time!');
-        return false;
-    }
 
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
@@ -342,22 +344,16 @@ async function entry(info) {
 
     log.info('updater process ' + `pid ${update_spawned.pid}`);
 
-    //make promises for app exit , error , data and some timeout
-    const primiseExit = new Promise(resolve => {
+    const returnCode = await new Promise(resolve => {
         update_spawned.on('exit', resolve);
-    });
-
-    const primiseError = new Promise(resolve => {
         update_spawned.on('error', resolve);
-    });
+      })
 
-    //wait for something to happen
-    const promise = await Promise.race([primiseError, primiseExit]);
-    log.info('Updater spawn promise ' + `result \"${promise}\"`);
+    log.info('Updater spawn promise ' + `result \"${returnCode}\"`);
 
     update_spawned.unref();
 
-    return `${promise}` === "0";
+    return `${returnCode}` === "0";
 }
 
 module.exports = async (info) => {
