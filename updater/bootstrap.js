@@ -131,21 +131,20 @@ async function checkChance(info, version) {
 
 async function is_updater_probably_running(updaterPath, updater_name) {
     let updater_probably_running = false;
-    if (fs.existsSync(updaterPath)) {
-        let processes = await tasklist();
+    if (!fs.existsSync(updaterPath)) {
+        return updater_probably_running;
+    } 
 
-        for (process_item in processes) {
-            if (processes[process_item].imageName === updater_name) {
-                console.log("Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
+    let processes = await tasklist();
 
-                try {
-                    fs.unlinkSync(updaterPath);
-                } catch (remove_error) {
-                    updater_probably_running = true;
-                }
-                if (fs.existsSync(updaterPath)) {
-                    updater_probably_running = true;
-                }
+    for (process_item in processes) {
+        if (processes[process_item].imageName === updater_name) {
+            console.log("Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
+
+            try {
+                fs.unlinkSync(updaterPath);
+            } catch (remove_error) {
+                updater_probably_running = true;
             }
         }
     }
