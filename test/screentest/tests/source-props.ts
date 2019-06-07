@@ -24,11 +24,7 @@ afterAppStart(async t => {
     'dshow_input',
     'wasapi_input_capture',
     'wasapi_output_capture',
-<<<<<<< HEAD
     'ndi_source',
-=======
-    'ndi_source'
->>>>>>> staging
   ];
 
   const client = await getClient();
