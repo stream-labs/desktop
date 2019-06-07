@@ -129,7 +129,7 @@ async function checkChance(info, version) {
     return roll <= chance;
 }
 
-function is_updater_probably_running(updaterPath) {
+async function is_updater_probably_running(updaterPath, updater_name) {
     let updater_probably_running = false;
     if (fs.existsSync(updaterPath)) {
         let processes = await tasklist();
@@ -152,7 +152,8 @@ function is_updater_probably_running(updaterPath) {
             }
         }
     }
-    return is_updater_probably_running;
+
+    return updater_probably_running;
 }
 
 /* Note that latest-updater.exe never changes
@@ -173,8 +174,8 @@ async function fetchUpdater(info, progress) {
     };
 
     const updaterPath = path.resolve(info.tempDir, updater_name);
-
-    if (is_updater_probably_running(updaterPath))
+    let updater_probably_running = await is_updater_probably_running(updaterPath, updater_name);
+    if (updater_probably_running)
         return running_updater_detected;
 
     const outStream = fs.createWriteStream(updaterPath);
