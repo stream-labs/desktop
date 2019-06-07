@@ -36,6 +36,11 @@ const args = process.argv.slice(2);
     checkoutBranch(branchName);
     exec(`yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests ${args.join(' ')}`);
   }
+  // return to the current branch
+  checkoutBranch('current');
+
+  // compile the test folder
+  exec(`tsc -p test`);
 
   // compare screenshots
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
@@ -48,9 +53,8 @@ const args = process.argv.slice(2);
 function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
-  if (branchName !== 'current') {
-    exec(`git checkout ${branchName}`);
-  }
+  const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
+  exec(`git checkout ${checkoutTarget}`);
   rimraf.sync(CONFIG.compiledTestsDist);
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');

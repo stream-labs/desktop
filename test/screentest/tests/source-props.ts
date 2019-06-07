@@ -3,6 +3,7 @@ import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ScenesService } from '../../../app/services/scenes/';
+import { sleep } from '../../helpers/sleep';
 
 let showSourceProps: (name: string) => void;
 
@@ -23,7 +24,11 @@ afterAppStart(async t => {
     'dshow_input',
     'wasapi_input_capture',
     'wasapi_output_capture',
+<<<<<<< HEAD
     'ndi_source',
+=======
+    'ndi_source'
+>>>>>>> staging
   ];
 
   const client = await getClient();
@@ -68,11 +73,13 @@ test('ffmpeg_source', async t => {
 
 test('text_gdiplus', async t => {
   await showSourceProps('text_gdiplus');
+  await sleep(1500); // the font selector rendering is very slow
   t.pass();
 });
 
 test('text_ft2_source', async t => {
   await showSourceProps('text_ft2_source');
+  await sleep(1500); // the font selector rendering is very slow
   t.pass();
 });
 

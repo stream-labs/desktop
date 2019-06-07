@@ -6,9 +6,10 @@ import { KeyListenerService } from 'services/key-listener';
 import { Inject } from 'services/core/injector';
 import { StatefulService, mutation, ServiceHelper } from 'services';
 import defer from 'lodash/defer';
+import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
-import mapValues from 'lodash/mapValues';
+import { GameOverlayService } from './game-overlay';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -24,6 +25,10 @@ function getStreamingService(): StreamingService {
 
 function getTransitionsService(): TransitionsService {
   return TransitionsService.instance;
+}
+
+function getGameOverlayService(): GameOverlayService {
+  return GameOverlayService.instance;
 }
 
 const isAudio = (sourceId: string) => {
@@ -137,6 +142,11 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'SAVE_REPLAY',
     description: () => $t('Save Replay'),
     down: () => getStreamingService().saveReplay(),
+  },
+  TOGGLE_OVERLAY: {
+    name: 'TOGGLE_OVERLAY',
+    description: () => $t('Toggle in-game overlay'),
+    down: () => getGameOverlayService().toggleOverlay(),
   },
 };
 
