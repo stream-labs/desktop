@@ -14,6 +14,7 @@
  * designed to be small and mostly standalone. */
 const util = require('util');
 const path = require('path');
+const tasklist = require('tasklist');
 const fs = require('fs');
 const request = require('request');
 const zlib = require('zlib');
@@ -34,6 +35,7 @@ const mkdir = util.promisify(fs.mkdir);
  * anything goes wrong, just don't spawn a window
  * for safety. */
 let statusWindow = null;
+const running_updater_detected = "Updater is running";
 
 function destroyStatusWindow() {
     if (statusWindow) {
@@ -143,8 +145,21 @@ async function fetchUpdater(info, progress) {
         baseUrl: info.baseUrl,
         uri: `/${updater_name}`
     };
-
+    
     const updaterPath = path.resolve(info.tempDir, updater_name);
+
+    if (fs.existsSync(updaterPath)) {
+        let processes = await tasklist();
+        
+        for (process_item in processes) {
+            if(processes[process_item].imageName === updater_name)
+            {
+                console.log( "Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
+                return running_updater_detected;
+            }
+        }
+     }
+
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
@@ -271,6 +286,13 @@ async function entry(info) {
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
     const updaterPath = await fetchUpdater(info, progress => {});
+    
+    /* Updater already running so no need to launch it again 
+    */
+    if(updaterPath === running_updater_detected){
+        log.info('Updater is already running!');
+        return true;
+    }
 
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
