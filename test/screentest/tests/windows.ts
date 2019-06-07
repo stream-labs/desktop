@@ -1,9 +1,10 @@
-import { useSpectron, test, focusChild, TExecutionContext } from '../../helpers/spectron';
+import { useSpectron, test, focusChild, TExecutionContext, closeWindow } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
-import { useScreentest } from '../screenshoter';
+import { makeScreenshots, useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
 import { ScenesService } from '../../../app/services/scenes';
+import { logIn, logOut } from '../../helpers/spectron/user';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
@@ -79,9 +80,15 @@ test('Game Overlay', async (t: TExecutionContext) => {
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
   settingsService.showSettings('Game Overlay');
   await focusChild(t);
+  await makeScreenshots(t, 'offline');
+  await closeWindow(t);
 
-  // enable overlays
-  await t.context.app.client.click('[data-type="toggle"]');
+  await logIn(t);
+  settingsService.showSettings('Game Overlay');
+  await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
+  await makeScreenshots(t, 'online');
+  await logOut(t);
+
   t.pass();
 });
 
