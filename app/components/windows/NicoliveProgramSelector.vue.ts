@@ -28,7 +28,7 @@ export default class NicoliveProgramSelector extends Vue {
     if (this.disabledOk) {
       return;
     }
-    this.streamingService.toggleStreamingAsync(this.selectedId);
+    this.streamingService.toggleStreamingAsync({programId: this.selectedId});
 
     this.windowsService.closeChildWindow();
   }

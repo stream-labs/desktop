@@ -442,7 +442,13 @@ export class SettingsService extends StatefulService<ISettingsState>
     };
   }
 
-  diffOptimizedSettings(options: {bitrate: number, useHardwareEncoder?: boolean}): OptimizedSettings {
+  diffOptimizedSettings(
+    options: {
+      bitrate: number,
+      useHardwareEncoder?: boolean,
+    },
+    getSettingsEvenIfNothingChanged: boolean = false
+  ): OptimizedSettings {
     const accessor = new SettingsKeyAccessor(this);
     const best = getBestSettingsForNiconico(options, accessor);
     const opt = new Optimizer(accessor, best);
@@ -452,7 +458,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     // 最適化の必要な値を抽出する
     const delta: OptimizeSettings = Object.assign({}, ...Optimizer.getDifference(current, best));
 
-    return Object.keys(delta).length > 0 ? {
+    return Object.keys(delta).length > 0 || getSettingsEvenIfNothingChanged ? {
       current,
       best,
       info: opt.optimizeInfo(current, delta)

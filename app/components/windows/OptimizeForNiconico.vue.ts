@@ -53,7 +53,7 @@ export default class OptimizeNiconico extends Vue {
     this.customizationService.setOptimizeWithHardwareEncoder(model.value);
     // close the dialog and open again to apply new optimization settings
     this.windowsService.closeChildWindow();
-    this.streamingService.toggleStreamingAsync();
+    this.streamingService.toggleStreamingAsync({mustShowOptimizationDialog: true});
   }
 
   optimizeAndGoLive() {

@@ -102,7 +102,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
-  async toggleStreamingAsync(programId: string = '') {
+  async toggleStreamingAsync(
+    options: {
+      programId?: string,
+      mustShowOptimizationDialog?: boolean
+    } = {}
+  ) {
+    const opts = Object.assign({
+      programId: '',
+      mustShowOptimizationDialog: false
+    }, options);
+
     if (this.isStreaming) {
       this.toggleStreaming();
       return;
@@ -112,7 +122,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.userService.isNiconicoLoggedIn()) {
       try {
         this.SET_PROGRAM_FETCHING(true);
-        const setting = await this.userService.updateStreamSettings(programId);
+        const setting = await this.userService.updateStreamSettings(opts.programId);
         if (setting.asking) {
           return;
         }
@@ -133,7 +143,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          return this.optimizeForNiconico(setting);
+          return this.optimizeForNiconico(setting, opts.mustShowOptimizationDialog);
         }
       } catch (e) {
         const message = e instanceof Response
@@ -228,7 +238,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return Math.floor(height); // floorしないと死ぬ
   }
 
-  private async optimizeForNiconico(streamingSetting: IStreamingSetting) {
+  private async optimizeForNiconico(streamingSetting: IStreamingSetting, mustShowDialog: boolean) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
@@ -247,9 +257,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const settings = this.settingsService.diffOptimizedSettings({
       bitrate: streamingSetting.bitrate,
       useHardwareEncoder: this.customizationService.optimizeWithHardwareEncoder,
-    });
+    }, mustShowDialog);
     if (settings) {
-      if (this.customizationService.showOptimizationDialogForNiconico) {
+      if (this.customizationService.showOptimizationDialogForNiconico || mustShowDialog) {
         this.windowsService.showWindow({
           componentName: 'OptimizeForNiconico',
           queryParams: settings,
