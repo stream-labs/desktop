@@ -12,6 +12,7 @@ import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { handlePlatformResponse, requiresToken } from './utils';
+import { $t } from 'services/i18n';
 
 interface IFacebookPage {
   access_token: string;
@@ -181,7 +182,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
       })
-      .catch(resp => Promise.reject(resp.error.message));
+      .catch(resp =>
+        Promise.reject($t('Something went wrong while going live, please try again.')),
+      );
   }
 
   prepopulateInfo() {
