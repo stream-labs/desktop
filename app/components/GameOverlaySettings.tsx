@@ -63,7 +63,11 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
           value={this.overlayOpacity}
           onInput={this.setOverlayOpacity}
         />
-        <button class="button button--action" onClick={this.resetPosition}>
+        <button
+          class="button button--action"
+          onClick={this.resetPosition}
+          style="margin-bottom: 16px;"
+        >
           {$t('Reset Overlay Position')}
         </button>
       </div>
@@ -82,7 +86,9 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
               />
               {this.enableGameOverlay && this.extraOptions(h)}
-              {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}
+              <div style="margin-bottom: 16px;">
+                {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}
+              </div>
             </div>
           )}
         </div>
