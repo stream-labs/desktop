@@ -39,6 +39,9 @@ const args = process.argv.slice(2);
   // return to the current branch
   checkoutBranch('current');
 
+  // compile the test folder
+  exec(`tsc -p test`);
+
   // compare screenshots
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
