@@ -23,34 +23,46 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Prop() readonly metadata: ISliderMetadata;
 
   usePercentages: boolean = this.options.usePercentages || false;
-  interval: number = this.options.usePercentages
-    ? this.options.interval * 100 || 1
-    : this.options.interval || 1;
-  isFullyMounted = false;
 
   // The displaying value on and within the ui components.
-  localValue: number | string = this.options.usePercentages
-    ? this.value * 100 || this.min
-    : this.value || this.min || 0;
+  localValue: number | string = this.initializeLocalValue();
 
-  $refs: { slider: any };
+  timeout: number | void = null;
 
   /**
    * Updates the local value that is used during the display processs.
    * @param value The value that will be displayed on the interface.
    */
   updateLocalValue(value: number) {
+    if (this.timeout) this.timeout = window.clearTimeout(this.timeout);
+
     const parsedValue = Number(value);
 
     // Dislay a empty string if and only if the user deletes all of the input field.
     if ((isNaN(parsedValue) && isString(value)) || (isString(value) && value === '')) {
       // preview only, when there is no input or just a negative symbol.
       this.localValue = value.trim() !== '-' ? '' : value;
+    } else if (parsedValue < this.min) {
+      this.timeout = window.setTimeout(() => this.updateLocalValue(this.min), 500);
+    } else if (parsedValue > this.max) {
+      this.localValue = this.max;
+      this.updateValue(this.max);
     } else if (value != null && !isNaN(value) && this.localValue !== parsedValue) {
-      // Otherwise use the provided number value if it has changed
+      // Otherwise use the provided number value if it has changed and is properly constrained
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
     }
+  }
+
+  initializeLocalValue() {
+    if (this.value == null) return this.min || 0;
+    return this.options.usePercentages ? this.value * 100 : this.value;
+  }
+
+  get interval() {
+    return this.options.usePercentages
+      ? this.options.interval * 100 || 1
+      : this.options.interval || 1;
   }
 
   get min() {

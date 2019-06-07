@@ -3,8 +3,8 @@ import { Singleton, Fallback } from 'services/api/external-api';
 import { ScenesService as InternalScenesService } from 'services/scenes/index';
 import { ISourceAddOptions } from 'services/api/external-api/sources/sources';
 import { Inject } from 'services/core/injector';
-import { IScene, Scene } from './scene';
-import { ISceneItem } from './scene-item';
+import { ISceneModel, Scene } from './scene';
+import { ISceneItemModel } from './scene-item';
 
 /**
  * Api for scenes management
@@ -28,7 +28,7 @@ export class ScenesService {
     return this.getScene(scene.id);
   }
 
-  removeScene(id: string): IScene {
+  removeScene(id: string): ISceneModel {
     const model = this.getScene(id).getModel();
     this.scenesService.removeScene(id);
     return model;
@@ -46,27 +46,27 @@ export class ScenesService {
     return this.scenesService.activeSceneId;
   }
 
-  get sceneSwitched(): Observable<IScene> {
+  get sceneSwitched(): Observable<ISceneModel> {
     return this.scenesService.sceneSwitched;
   }
 
-  get sceneAdded(): Observable<IScene> {
+  get sceneAdded(): Observable<ISceneModel> {
     return this.scenesService.sceneAdded;
   }
 
-  get sceneRemoved(): Observable<IScene> {
+  get sceneRemoved(): Observable<ISceneModel> {
     return this.scenesService.sceneRemoved;
   }
 
-  get itemAdded(): Observable<ISceneItem> {
+  get itemAdded(): Observable<ISceneItemModel> {
     return this.scenesService.itemAdded;
   }
 
-  get itemRemoved(): Observable<ISceneItem> {
+  get itemRemoved(): Observable<ISceneItemModel> {
     return this.scenesService.itemRemoved;
   }
 
-  get itemUpdated(): Observable<ISceneItem> {
+  get itemUpdated(): Observable<ISceneItemModel> {
     return this.scenesService.itemUpdated;
   }
 }

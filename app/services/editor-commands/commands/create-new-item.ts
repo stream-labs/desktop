@@ -2,6 +2,7 @@ import { Command } from './command';
 import { TSourceType } from 'services/sources';
 import { ScenesService, ISceneNodeAddOptions } from 'services/scenes';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class CreateNewItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
@@ -19,7 +20,7 @@ export class CreateNewItemCommand extends Command {
     private options: ISceneNodeAddOptions = {},
   ) {
     super();
-    this.description = `Create ${name}`;
+    this.description = $t('Create %{sourceName}', { sourceName: name });
   }
 
   execute() {

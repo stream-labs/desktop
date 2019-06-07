@@ -3,9 +3,10 @@ import { SceneItemFolder as InternalSceneItemFolder } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { SourcesService } from 'services/api/external-api/sources/sources';
 import { SceneItem } from './scene-item';
-import { ISceneNode, SceneNode } from './scene-node';
+import { ISceneNodeModel, SceneNode } from './scene-node';
+import { Selection } from './selection';
 
-export interface ISceneItemFolder extends ISceneNode {
+export interface ISceneItemFolderModel extends ISceneNodeModel {
   name: string;
 }
 
@@ -25,7 +26,7 @@ export class SceneItemFolder extends SceneNode {
   /**
    * serialize folder
    */
-  getModel(): ISceneItemFolder {
+  getModel(): ISceneItemFolderModel {
     return {
       name: this.sceneFolder.name,
       childrenIds: this.sceneNode.childrenIds,
@@ -89,5 +90,14 @@ export class SceneItemFolder extends SceneNode {
    */
   ungroup(): void {
     return this.sceneFolder.ungroup();
+  }
+
+  /**
+   * Returns a Selection object
+   * Helpful for bulk operations
+   */
+  getSelection(): Selection {
+    // convert InternalSelection to ExternalSelection
+    return this.getScene().getSelection(this.sceneFolder.getSelection().getIds());
   }
 }

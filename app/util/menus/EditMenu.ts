@@ -239,14 +239,14 @@ export class EditMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: `Undo ${this.editorCommandsService.nextUndoDescription}`,
+      label: $t('Undo %{action}', { action: this.editorCommandsService.nextUndoDescription }),
       accelerator: 'CommandOrControl+Z',
       click: () => this.editorCommandsService.undo(),
       enabled: this.editorCommandsService.nextUndo != null,
     });
 
     this.append({
-      label: `Redo ${this.editorCommandsService.nextRedoDescription}`,
+      label: $t('Redo %{action}', { action: this.editorCommandsService.nextRedoDescription }),
       accelerator: 'CommandOrControl+Y',
       click: () => this.editorCommandsService.redo(),
       enabled: this.editorCommandsService.nextRedo != null,

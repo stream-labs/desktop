@@ -2,6 +2,7 @@ import { CombinableCommand } from './combinable-command';
 import obs from '../../../../obs-api';
 import { Inject } from 'services/core';
 import { AudioService } from 'services/audio';
+import { $t } from 'services/i18n';
 
 export interface IChangableAudioSettings {
   forceMono?: boolean;
@@ -20,7 +21,9 @@ export class SetAudioSettingsCommand extends CombinableCommand {
 
   constructor(private sourceId: string, private changes: IChangableAudioSettings) {
     super();
-    this.description = `Edit ${this.audioService.getSource(this.sourceId).name}`;
+    this.description = $t('Edit %{sourceName}', {
+      sourceName: this.audioService.getSource(this.sourceId).name,
+    });
   }
 
   execute() {

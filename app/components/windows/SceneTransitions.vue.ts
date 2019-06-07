@@ -8,7 +8,7 @@ import TransitionSettings from 'components/TransitionSettings.vue';
 import { $t } from 'services/i18n';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ScenesService } from 'services/scenes';
-import ConnectionSettings from 'components/ConnectionSettings.vue';
+import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
 

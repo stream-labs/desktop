@@ -1,12 +1,12 @@
 body {
-    background-color: #09161d;
-    color: #BDC2C4;
-    font-family: 'Roboto', sans-serif;
+  background-color: #09161d;
+  color: #BDC2C4;
+  font-family: 'Roboto', sans-serif;
 }
 
 h1, h2, h3, h4 {
-    color: #eef2f3;
-    font-weight: normal;
+  color: #eef2f3;
+  font-weight: normal;
 }
 
 a {
@@ -14,44 +14,42 @@ a {
 }
 
 a:hover {
-    color: white;
+  color: white;
 }
 
 pre {
-    background-color: black;
-    border-radius: 3px;
+  background-color: black;
+  border-radius: 3px;
 }
 
 code {
-    background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .tsd-panel > h1, .tsd-panel > h2, .tsd-panel > h3 {
-    border-color: transparent;
+  border-color: transparent;
 }
 
 .tsd-index-panel h3 {
-    /*border-bottom-color: #152127;*/
-    border-bottom-color: transparent;
+  border-bottom-color: transparent;
 }
 
 .tsd-signature, .tsd-signatures {
-    border-color: transparent;
+  border-color: transparent;
 }
 
 .tsd-page-title, .tsd-page-toolbar {
-    border: none;
-    background: none;
+  border: none;
+  background: none;
 }
 
 .tsd-page-title {
-    border-bottom: 1px solid #2b383f;
+  border-bottom: 1px solid #2b383f;
 }
 
 .tsd-page-toolbar {
-    text-align: right;
+  text-align: right;
 }
-
 
 .title img {
     height: 40px;
@@ -59,53 +57,66 @@ code {
 }
 
 .tsd-panel {
-    background-color: #2b383f;
-    border-radius: 3px;
+  background-color: #09161d;
+  border-radius: 3px;
 }
 
 .tsd-breadcrumb {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .tsd-panel b {
-    color: white;
+  color: white;
 }
 
 .tsd-navigation a {
-    color: #91979a;
+  color: #bdc2c4;
 }
 
 .tsd-navigation a:hover {
-    text-decoration: none;
-    color: white;
+  text-decoration: none;
+  color: white;
 }
 
 .tsd-navigation.primary li {
-    border-top: none;
+  border-top: none;
 }
 
 .tsd-navigation.primary > ul {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 li.label.tsd-is-external {
-    display: none;
+  display: none;
 }
 
 .tsd-navigation.secondary li.current > a {
-    color: white;
+  color: white;
 }
 
 .tsd-navigation.secondary ul.current a {
-    border-left-color: #31c3a2;
+  border-left-color: #31c3a2;
+}
+
+.tsd-navigation.primary li.current a {
+  background-color: #31c3a2;
+  border-radius: 2px;
+  font-weight: normal;
+  color: white;
+}
+
+.tsd-navigation.primary li.nav-header {
+  font-size: 23px;
+  color: #31c3a2;
+  padding: 10px 0;
 }
 
 .tsd-flag {
-    background-color: #31c3a2;
+  background-color: #31c3a2;
 }
 
 .tsd-block-comment {
-    margin-top: 15px;
+  margin-top: 15px;
 }
 
 .tsd-panel.tsd-implemented-by li a{
@@ -117,6 +128,11 @@ li.label.tsd-is-external {
     text-decoration: inherit;
 }
 
+.tsd-member .tsd-anchor + h3 {
+  background-color: #2b383f;
+  padding-top: 10px;
+  border-radius: 2px;
+}
 
 footer {
     border-top: 1px solid #2b383f;

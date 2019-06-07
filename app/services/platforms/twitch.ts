@@ -205,6 +205,13 @@ export class TwitchService extends Service implements IPlatformService {
     return getAllTags(this.getRawHeaders(true));
   }
 
+  prepopulateInfo() {
+    return this.fetchRawChannelInfo().then(json => ({
+      title: json.status,
+      game: json.game,
+    }));
+  }
+
   @requiresToken()
   getStreamTags(): Promise<TTwitchTag[]> {
     return getStreamTags(this.twitchId, this.getRawHeaders(true, true));

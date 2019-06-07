@@ -3,6 +3,7 @@ import { Selection } from 'services/selection';
 import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
+import { $t } from 'services/i18n';
 
 export class CreateFolderCommand extends Command {
   @Inject() private scenesService: ScenesService;
@@ -15,7 +16,7 @@ export class CreateFolderCommand extends Command {
   }
 
   get description() {
-    return `Create ${this.name}`;
+    return $t('Create %{folderName}', { folderName: this.name });
   }
 
   execute() {

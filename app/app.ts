@@ -13,6 +13,7 @@ import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -21,6 +22,8 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
+import { UserService, setSentryContext } from 'services/user';
+import { getResource } from 'services';
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -47,10 +50,14 @@ if (isProduction) {
   });
 }
 
+let usingSentry = false;
+
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
   !electron.remote.process.env.SLOBS_IPC
 ) {
+  usingSentry = true;
+
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
@@ -74,7 +81,7 @@ if (
 
       return event;
     },
-    integrations: [new Sentry.Integrations.Vue({ Vue })],
+    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
@@ -118,6 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       if (Utils.isChildWindow()) {
         ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
+
+      if (usingSentry) {
+        const userService = getResource<UserService>('UserService');
+
+        const ctx = userService.getSentryContext();
+        if (ctx) setSentryContext(ctx);
+        userService.sentryContext.subscribe(setSentryContext);
       }
     }
 
@@ -163,6 +178,8 @@ electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowI
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
+  // TODO: Suppress N-API error until we upgrade electron to v4.x
+  if (/N\-API is an experimental feature/.test(args[0])) return;
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);

@@ -111,7 +111,7 @@ export default class EditStreamInfo extends Vue {
     if (!this.streamInfoService.state.channelInfo) {
       await this.refreshStreamInfo();
     }
-    if (this.isFacebook || this.isYoutube) {
+    if (this.isServicedPlatform) {
       const service = getPlatformService(this.userService.platform.type);
       await service
         .prepopulateInfo()
@@ -344,6 +344,10 @@ export default class EditStreamInfo extends Vue {
     return this.userService.platform.type === 'facebook';
   }
 
+  get isServicedPlatform() {
+    return this.isFacebook || this.isYoutube || this.isTwitch || this.isMixer;
+  }
+
   get submitText() {
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
@@ -373,7 +377,6 @@ export default class EditStreamInfo extends Vue {
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
-      placeholder: $t('Search'),
       options: this.gameOptions,
       noResult: $t('No matching game(s) found.'),
     };

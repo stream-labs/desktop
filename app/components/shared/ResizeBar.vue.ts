@@ -29,7 +29,7 @@ export default class ResizeBar extends Vue {
   transform = ''; // css-transform prop ResizeBar
 
   private barOffset = 0;
-  private mouseOffset = 0;
+  private mouseInitial = 0;
 
   private get hasConstraints() {
     return this.max !== Infinity || this.min !== -Infinity;
@@ -51,6 +51,7 @@ export default class ResizeBar extends Vue {
       },
       { once: true },
     );
+    this.mouseInitial = this.isHorizontal ? event.pageX : event.pageY;
     this.$emit('onresizestart', event);
   }
 
@@ -60,32 +61,34 @@ export default class ResizeBar extends Vue {
     let offset = this.barOffset;
     if (this.reverse) offset = -offset;
     this.barOffset = 0;
-    this.mouseOffset = 0;
+    this.mouseInitial = 0;
     this.updateTransform();
     this.$emit('onresizestop', offset, event);
     this.$emit('input', offset + this.value, event);
   }
 
   onMouseMoveHandler(event: MouseEvent) {
-    // save mouse offset
-    const movement = ['left', 'right'].includes(this.position) ? event.movementX : event.movementY;
-    this.mouseOffset += movement;
+    const mouseOffset = (this.isHorizontal ? event.pageX : event.pageY) - this.mouseInitial;
 
     // handle max and min constraints
     if (this.hasConstraints) {
-      const value = this.reverse ? this.value - this.mouseOffset : this.value + this.mouseOffset;
+      const value = this.reverse ? this.value - mouseOffset : this.value + mouseOffset;
       if (value <= this.max && value >= this.min) {
-        this.barOffset += movement;
+        this.barOffset = mouseOffset;
       }
     } else {
-      this.barOffset += movement;
+      this.barOffset = mouseOffset;
     }
 
     this.updateTransform();
   }
 
+  get isHorizontal() {
+    return ['left', 'right'].includes(this.position);
+  }
+
   private updateTransform() {
-    this.transform = ['left', 'right'].includes(this.position)
+    this.transform = this.isHorizontal
       ? `translateX(${this.barOffset}px)`
       : `translateY(${this.barOffset}px)`;
   }

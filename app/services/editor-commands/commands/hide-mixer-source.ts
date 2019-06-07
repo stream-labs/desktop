@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { Inject } from 'services/core';
 import { AudioService } from 'services/audio';
+import { $t } from 'services/i18n';
 
 export class HideMixerSourceCommand extends Command {
   @Inject() private audioService: AudioService;
@@ -9,7 +10,9 @@ export class HideMixerSourceCommand extends Command {
 
   constructor(private sourceId: string) {
     super();
-    this.description = `Hide ${this.audioService.getSource(this.sourceId).name}`;
+    this.description = $t('Hide %{sourceName}', {
+      sourceName: this.audioService.getSource(this.sourceId).name,
+    });
   }
 
   execute() {

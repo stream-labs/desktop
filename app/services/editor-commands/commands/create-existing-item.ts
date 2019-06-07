@@ -2,6 +2,7 @@ import { Command } from './command';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 /**
  * Creates an item from an existing source
@@ -16,7 +17,9 @@ export class CreateExistingItemCommand extends Command {
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
-    this.description = `Create ${this.sourcesService.getSource(this.sourceId).name}`;
+    this.description = $t('Create %{sourceName}', {
+      sourceName: this.sourcesService.getSource(this.sourceId).name,
+    });
   }
 
   execute() {

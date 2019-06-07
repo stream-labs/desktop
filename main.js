@@ -34,6 +34,8 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
+app.commandLine.appendSwitch('force-ui-direction', 'ltr');
+
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -254,7 +256,9 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    if (!childWindow.isDestroyed()) {
+      childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+    }
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -287,7 +291,7 @@ function startApp() {
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
     // setTimeout(() => {
-      //openDevTools();
+      // openDevTools();
     // }, 10 * 1000);
   }
 }

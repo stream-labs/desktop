@@ -119,6 +119,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
+      'Game Overlay',
       'Scene Collections',
       'Notifications',
       'Appearance',
@@ -138,6 +139,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   isTabbedForm(categoryName: string) {
+    if (!categoryName) return false;
     return obs.NodeObs.OBS_settings_getSettings(categoryName).type === 1;
   }
 
