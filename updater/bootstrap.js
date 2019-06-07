@@ -129,6 +129,32 @@ async function checkChance(info, version) {
     return roll <= chance;
 }
 
+function is_updater_probably_running(updaterPath) {
+    let updater_probably_running = false;
+    if (fs.existsSync(updaterPath)) {
+        let processes = await tasklist();
+
+        for (process_item in processes) {
+            if (processes[process_item].imageName === updater_name) {
+                console.log("Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
+
+                try {
+                    fs.unlinkSync(updaterPath);
+
+                    if (fs.existsSync(updaterPath)) {
+                        updater_probably_running = true;
+                    }
+                } catch (remove_error) {
+                    updater_probably_running = true;
+                }
+
+
+            }
+        }
+    }
+    return is_updater_probably_running;
+}
+
 /* Note that latest-updater.exe never changes
  * in name regardless of what version of the
  * application we're using. The base url should
@@ -145,35 +171,10 @@ async function fetchUpdater(info, progress) {
         baseUrl: info.baseUrl,
         uri: `/${updater_name}`
     };
-    
+
     const updaterPath = path.resolve(info.tempDir, updater_name);
-    
-    let updater_probably_running = false;
-    if (fs.existsSync(updaterPath)) {
-        let processes = await tasklist();
-        
-        for (process_item in processes) {
-            if(processes[process_item].imageName === updater_name)
-            {
-                console.log( "Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
-                
-                try {
-                    fs.unlinkSync(updaterPath);
-                
-                    if (fs.existsSync(updaterPath)) {
-                        updater_probably_running = true;
-                    }
-                } catch (remove_error)
-                {
-                    updater_probably_running = true;
-                }
-        
-                
-            }
-        }
-    }
-    
-    if(updater_probably_running)
+
+    if (is_updater_probably_running(updaterPath))
         return running_updater_detected;
 
     const outStream = fs.createWriteStream(updaterPath);
@@ -301,11 +302,11 @@ async function entry(info) {
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, progress => {});
-    
+    const updaterPath = await fetchUpdater(info, progress => { });
+
     /* Updater already running so no need to launch it again 
     */
-    if(updaterPath === running_updater_detected){
+    if (updaterPath === running_updater_detected) {
         log.info('Updater is already running!');
         return true;
     }
