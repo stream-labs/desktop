@@ -14,7 +14,7 @@ import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
-import AddSourceFilter from 'components/windows/AddSourceFilter.vue';
+import AddSourceFilter from 'components/windows/AddSourceFilter';
 import EditStreamInfo from 'components/windows/EditStreamInfo.vue';
 import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
 import Notifications from 'components/windows/Notifications.vue';

@@ -8,6 +8,7 @@ import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSetting
 import { PlatformAppsService } from 'services/platform-apps';
 import { TextInput } from 'components/shared/inputs/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -64,5 +65,37 @@ export default class DeveloperSettings extends Vue {
 
   private getApiSettingsFormData(): ISettingsSubCategory[] {
     return this.tcpServerService.getApiSettingsFormData();
+  }
+
+  render(h: Function) {
+    return (
+      <div>
+        {this.appDeveloperMode && (
+          <div class="section">
+            <AppPlatformDeveloperSettings />
+          </div>
+        )}
+
+        <div class="section">
+          <button class="button button--soft-warning" onClick={this.restoreDefaults}>
+            {$t('Restore Defaults')}
+          </button>
+        </div>
+
+        <div class="section">
+          <div class="section-content">
+            <VFormGroup metadata={{ title: $t('API Token') }}>
+              <TextInput value={this.tokenInput} metadata={{ masked: true }}>
+                <button class="button button--default" onClick={this.generateToken}>
+                  {$t('Update')}
+                </button>
+              </TextInput>
+            </VFormGroup>
+          </div>
+        </div>
+
+        <GenericFormGroups value={this.settingsFormData} onInput={this.save} />
+      </div>
+    );
   }
 }
