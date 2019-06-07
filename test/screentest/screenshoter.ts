@@ -70,7 +70,8 @@ export async function makeScreenshots(t: TExecutionContext, title = '') {
     await applyConfig(t, config);
     await t.context.app.browserWindow.capturePage().then((imageBuffer: NativeImage) => {
       const testName = t.title.replace('afterEach hook for ', '');
-      const imageFileName = `${testName}_${title}_${configInd}.png`;
+      const screenshotName = title ? `${testName}_${title}` : testName;
+      const imageFileName = `${screenshotName}__${configInd}.png`;
       fs.writeFileSync(`${CONFIG.dist}/${branchName}/${imageFileName}`, imageBuffer);
     });
     screenshotsCaptured = true;
