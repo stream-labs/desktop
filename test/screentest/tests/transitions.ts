@@ -24,6 +24,5 @@ test('Transitions', async (t: TExecutionContext) => {
   await makeScreenshots(t, 'Connections');
   await t.context.app.client.click('button=Add Connection');
   await makeScreenshots(t, 'Add connection');
-
   t.pass();
 });
