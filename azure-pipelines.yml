@@ -58,7 +58,7 @@ jobs:
     - script: yarn install --frozen-lockfile --check-files
       displayName: 'Install Dependencies'
 
-    - script: 'yarn screentest --match="Settings*"'
+    - script: 'yarn screentest'
       displayName: 'Snapshot testing'
       env:
         CI: true

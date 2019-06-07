@@ -25,6 +25,11 @@ const rimraf = require('rimraf');
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
+export function afterAppStart(cb: (t: TExecutionContext) => any) {
+  afterStartCallbacks.push(cb);
+}
+
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
@@ -67,7 +72,6 @@ interface ITestRunnerOptions {
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
-  afterStartCb?(t: any): Promise<any>;
 
   /**
    * Enable this to show network logs if test failed
@@ -195,8 +199,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     context = t.context;
     appIsRunning = true;
 
-    if (options.afterStartCb) {
-      await options.afterStartCb(t);
+    for (const callback of afterStartCallbacks) {
+      await callback(t);
     }
 
     return app;
