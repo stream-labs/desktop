@@ -1,4 +1,4 @@
-import { useSpectron, test, focusChild } from '../../helpers/spectron';
+import { useSpectron, test, focusChild, TExecutionContext } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
@@ -71,6 +71,17 @@ test('Settings Hotkeys', async t => {
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
   settingsService.showSettings('Hotkeys');
   await focusChild(t);
+  t.pass();
+});
+
+test('Game Overlay', async (t: TExecutionContext) => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Game Overlay');
+  await focusChild(t);
+
+  // enable overlays
+  await t.context.app.client.click('[data-type="toggle"]');
   t.pass();
 });
 
