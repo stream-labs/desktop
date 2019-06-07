@@ -140,15 +140,12 @@ async function is_updater_probably_running(updaterPath, updater_name) {
 
                 try {
                     fs.unlinkSync(updaterPath);
-
-                    if (fs.existsSync(updaterPath)) {
-                        updater_probably_running = true;
-                    }
                 } catch (remove_error) {
                     updater_probably_running = true;
                 }
-
-
+                if (fs.existsSync(updaterPath)) {
+                    updater_probably_running = true;
+                }
             }
         }
     }
