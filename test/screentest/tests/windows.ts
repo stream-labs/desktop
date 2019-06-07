@@ -78,13 +78,17 @@ test('Settings Hotkeys', async t => {
 test('Game Overlay', async (t: TExecutionContext) => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+
+  // take offline screenshot
   settingsService.showSettings('Game Overlay');
   await focusChild(t);
   await makeScreenshots(t, 'offline');
   await closeWindow(t);
 
+  // take online screenshot
   await logIn(t);
   settingsService.showSettings('Game Overlay');
+  await focusChild(t);
   await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
   await makeScreenshots(t, 'online');
   await logOut(t);
