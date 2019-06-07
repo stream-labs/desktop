@@ -4,15 +4,21 @@ import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ISettingsSubCategory, SettingsService } from '../../../services/settings';
 import { Inject } from 'services/core/injector';
+import TsxComponent from 'components/tsx-component';
 
 @Component({
   components: { AdvancedOutputTabs, GenericForm },
 })
-export default class GenericFormGroups extends Vue {
+export default class GenericFormGroups extends TsxComponent<{
+  value: ISettingsSubCategory[];
+  categoryName?: string;
+  onInput?: Function;
+}> {
   @Inject() settingsService: SettingsService;
 
   @Prop() value: ISettingsSubCategory[];
   @Prop() categoryName: string;
+  @Prop() onInput?: Function;
 
   collapsedGroups: Dictionary<boolean> = {};
 
@@ -23,6 +29,7 @@ export default class GenericFormGroups extends Vue {
   }
 
   onInputHandler() {
+    if (this.onInput) this.onInput(this.value);
     this.$emit('input', this.value);
 
     this.$nextTick(this.updateIsAdvancedOutput);

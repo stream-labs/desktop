@@ -182,10 +182,12 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     try {
       data = await this.withRetry(() => this.getFileData(serverId));
     } catch (e) {
-      console.error(`[Media Backup] Ran out of retries fetching data ${e.body}`);
-
       // At the moment, we don't surface sync errors to the user
       if (this.validateSyncLock(localId, syncLock)) {
+        if (e.status !== 404) {
+          // Don't log 404s, these are somewhat expected.
+          console.error(`[Media Backup] Ran out of retries fetching data ${e.body}`);
+        }
         this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
       }
       return null;
@@ -277,7 +279,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   private getFileData(id: number): Promise<IMediaFileDataResponse> {
     const req = new Request(`${this.apiBase}/${id}`, { headers: new Headers(this.authedHeaders) });
     return fetch(req)
-      .then(handleErrors)
+      .then(r => (r.ok ? Promise.resolve(r) : Promise.reject(r)))
       .then(r => r.json());
   }
 
