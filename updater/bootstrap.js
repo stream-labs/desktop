@@ -147,7 +147,8 @@ async function fetchUpdater(info, progress) {
     };
     
     const updaterPath = path.resolve(info.tempDir, updater_name);
-
+    
+    let updater_probably_running = false;
     if (fs.existsSync(updaterPath)) {
         let processes = await tasklist();
         
@@ -155,10 +156,25 @@ async function fetchUpdater(info, progress) {
             if(processes[process_item].imageName === updater_name)
             {
                 console.log( "Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
-                return running_updater_detected;
+                
+                try {
+                    fs.unlinkSync(updaterPath);
+                
+                    if (fs.existsSync(updaterPath)) {
+                        updater_probably_running = true;
+                    }
+                } catch (remove_error)
+                {
+                    updater_probably_running = true;
+                }
+        
+                
             }
         }
-     }
+    }
+    
+    if(updater_probably_running)
+        return running_updater_detected;
 
     const outStream = fs.createWriteStream(updaterPath);
 
