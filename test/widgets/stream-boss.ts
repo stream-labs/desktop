@@ -19,7 +19,7 @@ test('Set stream-boss health', async t => {
     await client.click(resetButtonSelector);
   }
 
-  await client.waitForVisible(setButtonSelector);
+  await client.waitForVisible(setButtonSelector, 20000);
   await client.click(setButtonSelector);
   await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
 

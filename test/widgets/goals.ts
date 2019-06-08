@@ -22,7 +22,7 @@ function testGoal(goalType: string) {
       await client.click('button=End Goal');
     }
 
-    await client.waitForVisible('button=Start Goal');
+    await client.waitForVisible('button=Start Goal', 20000);
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
