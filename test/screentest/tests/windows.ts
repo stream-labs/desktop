@@ -82,7 +82,7 @@ test('Game Overlay', async (t: TExecutionContext) => {
   // take offline screenshot
   settingsService.showSettings('Game Overlay');
   await focusChild(t);
-  await makeScreenshots(t, 'offline');
+  await makeScreenshots(t, 'Offline');
   await closeWindow(t);
 
   // take online screenshot
@@ -90,7 +90,7 @@ test('Game Overlay', async (t: TExecutionContext) => {
   settingsService.showSettings('Game Overlay');
   await focusChild(t);
   await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
-  await makeScreenshots(t, 'online');
+  await makeScreenshots(t, 'Online');
   await logOut(t);
 
   t.pass();
