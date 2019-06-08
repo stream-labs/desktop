@@ -92,6 +92,7 @@ test('Game Overlay', async (t: TExecutionContext) => {
   await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
   await makeScreenshots(t, 'Online');
   await logOut(t);
+  await closeWindow(t);
 
   t.pass();
 });
