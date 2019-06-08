@@ -1,6 +1,7 @@
 {
   "baseBranch": "staging",
   "dist": "test-dist/screentest",
+  "compiledTestsDist": "test-dist/test",
   "configs": {
     "resolution": {
       "window": "main",

@@ -7,9 +7,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ICustomizationServiceApi, ICustomizationSettings } from 'services/customization';
 import { WindowsService } from 'services/windows';
 
-@Component({
-  components: { GenericForm },
-})
+@Component({})
 export default class AppearanceSettings extends Vue {
   @Inject() private customizationService: ICustomizationServiceApi;
   @Inject() private windowsService: WindowsService;
@@ -44,6 +42,25 @@ export default class AppearanceSettings extends Vue {
         },
       },
       'ffz-settings',
+    );
+  }
+
+  render(h: Function) {
+    return (
+      <div>
+        <div class="section">
+          <div class="section-content">
+            <GenericForm value={this.settingsFormData} onInput={this.saveSettings} />
+          </div>
+        </div>
+        {this.enableFFZEmotes && (
+          <div class="section">
+            <button class="button button--action" onClick={this.openFFZSettings}>
+              {$t('Open FrankerFaceZ Settings')}
+            </button>
+          </div>
+        )}
+      </div>
     );
   }
 }

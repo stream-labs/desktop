@@ -34,6 +34,8 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
 
+app.commandLine.appendSwitch('force-ui-direction', 'ltr');
+
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -289,7 +291,7 @@ function startApp() {
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
     // setTimeout(() => {
-      //openDevTools();
+      // openDevTools();
     // }, 10 * 1000);
   }
 }
