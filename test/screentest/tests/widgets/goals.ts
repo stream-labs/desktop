@@ -20,8 +20,11 @@ function testGoal(goalType: string) {
 
     // end goal if it's already exist
     if (await client.isVisible('button=End Goal')) {
+      console.log('need to end the goal');
       await client.click('button=End Goal');
     }
+
+    console.log('wait for visible');
     await client.waitForVisible('button=Start Goal', 20000);
 
     await makeScreenshots(t, 'Empty Form');
@@ -49,9 +52,12 @@ function testGoal(goalType: string) {
     await logIn(t);
     const client = t.context.app.client;
 
+    console.log('add source');
     await addSource(t, goalType, goalType, false);
 
+    console.log('try click settings');
     await client.click('li=Visual Settings');
+    console.log('try fill form settings');
     const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
     const testSet = {
@@ -64,7 +70,11 @@ function testGoal(goalType: string) {
       font: 'Roboto',
     };
     await formMonkey.fill(testSet);
+
+    console.log('make screenshot');
     await makeScreenshots(t, 'Settings');
+
+    console.log('done ');
     await logOut(t);
     t.pass();
   });
