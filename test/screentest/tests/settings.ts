@@ -49,7 +49,7 @@ test('Settings Hotkeys', async t => {
   t.pass();
 });
 
-test('Game Overlay', async (t: TExecutionContext) => {
+test('Settings Game Overlay', async (t: TExecutionContext) => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
 
