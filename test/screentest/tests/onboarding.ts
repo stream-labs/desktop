@@ -1,6 +1,5 @@
-import { useSpectron, test, focusMain } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
-import { makeScreenshots, useScreentest } from '../screenshoter';
+import { useSpectron, test, focusMain, focusChild } from '../../helpers/spectron';
+import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
 import { logIn } from '../../helpers/spectron/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
@@ -12,15 +11,7 @@ useSpectron({ skipOnboarding: false });
 useScreentest();
 
 test('Onboarding steps', async t => {
-
-  // extract OBS config to the cache dir
-  const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
-  const dataDir = path.resolve(__dirname, '..', '..', 'test', 'data');
-  const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
-
   const app = t.context.app;
-  const client = app.client;
   await focusMain(t);
 
   // Wait for the auth screen to appear
@@ -37,19 +28,43 @@ test('Onboarding steps', async t => {
   await sleep(1000);
 
   // Start auto config
+  await disableGifAnimations(t);
   await makeScreenshots(t, 'Autoconfig');
   await app.client.click('button=Start');
   await app.client.waitForVisible('.button--action:not([disabled])', 60000);
   await makeScreenshots(t, 'Autoconfig is Finished');
 
-  // obs importer
-  await client.click('button=Next');
-  await makeScreenshots(t, 'Obs Importer');
-  await client.click('button=Import from OBS');
-  await client.waitForVisible('button=Continue');
-  await makeScreenshots(t, 'Obs Import is Completed');
-  await sleep(900000000)
-
   t.pass();
 });
 
+test('Onboarding OBS Importer', async t => {
+  const client = t.context.app.client;
+
+  // extract OBS config to the cache dir
+  const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
+  console.log(dataDir);
+  const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
+  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+
+  // skip auth
+  await client.click('a=Setup later');
+
+  // import from OBS
+  t.true(await client.isExisting('button=Import from OBS'), 'OBS detected');
+  await makeScreenshots(t, 'OBS detected');
+  await client.click('button=Import from OBS');
+  await client.waitForVisible('button=Continue');
+  await makeScreenshots(t, 'OBS completed');
+  await client.click('button=Continue');
+
+  // check sources exist in the main window
+  await focusMain(t);
+  await makeScreenshots(t, 'Sources exist');
+
+  // check settings
+  await client.click('.top-nav .icon-settings');
+  await focusChild(t);
+  await client.click('li=Output');
+  await makeScreenshots(t, 'Settings are applied');
+});
