@@ -9,32 +9,6 @@ import { logIn, logOut } from '../../helpers/spectron/user';
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
-test('Sources showcase window', async t => {
-  const client = await getClient();
-  const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  sourcesService.showShowcase();
-  await focusChild(t);
-  t.pass();
-});
-
-test('AddSource window', async t => {
-  const client = await getClient();
-  const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  sourcesService.showAddSource('color_source');
-  await focusChild(t);
-  t.pass();
-});
-
-test('AddSource window with suggestions', async t => {
-  const client = await getClient();
-  const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  const scenesService = client.getResource<ScenesService>('ScenesService');
-  scenesService.activeScene.createAndAddSource('MySource', 'color_source');
-  sourcesService.showAddSource('color_source');
-  await focusChild(t);
-  t.pass();
-});
-
 test('Settings General', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
