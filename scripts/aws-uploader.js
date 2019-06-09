@@ -7,7 +7,7 @@ const recursiveReadDir = require('recursive-readdir');
 /**
  * A aws-sdk wrapper for uploading folders and files to AWS
  */
-module.exports.AwsUploader = class AwsUploader {
+class AwsUploader {
 
   constructor(awsAccessKey, awsSecretKey, awsBucket) {
     this.awsAccessKey = awsAccessKey;
@@ -60,3 +60,20 @@ module.exports.AwsUploader = class AwsUploader {
     return `${this.baseUrl}/${bucketPath}`;
   }
 }
+
+/**
+ * Use environment variables to instantiate the uploader
+ * @returns {AwsUploader}
+ */
+function initAwsUploaderViaEnv() {
+  require('dotenv').config();
+  const {
+    AWS_ACCESS_KEY,
+    AWS_SECRET_KEY,
+    AWS_BUCKET
+  } = process.env;
+  return new AwsUploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET);
+}
+
+module.exports.AwsUploader = AwsUploader;
+module.exports.initAwsUploaderViaEnv = initAwsUploaderViaEnv();

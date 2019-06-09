@@ -1,13 +1,12 @@
+import { uploadScreenshotsForFailedTests } from '../helpers/screenshot-uploader';
+
 require('dotenv').config();
-import { AwsUploader, uploadDir } from '../../scripts/aws-uploader';
+import { initAwsUploaderViaEnv } from '../../scripts/aws-uploader';
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const { GithubClient } = require('../../scripts/github-client');
 const {
-  AWS_ACCESS_KEY,
-  AWS_SECRET_KEY,
-  AWS_BUCKET,
   CI,
   STREAMLABS_BOT_ID,
   STREAMLABS_BOT_KEY,
@@ -29,9 +28,20 @@ const args = process.argv.slice(2);
     CONFIG.baseBranch
   ];
   for (const branchName of branches) {
+    // run tests from the branch
     checkoutBranch(branchName);
-    exec(`yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests ${args.join(' ')}`);
+    try {
+      execSync(
+        `yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests ${args.join(' ')}`,
+        { stdio: [0, 1, 2] },
+      )
+    } catch (e) {
+      // if tests failed then upload screenshots of failed tests
+      await uploadScreenshotsForFailedTests();
+      process.exit(1);
+    }
   }
+
   // return to the current branch
   checkoutBranch('current');
 
@@ -93,7 +103,7 @@ async function updateCheck() {
   // upload screenshots if any changes present
   let screenshotsUrl = '';
   if (conclusion === 'action_required' || testResults.newScreens > 1) {
-    const uploader = new AwsUploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET);
+    const uploader = initAwsUploaderViaEnv();
     const uploadState = uploader.uploadDir(CONFIG.dist, uuid());
     if (uploadState) {
       if (screenshotsUrl) uploadState.baseUrl += '/preview.html';

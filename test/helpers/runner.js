@@ -5,41 +5,24 @@
  * - send analytics of failed tests
  * - send screenshots of failed tests
  */
+import { uploadScreenshotsForFailedTests } from './screenshot-uploader';
 
 require('dotenv').config();
 const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const request = require('request');
-const uuid = require('uuid');
-const AwsUploader = require( '../../scripts/aws-uploader').AwsUploader;
 
 const FAILED_TESTS_FILE = 'test-dist/failed-tests.json';
-const FAILED_TESTS_SCREENSHOTS_DIR = 'test-dist/failed-tests';
-const {
-  AWS_ACCESS_KEY,
-  AWS_SECRET_KEY,
-  AWS_BUCKET,
-  CI,
-  STREAMLABS_BOT_ID,
-  STREAMLABS_BOT_KEY,
-  BUILD_REPOSITORY_NAME,
-  SYSTEM_PULL_REQUEST_PULL_REQUEST_ID,
-} = process.env;
 const args = process.argv.slice(2);
 
 (function main() {
-
-  console.log('Pull request id is ', SYSTEM_PULL_REQUEST_PULL_REQUEST_ID);
-  console.log('Env', process.env);
-  // const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_FILE));
-  // sendFailedTestsToAnalytics(failedTests)
-  // try {
-  //   rimraf.sync(FAILED_TESTS_FILE);
-  //   execSync('yarn test --timeout=3m ' + args.join(' '), { stdio: [0, 1, 2] });
-  // } catch (e) {
-  //   retryTests();
-  // }
+  try {
+    rimraf.sync(FAILED_TESTS_FILE);
+    execSync('yarn test --timeout=3m ' + args.join(' '), { stdio: [0, 1, 2] });
+  } catch (e) {
+    retryTests();
+  }
 })();
 
 
@@ -76,6 +59,9 @@ function failAndExit() {
 }
 
 async function sendFailedTestsToAnalytics(failedTests) {
+  log('Upload screenshots of failed tests to the AWS bucket');
+  await uploadScreenshotsForFailedTests();
+
   log('Sending analytics..');
   await new Promise((resolve, reject) => {
 
@@ -108,22 +94,4 @@ async function sendFailedTestsToAnalytics(failedTests) {
     request(options, callback);
   });
 
-  // upload screenshots of failed tests to the AWS bucket
-  if (!AWS_BUCKET) return;
-  const bucketDir = uuid();
-  const uploader = new AwsUploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET);
-  const uploadState = await uploader.uploadDir(FAILED_TESTS_SCREENSHOTS_DIR, bucketDir);
-  if (!uploadState) return;
-
-  // create the index.html
-  const indexFilePath = `${FAILED_TESTS_SCREENSHOTS_DIR}/index.html`;
-  fs.writeFileSync(indexFilePath,
-    `<html><body>` +
-    uploadState.files.map(src => `<h5>${src}</h5><img src="${src}"/>`).join() +
-    `</body></html>`
-  );
-
-  // upload index.html
-  const url = await uploader.uploadFile(indexFilePath, `${bucketDir}/index.html`);
-  log('Preview URL:', url);
 }
