@@ -22,13 +22,13 @@ class AwsUploader {
   /**
    * @returns {Promise<{baseUrl: string, files: string[]}>}
    */
-  async uploadDir(path, bucketPath) {
+  async uploadDir(dirPath, bucketPath) {
     const uploadedFilesUrls = [];
     try {
-      const files = await recursiveReadDir(path);
+      const files = await recursiveReadDir(dirPath);
       for (const filePath of files) {
         console.info(`uploading ${filePath}`);
-        const relativePath = path.relative(path, filePath).replace('\\', '/');
+        const relativePath = path.relative(dirPath, filePath).replace('\\', '/');
         const bucketPath = `${bucketPath}/${relativePath}`;
         uploadedFilesUrls.push(await this.uploadFile(filePath, bucketPath))
       }
