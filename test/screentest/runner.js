@@ -1,5 +1,4 @@
 require('dotenv').config();
-import { initAwsUploaderViaEnv } from '../../scripts/aws-uploader';
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
@@ -13,6 +12,8 @@ const {
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
+
+const initAwsUploaderViaEnv = require('../../scripts/aws-uploader').initAwsUploaderViaEnv;
 const uploadScreenshotsForFailedTests = require('../helpers/screenshot-uploader')
   .uploadScreenshotsForFailedTests;
 
