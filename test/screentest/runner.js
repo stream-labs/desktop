@@ -1,11 +1,8 @@
 require('dotenv').config();
+import { AwsUploader, uploadDir } from '../../scripts/aws-uploader';
 const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
-const AWS = require('aws-sdk');
-const uuid = require('uuid');
-const recursiveReadDir = require('recursive-readdir');
 const { GithubClient } = require('../../scripts/github-client');
 const {
   AWS_ACCESS_KEY,
@@ -14,8 +11,7 @@ const {
   CI,
   STREAMLABS_BOT_ID,
   STREAMLABS_BOT_KEY,
-  BUILD_REPOSITORY_NAME,
-  BUILD_BUILD_ID,
+  BUILD_REPOSITORY_NAME
 } = process.env;
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
@@ -97,7 +93,12 @@ async function updateCheck() {
   // upload screenshots if any changes present
   let screenshotsUrl = '';
   if (conclusion === 'action_required' || testResults.newScreens > 1) {
-    screenshotsUrl = await uploadScreenshots();
+    const uploader = new AwsUploader(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_BUCKET);
+    const uploadState = uploader.uploadDir(CONFIG.dist, uuid());
+    if (uploadState) {
+      if (screenshotsUrl) uploadState.baseUrl += '/preview.html';
+      console.log('The screenshots preview page is ', screenshotsUrl);
+    }
   }
 
   console.info('Updating the GithubCheck', conclusion, title);
@@ -152,42 +153,4 @@ function getCommitSHA() {
   // the repo is in the detached state for CI
   // we need to take a one commit before to take a commit that has been associated to the PR
   return CI ? lastCommits[1] : lastCommits[0];
-}
-
-async function uploadScreenshots() {
-  if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || !AWS_BUCKET) {
-    console.error('Setup AWS_ACCESS_KEY AWS_SECRET_KEY AWS_BUCKET to upload screenshots');
-    return;
-  }
-
-  console.info(`Uploading screenshots to the s3 bucket`);
-  const Bucket = AWS_BUCKET;
-  const awsCredentials = new AWS.Credentials(AWS_ACCESS_KEY, AWS_SECRET_KEY);
-  const s3Options = {credentials : awsCredentials};
-  const s3Client = new AWS.S3(s3Options);
-  const bucketDir = BUILD_BUILD_ID || uuid();
-
-  try {
-    const files = await recursiveReadDir(CONFIG.dist);
-    for (const filePath of files) {
-      console.info(`uploading ${filePath}`);
-      const relativePath = path.relative(CONFIG.dist, filePath).replace('\\', '/');
-      const stream = fs.createReadStream(filePath);
-      const params = {
-        Bucket,
-        Key : `${bucketDir}/${relativePath}`,
-        ContentType: 'text/html',
-        ACL : 'public-read',
-        Body : stream
-      };
-      await s3Client.upload(params).promise();
-    }
-    const url = `http://${Bucket}.s3.amazonaws.com/${bucketDir}/preview.html`;
-    console.info('Screenshots uploaded', url);
-    return url;
-  } catch (e) {
-    console.error('Failed to upload screenshots');
-    console.error(e);
-  }
-
 }

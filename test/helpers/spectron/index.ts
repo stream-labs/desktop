@@ -6,6 +6,7 @@ import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
+import NativeImage = Electron.NativeImage;
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -24,6 +25,7 @@ const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
+const FAILED_TESTS_SCREENSHOTS_PATH = 'test-dist/failed-tests';
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
@@ -61,6 +63,11 @@ export async function focusLibrary(t: any) {
 // Close current focused window
 export async function closeWindow(t: any) {
   await t.context.app.browserWindow.close();
+}
+
+export async function getFocusedWindowId(t: TExecutionContext): Promise<string> {
+  const url = await t.context.app.client.getUrl();
+  return url.match(/windowId=main$/) ? 'main' : 'child';
 }
 
 export async function waitForLoader(t: any) {
@@ -273,6 +280,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
+      // make screnshots for failed tests
+      if (!testPassed) await makeScreenshots(t, testName);
       const client = await getClient();
       await client.unsubscribeAll();
       await releaseUserInPool();
@@ -324,5 +333,17 @@ function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
+}
+
+async function makeScreenshots(t: any, testName: string) {
+  const handles = await t.context.app.client.windowHandles();
+  for (const handle of handles.value) {
+    await t.context.app.client.window(handle);
+    const windowId = await getFocusedWindowId(t);
+    await t.context.app.browserWindow.capturePage().then((imageBuffer: NativeImage) => {
+      const imageFileName = `${testName}__${windowId}.png`;
+      fs.writeFileSync(`${FAILED_TESTS_SCREENSHOTS_PATH}/${imageFileName}`, imageBuffer);
+    });
   }
 }

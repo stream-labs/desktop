@@ -30,11 +30,6 @@ async function applyConfig(t: TExecutionContext, config: Dictionary<any>) {
   await sleep(1000);
 }
 
-async function getFocusedWindowId(t: TExecutionContext): Promise<string> {
-  const url = await t.context.app.client.getUrl();
-  return url.match(/windowId=main$/) ? 'main' : 'child';
-}
-
 export async function makeScreenshots(t: TExecutionContext, title = '') {
   const api = await getClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
