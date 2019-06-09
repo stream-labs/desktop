@@ -76,4 +76,4 @@ function initAwsUploaderViaEnv() {
 }
 
 module.exports.AwsUploader = AwsUploader;
-module.exports.initAwsUploaderViaEnv = initAwsUploaderViaEnv();
+module.exports.initAwsUploaderViaEnv = initAwsUploaderViaEnv;
