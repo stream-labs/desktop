@@ -23,6 +23,8 @@
   },
   "exclude": [
     "node_modules",
-    "screentest/runner.js"
+    "screentest/runner.js",
+    "helpers/runner.js",
+    "helpers/screenshot-uploader.js"
   ]
 }
