@@ -64,7 +64,7 @@ async function sendFailedTestsToAnalytics(failedTests) {
   await uploadScreenshotsForFailedTests();
 
   log('Sending analytics..');
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
     const options = {
       url: 'https://r2d2.streamlabs.com/slobs/data/ping',
