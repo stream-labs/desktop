@@ -1,5 +1,3 @@
-import { uploadScreenshotsForFailedTests } from '../helpers/screenshot-uploader';
-
 require('dotenv').config();
 import { initAwsUploaderViaEnv } from '../../scripts/aws-uploader';
 const rimraf = require('rimraf');
@@ -15,6 +13,8 @@ const {
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
+const uploadScreenshotsForFailedTests = require('../helpers/screenshot-uploader')
+  .uploadScreenshotsForFailedTests;
 
 (async function main() {
 

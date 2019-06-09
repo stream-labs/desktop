@@ -336,6 +336,9 @@ function removeFailedTestFromFile(testName: string) {
   }
 }
 
+/**
+ * Make a screenshoot for each window
+ */
 async function makeScreenshots(t: any, testName: string) {
   if (!fs.existsSync(FAILED_TESTS_SCREENSHOTS_PATH)) {
     fs.mkdirSync(FAILED_TESTS_SCREENSHOTS_PATH);

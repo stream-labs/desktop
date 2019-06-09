@@ -5,13 +5,14 @@
  * - send analytics of failed tests
  * - send screenshots of failed tests
  */
-import { uploadScreenshotsForFailedTests } from './screenshot-uploader';
 
 require('dotenv').config();
 const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const request = require('request');
+const uploadScreenshotsForFailedTests = require('./screenshot-uploader')
+  .uploadScreenshotsForFailedTests;
 
 const FAILED_TESTS_FILE = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);

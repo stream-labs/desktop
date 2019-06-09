@@ -31,6 +31,7 @@ export async function uploadScreenshotsForFailedTests() {
   const url = await uploader.uploadFile(indexFilePath, `${bucketDir}/index.html`);
   console.info('Preview URL:', url);
 
+  // leave a comment in PR
   const githubClient = initGithubClientViaEnv();
   await githubClient.comment(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER,
     `Some tests failed on this branch. Screenshot of failed tests have been uploaded to: ${url}`
