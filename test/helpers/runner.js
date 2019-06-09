@@ -5,7 +5,6 @@
  * - send analytics of failed tests
  * - send screenshots of failed tests
  */
-import { AwsUploader } from '../../scripts/aws-uploader';
 
 require('dotenv').config();
 const { execSync } = require('child_process');
@@ -13,6 +12,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const request = require('request');
 const uuid = require('uuid');
+const AwsUploader = require( '../../scripts/aws-uploader').AwsUploader;
 
 const FAILED_TESTS_FILE = 'test-dist/failed-tests.json';
 const FAILED_TESTS_SCREENSHOTS_DIR = 'test-dist/failed-tests';
@@ -23,17 +23,23 @@ const {
   CI,
   STREAMLABS_BOT_ID,
   STREAMLABS_BOT_KEY,
-  BUILD_REPOSITORY_NAME
+  BUILD_REPOSITORY_NAME,
+  SYSTEM_PULL_REQUEST_PULL_REQUEST_ID,
 } = process.env;
 const args = process.argv.slice(2);
 
 (function main() {
-  try {
-    rimraf.sync(FAILED_TESTS_FILE);
-    execSync('yarn test --timeout=3m ' + args.join(' '), { stdio: [0, 1, 2] });
-  } catch (e) {
-    retryTests();
-  }
+
+  console.log('Pull request id is ', SYSTEM_PULL_REQUEST_PULL_REQUEST_ID);
+  console.log('Env', process.env);
+  // const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_FILE));
+  // sendFailedTestsToAnalytics(failedTests)
+  // try {
+  //   rimraf.sync(FAILED_TESTS_FILE);
+  //   execSync('yarn test --timeout=3m ' + args.join(' '), { stdio: [0, 1, 2] });
+  // } catch (e) {
+  //   retryTests();
+  // }
 })();
 
 
@@ -44,7 +50,7 @@ function retryTests() {
     throw 'no tests to retry';
   }
 
-  const failedTests = require(FAILED_TESTS_FILE);
+  const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_FILE));
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
@@ -113,7 +119,7 @@ async function sendFailedTestsToAnalytics(failedTests) {
   const indexFilePath = `${FAILED_TESTS_SCREENSHOTS_DIR}/index.html`;
   fs.writeFileSync(indexFilePath,
     `<html><body>` +
-    uploadState.files.map(src => '<h5>${src}</h5><img src="${src}"/>').join() +
+    uploadState.files.map(src => `<h5>${src}</h5><img src="${src}"/>`).join() +
     `</body></html>`
   );
 

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const AWS = require('aws-sdk');
 const mime = require('mime');
 const recursiveReadDir = require('recursive-readdir');
@@ -6,7 +7,7 @@ const recursiveReadDir = require('recursive-readdir');
 /**
  * A aws-sdk wrapper for uploading folders and files to AWS
  */
-export class AwsUploader {
+module.exports.AwsUploader = class AwsUploader {
 
   constructor(awsAccessKey, awsSecretKey, awsBucket) {
     this.awsAccessKey = awsAccessKey;
@@ -21,14 +22,14 @@ export class AwsUploader {
   /**
    * @returns {Promise<{baseUrl: string, files: string[]}>}
    */
-  async uploadDir(dir, bucketDir) {
+  async uploadDir(path, bucketPath) {
     const uploadedFilesUrls = [];
     try {
-      const files = await recursiveReadDir(dir);
+      const files = await recursiveReadDir(path);
       for (const filePath of files) {
         console.info(`uploading ${filePath}`);
-        const relativePath = path.relative(dir, filePath).replace('\\', '/');
-        const bucketPath = `${bucketDir}/${relativePath}`;
+        const relativePath = path.relative(path, filePath).replace('\\', '/');
+        const bucketPath = `${bucketPath}/${relativePath}`;
         uploadedFilesUrls.push(await this.uploadFile(filePath, bucketPath))
       }
       console.info('file uploaded to', this.baseUrl);
@@ -46,7 +47,7 @@ export class AwsUploader {
    * @returns string file url
    */
   async uploadFile(filePath, bucketPath) {
-    const contentType = mime.lookup(filePath);
+    const contentType = mime.getType(filePath);
     const stream = fs.createReadStream(filePath);
     const params = {
       Bucket: this.awsBucket,

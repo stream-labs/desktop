@@ -337,6 +337,9 @@ function removeFailedTestFromFile(testName: string) {
 }
 
 async function makeScreenshots(t: any, testName: string) {
+  if (!fs.existsSync(FAILED_TESTS_SCREENSHOTS_PATH)) {
+    fs.mkdirSync(FAILED_TESTS_SCREENSHOTS_PATH);
+  }
   const handles = await t.context.app.client.windowHandles();
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);

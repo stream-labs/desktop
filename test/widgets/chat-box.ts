@@ -47,6 +47,7 @@ test('Chatbox Visual Settings', async t => {
 
   await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
   t.true(await formMonkey.includes(testSet2));
+  t.fail('UUUPS!');
 });
 
 test('Chatbox Font Settings', async t => {
