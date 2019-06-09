@@ -11,7 +11,7 @@ const {
 /**
  * upload screenshots of failed tests to the AWS bucket
  */
-export async function uploadScreenshotsForFailedTests() {
+async function uploadScreenshotsForFailedTests() {
   if (!SYSTEM_PULLREQUEST_PULLREQUESTNUMBER) return;
 
   const bucketDir = uuid();
@@ -37,3 +37,5 @@ export async function uploadScreenshotsForFailedTests() {
     `Some tests failed on this branch. Screenshot of failed tests have been uploaded to: ${url}`
   );
 }
+
+module.exports.uploadScreenshotsForFailedTests = uploadScreenshotsForFailedTests;
