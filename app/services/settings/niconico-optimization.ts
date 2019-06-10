@@ -4,10 +4,12 @@ import {
 
 /**
  * niconicoに最適な設定値を返す。
- * @param options ビットレート
  */
 export function getBestSettingsForNiconico(
-    options: { bitrate: number },
+    options: {
+        bitrate: number,
+        useHardwareEncoder?: boolean
+    },
     settings: SettingsKeyAccessor
 ): OptimizeSettings {
     let audioBitrate: number;
@@ -34,18 +36,20 @@ export function getBestSettingsForNiconico(
         simpleUseAdvanced: true,
         encoderPreset: 'ultrafast',
     };
-    if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc)) {
-        encoderSettings = {
-            encoder: EncoderType.nvenc,
-            simpleUseAdvanced: true,
-            NVENCPreset: 'llhq',
-        };
-    } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv)) {
-        encoderSettings = {
-            encoder: EncoderType.qsv,
-            simpleUseAdvanced: true,
-            targetUsage: 'speed',
-        };
+    if (!('useHardwareEncoder' in options) || options.useHardwareEncoder) {
+        if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc)) {
+            encoderSettings = {
+                encoder: EncoderType.nvenc,
+                simpleUseAdvanced: true,
+                NVENCPreset: 'llhq',
+            };
+        } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv)) {
+            encoderSettings = {
+                encoder: EncoderType.qsv,
+                simpleUseAdvanced: true,
+                targetUsage: 'speed',
+            };
+        }
     }
 
     const commonSettings: OptimizeSettings = {

@@ -41,6 +41,21 @@ export default class OptimizeNiconico extends Vue {
     this.customizationService.setShowOptimizationDialogForNiconico(!model.value);
   }
 
+  get useHardwareEncoder(): IFormInput<boolean> {
+    return {
+      name: 'use_hardware_encoder',
+      description: $t('streaming.optimizeWithHardwareEncoder'),
+      value: this.customizationService.optimizeWithHardwareEncoder === true
+    };
+  }
+
+  setUseHardwareEncoder(model: IFormInput<boolean>) {
+    this.customizationService.setOptimizeWithHardwareEncoder(model.value);
+    // close the dialog and open again to apply new optimization settings
+    this.windowsService.closeChildWindow();
+    this.streamingService.toggleStreamingAsync({mustShowOptimizationDialog: true});
+  }
+
   optimizeAndGoLive() {
     this.settingsService.optimizeForNiconico(this.settings.best);
     this.streamingService.toggleStreaming();

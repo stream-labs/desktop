@@ -47,5 +47,6 @@
   "resolution": "resolution",
   "optimizeAndGoLive": "Optimize & Go Live",
   "skipOptimization": "Skip Optimization",
-  "doNotShowAgainOptimizationDialog": "Do not show this dialog again"
+  "doNotShowAgainOptimizationDialog": "Do not show this dialog again",
+  "optimizeWithHardwareEncoder": "Use hardware encoder if available"
 }

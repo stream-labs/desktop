@@ -6,6 +6,7 @@ export interface ICustomizationServiceState {
   studioControlsOpened: boolean;
   optimizeForNiconico: boolean;
   showOptimizationDialogForNiconico: boolean;
+  optimizeWithHardwareEncoder: boolean;
   pollingPerformanceStatistics: boolean;
   experimental: any;
 }

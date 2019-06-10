@@ -24,6 +24,7 @@ export class CustomizationService
     studioControlsOpened: true,
     optimizeForNiconico: true,
     showOptimizationDialogForNiconico: true,
+    optimizeWithHardwareEncoder: true,
     pollingPerformanceStatistics: true,
     experimental: {
       // put experimental features here
@@ -67,6 +68,14 @@ export class CustomizationService
 
   setShowOptimizationDialogForNiconico(optimize: boolean) {
     this.setSettings({ showOptimizationDialogForNiconico: optimize });
+  }
+
+  get optimizeWithHardwareEncoder() {
+    return this.state.optimizeWithHardwareEncoder;
+  }
+
+  setOptimizeWithHardwareEncoder(useHardwareEncoder: boolean) {
+    this.setSettings({ optimizeWithHardwareEncoder: useHardwareEncoder });
   }
 
   get pollingPerformanceStatistics() {

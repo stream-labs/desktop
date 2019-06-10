@@ -102,7 +102,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
-  async toggleStreamingAsync(programId: string = '') {
+  async toggleStreamingAsync(
+    options: {
+      programId?: string,
+      mustShowOptimizationDialog?: boolean
+    } = {}
+  ) {
+    const opts = Object.assign({
+      programId: '',
+      mustShowOptimizationDialog: false
+    }, options);
+
     if (this.isStreaming) {
       this.toggleStreaming();
       return;
@@ -112,7 +122,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.userService.isNiconicoLoggedIn()) {
       try {
         this.SET_PROGRAM_FETCHING(true);
-        const setting = await this.userService.updateStreamSettings(programId);
+        const setting = await this.userService.updateStreamSettings(opts.programId);
         if (setting.asking) {
           return;
         }
@@ -133,7 +143,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          return this.optimizeForNiconico(setting);
+          return this.optimizeForNiconicoAndStartStreaming(setting, opts.mustShowOptimizationDialog);
         }
       } catch (e) {
         const message = e instanceof Response
@@ -228,7 +238,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return Math.floor(height); // floorしないと死ぬ
   }
 
-  private async optimizeForNiconico(streamingSetting: IStreamingSetting) {
+  /**
+   * ニコニコ生放送用設定最適化を行い、配信を開始する。この際、必要なら最適化ダイアログ表示を行う。
+   * @param streamingSetting 番組の情報から得られる最適化の前提となる情報
+   * @param mustShowDialog trueなら、設定に変更が必要ない場合や、最適化ダイアログを表示しない接敵のときであっても最適化ダイアログを表示する。
+   */
+  private async optimizeForNiconicoAndStartStreaming(streamingSetting: IStreamingSetting, mustShowDialog: boolean) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
@@ -244,9 +259,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       });
     }
-    const settings = this.settingsService.diffOptimizedSettings(streamingSetting.bitrate);
-    if (settings) {
-      if (this.customizationService.showOptimizationDialogForNiconico) {
+    const settings = this.settingsService.diffOptimizedSettings({
+      bitrate: streamingSetting.bitrate,
+      useHardwareEncoder: this.customizationService.optimizeWithHardwareEncoder,
+    });
+    if (Object.keys(settings.delta).length > 0 || mustShowDialog) {
+      if (this.customizationService.showOptimizationDialogForNiconico || mustShowDialog) {
         this.windowsService.showWindow({
           componentName: 'OptimizeForNiconico',
           queryParams: settings,

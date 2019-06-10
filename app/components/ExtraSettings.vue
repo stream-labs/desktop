@@ -12,6 +12,11 @@
       v-show="optimizeForNiconicoModel.value"
       @input="setShowOptimizationDialogForNiconico"
       class="optional-item" />
+    <BoolInput
+      :value="optimizeWithHardwareEncoderModel"
+      v-show="optimizeForNiconicoModel.value"
+      @input="setOptimizeWithHardwareEncoder"
+      class="optional-item" />
   </div>
 
   <div class="section">

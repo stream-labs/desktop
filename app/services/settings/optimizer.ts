@@ -412,6 +412,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
 export interface OptimizedSettings {
     best: OptimizeSettings;
     current: OptimizeSettings;
+    delta: OptimizeSettings;
     info: [CategoryName, {
         key: string,
         name: string,

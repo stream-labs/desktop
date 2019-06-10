@@ -67,6 +67,19 @@ export default class ExtraSettings extends Vue {
     this.customizationService.setShowOptimizationDialogForNiconico(model.value);
   }
 
+  get optimizeWithHardwareEncoderModel(): IFormInput<boolean> {
+    return {
+      name: 'optimize_with_hardware_encoder',
+      description: $t('settings.optimizeWithHardwareEncoder'),
+      value: this.customizationService.state.optimizeWithHardwareEncoder,
+      enabled: this.streamingService.isStreaming === false
+    };
+  }
+
+  setOptimizeWithHardwareEncoder(model: IFormInput<boolean>) {
+    this.customizationService.setOptimizeWithHardwareEncoder(model.value);
+  }
+
   get pollingPerformanceStatisticsModel(): IFormInput<boolean> {
     return {
       name: 'polling_performance_statistics',
