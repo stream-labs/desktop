@@ -49,27 +49,6 @@ test('Settings Hotkeys', async t => {
   t.pass();
 });
 
-test('Settings Game Overlay', async (t: TExecutionContext) => {
-  const client = await getClient();
-  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
-
-  // take offline screenshot
-  settingsService.showSettings('Game Overlay');
-  await focusChild(t);
-  await makeScreenshots(t, 'Offline');
-  await closeWindow(t);
-
-  // take online screenshot
-  await logIn(t);
-  settingsService.showSettings('Game Overlay');
-  await focusChild(t);
-  await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
-  await makeScreenshots(t, 'Online');
-  await logOut(t);
-
-  t.pass();
-});
-
 test('Settings Scene Collections', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
@@ -92,5 +71,26 @@ test('Settings Appearance', async t => {
   await sleep(1000);
   settingsService.showSettings('Appearance');
   await focusChild(t);
+  t.pass();
+});
+
+test('Settings Game Overlay', async (t: TExecutionContext) => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+
+  // take offline screenshot
+  settingsService.showSettings('Game Overlay');
+  await focusChild(t);
+  await makeScreenshots(t, 'Offline');
+  await closeWindow(t);
+
+  // take online screenshot
+  await logIn(t);
+  settingsService.showSettings('Game Overlay');
+  await focusChild(t);
+  await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
+  await makeScreenshots(t, 'Online');
+  await logOut(t);
+
   t.pass();
 });
