@@ -93,6 +93,8 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       );
     });
 
+    if (!filteredProfiles.length) return null;
+
     // find profiles with the closest resolution to current resolution in current settings
     const resInPx = resToPx(settings.outputResolution);
     const profile = filteredProfiles.sort((profileA, profileZ) => {
