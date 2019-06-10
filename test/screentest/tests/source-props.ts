@@ -24,7 +24,7 @@ afterAppStart(async t => {
     'dshow_input',
     'wasapi_input_capture',
     'wasapi_output_capture',
-    'ndi_source'
+    'ndi_source',
   ];
 
   const client = await getClient();
