@@ -116,7 +116,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
     if (game === this.state.lastLoadedGame) {
       profiles = this.state.lastLoadedProfiles;
-    } else {
+    } else if (game) {
       // try to fetch a game-specific profile
 
       try {
