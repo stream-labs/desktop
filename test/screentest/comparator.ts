@@ -120,7 +120,7 @@ const parsedImages: { [imageName: string]: IParsedImage } = {};
       parsedImage.diff.data,
       baseImage.width,
       baseImage.height,
-      { threshold: 0.1 },
+      { threshold: CONFIG.threshold },
     );
 
     regression.isChanged = numDiffPixels > 0;
