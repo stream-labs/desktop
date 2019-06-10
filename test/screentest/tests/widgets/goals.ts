@@ -55,9 +55,9 @@ function testGoal(goalType: string) {
     console.log('add source');
     await addSource(t, goalType, goalType, false);
 
-    console.log('try click settings');
+    await client.waitForExist('li=Visual Settings');
     await client.click('li=Visual Settings');
-    console.log('try fill form settings');
+
     const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
     const testSet = {
