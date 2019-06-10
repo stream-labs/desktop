@@ -143,7 +143,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          return this.optimizeForNiconico(setting, opts.mustShowOptimizationDialog);
+          return this.optimizeForNiconicoAndStartStreaming(setting, opts.mustShowOptimizationDialog);
         }
       } catch (e) {
         const message = e instanceof Response
@@ -238,7 +238,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return Math.floor(height); // floorしないと死ぬ
   }
 
-  private async optimizeForNiconico(streamingSetting: IStreamingSetting, mustShowDialog: boolean) {
+  /**
+   * ニコニコ生放送用設定最適化を行い、配信を開始する。この際、必要なら最適化ダイアログ表示を行う。
+   * @param streamingSetting 番組の情報から得られる最適化の前提となる情報
+   * @param mustShowDialog trueなら、設定に変更が必要ない場合や、最適化ダイアログを表示しない接敵のときであっても最適化ダイアログを表示する。
+   */
+  private async optimizeForNiconicoAndStartStreaming(streamingSetting: IStreamingSetting, mustShowDialog: boolean) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
