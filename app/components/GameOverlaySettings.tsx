@@ -22,12 +22,14 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     try {
       await this.gameOverlayService.setEnabled(val);
     } catch (e) {
-      this.$toasted.show(e, {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 3000,
-        singleton: true,
-      });
+      if (typeof e === 'string') {
+        this.$toasted.show(e, {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 3000,
+          singleton: true,
+        });
+      }
     }
     this.enabling = false;
   }
