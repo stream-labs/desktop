@@ -262,8 +262,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const settings = this.settingsService.diffOptimizedSettings({
       bitrate: streamingSetting.bitrate,
       useHardwareEncoder: this.customizationService.optimizeWithHardwareEncoder,
-    }, mustShowDialog);
-    if (settings) {
+    });
+    if (Object.keys(settings.delta).length > 0 || mustShowDialog) {
       if (this.customizationService.showOptimizationDialogForNiconico || mustShowDialog) {
         this.windowsService.showWindow({
           componentName: 'OptimizeForNiconico',
