@@ -115,3 +115,14 @@ export function useScreentest() {
     await focusMain(t);
   });
 }
+
+export async function disableGifAnimations(t: TExecutionContext) {
+  // there are no way to stop gif animations
+  // so just make them transparent
+  await t.context.app.webContents.executeJavaScript(`
+    const styleEl = document.createElement('style');
+    styleEl.textContent =
+      'img[src$=".gif"] { opacity: 0 }';
+    document.head.appendChild(styleEl);
+  `);
+}
