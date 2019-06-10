@@ -445,6 +445,21 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   if (formInputs.length === 0) return;
 
   obsSource.update(settings);
+
+  // validate list-inputs and update properties again if some of list inputs are invalid
+  const updatedFormData = getPropertiesFormData(obsSource);
+  let needUpdatePropsAgain = false;
+  updatedFormData.forEach(prop => {
+    if (prop.type !== 'OBS_PROPERTY_LIST') return;
+    const listProp = prop as IObsListInput<TObsValue>;
+    if (!listProp.options.length) return;
+    const optionExists = !!listProp.options.find(option => option.value === listProp.value);
+    if (optionExists) return;
+
+    needUpdatePropsAgain = true;
+    listProp.value = listProp.options[0].value;
+  });
+  if (needUpdatePropsAgain) setPropertiesFormData(obsSource, updatedFormData);
 }
 
 export abstract class ObsInput<TValueType> extends Vue {
