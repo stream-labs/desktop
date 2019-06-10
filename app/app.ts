@@ -172,6 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (Utils.isDevMode()) {
   window.addEventListener('error', () => ipcRenderer.send('showErrorAlert'));
+  window.addEventListener('keyup', ev => {
+    if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
+  });
 }
 
 // ERRORS LOGGING
