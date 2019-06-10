@@ -228,7 +228,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setEnabled(shouldEnable: boolean = true) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn()) {
+      return Promise.reject($t('Please log in to use the in-game overlay.'));
+    }
 
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
