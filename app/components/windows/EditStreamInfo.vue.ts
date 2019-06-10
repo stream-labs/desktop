@@ -120,7 +120,7 @@ export default class EditStreamInfo extends Vue {
           return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
         })
         .then(() => this.populateModels());
-    } else {
+    } else if (this.streamInfoService.state.channelInfo) {
       await this.populateModels();
     }
     this.populatingModels = false;

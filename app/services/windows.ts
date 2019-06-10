@@ -121,6 +121,7 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
+  alwaysOnTop?: boolean;
   height?: number;
   width?: number;
   webPreferences?: { offscreen: boolean };

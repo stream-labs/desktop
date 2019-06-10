@@ -127,6 +127,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
+      alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
       title: $t('Recent Events'),
     });
@@ -137,6 +138,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
+      alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
       title: $t('Chat'),
     });

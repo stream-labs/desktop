@@ -3,6 +3,8 @@ import { getClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
 import { logIn, logOut } from '../../helpers/spectron/user';
+import { sleep } from '../../helpers/sleep';
+
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
@@ -87,6 +89,7 @@ test('Settings Notifications', async t => {
 test('Settings Appearance', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  await sleep(1000);
   settingsService.showSettings('Appearance');
   await focusChild(t);
   t.pass();

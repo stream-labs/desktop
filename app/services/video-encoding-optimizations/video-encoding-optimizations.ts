@@ -93,6 +93,8 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       );
     });
 
+    if (!filteredProfiles.length) return null;
+
     // find profiles with the closest resolution to current resolution in current settings
     const resInPx = resToPx(settings.outputResolution);
     const profile = filteredProfiles.sort((profileA, profileZ) => {
@@ -116,7 +118,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
     if (game === this.state.lastLoadedGame) {
       profiles = this.state.lastLoadedProfiles;
-    } else {
+    } else if (game) {
       // try to fetch a game-specific profile
 
       try {
