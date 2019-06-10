@@ -128,8 +128,7 @@
     <v-form-group v-model="minRecentEvents" :metadata="metadata.minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
       <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
-      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variationFrequency" v-if="selectedVariation.condition === 'RANDOM'" />
-      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.conditionData" v-if="selectedVariation.condition !== 'RANDOM'" />
+      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variations" />
     </div>
   </validated-form>
 </widget-editor>
