@@ -1,9 +1,7 @@
 import { useSpectron, test, focusChild, TExecutionContext, closeWindow } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
-import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
-import { ScenesService } from '../../../app/services/scenes';
 import { logIn, logOut } from '../../helpers/spectron/user';
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -66,7 +64,6 @@ test('Settings Game Overlay', async (t: TExecutionContext) => {
   await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
   await makeScreenshots(t, 'Online');
   await logOut(t);
-  await closeWindow(t);
 
   t.pass();
 });
