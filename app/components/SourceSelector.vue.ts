@@ -229,8 +229,7 @@ export default class SourceSelector extends Vue {
 
     await this.$nextTick();
 
-    const domNode = document.querySelector(`[data-node-id="${this.lastSelectedId}"]`);
-    domNode.scrollIntoView();
+    this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
   }
 
   get activeItemIds() {
