@@ -85,7 +85,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       .subscribe({ complete: () => this.createWindowOverlays() });
 
     this.assignCommonWindowOptions();
-    this.createBrowserWindows();
+    this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
+    this.windows.chat = new BrowserWindow({ ...this.commonWindowOptions, height: 600 });
     this.createPreviewWindows();
     await this.configureWindows();
   }
@@ -105,18 +106,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       resizable: false,
       webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
     };
-  }
-
-  createBrowserWindows() {
-    this.windows.recentEvents = new BrowserWindow({
-      ...this.commonWindowOptions,
-      width: 600,
-    });
-
-    this.windows.chat = new BrowserWindow({
-      ...this.commonWindowOptions,
-      height: 600,
-    });
   }
 
   createPreviewWindows() {
@@ -224,10 +213,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.state.isShowing ? this.hideOverlay() : this.showOverlay();
   }
 
-  isEnabled() {
-    return this.state.isEnabled;
-  }
-
   get enabledWindows() {
     return Object.keys(this.windows).filter(
       (win: string) => this.state.windowProperties[win].enabled,
@@ -289,10 +274,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
   }
 
-  setPreviewEnabled(shouldEnable: boolean = true) {
-    this.SET_PREVIEW_ENABLED(shouldEnable);
-  }
-
   async destroy() {
     if (!this.lifecycle) return;
     await this.lifecycle.destroy();
@@ -348,11 +329,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const display = this.windowsService.getMainWindowDisplay();
 
     return [display.workArea.height / 2 + 200, display.workArea.height / 2 - 300];
-  }
-
-  @mutation()
-  private SET_PREVIEW_ENABLED(isEnabled: boolean) {
-    this.state.isPreviewEnabled = isEnabled;
   }
 
   @mutation()
