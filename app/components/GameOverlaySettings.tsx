@@ -19,7 +19,18 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
 
   async setEnableGameOverlay(val: boolean) {
     this.enabling = true;
-    await this.gameOverlayService.setEnabled(val);
+    try {
+      await this.gameOverlayService.setEnabled(val);
+    } catch (e) {
+      if (typeof e === 'string') {
+        this.$toasted.show(e, {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 3000,
+          singleton: true,
+        });
+      }
+    }
     this.enabling = false;
   }
 
