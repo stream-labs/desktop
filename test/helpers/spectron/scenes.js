@@ -30,6 +30,12 @@ export async function rightClickScene(t, name) {
   await t.context.app.client.rightClick(`div=${name}`);
 }
 
+export async function duplicateScene(t, sourceName, targetName) {
+  await openDuplicateWindow(t, sourceName);
+  await t.context.app.client.setValue('input', targetName);
+  await t.context.app.client.click('button=Done');
+}
+
 export async function addScene(t, name) {
   const app = t.context.app;
 
