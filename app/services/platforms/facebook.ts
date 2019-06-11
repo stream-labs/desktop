@@ -231,7 +231,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(json => json.live_views);
+      .then(json => json.live_views)
+      .catch(() => 0);
   }
 
   fbGoLive() {
