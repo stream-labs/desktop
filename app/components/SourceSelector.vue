@@ -39,7 +39,7 @@
       :maxScrollSpeed="15">
 
       <template slot="title" slot-scope="{ node }">
-        <span class="layer-icon">
+        <span class="layer-icon" :data-node-id="node.data.id">
           <i :class="determineIcon(node.isLeaf, node.data.sourceId)"></i>
         </span>
         <span class="item-title">{{ node.title }}</span>

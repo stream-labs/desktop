@@ -222,10 +222,15 @@ export default class SourceSelector extends Vue {
   }
 
   @Watch('lastSelectedId')
-  expandSelectedFolders() {
+  async expandSelectedFolders() {
     const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
-    if (!node) return;
-    this.expandedFoldersIds = node.getPath().slice(0, -1);
+    if (!node || this.selectionService.state.selectedIds.length > 1) return;
+    this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+
+    await this.$nextTick();
+
+    const domNode = document.querySelector(`[data-node-id="${this.lastSelectedId}"]`);
+    domNode.scrollIntoView();
   }
 
   get activeItemIds() {
