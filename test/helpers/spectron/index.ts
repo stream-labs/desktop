@@ -6,6 +6,7 @@ import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
+import { WindowsService } from 'services/windows';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
