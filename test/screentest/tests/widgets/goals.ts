@@ -1,4 +1,4 @@
-import { TExecutionContext, test, useSpectron } from '../../../helpers/spectron/index';
+import { TExecutionContext, test, useSpectron, closeWindow } from '../../../helpers/spectron/index';
 import { logIn, logOut } from '../../../helpers/spectron/user';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
@@ -44,7 +44,7 @@ function testGoal(goalType: string) {
     t.true(await client.isExisting('span=My Goal'));
 
     await makeScreenshots(t, 'Created Goal');
-
+    await closeWindow(t);
     await logOut(t);
   });
 
@@ -75,6 +75,7 @@ function testGoal(goalType: string) {
     await makeScreenshots(t, 'Settings');
 
     console.log('done ');
+    await closeWindow(t);
     await logOut(t);
     t.pass();
   });
