@@ -14,7 +14,9 @@ testGoal('Bit Goal');
 
 function testGoal(goalType: string) {
   test(`${goalType} create and delete`, async (t: TExecutionContext) => {
+    console.log('login');
     await logIn(t);
+    console.log('logged in');
     const client = t.context.app.client;
     await addSource(t, goalType, goalType, false);
 
@@ -45,11 +47,15 @@ function testGoal(goalType: string) {
 
     await makeScreenshots(t, 'Created Goal');
     await closeWindow(t);
+    console.log('log out');
     await logOut(t);
+    console.log('logged out');
   });
 
   test(`${goalType} settings`, async t => {
+    console.log('log in');
     await logIn(t);
+    console.log('logged in');
     const client = t.context.app.client;
 
     console.log('add source');
@@ -76,7 +82,9 @@ function testGoal(goalType: string) {
 
     console.log('done ');
     await closeWindow(t);
+    console.log('log out');
     await logOut(t);
+    console.log('logged out');
     t.pass();
   });
 }

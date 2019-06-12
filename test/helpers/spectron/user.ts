@@ -39,7 +39,7 @@ export async function logIn(
   const app = t.context.app;
   let authInfo: IPlatformAuth;
 
-  if (email) throw 'User already logged in';
+  if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
     authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
