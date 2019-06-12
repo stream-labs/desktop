@@ -227,11 +227,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchViewerCount(): Promise<number> {
+    if (this.state.liveVideoId == null) return Promise.resolve(0);
+
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(json => json.live_views);
+      .then(json => json.live_views)
+      .catch(() => 0);
   }
 
   fbGoLive() {
