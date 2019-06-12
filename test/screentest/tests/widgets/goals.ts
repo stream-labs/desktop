@@ -4,6 +4,7 @@ import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
 import { addSource } from '../../../helpers/spectron/sources';
 import { waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
+import { sleep } from '../../../helpers/sleep';
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
@@ -36,7 +37,7 @@ function testGoal(goalType: string) {
       title: 'My Goal',
       goal_amount: 100,
       manual_goal_amount: 0,
-      ends_at: '12/12/2030',
+      ends_at: '12/12/2030'
     });
 
     await makeScreenshots(t, 'Filled Form');
@@ -49,12 +50,16 @@ function testGoal(goalType: string) {
     await closeWindow(t);
     console.log('log out');
     await logOut(t);
+    console.log('wait');
+    await sleep(5000);
     console.log('logged out');
   });
 
   test(`${goalType} settings`, async t => {
     console.log('log in');
     await logIn(t);
+    console.log('wait');
+    await sleep(5000);
     console.log('logged in');
     const client = t.context.app.client;
 
@@ -73,7 +78,7 @@ function testGoal(goalType: string) {
       bar_bg_color: '#FF0000',
       text_color: '#FF0000',
       bar_text_color: '#FF0000',
-      font: 'Roboto',
+      font: 'Roboto'
     };
     await formMonkey.fill(testSet);
 
