@@ -10,7 +10,13 @@ import electron from 'electron';
 import { HostsService } from './hosts';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService, EPlatformCallResult } from './platforms';
+import {
+  getPlatformService,
+  IPlatformAuth,
+  TPlatform,
+  IPlatformService,
+  EPlatformCallResult,
+} from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
