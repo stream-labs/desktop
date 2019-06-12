@@ -37,6 +37,7 @@ const alertNameMap = () => ({
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
   facemasks: $t('Facemask Donations'),
+  loyaltystore: $t('Cloudbot Redemption'),
 });
 
 const triggerAmountMap = {
@@ -104,7 +105,11 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   facemaskEnabled = this.facemasksService.getEnabledStatus();
 
   get metadata() {
-    return this.service.getMetadata(this.selectedAlert, this.languages);
+    return this.service.getMetadata(
+      this.selectedAlert,
+      this.languages,
+      this.selectedVariation.condition,
+    );
   }
 
   get selectedVariation() {
@@ -143,6 +148,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   get conditions() {
     return this.alertBoxService.conditionsByType(this.selectedAlert);
+  }
+
+  get conditionData() {
+    return this.alertBoxService.conditionDataByCondition(this.selectedVariation);
   }
 
   get minTriggerAmount() {

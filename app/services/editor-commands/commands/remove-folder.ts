@@ -8,6 +8,7 @@ export class RemoveFolderCommand extends Command {
 
   private name: string;
   private childrenIds: string[];
+  private parentId: string;
 
   constructor(private sceneId: string, private folderId: string) {
     super();
@@ -21,12 +22,14 @@ export class RemoveFolderCommand extends Command {
     const folder = this.scenesService.getScene(this.sceneId).getFolder(this.folderId);
     this.name = folder.name;
     this.childrenIds = folder.childrenIds;
+    this.parentId = folder.parentId;
     folder.ungroup();
   }
 
   rollback() {
     const scene = this.scenesService.getScene(this.sceneId);
-    scene.createFolder(this.name, { id: this.folderId });
+    const folder = scene.createFolder(this.name, { id: this.folderId });
     scene.getSelection(this.childrenIds).setParent(this.folderId);
+    if (this.parentId) folder.setParent(this.parentId);
   }
 }

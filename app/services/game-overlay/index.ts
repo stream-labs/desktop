@@ -127,6 +127,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
+      alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
       title: $t('Recent Events'),
     });
@@ -137,6 +138,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       transparent: true,
       webPreferences: { offscreen: false },
       isFullScreen: true,
+      alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
       title: $t('Chat'),
     });
@@ -228,6 +230,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setEnabled(shouldEnable: boolean = true) {
+    if (!this.userService.isLoggedIn()) {
+      return Promise.reject($t('Please log in to use the in-game overlay.'));
+    }
+
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
