@@ -343,7 +343,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       ]);
 
       return {
-        platform: this.platform.type,
+        platform: this.platform ? this.platform.type : 'not logged in',
         cpuModel: nodeCpus()[0].model,
         cpuCores: `physical:${cpu.physicalCores} logical:${cpu.cores}`,
         gpus: graphics.controllers,
@@ -355,7 +355,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       };
     } catch (err) {
       return {
-        platform: this.platform.type,
+        platform: this.platform ? this.platform.type : 'not logged in',
         cpuModel: nodeCpus()[0].model,
         cpuCores: `logical:${nodeCpus().length}`,
         os: nodeOsRelease(),
