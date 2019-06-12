@@ -23,6 +23,7 @@ interface ITestUser {
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
+  await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
 }
 
