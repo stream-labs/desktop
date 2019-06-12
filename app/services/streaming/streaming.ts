@@ -224,13 +224,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private calculateOptimizeWindowSize(settings: OptimizedSettings): number {
     const windowHeader = 6 + 20 + 1;
     const descriptionLabel = 22.4 + 12;
+    const useHardwareCheck = 28 + 12;
     const doNotShowCheck = 28 + 12;
     const contentOverhead = 16;
     const modalControls = 8 + 36 + 8;
     const categoryOverhead = 22.4 + 4 + 8 + 8 + 12;
     const lineHeight = 20.8;
 
-    const overhead = windowHeader + descriptionLabel + doNotShowCheck + contentOverhead + modalControls;
+    const overhead = windowHeader + descriptionLabel + useHardwareCheck + doNotShowCheck
+      + contentOverhead + modalControls;
 
     const numCategories = settings.info.length;
     const numLines = settings.info.reduce((sum, tuple) => sum + tuple[1].length, 0);
