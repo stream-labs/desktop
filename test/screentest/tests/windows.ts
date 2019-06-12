@@ -4,6 +4,7 @@ import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
 import { ScenesService } from '../../../app/services/scenes';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
@@ -93,6 +94,7 @@ test('Settings Notifications', async t => {
 test('Settings Appearance', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  await sleep(1000);
   settingsService.showSettings('Appearance');
   await focusChild(t);
   t.pass();
