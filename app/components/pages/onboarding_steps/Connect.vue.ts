@@ -39,10 +39,10 @@ export default class Connect extends Vue {
                   'factor authentication and try again.',
               ),
               title: $t('Twitch Authentication Error'),
-              buttons: [$t('Dismiss'), $t('Enable Two Factor Authentication')],
+              buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
             },
             buttonIndex => {
-              if (buttonIndex === 1) {
+              if (buttonIndex === 0) {
                 electron.remote.shell.openExternal('https://twitch.tv/settings/security');
               }
             },
