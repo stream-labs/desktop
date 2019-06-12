@@ -66,8 +66,7 @@ Set-ItemProperty $RegPath "AutoAdminLogon" -Value "1" -type String
 Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
 Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
 
-# -once argument gracefuly stops Agent after first job
 echo "Add agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value "$agentPath --once";
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value $agentPath;
 
 echo "Installation completed. Restart PC to take effect"
