@@ -145,7 +145,7 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
     customHtmlEnabled: false,
     customJs: '',
     customJson: '',
-    duration: 2,
+    duration: 8,
     hideAnimation: 'fadeOut',
     image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
     layout: 'above',
