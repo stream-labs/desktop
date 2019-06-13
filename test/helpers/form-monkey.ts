@@ -34,7 +34,7 @@ export class FormMonkey {
     const formSelector = this.formSelector;
 
     if (formSelector !== DEFAULT_SELECTOR) {
-      await this.client.waitForExist(formSelector, 10000);
+      await this.client.waitForExist(formSelector, 15000);
     }
 
     const result = [];
