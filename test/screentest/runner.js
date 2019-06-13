@@ -58,7 +58,7 @@ function checkoutBranch(branchName) {
   exec(`git checkout ${checkoutTarget}`);
   if (branchName !== CONFIG.baseBranch) {
     // the base branch may have changes, so merge it
-    exec(`git merge ${CONFIG.baseBranch}`);
+    exec(`git merge origin/${CONFIG.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
