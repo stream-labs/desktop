@@ -67,6 +67,27 @@ interface IPlatformCapabilityScopeValidation {
   hasScope: (scope: TOAuthScope) => Promise<boolean>;
 }
 
+/**
+ * Returned from certain platform methods where particular errors
+ * may require special handling.
+ */
+export enum EPlatformCallResult {
+  /**
+   * The call succeeded
+   */
+  Success,
+
+  /**
+   * A generic error occurred
+   */
+  Error,
+
+  /**
+   * The user does not have 2FA enabled on their Twitch account
+   */
+  TwitchTwoFactor,
+}
+
 // All platform services should implement this interface.
 export interface IPlatformService {
   capabilities: Set<TPlatformCapability>;
@@ -80,8 +101,8 @@ export interface IPlatformService {
   authUrl: string;
 
   // This function is responsible for setting up stream
-  // settings for this platform, given an auth.
-  setupStreamSettings: (auth: IPlatformAuth) => void;
+  // settings for this platform.
+  setupStreamSettings: () => Promise<EPlatformCallResult>;
 
   fetchViewerCount: () => Promise<number>;
 

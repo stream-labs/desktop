@@ -10,7 +10,13 @@ import electron from 'electron';
 import { HostsService } from './hosts';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
+import {
+  getPlatformService,
+  IPlatformAuth,
+  TPlatform,
+  IPlatformService,
+  EPlatformCallResult,
+} from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -291,10 +297,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
+
+    const result = await service.setupStreamSettings();
+
+    // Currently we treat generic errors as success
+    if (result === EPlatformCallResult.TwitchTwoFactor) {
+      this.LOGOUT();
+      return result;
+    }
+
     this.setSentryContext();
-    service.setupStreamSettings(auth);
+
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
+
+    return result;
   }
 
   @RunInLoadingMode()
@@ -350,9 +367,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   startAuth(
     platform: TPlatform,
-    onWindowShow: (...args: any[]) => any,
-    onAuthStart: (...args: any[]) => any,
-    onAuthFinish: (...args: any[]) => any,
+    onWindowShow: () => void,
+    onAuthStart: () => void,
+    onAuthFinish: (result: EPlatformCallResult) => void,
   ) {
     const service = getPlatformService(platform);
     const partition = `persist:${uuid()}`;
@@ -376,8 +393,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
-        await this.login(service, parsed);
-        defer(onAuthFinish);
+        const result = await this.login(service, parsed);
+        defer(() => onAuthFinish(result));
       }
     });
 

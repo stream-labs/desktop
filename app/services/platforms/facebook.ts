@@ -5,6 +5,7 @@ import {
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
+  EPlatformCallResult,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -108,7 +109,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   setupStreamSettings() {
-    this.fetchStreamKey().then(key => this.setSettingsWithKey(key));
+    return this.fetchStreamKey()
+      .then(key => {
+        this.setSettingsWithKey(key);
+        return EPlatformCallResult.Success;
+      })
+      .catch(() => EPlatformCallResult.Error);
   }
 
   fetchNewToken(): Promise<void> {
