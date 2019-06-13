@@ -54,8 +54,12 @@ function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
-  exec(`git checkout ${checkoutTarget}`);
   rimraf.sync(CONFIG.compiledTestsDist);
+  exec(`git checkout ${checkoutTarget}`);
+  if (branchName !== CONFIG.baseBranch) {
+    // the base branch may have changes, so merge it
+    exec(`git merge ${CONFIG.baseBranch}`);
+  }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
   // save current branch name to the file
