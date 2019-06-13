@@ -55,10 +55,11 @@ function checkoutBranch(branchName) {
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
   rimraf.sync(CONFIG.compiledTestsDist);
+  exec(`git reset --hard`);
   exec(`git checkout ${checkoutTarget}`);
   if (branchName !== CONFIG.baseBranch) {
     // the base branch may have changes, so merge it
-    exec(`git merge origin/${CONFIG.baseBranch}`);
+    exec(`git pull origin ${CONFIG.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
