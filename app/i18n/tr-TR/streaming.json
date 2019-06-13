@@ -73,5 +73,9 @@
   "Scheduled Time": "Planlanan Saat",
   "You are 10 minutes away from the 8 hour stream limit": "8 saatlik yayın limitinden 10 dakika uzaktasınız",
   "Stream has disconnected, attempting to reconnect.": "Yayının bağlantısı kesildi, yeniden bağlanmaya çalışılıyor.",
-  "Start typing to search": "Start typing to search"
+  "Start typing to search": "Start typing to search",
+  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.",
+  "Twitch Authentication Error": "Twitch Authentication Error",
+  "Enable Two Factor Authentication": "Enable Two Factor Authentication",
+  "Dismiss": "İptal"
 }
