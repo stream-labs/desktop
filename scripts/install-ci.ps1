@@ -54,7 +54,7 @@ echo "Configure Azure Agent"
 $publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
 .\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
 
-# Disable the lock screen to prevent the PC locking after end of the RDP session
+# Disable the lock screen to prevent the PC locking after the end of the RDP session
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name 'NoLockScreen' -Value 1;
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
@@ -76,8 +76,7 @@ Set-Item -Force wsman:\localhost\client\trustedhosts *
 New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow
 Restart-Service WinRM
 
-# -once argument gracefuly stops Agent after first job
 echo "Add agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value "$agentPath --once";
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value $agentPath;
 
 echo "Installation completed. Restart PC to take effect"

@@ -19,7 +19,18 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
 
   async setEnableGameOverlay(val: boolean) {
     this.enabling = true;
-    await this.gameOverlayService.setEnabled(val);
+    try {
+      await this.gameOverlayService.setEnabled(val);
+    } catch (e) {
+      if (typeof e === 'string') {
+        this.$toasted.show(e, {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 3000,
+          singleton: true,
+        });
+      }
+    }
     this.enabling = false;
   }
 
@@ -48,6 +59,22 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
       interval: 0.1,
       usePercentages: true,
     });
+  }
+
+  windowEnableToggles(h: Function) {
+    const windows = Object.keys(this.gameOverlayService.state.windowProperties);
+    const titles = { chat: $t('Show Chat'), recentEvents: $t('Show Recent Events') };
+    return (
+      <div>
+        {windows.map(win => (
+          <VFormGroup
+            metadata={metadata.toggle({ title: titles[win] })}
+            value={this.gameOverlayService.state.windowProperties[win].enabled}
+            onInput={() => this.gameOverlayService.toggleWindowEnabled(win)}
+          />
+        ))}
+      </div>
+    );
   }
 
   extraOptions(h: Function) {
@@ -85,6 +112,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 onInput={this.setEnableGameOverlay}
                 metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
               />
+              {this.enableGameOverlay && this.windowEnableToggles(h)}
               {this.enableGameOverlay && this.extraOptions(h)}
               <div style="margin-bottom: 16px;">
                 {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}

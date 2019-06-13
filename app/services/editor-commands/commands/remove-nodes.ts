@@ -9,6 +9,7 @@ export class RemoveNodesCommand extends Command {
   private removeItemSubCommands: RemoveItemCommand[];
 
   private selectionName: string;
+  private nodeOrder: string[];
 
   constructor(private selection: Selection) {
     super();
@@ -22,6 +23,8 @@ export class RemoveNodesCommand extends Command {
   async execute() {
     this.removeFolderSubCommands = [];
     this.removeItemSubCommands = [];
+
+    this.nodeOrder = this.selection.getScene().getNodesIds();
 
     this.selection.getFolders().forEach(folder => {
       const subCommand = new RemoveFolderCommand(this.selection.sceneId, folder.id);
@@ -37,10 +40,12 @@ export class RemoveNodesCommand extends Command {
   }
 
   async rollback() {
-    for (const itemCommand of this.removeItemSubCommands.reverse()) {
+    for (const itemCommand of [...this.removeItemSubCommands].reverse()) {
       await itemCommand.rollback();
     }
 
-    this.removeFolderSubCommands.forEach(cmd => cmd.rollback());
+    [...this.removeFolderSubCommands].reverse().forEach(cmd => cmd.rollback());
+
+    this.selection.getScene().setNodesOrder(this.nodeOrder);
   }
 }

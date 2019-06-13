@@ -62,6 +62,8 @@ export class SceneBuilder {
   }
 
   parse(sketch: string): ISceneBuilderNode[] {
+    if (sketch === '') return [];
+
     let strings = sketch.split('\n');
     let offset = -1;
 
