@@ -44,8 +44,8 @@ test('Stream Boss Manage Battle settings', async t => {
     sub_multiplier: 3,
     donation_multiplier: 4,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
+  await formMonkey.fill(testSet1);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -57,8 +57,8 @@ test('Stream Boss Manage Battle settings', async t => {
     sub_multiplier: 300,
     donation_multiplier: 200,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
+  await formMonkey.fill(testSet2);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet2));
 });
 

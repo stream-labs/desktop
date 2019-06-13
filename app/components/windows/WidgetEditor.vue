@@ -10,6 +10,7 @@
 
     <div class="window-container">
       <div class="editor-tabs" :class="{ pushed: isAlertBox }">
+        <i v-if="isSaving" class="fa fa-spinner fa-pulse saving-indicator" />
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
@@ -168,6 +169,10 @@
 
     overflow: hidden;
     height: calc(~"100% - 66px");
+  }
+
+  .saving-indicator {
+    .absolute(15px, 15px);
   }
 
   .top-settings {

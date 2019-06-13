@@ -27,8 +27,8 @@ test('Chatbox Visual Settings', async t => {
     background_color: '#FFFFFF',
     message_hide_delay: 10,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
+  await formMonkey.fill(testSet1);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
@@ -44,8 +44,8 @@ test('Chatbox Visual Settings', async t => {
     background_color: '#000000',
     message_hide_delay: 60,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
+  await formMonkey.fill(testSet2);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet2));
 });
 
@@ -61,15 +61,15 @@ test('Chatbox Font Settings', async t => {
     text_color: '#FF0000',
     text_size: 20,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
+  await formMonkey.fill(testSet1);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet1));
 
   const testSet2 = {
     text_color: '#F8E71C',
     text_size: 15,
   };
-
-  await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
+  await formMonkey.fill(testSet2);
+  await waitForWidgetSettingsSync(t);
   t.true(await formMonkey.includes(testSet2));
 });
