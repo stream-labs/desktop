@@ -21,6 +21,7 @@
     "package": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.electronDownload.mirror=https://github.com/stream-labs/electron/releases/download/  ",
     "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
     "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
+    "package:nosign": "yarn package -- --config.win.certificateSubjectName \"\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "rollout": "yarn install --cwd bin && node bin/set-rollout.js",
     "lint": "tslint --project tsconfig.json {app,guest-api,obs-api,updater}/**/*.ts",
