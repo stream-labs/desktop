@@ -1,5 +1,10 @@
 <template>
-  <div class="tags-container">
+  <div
+    class="tags-container"
+    data-role="input"
+    data-type="twitchTags"
+    :data-name="name"
+  >
     <label class="input-label">{{ tagsLabel }}</label>
     <v-selectpage
       v-if="hasPermission"
