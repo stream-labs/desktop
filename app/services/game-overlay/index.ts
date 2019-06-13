@@ -27,6 +27,11 @@ export type GameOverlayState = {
   windowProperties: IWindowProperties;
 };
 
+const hideInteraction = `
+  const el = document.querySelector('.chat-input');
+  if (el) { el.style['display'] = 'none' };
+`;
+
 @InitAfter('UserService')
 @InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
@@ -149,6 +154,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         this.customizationService.isDarkTheme ? 'night' : 'day',
       ),
     );
+
+    for (const view of Object.values(this.windows)) {
+      view.webContents.once('dom-ready', async () => {
+        await view.webContents.executeJavaScript(hideInteraction);
+      });
+    }
   }
 
   determineStartPosition(window: string) {
