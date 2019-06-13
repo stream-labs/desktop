@@ -104,7 +104,28 @@ export function getComponents() {
   };
 }
 
-export interface IWindowOptions {
+export interface IElectronWindowOptions {
+  alwaysOnTop?: boolean;
+  height?: number;
+  width?: number;
+  skipTaskbar?: boolean;
+  x?: number;
+  y?: number;
+  backgroundColor?: string;
+  show?: boolean;
+  frame?: boolean;
+  thickFrame?: boolean;
+  resizable?: boolean;
+  webPreferences?: {
+    offscreen?: boolean;
+    nodeIntegration?: boolean;
+    contextIsolation?: boolean;
+    partition?: string;
+  };
+  transparent?: boolean;
+}
+
+export interface IWindowOptions extends IElectronWindowOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {
@@ -121,11 +142,6 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
-  alwaysOnTop?: boolean;
-  height?: number;
-  width?: number;
-  webPreferences?: { offscreen: boolean };
-  transparent?: boolean;
 
   // Will be true when the UI is performing animations, transitions, or property changes that affect
   // the display of elements we cannot draw over. During this time such elements, for example

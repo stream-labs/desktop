@@ -6,7 +6,7 @@ import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { getPlatformService } from '../platforms';
-import { WindowsService } from '../windows';
+import { WindowsService, IElectronWindowOptions } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
@@ -62,7 +62,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   onWindowsReadySubscription: Subscription;
   lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {};
+  commonWindowOptions = {} as IElectronWindowOptions;
 
   async initialize() {
     if (!this.state.isEnabled) return;
@@ -85,8 +85,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       .subscribe({ complete: () => this.createWindowOverlays() });
 
     this.assignCommonWindowOptions();
+    const partition = this.userService.state.auth.partition;
+    const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
     this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
-    this.windows.chat = new BrowserWindow({ ...this.commonWindowOptions, height: 600 });
+    this.windows.chat = new BrowserWindow({
+      ...this.commonWindowOptions,
+      height: 600,
+      webPreferences: chatWebPrefences,
+    });
     this.createPreviewWindows();
     await this.configureWindows();
   }
