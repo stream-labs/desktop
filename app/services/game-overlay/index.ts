@@ -29,7 +29,9 @@ export type GameOverlayState = {
 
 const hideInteraction = `
   const el = document.querySelector('.chat-input');
-  if (el) { el.style['display'] = 'none' };
+  const eventEl = document.querySelector('.recent-events__header');
+  if (el) { el.style.cssText = 'display: none !important'; }
+  if (eventEl) { eventEl.style.cssText = 'display: none !important'; }
 `;
 
 @InitAfter('UserService')
