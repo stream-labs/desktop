@@ -104,28 +104,7 @@ export function getComponents() {
   };
 }
 
-export interface IElectronWindowOptions {
-  alwaysOnTop?: boolean;
-  height?: number;
-  width?: number;
-  skipTaskbar?: boolean;
-  x?: number;
-  y?: number;
-  backgroundColor?: string;
-  show?: boolean;
-  frame?: boolean;
-  thickFrame?: boolean;
-  resizable?: boolean;
-  webPreferences?: {
-    offscreen?: boolean;
-    nodeIntegration?: boolean;
-    contextIsolation?: boolean;
-    partition?: string;
-  };
-  transparent?: boolean;
-}
-
-export interface IWindowOptions extends IElectronWindowOptions {
+export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {

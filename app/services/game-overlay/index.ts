@@ -6,7 +6,7 @@ import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { getPlatformService } from '../platforms';
-import { WindowsService, IElectronWindowOptions } from '../windows';
+import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
@@ -62,7 +62,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   onWindowsReadySubscription: Subscription;
   lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {} as IElectronWindowOptions;
+  commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
   async initialize() {
     if (!this.state.isEnabled) return;
