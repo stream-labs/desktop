@@ -23,6 +23,7 @@ interface ITestUser {
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
+  await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
 }
 
@@ -39,7 +40,7 @@ export async function logIn(
   const app = t.context.app;
   let authInfo: IPlatformAuth;
 
-  if (email) throw 'User already logged in';
+  if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
     authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);

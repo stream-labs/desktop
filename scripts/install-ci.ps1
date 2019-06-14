@@ -54,7 +54,7 @@ echo "Configure Azure Agent"
 $publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
 .\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
 
-# Disable the lock screen to prevent the PC locking after end of the RDP session
+# Disable the lock screen to prevent the PC locking after the end of the RDP session
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name 'NoLockScreen' -Value 1;
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
@@ -65,6 +65,16 @@ $RegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
 Set-ItemProperty $RegPath "AutoAdminLogon" -Value "1" -type String
 Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
 Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
+
+# Setup WinRM for remote connections
+# Trusted hosts and ports must be confgured on the level above
+# Use the example below to run scripts on several agents:
+#   $LiveCred = Get-Credential
+#   Invoke-Command -Computer Agent1, Agent2, Agent3 -Credential $LiveCred -ScriptBlock {Get-Process}
+Enable-PSRemoting -Force
+Set-Item -Force wsman:\localhost\client\trustedhosts *
+New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow
+Restart-Service WinRM
 
 echo "Add agent to startup"
 Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value $agentPath;

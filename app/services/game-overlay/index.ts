@@ -80,7 +80,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   onWindowsReadySubscription: Subscription;
   lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {};
+  commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
   async initialize() {
     if (!this.state.isEnabled) return;
@@ -104,8 +104,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       .subscribe({ complete: () => this.createWindowOverlays() });
 
     this.assignCommonWindowOptions();
+    const partition = this.userService.state.auth.partition;
+    const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
     this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
-    this.windows.chat = new BrowserWindow({ ...this.commonWindowOptions, height: 600 });
+    this.windows.chat = new BrowserWindow({
+      ...this.commonWindowOptions,
+      height: 600,
+      webPreferences: chatWebPrefences,
+    });
     this.createPreviewWindows();
     await this.configureWindows();
   }
