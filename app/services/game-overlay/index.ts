@@ -33,8 +33,6 @@ const hideInteraction = `
   /* Platform Chats */
   elements.push(document.querySelector('.chat-input'));
   elements.push(document.querySelector('.webComposerBlock__3lT5b'));
-  elements.push(document.querySelector('.yt-live-chat-renderer'));
-  elements.push(document.querySelector('.UFIAddComment'));
 
   /* Recent Events */
   elements.push(document.querySelector('.recent-events__header'));
@@ -93,7 +91,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async initializeOverlay() {
-    console.log(this.userService.recentEventsUrl());
     overlay.start();
 
     this.onWindowsReadySubscription = this.onWindowsReady
@@ -220,9 +217,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.TOGGLE_OVERLAY(true);
 
     // Force a refresh to trigger a paint event
-    Object.values(this.windows).forEach(win => {
-      win.webContents.invalidate();
-    });
+    Object.values(this.windows).forEach(win => win.webContents.invalidate());
   }
 
   hideOverlay() {
