@@ -104,7 +104,7 @@ export function getComponents() {
   };
 }
 
-export interface IWindowOptions {
+export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {
@@ -121,11 +121,6 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
-  alwaysOnTop?: boolean;
-  height?: number;
-  width?: number;
-  webPreferences?: { offscreen: boolean };
-  transparent?: boolean;
 
   // Will be true when the UI is performing animations, transitions, or property changes that affect
   // the display of elements we cannot draw over. During this time such elements, for example
