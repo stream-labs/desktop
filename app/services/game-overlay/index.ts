@@ -28,10 +28,21 @@ export type GameOverlayState = {
 };
 
 const hideInteraction = `
-  const el = document.querySelector('.chat-input');
-  const eventEl = document.querySelector('.recent-events__header');
-  if (el) { el.style.cssText = 'display: none !important'; }
-  if (eventEl) { eventEl.style.cssText = 'display: none !important'; }
+  const elements = [];
+
+  /* Platform Chats */
+  elements.push(document.querySelector('.chat-input'));
+  elements.push(document.querySelector('.webComposerBlock__3lT5b'));
+  elements.push(document.querySelector('.yt-live-chat-renderer'));
+  elements.push(document.querySelector('.UFIAddComment'));
+
+  /* Recent Events */
+  elements.push(document.querySelector('.recent-events__header'));
+  elements.push(document.querySelector('.recent-events__tabs'));
+  elements.push(document.querySelector('.popout--recent-events'));
+  elements.forEach((el) => {
+    if (el) { el.style.cssText = 'display: none !important'; }
+  });
 `;
 
 @InitAfter('UserService')
@@ -82,6 +93,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async initializeOverlay() {
+    console.log(this.userService.recentEventsUrl());
     overlay.start();
 
     this.onWindowsReadySubscription = this.onWindowsReady
@@ -156,12 +168,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         this.customizationService.isDarkTheme ? 'night' : 'day',
       ),
     );
-
-    for (const view of Object.values(this.windows)) {
-      view.webContents.once('dom-ready', async () => {
-        await view.webContents.executeJavaScript(hideInteraction);
-      });
-    }
   }
 
   determineStartPosition(window: string) {
@@ -208,7 +214,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.TOGGLE_OVERLAY(true);
 
     // Force a refresh to trigger a paint event
-    Object.values(this.windows).forEach(win => win.webContents.invalidate());
+    Object.values(this.windows).forEach(win => {
+      win.webContents.invalidate();
+    });
   }
 
   hideOverlay() {
@@ -326,6 +334,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       overlay.setPosition(overlayId, position.x, position.y, width, height);
       overlay.setTransparency(overlayId, this.state.opacity * 2.55);
+      win.webContents.executeJavaScript(hideInteraction);
 
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
