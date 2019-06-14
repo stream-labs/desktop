@@ -162,7 +162,10 @@ function startApp() {
     frame: false,
     title: 'Streamlabs OBS',
     backgroundColor: '#17242D',
+    webPreferences: { nodeIntegration: true }
   });
+
+  mainWindow.openDevTools({ mode: 'detach' });
 
   mainWindowState.manage(mainWindow);
 
@@ -216,6 +219,7 @@ function startApp() {
     show: false,
     frame: false,
     backgroundColor: '#17242D',
+    webPreferences: { nodeIntegration: true }
   });
 
   childWindow.setMenu(null);
@@ -314,7 +318,8 @@ app.setAsDefaultProtocolClient('slobs');
 
 
 // This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(argv => {
+app.requestSingleInstanceLock();
+app.on('second-instance', (event, argv, cwd) => {
   // Check for protocol links in the argv of the other process
   argv.forEach(arg => {
     if (arg.match(/^slobs:\/\//)) {
@@ -331,10 +336,6 @@ const shouldQuit = app.makeSingleInstance(argv => {
     mainWindow.focus();
   }
 });
-
-if (shouldQuit) {
-  app.exit();
-}
 
 app.on('ready', () => {
     if (
