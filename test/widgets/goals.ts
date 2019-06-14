@@ -45,6 +45,7 @@ function testGoal(goalType: string) {
 
     await addSource(t, goalType, goalType, false);
 
+    await client.waitForExist('li=Visual Settings');
     await client.click('li=Visual Settings');
     const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
