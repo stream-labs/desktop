@@ -1,6 +1,9 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
+import { getClient } from '../api-client';
+import { UserService } from '../../../app/services/user';
+import { first } from 'rxjs/operators';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -53,8 +56,13 @@ export async function logIn(
   }
 
   await focusMain(t);
-  await app.webContents.send('testing-fakeAuth', authInfo);
-  return true;
+
+  // send fake-auth and wait for the userLogin event
+  const userService = (await getClient()).getResource<UserService>('UserService');
+  return new Promise(r => {
+    userService.userLogin.pipe(first()).subscribe(() => r(true));
+    app.webContents.send('testing-fakeAuth', authInfo);
+  });
 }
 
 /**

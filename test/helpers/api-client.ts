@@ -39,7 +39,7 @@ export class ApiClient {
   private promises: Dictionary<Function[]> = {};
 
   // set to 'true' for debugging
-  logsEnabled = false;
+  logsEnabled = true;
 
   constructor() {
     this.socket.on('connect', () => {

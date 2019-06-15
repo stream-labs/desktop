@@ -2,21 +2,20 @@ import { TExecutionContext, test, useSpectron, closeWindow } from '../../../help
 import { logIn, logOut } from '../../../helpers/spectron/user';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
-import { addSource } from '../../../helpers/spectron/sources';
-import { sleep } from '../../../helpers/sleep';
+import { addWidget, EWidgetType } from '../../../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
 
-testGoal('Donation Goal');
-testGoal('Follower Goal');
-testGoal('Bit Goal');
+testGoal('Donation Goal', EWidgetType.DonationGoal);
+// testGoal('Follower Goal', EWidgetType.FollowerGoal);
+// testGoal('Bit Goal', EWidgetType.BitGoal);
 
-function testGoal(goalType: string) {
+function testGoal(goalType: string, widgetType: EWidgetType) {
   test(`${goalType} create and delete`, async (t: TExecutionContext) => {
     await logIn(t);
     const client = t.context.app.client;
-    await addSource(t, goalType, goalType, false);
+    await addWidget(t, widgetType, goalType);
 
     // end goal if it's already exist
     if (await client.isVisible('button=End Goal')) {
@@ -49,8 +48,7 @@ function testGoal(goalType: string) {
   test(`${goalType} settings`, async t => {
     await logIn(t);
     const client = t.context.app.client;
-
-    await addSource(t, goalType, goalType, false);
+    await addWidget(t, widgetType, goalType);
 
     await client.waitForExist('li=Visual Settings');
     await client.click('li=Visual Settings');
