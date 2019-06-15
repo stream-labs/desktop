@@ -56,8 +56,9 @@ export async function logIn(
   await focusMain(t);
 
   app.webContents.send('testing-fakeAuth', authInfo);
-  if (!waitForUI) return;
+  if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.icon-logout'); // wait for the log-out button
+  return true;
 }
 
 /**
