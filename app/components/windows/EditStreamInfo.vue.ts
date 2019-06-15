@@ -140,15 +140,16 @@ export default class EditStreamInfo extends Vue {
 
   async populateModels() {
     this.facebookPages = await this.fetchFacebookPages();
-    this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
-    this.gameModel = this.streamInfoService.state.channelInfo.game || '';
-    this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
-    this.gameOptions = [
-      {
-        title: this.streamInfoService.state.channelInfo.game,
-        value: this.streamInfoService.state.channelInfo.game,
-      },
-    ];
+    const { game, title, description } = this.streamInfoService.state.channelInfo || {
+      game: '',
+      title: '',
+      description: '',
+    };
+
+    this.streamTitleModel = title;
+    this.gameModel = game;
+    this.streamDescriptionModel = description;
+    this.gameOptions = [{ title: game, value: game }];
 
     if (this.facebookPages) {
       this.pageModel = this.facebookPages.page_id;
