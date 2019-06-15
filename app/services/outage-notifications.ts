@@ -79,6 +79,8 @@ export class OutageNotificationsService extends Service {
   }
 
   private async checkForNotification() {
+    if (!this.userService.isLoggedIn()) return;
+
     const msg = await this.fetchMessageJson();
 
     // There are no urgent messages to display to the user

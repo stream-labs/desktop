@@ -1,9 +1,6 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
-import { getClient } from '../api-client';
-import { UserService } from '../../../app/services/user';
-import { first } from 'rxjs/operators';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -39,6 +36,7 @@ export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
   email?: string, // if not set, pick a random user's account from user-pool
+  waitForUI = true,
 ): Promise<boolean> {
   const app = t.context.app;
   let authInfo: IPlatformAuth;
@@ -57,12 +55,9 @@ export async function logIn(
 
   await focusMain(t);
 
-  // send fake-auth and wait for the userLogin event
-  const userService = (await getClient()).getResource<UserService>('UserService');
-  return new Promise(r => {
-    userService.userLogin.pipe(first()).subscribe(() => r(true));
-    app.webContents.send('testing-fakeAuth', authInfo);
-  });
+  app.webContents.send('testing-fakeAuth', authInfo);
+  if (!waitForUI) return;
+  await t.context.app.client.waitForVisible('.icon-logout'); // wait for the log-out button
 }
 
 /**

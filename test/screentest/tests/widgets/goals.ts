@@ -8,8 +8,8 @@ useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
 
 testGoal('Donation Goal', EWidgetType.DonationGoal);
-// testGoal('Follower Goal', EWidgetType.FollowerGoal);
-// testGoal('Bit Goal', EWidgetType.BitGoal);
+testGoal('Follower Goal', EWidgetType.FollowerGoal);
+testGoal('Bit Goal', EWidgetType.BitGoal);
 
 function testGoal(goalType: string, widgetType: EWidgetType) {
   test(`${goalType} create and delete`, async (t: TExecutionContext) => {
@@ -62,7 +62,7 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
       bar_bg_color: '#FF0000',
       text_color: '#FF0000',
       bar_text_color: '#FF0000',
-      font: 'Roboto',
+      font: 'Roboto'
     };
     await formMonkey.fill(testSet);
 
