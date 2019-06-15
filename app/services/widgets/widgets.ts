@@ -69,9 +69,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   createWidget(type: WidgetType, name?: string): SceneItem {
-    console.log('try to create widget');
     if (!this.userService.isLoggedIn()) return;
-    console.log('user logged in');
 
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
@@ -120,8 +118,6 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         },
       },
     ) as SceneItem;
-
-    console.log('Widget item created', item);
 
     return item;
   }
