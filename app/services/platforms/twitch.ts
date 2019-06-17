@@ -142,8 +142,7 @@ export class TwitchService extends Service implements IPlatformService {
       })),
       this.getStreamTags(),
       // Fetch stream tags once per session as they're unlikely to change that often
-      this.streamInfoService.state.channelInfo &&
-      this.streamInfoService.state.channelInfo.availableTags
+      this.streamInfoService.state.channelInfo.availableTags.length
         ? Promise.resolve(this.streamInfoService.state.channelInfo.availableTags)
         : this.getAllTags(),
     ]).then(([channel, tags, availableTags]) => ({
