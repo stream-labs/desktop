@@ -120,7 +120,7 @@ export default class EditStreamInfo extends Vue {
           return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
         })
         .then(() => this.populateModels());
-    } else if (this.streamInfoService.state.channelInfo) {
+    } else {
       await this.populateModels();
     }
     this.populatingModels = false;
@@ -139,6 +139,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateModels() {
+    if (!this.streamInfoService.state.channelInfo) return;
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
     this.gameModel = this.streamInfoService.state.channelInfo.game || '';
