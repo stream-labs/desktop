@@ -1,7 +1,7 @@
 {
-  "Add %{filterName}": "Add %{filterName}",
-  "Center ${sourceName}": "Center ${sourceName}",
-  "Paste %{nodeName}": "Paste %{nodeName}",
+  "Add %{filterName}": "添加 %{filterName}",
+  "Center ${sourceName}": "置中 ${sourceName}",
+  "Paste %{nodeName}": "貼上 %{nodeName}",
   "Create a new connection": "Create a new connection",
   "Create %{sourceName}": "Create %{sourceName}",
   "Create %{folderName}": "Create %{folderName}",
