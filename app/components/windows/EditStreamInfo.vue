@@ -58,7 +58,7 @@
         <TwitchTagsInput
           v-if="isTwitch"
           v-model="twitchTags"
-          :tags="allTwitchTags"
+          :tags="channelInfo.availableTags"
           :has-permission="hasUpdateTagsPermission"
           @input="setTags"
         />

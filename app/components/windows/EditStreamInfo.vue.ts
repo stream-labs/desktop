@@ -79,7 +79,7 @@ export default class EditStreamInfo extends Vue {
 
   searchProfilesPending = false;
 
-  allTwitchTags: TTwitchTag[] = null;
+  // allTwitchTags: TTwitchTag[] = null;
 
   twitchTags: TTwitchTagWithLabel[] = null;
 
@@ -109,6 +109,11 @@ export default class EditStreamInfo extends Vue {
 
   async created() {
     await this.refreshStreamInfo();
+    this.twitchTags = prepareOptions(
+      this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
+      this.streamInfoService.state.channelInfo.tags,
+    );
+
     // this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
     //
     // this.streamInfoService.streamInfoChanged.subscribe(() => {
@@ -147,7 +152,7 @@ export default class EditStreamInfo extends Vue {
       //   .hasScope('user:edit:broadcast')
       //   .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
 
-      this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
+      // this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
       this.twitchTags = prepareOptions(
         this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
         this.streamInfoService.state.channelInfo.tags,

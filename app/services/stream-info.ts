@@ -80,11 +80,9 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
     const platform = getPlatformService(this.userService.platform.type);
     try {
-      // let info = await platform.prepopulateInfo();
-      // if (info) await this.setChannelInfo(info);
       const info = await platform.fetchChannelInfo();
-
       this.SET_CHANNEL_INFO(info);
+
       if (this.userService.platform.type === 'twitch') {
         this.SET_HAS_UPDATE_TAGS_PERM(await this.twitchService.hasScope('user:edit:broadcast'));
       }
