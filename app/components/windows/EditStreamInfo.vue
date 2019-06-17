@@ -31,12 +31,12 @@
           }"
         />
         <h-form-group
-          v-model="streamTitleModel"
+          v-model="channelInfo.title"
           :metadata="{ type: 'text', name: 'stream_title', title: $t('Title'), fullWidth: true }"
         />
         <h-form-group
           v-if="isYoutube || isFacebook"
-          v-model="streamDescriptionModel"
+          v-model="channelInfo.description"
           :metadata="{
             type: 'textArea',
             name: 'stream_description',
@@ -46,15 +46,13 @@
         />
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
-          :title="$t('Game')"
-          name="stream_game"
+          :metadata="formMetadata.game"
         >
           <list-input
-            @search-change="debouncedGameSearch"
+            @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
-            :value="gameModel"
-            :placeholder="$t('Start typing to search')"
-            :metadata="gameMetadata"
+            :value="channelInfo.game"
+            :metadata="formMetadata.game"
           />
         </h-form-group>
         <TwitchTagsInput
@@ -65,7 +63,7 @@
           @input="setTags"
         />
         <h-form-group v-if="searchProfilesPending">
-          {{ $t('Checking optimized setting for') }} {{ gameModel }}...
+          {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
           <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />

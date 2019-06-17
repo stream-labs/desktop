@@ -5,7 +5,8 @@ import { Inject } from 'services/core/injector';
 import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { TwitchService } from './platforms/twitch';
 
 interface IStreamInfoServiceState {
   fetching: boolean;
@@ -31,17 +32,25 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
+  @Inject() twitchService: TwitchService;
 
   static initialState: IStreamInfoServiceState = {
     fetching: false,
     error: false,
     viewerCount: 0,
-    channelInfo: null,
+    channelInfo: {
+      title: '',
+      game: '',
+      description: '',
+      tags: [],
+      availableTags: [],
+      hasUpdateTagsPermission: false,
+    },
   };
 
   viewerCountInterval: number;
 
-  streamInfoChanged = new BehaviorSubject<IStreamInfo>(StreamInfoService.initialState);
+  streamInfoChanged = new Subject();
 
   init() {
     this.refreshStreamInfo().catch(e => null);
@@ -54,55 +63,54 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
         platform.fetchViewerCount().then(viewers => {
           this.SET_VIEWER_COUNT(viewers);
-          this.streamInfoChanged.next({
-            viewerCount: this.state.viewerCount,
-            channelInfo: this.state.channelInfo,
-          });
+          this.streamInfoChanged.next();
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }
 
-  refreshStreamInfo(): Promise<void> {
-    if (!this.userService.isLoggedIn()) return Promise.reject('failed to fetch stream info');
-
+  async refreshStreamInfo(): Promise<void> {
     this.SET_ERROR(false);
     this.SET_FETCHING(true);
 
+    if (!this.userService.isLoggedIn()) {
+      this.SET_FETCHING(false);
+      return;
+    }
+
     const platform = getPlatformService(this.userService.platform.type);
-    return platform
-      .fetchChannelInfo()
-      .then(info => {
-        this.SET_CHANNEL_INFO(info);
-        this.streamInfoChanged.next({
-          viewerCount: this.state.viewerCount,
-          channelInfo: this.state.channelInfo,
-        });
-        this.SET_FETCHING(false);
-      })
-      .catch(() => {
-        this.SET_FETCHING(false);
-        this.SET_ERROR(true);
-      });
+    try {
+      // let info = await platform.prepopulateInfo();
+      // if (info) await this.setChannelInfo(info);
+      const info = await platform.fetchChannelInfo();
+
+      this.SET_CHANNEL_INFO(info);
+      if (this.userService.platform.type === 'twitch') {
+        this.SET_HAS_UPDATE_TAGS_PERM(await this.twitchService.hasScope('user:edit:broadcast'));
+      }
+      this.streamInfoChanged.next();
+    } catch (e) {
+      console.warn('Unable to refresh stream info', e);
+      this.SET_ERROR(true);
+    }
+    this.SET_FETCHING(false);
   }
 
-  setStreamInfo(title: string, description: string, game: string, tags?: Tag[]): Promise<boolean> {
+  async setChannelInfo(info: IChannelInfo): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
-    if (this.userService.platform.type === 'facebook' && game === '') {
+    if (this.userService.platform.type === 'facebook' && info.game === '') {
       return Promise.reject('You must select a game.');
     }
 
-    return platform
-      .putChannelInfo({ title, game, description, tags })
-      .then(success => {
-        this.refreshStreamInfo();
-        this.createGameAssociation(game);
-        return success;
-      })
-      .catch(() => {
-        this.refreshStreamInfo();
-        return false;
-      });
+    try {
+      await platform.putChannelInfo(info);
+      this.createGameAssociation(info.game);
+      await this.refreshStreamInfo();
+      return true;
+    } catch (e) {
+      console.warn('Unable to set stream info: ', e);
+    }
+    return false;
   }
 
   /**
@@ -111,7 +119,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
    * experience in the overlay library.
    * @param game the name of the game
    */
-  createGameAssociation(game: string) {
+  private createGameAssociation(game: string) {
     const url = `https://${this.hostsService.overlays}/api/overlay-games-association`;
 
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -137,6 +145,11 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @mutation()
   SET_CHANNEL_INFO(info: IChannelInfo) {
     this.state.channelInfo = info;
+  }
+
+  @mutation()
+  SET_HAS_UPDATE_TAGS_PERM(perm: boolean) {
+    this.state.channelInfo.hasUpdateTagsPermission = perm;
   }
 
   @mutation()

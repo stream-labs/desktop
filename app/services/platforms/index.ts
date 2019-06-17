@@ -14,6 +14,7 @@ export interface IChannelInfo {
   description?: string;
   tags?: Tag[];
   availableTags?: Tag[];
+  hasUpdateTagsPermission?: boolean;
 }
 
 export interface IGame {

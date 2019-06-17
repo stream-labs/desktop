@@ -19,10 +19,12 @@ import {
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
 import { shell } from 'electron';
-import { IListOption } from '../shared/inputs';
+import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
 import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
+import { cloneDeep } from 'lodash';
+import { Debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -52,12 +54,12 @@ export default class EditStreamInfo extends Vue {
   populatingModels = false;
 
   // Form Models:
-
-  streamTitleModel: string = '';
-
-  streamDescriptionModel: string = '';
-
-  gameModel: string = '';
+  //
+  // streamTitleModel: string = '';
+  //
+  // streamDescriptionModel: string = '';
+  //
+  // gameModel: string = '';
   gameOptions: IListOption<string>[] = [];
 
   pageModel: string = '';
@@ -71,9 +73,9 @@ export default class EditStreamInfo extends Vue {
   };
 
   facebookPages: IStreamlabsFacebookPages;
-
-  // Debounced Functions:
-  debouncedGameSearch: (search: string) => void;
+  //
+  // // Debounced Functions:
+  // debouncedGameSearch: (search: string) => void;
 
   searchProfilesPending = false;
 
@@ -81,7 +83,21 @@ export default class EditStreamInfo extends Vue {
 
   twitchTags: TTwitchTagWithLabel[] = null;
 
-  hasUpdateTagsPermission: boolean = true;
+  get hasUpdateTagsPermission() {
+    return this.channelInfo.hasUpdateTagsPermission;
+  }
+
+  channelInfo: IChannelInfo = null;
+
+  get formMetadata() {
+    return formMetadata({
+      game: metadata.list({
+        title: $t('Game'),
+        placeholder: $t('Start typing to search'),
+        options: this.gameOptions,
+      }),
+    });
+  }
 
   get useOptimizedProfile() {
     return this.videoEncodingOptimizationService.state.useOptimizedProfile;
@@ -92,43 +108,44 @@ export default class EditStreamInfo extends Vue {
   }
 
   async created() {
-    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
-
-    this.streamInfoService.streamInfoChanged.subscribe(() => {
-      if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-        if (!this.allTwitchTags && !this.twitchTags) {
-          this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-          this.twitchTags = prepareOptions(
-            this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-            this.streamInfoService.state.channelInfo.tags,
-          );
-        }
-      }
-    });
-
-    this.populatingModels = true;
-    // If the stream info pre-fetch failed, we should try again now
-    if (!this.streamInfoService.state.channelInfo) {
-      await this.refreshStreamInfo();
-    }
-    if (this.isServicedPlatform) {
-      const service = getPlatformService(this.userService.platform.type);
-      await service
-        .prepopulateInfo()
-        .then((info: IChannelInfo) => {
-          if (!info) return;
-          return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-        })
-        .then(() => this.populateModels());
-    } else if (this.streamInfoService.state.channelInfo) {
-      await this.populateModels();
-    }
-    this.populatingModels = false;
+    await this.refreshStreamInfo();
+    // this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
+    //
+    // this.streamInfoService.streamInfoChanged.subscribe(() => {
+    //   if (this.isTwitch && this.streamInfoService.state.channelInfo) {
+    //     if (!this.allTwitchTags && !this.twitchTags) {
+    //       this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
+    //       this.twitchTags = prepareOptions(
+    //         this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
+    //         this.streamInfoService.state.channelInfo.tags,
+    //       );
+    //     }
+    //   }
+    // });
+    //
+    // this.populatingModels = true;
+    // // If the stream info pre-fetch failed, we should try again now
+    // if (!this.streamInfoService.state.channelInfo) {
+    //   await this.refreshStreamInfo();
+    // }
+    // if (this.isServicedPlatform) {
+    //   const service = getPlatformService(this.userService.platform.type);
+    //   await service
+    //     .prepopulateInfo()
+    //     .then((info: IChannelInfo) => {
+    //       if (!info) return;
+    //       return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
+    //     })
+    //     .then(() => this.populateModels());
+    // } else if (this.streamInfoService.state.channelInfo) {
+    //   await this.populateModels();
+    // }
+    // this.populatingModels = false;
 
     if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-      this.twitchService
-        .hasScope('user:edit:broadcast')
-        .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
+      // this.twitchService
+      //   .hasScope('user:edit:broadcast')
+      //   .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
 
       this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
       this.twitchTags = prepareOptions(
@@ -138,31 +155,32 @@ export default class EditStreamInfo extends Vue {
     }
   }
 
-  async populateModels() {
-    this.facebookPages = await this.fetchFacebookPages();
-    const { game, title, description } = this.streamInfoService.state.channelInfo || {
-      game: '',
-      title: '',
-      description: '',
-    };
+  // async populateModels() {
+  //   this.facebookPages = await this.fetchFacebookPages();
+  //   const { game, title, description } = this.streamInfoService.state.channelInfo || {
+  //     game: '',
+  //     title: '',
+  //     description: '',
+  //   };
+  //
+  //   this.streamTitleModel = title;
+  //   this.gameModel = game;
+  //   this.streamDescriptionModel = description;
+  //   this.gameOptions = [{ title: game, value: game }];
+  //
+  //   if (this.facebookPages) {
+  //     this.pageModel = this.facebookPages.page_id;
+  //     this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
+  //       value: page.id,
+  //       title: `${page.name} | ${page.category}`,
+  //     }));
+  //     this.hasPages = !!this.facebookPages.pages.length;
+  //   }
+  //   await this.loadAvailableProfiles();
+  // }
 
-    this.streamTitleModel = title;
-    this.gameModel = game;
-    this.streamDescriptionModel = description;
-    this.gameOptions = [{ title: game, value: game }];
-
-    if (this.facebookPages) {
-      this.pageModel = this.facebookPages.page_id;
-      this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
-        value: page.id,
-        title: `${page.name} | ${page.category}`,
-      }));
-      this.hasPages = !!this.facebookPages.pages.length;
-    }
-    await this.loadAvailableProfiles();
-  }
-
-  onGameSearchChange(searchString: string) {
+  @Debounce(500)
+  onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
       const platform = this.userService.platform.type;
@@ -188,14 +206,14 @@ export default class EditStreamInfo extends Vue {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
     this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
-      this.gameModel,
+      this.channelInfo.game,
     );
     this.searchProfilesPending = false;
   }
 
   // For some reason, v-model doesn't work with ListInput
   onGameInput(gameModel: string) {
-    this.gameModel = gameModel;
+    this.channelInfo.game = gameModel;
     this.loadAvailableProfiles();
   }
 
@@ -214,12 +232,7 @@ export default class EditStreamInfo extends Vue {
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
     this.streamInfoService
-      .setStreamInfo(
-        this.streamTitleModel,
-        this.streamDescriptionModel,
-        this.gameModel,
-        this.isTwitch && this.twitchTags && this.twitchTags.length ? this.twitchTags : undefined,
-      )
+      .setChannelInfo(this.channelInfo)
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -252,14 +265,9 @@ export default class EditStreamInfo extends Vue {
 
     const scheduledStartTime = this.formatDateString();
     const service = getPlatformService(this.userService.platform.type);
-    const streamInfo = {
-      title: this.streamTitleModel,
-      description: this.streamDescriptionModel,
-      game: this.gameModel,
-    };
     if (scheduledStartTime) {
       await service
-        .scheduleStream(scheduledStartTime, streamInfo)
+        .scheduleStream(scheduledStartTime, this.channelInfo)
         .then(() => (this.startTimeModel = { time: null, date: null }))
         .then(() => {
           this.$toasted.show(
@@ -309,10 +317,10 @@ export default class EditStreamInfo extends Vue {
   }
 
   // This should have been pre-fetched, but we can force a refresh
-  refreshStreamInfo() {
-    return this.streamInfoService.refreshStreamInfo().then(() => {
-      if (this.streamInfoService.state.channelInfo) this.populateModels();
-    });
+  async refreshStreamInfo() {
+    await this.streamInfoService.refreshStreamInfo();
+    this.channelInfo = cloneDeep(this.streamInfoService.state.channelInfo);
+    await this.loadAvailableProfiles();
   }
 
   setTags(tags: TTwitchTagWithLabel[]) {
@@ -355,7 +363,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get infoLoading() {
-    return this.streamInfoService.state.fetching;
+    return !this.channelInfo || this.streamInfoService.state.fetching;
   }
 
   get infoError() {
@@ -388,7 +396,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get optimizedProfileMetadata() {
-    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.gameModel}` : '';
+    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.channelInfo.game}` : '';
     return {
       title: $t('Use optimized encoder settings ') + game,
       tooltip: $t(
