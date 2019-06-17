@@ -27,6 +27,22 @@ export type GameOverlayState = {
   windowProperties: IWindowProperties;
 };
 
+const hideInteraction = `
+  const elements = [];
+
+  /* Platform Chats */
+  elements.push(document.querySelector('.chat-input'));
+  elements.push(document.querySelector('.webComposerBlock__3lT5b'));
+
+  /* Recent Events */
+  elements.push(document.querySelector('.recent-events__header'));
+  elements.push(document.querySelector('.recent-events__tabs'));
+  elements.push(document.querySelector('.popout--recent-events'));
+  elements.forEach((el) => {
+    if (el) { el.style.cssText = 'display: none !important'; }
+  });
+`;
+
 @InitAfter('UserService')
 @InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
@@ -319,6 +335,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       overlay.setPosition(overlayId, position.x, position.y, width, height);
       overlay.setTransparency(overlayId, this.state.opacity * 2.55);
+      win.webContents.executeJavaScript(hideInteraction);
 
       win.webContents.on('paint', (event, dirty, image) => {
         overlay.paintOverlay(overlayId, width, height, image.getBitmap());
