@@ -74,8 +74,8 @@
   "You are 10 minutes away from the 8 hour stream limit": "You are 10 minutes away from the 8 hour stream limit",
   "Stream has disconnected, attempting to reconnect.": "Stream has disconnected, attempting to reconnect.",
   "Start typing to search": "开始输入搜寻",
-  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.",
-  "Twitch Authentication Error": "Twitch Authentication Error",
-  "Enable Two Factor Authentication": "Enable Two Factor Authentication",
+  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "您的Twitch帐号需要开启双重认证才可以直播至Twitch。请开启双重认证后再尝试。",
+  "Twitch Authentication Error": "Twitch认证失败",
+  "Enable Two Factor Authentication": "开启双重验证",
   "Dismiss": "Dismiss"
 }
