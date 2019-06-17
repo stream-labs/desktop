@@ -81,13 +81,13 @@ export class OutageNotificationsService extends Service {
   private async checkForNotification() {
     const msg = await this.fetchMessageJson();
 
+    if (!this.userService.isLoggedIn()) return;
+
     // There are no urgent messages to display to the user
     if (
       !msg ||
       msg.disabled ||
-      (msg.platforms &&
-        this.userService.isLoggedIn() &&
-        !msg.platforms.includes(this.userService.platform.type))
+      (msg.platforms && !msg.platforms.includes(this.userService.platform.type))
     ) {
       this.clearNotification();
       return;
