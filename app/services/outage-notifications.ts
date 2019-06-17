@@ -85,7 +85,9 @@ export class OutageNotificationsService extends Service {
     if (
       !msg ||
       msg.disabled ||
-      (msg.platforms && !msg.platforms.includes(this.userService.platform.type))
+      (msg.platforms &&
+        this.userService.isLoggedIn() &&
+        !msg.platforms.includes(this.userService.platform.type))
     ) {
       this.clearNotification();
       return;
