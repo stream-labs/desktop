@@ -160,7 +160,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   determineStartPosition(window: string) {
     const pos = this.state.windowProperties[window].position;
     if (pos) {
-      const display = electron.screen.getAllDisplays().find(display => {
+      const display = electron.remote.screen.getAllDisplays().find(display => {
         const bounds = display.bounds;
         const intBounds = pos.x > bounds.x && pos.y > bounds.y;
         const extBounds = pos.x < bounds.x + bounds.width && pos.y < bounds.y + bounds.height;
