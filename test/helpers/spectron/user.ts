@@ -1,6 +1,7 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
+import { dialogDismiss } from './dialog';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -23,6 +24,7 @@ interface ITestUser {
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
+  await dialogDismiss(t, 'Yes');
   await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
 }
