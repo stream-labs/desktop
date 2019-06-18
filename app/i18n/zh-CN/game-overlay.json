@@ -1,7 +1,7 @@
 {
-  "Enable in-game overlay": "Enable in-game overlay",
-  "Enable stream preview in overlay": "Enable stream preview in overlay",
-  "Toggle in-game overlay": "Toggle in-game overlay",
-  "Toggle positioning mode": "Toggle positioning mode",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay"
+  "Enable in-game overlay": "开启游戏嵌入介面",
+  "Enable stream preview in overlay": "在游戏嵌入介面开启直播预览",
+  "Toggle in-game overlay": "切换游戏嵌入介面",
+  "Toggle positioning mode": "切换位置模式",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "在快捷键设定中设定一个快捷键切换游戏嵌入介面"
 }
