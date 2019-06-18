@@ -203,9 +203,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * to workaround.
      */
     if (options.size && !remote.process.env.CI) {
-      const { width: screenWidth, height: screenHeight } = electron.remote.screen.getDisplayMatching(
-        this.windows.main.getBounds(),
-      ).workAreaSize;
+      const {
+        width: screenWidth,
+        height: screenHeight,
+      } = electron.remote.screen.getDisplayMatching(this.windows.main.getBounds()).workAreaSize;
 
       const SCREEN_PERCENT = 0.75;
 
