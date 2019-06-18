@@ -36,6 +36,7 @@
   }
   &.opened {
     height: 196px;
+    padding-top: 28px;
     svg {
       width: 140px;
       height: 10px;
@@ -60,8 +61,12 @@
     width: 140px;
     height: 10px;
     transform: rotate(180deg);
-    fill: @bg-secondary;
+    fill: @text-primary;
     transition: .5s;
+  }
+
+  .opened & {
+    margin-top: -28px;
   }
 
   &:hover {
