@@ -284,7 +284,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true }
+      webPreferences: { nodeIntegration: true },
     }));
 
     newWindow.setMenu(null);
