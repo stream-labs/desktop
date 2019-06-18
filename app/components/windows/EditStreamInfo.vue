@@ -21,13 +21,13 @@
         </div>
         <h-form-group
           v-if="isFacebook && hasPages && !midStreamMode"
-          :value="pageModel"
+          :v-model="channelInfo.facebookPages.page_id"
           @input="pageId => setFacebookPageId(pageId)"
           :metadata="{
             type: 'list',
             name: 'stream_page',
             title: $t('Facebook Page'),
-            options: pageOptions,
+            options: channelInfo.facebookPages.options,
           }"
         />
         <h-form-group

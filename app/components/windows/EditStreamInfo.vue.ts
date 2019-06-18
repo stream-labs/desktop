@@ -13,7 +13,7 @@ import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
-import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { FacebookService, IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
@@ -43,6 +43,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
+  @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
 
   // UI State Flags
@@ -50,7 +51,6 @@ export default class EditStreamInfo extends Vue {
   updatingInfo = false;
   updateError = false;
   selectedProfile: IEncoderProfile = null;
-  hasPages = false;
   populatingModels = false;
 
   // Form Models:
@@ -85,6 +85,14 @@ export default class EditStreamInfo extends Vue {
 
   get hasUpdateTagsPermission() {
     return this.channelInfo.hasUpdateTagsPermission;
+  }
+
+  get hasPages() {
+    return (
+      !this.infoLoading &&
+      this.channelInfo.facebookPages &&
+      this.channelInfo.facebookPages.pages.length
+    );
   }
 
   channelInfo: IChannelInfo = null;
@@ -386,13 +394,8 @@ export default class EditStreamInfo extends Vue {
     };
   }
 
-  fetchFacebookPages() {
-    return this.userService.getFacebookPages();
-  }
-
   setFacebookPageId(value: string) {
-    this.pageModel = value;
-    this.userService.postFacebookPage(value);
+    this.facebookService.postPage(value);
   }
 
   openFBPageCreateLink() {

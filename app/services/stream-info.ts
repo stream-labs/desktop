@@ -7,6 +7,7 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs';
 import { TwitchService } from './platforms/twitch';
+import { FacebookService, IStreamlabsFacebookPages } from './platforms/facebook';
 
 interface IStreamInfoServiceState {
   fetching: boolean;
@@ -33,6 +34,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
   @Inject() twitchService: TwitchService;
+  @Inject() facebookService: FacebookService;
 
   static initialState: IStreamInfoServiceState = {
     fetching: false,
@@ -45,6 +47,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       tags: [],
       availableTags: [],
       hasUpdateTagsPermission: false,
+      facebookPages: null,
     },
   };
 
@@ -86,6 +89,11 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       if (this.userService.platform.type === 'twitch') {
         this.SET_HAS_UPDATE_TAGS_PERM(await this.twitchService.hasScope('user:edit:broadcast'));
       }
+
+      if (this.userService.platform.type === 'facebook') {
+        this.SET_FACEBOOK_PAGES(await this.facebookService.getPages());
+      }
+
       this.streamInfoChanged.next();
     } catch (e) {
       console.warn('Unable to refresh stream info', e);
@@ -148,6 +156,11 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @mutation()
   SET_HAS_UPDATE_TAGS_PERM(perm: boolean) {
     this.state.channelInfo.hasUpdateTagsPermission = perm;
+  }
+
+  @mutation()
+  SET_FACEBOOK_PAGES(pages: IStreamlabsFacebookPages) {
+    this.state.channelInfo.facebookPages = pages;
   }
 
   @mutation()

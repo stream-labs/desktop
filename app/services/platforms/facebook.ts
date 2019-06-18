@@ -10,9 +10,10 @@ import {
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../core/injector';
-import { authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { handlePlatformResponse, requiresToken } from './utils';
+import { IListOption } from '../../components/shared/inputs';
 
 interface IFacebookPage {
   access_token: string;
@@ -29,6 +30,10 @@ export interface IStreamlabsFacebookPage {
 export interface IStreamlabsFacebookPages {
   pages: IStreamlabsFacebookPage[];
   page_id: string;
+  page_type: string;
+  type: { name?: string };
+  name: string;
+  options: IListOption<string>;
 }
 
 interface IFacebookServiceState {
@@ -133,7 +138,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       .then(async json => {
         let pageId = this.userService.platform.channelId;
         if (!pageId) {
-          const pages = await this.userService.getFacebookPages();
+          const pages = await this.getPages();
           pageId = pages.page_id;
         }
         const activePage =
@@ -143,7 +148,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchUserPagePreference() {
-    return this.userService.getFacebookPages().then(json => {
+    return this.getPages().then(json => {
       const pageId = json.page_type === 'page' && json.page_id ? json.page_id : '0';
       this.userService.updatePlatformChannelId(pageId);
       return json;
@@ -312,5 +317,39 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
+  }
+
+  getPages(): Promise<IStreamlabsFacebookPages> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request)
+      .then(handleResponse)
+      .then(response => {
+        // create an options list for using in the ListInput
+        response.options = response.pages.map((page: any) => {
+          return { value: page.id, title: `${page.name} | ${page.category}` };
+        });
+        return response;
+      })
+      .catch(() => null);
+  }
+
+  postPage(pageId: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
+    });
+    try {
+      fetch(request).then(() => this.userService.updatePlatformChannelId(pageId));
+    } catch {
+      console.error(new Error('Could not set Facebook page'));
+    }
   }
 }
