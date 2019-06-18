@@ -43,5 +43,5 @@
   "Ungroup %{sourceName}": "取消归类%{sourceName}",
   "Unhide mixer items": "取消隐藏混音器物件",
   "Undo %{action}": "复原%{action}",
-  "Redo %{action}": "Redo %{action}"
+  "Redo %{action}": "重做%{action}"
 }
