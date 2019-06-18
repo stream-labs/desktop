@@ -1,7 +1,7 @@
 {
-  "Enable in-game overlay": "Enable in-game overlay",
+  "Enable in-game overlay": "ゲーム内のオーバーレイを有効にする",
   "Enable stream preview in overlay": "Enable stream preview in overlay",
-  "Toggle in-game overlay": "Toggle in-game overlay",
-  "Toggle positioning mode": "Toggle positioning mode",
+  "Toggle in-game overlay": "ゲーム内のオーバーレイを切り替える",
+  "Toggle positioning mode": "位置調整モードを切り替える",
   "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay"
 }
