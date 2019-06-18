@@ -11,7 +11,7 @@ import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
-const ControlsArrow = require('../../../media/images/controls-arrow-vertical.svg');
+import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
 
 @Component({
   components: {

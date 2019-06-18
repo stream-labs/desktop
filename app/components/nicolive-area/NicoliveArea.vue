@@ -50,9 +50,9 @@
   > svg {
     width: 10px;
     height: 140px;
-    fill: @bg-secondary;
+    fill: @text-primary;
     transition: .5s;
-    transform: rotate(180deg);
+    transform: rotate(0deg);
   }
 
   &:hover {
@@ -65,7 +65,7 @@
 
   &.nicolive-area--opened {
     > svg {
-      transform: rotate(0deg);
+      transform: rotate(180deg);
     }
   }
 }
