@@ -13,7 +13,7 @@ import { WidgetNode } from './nodes/overlays/widget';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import extractZip from 'extract-zip'
+import extractZip from 'extract-zip';
 import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
