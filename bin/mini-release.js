@@ -180,8 +180,8 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
         if (!pr || pr.length < 2) {
             continue;
         }
-        const number = parseInt(pr[1], 10);
-        promises.push(octokit.pullRequests.get({ owner, repo, number }).catch(e => { info(e); return { data: {} } }));
+        const pull_number = parseInt(pr[1], 10);
+        promises.push(octokit.pullRequests.get({ owner, repo, pull_number }).catch(e => { info(e); return { data: {} } }));
     }
 
     function level(line) {
@@ -332,11 +332,10 @@ async function runScript() {
 
     if (!notes) {
         // get pull request description from github.com
-        const github = new OctoKit({ baseUrl: 'https://api.github.com' });
-        github.authenticate({
-            type: 'token',
-            token: process.env.NAIR_GITHUB_TOKEN
-        });
+        const github = OctoKit({
+	    baseUrl: 'https://api.github.com',
+            auth: `token ${process.env.NAIR_GITHUB_TOKEN}`
+	});
         const prMerges = await collectPullRequestMerges({
             octokit: github,
             owner: 'n-air-app',
@@ -446,12 +445,8 @@ async function runScript() {
     // upload to the github directly via GitHub API...
 
     const octokit = OctoKit({
-        baseUrl: githubApiServer
-    });
-
-    octokit.authenticate({
-        type: 'token',
-        token: process.env.NAIR_GITHUB_TOKEN
+        baseUrl: githubApiServer,
+	auth: `token ${process.env.NAIR_GITHUB_TOKEN}`,
     });
 
     info(`creating release ${newTag}...`);
