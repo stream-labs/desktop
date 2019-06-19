@@ -68,6 +68,11 @@ export class ChatService extends Service {
       },
     });
 
+    this.chatView.webContents.on('did-fail-load', (e, code, description) => {
+      // This is almost always ERR_ABORTED, and is expected
+      console.debug('Chat load error', code, description);
+    });
+
     this.navigateToChat();
     this.bindWindowListener();
     this.bindDomReadyListener();
