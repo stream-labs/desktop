@@ -19,10 +19,12 @@ test('Go through the onboarding and autoconfig', async t => {
   await app.client.isExisting('button=Twitch');
 
   await logIn(t, null, null, false);
+  await sleep(1000);
 
   // This will show up if there are scene collections to import
   if (await t.context.app.client.isExisting('button=Continue')) {
     await t.context.app.client.click('button=Continue');
+    await sleep(1000);
   }
 
   // This will only show up if OBS is installed
@@ -31,6 +33,7 @@ test('Go through the onboarding and autoconfig', async t => {
   }
 
   // Start auto config
+  t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
   await app.client.waitForVisible('.button--action:not([disabled])', 60000);
   await app.client.click('button=Next');
