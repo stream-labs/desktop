@@ -7,8 +7,8 @@
   "Skipped frames threshold": "スキップされたフレームの限界",
   "Detect lagged frames": "時間差フレームを検出します。",
   "Lagged frames threshold": "時間差フレームの限界",
-  "Detect dropped frames": "捨てられたフレームを検出します",
-  "Dropped frames threshold": "捨てられたフレームの限界",
+  "Detect dropped frames": "ドロップフレームを検出します",
+  "Dropped frames threshold": "ドロップフレームのしきい値\n",
   "Show Notifications": "通知を表示します。",
   "Restore Defaults": "既定値に戻す",
   "Troubleshooter Notifications": "通知のトラブルシューティング",
@@ -16,5 +16,5 @@
   "Click to read your unread Notifications": "未読通知を読むにはクリックします",
   "New Notifications": "新しい通知",
   "Log": "ログ",
-  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS has updated! Click here to see what changed."
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBSは更新されました！こちらをクリックして変更内容を確認してください"
 }
