@@ -305,8 +305,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
     socket.on('error', e => {
       if (e.code === 'EPIPE') {
-        // Client has disconnected, do nothing
+        // Client has silently disconnected
         console.debug('TCP Server: Socket was disconnected', e);
+        this.onDisconnectHandler(client);
       } else {
         throw e;
       }
