@@ -334,8 +334,7 @@ async function runScript() {
         // get pull request description from github.com
         const github = OctoKit({
 	    baseUrl: 'https://api.github.com',
-            auth: `token ${process.env.NAIR_GITHUB_TOKEN}`,
-	    log: console
+            auth: `token ${process.env.NAIR_GITHUB_TOKEN}`
 	});
         const prMerges = await collectPullRequestMerges({
             octokit: github,
