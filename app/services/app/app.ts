@@ -205,7 +205,11 @@ export class AppService extends StatefulService<IAppState> {
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.gameOverlayService.destroy();
-      await this.fileManagerService.flushAll();
+      try {
+        await this.fileManagerService.flushAll();
+      } catch (e) {
+        console.error('Error flushing files on shutdown', e);
+      }
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
       obs.IPC.disconnect();

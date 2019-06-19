@@ -127,7 +127,7 @@ export class FileManagerService extends Service {
         return this.flush(filePath);
       });
 
-    await promises;
+    await Promise.all(promises);
   }
 
   private async flush(filePath: string, tries = 10) {
