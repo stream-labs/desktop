@@ -38,6 +38,7 @@ export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
   email?: string, // if not set, pick a random user's account from user-pool
+  waitForUI = true,
 ): Promise<boolean> {
   const app = t.context.app;
   let authInfo: IPlatformAuth;
@@ -55,7 +56,10 @@ export async function logIn(
   }
 
   await focusMain(t);
-  await app.webContents.send('testing-fakeAuth', authInfo);
+
+  app.webContents.send('testing-fakeAuth', authInfo);
+  if (!waitForUI) return true;
+  await t.context.app.client.waitForVisible('.icon-logout'); // wait for the log-out button
   return true;
 }
 

@@ -18,7 +18,7 @@ test('Go through the onboarding and autoconfig', async t => {
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
 
-  await logIn(t);
+  await logIn(t, null, null, false);
 
   // This will show up if there are scene collections to import
   if (await t.context.app.client.isExisting('button=Continue')) {
