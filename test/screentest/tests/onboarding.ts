@@ -28,7 +28,7 @@ test('Onboarding steps', async t => {
   await sleep(1000);
 
   // Start auto config
-  t.true(app.client.isExisting('button=Start'));
+  t.true(await app.client.isExisting('button=Start'));
   await disableGifAnimations(t);
   await makeScreenshots(t, 'Autoconfig');
   await app.client.click('button=Start');
