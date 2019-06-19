@@ -187,6 +187,11 @@ const consoleError = console.error;
 console.error = function(...args: any[]) {
   // TODO: Suppress N-API error until we upgrade electron to v4.x
   if (/N\-API is an experimental feature/.test(args[0])) return;
+
+  // This is an electron issue that started popping up around electron 5
+  // This should not be emitted globally but is.
+  if (/Error: ERR_ABORTED \(\-3\) loading/.test(args[0])) return;
+
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);
