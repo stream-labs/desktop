@@ -51,11 +51,11 @@ export async function addSource(t, type, name, closeProps = true) {
 
   await app.client.click('button=Add Source');
 
-  if (name !== type) {
+  if (name !== type && await app.client.isExisting('[data-type="toggle"]')) {
     await app.client.click('[data-type="toggle"]')
   }
 
-  if (app.client.isExisting('input')) {
+  if (await app.client.isExisting('input')) {
     await app.client.setValue('input', name);
   }
 
@@ -81,7 +81,7 @@ export async function addExistingSource(t, type, name, closeProps = true) {
   await app.client.click(`li=${type}`);
   await app.client.click('button=Add Source');
   await app.client.click(`div=${name}`);
-  await app.client.click('button=Add Existing Source');
+  await app.client.click('button=Add Source');
 }
 
 
