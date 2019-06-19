@@ -24,31 +24,31 @@ async function redo(t: TExecutionContext) {
 test('Creating some sources with undo/redo', async t => {
   await focusMain(t);
 
-  await addSource(t, 'Color Source', 'Color Source 1');
+  await addSource(t, 'Color Source', 'Color Source');
   await addSource(t, 'Color Source', 'Color Source 2');
   await addSource(t, 'Color Source', 'Color Source 3');
 
   await focusMain(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source 1'));
+  t.true(await sourceIsExisting(t, 'Color Source'));
   t.true(await sourceIsExisting(t, 'Color Source 2'));
   t.true(await sourceIsExisting(t, 'Color Source 3'));
 
   await undo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source 1'));
+  t.true(await sourceIsExisting(t, 'Color Source'));
   t.true(await sourceIsExisting(t, 'Color Source 2'));
   t.false(await sourceIsExisting(t, 'Color Source 3'));
 
   await undo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source 1'));
+  t.true(await sourceIsExisting(t, 'Color Source'));
   t.false(await sourceIsExisting(t, 'Color Source 2'));
   t.false(await sourceIsExisting(t, 'Color Source 3'));
 
   await undo(t);
 
-  t.false(await sourceIsExisting(t, 'Color Source 1'));
+  t.false(await sourceIsExisting(t, 'Color Source'));
   t.false(await sourceIsExisting(t, 'Color Source 2'));
   t.false(await sourceIsExisting(t, 'Color Source 3'));
 
@@ -56,7 +56,7 @@ test('Creating some sources with undo/redo', async t => {
   await redo(t);
   await redo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source 1'));
+  t.true(await sourceIsExisting(t, 'Color Source'));
   t.true(await sourceIsExisting(t, 'Color Source 2'));
   t.true(await sourceIsExisting(t, 'Color Source 3'));
 });

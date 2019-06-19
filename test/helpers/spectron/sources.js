@@ -50,6 +50,11 @@ export async function addSource(t, type, name, closeProps = true) {
   }
 
   await app.client.click('button=Add Source');
+
+  if (name !== type) {
+    await app.client.click('[data-type="toggle"]')
+  }
+
   await app.client.setValue('input', name);
 
   if (await app.client.isExisting('button=Add Source')) {
