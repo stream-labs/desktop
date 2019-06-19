@@ -7,13 +7,12 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../services/core/injector';
-import debounce from 'lodash/debounce';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
-import { FacebookService, IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { FacebookService } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
@@ -22,7 +21,6 @@ import { shell } from 'electron';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
-import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 
@@ -51,19 +49,8 @@ export default class EditStreamInfo extends Vue {
   updatingInfo = false;
   updateError = false;
   selectedProfile: IEncoderProfile = null;
-  populatingModels = false;
 
-  // Form Models:
-  //
-  // streamTitleModel: string = '';
-  //
-  // streamDescriptionModel: string = '';
-  //
-  // gameModel: string = '';
   gameOptions: IListOption<string>[] = [];
-
-  pageModel: string = '';
-  pageOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
 
@@ -72,16 +59,8 @@ export default class EditStreamInfo extends Vue {
     date: null,
   };
 
-  facebookPages: IStreamlabsFacebookPages;
-  //
-  // // Debounced Functions:
-  // debouncedGameSearch: (search: string) => void;
-
   searchProfilesPending = false;
-
-  // allTwitchTags: TTwitchTag[] = null;
-
-  twitchTags: TTwitchTagWithLabel[] = null;
+  channelInfo: IChannelInfo = null;
 
   get hasUpdateTagsPermission() {
     return this.channelInfo.hasUpdateTagsPermission;
@@ -95,14 +74,19 @@ export default class EditStreamInfo extends Vue {
     );
   }
 
-  channelInfo: IChannelInfo = null;
-
   get formMetadata() {
     return formMetadata({
       game: metadata.list({
         title: $t('Game'),
         placeholder: $t('Start typing to search'),
         options: this.gameOptions,
+      }),
+      title: metadata.text({
+        title: $t('Title'),
+        fullWidth: true,
+      }),
+      description: metadata.textArea({
+        title: $t('Description'),
       }),
     });
   }
@@ -117,83 +101,10 @@ export default class EditStreamInfo extends Vue {
 
   async created() {
     await this.refreshStreamInfo();
-    this.twitchTags = prepareOptions(
-      this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-      this.streamInfoService.state.channelInfo.tags,
-    );
-
-    // this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
-    //
-    // this.streamInfoService.streamInfoChanged.subscribe(() => {
-    //   if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-    //     if (!this.allTwitchTags && !this.twitchTags) {
-    //       this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-    //       this.twitchTags = prepareOptions(
-    //         this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-    //         this.streamInfoService.state.channelInfo.tags,
-    //       );
-    //     }
-    //   }
-    // });
-    //
-    // this.populatingModels = true;
-    // // If the stream info pre-fetch failed, we should try again now
-    // if (!this.streamInfoService.state.channelInfo) {
-    //   await this.refreshStreamInfo();
-    // }
-    // if (this.isServicedPlatform) {
-    //   const service = getPlatformService(this.userService.platform.type);
-    //   await service
-    //     .prepopulateInfo()
-    //     .then((info: IChannelInfo) => {
-    //       if (!info) return;
-    //       return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-    //     })
-    //     .then(() => this.populateModels());
-    // } else if (this.streamInfoService.state.channelInfo) {
-    //   await this.populateModels();
-    // }
-    // this.populatingModels = false;
-
-    if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-      // this.twitchService
-      //   .hasScope('user:edit:broadcast')
-      //   .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
-
-      // this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-      this.twitchTags = prepareOptions(
-        this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-        this.streamInfoService.state.channelInfo.tags,
-      );
-    }
   }
 
-  // async populateModels() {
-  //   this.facebookPages = await this.fetchFacebookPages();
-  //   const { game, title, description } = this.streamInfoService.state.channelInfo || {
-  //     game: '',
-  //     title: '',
-  //     description: '',
-  //   };
-  //
-  //   this.streamTitleModel = title;
-  //   this.gameModel = game;
-  //   this.streamDescriptionModel = description;
-  //   this.gameOptions = [{ title: game, value: game }];
-  //
-  //   if (this.facebookPages) {
-  //     this.pageModel = this.facebookPages.page_id;
-  //     this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
-  //       value: page.id,
-  //       title: `${page.name} | ${page.category}`,
-  //     }));
-  //     this.hasPages = !!this.facebookPages.pages.length;
-  //   }
-  //   await this.loadAvailableProfiles();
-  // }
-
   @Debounce(500)
-  onGameSearchHandler(searchString: string) {
+  async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
       const platform = this.userService.platform.type;
@@ -201,7 +112,7 @@ export default class EditStreamInfo extends Vue {
 
       this.gameOptions = [];
 
-      service.searchGames(searchString).then(games => {
+      return service.searchGames(searchString).then(games => {
         this.searchingGames = false;
         if (games && games.length) {
           games.forEach(game => {
@@ -339,15 +250,20 @@ export default class EditStreamInfo extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  // This should have been pre-fetched, but we can force a refresh
   async refreshStreamInfo() {
+    // This should have been pre-fetched, but we can force a refresh
     await this.streamInfoService.refreshStreamInfo();
-    this.channelInfo = cloneDeep(this.streamInfoService.state.channelInfo);
-    await this.loadAvailableProfiles();
-  }
 
-  setTags(tags: TTwitchTagWithLabel[]) {
-    this.twitchTags = tags;
+    // set a local state of the channelInfo
+    this.channelInfo = cloneDeep(this.streamInfoService.state.channelInfo);
+
+    // the ListInput component requires the selected game to be in the options list
+    if (this.channelInfo.game) {
+      this.gameOptions = [{ value: this.channelInfo.game, title: this.channelInfo.game }];
+    }
+
+    // check available profiles for the selected game
+    await this.loadAvailableProfiles();
   }
 
   get isTwitch() {

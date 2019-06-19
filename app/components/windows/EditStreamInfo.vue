@@ -1,7 +1,7 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <div v-if="infoLoading || populatingModels"><i class="fa fa-spinner fa-pulse" /></div>
+      <div v-if="infoLoading"><i class="fa fa-spinner fa-pulse" /></div>
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="refreshStreamInfo">{{
@@ -11,7 +11,7 @@
         <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
-      <form name="editStreamForm" v-if="!infoLoading && !infoError && !populatingModels">
+      <form name="editStreamForm" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           {{ $t("It looks like you don't have any Pages. Head to ") }}
           <a class="description-link" @click="openFBPageCreateLink">{{
@@ -32,19 +32,13 @@
         />
         <h-form-group
           v-model="channelInfo.title"
-          :metadata="{ type: 'text', name: 'stream_title', title: $t('Title'), fullWidth: true }"
+          :metadata="formMetadata.title"
         />
         <h-form-group
           v-if="isYoutube || isFacebook"
           v-model="channelInfo.description"
-          :metadata="{
-            type: 'textArea',
-            name: 'stream_description',
-            title: $t('Description'),
-            rows: 4,
-          }"
+          :metadata="formMetadata.description"
         />
-        Game: {{ channelInfo.game }}
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
           :metadata="formMetadata.game"
@@ -52,16 +46,15 @@
           <list-input
             @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
-            :value="channelInfo.game"
+            v-model="channelInfo.game"
             :metadata="formMetadata.game"
           />
         </h-form-group>
         <TwitchTagsInput
           v-if="isTwitch"
-          v-model="twitchTags"
+          v-model="channelInfo.tags"
           :tags="channelInfo.availableTags"
           :has-permission="hasUpdateTagsPermission"
-          @input="setTags"
         />
         <h-form-group v-if="searchProfilesPending">
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
