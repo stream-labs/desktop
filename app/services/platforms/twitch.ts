@@ -154,7 +154,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   @requiresToken()
   fetchUserInfo() {
-    const headers = this.getHeaders();
+    const headers = this.getHeaders(true, true);
     const request = new Request(`https://api.twitch.tv/helix/users?id=${this.twitchId}`, {
       headers,
     });
@@ -211,7 +211,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   @requiresToken()
   getAllTags(): Promise<TTwitchTag[]> {
-    return getAllTags(this.getRawHeaders(true));
+    return getAllTags(this.getRawHeaders(true, true));
   }
 
   prepopulateInfo() {

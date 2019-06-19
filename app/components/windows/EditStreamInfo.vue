@@ -44,6 +44,7 @@
             rows: 4,
           }"
         />
+        Game: {{ channelInfo.game }}
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
           :metadata="formMetadata.game"
