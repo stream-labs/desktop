@@ -5,8 +5,14 @@ const electron = require('electron');
   let currentButtons;
 
   electron.dialog.showMessageBox = function showMessageBox(win, opts, cb) {
-    currentCb = cb;
-    currentButtons = opts.buttons;
+    // Support alternate function signature where win is omitted
+    if (win.buttons) {
+      currentCb = opts;
+      currentButtons = win.buttons;
+    } else {
+      currentCb = cb;
+      currentButtons = opts.buttons;
+    }
   };
 
   electron.ipcMain.on('__SPECTRON_FAKE_MESSAGE_BOX', (e, buttonLabel) => {

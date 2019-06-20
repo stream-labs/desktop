@@ -45,7 +45,8 @@ module.exports = {
     'backtrace-js': 'require("backtrace-js")',
     'request': 'require("request")',
     'archiver': 'require("archiver")',
-    '@streamlabs/game-overlay': 'require("@streamlabs/game-overlay")'
+    '@streamlabs/game-overlay': 'require("@streamlabs/game-overlay")',
+    'extract-zip': 'require("extract-zip")'
   },
 
   module: {

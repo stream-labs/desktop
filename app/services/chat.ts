@@ -90,14 +90,24 @@ export class ChatService extends Service {
     // Youtube requires some special redirecting
     if (service instanceof YoutubeService) {
       const chatUrl = await service.getChatUrl(nightMode);
-      this.chatView.webContents.loadURL('https://youtube.com/signin');
+      this.chatView.webContents
+        .loadURL('https://youtube.com/signin')
+        .catch(this.handleRedirectError);
 
       this.chatView.webContents.once('did-navigate', () => {
-        this.chatView.webContents.loadURL(chatUrl);
+        this.chatView.webContents.loadURL(chatUrl).catch(this.handleRedirectError);
       });
     } else {
       const chatUrl = await service.getChatUrl(nightMode);
-      this.chatView.webContents.loadURL(chatUrl);
+
+      this.chatView.webContents.loadURL(chatUrl).catch(this.handleRedirectError);
+    }
+  }
+
+  handleRedirectError(e: Error) {
+    // This error happens when the page redirects, which is expected for chat
+    if (!e.message.match(/\(\-3\) loading/)) {
+      throw e;
     }
   }
 
