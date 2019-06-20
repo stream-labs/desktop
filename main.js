@@ -30,6 +30,17 @@ const pid = require('process').pid;
 const crashHandler = require('crash-handler');
 const electronLog = require('electron-log');
 
+// We use a special cache directory for running tests
+if (process.env.SLOBS_CACHE_DIR) {
+  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
+}
+app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
@@ -298,17 +309,6 @@ function startApp() {
   }
 }
 
-// We use a special cache directory for running tests
-if (process.env.SLOBS_CACHE_DIR) {
-  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
-  electronLog.transports.file.file = path.join(
-    process.env.SLOBS_CACHE_DIR,
-    'slobs-client',
-    'log.log'
-  );
-}
-app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
-
 const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
 if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
@@ -336,9 +336,9 @@ app.on('second-instance', (event, argv, cwd) => {
 });
 
 app.on('ready', () => {
-    if (
-      !process.argv.includes('--skip-update') &&
-      ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
+  if (
+    !process.argv.includes('--skip-update') &&
+    ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
     const updateInfo = {
       baseUrl: 'https://slobs-cdn.streamlabs.com',
       version: pjson.version,
@@ -352,14 +352,7 @@ app.on('ready', () => {
     };
 
     log(updateInfo);
-    bootstrap(updateInfo).then((updating) => {
-      if (updating) {
-        log('Closing for update...');
-        app.exit();
-      } else {
-        startApp();
-      }
-    });
+    bootstrap(updateInfo, startApp, app.exit);
   } else {
     startApp();
   }
