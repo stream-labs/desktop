@@ -92,7 +92,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
   networkLogging: false,
-  pauseIfFailed: false,
+  pauseIfFailed: true,
 };
 
 export interface ITestContext {

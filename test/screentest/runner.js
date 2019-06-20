@@ -34,7 +34,7 @@ const args = process.argv.slice(2);
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName);
-    exec(`yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
+    exec(`yarn test --timeout=3m --match=*onboarding* ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
   // return to the current branch
   checkoutBranch('current');
