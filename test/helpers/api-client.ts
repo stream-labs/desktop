@@ -19,7 +19,7 @@ export class ApiClient {
   eventReceived = new Subject<IJsonRpcEvent>();
 
   private nextRequestId = 1;
-  private socket = new net.Socket();
+  private socket: any;
   private resolveConnection: Function;
   private rejectConnection: Function;
   private requests = {};
@@ -41,7 +41,23 @@ export class ApiClient {
   // set to 'true' for debugging
   logsEnabled = false;
 
-  constructor() {
+  connect() {
+    if (this.socket) this.socket.destroy();
+
+    this.socket = new net.Socket();
+    this.bindListeners();
+
+    this.log('connecting...');
+    this.connectionStatus = 'pending';
+
+    return new Promise((resolve, reject) => {
+      this.resolveConnection = resolve;
+      this.rejectConnection = reject;
+      this.socket.connect(PIPE_PATH);
+    });
+  }
+
+  bindListeners() {
     this.socket.on('connect', () => {
       this.log('connected');
       this.connectionStatus = 'connected';
@@ -62,16 +78,6 @@ export class ApiClient {
     this.socket.on('close', () => {
       this.connectionStatus = 'disconnected';
       this.log('Connection closed');
-    });
-  }
-
-  connect() {
-    this.log('connecting...');
-    this.connectionStatus = 'pending';
-    return new Promise((resolve, reject) => {
-      this.resolveConnection = resolve;
-      this.rejectConnection = reject;
-      this.socket.connect(PIPE_PATH);
     });
   }
 
