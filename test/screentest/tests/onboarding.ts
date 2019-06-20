@@ -28,6 +28,10 @@ test('Onboarding steps', async t => {
   await sleep(1000);
 
   // Start auto config
+  if (!(await app.client.isExisting('button=Start'))) {
+    console.log('Stop test');
+    await sleep(999999999);
+  }
   t.true(await app.client.isExisting('button=Start'));
   await disableGifAnimations(t);
   await makeScreenshots(t, 'Autoconfig');
