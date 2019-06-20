@@ -44,7 +44,6 @@ test('Onboarding OBS Importer', async t => {
   // extract OBS config to the cache dir
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
-  console.log(dataDir);
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
