@@ -11,6 +11,9 @@ useSpectron({ skipOnboarding: false });
 useScreentest();
 
 test('Onboarding steps', async t => {
+  try {
+
+
   const app = t.context.app;
   await focusMain(t);
 
@@ -36,6 +39,10 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Autoconfig is Finished');
 
   t.pass();
+  } catch (e) {
+    console.log('catched', e);
+    await sleep(999999999);
+  }
 });
 
 test('Onboarding OBS Importer', async t => {
