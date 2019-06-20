@@ -18,7 +18,7 @@ test('Onboarding steps', async t => {
   await app.client.isExisting('button=Twitch');
   await makeScreenshots(t, 'Auth Buttons');
 
-  await logIn(t);
+  await logIn(t, null, null, false);
   await sleep(1000);
 
   // This will show up if there are scene collections to import
@@ -28,6 +28,7 @@ test('Onboarding steps', async t => {
   await sleep(1000);
 
   // Start auto config
+  t.true(await app.client.isExisting('button=Start'));
   await disableGifAnimations(t);
   await makeScreenshots(t, 'Autoconfig');
   await app.client.click('button=Start');

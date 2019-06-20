@@ -217,9 +217,12 @@ export class FormMonkey {
 
   async setBoolValue(selector: string, value: boolean) {
     const checkboxSelector = `${selector} input`;
+
+    // click to change the checkbox state
     await this.client.click(checkboxSelector);
 
-    if (!value && (await this.client.isSelected(checkboxSelector))) {
+    // if the current value is not what we need than click one more time
+    if (value !== (await this.getBoolValue(selector))) {
       await this.client.click(checkboxSelector);
     }
   }

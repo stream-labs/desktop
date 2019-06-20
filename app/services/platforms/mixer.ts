@@ -6,6 +6,7 @@ import {
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
+  EPlatformCallResult,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -74,24 +75,27 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return headers;
   }
 
-  setupStreamSettings(auth: IPlatformAuth) {
-    this.fetchStreamKey().then(key => {
-      const settings = this.settingsService.getSettingsFormData('Stream');
+  setupStreamSettings() {
+    return this.fetchStreamKey()
+      .then(key => {
+        const settings = this.settingsService.getSettingsFormData('Stream');
 
-      settings.forEach(subCategory => {
-        subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'service') {
-            parameter.value = 'Mixer.com - FTL';
-          }
+        settings.forEach(subCategory => {
+          subCategory.parameters.forEach(parameter => {
+            if (parameter.name === 'service') {
+              parameter.value = 'Mixer.com - FTL';
+            }
 
-          if (parameter.name === 'key') {
-            parameter.value = key;
-          }
+            if (parameter.name === 'key') {
+              parameter.value = key;
+            }
+          });
         });
-      });
 
-      this.settingsService.setSettings('Stream', settings);
-    });
+        this.settingsService.setSettings('Stream', settings);
+        return EPlatformCallResult.Success;
+      })
+      .catch(() => EPlatformCallResult.Error);
   }
 
   fetchUserInfo() {
@@ -108,7 +112,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       .then(handlePlatformResponse)
       .then(response => {
         this.userService.updatePlatformToken(response.access_token);
-        this.setupStreamSettings(this.userService.state.auth);
+        this.setupStreamSettings();
       });
   }
 
