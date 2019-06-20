@@ -11,11 +11,12 @@ const request = require('request');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
+const TIMEOUT = 3; // timeout in minutes
 
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync('yarn test --timeout=3m ' + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }
@@ -33,7 +34,7 @@ function retryTests() {
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
-    execSync('yarn test ' + args.concat(retryingArgs).join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), { stdio: [0, 1, 2] });
     log('retrying succeed');
   } catch (e) {
     retryingFailed = true;
