@@ -244,6 +244,7 @@ function startApp() {
     }
   });
 
+  if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
   // simple messaging system for services between windows
   // WARNING! the child window use synchronous requests and will be frozen
