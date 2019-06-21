@@ -66,8 +66,8 @@
       </div>
       <div class="row">
         <h-form-group :title="$t('Test Face Masks')">
-        <Accordion :opened-title="$t('Collapse')" :closed-title="$t('Expand')">
-          <div slot="content">
+          <Accordion :opened-title="$t('Collapse')" :closed-title="$t('Expand')">
+            <div slot="content">
               <item-grid>
                 <virtual-item
                   v-for="(mask) in availableMasks"
@@ -78,7 +78,7 @@
                 ></virtual-item>
               </item-grid>
           </div>
-        </Accordion>
+          </Accordion>
         </h-form-group>
       </div>
     </div>
