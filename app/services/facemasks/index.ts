@@ -702,7 +702,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       title: $t('Face Mask Settings'),
       queryParams: { categoryName },
       size: {
-        width: 800,
+        width: 850,
         height: 800,
       },
     });
