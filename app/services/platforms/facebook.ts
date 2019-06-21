@@ -5,6 +5,7 @@ import {
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
+  EPlatformCallResult,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -12,6 +13,7 @@ import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { handlePlatformResponse, requiresToken } from './utils';
+import { $t } from 'services/i18n';
 
 interface IFacebookPage {
   access_token: string;
@@ -108,7 +110,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   setupStreamSettings() {
-    this.fetchStreamKey().then(key => this.setSettingsWithKey(key));
+    return this.fetchStreamKey()
+      .then(key => {
+        this.setSettingsWithKey(key);
+        return EPlatformCallResult.Success;
+      })
+      .catch(() => EPlatformCallResult.Error);
   }
 
   fetchNewToken(): Promise<void> {
@@ -180,7 +187,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
         this.setSettingsWithKey(streamKey);
-      });
+      })
+      .catch(resp =>
+        Promise.reject($t('Something went wrong while going live, please try again.')),
+      );
   }
 
   prepopulateInfo() {
@@ -227,24 +237,25 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchViewerCount(): Promise<number> {
+    if (this.state.liveVideoId == null) return Promise.resolve(0);
+
     const url = `${this.apiBase}/${this.state.liveVideoId}?fields=live_views`;
     const request = this.formRequest(url, {}, this.activeToken);
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(json => json.live_views);
+      .then(json => json.live_views)
+      .catch(() => 0);
   }
 
-  fbGoLive() {
-    return new Promise(resolve => {
-      if (this.state.streamUrl && this.settingsService.state.Stream.service === 'Facebook Live') {
-        const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
-        this.setSettingsWithKey(streamKey);
-        this.SET_STREAM_URL(null);
-        resolve();
-      } else {
-        return this.state.activePage ? this.createLiveVideo().then(() => resolve()) : resolve();
-      }
-    });
+  async fbGoLive() {
+    if (this.state.streamUrl && this.settingsService.state.Stream.service === 'Facebook Live') {
+      const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
+      this.setSettingsWithKey(streamKey);
+      this.SET_STREAM_URL(null);
+      Promise.resolve();
+    } else {
+      return this.state.activePage ? this.createLiveVideo() : Promise.resolve();
+    }
   }
 
   putChannelInfo({ title, description, game }: IChannelInfo): Promise<boolean> {

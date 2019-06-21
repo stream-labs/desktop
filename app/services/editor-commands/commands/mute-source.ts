@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { AudioService } from 'services/audio';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class MuteSourceCommand extends Command {
   @Inject() private audioService: AudioService;
@@ -10,8 +11,8 @@ export class MuteSourceCommand extends Command {
 
   constructor(private sourceId: string, private muted: boolean) {
     super();
-    const action = muted ? 'Mute' : 'Unmute';
-    this.description = `${action} ${this.audioService.getSource(this.sourceId).name}`;
+    const action = muted ? 'Mute %{sourceName}' : 'Unmute %{sourceName}';
+    this.description = $t(action, { sourceName: this.audioService.getSource(this.sourceId).name });
   }
 
   execute() {

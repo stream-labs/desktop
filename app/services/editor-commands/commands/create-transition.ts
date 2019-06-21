@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class CreateTransitionCommand extends Command {
   @Inject() private transitionsService: TransitionsService;
@@ -12,7 +13,7 @@ export class CreateTransitionCommand extends Command {
   constructor(private type: ETransitionType, private name: string) {
     super();
 
-    this.description = `Create ${name}`;
+    this.description = $t('Create %{transitionName}', { transitionName: name });
   }
 
   execute() {

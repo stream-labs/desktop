@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { ETransitionType, TransitionsService } from 'services/transitions';
 import { Inject } from 'services/core';
+import { $t } from 'services/i18n';
 
 export class RemoveTransitionCommand extends Command {
   @Inject() private transitionsService: TransitionsService;
@@ -15,7 +16,7 @@ export class RemoveTransitionCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.name}`;
+    return $t('Remove %{transitionName}', { transitionName: this.name });
   }
 
   execute() {

@@ -1,6 +1,7 @@
 import { CombinableCommand } from './combinable-command';
 import { AudioService } from 'services/audio';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class SetDeflectionCommand extends CombinableCommand {
   @Inject() private audioService: AudioService;
@@ -12,7 +13,7 @@ export class SetDeflectionCommand extends CombinableCommand {
   constructor(private sourceId: string, private deflection: number) {
     super();
     const source = this.audioService.getSource(this.sourceId);
-    this.description = `Adjust ${source.name} volume`;
+    this.description = $t('Adjust %{sourceName} volume', { sourceName: source.name });
     this.initialValue = source.fader.deflection;
   }
 

@@ -19,13 +19,13 @@ const {
 } = process.env;
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
+const args = process.argv.slice(2);
 
 (async function main() {
 
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
-
 
   // make screenshots for each branch
   const branches = [
@@ -34,12 +34,16 @@ const commitSHA = getCommitSHA();
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName);
-    // TODO: run all tests, not only for settings
-    exec('yarn test --timeout=3m test-dist/test/screentest/tests --match="Settings*" ');
+    exec(`yarn test-flaky ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
+  // return to the current branch
+  checkoutBranch('current');
+
+  // compile the test folder
+  exec(`tsc -p test`);
 
   // compare screenshots
-  exec(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+  exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
   // send the status to the GitHub check and upload screenshots
   await updateCheck();
@@ -49,13 +53,18 @@ const commitSHA = getCommitSHA();
 function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
-  if (branchName !== 'current') {
-    exec(`git checkout ${branchName}`);
+  const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
+  rimraf.sync(CONFIG.compiledTestsDist);
+  exec(`git reset --hard`);
+  exec(`git checkout ${checkoutTarget}`);
+  if (branchName !== CONFIG.baseBranch) {
+    // the base branch may have changes, so merge it
+    exec(`git pull origin ${CONFIG.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
   // save current branch name to the file
-  // screenshoter needs will use this value
+  // screenshoter.js will use this value
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 

@@ -3,6 +3,7 @@ import { setFormInput } from './helpers/spectron/forms';
 import { fillForm } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
 import { setOutputResolution } from './helpers/spectron/output';
+import { sleep } from './helpers/sleep';
 
 
 useSpectron({ appArgs: '--nosync' });
@@ -65,8 +66,7 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-// TODO: flaky
-test.skip('Streaming to Facebook', async t => {
+test('Streaming to Facebook', async t => {
 
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;

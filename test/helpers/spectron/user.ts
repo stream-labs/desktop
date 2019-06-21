@@ -1,6 +1,7 @@
 import { focusMain, TExecutionContext } from './index';
 import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
+import { dialogDismiss } from './dialog';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -23,6 +24,8 @@ interface ITestUser {
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');
+  await dialogDismiss(t, 'Yes');
+  await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
 }
 
@@ -35,11 +38,12 @@ export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
   email?: string, // if not set, pick a random user's account from user-pool
+  waitForUI = true,
 ): Promise<boolean> {
   const app = t.context.app;
   let authInfo: IPlatformAuth;
 
-  if (email) throw 'User already logged in';
+  if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
     authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
@@ -52,7 +56,10 @@ export async function logIn(
   }
 
   await focusMain(t);
-  await app.webContents.send('testing-fakeAuth', authInfo);
+
+  app.webContents.send('testing-fakeAuth', authInfo);
+  if (!waitForUI) return true;
+  await t.context.app.client.waitForVisible('.icon-logout'); // wait for the log-out button
   return true;
 }
 

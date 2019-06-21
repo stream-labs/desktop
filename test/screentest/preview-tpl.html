@@ -28,35 +28,48 @@
   </div>
   <div class="regressions">
     <div
-        class="regression"
-        :class="{'regression-new': regression.isNew }"
-        v-for="(regression, ind) of state.regressions"
-        v-if="canShow(regression)"
+      class="regression"
+      :class="{'regression-new': regression.isNew }"
+      v-for="(regression, ind) of state.regressions"
+      v-if="canShow(regression)"
     >
 
-      <span v-if="regression.isNew" class="badge new">NEW</span>
-      <span v-if="regression.isChanged" class="badge changed">CHANGED</span>
-      {{ ind }}
-      <pre>({{ JSON.stringify(regression.params) }})</pre>
-      <table width="100%">
-        <tr>
-          <td >
-            <a :href="regression.branchImage" target="_blank">
-              <img :src="regression.branchImage" >
-            </a>
-          </td>
-          <td >
-            <a :href="regression.baseImage"  target="_blank" v-if="!regression.isNew">
-              <img :src="regression.baseImage" >
-            </a>
-          </td>
-          <td>
-            <a :href="regression.diffImage"  target="_blank" v-if="!regression.isNew">
-              <img :src="regression.diffImage" >
-            </a>
-          </td>
-        </tr>
-      </table>
+      <div @click="toggleExpand(ind)" style="cursor: default;">
+        <span v-if="regression.isNew" class="badge new">NEW</span>
+        <span v-if="regression.isChanged" class="badge changed">CHANGED</span>
+        <span v-if="!regression.isChanged && !regression.isNew" class="badge no-changes">NO CHANGES</span>
+        {{ ind }}
+        <span>{{ regression.expanded ? '-' : '+'}}</span>
+      </div>
+
+      <div v-show="regression.expanded" style="margin-bottom: 50px;">
+        <pre>({{ JSON.stringify(regression.params) }})</pre>
+        <table width="100%">
+          <tr>
+            <th>{{ state.branches[0] }}</th>
+            <th>{{ state.branches[1] }}</th>
+            <th>diff</th>
+          </tr>
+          <tr>
+            <td >
+              <a :href="regression.branchImage" target="_blank">
+                <img :src="regression.branchImage" >
+              </a>
+            </td>
+            <td >
+              <a :href="regression.baseImage"  target="_blank" v-if="!regression.isNew">
+                <img :src="regression.baseImage" >
+              </a>
+            </td>
+            <td>
+              <a :href="regression.diffImage"  target="_blank" v-if="!regression.isNew">
+                <img :src="regression.diffImage" >
+              </a>
+            </td>
+          </tr>
+        </table>
+      </div>
+
     </div>
   </div>
 
@@ -78,6 +91,12 @@
         filters[paramName] = filterValues;
       });
 
+      // make visible only changed and new screenshots
+      Object.keys(state.regressions).forEach(regId => {
+        const regression = state.regressions[regId];
+        regression.expanded = regression.isChanged || regression.isNew;
+      });
+
       return {
         state,
         filters,
@@ -85,6 +104,12 @@
       }
     },
     methods: {
+
+      toggleExpand(regId) {
+        const regression = this.state.regressions[regId];
+        regression.expanded = !regression.expanded;
+      },
+
       canShow(regression) {
 
         if (this.showOnlyChanged && !regression.isChanged && !regression.isNew) {
@@ -157,6 +182,10 @@
     margin-bottom: 20px;
   }
 
+  .regression table th {
+    text-align: left;
+  }
+
   .regression img {
     display:block;
     width:100%;
@@ -177,6 +206,9 @@
     background-color: orangered;
   }
 
+  .badge.no-changes {
+    background-color: #35444c;
+  }
 
   .regression-new img {
     display: inline;

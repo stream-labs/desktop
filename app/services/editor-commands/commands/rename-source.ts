@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { SourcesService } from 'services/sources';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class RenameSourceCommand extends Command {
   @Inject() sourcesService: SourcesService;
@@ -12,7 +13,7 @@ export class RenameSourceCommand extends Command {
   }
 
   get description() {
-    return `Rename ${this.oldName}`;
+    return $t('Rename %{sourceName}', { sourceName: this.oldName });
   }
 
   execute() {

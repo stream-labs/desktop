@@ -117,6 +117,7 @@ export default class EditTransform extends TsxComponent<{}> {
     const title = type === 'pos' ? $t('Position') : $t('Size');
     const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
     const inputHandler = type === 'pos' ? this.setPos : this.setScale;
+    if (dataArray.some(dir => isNaN(Math.round(this.rect[dir])))) return null;
     return (
       <HFormGroup metadata={{ title }}>
         <div style="display: flex;">

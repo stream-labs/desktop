@@ -139,6 +139,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateModels() {
+    if (!this.streamInfoService.state.channelInfo) return;
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
     this.gameModel = this.streamInfoService.state.channelInfo.game || '';
@@ -298,9 +299,19 @@ export default class EditStreamInfo extends Vue {
     this.updateAndGoLive();
   }
 
-  goLive() {
-    this.streamingService.toggleStreaming();
-    this.windowsService.closeChildWindow();
+  async goLive() {
+    try {
+      await this.streamingService.toggleStreaming();
+      this.windowsService.closeChildWindow();
+    } catch (e) {
+      this.$toasted.show(e, {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      this.updatingInfo = false;
+    }
   }
 
   cancel() {
@@ -367,7 +378,6 @@ export default class EditStreamInfo extends Vue {
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
-      placeholder: $t('Search'),
       options: this.gameOptions,
       noResult: $t('No matching game(s) found.'),
     };

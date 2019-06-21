@@ -6,7 +6,7 @@
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component :is="options.componentName"/>
+  <component :is="options.componentName" :title="options.title" />
 </div>
 </template>
 

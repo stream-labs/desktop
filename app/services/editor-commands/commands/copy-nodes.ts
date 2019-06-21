@@ -3,6 +3,7 @@ import { Selection } from 'services/selection';
 import { Inject } from 'services/core';
 import { ScenesService, TSceneNode } from 'services/scenes';
 import compact from 'lodash/compact';
+import { $t } from 'services/i18n';
 
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
@@ -28,7 +29,7 @@ export class CopyNodesCommand extends Command {
   ) {
     super();
     const nodes = this.selection.getNodes();
-    this.description = `Paste ${nodes[0] ? nodes[0].name : ''}`;
+    this.description = $t('Paste %{nodeName}', { nodeName: nodes[0] ? nodes[0].name : '' });
   }
 
   execute() {

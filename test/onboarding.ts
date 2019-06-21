@@ -11,18 +11,20 @@ const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
-test('Go through onboarding', async t => {
+test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
   await focusMain(t);
 
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
 
-  await logIn(t);
+  await logIn(t, 'twitch', null, false);
+  await sleep(1000);
 
   // This will show up if there are scene collections to import
   if (await t.context.app.client.isExisting('button=Continue')) {
     await t.context.app.client.click('button=Continue');
+    await sleep(1000);
   }
 
   // This will only show up if OBS is installed
@@ -30,11 +32,15 @@ test('Go through onboarding', async t => {
     await t.context.app.client.click('button=Start Fresh');
   }
 
-  await app.client.click('a=Setup later');
+  // Start auto config
+  t.true(await app.client.isExisting('button=Start'));
+  await app.client.click('button=Start');
+  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
+  await app.client.click('button=Next');
 
-  t.pass();
+  // success?
+  t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
 });
-
 
 test('OBS Importer', async t => {
   const client = t.context.app.client;

@@ -1,5 +1,6 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export enum EFlipAxis {
   Horizontal = 'horizontal',
@@ -12,7 +13,7 @@ export class FlipItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return `Flip ${this.selection.getNodes()[0].name}`;
+    return $t('Flip %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

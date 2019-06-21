@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
@@ -215,6 +215,21 @@ export default class SourceSelector extends Vue {
   canShowActions(sceneNodeId: string) {
     const node = this.scene.getNode(sceneNodeId);
     return node.isItem() || node.getNestedItems().length;
+  }
+
+  get lastSelectedId() {
+    return this.selectionService.state.lastSelectedId;
+  }
+
+  @Watch('lastSelectedId')
+  async expandSelectedFolders() {
+    const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
+    if (!node || this.selectionService.state.selectedIds.length > 1) return;
+    this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+
+    await this.$nextTick();
+
+    this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
   }
 
   get activeItemIds() {
