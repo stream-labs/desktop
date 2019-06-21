@@ -19,6 +19,8 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   hotkeys?: HotkeysNode;
   locked?: boolean;
   rotation?: number;
+  showingStreaming?: boolean;
+  showingRecording?: boolean;
   sceneNodeType: 'item';
 }
 
@@ -75,6 +77,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               crop: transform.crop,
               locked: sceneItem.locked,
               rotation: transform.rotation,
+              showingStreaming: sceneItem.showingStreaming,
+              showingRecording: sceneItem.showingRecording,
               sceneNodeType: 'item',
             });
           });

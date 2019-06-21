@@ -50,6 +50,8 @@ export class SceneItem extends SceneItemNode {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  showingStreaming: boolean;
+  showingRecording: boolean;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -116,6 +118,8 @@ export class SceneItem extends SceneItemNode {
       transform: this.transform,
       locked: this.locked,
       visible: this.visible,
+      showingStreaming: this.showingStreaming,
+      showingRecording: this.showingRecording,
     };
   }
 
@@ -168,6 +172,14 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().visible = newSettings.visible;
     }
 
+    if (changed.showingStreaming !== void 0) {
+      this.getObsSceneItem().showingStreaming = newSettings.showingStreaming;
+    }
+
+    if (changed.showingRecording !== void 0) {
+      this.getObsSceneItem().showingRecording = newSettings.showingRecording;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -201,6 +213,14 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ visible });
   }
 
+  setShowStreaming(showingStreaming: boolean) {
+    this.setSettings({ showingStreaming });
+  }
+
+  setShowRecording(showingRecording: boolean) {
+    this.setSettings({ showingRecording });
+  }
+
   setLocked(locked: boolean) {
     this.setSettings({ locked });
   }
@@ -209,6 +229,8 @@ export class SceneItem extends SceneItemNode {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
+    const showingStreaming = customSceneItem.showingStreaming;
+    const showingRecording = customSceneItem.showingRecording;
 
     this.UPDATE({
       visible,
@@ -220,6 +242,8 @@ export class SceneItem extends SceneItemNode {
         rotation: customSceneItem.rotation,
       },
       locked: !!customSceneItem.locked,
+      showingStreaming: !!customSceneItem.showingStreaming,
+      showingRecording: !!customSceneItem.showingRecording,
     });
   }
 

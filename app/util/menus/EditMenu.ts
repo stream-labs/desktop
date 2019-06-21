@@ -109,12 +109,28 @@ export class EditMenu extends Menu {
 
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
+        const showingStreamingLabel =
+          selectedItem.showingStreaming ? $t('Hide in stream') : $t('Show in stream');
+        const showingRecordingLabel =
+          selectedItem.showingRecording ? $t('Hide in record') : $t('Show in record');
 
         if (!isMultipleSelection) {
           this.append({
             label: visibilityLabel,
             click: () => {
               selectedItem.setVisibility(!selectedItem.visible);
+            },
+          });
+          this.append({
+            label: showingStreamingLabel,
+            click: () => {
+              selectedItem.setShowStreaming(!selectedItem.showingStreaming);
+            },
+          });
+          this.append({
+            label: showingRecordingLabel,
+            click: () => {
+              selectedItem.setShowRecording(!selectedItem.showingRecording);
             },
           });
           this.append({
@@ -134,6 +150,30 @@ export class EditMenu extends Menu {
             label: $t('Hide'),
             click: () => {
               this.selectionService.setVisibility(false);
+            },
+          });
+          this.append({
+            label: $t('Show in stream'),
+            click: () => {
+              selectedItem.setShowStreaming(true);
+            },
+          });
+          this.append({
+            label: $t('Show in record'),
+            click: () => {
+              selectedItem.setShowRecording(true);
+            },
+          });
+          this.append({
+            label: $t('Hide in stream'),
+            click: () => {
+              selectedItem.setShowStreaming(false);
+            },
+          });
+          this.append({
+            label: $t('Hide in record'),
+            click: () => {
+              selectedItem.setShowRecording(false);
             },
           });
         }

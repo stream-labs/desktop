@@ -39,6 +39,8 @@ export interface ISceneItemInfo {
   crop: ICrop;
   locked?: boolean;
   rotation?: number;
+  showingStreaming?: boolean;
+  showingRecording?: boolean;
 }
 
 export interface IScenesState {
@@ -71,12 +73,16 @@ export interface ISceneItemSettings {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  showingStreaming: boolean;
+  showingRecording: boolean;
 }
 
 export interface IPartialSettings {
   transform?: IPartialTransform;
   visible?: boolean;
   locked?: boolean;
+  showingStreaming?: boolean;
+  showingRecording?: boolean;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -89,6 +95,8 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
 export interface ISceneItemActions {
   setSettings(settings: Partial<ISceneItemSettings>): void;
   setVisibility(visible: boolean): void;
+  setShowingStreaming(showingStreaming: boolean): void;
+  setShowingRecording(showingRecording: boolean): void;
   setTransform(transform: IPartialTransform): void;
   resetTransform(): void;
   flipX(): void;
