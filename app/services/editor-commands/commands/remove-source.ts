@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { Inject } from 'services/core/injector';
 import { ISourceAddOptions, SourcesService, TSourceType } from 'services/sources';
+import { $t } from '../../i18n';
 
 /**
  * Removes the source
@@ -18,7 +19,7 @@ export class RemoveSourceCommand extends Command {
   }
 
   get description() {
-    return `Remove source ${this.name}`;
+    return `${$t('Remove source')} ${this.name}`;
   }
 
   execute() {
