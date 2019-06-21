@@ -301,7 +301,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
-    console.log('call login');
     this.LOGIN(auth);
 
     const result = await service.setupStreamSettings();

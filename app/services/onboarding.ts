@@ -67,12 +67,8 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeA: {
     isEligible: service => {
-      console.log('check OptimizeA is eligable');
       if (service.options.isLogin) return false;
-      console.log('login is ok');
       if (service.completedSteps.includes('OptimizeBrandDevice')) return false;
-      console.log('OptimizeBrandDevice is completed');
-      console.log('Is twitch', service.isTwitchAuthed);
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB',
@@ -137,7 +133,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Completes the current step and moves on to the
   // next eligible step.
   next() {
-    console.log('complete step', this.state.currentStep);
     this.COMPLETE_STEP(this.state.currentStep);
     this.goToNextStep(ONBOARDING_STEPS[this.state.currentStep].next);
   }
