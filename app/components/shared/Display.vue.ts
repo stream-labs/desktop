@@ -15,6 +15,7 @@ export default class Display extends Vue {
   @Prop({ default: 0 }) paddingSize: number;
   @Prop({ default: false }) drawUI: boolean;
   @Prop() clickHandler: boolean;
+  @Prop({ default: 0 }) renderingMode: number;
 
   $refs: {
     display: HTMLElement;
@@ -40,6 +41,7 @@ export default class Display extends Vue {
       sourceId: this.sourceId,
       paddingSize: this.paddingSize,
       paddingColor: this.paddingColor,
+      renderingMode: this.renderingMode,
     });
     this.display.setShoulddrawUI(this.drawUI);
 

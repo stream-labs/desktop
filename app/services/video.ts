@@ -19,6 +19,7 @@ export interface IDisplayOptions {
   electronWindowId?: number;
   slobsWindowId?: string;
   paddingColor?: IRGBColor;
+  renderingMode?: number;
 }
 
 export class Display {
@@ -45,6 +46,7 @@ export class Display {
   private readonly selectionSubscription: Subscription;
 
   sourceId: string;
+  renderingMode: number;
 
   boundDestroy: any;
   boundClose: any;
@@ -54,10 +56,11 @@ export class Display {
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
+    this.renderingMode = options.renderingMode;
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    this.videoService.createOBSDisplay(this.electronWindowId, name, this.sourceId);
+    this.videoService.createOBSDisplay(this.electronWindowId, name, this.renderingMode, this.sourceId);
 
     this.displayDestroyed = false;
 
@@ -235,7 +238,7 @@ export class VideoService extends Service {
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
    */
-  createOBSDisplay(electronWindowId: number, name: string, sourceId?: string) {
+  createOBSDisplay(electronWindowId: number, name: string, remderingMode: number, sourceId?: string) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
     if (sourceId) {
@@ -245,7 +248,8 @@ export class VideoService extends Service {
         name,
       );
     } else {
-      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
+      obs.NodeObs.OBS_content_createDisplay(
+        electronWindow.getNativeWindowHandle(), name, remderingMode);
     }
   }
 

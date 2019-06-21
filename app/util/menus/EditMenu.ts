@@ -14,6 +14,7 @@ import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import * as obs from '../../../obs-api';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -136,7 +137,8 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Create Source Projector'),
             click: () => {
-              this.projectorService.createProjector(selectedItem.sourceId);
+              this.projectorService.createProjector(
+                obs.ERenderingMode.OBS_MAIN_RENDERING, selectedItem.sourceId);
             },
           });
         } else {
@@ -273,7 +275,17 @@ export class EditMenu extends Menu {
 
     this.append({
       label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector(),
+      click: () => this.projectorService.createProjector(obs.ERenderingMode.OBS_MAIN_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Streaming Output Projector'),
+      click: () => this.projectorService.createProjector(obs.ERenderingMode.OBS_STREAMING_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Recording Output Projector'),
+      click: () => this.projectorService.createProjector(obs.ERenderingMode.OBS_RECORDING_RENDERING),
     });
 
     this.append({ type: 'separator' });
