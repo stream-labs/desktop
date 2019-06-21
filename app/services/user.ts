@@ -304,8 +304,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const result = await service.setupStreamSettings();
 
     // Currently we treat generic errors as success
-    this.LOGOUT();
-    return EPlatformCallResult.TwitchTwoFactor;
     if (result === EPlatformCallResult.TwitchTwoFactor) {
       this.LOGOUT();
       return result;
