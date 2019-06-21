@@ -546,7 +546,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
-        height: 540,
+        height: 320,
       },
     });
   }
