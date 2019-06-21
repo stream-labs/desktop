@@ -37,12 +37,9 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   cdn = `https://${this.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
   socketConnectionActive = false;
-
-  registeredDonations = {};
-  registeredSubscriptions = {};
-  registeredBits = {};
   downloadProgress = {};
   isDownloading = false;
+  renderLock = false;
 
   static defaultState: Interfaces.IFacemasksServiceState = {
     modtimeMap: {},
@@ -53,18 +50,13 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       donations_enabled: false,
       subs_enabled: false,
       sub_duration: 8,
-      extension_enabled: false,
       bits_enabled: false,
       bits_duration: 10,
       bits_price: 500,
       pricing_options: [200, 500, 1000, 2000, 10000],
       primary_platform: 'twitch_account',
       partnered: false,
-      t2masks: [],
-      t3masks: [],
       facemasks: [],
-      extension: false,
-      extension_url: '',
       duration: 10,
       username: null,
       device: {
@@ -148,28 +140,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     this.sourcesService.sourceAdded.subscribe(e => this.onSourceAdded(e));
   }
 
-  registerDonationEvent(donation: Interfaces.IFacemaskDonation) {
-    this.registeredDonations[donation.eventId] = donation.facemask;
-  }
-
-  registerBitsEvent(bits: Interfaces.IFacemaskBits) {
-    this.registeredBits[bits.eventId] = bits.facemask;
-  }
-
-  registerSubscriptionEvent(subscription: Interfaces.IFacemaskSubscription) {
-    const eventKey = subscription.name + subscription.subPlan;
-    if (subscription.subPlan !== '2000' && subscription.subPlan !== '3000') {
-      return;
-    }
-
-    // Pick Eligible Mask at random
-    if (!subscription.subscriberId) {
-      this.registeredSubscriptions[eventKey] = this.selectRandomMaskForSub(subscription);
-    }
-
-    this.registeredSubscriptions[eventKey] = this.fetchViewerMaskSelection(subscription);
-  }
-
   fetchViewerMaskSelection(sub: Interfaces.IFacemaskSubscription) {
     const endpoint = 'slobs/facemasks/subscription';
     const data = {
@@ -186,140 +156,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     return this.formRequest(endpoint, postData);
   }
 
-  selectRandomMaskForSub(sub: Interfaces.IFacemaskSubscription): Promise<{ uuid: string }> {
-    return new Promise(resolve => {
-      let availableMasks: string[] = [];
-
-      if (sub.subPlan === '2000') {
-        availableMasks = this.state.settings.t2masks.map(mask => {
-          return mask.uuid;
-        });
-      }
-
-      if (sub.subPlan === '3000') {
-        availableMasks = this.state.settings.t2masks
-          .concat(this.state.settings.t3masks)
-          .map(mask => {
-            return mask.uuid;
-          });
-      }
-
-      resolve({ uuid: availableMasks[Math.floor(Math.random() * availableMasks.length)] });
-    });
-  }
-
-  playDonationEvent(donation: Interfaces.IFacemaskDonation) {
-    if (this.registeredDonations[donation.eventId] && this.facemaskFilter) {
-      const uuid = this.registeredDonations[donation.eventId];
-      delete this.registeredDonations[donation.eventId];
-      this.trigger(uuid, this.state.settings.duration);
-    }
-  }
-
-  playBitsEvent(bits: Interfaces.IFacemaskBits) {
-    if (this.registeredBits[bits.eventId] && this.facemaskFilter) {
-      const uuid = this.registeredBits[bits.eventId];
-      delete this.registeredBits[bits.eventId];
-      this.trigger(uuid, this.state.settings.bits_duration);
-    }
-  }
-
-  playSubscriptionEvent(subscription: Interfaces.IFacemaskSubscription) {
-    const eventKey = subscription.name + subscription.subPlan;
-    if (this.registeredSubscriptions[eventKey] && this.facemaskFilter) {
-      const uuidPromise = this.registeredSubscriptions[eventKey];
-      delete this.registeredSubscriptions[eventKey];
-      uuidPromise.then((response: Interfaces.IFacemaskSelection) => {
-        if (response.uuid) {
-          this.trigger(response.uuid, this.state.settings.sub_duration);
-        } else {
-          this.selectRandomMaskForSub(subscription).then(result => {
-            this.trigger(result.uuid, this.state.settings.sub_duration);
-          });
-        }
-      });
-    }
-  }
-
-  shouldQueueDonationEvents() {
-    return this.state.settings.donations_enabled;
-  }
-
-  shouldQueueSubscriptionEvents() {
-    return this.state.settings.subs_enabled && this.state.settings.extension_enabled;
-  }
-
-  shouldQueueBitsEvents() {
-    return this.state.settings.bits_enabled && this.state.settings.extension_enabled;
-  }
-
-  onSocketEvent(event: TSocketEvent) {
-    if (event.type === 'fm-ext-enabled') {
-      this.startup();
-    }
-
-    if (event.type === 'facemaskdonation' && this.shouldQueueDonationEvents()) {
-      this.registerDonationEvent({
-        facemask: event.message[0].facemask,
-        eventId: event.message[0]._id,
-      });
-    }
-
-    if (
-      event.type === 'subscription' &&
-      this.shouldQueueSubscriptionEvents() &&
-      event.message[0].subscriber_twitch_id
-    ) {
-      this.registerSubscriptionEvent({
-        subscriberId: event.message[0].subscriber_twitch_id,
-        subPlan: event.message[0].sub_plan,
-        name: event.message[0].name.toLowerCase(),
-      });
-    }
-
-    if (event.type === 'bits' && this.shouldQueueBitsEvents() && event.message[0].data) {
-      this.registerBitsEvent({
-        facemask: event.message[0].data.facemask,
-        eventId: event.message[0].data.fm_id,
-      });
-    }
-
-    if (event.type === 'alertPlaying') {
-      this.onAlertPlayingSocketEvent(event);
-    }
-  }
-
-  onAlertPlayingSocketEvent(event: IAlertPlayingSocketEvent) {
-    if (
-      event.message.type === 'donation' &&
-      event.message.facemask &&
-      this.shouldQueueDonationEvents()
-    ) {
-      this.playDonationEvent({ facemask: event.message.facemask, eventId: event.message._id });
-    }
-
-    if (event.message.type === 'subscription' && this.shouldQueueSubscriptionEvents()) {
-      this.playSubscriptionEvent({
-        subscriberId: event.message.subscriber_twitch_id,
-        subPlan: event.message.sub_plan,
-        name: event.message.name.toLowerCase(),
-      });
-    }
-
-    if (event.message.type === 'bits' && this.shouldQueueBitsEvents() && event.message.data) {
-      this.playBitsEvent({
-        facemask: event.message.data.facemask,
-        eventId: event.message.data.fm_id,
-      });
-    }
-  }
-
-  onSourceAdded(event: ISource) {
-    if (this.state.active && event.type === 'dshow_input') {
-      this.setupFilter();
-    }
-  }
-
   trigger(uuid: string, duration: number) {
     this.updateFilter({
       Mask: `${uuid}.json`,
@@ -328,7 +164,71 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     });
     setTimeout(() => {
       this.updateFilter({ alertActivate: false });
+      this.renderLock = false;
     }, 500);
+  }
+
+  playMask(uuid: string) {
+    if (this.facemaskFilter && !this.renderLock) {
+      this.renderLock = true;
+      this.trigger(uuid, this.state.settings.duration);
+    }
+  }
+
+  playRandomMask() {
+    this.playMask(
+      this.state.settings.facemasks[
+        Math.floor(Math.random() * this.state.settings.facemasks.length)
+      ].uuid,
+    );
+  }
+
+  shouldPlayDonation() {
+    return this.state.settings.donations_enabled;
+  }
+
+  shouldPlaySubscription() {
+    return this.state.settings.subs_enabled;
+  }
+
+  shouldPlayBits(amount: string) {
+    return (
+      this.state.settings.bits_enabled && parseInt(amount, 10) > this.state.settings.bits_price
+    );
+  }
+
+  onSocketEvent(event: TSocketEvent) {
+    if (!this.state.active) {
+      return;
+    }
+
+    if (event.type === 'alertPlaying') {
+      this.onAlertPlayingSocketEvent(event);
+    }
+  }
+
+  onAlertPlayingSocketEvent(event: IAlertPlayingSocketEvent) {
+    if (this.renderLock) {
+      return;
+    }
+
+    if (event.message.facemask && this.shouldPlayDonation()) {
+      this.playMask(event.message.facemask);
+    }
+
+    if (event.message.type === 'subscription' && this.shouldPlaySubscription()) {
+      this.playRandomMask();
+    }
+
+    if (event.message.type === 'bits' && this.shouldPlayBits(event.message.amount)) {
+      this.playRandomMask();
+    }
+  }
+
+  onSourceAdded(event: ISource) {
+    if (this.state.active && event.type === 'dshow_input') {
+      this.setupFilter();
+    }
   }
 
   updateFilter(settings: Dictionary<TObsValue>) {
@@ -403,19 +303,9 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       return;
     }
 
-    let uuids = settings.facemasks.map((mask: Interfaces.IFacemask) => {
+    const uuids = settings.facemasks.map((mask: Interfaces.IFacemask) => {
       return { uuid: mask.uuid, intro: mask.is_intro };
     });
-
-    const t3 = settings.t3masks.map((mask: Interfaces.IFacemask) => {
-      return { uuid: mask.uuid, intro: mask.is_intro };
-    });
-
-    const t2 = settings.t2masks.map((mask: Interfaces.IFacemask) => {
-      return { uuid: mask.uuid, intro: mask.is_intro };
-    });
-
-    uuids = uuids.concat(t3).concat(t2);
 
     this.isDownloading = true;
 
