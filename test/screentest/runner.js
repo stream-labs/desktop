@@ -34,7 +34,7 @@ const args = process.argv.slice(2);
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName);
-    exec(`yarn test --timeout=3m ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
+    exec(`yarn test-flaky ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
   // return to the current branch
   checkoutBranch('current');
@@ -54,8 +54,13 @@ function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
-  exec(`git checkout ${checkoutTarget}`);
   rimraf.sync(CONFIG.compiledTestsDist);
+  exec(`git reset --hard`);
+  exec(`git checkout ${checkoutTarget}`);
+  if (branchName !== CONFIG.baseBranch) {
+    // the base branch may have changes, so merge it
+    exec(`git pull origin ${CONFIG.baseBranch}`);
+  }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
   // save current branch name to the file
