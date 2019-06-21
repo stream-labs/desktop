@@ -68,6 +68,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
+    console.log('login mutation');
+    console.trace();
     Vue.set(this.state, 'auth', auth);
   }
 
@@ -299,6 +301,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
+    console.log('call login');
     this.LOGIN(auth);
 
     const result = await service.setupStreamSettings();

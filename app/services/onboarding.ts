@@ -133,6 +133,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Completes the current step and moves on to the
   // next eligible step.
   next() {
+    console.log('complete step', this.state.currentStep);
     this.COMPLETE_STEP(this.state.currentStep);
     this.goToNextStep(ONBOARDING_STEPS[this.state.currentStep].next);
   }
@@ -172,6 +173,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   private goToNextStep(step: TOnboardingStep) {
+    console.log('go to next step', step);
     if (!step) {
       this.finish();
       return;
@@ -180,8 +182,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     const stepObj = ONBOARDING_STEPS[step];
 
     if (stepObj.isEligible(this)) {
+      console.log('isEligible');
       this.SET_CURRENT_STEP(step);
     } else {
+      console.log('is not eligible');
       this.goToNextStep(stepObj.next);
     }
   }
