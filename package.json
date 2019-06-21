@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.16.0-preview.5",
+  "version": "0.16.0-preview.7",
   "main": "main.js",
   "engines": {
     "node": ">= 10 < 12",
@@ -18,10 +18,8 @@
     "watch-app": "yarn clear && yarn webpack-cli --watch --progress --config dev-app.config.js",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
-    "package": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.electronDownload.mirror=https://github.com/stream-labs/electron/releases/download/  ",
-    "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
-    "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
-    "package:nosign": "yarn package -- --config.win.certificateSubjectName \"\"",
+    "package": "rimraf dist && build -w --x64 --config electron-builder/base.config.js",
+    "package:preview": "rimraf dist && build -w --x64 --config electron-builder/preview.config.js",
     "release": "yarn install --cwd bin && node bin/release.js",
     "rollout": "yarn install --cwd bin && node bin/set-rollout.js",
     "lint": "tslint --project tsconfig.json {app,guest-api,obs-api,updater}/**/*.ts",
@@ -52,42 +50,6 @@
       "tslint --fix",
       "git add"
     ]
-  },
-  "build": {
-    "appId": "com.streamlabs.slobs",
-    "productName": "Streamlabs OBS",
-    "icon": "media/images/icon.ico",
-    "files": [
-      "bundles",
-      "!bundles/*.js.map",
-      "node_modules",
-      "vendor",
-      "app/i18n",
-      "updater/index.html",
-      "updater/bootstrap.js",
-      "index.html",
-      "main.js",
-      "obs-api"
-    ],
-    "extraFiles": [
-      "LICENSE",
-      "AGREEMENT"
-    ],
-    "publish": {
-      "provider": "generic",
-      "url": "https://d1g6eog1uhe0xm.cloudfront.net"
-    },
-    "nsis": {
-      "license": "AGREEMENT",
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "include": "installer.nsh"
-    },
-    "win": {
-      "certificateSubjectName": "Streamlabs (General Workings, Inc.)",
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
-    }
   },
   "ava": {
     "files": [
