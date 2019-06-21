@@ -73,6 +73,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   LOGOUT() {
+    console.log('logout mutation');
+    console.trace();
     Vue.delete(this.state, 'auth');
   }
 
@@ -124,6 +126,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   // Makes sure the user's login is still good
   validateLogin() {
     if (!this.isLoggedIn()) return;
+    console.log('makes sure the login');
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
