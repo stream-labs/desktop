@@ -68,15 +68,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
-    console.log('login mutation');
-    console.trace();
     Vue.set(this.state, 'auth', auth);
   }
 
   @mutation()
   LOGOUT() {
-    console.log('logout mutation');
-    console.trace();
     Vue.delete(this.state, 'auth');
   }
 

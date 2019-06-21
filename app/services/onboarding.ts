@@ -181,10 +181,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     const stepObj = ONBOARDING_STEPS[step];
 
     if (stepObj.isEligible(this)) {
-      console.log('isEligible');
       this.SET_CURRENT_STEP(step);
     } else {
-      console.log('is not eligible');
       this.goToNextStep(stepObj.next);
     }
   }
