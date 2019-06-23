@@ -4,6 +4,10 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
 import { clipboard } from 'electron';
 
+interface HTMLElementEvent<T extends HTMLElement> extends Event {
+  target: T;
+}
+
 @Component({})
 export default class TopNav extends Vue {
   @Inject()
@@ -44,8 +48,19 @@ export default class TopNav extends Vue {
     }
   }
 
-  copyProgramURL() {
+  copyProgramURL(event: HTMLElementEvent<HTMLInputElement>) {
     if (this.isFetching) throw new Error('fetchProgram is running');
     clipboard.writeText(`https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`);
+
+    const icons = event.target.parentNode.querySelectorAll('i[class^="icon-"]')
+    icons.forEach((element : Element) => {
+      element.classList.toggle('is-invisible')
+    })
+    
+    setTimeout(() => {
+      icons.forEach((element : Element) => {
+        element.classList.toggle('is-invisible')
+      })
+    }, 1000)
   }
 }
