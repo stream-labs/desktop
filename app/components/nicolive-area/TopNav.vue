@@ -8,7 +8,7 @@
         <a @click="editProgram" :disabled="isEditing" class="link"><i class="icon-edit"></i>番組編集</a>
       </div>
       <div class="top-nav-item">
-        <a @click="copyProgramURL" class="link"><i class="icon-clipboard-copy"></i><i class="icon-check is-invisible"></i>番組URLをコピー</a>
+        <a @click="copyProgramURL" class="link"><i :class="hasProgramUrlCopied ? 'icon-check' : 'icon-clipboard-copy'"></i>番組URLをコピー</a>
       </div>
     </div>  
   </div>
@@ -38,9 +38,6 @@
     margin-right: 4px;
     &.icon-dev {
       font-size: 16px;
-    }
-    &.is-invisible::before {
-      display: none;
     }
   }
 }
