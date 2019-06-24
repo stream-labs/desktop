@@ -26,7 +26,7 @@
 
     </div>
 
-    <div>
+    <div style="display: flex;">
       <i
         class="icon-add icon-button icon-button--lg"
         @click="addScene"
@@ -71,6 +71,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 50%;
 }
 
 .input-wrapper--search {
