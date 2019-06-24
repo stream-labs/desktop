@@ -469,18 +469,20 @@ async function runScript() {
         const MAX_RETRY = 3;
         for (let retry = 0; retry < MAX_RETRY; ++retry) {
             try {
-                const result = await octokit.repos.uploadAsset({
+                const result = await octokit.repos.uploadReleaseAsset({
                     url,
+                    headers: {
+                      'content-length': fs.statSync(pathname).size,
+                      'content-type': contentType
+                    },
                     name,
                     file: fs.createReadStream(pathname),
-                    contentLength: fs.statSync(pathname).size,
-                    contentType
                 });
                 info('done.');
                 return result;
             } catch (e) {
-                if ('code' in e && 'status' in e) {
-                    error(`${e.name}: '${e.message}', code = ${e.code}, status = ${e.status}`);
+                if ('status' in e) {
+                    error(`${e.name}: '${e.message}', status = ${e.status}`);
                     if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
                         // retry
                     } else {
