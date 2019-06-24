@@ -469,7 +469,7 @@ async function runScript() {
         const MAX_RETRY = 3;
         for (let retry = 0; retry < MAX_RETRY; ++retry) {
             try {
-                const result = await octokit.repos.uploadAsset({
+                const result = await octokit.repos.uploadReleaseAsset({
                     url,
                     name,
                     file: fs.createReadStream(pathname),
