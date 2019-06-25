@@ -11,9 +11,10 @@ import { WidgetsService, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
-  components: { ModalLayout, Selector, Display },
+  components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
@@ -58,6 +59,8 @@ export default class AddSource extends Vue {
 
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
+  overrideExistingSource = false;
+
   mounted() {
     if (this.sourceAddOptions.propertiesManager === 'replay') {
       this.name = $t('Instant Replay');
@@ -81,6 +84,11 @@ export default class AddSource extends Vue {
 
       this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
     }
+  }
+
+  get isNewSource() {
+    if (this.sourceType === 'scene') return false;
+    return this.overrideExistingSource || !this.existingSources.length;
   }
 
   addExisting() {
@@ -153,6 +161,10 @@ export default class AddSource extends Vue {
         this.close();
       }
     }
+  }
+
+  handleSubmit() {
+    return this.isNewSource ? this.addNew() : this.addExisting();
   }
 
   get selectedSource() {

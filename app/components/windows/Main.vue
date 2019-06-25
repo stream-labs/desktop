@@ -77,7 +77,7 @@
 .main-contents {
   display: grid;
   grid-template-columns: 1fr;
-  height: 100%;
+  flex-grow: 1;
 }
 
 .main-contents--right {

@@ -7,6 +7,12 @@ interface IFile {
   locked: boolean;
   version: number;
   dirty: boolean;
+
+  /**
+   * Used during shutdown to coordinate flushing fully finished
+   * before shutting down.
+   */
+  flushFinished?: () => void;
 }
 
 export interface IFileReadOptions {
@@ -119,15 +125,15 @@ export class FileManagerService extends Service {
    * be called before shutdown.
    */
   async flushAll() {
-    const promises = Object.keys(this.files)
-      .filter(filePath => {
-        return this.files[filePath].dirty;
-      })
-      .map(filePath => {
-        return this.flush(filePath);
+    const promises = Object.values(this.files)
+      .filter(file => file.dirty)
+      .map(file => {
+        return new Promise(resolve => {
+          file.flushFinished = resolve;
+        });
       });
 
-    await promises;
+    await Promise.all(promises);
   }
 
   private async flush(filePath: string, tries = 10) {
@@ -149,12 +155,14 @@ export class FileManagerService extends Service {
 
       file.locked = false;
       file.dirty = false;
+      if (file.flushFinished) file.flushFinished();
       console.debug(`Wrote file ${filePath} version ${version}`);
     } catch (e) {
       if (tries > 0) {
         file.locked = false;
         await this.flush(filePath, tries - 1);
       } else {
+        if (file.flushFinished) file.flushFinished();
         console.error(`Ran out of retries writing ${filePath}`);
       }
     }

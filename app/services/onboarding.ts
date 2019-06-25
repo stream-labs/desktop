@@ -172,6 +172,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   private goToNextStep(step: TOnboardingStep) {
+    console.log('go to next step', step);
     if (!step) {
       this.finish();
       return;

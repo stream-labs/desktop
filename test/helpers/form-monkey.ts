@@ -34,7 +34,7 @@ export class FormMonkey {
     const formSelector = this.formSelector;
 
     if (formSelector !== DEFAULT_SELECTOR) {
-      await this.client.waitForExist(formSelector, 10000);
+      await this.client.waitForExist(formSelector, 15000);
     }
 
     const result = [];
@@ -217,9 +217,12 @@ export class FormMonkey {
 
   async setBoolValue(selector: string, value: boolean) {
     const checkboxSelector = `${selector} input`;
+
+    // click to change the checkbox state
     await this.client.click(checkboxSelector);
 
-    if (!value && (await this.client.isSelected(checkboxSelector))) {
+    // if the current value is not what we need than click one more time
+    if (value !== (await this.getBoolValue(selector))) {
       await this.client.click(checkboxSelector);
     }
   }

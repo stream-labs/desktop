@@ -266,7 +266,8 @@ async function entry(info) {
             height: 180,
             frame: false,
             resizable: false,
-            show: false
+            show: false,
+            alwaysOnTop: true
         });
 
         statusWindow.on('closed', () => {
@@ -356,13 +357,19 @@ async function entry(info) {
     return `${returnCode}` === "0";
 }
 
-module.exports = async (info) => {
+module.exports = (info, startApp, exit) => {
     return entry(info).then(status => {
-        destroyStatusWindow();
-        return Promise.resolve(status);
+        if (status) {
+            log.info('Closing for update...');
+            destroyStatusWindow();
+            exit();
+        } else {
+            startApp();
+            destroyStatusWindow();
+        }
     }).catch((error) => {
         log.info(error);
+        startApp();
         destroyStatusWindow();
-        return Promise.resolve(false);
     });
 };

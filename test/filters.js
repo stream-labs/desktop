@@ -36,7 +36,7 @@ test('Adding and removing a Color Correction filter', async t => {
 
 test('Adding and removing a Image Mask filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 2';
   const filterName = 'Image Mask/Blend';
 
   await addSource(t, 'Color Source', sourceName);
@@ -60,7 +60,7 @@ test('Adding and removing a Image Mask filter', async t => {
 
 test('Adding and removing a Crop Pad filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 3';
   const filterName = 'Crop/Pad';
 
   await addSource(t, 'Color Source', sourceName);
@@ -84,7 +84,7 @@ test('Adding and removing a Crop Pad filter', async t => {
 
 test('Adding and removing a Scaling aspect filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 4';
   const filterName = 'Scaling/Aspect Ratio';
 
   await addSource(t, 'Color Source', sourceName);
@@ -104,7 +104,7 @@ test('Adding and removing a Scaling aspect filter', async t => {
 
 test('Adding and removing a Scroll filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 5';
   const filterName = 'Scroll';
 
   await addSource(t, 'Color Source', sourceName);
@@ -128,7 +128,7 @@ test('Adding and removing a Scroll filter', async t => {
 
 test('Adding and removing a Render Delay filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 6';
   const filterName = 'Render Delay';
 
   await addSource(t, 'Color Source', sourceName);
@@ -145,7 +145,7 @@ test('Adding and removing a Render Delay filter', async t => {
 
 test('Adding and removing a Color Key filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 7';
   const filterName = 'Color Key';
 
   await addSource(t, 'Color Source', sourceName);
@@ -176,7 +176,7 @@ test('Adding and removing a Color Key filter', async t => {
 
 test('Adding and removing a LUT filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 8';
   const filterName = 'Apply LUT';
 
   await addSource(t, 'Color Source', sourceName);
@@ -196,7 +196,7 @@ test('Adding and removing a LUT filter', async t => {
 
 test('Adding and removing a Sharpen filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 9';
   const filterName = 'Sharpen';
 
   await addSource(t, 'Color Source', sourceName);
@@ -214,7 +214,7 @@ test('Adding and removing a Sharpen filter', async t => {
 
 test('Adding and removing a Chroma Key filter', async t => {
   const app = t.context.app;
-  const sourceName = 'Color Source';
+  const sourceName = 'Color Source 10';
   const filterName = 'Chroma Key';
 
   await addSource(t, 'Color Source', sourceName);
@@ -244,7 +244,7 @@ test('Adding and removing a Chroma Key filter', async t => {
 
 
 test('Adding and removing a Invert Polarity filter', async t => {
-  const sourceName = 'Color Source';
+  const sourceName = 'Audio Input Capture';
   const filterName = 'Invert Polarity';
 
   await addSource(t, 'Audio Input Capture', sourceName);

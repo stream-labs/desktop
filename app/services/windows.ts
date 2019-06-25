@@ -185,7 +185,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const window = this.windows[windowId];
     if (window) {
       const bounds = window.getBounds();
-      const currentDisplay = electron.screen.getDisplayMatching(bounds);
+      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }
@@ -203,9 +203,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * to workaround.
      */
     if (options.size && !remote.process.env.CI) {
-      const { width: screenWidth, height: screenHeight } = electron.screen.getDisplayMatching(
-        this.windows.main.getBounds(),
-      ).workAreaSize;
+      const {
+        width: screenWidth,
+        height: screenHeight,
+      } = electron.remote.screen.getDisplayMatching(this.windows.main.getBounds()).workAreaSize;
 
       const SCREEN_PERCENT = 0.75;
 
@@ -224,7 +225,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   getMainWindowDisplay() {
     const window = this.windows.main;
     const bounds = window.getBounds();
-    return electron.screen.getDisplayMatching(bounds);
+    return electron.remote.screen.getDisplayMatching(bounds);
   }
 
   closeChildWindow() {
@@ -283,6 +284,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
       backgroundColor: '#17242D',
+      webPreferences: { nodeIntegration: true },
     }));
 
     newWindow.setMenu(null);
