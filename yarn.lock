@@ -3498,9 +3498,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.28-electron_4/iojs-v5.0.1-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.35b/iojs-v5.0.4-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.28-electron_4/iojs-v5.0.1-crash-handler.tar.gz#b247cea365d3505329e18710922c366da82dd5c8"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.35b/iojs-v5.0.4-crash-handler.tar.gz#92f7c2f81712bd5250eed3dc38fd53e9114064d8"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -4813,9 +4813,9 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.1"
     readable-stream "^2.0.4"
 
-"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.6/iojs-v5.0.1-font-manager.tar.gz":
-  version "1.0.6"
-  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.6/iojs-v5.0.1-font-manager.tar.gz#83d15e0cfb03bfde86c96fb89d71fdab68bdc389"
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.7/iojs-v5.0.4-font-manager.tar.gz":
+  version "1.0.7"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.7/iojs-v5.0.4-font-manager.tar.gz#5f3d8ce161d0cfd07825a29ce488c79caf7a0a0c"
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -7375,9 +7375,9 @@ node-fetch@^2.3.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.10/iojs-v5.0.1-node-fontinfo.tar.gz":
-  version "0.0.10"
-  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.10/iojs-v5.0.1-node-fontinfo.tar.gz#2c8d4bff10a5f97f249332e82045cff06829b2d3"
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.11b/iojs-v5.0.4-node-fontinfo.tar.gz":
+  version "0.0.11"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.11b/iojs-v5.0.4-node-fontinfo.tar.gz#6e6a20f767b751b45cec3a99a151a86a0b1f88d7"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -7408,9 +7408,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.10/iojs-v5.0.1-node-libuiohook.tar.gz":
-  version "0.0.8"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.10/iojs-v5.0.1-node-libuiohook.tar.gz#e811a9d12289b1ac3d9b9a51116b67b72eb5bba8"
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz":
+  version "0.0.9"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz#3220a6c5d6ed7f847d09faa6d310270acadcb54a"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
