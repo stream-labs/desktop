@@ -4,7 +4,7 @@
     class="projector-fullscreen"
     @keydown="exitFullscreen"
     v-if="fullscreen">
-    <display :source-id="sourceId" />
+    <display :source-id="sourceId" :rendering-mode="renderingMode" />
   </div>
   <modal-layout
     v-else
@@ -20,7 +20,7 @@
           Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
         </button>
       </div>
-      <display v-if="!hideStyleBlockers" :source-id="sourceId" />
+      <display v-if="!hideStyleBlockers" :source-id="sourceId" :rendering-mode="renderingMode" />
     </div>
   </modal-layout>
 </div>

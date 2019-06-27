@@ -53,7 +53,7 @@ export default class Projector extends Vue {
   }
 
   get renderingMode() {
-    return this.windowsService.getWindowOptions(this.windowId).rendreingMode;
+    return this.windowsService.getWindowOptions(this.windowId).renderingMode;
   }  
 
   get allDisplays() {
