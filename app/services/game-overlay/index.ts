@@ -338,7 +338,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       win.webContents.executeJavaScript(hideInteraction);
 
       win.webContents.on('paint', (event, dirty, image) => {
-        overlay.paintOverlay(overlayId, width, height, image.getBitmap());
+        if( overlay.paintOverlay(overlayId,  image.getSize().width, image.getSize().height, image.getBitmap()) == 0 )
+        {
+          win.webContents.invalidate();
+        }
       });
       win.webContents.setFrameRate(1);
     });
