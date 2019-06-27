@@ -73,9 +73,9 @@
   "Scheduled Time": "Scheduled Time",
   "You are 10 minutes away from the 8 hour stream limit": "You are 10 minutes away from the 8 hour stream limit",
   "Stream has disconnected, attempting to reconnect.": "Stream has disconnected, attempting to reconnect.",
-  "Start typing to search": "Start typing to search",
-  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.",
-  "Twitch Authentication Error": "Twitch Authentication Error",
-  "Enable Two Factor Authentication": "Enable Two Factor Authentication",
+  "Start typing to search": "Enter tekst hier om te zoeken",
+  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch vereist dat tweefactorauthenticatie op uw accountis ingeschakeld om naar Twitch te streamen. Schakel dit eerst in en probeer daarna opnieuw.",
+  "Twitch Authentication Error": "Twitch authenticatie fout",
+  "Enable Two Factor Authentication": "Schakel tweefactorauthenticatie in",
   "Dismiss": "Dismiss"
 }
