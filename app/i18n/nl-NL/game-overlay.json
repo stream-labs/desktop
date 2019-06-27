@@ -1,7 +1,7 @@
 {
-  "Enable in-game overlay": "Enable in-game overlay",
-  "Enable stream preview in overlay": "Enable stream preview in overlay",
-  "Toggle in-game overlay": "Toggle in-game overlay",
-  "Toggle positioning mode": "Toggle positioning mode",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay"
+  "Enable in-game overlay": "In-game overlay inschakelen",
+  "Enable stream preview in overlay": "Stream preview in overlay inschakelen",
+  "Toggle in-game overlay": "Toggle de in-game overlay",
+  "Toggle positioning mode": "Toggle de positionering mode",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Voeg een hotkey in de Hotkey Settings toe om de in-game overlay te toggelen"
 }
