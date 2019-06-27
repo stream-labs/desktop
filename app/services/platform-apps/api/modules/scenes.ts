@@ -33,6 +33,8 @@ interface ISceneItem extends INode {
   visible: boolean;
   locked: boolean;
   transform: ITransform;
+  showingStreaming: boolean;
+  showingRecording: boolean;
 }
 
 interface ISceneItemFolder extends INode {

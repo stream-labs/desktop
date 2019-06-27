@@ -213,11 +213,11 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ visible });
   }
 
-  setShowStreaming(showingStreaming: boolean) {
+  setShowingStreaming(showingStreaming: boolean) {
     this.setSettings({ showingStreaming });
   }
 
-  setShowRecording(showingRecording: boolean) {
+  setShowingRecording(showingRecording: boolean) {
     this.setSettings({ showingRecording });
   }
 

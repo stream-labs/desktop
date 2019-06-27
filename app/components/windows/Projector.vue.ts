@@ -48,8 +48,13 @@ export default class Projector extends Vue {
   }
 
   get sourceId() {
+    debugger;
     return this.windowsService.getWindowOptions(this.windowId).sourceId;
   }
+
+  get renderingMode() {
+    return this.windowsService.getWindowOptions(this.windowId).rendreingMode;
+  }  
 
   get allDisplays() {
     return electron.remote.screen.getAllDisplays();

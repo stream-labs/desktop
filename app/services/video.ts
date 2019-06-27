@@ -8,6 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import * as obs from '../../obs-api';
 
 const { remote } = electron;
 
@@ -56,8 +57,8 @@ export class Display {
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
-    this.renderingMode = options.renderingMode;
-
+    this.renderingMode = options.renderingMode ? options.renderingMode : obs.ERenderingMode.OBS_MAIN_RENDERING;
+    debugger;
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     this.videoService.createOBSDisplay(this.electronWindowId, name, this.renderingMode, this.sourceId);

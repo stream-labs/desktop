@@ -298,6 +298,14 @@ export class Selection {
     return !this.getItems().find(item => !item.locked);
   }
 
+  showingStreaming(): boolean {
+    return !this.getItems().find(item => !item.showingStreaming);
+  }
+
+  showingRecording(): boolean {
+    return !this.getItems().find(item => !item.showingRecording);
+  }
+
   /**
    * Returns a minimal representation of selection
    * for selection list like this:
@@ -378,6 +386,14 @@ export class Selection {
     this.getItems().forEach(item => item.setVisibility(isVisible));
   }
 
+  setShowingStreaming(showingStreaming: boolean) {
+    this.getItems().forEach(item => item.setShowingStreaming(showingStreaming));
+  }
+
+  setShowingRecording(showingRecording: boolean) {
+    this.getItems().forEach(item => item.setShowingRecording(showingRecording));
+  }
+  
   setTransform(transform: IPartialTransform) {
     this.getItems().forEach(item => item.setTransform(transform));
   }

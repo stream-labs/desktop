@@ -16,6 +16,7 @@ import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import electron from 'electron';
 import { EditorCommandsService } from 'services/editor-commands';
+import * as obs from '../../obs-api';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -58,7 +59,8 @@ export default class SceneSelector extends Vue {
     });
     menu.append({
       label: $t('Create Scene Projector'),
-      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id),
+      click: () => this.projectorService.createProjector(
+        obs.ERenderingMode.OBS_MAIN_RENDERING, this.scenesService.activeScene.id),
     });
     menu.popup();
   }

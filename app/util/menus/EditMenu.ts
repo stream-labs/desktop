@@ -125,13 +125,13 @@ export class EditMenu extends Menu {
           this.append({
             label: showingStreamingLabel,
             click: () => {
-              selectedItem.setShowStreaming(!selectedItem.showingStreaming);
+              selectedItem.setShowingStreaming(!selectedItem.showingStreaming);
             },
           });
           this.append({
             label: showingRecordingLabel,
             click: () => {
-              selectedItem.setShowRecording(!selectedItem.showingRecording);
+              selectedItem.setShowingRecording(!selectedItem.showingRecording);
             },
           });
           this.append({
@@ -157,25 +157,25 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Show in stream'),
             click: () => {
-              selectedItem.setShowStreaming(true);
+              selectedItem.setShowingStreaming(true);
             },
           });
           this.append({
             label: $t('Show in record'),
             click: () => {
-              selectedItem.setShowRecording(true);
+              selectedItem.setShowingRecording(true);
             },
           });
           this.append({
             label: $t('Hide in stream'),
             click: () => {
-              selectedItem.setShowStreaming(false);
+              selectedItem.setShowingStreaming(false);
             },
           });
           this.append({
             label: $t('Hide in record'),
             click: () => {
-              selectedItem.setShowRecording(false);
+              selectedItem.setShowingRecording(false);
             },
           });
         }
