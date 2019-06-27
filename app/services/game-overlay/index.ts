@@ -342,7 +342,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
           overlayId,
           image.getSize().width,
           image.getSize().height,
-          image.getBitmap()) == 0 
+          image.getBitmap()) === 0 
         )
         {
           win.webContents.invalidate();
