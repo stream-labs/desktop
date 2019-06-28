@@ -1299,9 +1299,9 @@
     "@sentry/types" "5.4.0"
     tslib "^1.9.3"
 
-"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.31d503.tar.gz":
-  version "0.0.31-d"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.31d503.tar.gz#70186d42d08dd69a4a6aafa8e7fa8c9af76e6c5c"
+"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.34.tar.gz":
+  version "0.0.34"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.34.tar.gz#eb105f6b8065eb88c0a693eb3b92a76b2e7cfb5e"
   dependencies:
     nan "^2.12.1"
 
@@ -7638,9 +7638,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.43_electron5b-iojs-v5.0.3.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.44-iojs-v5.0.3.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.43_electron5b-iojs-v5.0.3.tar.gz#03277a428fbbf4fd62678b91e0b26fd32316dbd6"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.44-iojs-v5.0.3.tar.gz#dfd5b9da912ab97efa576df806614edc01c7f0a8"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
