@@ -1299,9 +1299,9 @@
     "@sentry/types" "5.4.0"
     tslib "^1.9.3"
 
-"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.34.tar.gz":
-  version "0.0.34"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.34.tar.gz#eb105f6b8065eb88c0a693eb3b92a76b2e7cfb5e"
+"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.35.tar.gz":
+  version "0.0.35"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.35.tar.gz#5351cb38bddb8c06cae4cc27ef8a4b90cab29efb"
   dependencies:
     nan "^2.12.1"
 
