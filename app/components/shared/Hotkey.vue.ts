@@ -148,6 +148,10 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
     const matchKey = binding.key.match(/^Key([A-Z])$/);
     if (matchKey) key = matchKey[1];
 
+    if (key === 'MiddleMouseButton') key = 'Mouse 3';
+    if (key === 'X1MouseButton') key = 'Mouse 4';
+    if (key === 'X2MouseButton') key = 'Mouse 5';
+
     keys.push(key);
 
     return keys.join('+');
