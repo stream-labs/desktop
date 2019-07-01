@@ -5,7 +5,7 @@ import { Loading } from 'streamlabs-beaker';
 @Component({
   components: { Loading },
 })
-export default class Chatbot extends Vue {
+export default class WebviewLoader extends Vue {
   readyToShow = false;
 
   mounted() {
