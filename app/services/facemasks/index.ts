@@ -468,23 +468,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     this.SET_DOWNLOAD_PROGRESS(progress);
   }
 
-  // Redundant function to be deleted once legacy settings page is sunsetted
-  getDownloadProgress() {
-    if (!this.state.settings.enabled) {
-      return 'Not Enabled';
-    }
-
-    let current = 0;
-    Object.keys(this.downloadProgress).forEach(key => {
-      current += this.downloadProgress[key];
-    });
-
-    if (current / Object.keys(this.downloadProgress).length === 1) {
-      return this.state.active ? 'Ready' : 'Loading';
-    }
-    return `${((current / Object.keys(this.downloadProgress).length) * 100).toFixed(2)}%`;
-  }
-
   getEnabledDevice() {
     return this.state.settings.device;
   }
