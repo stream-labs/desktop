@@ -6,8 +6,11 @@ import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import electron from 'electron';
 import { NavigationService, TAppPage } from 'services/navigation';
+import WebviewLoader from 'components/WebviewLoader.vue';
 
-@Component({})
+@Component({
+  components: { WebviewLoader },
+})
 export default class Dashboard extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
