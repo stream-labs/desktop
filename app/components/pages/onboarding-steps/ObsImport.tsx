@@ -15,7 +15,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
 
   @Prop() continue: Function;
 
-  status = 'initial';
+  importing = false;
 
   sceneCollections = this.obsImporterService.getSceneCollections();
 
@@ -24,15 +24,19 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
   selectedProfile = this.profiles[0] || null;
 
   startImport() {
-    if (this.status === 'importing') return;
-    this.status = 'importing';
+    if (this.importing) return;
+    this.importing = true;
     defer(async () => {
       try {
         await this.obsImporterService.load(this.selectedProfile);
-        this.status = 'done';
+        this.importing = false;
       } catch (e) {
-        // I suppose let's pretend we succeeded for now.
-        this.status = 'done';
+        this.$toasted.show($t('Something went wrong.'), {
+          position: 'bottom-center',
+          className: 'toast-alert',
+          duration: 3000,
+        });
+        this.importing = false;
       }
     });
 
@@ -71,21 +75,25 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
         <template slot="desc">
           {$t('Import your existing settings from OBS in less than a minute and go live')}
         </template>
-        <div style="display: flex; justify-content: space-between;">
-          {this.optionsMetadata.map(data => (
-            <div class={styles.optionCard} onClick={() => data.onClick()}>
-              <span
-                class={`${styles.badge} ${styles.timeBadge}`}
-                style={{ background: `var(${data.timeColor})`, color: 'white' }}
-              >
-                {data.time}
-              </span>
-              <h2>{data.title}</h2>
-              <span>{data.description}</span>
-              {data.image(h)}
-            </div>
-          ))}
-        </div>
+        {this.importing ? (
+          <div style="display: flex; justify-content: space-between;">
+            {this.optionsMetadata.map(data => (
+              <div class={styles.optionCard} onClick={() => data.onClick()}>
+                <span
+                  class={`${styles.badge} ${styles.timeBadge}`}
+                  style={{ background: `var(${data.timeColor})`, color: 'white' }}
+                >
+                  {data.time}
+                </span>
+                <h2>{data.title}</h2>
+                <span>{data.description}</span>
+                {data.image(h)}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <i class="fa fa-spinner fa-pulse" />
+        )}
       </OnboardingStep>
     );
   }

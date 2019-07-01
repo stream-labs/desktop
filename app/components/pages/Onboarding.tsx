@@ -4,8 +4,9 @@ import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
-import Connect from './onboarding_steps/Connect';
-import ObsImport from './onboarding_steps/ObsImport';
+import Connect from './onboarding-steps/Connect';
+import ObsImport from './onboarding-steps/ObsImport';
+import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: boolean } }> {
@@ -18,20 +19,17 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
   importedFromObs = false;
   currentStep = 1;
 
-  importFromObs() {
-    this.importedFromObs = true;
-  }
-
-  get remainingSteps() {
-    return this.importedFromObs ? [''] : ['', '', ''];
-  }
-
-  continue() {
+  continue(importedObs?: boolean) {
+    if (importedObs) this.importedFromObs = true;
     this.currentStep = this.currentStep + 1;
   }
 
   complete() {
     this.currentStep = this.currentStep + 1;
+  }
+
+  remainingSteps(h: Function) {
+    return this.importedFromObs ? [<StreamlabsFeatures slot="3" />] : ['', '', ''];
   }
 
   render(h: Function) {
@@ -47,17 +45,7 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
         >
           <Connect slot="1" />
           <ObsImport slot="2" continue={() => this.continue} />
-          <OnboardingStep slot="3">
-            <template slot="title">Enable Cloudbot</template>
-            <template slot="desc">
-              Streamlabs Cloudbot is a chatbot that provides entertainment and moderation features
-              for your stream.
-            </template>
-          </OnboardingStep>
-          <OnboardingStep slot="4">
-            <template slot="title">Let’s setup your custom streamer website</template>
-            <template slot="desc">This is where your viewers will go to engage with you.</template>
-          </OnboardingStep>
+          {this.remainingSteps(h)}
         </Onboarding>
       </div>
     );
