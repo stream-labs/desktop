@@ -49,6 +49,7 @@ export { HideMixerSourceCommand } from './hide-mixer-source';
 export { UnhideMixerSourcesCommand } from './unhide-mixer-sources';
 export { SetAudioSettingsCommand } from './set-audio-settings';
 export { RenameSourceCommand } from './rename-source';
+export { RemoveSourceCommand } from './remove-source';
 
 // Transitions
 export { CreateTransitionCommand } from './create-transition';
