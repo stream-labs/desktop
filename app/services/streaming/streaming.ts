@@ -19,7 +19,6 @@ import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
-import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
@@ -67,7 +66,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
-  @Inject() private announcementsService: AnnouncementsService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
@@ -199,8 +197,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
         this.stopReplayBuffer();
       }
-
-      this.announcementsService.updateBanner();
 
       return Promise.resolve();
     }
