@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { Service } from 'services/core/service';
+import { StatefulService } from 'services/core/stateful-service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
@@ -72,7 +72,7 @@ interface IOBSConfigJSON {
   transition_duration: number;
 }
 
-export class ObsImporterService extends Service {
+export class ObsImporterService extends StatefulService<{ progress: number; total: number }> {
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;

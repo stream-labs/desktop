@@ -1,14 +1,16 @@
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
+import { OnboardingStep } from 'streamlabs-beaker';
+import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform, EPlatformCallResult } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
-import electron from 'electron';
+import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
+import styles from './Connect.m.less';
 
 @Component({})
-export default class Connect extends Vue {
+export default class Connect extends TsxComponent<{}> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
 
@@ -71,7 +73,43 @@ export default class Connect extends Vue {
     return this.onboardingService.options.isSecurityUpgrade;
   }
 
+  securityUpgradeLink(h: Function) {
+    return (
+      <span>
+        {$t(
+          'We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can ',
+        )}
+        <a onClick="contactSupport">{$t('contact support.')}</a>
+      </span>
+    );
+  }
+
   contactSupport() {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
+  }
+
+  render(h: Function) {
+    return (
+      <OnboardingStep>
+        <div slot="title">{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</div>
+        <div slot="desc">
+          {this.isSecurityUpgrade
+            ? this.securityUpgradeLink(h)
+            : $t('Sign in with your streaming account to get started with Streamlabs')}
+        </div>
+        <div class={styles.signupButtons}>
+          {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
+            <button
+              class={`button button--${platform}`}
+              disabled={this.loadingState}
+              onClick={() => this.authPlatform(platform)}
+            >
+              <i class={this.iconForPlatform(platform)} />{' '}
+              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+            </button>
+          ))}
+        </div>
+      </OnboardingStep>
+    );
   }
 }
