@@ -358,10 +358,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     this.SET_DOWNLOAD_PROGRESS(progress);
   }
 
-  getEnabledDevice() {
-    return this.state.settings.device;
-  }
-
   getEnabledStatus() {
     return this.state.settings.enabled;
   }
