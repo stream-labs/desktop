@@ -1,7 +1,7 @@
 {
-  "Enable in-game overlay": "Enable in-game overlay",
-  "Enable stream preview in overlay": "Enable stream preview in overlay",
-  "Toggle in-game overlay": "Toggle in-game overlay",
-  "Toggle positioning mode": "Toggle positioning mode",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay"
+  "Enable in-game overlay": "Habilitar vista previa en la superposición",
+  "Enable stream preview in overlay": "Habilitar vista previa en la superposición",
+  "Toggle in-game overlay": "Alternar superposición dentro del juego",
+  "Toggle positioning mode": "Alternar modo de posicionamiento",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Asignar un bottom en Hotkey Settings para alternar la superposición dentro del juego"
 }
