@@ -146,7 +146,7 @@ export default class FacemaskSettings extends Vue {
   }
 
   clickMask(mask: IFacemaskSelection) {
-    this.facemasksService.trigger(mask.uuid, this.facemasksService.state.settings.sub_duration);
+    this.facemasksService.playMask(mask.uuid);
   }
 
   onFailHandler(msg: string) {
