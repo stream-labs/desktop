@@ -127,20 +127,22 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return this.fetchUserPagePreference();
   }
 
-  fetchPages() {
+  fetchRawPageResponse() {
     const request = this.formRequest(`${this.apiBase}/me/accounts`);
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(async json => {
-        let pageId = this.userService.platform.channelId;
-        if (!pageId) {
-          const pages = await this.userService.getFacebookPages();
-          pageId = pages.page_id;
-        }
-        const activePage =
-          json.data.filter((page: IFacebookPage) => pageId === page.id)[0] || json.data[0];
-        this.SET_ACTIVE_PAGE(activePage);
-      });
+    return fetch(request).then(handlePlatformResponse);
+  }
+
+  fetchPages() {
+    return this.fetchRawPageResponse().then(async json => {
+      let pageId = this.userService.platform.channelId;
+      if (!pageId) {
+        const pages = await this.userService.getFacebookPages();
+        pageId = pages.page_id;
+      }
+      const activePage =
+        json.data.filter((page: IFacebookPage) => pageId === page.id)[0] || json.data[0];
+      this.SET_ACTIVE_PAGE(activePage);
+    });
   }
 
   fetchUserPagePreference() {
