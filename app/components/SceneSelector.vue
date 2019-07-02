@@ -43,11 +43,16 @@
   </div>
 
   <sl-vue-tree
+    data-name="scene-selector"
     :value="scenes"
     ref="slVueTree"
     @select="makeActive"
     @input="handleSort"
     @contextmenu.native="showContextMenu()">
+
+    <template slot="title" slot-scope="{ node }">
+      <div>{{ node.title }}</div>
+    </template>
 
   </sl-vue-tree>
 

@@ -2,6 +2,7 @@ import { focusLibrary, focusMain, test, useSpectron } from './helpers/spectron';
 import { logIn } from './helpers/spectron/user';
 import { sleep } from './helpers/sleep';
 import { FormMonkey } from './helpers/form-monkey';
+import { sceneExisting } from './helpers/spectron/scenes';
 
 useSpectron({ appArgs: '--nosync' });
 
@@ -38,7 +39,7 @@ test('Installing a theme', async (t: any) => {
 
   // Should've populated scenes
   for (const scene of OVERLAY_SCENES) {
-    t.true(await app.client.isExisting(`li=${scene}`), `Scene ${scene} was not found`);
+    t.true(await sceneExisting(scene), `Scene ${scene} was not found`);
   }
 
   // Should've populated sources (this checks Starting Soon scene sources)
