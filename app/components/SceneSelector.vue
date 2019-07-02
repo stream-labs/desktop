@@ -42,14 +42,14 @@
     </div>
   </div>
 
-  <selector
-    class="studio-controls-selector"
-    :items="scenes"
-    :activeItems="activeSceneId ? [activeSceneId] : []"
+  <sl-vue-tree
+    :value="scenes"
+    ref="slVueTree"
     @select="makeActive"
-    @sort="handleSort"
-    @contextmenu="showContextMenu"
-  />
+    @input="handleSort"
+    @contextmenu.native="showContextMenu()">
+
+  </sl-vue-tree>
 
   <help-tip :dismissable-key="helpTipDismissable">
     <div slot="title">
