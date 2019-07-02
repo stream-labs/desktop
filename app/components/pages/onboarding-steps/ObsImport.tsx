@@ -30,6 +30,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
       try {
         await this.obsImporterService.load(this.selectedProfile);
         this.importing = false;
+        this.continue(true);
       } catch (e) {
         this.$toasted.show($t('Something went wrong.'), {
           position: 'bottom-center',
@@ -39,8 +40,6 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
         this.importing = false;
       }
     });
-
-    this.continue(true);
   }
 
   get optionsMetadata() {
@@ -53,7 +52,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
           'We import all of your settings, including scenes, output, configurations, and much more',
         ),
         image: ObsSvg,
-        onClick: this.startImport,
+        onClick: () => this.startImport(),
       },
       {
         title: $t('Start Fresh'),
@@ -63,7 +62,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
           'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',
         ),
         image: KevinSvg,
-        onClick: this.continue,
+        onClick: () => this.continue(),
       },
     ];
   }
@@ -75,10 +74,10 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
         <template slot="desc">
           {$t('Import your existing settings from OBS in less than a minute and go live')}
         </template>
-        {this.importing ? (
+        {!this.importing ? (
           <div style="display: flex; justify-content: space-between;">
             {this.optionsMetadata.map(data => (
-              <div class={styles.optionCard} onClick={() => data.onClick()}>
+              <div class={styles.optionCard} onClick={data.onClick}>
                 <span
                   class={`${styles.badge} ${styles.timeBadge}`}
                   style={{ background: `var(${data.timeColor})`, color: 'white' }}

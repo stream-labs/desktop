@@ -19,24 +19,25 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
   importedFromObs = false;
   currentStep = 1;
 
-  continue(importedObs?: boolean) {
-    if (importedObs) this.importedFromObs = true;
-    this.currentStep = this.currentStep + 1;
+  async continue(importedObs?: boolean) {
+    if (importedObs) {
+      this.importedFromObs = true;
+      await this.$nextTick();
+    }
   }
 
   complete() {
-    this.currentStep = this.currentStep + 1;
-  }
-
-  remainingSteps(h: Function) {
-    return this.importedFromObs ? [<StreamlabsFeatures slot="3" />] : ['', '', ''];
+    return;
   }
 
   render(h: Function) {
+    const remainingSteps = this.importedFromObs
+      ? [<StreamlabsFeatures slot="3" />]
+      : [<div slot="3" />, <div slot="4" />, <div slot="5" />];
     return (
       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <Onboarding
-          steps={this.remainingSteps.length + 2}
+          steps={remainingSteps.length + 2}
           stepLocation="top"
           current={this.currentStep}
           skip={true}
@@ -44,8 +45,8 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
           completeFunc={this.complete}
         >
           <Connect slot="1" />
-          <ObsImport slot="2" continue={() => this.continue} />
-          {this.remainingSteps(h)}
+          <ObsImport slot="2" continue={() => this.continue()} />
+          {remainingSteps}
         </Onboarding>
       </div>
     );
