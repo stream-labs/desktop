@@ -7,7 +7,7 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs';
 import { TwitchService } from './platforms/twitch';
-import { FacebookService, IStreamlabsFacebookPages } from './platforms/facebook';
+import { FacebookService } from './platforms/facebook';
 
 interface IStreamInfoServiceState {
   fetching: boolean;
@@ -47,7 +47,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       tags: [],
       availableTags: [],
       hasUpdateTagsPermission: false,
-      facebookPages: null,
+      facebookPageId: '',
     },
   };
 
@@ -91,7 +91,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       }
 
       if (this.userService.platform.type === 'facebook') {
-        this.SET_FACEBOOK_PAGES(await this.facebookService.getPages());
+        this.SET_FACEBOOK_PAGE(this.facebookService.state.facebookPages.page_id);
       }
 
       this.streamInfoChanged.next();
@@ -159,12 +159,12 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   }
 
   @mutation()
-  SET_FACEBOOK_PAGES(pages: IStreamlabsFacebookPages) {
-    this.state.channelInfo.facebookPages = pages;
+  SET_VIEWER_COUNT(viewers: number) {
+    this.state.viewerCount = viewers;
   }
 
   @mutation()
-  SET_VIEWER_COUNT(viewers: number) {
-    this.state.viewerCount = viewers;
+  SET_FACEBOOK_PAGE(pageId: string) {
+    this.state.channelInfo.facebookPageId = pageId;
   }
 }

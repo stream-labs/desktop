@@ -23,6 +23,7 @@ import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
+import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -31,6 +32,7 @@ import { Debounce } from 'lodash-decorators';
     BoolInput,
     ListInput,
     TwitchTagsInput,
+    ValidatedForm,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -62,6 +64,10 @@ export default class EditStreamInfo extends Vue {
   searchProfilesPending = false;
   channelInfo: IChannelInfo = null;
 
+  $refs: {
+    form: ValidatedForm;
+  };
+
   get hasUpdateTagsPermission() {
     return this.channelInfo.hasUpdateTagsPermission;
   }
@@ -69,8 +75,9 @@ export default class EditStreamInfo extends Vue {
   get hasPages() {
     return (
       !this.infoLoading &&
-      this.channelInfo.facebookPages &&
-      this.channelInfo.facebookPages.pages.length
+      this.isFacebook &&
+      this.facebookService.state.facebookPages &&
+      this.facebookService.state.facebookPages.pages.length
     );
   }
 
@@ -80,13 +87,34 @@ export default class EditStreamInfo extends Vue {
         title: $t('Game'),
         placeholder: $t('Start typing to search'),
         options: this.gameOptions,
+        loading: this.searchingGames,
+        internalSearch: false,
+        allowEmpty: true,
+        noResult: $t('No matching game(s) found.'),
       }),
       title: metadata.text({
         title: $t('Title'),
         fullWidth: true,
+        required: true,
       }),
       description: metadata.textArea({
         title: $t('Description'),
+      }),
+      date: metadata.text({
+        title: $t('Scheduled Date'),
+        dateFormat: 'MM/dd/yyyy',
+        placeholder: 'MM/DD/YYYY',
+        required: true,
+        description: this.isFacebook
+          ? $t(
+              'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+            )
+          : undefined,
+      }),
+      time: metadata.timer({
+        title: $t('Scheduled Time'),
+        format: 'hm',
+        max: 24 * 3600,
       }),
     });
   }
@@ -226,7 +254,8 @@ export default class EditStreamInfo extends Vue {
     this.updatingInfo = false;
   }
 
-  handleSubmit() {
+  async handleSubmit() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
     this.updateAndGoLive();
   }
@@ -309,21 +338,6 @@ export default class EditStreamInfo extends Vue {
     return this.streamInfoService.state.error;
   }
 
-  get gameMetadata() {
-    return {
-      name: 'game',
-      loading: this.searchingGames,
-      internalSearch: false,
-      allowEmpty: true,
-      options: this.gameOptions,
-      noResult: $t('No matching game(s) found.'),
-    };
-  }
-
-  setFacebookPageId(value: string) {
-    this.facebookService.postPage(value);
-  }
-
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/pages/creation/');
     this.windowsService.closeChildWindow();
@@ -338,23 +352,6 @@ export default class EditStreamInfo extends Vue {
           'resolution may be changed for a better quality of experience',
       ),
     };
-  }
-
-  get dateMetadata() {
-    return {
-      title: $t('Scheduled Date'),
-      dateFormat: 'MM/dd/yyyy',
-      placeholder: 'MM/DD/YYYY',
-      description: this.isFacebook
-        ? $t(
-            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-          )
-        : undefined,
-    };
-  }
-
-  get timeMetadata() {
-    return { title: $t('Scheduled Time'), format: 'hm', max: 24 * 3600 };
   }
 
   private formatDateString() {

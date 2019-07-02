@@ -15,7 +15,7 @@ export interface IChannelInfo {
   tags?: Tag[];
   availableTags?: Tag[];
   hasUpdateTagsPermission?: boolean;
-  facebookPages?: IStreamlabsFacebookPages;
+  facebookPageId?: string;
 }
 
 export interface IGame {

@@ -11,7 +11,7 @@
         <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
-      <form name="editStreamForm" v-if="!infoLoading && !infoError">
+      <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           {{ $t("It looks like you don't have any Pages. Head to ") }}
           <a class="description-link" @click="openFBPageCreateLink">{{
@@ -21,13 +21,12 @@
         </div>
         <h-form-group
           v-if="isFacebook && hasPages && !midStreamMode"
-          :v-model="channelInfo.facebookPages.page_id"
-          @input="pageId => setFacebookPageId(pageId)"
+          :v-model="channelInfo.facebookPageId"
           :metadata="{
             type: 'list',
             name: 'stream_page',
             title: $t('Facebook Page'),
-            options: channelInfo.facebookPages.options,
+            options: facebookService.state.facebookPages.options,
           }"
         />
         <h-form-group
@@ -60,8 +59,8 @@
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
-          <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
-          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
+          <h-form-group type="text" v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"
@@ -99,7 +98,7 @@
             >.
           </div>
         </div>
-      </form>
+      </validated-form>
     </div>
     <div slot="controls">
       <button class="button button--default" :disabled="updatingInfo" @click="cancel">
