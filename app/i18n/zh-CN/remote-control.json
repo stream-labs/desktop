@@ -1,12 +1,12 @@
 {
-  "Show details": "Show details",
-  "Hide details": "Hide details",
-  "API token": "API token",
-  "Generate new": "Generate new",
-  "Port": "Port",
-  "IP addresses": "IP addresses",
-  "You can now control Streamlabs OBS from your phone.": "You can now control Streamlabs OBS from your phone.",
-  "To begin, Scan this QR code with your phone.": "To begin, Scan this QR code with your phone.",
-  "This feature will only work with the most recent version of the Streamlabs mobile app.": "This feature will only work with the most recent version of the Streamlabs mobile app.",
-  "Click to show": "Click to show"
+  "Show details": "显示详细资讯",
+  "Hide details": "隐藏详细资讯",
+  "API token": "API令牌",
+  "Generate new": "产生新的",
+  "Port": "埠",
+  "IP addresses": "IP位址",
+  "You can now control Streamlabs OBS from your phone.": "现在可藉由您的手机操控您的Streamlabs OBS。",
+  "To begin, Scan this QR code with your phone.": "首先，用你的手机扫瞄萤幕上方QR Code。",
+  "This feature will only work with the most recent version of the Streamlabs mobile app.": "此功能仅可使用于最新的Streamlabs手机app。",
+  "Click to show": "单击此处可显示"
 }
