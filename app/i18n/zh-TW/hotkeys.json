@@ -1,6 +1,6 @@
 {
-  "Start Streaming": "開始串流",
-  "Stop Streaming": "停止串流",
+  "Start Streaming": "開始直播",
+  "Stop Streaming": "停止直播",
   "Start Recording": "開始錄製",
   "Stop Recording": "停止錄製",
   "Switch to scene": "切換到場景",
@@ -15,6 +15,6 @@
   "Enable Studio Mode": "啟用工作室模式",
   "Disable Studio Mode": "關閉工作室模式",
   "Transition (Studio Mode)": "轉場 （工作室模式）",
-  "Capture Foreground Window": "Capture Foreground Window",
-  "Deactivate Capture": "Deactivate Capture"
+  "Capture Foreground Window": "擷取前台視窗",
+  "Deactivate Capture": "停止擷取"
 }
