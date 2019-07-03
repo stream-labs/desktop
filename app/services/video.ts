@@ -8,7 +8,6 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
-import * as obs from '../../obs-api';
 
 const { remote } = electron;
 
