@@ -193,7 +193,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   shouldPlayBits(amount: string) {
     return (
-      this.state.settings.bits_enabled && parseInt(amount, 10) > this.state.settings.bits_price
+      this.state.settings.bits_enabled && parseInt(amount, 10) >= this.state.settings.bits_price
     );
   }
 
@@ -356,10 +356,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     }
 
     this.SET_DOWNLOAD_PROGRESS(progress);
-  }
-
-  getEnabledDevice() {
-    return this.state.settings.device;
   }
 
   getEnabledStatus() {
