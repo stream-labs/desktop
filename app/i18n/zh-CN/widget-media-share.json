@@ -1,11 +1,11 @@
 {
-  "Banned Media": "Banned Media",
-  "Check Banned Media": "Check Banned Media",
-  "Price Per Second": "Price Per Second",
-  "Min. Amount to Share": "Min. Amount to Share",
-  "Max Duration": "Max Duration",
-  "Buffer Time": "Buffer Time",
-  "Spam Security": "Spam Security",
-  "The time between videos the next video has to buffer.": "The time between videos the next video has to buffer.",
-  "Manage Media Settings": "Manage Media Settings"
+  "Banned Media": "禁止的媒体",
+  "Check Banned Media": "检阅被禁止的媒体",
+  "Price Per Second": "每秒价格",
+  "Min. Amount to Share": "共享最小额度",
+  "Max Duration": "最长持续时间",
+  "Buffer Time": "缓冲时间",
+  "Spam Security": "垃圾防御",
+  "The time between videos the next video has to buffer.": "换下一个影片的缓冲时间",
+  "Manage Media Settings": "管理媒体设定"
 }
