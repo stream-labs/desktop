@@ -11,7 +11,8 @@ type TOnboardingStep =
   | 'OptimizeC'
   | 'OptimizeBrandDevice'
   | 'SceneCollectionsImport'
-  | 'ObsImport';
+  | 'ObsImport'
+  | 'FacebookPageCreation';
 
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
@@ -40,6 +41,11 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
+    next: 'FacebookPageCreation',
+  },
+
+  FacebookPageCreation: {
+    isEligible: service => service.isFacebookAuthed,
     next: 'SceneCollectionsImport',
   },
 
@@ -171,8 +177,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return this.userService.isLoggedIn() && this.userService.platform.type === 'twitch';
   }
 
+  get isFacebookAuthed() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+  }
+
   private goToNextStep(step: TOnboardingStep) {
-    console.log('go to next step', step);
     if (!step) {
       this.finish();
       return;
