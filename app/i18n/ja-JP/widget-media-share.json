@@ -1,11 +1,11 @@
 {
-  "Banned Media": "Banned Media",
-  "Check Banned Media": "Check Banned Media",
-  "Price Per Second": "Price Per Second",
-  "Min. Amount to Share": "Min. Amount to Share",
+  "Banned Media": "アカウント停止されたメディア",
+  "Check Banned Media": "アカウント停止されたメディアを確認する",
+  "Price Per Second": "毎秒毎の価格",
+  "Min. Amount to Share": "シェアするための最小単位",
   "Max Duration": "Max Duration",
-  "Buffer Time": "Buffer Time",
+  "Buffer Time": "バッファ時間",
   "Spam Security": "Spam Security",
-  "The time between videos the next video has to buffer.": "The time between videos the next video has to buffer.",
-  "Manage Media Settings": "Manage Media Settings"
+  "The time between videos the next video has to buffer.": "次のビデオをバッファするためにかかる時間",
+  "Manage Media Settings": "メディア設定の管理"
 }
