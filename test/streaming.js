@@ -196,7 +196,7 @@ schedulingPlatforms.forEach(platform => {
     await app.client.click('button=Schedule');
 
     // need to provide a date
-    t.true(app.client.elementIsVisible('div=The field is required'));
+    t.true(app.client.isVisible('div=The field is required'));
 
     // set the date to tomorrow
     const today = new Date();
