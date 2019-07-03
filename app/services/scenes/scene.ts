@@ -306,18 +306,19 @@ export class Scene {
   private reconcileNodeOrderWithObs() {
     const obsScene = this.getObsScene();
     const destOrder = this.getItems().map(item => item.obsSceneItemId);
-    const currentOrder = this.getObsScene()
+    const currentOBSOrder = obsScene
       .getItems()
       .reverse()
       .map(item => item.id);
 
-    destOrder.forEach(ind => {
-      if (destOrder[ind] === currentOrder[ind]) return;
-      const itemToMoveInd = currentOrder.indexOf(destOrder[ind]);
-      const itemToMove = currentOrder[itemToMoveInd];
-      currentOrder.splice(itemToMoveInd, 1);
-      currentOrder.splice(ind, 0, itemToMove);
-      obsScene.moveItem(itemToMoveInd, ind);
+    destOrder.forEach(itemId => {
+      const itemToMoveInd = currentOBSOrder.indexOf(itemId);
+      const currentItemInd = destOrder.indexOf(itemId);
+      if (itemToMoveInd === currentItemInd) return;
+      const itemIdToMove = itemId;
+      currentOBSOrder.splice(itemToMoveInd, 1);
+      currentOBSOrder.splice(currentItemInd, 0, itemIdToMove);
+      obsScene.moveItem(itemToMoveInd, currentItemInd);
     });
   }
 
