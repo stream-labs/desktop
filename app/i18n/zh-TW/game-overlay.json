@@ -3,5 +3,6 @@
   "Enable stream preview in overlay": "在遊戲嵌入介面開啟直播預覽",
   "Toggle in-game overlay": "切換遊戲嵌入介面",
   "Toggle positioning mode": "切換位置模式",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "在快捷鍵設定中設定一個快捷鍵切換遊戲嵌入介面"
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "在快捷鍵設定中設定一個快捷鍵切換遊戲嵌入介面",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode."
 }
