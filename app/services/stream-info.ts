@@ -83,6 +83,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
     const platform = getPlatformService(this.userService.platform.type);
     try {
+      await platform.prepopulateInfo();
       const info = await platform.fetchChannelInfo();
       this.SET_CHANNEL_INFO(info);
 
