@@ -36,20 +36,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @Inject() twitchService: TwitchService;
   @Inject() facebookService: FacebookService;
 
-  static initialState: IStreamInfoServiceState = {
-    fetching: false,
-    error: false,
-    viewerCount: 0,
-    channelInfo: {
-      title: '',
-      game: '',
-      description: '',
-      tags: [],
-      availableTags: [],
-      hasUpdateTagsPermission: false,
-      facebookPageId: '',
-    },
-  };
+  static initialState: IStreamInfoServiceState = null;
 
   viewerCountInterval: number;
 
@@ -57,6 +44,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   init() {
     this.refreshStreamInfo().catch(e => null);
+    this.userService.userLogout.subscribe(_ => this.RESET());
 
     this.viewerCountInterval = window.setInterval(() => {
       if (!this.userService.isLoggedIn()) return;
@@ -167,5 +155,23 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @mutation()
   SET_FACEBOOK_PAGE(pageId: string) {
     this.state.channelInfo.facebookPageId = pageId;
+  }
+
+  @mutation()
+  RESET() {
+    this.state = {
+      fetching: false,
+      error: false,
+      viewerCount: 0,
+      channelInfo: {
+        title: '',
+        game: '',
+        description: '',
+        tags: [],
+        availableTags: [],
+        hasUpdateTagsPermission: false,
+        facebookPageId: '',
+      },
+    }
   }
 }
