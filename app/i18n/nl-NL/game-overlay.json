@@ -3,5 +3,6 @@
   "Enable stream preview in overlay": "Stream preview in overlay inschakelen",
   "Toggle in-game overlay": "Toggle de in-game overlay",
   "Toggle positioning mode": "Toggle de positionering mode",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Voeg een hotkey in de Hotkey Settings toe om de in-game overlay te toggelen"
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Voeg een hotkey in de Hotkey Settings toe om de in-game overlay te toggelen",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode."
 }
