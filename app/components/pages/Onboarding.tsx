@@ -1,9 +1,8 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { Onboarding, OnboardingStep } from 'streamlabs-beaker';
+import { Onboarding } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
-import { $t } from 'services/i18n';
 import Connect from './onboarding-steps/Connect';
 import ObsImport from './onboarding-steps/ObsImport';
 import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
@@ -24,6 +23,8 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
       this.importedFromObs = true;
       await this.$nextTick();
     }
+
+    this.currentStep = this.currentStep + 1;
   }
 
   complete() {
@@ -34,6 +35,15 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
     const remainingSteps = this.importedFromObs
       ? [<StreamlabsFeatures slot="3" />]
       : [<div slot="3" />, <div slot="4" />, <div slot="5" />];
+
+    if (this.params.isLogin) {
+      return (
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+          <Connect slot="1" />
+        </div>
+      );
+    }
+
     return (
       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <Onboarding
@@ -45,7 +55,10 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
           completeFunc={this.complete}
         >
           <Connect slot="1" />
-          <ObsImport slot="2" continue={() => this.continue()} />
+          <ObsImport
+            slot="2"
+            continue={(importedFromObs: boolean) => this.continue(importedFromObs)}
+          />
           {remainingSteps}
         </Onboarding>
       </div>

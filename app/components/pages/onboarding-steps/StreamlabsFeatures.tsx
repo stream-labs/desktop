@@ -5,6 +5,7 @@ import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { ScenesService } from 'services/scenes';
+import styles from './StreamlabsFeatures.m.less';
 
 @Component({})
 export default class ObsImport extends TsxComponent<{}> {
@@ -40,7 +41,8 @@ export default class ObsImport extends TsxComponent<{}> {
         title: $t('App Store'),
         description: $t(
           'Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music ' +
-            'to stunning overlays to more tools to engage with your community.',
+            'to stunning overlays to more tools to engage with your community. Head over to the app store in the main ' +
+            'naviagtion to browse our selection of free and paid apps.',
         ),
         image: 'app-store',
       },
@@ -48,7 +50,8 @@ export default class ObsImport extends TsxComponent<{}> {
         title: $t('In-game Overlay'),
         description: $t(
           'Only have one screen? Perfect! Enable our in-game overlay to make sure you catch every chat message and ' +
-            'stream event that happens while you get your game on.',
+            'stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ ' +
+            'tab of the settings menu.',
         ),
         image: '',
       },
@@ -56,7 +59,8 @@ export default class ObsImport extends TsxComponent<{}> {
         title: $t('Facemasks'),
         description: $t(
           'Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with ' +
-            'Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate.',
+            'Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. ' +
+            'Head over to the facemask settings to get started.',
         ),
         image: '',
       },
@@ -64,7 +68,8 @@ export default class ObsImport extends TsxComponent<{}> {
         title: $t('Optimized Video Encoding'),
         description: $t(
           'Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these ' +
-            'improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth.',
+            'improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. ' +
+            'To enable, check the box ‘Use optimized encoder settings’ while editing your stream information',
         ),
         image: 'video-encoding',
       },
@@ -78,14 +83,14 @@ export default class ObsImport extends TsxComponent<{}> {
         <template slot="desc">
           {$t('Some exclusive features we recommend to take your stream to the next level')}
         </template>
-        <div style="display: flex;">
+        <div class={styles.container}>
           {this.recommendedFeatures.map(feature => {
             const data = this.featuresMetadata[feature];
             return (
-              <div>
-                <img src={require(`../../../../media/images/onboarding/${data.image}.png`)} />
+              <div class={styles.card}>
                 <h3>{data.title}</h3>
-                <span>{data.description}</span>
+                <img src={require(`../../../../media/images/onboarding/${data.image}.png`)} />
+                <div>{data.description}</div>
               </div>
             );
           })}
