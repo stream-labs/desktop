@@ -88,7 +88,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   @mutation()
-  SET_FACEBOOK_PAGES(pages: IStreamlabsFacebookPages) {
+  private SET_FACEBOOK_PAGES(pages: IStreamlabsFacebookPages) {
     this.state.facebookPages = pages;
   }
 
@@ -134,7 +134,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return Promise.resolve();
   }
 
-  fetchActivePage() {
+  async fetchActivePage() {
+    await this.fetchPages();
     const request = this.formRequest(`${this.apiBase}/me/accounts`);
     return fetch(request)
       .then(handlePlatformResponse)
@@ -155,7 +156,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     if (this.state.streamProperties.title) {
       return Promise.resolve(this.state.streamProperties);
     }
-    await this.fetchPages();
     await this.fetchActivePage();
     return this.fetchPrefillData();
   }
@@ -258,6 +258,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     game,
     facebookPageId,
   }: IChannelInfo): Promise<boolean> {
+    console.log('put channel info', title, description, game);
     this.SET_STREAM_PROPERTIES(title, description, game);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {

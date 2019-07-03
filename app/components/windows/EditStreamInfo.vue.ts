@@ -91,6 +91,7 @@ export default class EditStreamInfo extends Vue {
         internalSearch: false,
         allowEmpty: true,
         noResult: $t('No matching game(s) found.'),
+        required: true,
       }),
       title: metadata.text({
         title: $t('Title'),
