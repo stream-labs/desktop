@@ -14,3 +14,9 @@
 </template>
 
 <script lang='ts' src="./Chatbot.vue.ts"></script>
+
+<style lange="less" scoped>
+  .chatbot {
+    width: 100%;
+  }
+</style>
