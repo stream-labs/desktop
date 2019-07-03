@@ -43,6 +43,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   streamInfoChanged = new Subject();
 
   init() {
+    this.RESET();
     this.refreshStreamInfo().catch(e => null);
     this.userService.userLogout.subscribe(_ => this.RESET());
 
