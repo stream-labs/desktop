@@ -58,7 +58,6 @@ export class Display {
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
     this.renderingMode = options.renderingMode ? options.renderingMode : obs.ERenderingMode.OBS_MAIN_RENDERING;
-    debugger;
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     this.videoService.createOBSDisplay(this.electronWindowId, name, this.renderingMode, this.sourceId);

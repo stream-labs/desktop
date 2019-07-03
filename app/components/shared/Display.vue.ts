@@ -36,7 +36,6 @@ export default class Display extends Vue {
   }
 
   createDisplay() {
-    debugger;
     const displayId = this.videoService.getRandomDisplayId();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,

@@ -29,7 +29,6 @@ export class DisplayModule extends Module {
   @apiMethod()
   create(ctx: IApiContext, options: IDisplayCreateOptions) {
     const displayId = uuid();
-    debugger;
     this.displays[displayId] = {
       displayId,
       options,

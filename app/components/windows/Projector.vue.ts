@@ -48,7 +48,6 @@ export default class Projector extends Vue {
   }
 
   get sourceId() {
-    debugger;
     return this.windowsService.getWindowOptions(this.windowId).sourceId;
   }
 

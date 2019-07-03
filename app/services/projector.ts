@@ -44,6 +44,5 @@ export class ProjectorService extends Service {
         height: 400,
       },
     });
-    debugger;
   }
 }
