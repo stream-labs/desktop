@@ -24,6 +24,7 @@ export type GameOverlayState = {
   isPreviewEnabled: boolean;
   previewMode: boolean;
   opacity: number;
+  autohideTimeout: number;
   windowProperties: IWindowProperties;
 };
 
@@ -56,6 +57,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     isPreviewEnabled: true,
     previewMode: false,
     opacity: 100,
+    autohideTimeout: 0,
     windowProperties: {
       chat: { position: null, id: null, enabled: true },
       recentEvents: { position: null, id: null, enabled: true },
@@ -300,6 +302,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
   }
 
+  setOverlayAutohide(timeout: number) {
+    this.SET_AUTOHIDE(timeout);
+    if (!this.state.isEnabled) return;
+    Object.keys(this.windows).forEach(key => {
+      const overlayId = this.state.windowProperties[key].id;
+
+      overlay.setAutohide(overlayId, timeout, 0);
+    });
+  }
+
   async destroy() {
     if (!this.lifecycle) return;
     await this.lifecycle.destroy();
@@ -336,7 +348,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       overlay.setPosition(overlayId, position.x, position.y, width, height);
       overlay.setTransparency(overlayId, this.state.opacity * 2.55);
       overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
-
+      overlay.setAutohide(overlayId, this.state.autohideTimeout, 0);
       win.webContents.executeJavaScript(hideInteraction);
 
       win.webContents.on('paint', (event, dirty, image) => {
@@ -402,5 +414,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @mutation()
   private SET_OPACITY(val: number) {
     this.state.opacity = val;
+  }
+
+  @mutation()
+  private SET_AUTOHIDE(val: number) {
+    this.state.autohideTimeout = val;
   }
 }

@@ -12,6 +12,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
 
   enabling = false;
   overlayOpacity = this.gameOverlayService.state.opacity / 100;
+  overlayAutohide = this.gameOverlayService.state.autohideTimeout;
 
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
@@ -47,6 +48,11 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.gameOverlayService.setOverlayOpacity(value * 100);
   }
 
+  setOverlayAutohide(value: number) {
+    this.overlayAutohide = value;
+    this.gameOverlayService.setOverlayAutohide(value);
+  }
+
   resetPosition() {
     this.gameOverlayService.resetPosition();
   }
@@ -58,6 +64,16 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
       max: 1,
       interval: 0.1,
       usePercentages: true,
+    });
+  }
+
+  get sliderAutohideMetadata() {
+    return metadata.slider({
+      title: $t('Overlay autohide timeout'),
+      min: 0,
+      max: 120,
+      interval: 1,
+      usePercentages: false,
     });
   }
 
@@ -89,6 +105,11 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
           metadata={this.sliderMetadata}
           value={this.overlayOpacity}
           onInput={this.setOverlayOpacity}
+        />
+        <VFormGroup
+          metadata={this.sliderAutohideMetadata}
+          value={this.overlayAutohide}
+          onInput={this.setOverlayAutohide}
         />
         <button
           class="button button--action"
