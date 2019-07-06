@@ -37,11 +37,11 @@
   "Rotate %{sourceName}": "Rotera %{sourceName}",
   "Change default transition": "Byt standard övergång",
   "Adjust %{sourceName} volume": "Ändra %{sourceName} volym",
-  "Stretch %{sourceName}": "Stretch %{sourceName}",
-  "Enable %{filterName}": "Enable %{filterName}",
-  "Disable %{filterName}": "Disable %{filterName}",
-  "Ungroup %{sourceName}": "Ungroup %{sourceName}",
-  "Unhide mixer items": "Unhide mixer items",
-  "Undo %{action}": "Undo %{action}",
-  "Redo %{action}": "Redo %{action}"
+  "Stretch %{sourceName}": "Sträck ut %{sourceName}",
+  "Enable %{filterName}": "Aktivera %{filterName}",
+  "Disable %{filterName}": "Inaktivera %{filterName}",
+  "Ungroup %{sourceName}": "Splittra %{sourceName}",
+  "Unhide mixer items": "Visa mixer föremål",
+  "Undo %{action}": "Ångra %{action}",
+  "Redo %{action}": "Återställ %{action}"
 }
