@@ -74,8 +74,8 @@
   "You are 10 minutes away from the 8 hour stream limit": "Faltam 10 minutos para o limite de transmissão de 8 horas",
   "Stream has disconnected, attempting to reconnect.": "A stream foi desconectada. Tentando reconectar.",
   "Start typing to search": "Comece a digitar para pesquisar",
-  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch requer que a autenticação em dois fatores seja ativado em sua conta, a fim de transmitir pelo Twitch. Por favor habilite a autenticação de dois fatores e tente novamente.",
-  "Twitch Authentication Error": "Erro de autenticação na Twitch",
+  "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch requer que a autenticação em dois fatores seja ativada em sua conta, a fim de transmitir para o Twitch. Por favor habilite a autenticação de dois fatores e tente novamente.",
+  "Twitch Authentication Error": "Erro de autenticação no Twitch",
   "Enable Two Factor Authentication": "Habilitar autenticação em dois fatores",
   "Dismiss": "Descartar"
 }
