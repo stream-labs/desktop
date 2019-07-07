@@ -19,7 +19,7 @@
   "Move %{sourceName}": "Mover %{sourceName}",
   "Mute %{sourceName}": "Silenciar %{sourceName}",
   "Unmute %{sourceName}": "Ativar som %{sourceName}",
-  "Nudge %{sourceName}": "Cutucar %{sourceName}",
+  "Nudge %{sourceName}": "Tocar %{sourceName}",
   "Paste %{filterName}": "Colar %{filterName}",
   "Remove a connection": "Remover uma conexão",
   "Remove %{filterName}": "Remover %{filterName}",
