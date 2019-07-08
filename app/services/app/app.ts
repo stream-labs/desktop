@@ -115,7 +115,7 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
-      this.transitionsService.reset();
+      this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');

@@ -525,7 +525,7 @@ export class ServicesManager extends Service {
             }
           }
 
-          if (result && result._type === 'HELPER') {
+          if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
             const helper = this.getResource(result.resourceId);
             return this.applyIpcProxy(helper);
           }

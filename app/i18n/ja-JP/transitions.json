@@ -7,6 +7,19 @@
   "fade_to_color_transition": "カラーフェード",
   "wipe_transition": "ルミナンスワイプ",
   "obs_stinger_transition": "スティンガー",
-  "transition": "種類",
-  "duration": "時間（ミリ秒）"
+  "transitionName": "名前",
+  "transitionType": "種類",
+  "duration": "時間（ミリ秒）",
+  "connectionFrom": "開始シーン",
+  "connectionTo": "終了シーン",
+  "default": "既定",
+  "transitions": "トランジション",
+  "connections": "コネクション",
+  "addTransition": "新規トランジション",
+  "addConnection": "新規コネクション",
+  "mustHaveLeastTwoScenes": "トランジションを編集するには2つ以上のシーンが必要です",
+  "mustHaveLeastOneTransition": "1つ以上のトランジションが必要です",
+  "redundantConnectionTooltip": "このコネクションは冗長です。他のコネクションとシーンの指定が一致しています。",
+  "newTransition": "トランジション",
+  "deleted": "削除済み"
 }

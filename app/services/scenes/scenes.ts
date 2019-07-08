@@ -49,7 +49,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       nodes: []
     });
     this.state.displayOrder.push(id);
-    this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.activeSceneId = this.state.activeSceneId;
   }
 
   @mutation()
@@ -144,9 +144,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const scene = this.getScene(id);
     if (!scene) return false;
 
-    const obsScene = scene.getObsScene();
+    const activeScene = this.activeScene;
 
-    this.transitionsService.transitionTo(obsScene);
+    this.transitionsService.transition(activeScene && activeScene.id, scene.id);
+
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
     return true;

@@ -6,11 +6,12 @@ import { TFormData } from 'components/shared/forms/Input';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
 import { ISourcesServiceApi } from 'services/sources';
-
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
 import { $t } from 'services/i18n';
+import { Subscription } from 'rxjs/subscription';
+import electron from 'electron';
 
 @Component({
   components: {
@@ -34,9 +35,20 @@ export default class SourceProperties extends Vue {
   initialProperties: TFormData = [];
   tainted = false;
 
+  sourcesSubscription: Subscription;
+
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
     this.initialProperties = cloneDeep(this.properties);
+    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        electron.remote.getCurrentWindow().close();
+      }
+    });
+  }
+
+  destroyed() {
+    this.sourcesSubscription.unsubscribe();
   }
 
   get propertiesManagerUI() {

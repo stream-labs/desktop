@@ -1,6 +1,7 @@
 // Source helper functions
 import { focusMain, focusChild } from '.';
 import { contextMenuClick } from './context-menu';
+import { dialogDismiss } from './dialog';
 
 async function clickSourceAction(t, selector) {
   await t.context.app.client
@@ -14,6 +15,7 @@ export async function clickAddSource(t) {
 
 export async function clickRemoveSource(t) {
   await clickSourceAction(t, '[data-test="Remove"]');
+  await dialogDismiss(t, 'OK');
 }
 
 export async function clickSourceProperties(t) {

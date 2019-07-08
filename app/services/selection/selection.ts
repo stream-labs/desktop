@@ -1,4 +1,5 @@
 import { uniq } from 'lodash';
+import electron from 'electron';
 import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
 import {
   Scene,
@@ -9,6 +10,7 @@ import {
   IPartialTransform,
   TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
 } from 'services/scenes';
+import { $t } from 'services/i18n';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
@@ -95,7 +97,19 @@ export class SelectionService
 
   @shortcut('Delete')
   remove() {
-    return this.getSelection().remove.call(this);
+    const name = this.getLastSelected().name;
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: $t('scenes.removeSceneConfirm', { sceneName: name }),
+        buttons: [$t('common.cancel'), $t('common.ok')]
+      },
+      ok => {
+        if (!ok) return;
+        return this.getSelection().remove.call(this);
+      }
+    );
   }
 
   @shortcut('ArrowLeft')

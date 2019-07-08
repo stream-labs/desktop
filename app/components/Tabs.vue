@@ -1,18 +1,19 @@
 <template>
 <div>
   <div>
-    <ul class="Tabs-tabContainer">
+    <ul class="tab-container">
       <li
-        class="Tabs-tab"
-        :class="{ 'Tabs-tab__active': tab.value === selected }"
         v-for="tab in tabs"
+        :key="tab.value"
+        class="tab"
+        :class="{ 'active': tab.value === value }"
         @click="showTab(tab.value)">
         {{ tab.name }}
       </li>
     </ul>
   </div>
-  <div class="Tabs-contentContainer">
-    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === selected"/>
+  <div>
+    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === value"/>
   </div>
 </div>
 </template>
@@ -20,29 +21,31 @@
 <script lang="ts" src="./Tabs.vue.ts"></script>
 
 <style lang="less" scoped>
-.Tabs-tabContainer {
+@import "../styles/_colors";
+
+.tab-container {
   display: flex;
   flex-direction: row;
   list-style-type: none;
   margin: 0;
 }
 
-.Tabs-tab {
+.tab {
   flex-grow: 1;
   text-align: center;
   padding: 10px 0;
   cursor: pointer;
   box-sizing: border-box;
-  border: 1px solid rgba(0,0,0,0);
-  border-bottom: 1px solid #ccc;
-  &.Tabs-tab__active {
-    border: 1px solid #ccc;
-    border-bottom: 1px solid rgba(0,0,0,0);
+  border-radius: 3px 3px 0 0;
+  border: 1px solid @border;
+  &.active {
+    border-bottom: none;
   }
-}
-
-.Tabs-contentContainer {
-  border: 1px solid #ccc;
-  border-top: 0;
+  &:first-of-type {
+    border-left: none;
+  }
+  &:last-of-type {
+    border-right: none;
+  }
 }
 </style>

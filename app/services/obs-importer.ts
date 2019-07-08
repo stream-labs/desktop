@@ -328,12 +328,17 @@ export class ObsImporterService extends Service {
     });
   }
 
+  // TODO: Fix this function
   importTransitions(configJSON: IOBSConfigJSON) {
-    // Only import the first transition found in obs as N Air only
-    // uses one global transition
+    // Only import a single transition from OBS for now.
+    // Eventually we should import all transitions
     if (configJSON.transitions && configJSON.transitions.length > 0) {
-      this.transitionsService.setType(configJSON.transitions[0].id as ETransitionType);
-      this.transitionsService.setDuration(configJSON.transition_duration);
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.createTransition(
+        configJSON.transitions[0].id as ETransitionType,
+        'Global Transition',
+        { duration: configJSON.transition_duration }
+      );
     }
   }
 

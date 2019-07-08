@@ -121,7 +121,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   getFormData() {
     return {
       type: {
-        description: $t('transitions.transition'),
+        description: $t('transitions.transitionType'),
         name: 'type',
         value: this.state.type,
         options: this.getTypes()

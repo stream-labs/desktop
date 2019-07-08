@@ -42,11 +42,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private windowsService: WindowsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
 
   /**
    * Maps a source id to a property manager
@@ -379,6 +376,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     this.windowsService.closeChildWindow();
+
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
       queryParams: { sourceId },
@@ -388,7 +386,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
     });
   }
-
 
   showShowcase() {
     this.windowsService.showWindow({

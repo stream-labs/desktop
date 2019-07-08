@@ -1,5 +1,5 @@
 <template>
-<div class="modal-layout" data-test="ModalLayout">
+<div id="mainWrapper" class="modal-layout" data-test="ModalLayout">
   <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"

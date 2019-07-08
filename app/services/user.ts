@@ -196,6 +196,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     */
     this.userLogout.next();
     this.LOGOUT();
+    electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
   }
 

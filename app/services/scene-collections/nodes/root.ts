@@ -1,47 +1,53 @@
 import { Node } from './node';
 import { SourcesNode } from './sources';
 import { ScenesNode } from './scenes';
-import { TransitionNode } from './transition';
+import { TransitionsNode } from './transitions';
 import { HotkeysNode } from './hotkeys';
 
 interface ISchema {
   sources: SourcesNode;
   scenes: ScenesNode;
-  transition: TransitionNode;
   hotkeys?: HotkeysNode;
+  transitions?: TransitionsNode; // V2 Transitions
 }
 
 // This is the root node of the config file
 export class RootNode extends Node<ISchema, {}> {
 
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
     const scenes = new ScenesNode();
-    const transition = new TransitionNode();
+    const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
 
     await sources.save({});
     await scenes.save({});
-    await transition.save();
+    await transitions.save();
     await hotkeys.save({});
 
     this.data = {
       sources,
       scenes,
-      transition,
+      transitions,
       hotkeys
     };
   }
 
   async load(): Promise<void> {
+    await this.data.transitions.load();
     await this.data.sources.load({});
     await this.data.scenes.load({});
-    await this.data.transition.load();
 
     if (this.data.hotkeys) {
       await this.data.hotkeys.load({});
+    }
+  }
+
+  migrate(version: number) {
+    if (version === 1) {
+      this.data.transitions = this.data['transition'];
     }
   }
 }
