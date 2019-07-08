@@ -305,14 +305,11 @@ export class Scene {
    */
   private reconcileNodeOrderWithObs() {
     this.getItems().forEach((item, index) => {
-      let currentIdx: number;
-      this.getObsScene()
+      const currentIndex = this.getObsScene()
         .getItems()
         .reverse()
-        .forEach((obsItem, idx) => {
-          if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
-        });
-      this.getObsScene().moveItem(currentIdx, index);
+        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
+      this.getObsScene().moveItem(currentIndex, index);
     });
   }
 
