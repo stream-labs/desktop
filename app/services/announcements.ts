@@ -32,6 +32,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     closeOnLink: false,
   };
 
+  localStorageKey = 'FirstActivationTimestamp';
+
   async updateBanner() {
     const newBanner = await this.fetchBanner();
     this.SET_BANNER(newBanner);
@@ -45,8 +47,24 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     await this.postBannerClose();
   }
 
+  get activationTimestamp(): number {
+    if (localStorage.getItem(this.localStorageKey)) {
+      return parseInt(localStorage.getItem(this.localStorageKey), 10);
+    }
+    this.activationTimestamp = Date.now();
+    return this.activationTimestamp;
+  }
+
+  set activationTimestamp(timestamp: number) {
+    localStorage.setItem(this.localStorageKey, timestamp.toString());
+  }
+
+  underOneWeek() {
+    return (Date.now() - this.activationTimestamp) / (1000 * 60 * 60 * 24 * 7) < 1;
+  }
+
   private async fetchBanner() {
-    if (!this.userService.isLoggedIn()) return this.state;
+    if (!this.userService.isLoggedIn() || this.underOneWeek()) return this.state;
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
