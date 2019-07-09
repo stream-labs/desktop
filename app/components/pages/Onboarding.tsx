@@ -6,6 +6,7 @@ import { Inject } from 'services/core/injector';
 import Connect from './onboarding-steps/Connect';
 import ObsImport from './onboarding-steps/ObsImport';
 import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
+import Optimize from './onboarding-steps/Optimize';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: boolean } }> {
@@ -34,7 +35,7 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
   render(h: Function) {
     const remainingSteps = this.importedFromObs
       ? [<StreamlabsFeatures slot="3" />]
-      : [<div slot="3" />, <div slot="4" />, <div slot="5" />];
+      : [<Optimize slot="3" />, <div slot="4" />];
 
     if (this.params.isLogin) {
       return (
