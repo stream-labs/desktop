@@ -8,7 +8,7 @@ jest.mock('../../../obs-api', () => ({
   Global: {},
 }));
 jest.mock('services/app', () => ({}));
-jest.mock('components/shared/forms/Input', () => ({}));
+jest.mock('components/obs/inputs/ObsInput', () => ({}));
 
 const setup = createSetupFunction({
   injectee: {

@@ -5,9 +5,9 @@ import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
 import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
-import { TFormData } from '../../components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../obs-api';
-import { Selection, SelectionService } from 'services/selection';
+
 import {
   IPartialSettings,
   IPartialTransform,
@@ -38,7 +38,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   muted: boolean;
   width: number;
   height: number;
-  properties: TFormData;
+  properties: TObsFormData;
   channel?: number;
 
   sceneItemId: string;

@@ -1,24 +1,25 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, ServiceHelper } from '../stateful-service';
-import { SourcesService, ISource, Source } from '../sources';
-import { ScenesService } from '../scenes';
+import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { SourcesService, ISource, Source } from 'services/sources';
+import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
-import Utils from '../utils';
+import Utils from 'services/utils';
 import electron from 'electron';
-import { Inject } from '../../util/injector';
-import { InitAfter } from '../../util/service-observer';
-import { WindowsService } from '../windows';
+import { Inject } from 'util/injector';
+import { InitAfter } from 'util/service-observer';
+import { WindowsService } from 'services/windows';
 import {
-  IBitmaskInput, IFormInput, IListInput, INumberInputValue, TFormData,
-} from '../../components/shared/forms/Input';
+  IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
+} from 'components/obs/inputs/ObsInput';
 import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
 } from './audio-api';
 import { Observable } from 'rxjs/Observable';
 import { $t } from 'services/i18n';
+import uuid from 'uuid/v4';
 
 const { ipcRenderer } = electron;
 
@@ -160,8 +161,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   getDevices(): IAudioDevice[] {
     const devices: IAudioDevice[] = [];
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
+    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid());
+    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid());
 
     (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
@@ -301,10 +302,10 @@ export class AudioSource implements IAudioSourceApi {
     return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
-  getSettingsForm(): TFormData {
+  getSettingsForm(): TObsFormData {
 
     return [
-      <INumberInputValue>{
+      <IObsNumberInputValue>{
         name: 'deflection',
         value: Math.round(this.fader.deflection * 100),
         description: $t('audio.volumeInPercent'),
@@ -316,7 +317,7 @@ export class AudioSource implements IAudioSourceApi {
         type: 'OBS_PROPERTY_INT'
       },
 
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: this.forceMono,
         name: 'forceMono',
         description: $t('audio.downmixToMono'),
@@ -326,7 +327,7 @@ export class AudioSource implements IAudioSourceApi {
         enabled: true,
       },
 
-      <IFormInput<number>> {
+      <IObsInput<number>> {
         value: this.syncOffset,
         name: 'syncOffset',
         description: $t('audio.syncOffsetInMs'),
@@ -336,7 +337,7 @@ export class AudioSource implements IAudioSourceApi {
         enabled: true,
       },
 
-      <IListInput<obs.EMonitoringType>> {
+      <IObsListInput<obs.EMonitoringType>> {
         value: this.monitoringType,
         name: 'monitoringType',
         description: $t('audio.audioMonitoring'),
@@ -352,7 +353,7 @@ export class AudioSource implements IAudioSourceApi {
       },
 
 
-      <IBitmaskInput> {
+      <IObsBitmaskInput> {
         value: this.audioMixers,
         name: 'audioMixers',
         description: $t('audio.tracks'),

@@ -5,7 +5,7 @@ import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { SourceFiltersService } from '../../services/source-filters';
 
-import * as inputComponents from '../shared/forms';
+import * as inputComponents from 'components/obs/inputs';
 import ModalLayout from '../ModalLayout.vue';
 import { $t } from 'services/i18n';
 

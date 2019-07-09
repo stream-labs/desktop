@@ -3,10 +3,9 @@ import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
-  TFormData,
-  IListOption,
-  IListInput
-} from '../../components/shared/forms/Input';
+  TObsFormData,
+  IObsListInput
+} from 'components/obs/inputs/ObsInput';
 import { nodeObs } from '../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
@@ -176,7 +175,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories: string[] = nodeObs.OBS_settings_getListCategories();
+    const categories: string[] = nodeObs.OBS_settings_getListCategories();
 
     // if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
@@ -516,7 +515,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         return param.value;
       }
       if (typeof param.options !== 'undefined' && Array.isArray(param.options)) {
-        return (param as IListInput<string>).options[0].value;
+        return (param as IObsListInput<string>).options[0].value;
       }
     }
     return undefined;
@@ -528,7 +527,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       .getSources()
       .filter(source => source.channel !== void 0);
 
-    const parameters: TFormData = [];
+    const parameters: TObsFormData = [];
 
     // collect output channels info
     for (

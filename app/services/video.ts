@@ -59,8 +59,8 @@ export class Display {
       );
     }
 
-    this.selectionSubscription = this.selectionService.updated.subscribe(() => {
-      this.switchGridlines(this.selectionService.getSize() <= 1);
+    this.selectionSubscription = this.selectionService.updated.subscribe(state => {
+      this.switchGridlines(state.selectedIds.length <= 1);
     });
 
     // 映像部分以外の色
@@ -158,11 +158,16 @@ export class Display {
     });
   }
 
+  drawingUI = true;
+
   setShoulddrawUI(drawUI: boolean) {
+    this.drawingUI = drawUI;
     nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
   }
 
   switchGridlines(enabled: boolean) {
+    // This function does nothing if we aren't drawing the UI
+    if (!this.drawingUI) return;
     nodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
   }
 }

@@ -30,4 +30,3 @@ export class ObserveList extends Service {
     this.observations.push(observation);
   }
 }
-

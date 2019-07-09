@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import { defer } from 'lodash';
-import { PersistentStatefulService } from './persistent-stateful-service';
-import { Inject } from '../util/injector';
-import { mutation } from './stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { Inject } from 'util/injector';
+import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import {
@@ -13,7 +13,7 @@ import {
   IPlatformService,
   IStreamingSetting
 } from './platforms';
-import { CustomizationService } from './customization';
+import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -35,6 +35,7 @@ import {
   release as nodeOsRelease,
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
+import uuid from 'uuid/v4';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -127,7 +128,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     let userId = localStorage.getItem(localStorageKey);
 
     if (!userId) {
-      userId = electron.ipcRenderer.sendSync('getUniqueId');
+      userId = uuid();
       localStorage.setItem(localStorageKey, userId);
     }
 

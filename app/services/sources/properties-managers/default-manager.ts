@@ -1,6 +1,6 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
-import * as input from 'components/shared/forms/Input';
+import { TObsFormData, IObsListInput, TObsValue } from 'components/obs/inputs/ObsInput';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';
@@ -40,20 +40,20 @@ export class DefaultManager extends PropertiesManager {
     }
   }
 
-  setPropertiesFormData(properties: input.TFormData) {
+  setPropertiesFormData(properties: TObsFormData) {
     super.setPropertiesFormData(properties);
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
       this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
     }
   }
 
-  getPropertiesFormData(): input.TFormData {
+  getPropertiesFormData(): TObsFormData {
     const propArray = super.getPropertiesFormData();
 
     // TODO: 選択肢単位のフィルタリング機構がないので暫定対処、これ以上増やしたくなったらやり方を考えること
     // TODO: ホットキーのフォームが未実装
     if (this.obsSource.id === 'game_capture') {
-      const captureModeProp = propArray.find(prop => prop.name === 'capture_mode') as input.IListInput<input.TObsValue>;
+      const captureModeProp = propArray.find(prop => prop.name === 'capture_mode') as IObsListInput<TObsValue>;
       if (captureModeProp) {
         captureModeProp.options = captureModeProp.options.filter(option => {
           return option.value !== 'hotkey';

@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { TFormData } from '../../components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ICustomizationServiceState {
   performanceMode: boolean;
@@ -17,7 +17,7 @@ export interface ICustomizationServiceApi {
   settingsChanged: Observable<Partial<ICustomizationSettings>>;
   setSettings(settingsPatch: Partial<ICustomizationSettings>): void;
   getSettings(): ICustomizationSettings;
-  getSettingsFormData(): TFormData;
-  getExperimentalSettingsFormData(): TFormData;
+  getSettingsFormData(): TObsFormData;
+  getExperimentalSettingsFormData(): TObsFormData;
   restoreDefaults(): void;
 }

@@ -5,7 +5,7 @@ import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
-import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
+import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
 import { UserService } from '../../services/user';
 import { CustomizationService } from '../../services/customization';

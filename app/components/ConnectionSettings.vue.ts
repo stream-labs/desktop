@@ -2,9 +2,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
-import * as inputComponents from 'components/shared/forms';
-import { IListInput, IFormInput } from 'components/shared/forms/Input';
-import { ScenesService, Scene } from 'services/scenes';
+import * as inputComponents from 'components/obs/inputs';
+import { IObsListInput } from 'components/obs/inputs/ObsInput';
+import { ScenesService } from 'services/scenes';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -18,7 +18,7 @@ export default class SceneTransitions extends Vue {
 
   @Prop() connectionId: string;
 
-  get fromSceneModel(): IListInput<string> {
+  get fromSceneModel(): IObsListInput<string> {
     return {
       description: $t('transitions.connectionFrom'),
       name: 'from',
@@ -27,13 +27,13 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set fromSceneModel(model: IListInput<string>) {
+  set fromSceneModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
       fromSceneId: model.value
     });
   }
 
-  get toSceneModel(): IListInput<string> {
+  get toSceneModel(): IObsListInput<string> {
     return {
       description: $t('transitions.connectionTo'),
       name: 'to',
@@ -42,13 +42,13 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set toSceneModel(model: IListInput<string>) {
+  set toSceneModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
       toSceneId: model.value
     });
   }
 
-  get transitionModel(): IListInput<string> {
+  get transitionModel(): IObsListInput<string> {
     return {
       description: $t('transitions.sceneTransition'),
       name: 'transition',
@@ -57,7 +57,7 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set transitionModel(model: IListInput<string>) {
+  set transitionModel(model: IObsListInput<string>) {
     this.transitionsService.updateConnection(this.connectionId, {
       transitionId: model.value
     });

@@ -2,9 +2,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
-import * as inputComponents from 'components/shared/forms';
-import { TFormData, IListInput, IFormInput } from 'components/shared/forms/Input';
-import GenericForm from 'components/shared/forms/GenericForm.vue';
+import * as inputComponents from 'components/obs/inputs';
+import { TObsFormData, IObsListInput, IObsInput } from 'components/obs/inputs/ObsInput';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -18,7 +18,7 @@ export default class SceneTransitions extends Vue {
 
   @Prop() transitionId: string;
 
-  get typeModel(): IListInput<ETransitionType> {
+  get typeModel(): IObsListInput<ETransitionType> {
     return {
       description: $t('transitions.transitionType'),
       name: 'type',
@@ -27,12 +27,12 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set typeModel(model: IListInput<ETransitionType>) {
+  set typeModel(model: IObsListInput<ETransitionType>) {
     this.transitionsService.changeTransitionType(this.transitionId, model.value);
     this.properties = this.transitionsService.getPropertiesFormData(this.transitionId);
   }
 
-  get durationModel(): IFormInput<number> {
+  get durationModel(): IObsInput<number> {
     return {
       description: $t('transitions.duration'),
       name: 'duration',
@@ -40,11 +40,11 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set durationModel(model: IFormInput<number>) {
+  set durationModel(model: IObsInput<number>) {
     this.transitionsService.setDuration(this.transitionId, model.value);
   }
 
-  get nameModel(): IFormInput<string> {
+  get nameModel(): IObsInput<string> {
     return {
       description: $t('transitions.name'),
       name: 'name',
@@ -52,7 +52,7 @@ export default class SceneTransitions extends Vue {
     };
   }
 
-  set nameModel(name: IFormInput<string>) {
+  set nameModel(name: IObsInput<string>) {
     this.transitionsService.renameTransition(this.transitionId, name.value);
   }
 
@@ -62,7 +62,7 @@ export default class SceneTransitions extends Vue {
 
   properties = this.transitionsService.getPropertiesFormData(this.transitionId);
 
-  saveProperties(props: TFormData) {
+  saveProperties(props: TObsFormData) {
     this.transitionsService.setPropertiesFormData(this.transitionId, props);
   }
 }

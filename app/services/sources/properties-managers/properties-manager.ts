@@ -1,4 +1,4 @@
-import * as input from 'components/shared/forms/Input';
+import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import { compact } from 'lodash';
 
@@ -9,8 +9,8 @@ import { compact } from 'lodash';
  */
 export interface IPropertyManager {
   destroy(): void;
-  getPropertiesFormData(): input.TFormData;
-  setPropertiesFormData(property: input.TFormData): void;
+  getPropertiesFormData(): input.TObsFormData;
+  setPropertiesFormData(property: input.TObsFormData): void;
   settings: Dictionary<any>;
   applySettings(settings: Dictionary<any>): void;
   customUIComponent: string;
@@ -100,9 +100,9 @@ export abstract class PropertiesManager implements IPropertyManager {
   }
 
 
-  getPropertiesFormData(): input.TFormData {
+  getPropertiesFormData(): input.TObsFormData {
     const obsProperties = input.getPropertiesFormData(this.obsSource);
-    let propsArray: input.TFormData = [];
+    let propsArray: input.TObsFormData = [];
 
     // First, add properties that appear in the display order
     this.displayOrder.forEach(name => {
@@ -128,7 +128,7 @@ export abstract class PropertiesManager implements IPropertyManager {
    * are edited by the user.
    * @param properties The OBS properties
    */
-  setPropertiesFormData(properties: input.TFormData) {
+  setPropertiesFormData(properties: input.TObsFormData) {
     input.setPropertiesFormData(this.obsSource, properties);
   }
 

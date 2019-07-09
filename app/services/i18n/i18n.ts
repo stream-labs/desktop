@@ -5,7 +5,7 @@ import { mutation } from 'services/stateful-service';
 import { Inject } from 'util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { AppService } from 'services/app';
-import { IListInput, TFormData } from 'components/shared/forms/Input';
+import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { I18nServiceApi } from './i18n-api';
 import * as obs from '../../../obs-api';
 import * as fs from 'fs';
@@ -15,7 +15,7 @@ interface II18nState {
   locale: string;
 }
 
-export function $t(...args: any[]) {
+export function $t(...args: any[]): string {
   const vueI18nInstance = I18nService.vueI18nInstance;
 
   // some tests try to call this function before dictionaries have been loaded
@@ -156,7 +156,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     });
   }
 
-  getLocaleFormData(): TFormData {
+  getLocaleFormData(): TObsFormData {
     const options = Object.keys(this.availableLocales)
       .map(locale => {
         return {
@@ -166,7 +166,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       });
 
     return [
-      <IListInput<string>>{
+      <IObsListInput<string>>{
         type: 'OBS_PROPERTY_LIST',
         name: 'locale',
         description: $t('common.language'),

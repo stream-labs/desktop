@@ -2,13 +2,13 @@ import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
 import { ISourcesServiceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
-import GenericForm from 'components/shared/forms/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs/subscription';
 import electron from 'electron';
@@ -31,8 +31,8 @@ export default class SourceProperties extends Vue {
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  properties: TFormData = [];
-  initialProperties: TFormData = [];
+  properties: TObsFormData = [];
+  initialProperties: TObsFormData = [];
   tainted = false;
 
   sourcesSubscription: Subscription;
@@ -55,7 +55,7 @@ export default class SourceProperties extends Vue {
     if (this.source) return  this.source.getPropertiesManagerUI();
   }
 
-  onInputHandler(properties: TFormData, changedIndex: number) {
+  onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData(
       [properties[changedIndex]]

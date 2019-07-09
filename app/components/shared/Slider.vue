@@ -11,6 +11,7 @@
     :height="4"
     :dotSize="dotSize"
     :tooltip="tooltip"
+    tooltip-dir="bottom"
     :sliderStyle="sliderStyle"
     :formatter="formatter"
     ref="slider"

@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import GenericForm from './shared/forms/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { INotificationsServiceApi, INotificationsSettings } from 'services/notifications';
-import { TFormData } from './shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ITroubleshooterServiceApi, ITroubleshooterSettings } from 'services/troubleshooter';
 
 @Component({
@@ -14,8 +14,8 @@ export default class NotificationsSettings extends Vue {
   @Inject() notificationsService: INotificationsServiceApi;
   @Inject() troubleshooterService: ITroubleshooterServiceApi;
 
-  settingsFormData: TFormData = null;
-  troubleshooterFormData: TFormData = null;
+  settingsFormData: TObsFormData = null;
+  troubleshooterFormData: TObsFormData = null;
 
 
   created() {
@@ -23,7 +23,7 @@ export default class NotificationsSettings extends Vue {
   }
 
 
-  saveNotificationsSettings(formData: TFormData) {
+  saveNotificationsSettings(formData: TObsFormData) {
     const settings: Partial<INotificationsSettings> = {};
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;
@@ -33,7 +33,7 @@ export default class NotificationsSettings extends Vue {
   }
 
 
-  saveTroubleshooterSettings(formData: TFormData) {
+  saveTroubleshooterSettings(formData: TObsFormData) {
     const settings: Partial<ITroubleshooterSettings> = {};
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;

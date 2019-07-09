@@ -11,7 +11,7 @@ import {
 import { mutation, ServiceHelper } from 'services/stateful-service';
 import { Inject } from 'util/injector';
 import { ScenesService } from 'services/scenes';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
@@ -113,13 +113,13 @@ export class Source implements ISourceApi {
   }
 
 
-  getPropertiesFormData(): TFormData {
+  getPropertiesFormData(): TObsFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
   }
 
 
-  setPropertiesFormData(properties: TFormData) {
+  setPropertiesFormData(properties: TObsFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
     this.sourcesService.sourceUpdated.next(this.sourceState);

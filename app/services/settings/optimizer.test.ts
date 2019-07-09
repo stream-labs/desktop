@@ -17,7 +17,7 @@ import { ISettingsSubCategory } from './settings-api';
 jest.mock('services/stateful-service');
 jest.mock('util/injector');
 jest.mock('services/obs-api', () => ({}));
-jest.mock('components/shared/forms/Input', () => ({}));
+jest.mock('components/obs/inputs/ObsInput', () => ({}));
 jest.mock('services/windows', () => ({}));
 jest.mock('services/hotkeys', () => ({}));
 jest.mock('services/audio', () => ({}));

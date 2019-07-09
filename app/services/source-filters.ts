@@ -1,9 +1,9 @@
 import { Service } from './service';
 import {
-  TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
-  TObsValue,
-  IListInput
-} from '../components/shared/forms/Input';
+  TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
+  TObsValue, IObsListInput
+} from 'components/obs/inputs/ObsInput';
+
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -54,9 +54,9 @@ export class SourceFiltersService extends Service {
   @Inject()
   windowsService: WindowsService;
 
-  getTypesList(): IListOption<TSourceFilterType>[] {
+  getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
+    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('filters.mask'), value: 'mask_filter' },
       { description: $t('filters.crop'), value: 'crop_filter' },
       { description: $t('filters.gain'), value: 'gain_filter' },
@@ -164,7 +164,7 @@ export class SourceFiltersService extends Service {
   }
 
 
-  setPropertiesFormData(sourceId: string, filterName: string, properties: TFormData) {
+  setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
   }
@@ -209,14 +209,14 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getPropertiesFormData(sourceId: string, filterName: string): TFormData {
+  getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
     const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
 
     // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
-    formData.forEach(input => {
+    formData.forEach((input: any) => {
       if (input.name === 'sidechain_source') {
-        (input as IListInput<string>).options.forEach(option => {
+        (input as IObsListInput<string>).options.forEach(option => {
           if (option.value === 'none') return;
 
           const source = this.sourcesService.getSourceById(option.value);

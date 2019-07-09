@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
-import { IListOption, setupConfigurableDefaults, TObsValue } from 'components/shared/forms/Input';
+import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -17,6 +17,7 @@ import {
   TPropertiesManager
 } from './index';
 import { $t } from '../i18n';
+import uuid from 'uuid/v4';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -129,9 +130,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string =
-      options.sourceId ||
-      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
+    const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
@@ -244,7 +243,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
     const whitelistedTypes: TSourceType[] = [
       'image_source',
@@ -433,4 +432,3 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 }
-

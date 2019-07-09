@@ -2,17 +2,17 @@ import { mutation, StatefulService } from './stateful-service';
 import * as obs from '../../obs-api';
 import {
   getPropertiesFormData,
-  IListOption, setPropertiesFormData,
-  TFormData, TObsValue
-} from '../components/shared/forms/Input';
+  IObsListOption, setPropertiesFormData,
+  TObsFormData, TObsValue
+} from 'components/obs/inputs/ObsInput';
 import { Inject } from '../util/injector';
 import { WindowsService } from './windows';
 import { $t } from 'services/i18n';
 
 interface ISceneTransitionsState {
-  availableTransitions: IListOption<string>[];
+  availableTransitions: IObsListOption<string>[];
   duration: number;
-  properties: TFormData;
+  properties: TObsFormData;
   type: string;
 }
 
@@ -44,7 +44,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     this.state.duration = duration;
   }
 
-  getTypes(): IListOption<string>[] {
+  getTypes(): IObsListOption<string>[] {
     return [
       { description: $t('transitions.cut_transition'), value: 'cut_transition' },
       { description: $t('transitions.fade_transition'), value: 'fade_transition' },
@@ -79,11 +79,11 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     this.getCurrentTransition().update(settings);
   }
 
-  getPropertiesFormData(): TFormData {
+  getPropertiesFormData(): TObsFormData {
     return getPropertiesFormData(this.getCurrentTransition()) || [];
   }
 
-  setPropertiesFormData(formData: TFormData) {
+  setPropertiesFormData(formData: TObsFormData) {
     return setPropertiesFormData(this.getCurrentTransition(), formData);
   }
 

@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import BoolInput from '../shared/forms/BoolInput.vue';
+import BoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 import windowMixin from '../mixins/window';
 import { CustomizationService } from '../../services/customization';
-import { IFormInput } from '../../components/shared/forms/Input';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from '../../services/streaming';
 import { WindowsService } from '../../services/windows';
 import { SettingsService } from '../../services/settings';
@@ -29,7 +29,7 @@ export default class OptimizeNiconico extends Vue {
   settings: OptimizedSettings = this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
   icons = CategoryIcons;
 
-  get doNotShowAgain(): IFormInput<boolean> {
+  get doNotShowAgain(): IObsInput<boolean> {
     return {
       name: 'do_not_show_again',
       description: $t('streaming.doNotShowAgainOptimizationDialog'),
@@ -37,11 +37,11 @@ export default class OptimizeNiconico extends Vue {
     };
   }
 
-  setDoNotShowAgain(model: IFormInput<boolean>) {
+  setDoNotShowAgain(model: IObsInput<boolean>) {
     this.customizationService.setShowOptimizationDialogForNiconico(!model.value);
   }
 
-  get useHardwareEncoder(): IFormInput<boolean> {
+  get useHardwareEncoder(): IObsInput<boolean> {
     return {
       name: 'use_hardware_encoder',
       description: $t('streaming.optimizeWithHardwareEncoder'),
@@ -49,7 +49,7 @@ export default class OptimizeNiconico extends Vue {
     };
   }
 
-  setUseHardwareEncoder(model: IFormInput<boolean>) {
+  setUseHardwareEncoder(model: IObsInput<boolean>) {
     this.customizationService.setOptimizeWithHardwareEncoder(model.value);
     // close the dialog and open again to apply new optimization settings
     this.windowsService.closeChildWindow();

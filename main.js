@@ -619,11 +619,6 @@ ipcMain.on('obs-apiCall', (event, data) => {
   event.returnValue = retVal;
 });
 
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
-});
-
 ipcMain.on('restartApp', () => {
   // prevent unexpected cache clear
   const args = process.argv.slice(1).filter(x => x !== '--clearCacheDir');

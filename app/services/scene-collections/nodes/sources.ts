@@ -52,7 +52,6 @@ export interface ISourceInfo {
 }
 
 export class SourcesNode extends Node<ISchema, {}> {
-
   schemaVersion = 3;
 
   @Inject() private fontLibraryService: FontLibraryService;
@@ -61,8 +60,8 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private scenesService: ScenesService;
 
   getItems() {
-
-    const linkedSourcesIds = this.scenesService.getSceneItems()
+    const linkedSourcesIds = this.scenesService
+      .getSceneItems()
       .map(sceneItem => sceneItem.sourceId);
 
     return this.sourcesService.sources.filter(source => {
@@ -84,7 +83,6 @@ export class SourcesNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         return hotkeys.save({ sourceId: source.sourceId }).then(() => {
-
           const audioSource = this.audioService.getSource(source.sourceId);
 
           const obsInput = source.getObsInput();
@@ -153,7 +151,6 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-
   checkTextSourceValidity(item: ISourceInfo) {
     if (item.type !== 'text_gdiplus') {
       return;
@@ -161,7 +158,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const settings = item.settings;
 
-    if (settings['font']['face'] && (settings['font']['flags'] != null)) {
+    if (settings['font']['face'] && settings['font']['flags'] != null) {
       return;
     }
 
@@ -231,7 +228,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             name: filter.name,
             type: filter.type,
             settings: filter.settings,
-            enabled: (filter.enabled === void 0) ? true : filter.enabled
+            enabled: filter.enabled === void 0 ? true : filter.enabled
           };
         })
       };
@@ -243,15 +240,11 @@ export class SourcesNode extends Node<ISchema, {}> {
     sources.forEach((source, index) => {
       const sourceInfo = this.data.items[index];
 
-      this.sourcesService.addSource(
-        source,
-        this.data.items[index].name,
-        {
-          channel: sourceInfo.channel,
-          propertiesManager: sourceInfo.propertiesManager,
-          propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
-        }
-      );
+      this.sourcesService.addSource(source, this.data.items[index].name, {
+        channel: sourceInfo.channel,
+        propertiesManager: sourceInfo.propertiesManager,
+        propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
+      });
 
       let newSource = this.sourcesService.getSource(sourceInfo.id);
       if (newSource.async && newSource.video) {
@@ -264,20 +257,28 @@ export class SourcesNode extends Node<ISchema, {}> {
       }
 
       if (source.audioMixers) {
-        this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);
+        this.audioService
+          .getSource(sourceInfo.id)
+          .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
           forceMono: sourceInfo.forceMono,
-          syncOffset: sourceInfo.syncOffset ? AudioService.timeSpecToMs(sourceInfo.syncOffset) : 0,
+          syncOffset: sourceInfo.syncOffset
+            ? AudioService.timeSpecToMs(sourceInfo.syncOffset)
+            : 0,
           audioMixers: sourceInfo.audioMixers,
           monitoringType: sourceInfo.monitoringType
         });
-        this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
+        this.audioService
+          .getSource(sourceInfo.id)
+          .setHidden(!!sourceInfo.mixerHidden);
       }
 
       this.checkTextSourceValidity(sourceInfo);
 
       if (sourceInfo.hotkeys) {
-        promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
+        promises.push(
+          this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id })
+        );
       }
     });
 
@@ -286,14 +287,10 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-
   migrate(version: number) {
-
     // migrate audio sources names
     if (version < 3) {
-
       this.data.items.forEach(source => {
-
         const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(source.name);
         if (desktopDeviceMatch) {
           const index = parseInt(desktopDeviceMatch[1], 10);
@@ -307,9 +304,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           source.name = $t('sources.micAux') + (index > 1 ? ' ' + index : '');
           return;
         }
-
       });
-
     }
   }
 }

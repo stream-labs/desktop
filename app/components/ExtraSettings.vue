@@ -51,7 +51,7 @@
   </div>
 
   <div class="section">
-    <BoolInput
+    <ObsBoolInput
       :value="pollingPerformanceStatisticsModel"
       @input="setPollingPerformanceStatistics" />
     <p>{{ $t('settings.pollingPerformanceStatisticsDescription') }}</p>
