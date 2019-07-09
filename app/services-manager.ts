@@ -160,6 +160,12 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
+
+    // this helps to debug services from the console
+    if (Utils.isDevMode()) {
+      window['sm'] = this;
+    }
+
     if (!Utils.isMainWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
@@ -170,10 +176,6 @@ export class ServicesManager extends Service {
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
 
-    // this helps to debug services from console
-    if (Utils.isDevMode()) {
-      window['sm'] = this;
-    }
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -396,7 +398,7 @@ export class ServicesManager extends Service {
    * @example
    * source = getResource('Source[12]')
    */
-  private getResource(resourceId: string) {
+  getResource(resourceId: string) {
     if (resourceId === 'ServicesManager') {
       return this;
     }

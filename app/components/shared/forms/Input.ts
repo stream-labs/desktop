@@ -318,12 +318,12 @@ export function inputValuesToObsValues(
 
 
 export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
-  setupSourceDefaults(obsSource);
-
   const sourceType = obsSource.id;
   const formData: TFormData = [];
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
+
+  setupConfigurableDefaults(obsSource, obsProps, obsSettings);
 
   if (!obsProps) return null;
   if (!obsProps.count()) return null;
@@ -432,7 +432,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
 export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
   const buttons: IFormInput<boolean>[] = [];
   const formInputs: IFormInput<TObsValue>[] = [];
-  const properties = obsSource.properties;
+  let properties = null;
 
   form.forEach(item => {
     if (item.type === 'OBS_PROPERTY_BUTTON') {
@@ -441,6 +441,14 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
       formInputs.push(item);
     }
   });
+
+  /* Don't fetch properties unless we use it. */
+  if (buttons.length !== 0) properties = obsSource.properties;
+
+  for (const button of buttons) {
+    const obsButtonProp = properties.get(button.name) as obs.IButtonProperty;
+    obsButtonProp.buttonClicked(obsSource);
+  }
 
   const settings: Dictionary<any> = {};
   formInputs.forEach(property => {
@@ -452,35 +460,56 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
     }
   });
 
-  obsSource.update(settings);
+  /* Don't update unless we need to. */
+  if (formInputs.length === 0) return;
 
-  buttons.forEach(buttonInput => {
-    if (!buttonInput.value) return;
-    const obsButtonProp = properties.get(buttonInput.name) as obs.IButtonProperty;
-    obsButtonProp.buttonClicked(obsSource);
-  });
+  obsSource.update(settings);
 }
 
 
-export function setupSourceDefaults(obsSource: obs.ISource) {
-  const propSettings = obsSource.settings;
+/* Passing a properties and settings object here
+ * prevents a copy and object creation which
+ * also requires IPC. Highly recommended to
+ * pass all parameters. */
+export function setupConfigurableDefaults(
+  configurable: obs.IConfigurable,
+  properties?: obs.IProperties,
+  settings?: obs.ISettings
+) {
+  if (!settings) settings = configurable.settings;
+  if (!properties) properties = configurable.properties;
   const defaultSettings = {};
-  const properties = obsSource.properties;
 
   if (!properties) return;
-  if (!properties.count()) return;
 
   let obsProp = properties.first();
   do {
-    if (
-      propSettings[obsProp.name] !== void 0 ||
-      !isListProperty(obsProp) ||
-      obsProp.details.items.length === 0
-    ) continue;
-    defaultSettings[obsProp.name] = obsProp.details.items[0].value;
-  } while (obsProp = obsProp.next());
+    if (!isListProperty(obsProp)) continue;
+
+    const items = obsProp.details.items;
+
+    if (items.length === 0) continue;
+
+    /* If setting isn't set at all, set to first element. */
+    if (settings[obsProp.name] === void 0) {
+      defaultSettings[obsProp.name] = items[0].value;
+      continue;
+    }
+
+    let validItem = false;
+
+    /* If there is a setting, make sure it's a valid item */
+    for (let i = 0; i < items.length; ++i) {
+      if (settings[obsProp.name] === items[i].value) {
+        validItem = true;
+        break;
+      }
+    }
+
+    if (!validItem) defaultSettings[obsProp.name] = items[0].value;
+  } while ((obsProp = obsProp.next()));
   const needUpdate = Object.keys(defaultSettings).length > 0;
-  if (needUpdate) obsSource.update(defaultSettings);
+  if (needUpdate) configurable.update(defaultSettings);
 }
 
 export abstract class Input<TValueType> extends Vue {

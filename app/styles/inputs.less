@@ -52,7 +52,8 @@
 }
 
 input[type=text],
-input[type="password"],
+input[type=number],
+input[type=password],
 textarea {
   border: 1px solid @grey;
   background: #2B2F3B;
@@ -133,7 +134,7 @@ textarea {
     bottom: 0;
     left: 0;
   }
-  
+
   &:before {
     width: 30px;
     height: 8px;;
@@ -153,7 +154,7 @@ textarea {
     &:before {
         background-color: @text-secondary;
     }
-    
+
     &:after {
       left: 14px;
       background-color: @text-active;
@@ -292,6 +293,7 @@ textarea {
 
 input[type="text"],
 input[type="password"],
+input[type="number"],
 textarea {
   background: @bg-secondary;
   color: @white;

@@ -19,6 +19,7 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import moment from 'moment';
 import { setupGlobalContextMenuForEditableElement } from 'util/menus/GlobalMenu';
@@ -86,9 +87,9 @@ require('./app.less');
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
-
+Vue.use(Toasted);
+Vue.use(VeeValidate); // form validations
 Vue.use(VModal);
-Vue.use(VeeValidate);
 
 
 // Disable chrome default drag/drop behavior

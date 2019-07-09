@@ -138,6 +138,7 @@
     "vue-property-decorator": "^5.0.1",
     "vue-slider-component": "^2.2.7",
     "vue-spinner": "^1.0.3",
+    "vue-toasted": "^1.1.24",
     "vuedraggable": "^2.8.5",
     "vuex": "^3.0.1"
   },
@@ -165,6 +166,7 @@
     "@types/semver": "^5.5.0",
     "@types/socket.io-client": "^1.4.31",
     "@types/urijs": "^1.15.37",
+    "@types/uuid": "^3.4.3",
     "@types/webdriverio": "^4.8.6",
     "@types/xml2js": "^0.4.3",
     "@xkeshi/vue-qrcode": "^0.3.0",
