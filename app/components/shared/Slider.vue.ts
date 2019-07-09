@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueSlider from 'vue-slider-component';
-import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
@@ -27,7 +26,6 @@ export default class SliderInput extends Vue {
     }, 500);
   }
 
-  @throttle(500)
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
   }

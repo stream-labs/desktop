@@ -12,7 +12,7 @@
       </button>
     </div>
   </div>
-  <div>
+  <div class="tab-content">
     <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === value"/>
   </div>
 </div>
@@ -33,5 +33,9 @@
   padding: 0 15px;
   height: 54px;
   border-bottom: 1px solid @border;
+}
+
+.tab-content {
+  padding-top: 60px;
 }
 </style>

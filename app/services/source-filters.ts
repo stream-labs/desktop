@@ -12,7 +12,6 @@ import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 
-
 export type TSourceFilterType =
   'mask_filter' |
   'crop_filter' |
@@ -108,19 +107,35 @@ export class SourceFiltersService extends Service {
   getTypesForSource(sourceId: string): ISourceFilterType[] {
     const source = this.sourcesService.getSource(sourceId);
     return this.getTypes().filter(filterType => {
-      return (filterType.audio && source.audio) || (filterType.video && source.video);
+      /* Audio filters can be applied to audio sources. */
+      if (source.audio && filterType.audio) {
+        return true;
+      }
+
+      /* We have either a video filter or source */
+      /* Can't apply asynchronous video filters to non-asynchronous video souces. */
+      if (!source.async && filterType.async) {
+        return false;
+      }
+
+      /* Video filters can be applied to video sources. */
+      if (source.video && filterType.video) {
+        return true;
+      }
+
+      return false;
     });
   }
 
 
   add(sourceId: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
     const source = this.sourcesService.getSource(sourceId);
-    const obsFilter = obs.FilterFactory.create(filterType, filterName);
+    const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
+
     source.getObsInput().addFilter(obsFilter);
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
-    if (settings) obsFilter.update(settings);
     return obsFilter;
   }
 
