@@ -117,7 +117,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     electron.ipcRenderer.on('testing-fakeAuth', async (e: Electron.Event, auth: IPlatformAuth) => {
       const service = getPlatformService(auth.platform.type);
       await this.login(service, auth);
-      this.onboardingService.next();
+      this.onboardingService.finish();
     });
   }
 

@@ -7,17 +7,29 @@ import Connect from './onboarding-steps/Connect';
 import ObsImport from './onboarding-steps/ObsImport';
 import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
 import Optimize from './onboarding-steps/Optimize';
+import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
+import ThemeSelector from './onboarding-steps/ThemeSelector';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { setTransparency } from '@streamlabs/game-overlay';
 
 @Component({})
-export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: boolean } }> {
+export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
-
-  @Prop() params?: {
-    isLogin?: boolean;
-  };
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   importedFromObs = false;
   currentStep = 1;
+  fbSetupEnabled = false;
+
+  mounted() {
+    // This will do a second unnecessary fetch, but it's the only
+    // way to be sure we have fetched features
+    this.incrementalRolloutService.fetchAvailableFeatures().then(() => {
+      if (this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.facebookOnboarding)) {
+        this.fbSetupEnabled = true;
+      }
+    });
+  }
 
   async continue(importedObs?: boolean) {
     if (importedObs) {
@@ -29,18 +41,42 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
   }
 
   complete() {
-    return;
+    this.onboardingService.finish();
+  }
+
+  steps(h: Function) {
+    const steps = [
+      <Connect slot="1" continue={() => this.continue()} />,
+      <ObsImport
+        slot="2"
+        continue={(importedFromObs: boolean) => this.continue(importedFromObs)}
+      />,
+    ];
+    let currentSlot = 3;
+
+    if (this.importedFromObs) {
+      steps.push(<StreamlabsFeatures slot={String(currentSlot)} />);
+      return steps;
+    }
+    steps.push(<ThemeSelector slot={String(currentSlot)} />);
+    currentSlot++;
+    if (this.onboardingService.isTwitchAuthed) {
+      steps.push(<Optimize slot={String(currentSlot)} continue={() => this.continue()} />);
+    } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
+      steps.push(
+        <FacebookPageCreation slot={String(currentSlot)} continue={() => this.continue()} />,
+      );
+    }
+    return steps;
   }
 
   render(h: Function) {
-    const remainingSteps = this.importedFromObs
-      ? [<StreamlabsFeatures slot="3" />]
-      : [<Optimize slot="3" continue={() => this.continue()} />, <div slot="4" />];
+    const steps = this.steps(h);
 
-    if (this.params.isLogin) {
+    if (this.onboardingService.options.isLogin) {
       return (
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-          <Connect slot="1" />
+          <Connect continue={() => this.complete()} />
         </div>
       );
     }
@@ -48,19 +84,15 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
     return (
       <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <Onboarding
-          steps={remainingSteps.length + 2}
+          steps={steps.length}
           stepLocation="top"
           current={this.currentStep}
           skip={true}
           continueFunc={this.continue}
           completeFunc={this.complete}
+          hideControls={this.currentStep < 3}
         >
-          <Connect slot="1" />
-          <ObsImport
-            slot="2"
-            continue={(importedFromObs: boolean) => this.continue(importedFromObs)}
-          />
-          {remainingSteps}
+          {steps}
         </Onboarding>
       </div>
     );

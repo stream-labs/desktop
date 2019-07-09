@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { OnboardingStep } from 'streamlabs-beaker';
 import electron from 'electron';
 import { UserService } from 'services/user';
@@ -10,9 +10,11 @@ import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
 
 @Component({})
-export default class Connect extends TsxComponent<{}> {
+export default class Connect extends TsxComponent<{ continue: Function }> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
+
+  @Prop() continue: Function;
 
   loadingState = false;
 
@@ -29,7 +31,7 @@ export default class Connect extends TsxComponent<{}> {
       result => {
         // Currently we do not have special handling for generic errors
         if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
-          this.onboardingService.next();
+          this.continue();
         } else if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
           electron.remote.dialog.showMessageBox(
@@ -63,10 +65,6 @@ export default class Connect extends TsxComponent<{}> {
       mixer: 'fas fa-times',
       facebook: 'fab fa-facebook',
     }[platform];
-  }
-
-  skipOnboarding() {
-    this.onboardingService.skip();
   }
 
   get isSecurityUpgrade() {

@@ -1,41 +1,29 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import electron from 'electron';
+import { OnboardingStep } from 'streamlabs-beaker';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services';
 import { getPlatformService } from 'services/platforms';
 import { FacebookService } from 'services/platforms/facebook';
 import { $t } from 'services/i18n';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 @Component({})
-export default class FacebookPageCreation extends TsxComponent<{}> {
+export default class FacebookPageCreation extends TsxComponent<{ continue: Function }> {
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() incrementalRolloutService: IncrementalRolloutService;
+
+  @Prop() continue: Function;
 
   pageCount: number = null;
   loading = true;
 
   mounted() {
-    // This will do a second unnecessary fetch, but it's the only
-    // way to be sure we have fetched features
-    this.incrementalRolloutService
-      .fetchAvailableFeatures()
-      .then(() => {
-        if (
-          this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.facebookOnboarding)
-        ) {
-          this.getPageCount().then(count => {
-            this.pageCount = count;
-            this.loading = false;
-          });
-        } else {
-          this.onboardingService.skip();
-        }
-      })
-      .catch(() => this.onboardingService.skip());
+    this.getPageCount().then(count => {
+      this.pageCount = count;
+      this.loading = false;
+    });
   }
 
   openPageCreation() {
@@ -43,7 +31,7 @@ export default class FacebookPageCreation extends TsxComponent<{}> {
     electron.remote.shell.openExternal(
       'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
     );
-    this.onboardingService.next();
+    this.continue();
   }
 
   openStreamerDashboard() {
@@ -51,12 +39,7 @@ export default class FacebookPageCreation extends TsxComponent<{}> {
       action: 'streamer_dashboard',
     });
     electron.remote.shell.openExternal('https://fb.gg/streamer?ref=streamlabs');
-    this.onboardingService.next();
-  }
-
-  skip() {
-    this.usageStatisticsService.recordAnalyticsEvent('FacebookLogin', { action: 'skip' });
-    this.onboardingService.skip();
+    this.continue();
   }
 
   async getPageCount(): Promise<number> {
@@ -94,16 +77,13 @@ export default class FacebookPageCreation extends TsxComponent<{}> {
     }
 
     return (
-      <div class="onboarding-step">
-        <div class="onboarding-title">Facebook Setup</div>
-        <div class="onboarding-desc">{this.description}</div>
+      <OnboardingStep>
+        <div slot="title">{$t('Facebook Setup')}</div>
+        <div slot="desc">{this.description}</div>
         <button class="button button--action button--lg" onClick={this.buttonAction}>
           {this.buttonText}
         </button>
-        <div class="setup-later">
-          <a onClick={() => this.skip()}>{$t('Skip')}</a>
-        </div>
-      </div>
+      </OnboardingStep>
     );
   }
 }

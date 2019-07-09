@@ -17,7 +17,7 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
   @Inject() autoConfigService: AutoConfigService;
   @Prop() continue: Function;
 
-  stepInfo: IConfigStepPresentation;
+  stepInfo: IConfigStepPresentation = null;
   optimizing = false;
 
   optimize() {
@@ -94,7 +94,7 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
         {this.optimizing ? (
           <div>
             <ProgressBar progressComplete={Math.floor(this.percentage * 100)} />
-            <span>{this.stepInfo && `${this.stepInfo.summary} ${this.stepInfo.percentage}%`}</span>
+            <span>{this.stepInfo && this.stepInfo.summary}</span>
           </div>
         ) : (
           <button class="button button--action button--lg" onClick={this.optimize}>
