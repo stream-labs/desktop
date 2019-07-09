@@ -27,7 +27,11 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   async updateValue() {
     const filter = this.metadata.filter;
     const selectedFile = await this.mediaGalleryService.pickFile({ filter });
-    this.emitInput(selectedFile.href);
+    if (selectedFile) {
+      this.emitInput(selectedFile.href);
+    } else {
+      this.clearImage();
+    }
   }
 
   clearImage() {

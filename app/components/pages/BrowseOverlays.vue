@@ -1,13 +1,15 @@
 <template>
 <div>
   <div class="overlays-container">
-    <webview
-      class="overlays"
-      id="overlaysWebview"
-      :src="overlaysUrl"
-      ref="overlaysWebview"
-      preload="bundles/guest-api">
-    </webview>
+    <webview-loader>
+      <webview
+        class="overlays"
+        id="overlaysWebview"
+        :src="overlaysUrl"
+        ref="overlaysWebview"
+        preload="bundles/guest-api">
+      </webview>
+    </webview-loader>
   </div>
 </div>
 </template>

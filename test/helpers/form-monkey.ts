@@ -271,13 +271,17 @@ export class FormMonkey {
       await sleep(100);
 
       moveOffset = moveOffset / 2;
-      if (moveOffset < 0.5) throw new Error('Slider position setup failed');
+      if (moveOffset < 0.3) throw new Error('Slider position setup failed');
     }
   }
 
   async getSliderValue(sliderInputSelector: string): Promise<number> {
     // fetch the value from the slider's tooltip
-    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`));
+    return Number(
+      await this.client.getText(
+        `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
+      ),
+    );
   }
 
   async setInputValue(selector: string, value: string) {

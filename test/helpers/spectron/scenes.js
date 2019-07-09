@@ -69,5 +69,5 @@ export async function switchCollection(t, collectionName) {
 }
 
 export async function sceneExisting(t, name) {
-  return await t.context.app.client.$(`.studio-controls-selector`).isExisting(`div=${name}`);
+  return await t.context.app.client.$(`[data-name=scene-selector]`).isExisting(`div=${name}`);
 }

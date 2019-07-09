@@ -1,6 +1,6 @@
 import { StreamingService } from 'services/streaming';
 import { ScenesService } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
 import { Inject } from 'services/core/injector';
@@ -37,10 +37,10 @@ const isAudio = (sourceId: string) => {
   return source ? source.audio : false;
 };
 
-const isGameCapture = (sourceId: string) => {
+const isSourceType = (type: TSourceType) => (sourceId: string) => {
   const source = getSourcesService().getSource(sourceId);
 
-  return source ? source.type === 'game_capture' : false;
+  return source ? source.type === type : false;
 };
 
 /**
@@ -189,14 +189,49 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     description: () => $t('Capture Foreground Window'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
-    shouldApply: isGameCapture,
+    shouldApply: isSourceType('game_capture'),
   },
   GAME_CAPTURE_HOTKEY_STOP: {
     name: 'GAME_CAPTURE_HOTKEY_STOP',
     description: () => $t('Deactivate Capture'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
-    shouldApply: isGameCapture,
+    shouldApply: isSourceType('game_capture'),
+  },
+  SLIDESHOW_PLAYPAUSE: {
+    name: 'SLIDESHOW_PLAYPAUSE',
+    description: () => $t('Play/Pause'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_RESTART: {
+    name: 'SLIDESHOW_RESTART',
+    description: () => $t('Restart'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_STOP: {
+    name: 'SLIDESHOW_STOP',
+    description: () => $t('Stop'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_NEXTSLIDE: {
+    name: 'SLIDESHOW_NEXTSLIDE',
+    description: () => $t('Next Slide'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_PREVIOUSSLIDE: {
+    name: 'SLIDESHOW_PREVIOUSSLIDE',
+    description: () => $t('Previous Slide'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
   },
 };
 
