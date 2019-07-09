@@ -1,6 +1,6 @@
 import TsxComponent from 'components/tsx-component';
 import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
+import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
 import { Inject } from '../../../services/core/injector';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
 import { $t } from 'services/i18n';
@@ -18,6 +18,7 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
 
   stepInfo: IConfigStepPresentation;
   optimizing = false;
+  percentage = 0;
 
   optimize() {
     this.optimizing = true;
@@ -27,7 +28,7 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
         progress.event === 'progress' ||
         progress.event === 'stopping_step'
       ) {
-        if (this.stepInfo.description === progress.description) {
+        if (this.stepInfo && this.stepInfo.description === progress.description) {
           this.stepInfo.percentage = progress.percentage;
         } else {
           this.stepInfo = {
@@ -58,36 +59,44 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
 
   summaryForStep(progress: IConfigProgress) {
     return {
-      detecting_location: $t('Detecting your location ...'),
+      detecting_location: $t('Detecting your location...'),
       location_found: $t('Detected %{continent}', { continent: progress.continent }),
-      bandwidth_test: $t('Performing bandwidth test ...'),
-      streamingEncoder_test: $t('Testing streaming encoder ...'),
-      recordingEncoder_test: $t('Testing recording encoder ...'),
-      checking_settings: $t('Attempting stream ...'),
-      setting_default_settings: $t('Reverting to defaults ...'),
-      saving_service: $t('Applying stream settings ...'),
-      saving_settings: $t('Applying general settings ...'),
+      bandwidth_test: $t('Performing bandwidth test...'),
+      streamingEncoder_test: $t('Testing streaming encoder...'),
+      recordingEncoder_test: $t('Testing recording encoder...'),
+      checking_settings: $t('Attempting stream...'),
+      setting_default_settings: $t('Reverting to defaults...'),
+      saving_service: $t('Applying stream settings...'),
+      saving_settings: $t('Applying general settings...'),
     }[progress.description];
   }
 
   render(h: Function) {
-    let percentage = 0;
     if (this.optimizing && this.stepInfo) {
-      percentage = ((this.steps.indexOf(this.stepInfo.description) + 1) / this.steps.length) * 100;
+      this.percentage = (this.steps.indexOf(this.stepInfo.description) + 1) / this.steps.length;
     }
     return (
       <OnboardingStep>
         <template slot="title">
-          {this.optimizing ? $t('Optimize') : `${$t('Optimizing...')} ${percentage}%`}
+          {this.optimizing
+            ? `${$t('Optimizing...')} ${Math.floor(this.percentage * 100)}%`
+            : $t('Optimize')}
         </template>
         <template slot="desc">
           {$t(
             "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
           )}
         </template>
-        <button class="button button--action button--lg" onClick={this.optimize}>
-          {$t('Start')}
-        </button>
+        {this.optimizing ? (
+          <div>
+            <ProgressBar progressComplete={Math.floor(this.percentage * 100)} />
+            <span>{this.stepInfo && `${this.stepInfo.summary} ${this.stepInfo.percentage}`}</span>
+          </div>
+        ) : (
+          <button class="button button--action button--lg" onClick={this.optimize}>
+            {$t('Start')}
+          </button>
+        )}
       </OnboardingStep>
     );
   }

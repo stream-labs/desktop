@@ -35,7 +35,7 @@ export default class OnboardingPage extends TsxComponent<{ params?: { isLogin?: 
   render(h: Function) {
     const remainingSteps = this.importedFromObs
       ? [<StreamlabsFeatures slot="3" />]
-      : [<Optimize slot="3" />, <div slot="4" />];
+      : [<Optimize slot="3" continue={() => this.continue()} />, <div slot="4" />];
 
     if (this.params.isLogin) {
       return (
