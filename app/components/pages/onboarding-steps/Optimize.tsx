@@ -4,6 +4,7 @@ import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
 import { Inject } from '../../../services/core/injector';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
 import { $t } from 'services/i18n';
+import { Span } from '@sentry/hub';
 
 interface IConfigStepPresentation {
   description: string;
@@ -18,7 +19,6 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
 
   stepInfo: IConfigStepPresentation;
   optimizing = false;
-  percentage = 0;
 
   optimize() {
     this.optimizing = true;
@@ -57,6 +57,13 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
     ];
   }
 
+  get percentage() {
+    if (this.optimizing && this.stepInfo) {
+      return (this.steps.indexOf(this.stepInfo.description) + 1) / this.steps.length;
+    }
+    return 0;
+  }
+
   summaryForStep(progress: IConfigProgress) {
     return {
       detecting_location: $t('Detecting your location...'),
@@ -72,9 +79,6 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
   }
 
   render(h: Function) {
-    if (this.optimizing && this.stepInfo) {
-      this.percentage = (this.steps.indexOf(this.stepInfo.description) + 1) / this.steps.length;
-    }
     return (
       <OnboardingStep>
         <template slot="title">
@@ -90,7 +94,7 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
         {this.optimizing ? (
           <div>
             <ProgressBar progressComplete={Math.floor(this.percentage * 100)} />
-            <span>{this.stepInfo && `${this.stepInfo.summary} ${this.stepInfo.percentage}`}</span>
+            <span>{this.stepInfo && `${this.stepInfo.summary} ${this.stepInfo.percentage}%`}</span>
           </div>
         ) : (
           <button class="button button--action button--lg" onClick={this.optimize}>
