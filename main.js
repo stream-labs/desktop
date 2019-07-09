@@ -317,47 +317,52 @@ app.setAsDefaultProtocolClient('slobs');
 
 
 // This ensures that only one copy of our app can run at once.
-app.requestSingleInstanceLock();
-app.on('second-instance', (event, argv, cwd) => {
-  // Check for protocol links in the argv of the other process
-  argv.forEach(arg => {
-    if (arg.match(/^slobs:\/\//)) {
-      mainWindow.send('protocolLink', arg);
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (gotTheLock) {
+  app.on('second-instance', (event, argv, cwd) => {
+    // Check for protocol links in the argv of the other process
+    argv.forEach(arg => {
+      if (arg.match(/^slobs:\/\//)) {
+        mainWindow.send('protocolLink', arg);
+      }
+    });
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+
+      mainWindow.focus();
     }
   });
 
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      mainWindow.restore();
+  app.on('ready', () => {
+    if (
+      !process.argv.includes('--skip-update') &&
+      ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
+      const updateInfo = {
+        baseUrl: 'https://slobs-cdn.streamlabs.com',
+        version: pjson.version,
+        exec: process.argv,
+        cwd: process.cwd(),
+        waitPids: [ process.pid ],
+        appDir: path.dirname(app.getPath('exe')),
+        tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+        cacheDir: app.getPath('userData'),
+        versionFileName: `${releaseChannel}.json`
+      };
+
+      log(updateInfo);
+      bootstrap(updateInfo, startApp, app.exit);
+    } else {
+      startApp();
     }
-
-    mainWindow.focus();
-  }
-});
-
-app.on('ready', () => {
-  if (
-    !process.argv.includes('--skip-update') &&
-    ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
-    const updateInfo = {
-      baseUrl: 'https://slobs-cdn.streamlabs.com',
-      version: pjson.version,
-      exec: process.argv,
-      cwd: process.cwd(),
-      waitPids: [ process.pid ],
-      appDir: path.dirname(app.getPath('exe')),
-      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
-      cacheDir: app.getPath('userData'),
-      versionFileName: `${releaseChannel}.json`
-    };
-
-    log(updateInfo);
-    bootstrap(updateInfo, startApp, app.exit);
-  } else {
-    startApp();
-  }
-});
+  });
+} else {
+  app.quit();
+}
 
 ipcMain.on('openDevTools', () => {
   openDevTools();
