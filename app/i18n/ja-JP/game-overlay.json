@@ -4,5 +4,5 @@
   "Toggle in-game overlay": "ゲーム内のオーバーレイを切り替える",
   "Toggle positioning mode": "位置調整モードを切り替える",
   "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "ホットキーを設定して、ゲーム内のオーバーレイを切り替える",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode."
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "オーバーレイは新しい試験的な機能で、ゲームのトップにチャットやイベントを見せるようにできます。このオーバーレイはフルスクリーンモードで起動するようなゲームではうまく動作しないかもしれません。ウィンドウズのフルスクリーンモードでゲームを起動するをおすすめします。"
 }
