@@ -16,7 +16,11 @@ const base = {
   ],
   extraFiles: [
     'LICENSE',
-    'AGREEMENT'
+    'AGREEMENT',
+    {
+      from: 'node_modules/obs-studio-node/vcruntime140.dll',
+      to: 'vcruntime140.dll'
+    }
   ],
   nsis: {
     license: 'AGREEMENT',
