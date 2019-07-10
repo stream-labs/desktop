@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.16.2-preview.0",
+  "version": "0.16.2-preview.1",
   "main": "main.js",
   "engines": {
     "node": ">= 10 < 12",
@@ -65,7 +65,7 @@
     "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.37.tar.gz",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
-    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.35b/iojs-v5.0.4-crash-handler.tar.gz",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.36/iojs-v5.0.4-crash-handler.tar.gz",
     "electron-log": "^3.0.4",
     "electron-window-state": "5.0.3",
     "extract-zip": "^1.6.7",
