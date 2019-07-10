@@ -1,8 +1,11 @@
 import { StatefulService, mutation } from './core/stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
+import { AppService } from 'services/app';
 import { Inject } from './core/injector';
 import { authorizedHeaders } from '../util/requests';
+import path from 'path';
+import fs from 'fs';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -19,6 +22,7 @@ interface IAnnouncementsInfo {
 export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() private appService: AppService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -31,8 +35,6 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     params: null,
     closeOnLink: false,
   };
-
-  localStorageKey = 'FirstActivationTimestamp';
 
   async updateBanner() {
     const newBanner = await this.fetchBanner();
@@ -47,24 +49,34 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     await this.postBannerClose();
   }
 
-  get activationTimestamp(): number {
-    if (localStorage.getItem(this.localStorageKey)) {
-      return parseInt(localStorage.getItem(this.localStorageKey), 10);
+  private get installDateProxyFilePath() {
+    return path.join(this.appService.appDataDirectory, 'log.log');
+  }
+
+  private async getInstallDateTimestamp(): Promise<number> {
+    if (!fs.existsSync(this.installDateProxyFilePath)) {
+      return Promise.resolve(Date.now());
     }
-    this.activationTimestamp = Date.now();
-    return this.activationTimestamp;
+
+    return new Promise<number>(resolve => {
+      fs.stat(this.installDateProxyFilePath, (err, stats) => {
+        if (err) {
+          resolve(Date.now());
+        }
+
+        resolve(stats.birthtimeMs);
+      });
+    });
   }
 
-  set activationTimestamp(timestamp: number) {
-    localStorage.setItem(this.localStorageKey, timestamp.toString());
-  }
-
-  underOneWeek() {
-    return Date.now() - this.activationTimestamp < 1000 * 60 * 60 * 24 * 7;
+  private async recentlyInstalled() {
+    const installationTimestamp = await this.getInstallDateTimestamp();
+    return Date.now() - installationTimestamp < 1000 * 60 * 60 * 24 * 7;
   }
 
   private async fetchBanner() {
-    if (!this.userService.isLoggedIn() || this.underOneWeek()) return this.state;
+    const recentlyInstalled = await this.recentlyInstalled();
+    if (!this.userService.isLoggedIn() || recentlyInstalled) return this.state;
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
