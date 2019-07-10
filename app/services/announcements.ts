@@ -60,7 +60,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   underOneWeek() {
-    return (Date.now() - this.activationTimestamp) / (1000 * 60 * 60 * 24 * 7) < 1;
+    return Date.now() - this.activationTimestamp < 1000 * 60 * 60 * 24 * 7;
   }
 
   private async fetchBanner() {
