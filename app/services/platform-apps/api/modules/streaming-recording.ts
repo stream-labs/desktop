@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
 import { StreamingService, EStreamingState, ERecordingState } from 'services/streaming';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { StreamInfoService } from 'services/stream-info';
 

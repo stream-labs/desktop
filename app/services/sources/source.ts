@@ -7,8 +7,7 @@ import {
   ISourceComparison,
   PROPERTIES_MANAGER_TYPES,
 } from './index';
-import { mutation, ServiceHelper } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { mutation, ServiceHelper, Inject } from 'services';
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
@@ -132,9 +131,10 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
-  duplicate(): Source {
+  duplicate(newSourceId?: string): Source {
     if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
+      sourceId: newSourceId,
       propertiesManager: this.getPropertiesManagerType(),
       propertiesManagerSettings: this.getPropertiesManagerSettings(),
     });

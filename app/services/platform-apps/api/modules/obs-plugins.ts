@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 export class ObsPluginsModule extends Module {
   readonly moduleName = 'ObsPlugins';

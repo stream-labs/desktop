@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from '../../app/services/scenes';
 import { SceneBuilder } from '../helpers/scene-builder';
@@ -81,7 +80,6 @@ test('Creating, fetching and removing scene-items', async t => {
 test('Scenes events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  let eventData: Dictionary<any>;
 
   scenesService.sceneSwitched.subscribe(() => void 0);
   scenesService.sceneAdded.subscribe(() => void 0);
@@ -91,32 +89,32 @@ test('Scenes events', async t => {
   scenesService.itemUpdated.subscribe(() => void 0);
 
   const scene2 = scenesService.createScene('Scene2');
-  eventData = await client.fetchNextEvent();
+  let event = await client.fetchNextEvent();
 
-  t.is(eventData.name, 'Scene2');
+  t.is(event.data.name, 'Scene2');
 
   const scene3 = scenesService.createScene('Scene3');
   await client.fetchNextEvent();
 
   scenesService.makeSceneActive(scene2.id);
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'Scene2');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'Scene2');
 
   scene3.remove();
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'Scene3');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'Scene3');
 
   const image = scene2.createAndAddSource('image', 'image_source');
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.sceneItemId, image.sceneItemId);
+  event = await client.fetchNextEvent();
+  t.is(event.data.sceneItemId, image.sceneItemId);
 
   image.setVisibility(false);
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.visible, false);
+  event = await client.fetchNextEvent();
+  t.is(event.data.visible, false);
 
   image.remove();
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.sceneItemId, image.sceneItemId);
+  event = await client.fetchNextEvent();
+  t.is(event.data.sceneItemId, image.sceneItemId);
 });
 
 test('Creating nested scenes', async t => {

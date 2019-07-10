@@ -44,8 +44,7 @@
         <div class="live-display-wrapper">
           <display class="live-display" :drawUI="false" v-if="previewEnabled" />
           <div class="live-display-placeholder" v-else>
-            <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-            <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
+            <img class="live-display-placeholder__img" :src="sleepingKevin">
             <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
             <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
           </div>
@@ -60,17 +59,20 @@
 
 <style lang="less" scoped>
 @import '../../styles/index';
+
 .live-container {
+  .padding(2);
+
   display: flex;
   height: 100%;
   width: 100%;
-  .padding(2);
   box-sizing: border-box;
 }
 
 .mission-control-container {
-  flex: 1;
   .radius();
+
+  flex: 1;
   overflow: hidden;
   position: relative;
 }
@@ -100,11 +102,12 @@
 }
 
 .live-display-wrapper {
-  max-width: 100%;
   .radius();
+  .border();
+
+  max-width: 100%;
   background-color: var(--section);
   position: relative;
-  .border();
   border-top: 0;
   height: calc(~'100% - 29px');
 }
@@ -126,19 +129,5 @@
 .live-display-placeholder__img {
   margin-bottom: 20px;
   width: 40%;
-}
-
-.live-display-placeholder__img--night {
-  display: none;
-}
-
-.night-theme {
-  .live-display-placeholder__img--day {
-    display: none;
-  }
-
-  .live-display-placeholder__img--night {
-    display: block;
-  }
 }
 </style>

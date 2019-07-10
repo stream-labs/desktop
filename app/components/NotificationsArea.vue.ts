@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ENotificationType, NotificationsService, INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
 const notificationAudio = require('../../media/sound/ding.wav');
@@ -50,6 +50,10 @@ export default class NotificationsArea extends Vue {
 
       this.showExtendedNotifications = this.$refs.notificationsContainer.offsetWidth >= 150;
     }, 1000);
+
+    if (this.notificationsService.state.notifications.length) {
+      this.notificationsService.state.notifications.forEach(this.onNotificationHandler);
+    }
   }
 
   destroyed() {

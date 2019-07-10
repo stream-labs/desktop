@@ -17,7 +17,7 @@ import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
@@ -32,6 +32,7 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import CreatorSites from 'components/pages/CreatorSites';
 
 @Component({
   components: {
@@ -54,6 +55,7 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
     PlatformAppStore,
     Help,
     ResizeBar,
+    CreatorSites,
   },
 })
 export default class Main extends Vue {

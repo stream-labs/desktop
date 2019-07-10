@@ -38,14 +38,4 @@ test('Populates video settings', async t => {
     '30',
     ['10', '20', '24 NTSC', '29.97', '30', '48', '59.94', '60'].map(addTrailingSpace),
   );
-
-  // Only test resolution on CI, as this is hardware-specific
-  if (process.env.CI) {
-    for (const res of ['1024x768']) {
-      await t.notThrowsAsync(
-        setFormDropdown(t, 'Base (Canvas) Resolution', '1024x768'),
-        `Resolution ${res} was not found`,
-      );
-    }
-  }
 });

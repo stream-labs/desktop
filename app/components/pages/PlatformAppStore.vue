@@ -1,14 +1,16 @@
 <template>
 <div>
   <div class="app-store-container">
-    <webview
-      class="app-store"
-      v-if="loggedIn"
-      id="appStoreWebview"
-      :src="appStoreUrl"
-      ref="appStoreWebview"
-      preload="bundles/guest-api">
-    </webview>
+    <webview-loader>
+      <webview
+        class="app-store"
+        v-if="loggedIn"
+        id="appStoreWebview"
+        :src="appStoreUrl"
+        ref="appStoreWebview"
+        preload="bundles/guest-api">
+      </webview>
+    </webview-loader>
   </div>
 </div>
 </template>

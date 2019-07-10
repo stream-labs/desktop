@@ -1,7 +1,7 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import electron from 'electron';
 import url from 'url';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';

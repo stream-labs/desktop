@@ -68,6 +68,7 @@ tr {
       justify-content: flex-end;
     }
   }
+
   .alignable-input /deep/ .input-body {
     width: 100%;
   }

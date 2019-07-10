@@ -1,18 +1,19 @@
 import Vue from 'vue';
-import electron from 'electron';
 import path from 'path';
 import util from 'util';
 import mkdirpModule from 'mkdirp';
 import { tmpdir } from 'os';
 import fs from 'fs';
-import { mutation } from '../stateful-service';
-import { PersistentStatefulService } from '../persistent-stateful-service';
+import { mutation } from '../core/stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
 import { TransitionsService } from '../transitions';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { downloadFileAlt, getChecksum } from 'util/requests';
-import { InitAfter } from 'util/service-observer';
+import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
+import url from 'url';
+import rimraf from 'rimraf';
 
 const mkdirp = util.promisify(mkdirpModule);
 const mkdtemp = util.promisify(fs.mkdtemp);
@@ -20,9 +21,7 @@ const copyFile = util.promisify(fs.copyFile);
 
 type Checksum = string;
 
-// prettier-ignore
-type ResourceType = |
-  'transition';
+type ResourceType = 'transition';
 
 /**
  * Maintains a lookup table of asset filenames to checksum mappings, grouped by app ID.
@@ -34,23 +33,30 @@ export interface AssetsServiceState {
 }
 
 export interface AssetsMap {
-  // asset filename -> asset
-  [assetFilename: string]: Asset;
+  [assetUrl: string]: Asset;
 }
 
 export interface Asset {
   checksum: Checksum;
   resourceId?: string;
   resourceType?: ResourceType;
-  originalUrl?: string;
 }
 
 export interface AssetUpdateInfo extends Asset {
   oldFile: string;
   newFile: string;
   newChecksum: string;
-  assetName: string;
+  assetUrl: string;
 }
+
+/* A note on terminology in this service:
+ * name = the filename, e.g. video.webm
+ * path = a relative path, e.g. media/video.webm
+ * url = a full URL with protocol, e.g.
+ *   https://platform-cdn.streamlabs.com/abcde1234/videos/video.webm
+ * pathOrUrl = could be either a path or a url - need to test the string
+ *   to determine which one you are dealing with
+ */
 
 /**
  * Manage and download assets provided by platform apps.
@@ -68,6 +74,20 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
   init() {
     super.init();
 
+    // Older versions of this service only stored relative paths in the
+    // store.  We should migrate to full URLs.
+    Object.keys(this.state).forEach(appId => {
+      Object.keys(this.state[appId]).forEach(assetPathOrUrl => {
+        const assetUrl = this.assetPathOrUrlToUrl(appId, assetPathOrUrl);
+
+        if (assetUrl !== assetPathOrUrl || this.state[appId][assetPathOrUrl].resourceId == null) {
+          // We never retained enough information to update this asset so
+          // we should just delete it.
+          this.REMOVE_ASSET(appId, assetPathOrUrl);
+        }
+      });
+    });
+
     this.platformAppsService.appLoad.subscribe((app: ILoadedApp) => {
       this.updateAppAssets(app.id);
     });
@@ -77,22 +97,22 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * Get a specific asset
    *
    * @param appId Application ID
-   * @param assetName Asset filename
+   * @param assetUrl Asset URL
    */
-  getAsset(appId: string, assetName: string): Asset | null {
+  getAsset(appId: string, assetUrl: string): Asset | null {
     const appAssets = this.state[appId];
 
-    return appAssets ? appAssets[assetName] : null;
+    return appAssets ? appAssets[assetUrl] : null;
   }
 
   /**
    * Returns whether we have downloaded an asset before
    *
    * @param appId Application ID
-   * @param assetName Asset filename
+   * @param assetUrl Asset URL
    */
-  hasAsset(appId: string, assetName: string) {
-    return !!this.getAsset(appId, assetName);
+  hasAsset(appId: string, assetUrl: string) {
+    return !!this.getAsset(appId, assetUrl);
   }
 
   /**
@@ -115,12 +135,10 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
   }
 
   async getAssetDiskInfo(appId: string, assetUrl: string) {
-    const originalUrl = this.platformAppsService.getAssetUrl(appId, assetUrl);
-
     const assetsDir = await this.getAssetsTargetDirectory(appId);
-    const filePath = path.join(assetsDir, path.basename(originalUrl));
+    const filePath = path.join(assetsDir, path.basename(assetUrl));
 
-    return { originalUrl, filePath };
+    return { filePath, originalUrl: assetUrl };
   }
 
   /**
@@ -138,12 +156,11 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
       return;
     }
 
-    const files = Object.keys(assets).map(assetName => {
-      const { checksum: oldChecksum, originalUrl } = assets[assetName];
+    const files = Object.keys(assets).map(assetUrl => {
+      const oldChecksum = assets[assetUrl].checksum;
       return {
-        assetName,
         oldChecksum,
-        originalUrl,
+        assetUrl,
       };
     });
 
@@ -151,15 +168,16 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
 
     const assetsToUpdate = await Promise.all(
       files.map(async asset => {
-        const tmpFile = path.join(tmpDir, asset.assetName);
+        const assetName = path.basename(asset.assetUrl);
+        const tmpFile = path.join(tmpDir, assetName);
 
-        await downloadFileAlt(asset.originalUrl, tmpFile);
+        await downloadFileAlt(asset.assetUrl, tmpFile);
 
         return {
-          ...assets[asset.assetName],
-          assetName: asset.assetName,
+          ...assets[asset.assetUrl],
+          assetUrl: asset.assetUrl,
           newChecksum: await getChecksum(tmpFile),
-          oldFile: path.join(await this.getAssetsTargetDirectory(appId), asset.assetName),
+          oldFile: path.join(await this.getAssetsTargetDirectory(appId), assetName),
           newFile: tmpFile,
         };
       }),
@@ -167,6 +185,10 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
 
     assetsToUpdate.forEach(async asset => {
       await this.updateAssetResource(appId, asset);
+    });
+
+    await new Promise(resolve => {
+      rimraf(tmpDir, resolve);
     });
   }
 
@@ -197,26 +219,26 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    * Associate an asset with a resource (such as a transition)
    *
    * @param appId Application ID
-   * @param assetUrl The asset name
-   * @param originalUrl The original relative url
+   * @param assetUrl The asset URL
    * @param resourceType Type of resource, currently only transitions supported
    * @param resourceId ID of the resource
    * @see {LINK_ASSET}
    */
-  linkAsset(
-    appId: string,
-    assetUrl: string,
-    originalUrl: string,
-    resourceType: ResourceType,
-    resourceId: string,
-  ): void {
-    this.LINK_ASSET(
-      appId,
-      assetUrl,
-      this.platformAppsService.getAssetUrl(appId, originalUrl),
-      resourceType,
-      resourceId,
-    );
+  linkAsset(appId: string, assetUrl: string, resourceType: ResourceType, resourceId: string): void {
+    this.LINK_ASSET(appId, assetUrl, resourceType, resourceId);
+  }
+
+  /**
+   * Takes an asset path or URL and returns a full URL.
+   * Relative paths are assumed relative to an app.
+   * @param assetPathOrUrl An asset path or asset URL
+   */
+  assetPathOrUrlToUrl(appId: string, assetPathOrUrl: string) {
+    // We have a full URL already
+    if (url.parse(assetPathOrUrl).protocol) return assetPathOrUrl;
+
+    // This is a relative path instead
+    return this.platformAppsService.getAssetUrl(appId, assetPathOrUrl);
   }
 
   @mutation()
@@ -228,31 +250,33 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
     Vue.set(this.state[appId], assetName, { checksum });
   }
 
-  @mutation()
+  @mutation({ unsafe: true })
   private LINK_ASSET(
     appId: string,
     assetUrl: string,
-    originalUrl: string,
     resourceType: ResourceType,
     resourceId: string,
   ) {
-    const assetName = path.basename(assetUrl);
-    const asset = this.getAsset(appId, assetName);
+    const asset = this.getAsset(appId, assetUrl);
 
     if (asset) {
       Vue.set(asset, 'resourceId', resourceId);
       Vue.set(asset, 'resourceType', resourceType);
-      Vue.set(asset, 'originalUrl', originalUrl);
     }
   }
 
-  private updateChecksum(appId: string, assetName: string, checksum: Checksum) {
-    this.UPDATE_CHECKSUM(appId, assetName, checksum);
+  private updateChecksum(appId: string, assetUrl: string, checksum: Checksum) {
+    this.UPDATE_CHECKSUM(appId, assetUrl, checksum);
   }
 
   @mutation()
   private UPDATE_CHECKSUM(appId: string, assetId: string, checksum: Checksum): void {
     this.state[appId][assetId].checksum = checksum;
+  }
+
+  @mutation()
+  private REMOVE_ASSET(appId: string, assetUrl: string) {
+    Vue.delete(this.state[appId], assetUrl);
   }
 
   private getApp(appId: string): ILoadedApp {
@@ -282,7 +306,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
 
     this.updateTransitionPath(asset.resourceId, asset.oldFile);
 
-    this.updateChecksum(appId, asset.assetName, asset.newChecksum);
+    this.updateChecksum(appId, asset.assetUrl, asset.newChecksum);
   }
 
   private updateTransitionPath(transitionId: string, path: string) {

@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
@@ -37,7 +36,7 @@ test('Source events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
-  let eventData: Dictionary<any>;
+
 
   sourcesService.sourceAdded.subscribe(() => void 0);
   sourcesService.sourceRemoved.subscribe(() => void 0);
@@ -45,22 +44,22 @@ test('Source events', async t => {
 
   // check `sourceUpdated` event after `createSource` call
   const source1 = sourcesService.createSource('audio1', 'wasapi_output_capture');
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'audio1');
-  t.truthy(eventData.id); // id field is necessary for Streamdeck
+  let event = await client.fetchNextEvent();
+  t.is(event.data.name, 'audio1');
+  t.truthy(event.data.id); // id field is necessary for Streamdeck
 
   // check `sourceUpdated` event after `createAndAddSource` call
   const item2 = scenesService.activeScene.createAndAddSource('audio2', 'wasapi_output_capture');
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'audio2');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'audio2');
 
   // check `sourceRemoved` event
   item2.remove();
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'audio2');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'audio2');
 
   // check `sourceUpdated` event when renaming a source
   source1.setName('audio3');
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'audio3');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'audio3');
 });

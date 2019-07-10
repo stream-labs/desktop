@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
 import { getDefinitions, IStreamlabelDefinition } from 'services/streamlabels/definitions';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { Multiselect } from 'vue-multiselect';
 import { StreamlabelsService, IStreamlabelSettings } from 'services/streamlabels';

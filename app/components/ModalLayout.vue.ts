@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import TsxComponent from 'components/tsx-component';
 
@@ -66,6 +66,9 @@ export default class ModalLayout extends TsxComponent<{
   @Prop({ default: false })
   customControls: boolean;
 
+  @Prop({ default: true })
+  hasTitleBar: boolean;
+
   created() {
     const contentStyle = {
       padding: '16px',
@@ -82,7 +85,11 @@ export default class ModalLayout extends TsxComponent<{
     this.fixedStyle = fixedStyle;
   }
 
-  get theme() {
+  get wrapperClassNames() {
+    if (this.hasTitleBar) {
+      return [this.customizationService.currentTheme, 'has-titlebar'].join(' ');
+    }
+
     return this.customizationService.currentTheme;
   }
 

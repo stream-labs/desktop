@@ -1,15 +1,16 @@
 <template>
 <div>
   <div class="dashboard-container">
-    <webview
-      class="dashboard"
-      v-show="loggedIn"
-      id="dashboardWebview"
-      :src="dashboardUrl"
-      ref="dashboard"
-      preload="bundles/guest-api">
-    </webview>
-    <!-- <p v-else>User Not Logged In, Display something here????</p> -->
+    <webview-loader>
+      <webview
+        class="dashboard"
+        v-show="loggedIn"
+        id="dashboardWebview"
+        :src="dashboardUrl"
+        ref="dashboard"
+        preload="bundles/guest-api">
+      </webview>
+    </webview-loader>
   </div>
 </div>
 </template>

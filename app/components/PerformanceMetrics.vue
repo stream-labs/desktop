@@ -42,7 +42,7 @@
 .performance-metrics {
   .performance-metric-wrapper {
     &:first-child {
-      &:before {
+      &::before {
         content: '';
         padding-right: 0;
       }
@@ -52,14 +52,16 @@
 
 .performance-metric-wrapper {
   .padding-right();
+
   color: var(--icon);
   white-space: nowrap;
   display: flex;
   align-items: center;
 
-  &:before {
-    content: '|';
+  &::before {
     .padding-right();
+
+    content: '|';
     opacity: 0.5;
   }
 
@@ -73,10 +75,11 @@
 }
 
 .performance-metric-icon {
+  .margin-right();
+
   height: 14px;
   width: auto;
   vertical-align: text-top;
-  .margin-right();
 
   @media (max-width: 1200px) {
     display: none;

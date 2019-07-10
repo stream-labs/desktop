@@ -1,10 +1,10 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
 import { AppService } from 'services/app';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 export interface IFamilyWithStyle {
   family: IFontFamily;

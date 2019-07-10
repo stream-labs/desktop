@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
@@ -100,6 +100,10 @@ export default class WidgetEditor extends Vue {
       return this.selectedVariation.settings.customHtmlEnabled;
     }
     return this.wData && this.wData.settings.custom_enabled;
+  }
+
+  get isSaving() {
+    return this.settingsState.pendingRequests > 0;
   }
 
   mounted() {

@@ -1,10 +1,10 @@
 import uuid from 'uuid/v4';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { OnboardingService } from 'services/onboarding';
 import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import electron from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
@@ -30,6 +30,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { GameOverlayService } from 'services/game-overlay';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
@@ -60,6 +61,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() gameOverlayService: GameOverlayService;
 
   static initialState: IAppState = {
     loading: true,
@@ -182,6 +184,8 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
+
+    await this.gameOverlayService.initialize();
   }
 
   @track('app_close')
@@ -200,6 +204,7 @@ export class AppService extends StatefulService<IAppState> {
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
+      await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();

@@ -1,16 +1,22 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import defer from 'lodash/defer';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Inject } from 'util/injector';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
-import { mutation } from 'services/stateful-service';
+import { mutation } from 'services/core/stateful-service';
+import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
+import {
+  getPlatformService,
+  IPlatformAuth,
+  TPlatform,
+  IPlatformService,
+  EPlatformCallResult,
+} from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -18,7 +24,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
@@ -28,6 +34,28 @@ interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
+export type LoginLifecycleOptions = {
+  init: () => Promise<void>;
+  destroy: () => Promise<void>;
+  context: Service;
+};
+
+export type LoginLifecycle = {
+  destroy: () => Promise<void>;
+};
+
+interface ISentryContext {
+  username: string;
+  platform: string;
+}
+
+export function setSentryContext(ctx: ISentryContext) {
+  Sentry.configureScope(scope => {
+    scope.setUser({ username: ctx.username });
+    scope.setExtra('platform', ctx.platform);
+  });
+}
+
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
@@ -35,7 +63,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private platformAppsService: PlatformAppsService;
 
@@ -67,6 +94,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
 
+  /**
+   * Used by child and 1-off windows to update their sentry contexts
+   */
+  sentryContext = new Subject<ISentryContext>();
+
   init() {
     super.init();
     this.setSentryContext();
@@ -92,6 +124,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   // Makes sure the user's login is still good
   validateLogin() {
     if (!this.isLoggedIn()) return;
+    console.log('makes sure the login');
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -208,12 +241,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  dashboardUrl(subPage: string) {
+  dashboardUrl(subPage: string, hidenav: boolean = false) {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const hideNav = hidenav ? 'true' : 'false';
+    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
+    const locale = i18nService.state.locale;
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
@@ -262,10 +298,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
+
+    const result = await service.setupStreamSettings();
+
+    // Currently we treat generic errors as success
+    if (result === EPlatformCallResult.TwitchTwoFactor) {
+      this.LOGOUT();
+      return result;
+    }
+
     this.setSentryContext();
-    service.setupStreamSettings(auth);
+
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
+
+    return result;
   }
 
   @RunInLoadingMode()
@@ -273,8 +320,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // Attempt to sync scense before logging out
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
-    // signs out of chatbot
-    await this.chatbotApiService.Base.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 
@@ -323,9 +368,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   startAuth(
     platform: TPlatform,
-    onWindowShow: (...args: any[]) => any,
-    onAuthStart: (...args: any[]) => any,
-    onAuthFinish: (...args: any[]) => any,
+    onWindowShow: () => void,
+    onAuthStart: () => void,
+    onAuthFinish: (result: EPlatformCallResult) => void,
   ) {
     const service = getPlatformService(platform);
     const partition = `persist:${uuid()}`;
@@ -349,8 +394,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
-        await this.login(service, parsed);
-        defer(onAuthFinish);
+        const result = await this.login(service, parsed);
+        defer(() => onAuthFinish(result));
       }
     });
 
@@ -406,10 +451,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   setSentryContext() {
     if (!this.isLoggedIn()) return;
 
-    Sentry.configureScope(scope => {
-      scope.setUser({ username: this.username });
-      scope.setExtra('platform', this.platform.type);
-    });
+    setSentryContext(this.getSentryContext());
+
+    this.sentryContext.next(this.getSentryContext());
+  }
+
+  getSentryContext(): ISentryContext {
+    if (!this.isLoggedIn()) return null;
+
+    return {
+      username: this.username,
+      platform: this.platform.type,
+    };
   }
 
   popoutRecentEvents() {
@@ -424,6 +477,55 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
       'RecentEvents',
     );
+  }
+
+  /**
+   * Abstracts a common pattern of performing an action if the user is logged in, listening for user
+   * login events to perform that action at the point the user logs in, and doing cleanup on logout.
+   *
+   * @param init A function to be performed immediately if the user is logged in, and on every login
+   * @param destroy A function to be performed when the user logs out
+   * @param context `this` binding
+   * @returns An object with a `destroy` method that will perform cleanup (including un-subscribing
+   * from login events), typically invoked on a Service's `destroyed` method.
+   * @example
+   * class ChatService extends Service {
+   *   @Inject() userService: UserService;
+   *
+   *   init() {
+   *     this.lifecycle = this.userService.withLifecycle({
+   *       init: this.initChat,
+   *       destroy: this.deinitChat,
+   *       context: this,
+   *     })
+   *   }
+   *
+   *   async initChat() { ... }
+   *   async deinitChat() { ... }
+   *
+   *   async destroyed() {
+   *     this.lifecycle.destroy();
+   *   }
+   * }
+   */
+  async withLifecycle({ init, destroy, context }: LoginLifecycleOptions): Promise<LoginLifecycle> {
+    const doInit = init.bind(context);
+    const doDestroy = destroy.bind(context);
+
+    const userLoginSubscription = this.userLogin.subscribe(() => doInit());
+    const userLogoutSubscription = this.userLogout.subscribe(() => doDestroy());
+
+    if (this.isLoggedIn()) {
+      await doInit();
+    }
+
+    return {
+      destroy: async () => {
+        userLoginSubscription.unsubscribe();
+        userLogoutSubscription.unsubscribe();
+        await doDestroy();
+      },
+    } as LoginLifecycle;
   }
 }
 

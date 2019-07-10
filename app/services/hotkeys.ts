@@ -1,14 +1,15 @@
 import { StreamingService } from 'services/streaming';
 import { ScenesService } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
-import { Inject } from 'util/injector';
-import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
+import { Inject } from 'services/core/injector';
+import { StatefulService, mutation, ServiceHelper } from 'services';
 import defer from 'lodash/defer';
+import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
-import mapValues from 'lodash/mapValues';
+import { GameOverlayService } from './game-overlay';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -26,16 +27,20 @@ function getTransitionsService(): TransitionsService {
   return TransitionsService.instance;
 }
 
+function getGameOverlayService(): GameOverlayService {
+  return GameOverlayService.instance;
+}
+
 const isAudio = (sourceId: string) => {
   const source = getSourcesService().getSource(sourceId);
 
   return source ? source.audio : false;
 };
 
-const isGameCapture = (sourceId: string) => {
+const isSourceType = (type: TSourceType) => (sourceId: string) => {
   const source = getSourcesService().getSource(sourceId);
 
-  return source ? source.type === 'game_capture' : false;
+  return source ? source.type === type : false;
 };
 
 /**
@@ -138,6 +143,16 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Save Replay'),
     down: () => getStreamingService().saveReplay(),
   },
+  TOGGLE_OVERLAY: {
+    name: 'TOGGLE_OVERLAY',
+    description: () => $t('Toggle in-game overlay'),
+    down: () => getGameOverlayService().toggleOverlay(),
+  },
+  TOGGLE_OVERLAY_POSITIONING: {
+    name: 'TOGGLE_OVERLAY_POSITIONING',
+    description: () => $t('Toggle overlay positioning mode'),
+    down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
+  },
 };
 
 const SOURCE_ACTIONS: HotkeyGroup = {
@@ -174,14 +189,49 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     description: () => $t('Capture Foreground Window'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
-    shouldApply: isGameCapture,
+    shouldApply: isSourceType('game_capture'),
   },
   GAME_CAPTURE_HOTKEY_STOP: {
     name: 'GAME_CAPTURE_HOTKEY_STOP',
     description: () => $t('Deactivate Capture'),
     up: processObsHotkey(false),
     down: processObsHotkey(true),
-    shouldApply: isGameCapture,
+    shouldApply: isSourceType('game_capture'),
+  },
+  SLIDESHOW_PLAYPAUSE: {
+    name: 'SLIDESHOW_PLAYPAUSE',
+    description: () => $t('Play/Pause'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_RESTART: {
+    name: 'SLIDESHOW_RESTART',
+    description: () => $t('Restart'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_STOP: {
+    name: 'SLIDESHOW_STOP',
+    description: () => $t('Stop'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_NEXTSLIDE: {
+    name: 'SLIDESHOW_NEXTSLIDE',
+    description: () => $t('Next Slide'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
+  },
+  SLIDESHOW_PREVIOUSSLIDE: {
+    name: 'SLIDESHOW_PREVIOUSSLIDE',
+    description: () => $t('Previous Slide'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('slideshow'),
   },
 };
 
@@ -215,6 +265,38 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
     isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+  },
+  PUSH_TO_SOURCE_SHOW: {
+    name: 'PUSH_TO_SOURCE_SHOW',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Show %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(false),
+    down: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
+  },
+  PUSH_TO_SOURCE_HIDE: {
+    name: 'PUSH_TO_SOURCE_HIDE',
+    description: sceneItemId => {
+      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      return $t('Push to Hide %{sourcename}', { sourcename: sceneItem.source.name });
+    },
+    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    up: sceneItemId =>
+      getScenesService()
+        .getSceneItem(sceneItemId)
+        .setVisibility(true),
     down: sceneItemId =>
       getScenesService()
         .getSceneItem(sceneItemId)

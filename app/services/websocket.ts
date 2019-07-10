@@ -1,6 +1,6 @@
 import electronLog from 'electron-log';
-import { Service } from './service';
-import { Inject } from 'util/injector';
+import { Service } from './core/service';
+import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';
@@ -57,8 +57,6 @@ interface ISubscriptionSocketEvent {
   type: 'subscription';
   message: {
     name: string;
-    subscriber_twitch_id?: string;
-    sub_plan?: string;
     _id: string;
   }[];
 }
@@ -67,10 +65,6 @@ interface IBitsSocketEvent {
   type: 'bits';
   message: {
     name: string;
-    data: {
-      facemask?: string;
-      fm_id?: string;
-    };
   }[];
 }
 
@@ -82,18 +76,8 @@ export interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
     facemask?: string;
-    _id: string;
     type: string;
-    payload?: {
-      _id?: string;
-    };
-    data: {
-      facemask?: string;
-      fm_id?: string;
-    };
-    subscriber_twitch_id?: string;
-    sub_plan?: string;
-    name?: string;
+    amount?: string;
   };
 }
 

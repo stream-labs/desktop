@@ -26,8 +26,10 @@
       <appearance-settings v-if="categoryName === 'Appearance'" />
       <experimental-settings v-if="categoryName === 'Experimental'" />
       <remote-control-settings v-if="categoryName === 'Remote Control'" />
+      <game-overlay-settings v-if="categoryName === 'Game Overlay'" />
       <GenericFormGroups
         v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
+        :categoryName="categoryName"
         v-model="settingsData"
         @input="save" />
     </div>
@@ -38,21 +40,23 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .settings {
+  .transition();
+
   display: flex;
   align-content: stretch;
   align-items: stretch;
   flex: 1;
-  .transition();
   margin: -16px;
 }
 
 .settings-container {
-  flex-grow: 1;
   .padding-right(2);
   .padding-top(2);
+
+  flex-grow: 1;
   overflow: auto;
 }
 </style>

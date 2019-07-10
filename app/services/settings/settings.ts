@@ -1,5 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import {
   inputValuesToObsValues,
   obsValuesToInputValues,
@@ -10,7 +10,7 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
 import Utils from '../utils';
@@ -106,7 +106,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       title: $t('Settings'),
       queryParams: { categoryName },
       size: {
-        width: 800,
+        width: 830,
         height: 800,
       },
     });
@@ -119,6 +119,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
+      'Game Overlay',
       'Scene Collections',
       'Notifications',
       'Appearance',
@@ -137,8 +138,14 @@ export class SettingsService extends StatefulService<ISettingsState>
     return categories;
   }
 
+  isTabbedForm(categoryName: string) {
+    if (!categoryName) return false;
+    return obs.NodeObs.OBS_settings_getSettings(categoryName).type === 1;
+  }
+
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
-    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName).data;
+    if (!settings) settings = [];
 
     // Names of settings that are disabled because we
     // have not implemented them yet.

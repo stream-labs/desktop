@@ -1,11 +1,9 @@
-import { ServiceHelper } from 'services/stateful-service';
-import { Inject } from '../../util/injector';
+import { ServiceHelper, Inject, mutation } from 'services';
 import { Source, SourcesService } from 'services/sources';
 import { WidgetsService } from './widgets';
 import { IWidgetSource, WidgetType, IWidgetData } from './index';
 import { WidgetSettingsService } from 'services/widgets';
 import Utils from '../utils';
-import { mutation } from '../stateful-service';
 
 @ServiceHelper()
 export class WidgetSource implements IWidgetSource {

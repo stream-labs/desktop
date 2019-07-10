@@ -14,7 +14,7 @@ import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
-import AddSourceFilter from 'components/windows/AddSourceFilter.vue';
+import AddSourceFilter from 'components/windows/AddSourceFilter';
 import EditStreamInfo from 'components/windows/EditStreamInfo.vue';
 import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
 import Notifications from 'components/windows/Notifications.vue';
@@ -27,7 +27,9 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
-import { mutation, StatefulService } from 'services/stateful-service';
+import OverlayWindow from 'components/windows/OverlayWindow.vue';
+import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
@@ -50,32 +52,6 @@ import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
-
-import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
-import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
-import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
-import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
-import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
-import ChatbotSymbolProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
-import ChatbotLinkProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
-import ChatbotWordProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
-import ChatbotParagraphProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotParagraphProtectionWindow.vue';
-import ChatbotEmoteProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotEmoteProtectionWindow.vue';
-import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
-import ChatbotQuotePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
-import ChatbotQueuePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
-import ChatbotMediaRequestPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotMediaRequestPreferencesWindow.vue';
-import ChatbotLoyaltyWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyWindow.vue';
-import ChatbotLoyaltyPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyPreferencesWindow.vue';
-import ChatbotHeistPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotHeistPreferencesWindow.vue';
-import ChatbotPollPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotPollPreferencesWindow.vue';
-import ChatbotLoyaltyAddAllWindow from 'components/page-components/Chatbot/windows/ChatbotLoyaltyAddAllWindow.vue';
-import ChatbotPollProfileWindow from 'components/page-components/Chatbot/windows/ChatbotPollProfileWindow.vue';
-import ChatbotBettingProfileWindow from 'components/page-components/Chatbot/windows/ChatbotBettingProfileWindow.vue';
-import ChatbotBettingPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotBettingPreferencesWindow.vue';
-import ChatbotGamblePreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotGamblePreferencesWindow.vue';
-import ChatbotCommandPreferencesWindow from 'components/page-components/Chatbot/windows/ChatbotCommandPreferencesWindow.vue';
-import ChatbotRegularWindow from 'components/page-components/Chatbot/UserManagement/Modals/ChatbotRegularWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -109,6 +85,8 @@ export function getComponents() {
     PlatformAppPopOut,
     FacemaskSettings,
     EditTransform,
+    OverlayWindow,
+    OverlayPlaceholder,
 
     BitGoal,
     DonationGoal,
@@ -127,36 +105,10 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-
-    ChatbotCustomCommandWindow,
-    ChatbotDefaultCommandWindow,
-    ChatbotTimerWindow,
-    ChatbotAlertsWindow,
-    ChatbotGamblePreferencesWindow,
-    ChatbotCapsProtectionWindow,
-    ChatbotSymbolProtectionWindow,
-    ChatbotLinkProtectionWindow,
-    ChatbotWordProtectionWindow,
-    ChatbotParagraphProtectionWindow,
-    ChatbotEmoteProtectionWindow,
-    ChatbotQuoteWindow,
-    ChatbotQuotePreferencesWindow,
-    ChatbotQueuePreferencesWindow,
-    ChatbotCommandPreferencesWindow,
-    ChatbotMediaRequestPreferencesWindow,
-    ChatbotLoyaltyWindow,
-    ChatbotLoyaltyAddAllWindow,
-    ChatbotLoyaltyPreferencesWindow,
-    ChatbotHeistPreferencesWindow,
-    ChatbotPollProfileWindow,
-    ChatbotPollPreferencesWindow,
-    ChatbotBettingProfileWindow,
-    ChatbotBettingPreferencesWindow,
-    ChatbotRegularWindow,
   };
 }
 
-export interface IWindowOptions {
+export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {
@@ -237,7 +189,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const window = this.windows[windowId];
     if (window) {
       const bounds = window.getBounds();
-      const currentDisplay = electron.screen.getDisplayMatching(bounds);
+      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }
@@ -255,9 +207,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * to workaround.
      */
     if (options.size && !remote.process.env.CI) {
-      const { width: screenWidth, height: screenHeight } = electron.screen.getDisplayMatching(
-        this.windows.main.getBounds(),
-      ).workAreaSize;
+      const {
+        width: screenWidth,
+        height: screenHeight,
+      } = electron.remote.screen.getDisplayMatching(this.windows.main.getBounds()).workAreaSize;
 
       const SCREEN_PERCENT = 0.75;
 
@@ -271,6 +224,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
+  }
+
+  getMainWindowDisplay() {
+    const window = this.windows.main;
+    const bounds = window.getBounds();
+    return electron.remote.screen.getDisplayMatching(bounds);
   }
 
   closeChildWindow() {
@@ -328,7 +287,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
       title: options.title || 'New Window',
-      transparent: true,
+      backgroundColor: '#17242D',
+      webPreferences: { nodeIntegration: true },
     }));
 
     newWindow.setMenu(null);
@@ -349,6 +309,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
 
     return windowId;
+  }
+
+  createOneOffWindowForOverlay(
+    options: Partial<IWindowOptions>,
+    windowId?: string,
+  ): Electron.BrowserWindow {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    windowId = windowId || uuid();
+
+    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+
+    const newWindow = (this.windows[windowId] = new BrowserWindow(options));
+
+    const indexUrl = remote.getGlobal('indexUrl');
+    newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    return newWindow;
   }
 
   setOneOffFullscreen(windowId: string, fullscreen: boolean) {

@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
-import Selector from './Selector.vue';
+import { Inject } from '../services/core/injector';
 import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
 import { TransitionsService } from 'services/transitions';
@@ -15,9 +14,11 @@ import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
 import electron from 'electron';
+import { EditorCommandsService } from 'services/editor-commands';
+import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
 
 @Component({
-  components: { Selector, DropdownMenu, HelpTip },
+  components: { DropdownMenu, HelpTip, SlVueTree },
 })
 export default class SceneSelector extends Vue {
   @Inject() scenesService: ScenesService;
@@ -26,12 +27,24 @@ export default class SceneSelector extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() projectorService: ProjectorService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   searchQuery = '';
 
   addSceneTooltip = $t('Add a new Scene.');
   removeSceneTooltip = $t('Remove Scene.');
   showTransitionsTooltip = $t('Edit Scene Transitions.');
+
+  get scenes() {
+    return this.scenesService.scenes.map(scene => {
+      return {
+        title: scene.name,
+        isLeaf: true,
+        isSelected: scene.id === this.scenesService.activeSceneId,
+        data: { id: scene.id },
+      };
+    });
+  }
 
   showContextMenu() {
     const menu = new Menu();
@@ -61,12 +74,12 @@ export default class SceneSelector extends Vue {
     menu.popup();
   }
 
-  makeActive(id: string) {
-    this.scenesService.makeSceneActive(id);
+  makeActive(selectedNodes: ISlTreeNode<{ id: string }>[]) {
+    this.scenesService.makeSceneActive(selectedNodes[0].data.id);
   }
 
-  handleSort(data: any) {
-    this.scenesService.setSceneOrder(data.order);
+  handleSort(nodes: ISlTreeNode<{ id: string }>[]) {
+    this.scenesService.setSceneOrder(nodes.map(node => node.data.id));
   }
 
   addScene() {
@@ -84,24 +97,21 @@ export default class SceneSelector extends Vue {
       },
       ok => {
         if (!ok) return;
-        if (!this.scenesService.removeScene(this.activeSceneId)) {
+        if (!this.scenesService.canRemoveScene()) {
           alert($t('There needs to be at least one scene.'));
+          return;
         }
+
+        this.editorCommandsService.executeCommand(
+          'RemoveSceneCommand',
+          this.scenesService.activeSceneId,
+        );
       },
     );
   }
 
   showTransitions() {
     this.transitionsService.showSceneTransitions();
-  }
-
-  get scenes() {
-    return this.scenesService.scenes.map(scene => {
-      return {
-        name: scene.name,
-        value: scene.id,
-      };
-    });
   }
 
   get sceneCollections() {

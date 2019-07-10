@@ -1,14 +1,20 @@
 import uuid from 'uuid/v4';
 import { IWidgetData, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 import {
   IAlertBoxApiSettings,
   IAlertBoxSetting,
   IAlertBoxSettings,
   IAlertBoxVariation,
 } from './alert-box-api';
-import { API_NAME_MAP, conditions, newVariation, REGEX_TESTERS } from './alert-box-data';
+import {
+  API_NAME_MAP,
+  conditions,
+  newVariation,
+  REGEX_TESTERS,
+  conditionData,
+} from './alert-box-data';
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
@@ -45,6 +51,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return conditions().base.concat(conditions()[type]);
   }
 
+  conditionDataByCondition(type: string) {
+    return conditionData()[type] || metadata.number({ title: $t('Variation Amount') });
+  }
+
   newVariation(type: string): IAlertBoxVariation {
     return newVariation(type);
   }
@@ -62,7 +72,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     this.saveSettings(newSettings);
   }
 
-  getMetadata(type: string, languages: any[]) {
+  getMetadata(type: string, languages: any[], condition?: string) {
     return {
       moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
       alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
@@ -121,8 +131,8 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),
-      variationFrequency: metadata.frequency({ title: $t('Variation Frequency') }),
       template: metadata.textArea({ title: $t('Message Template') }),
+      variations: this.conditionDataByCondition(condition),
     };
   }
 

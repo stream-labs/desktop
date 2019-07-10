@@ -13,11 +13,6 @@
         </h-form-group>
       </div>
       <div class="row">
-        <h-form-group :title="$t('Download Progress')">
-          <progress-bar :progressComplete="downloadProgress"></progress-bar>
-        </h-form-group>
-      </div>
-      <div class="row">
         <h-form-group :title="$t('Video Device')">
           <list-input
             v-model="videoInputModel"
@@ -26,22 +21,17 @@
         </h-form-group>
       </div>
       <div class="row">
-        <h-form-group :title="$t('Face Mask Donations')">
+        <h-form-group :title="$t('Mask Duration')">
+          <slider-input v-model="durationModel" :metadata="{min: 8, max: 60}"/>
+        </h-form-group>
+      </div>
+      <div class="row">
+        <h-form-group :title="$t('Donation Masks')">
           <toggle-input
             v-model="donationsEnabledModel"
             name="donationsEnabled"
             :metadata="{ title: $t('Enable Face Mask Donations') }"
           />
-        </h-form-group>
-      </div>
-      <div class="row">
-        <h-form-group :title="$t('Donation URL')">
-          <a @click="openTipPage">https://streamlabs.com/{{username}}/masks</a>
-        </h-form-group>
-      </div>
-      <div class="row">
-        <h-form-group :title="$t('Donation Alert Duration')">
-          <slider-input v-model="durationModel" :metadata="{min: 8, max: 60}"/>
         </h-form-group>
       </div>
       <div class="row" v-if="showTwitchFeatures">
@@ -54,46 +44,6 @@
         </h-form-group>
       </div>
       <div class="row" v-if="showTwitchFeatures">
-        <h-form-group :title="$t('Sub Alert Duration')">
-          <slider-input v-model="subsDurationModel" :metadata="{min: 2, max: 300}"/>
-        </h-form-group>
-      </div>
-      <div class="row" v-if="showTwitchFeatures && showExtensionPromt">
-        <h-form-group :title="$t('Get the Extension')">
-          <div class="extension-warning">
-            <span>{{$t('The Streamlabs Face Masks extension is required for Subscription and Bits Masks')}}</span>
-            <span>{{$t('Make sure to enable the extension in the extension config page to complete setup')}}</span>
-            <a @click="openExtensionPage">{{extensionUrl}}</a>
-          </div>
-        </h-form-group>
-      </div>
-      <div class="row"  v-if="showTwitchFeatures">
-        <h-form-group :title="$t('Test T3  Masks')">
-          <item-grid>
-            <virtual-item
-              v-for="(mask) in t3AvailableMasks"
-              :key="mask.uuid"
-              :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
-              :name="mask.name"
-              @click="clickMask(mask, t3AvailableMasks)"
-            ></virtual-item>
-          </item-grid>
-        </h-form-group>
-      </div>
-      <div class="row" v-if="showTwitchFeatures">
-        <h-form-group :title="$t('Test T2 Masks')">
-          <item-grid>
-            <virtual-item
-              v-for="(mask) in t2AvailableMasks"
-              :key="mask.uuid"
-              :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
-              :name="mask.name"
-              @click="clickMask(mask, t2AvailableMasks)"
-            ></virtual-item>
-          </item-grid>
-        </h-form-group>
-      </div>
-      <div class="row" v-if="showTwitchFeatures">
         <h-form-group :title="$t('Bits Masks')">
           <toggle-input
             v-model="bitsEnabledModel"
@@ -102,17 +52,33 @@
           />
         </h-form-group>
       </div>
-      <div class="row" v-if="showTwitchFeatures">
-        <h-form-group :title="$t('Bits Alert Duration')">
-          <slider-input v-model="bitsDurationModel" :metadata="{min: 2, max: 300}"/>
+      <div class="row last-item" v-if="showTwitchFeatures">
+        <h-form-group :title="$t('Minimum Bits to Activate')">
+          <number-input
+            v-model="bitsPriceModel"
+          />
         </h-form-group>
       </div>
-      <div class="row last-item" v-if="showTwitchFeatures">
-        <h-form-group :title="$t('Bits Price')">
-          <list-input
-            v-model="bitsPriceModel"
-            :metadata="bitsPricingMetadata"
-          />
+       <div class="row">
+        <h-form-group :title="$t('Download Progress')">
+          <progress-bar :progressComplete="downloadProgress"></progress-bar>
+        </h-form-group>
+      </div>
+      <div class="row">
+        <h-form-group :title="$t('Test Face Masks')">
+          <Accordion :opened-title="$t('Collapse')" :closed-title="$t('Expand')">
+            <div slot="content">
+              <item-grid>
+                <virtual-item
+                  v-for="(mask) in availableMasks"
+                  :key="mask.uuid"
+                  :preview="`http://facemasks-cdn.streamlabs.com/${mask.uuid}.png`"
+                  :name="mask.name"
+                  @click="clickMask(mask)"
+                ></virtual-item>
+              </item-grid>
+          </div>
+          </Accordion>
         </h-form-group>
       </div>
     </div>
@@ -133,6 +99,7 @@
 <script lang="ts" src="./FacemaskSettings.vue.ts"></script>
 <style lang="less" scoped>
   @import '../../styles/index';
+
   .row {
     flex-wrap: nowrap;
     width: 100%;
@@ -145,6 +112,7 @@
     color: var(--white);
     border-radius: 4px;
     padding: 6px;
+
     a {
       color: white;
     }

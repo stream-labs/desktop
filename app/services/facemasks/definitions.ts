@@ -29,13 +29,10 @@ export interface IFacemaskSettings {
   enabled: boolean;
   donations_enabled: boolean;
   subs_enabled: boolean;
-  extension_enabled: boolean;
   bits_enabled: boolean;
   bits_price: number;
   pricing_options: number[];
   primary_platform: string;
-  t2masks: IFacemask[];
-  t3masks: IFacemask[];
   facemasks: IFacemask[];
   duration: number;
   sub_duration: number;
@@ -44,8 +41,6 @@ export interface IFacemaskSettings {
   username: string;
   twitch_id?: number;
   partnered: boolean;
-  extension: boolean;
-  extension_url: string;
 }
 
 export interface IUserFacemaskSettings {
@@ -53,6 +48,12 @@ export interface IUserFacemaskSettings {
   facemasks?: IFacemask[];
   duration: number;
   device: IInputDeviceSelection;
+  donations_enabled: boolean;
+  subs_enabled: boolean;
+  sub_duration?: number;
+  bits_enabled: boolean;
+  bits_duration?: number;
+  bits_price: number;
 }
 
 export interface IFacemaskDonation {

@@ -6,9 +6,9 @@ import {
   ITransitionCreateOptions,
   TransitionsService,
 } from 'services/transitions';
-import { Inject } from 'util/injector';
-import { PlatformAppsService } from '../../index';
+import { Inject } from 'services/core/injector';
 import { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
+import url from 'url';
 
 type AudioFadeStyle = 'fadeOut' | 'crossFade';
 
@@ -43,7 +43,7 @@ interface StingerTransitionOptions {
   type: 'stinger';
   /** The name of the transition **/
   name: string;
-  /** A relative URL to a video asset inside a Platform app **/
+  /** A relative path to a video asset inside a Platform app or a fully qualified URL **/
   url: string;
   /** How the audio should fade: fade out or crossfade. **/
   audioFadeStyle?: AudioFadeStyle;
@@ -83,9 +83,6 @@ export class SceneTransitionsModule extends Module {
   permissions = [EApiPermissions.SceneTransitions];
 
   @Inject() private transitionsService: TransitionsService;
-
-  @Inject() private platformAppsService: PlatformAppsService;
-
   @Inject() private platformAppAssetsService: PlatformAppAssetsService;
 
   /**
@@ -104,16 +101,28 @@ export class SceneTransitionsModule extends Module {
   async createTransition(ctx: IApiContext, options: TransitionOptions): Promise<ITransition> {
     if (options.type === 'stinger') {
       const appId = ctx.app.id;
-      const { url: originalUrl } = options;
 
-      if (!this.isVideo(originalUrl)) {
+      if (!this.isVideo(options.url)) {
         throw new Error('Invalid file specified, you must provide a video file.');
       }
 
-      // TODO: avoid mutation
-      options.url = this.platformAppAssetsService.hasAsset(appId, originalUrl)
-        ? (await this.platformAppAssetsService.getAssetDiskInfo(appId, originalUrl)).filePath
-        : await this.platformAppAssetsService.addPlatformAppAsset(appId, originalUrl);
+      const parsed = url.parse(options.url);
+
+      if (parsed.protocol) {
+        const whitelist = ctx.app.manifest.mediaDomains || [];
+
+        if (!whitelist.includes(parsed.hostname)) {
+          throw new Error(`The host ${parsed.hostname} was not found in the mediaDomains list`);
+        }
+      }
+
+      // Convert the path or url to a full URL
+      const assetUrl = this.platformAppAssetsService.assetPathOrUrlToUrl(appId, options.url);
+
+      // TODO: Avoid mutation
+      options.url = this.platformAppAssetsService.hasAsset(appId, assetUrl)
+        ? (await this.platformAppAssetsService.getAssetDiskInfo(appId, assetUrl)).filePath
+        : await this.platformAppAssetsService.addPlatformAppAsset(appId, assetUrl);
 
       const { shouldLock = false, name, ...settings } = options;
 
@@ -128,13 +137,7 @@ export class SceneTransitionsModule extends Module {
         transitionOptions,
       );
 
-      this.platformAppAssetsService.linkAsset(
-        appId,
-        options.url,
-        originalUrl,
-        'transition',
-        transition.id,
-      );
+      this.platformAppAssetsService.linkAsset(appId, assetUrl, 'transition', transition.id);
 
       return transition;
     }

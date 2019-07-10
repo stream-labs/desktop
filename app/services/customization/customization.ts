@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
-import { PersistentStatefulService } from '../persistent-stateful-service';
-import { mutation } from '../stateful-service';
+import { PersistentStatefulService } from '../core/persistent-stateful-service';
+import { mutation } from '../core/stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
@@ -33,6 +33,16 @@ const DISPLAY_BACKGROUNDS = {
  */
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
+  static get migrations() {
+    return [
+      {
+        oldKey: 'nightMode',
+        newKey: 'theme',
+        transform: (val: boolean) => (val ? 'night-theme' : 'day-theme'),
+      },
+    ];
+  }
+
   static defaultState: ICustomizationServiceState = {
     theme: 'night-theme',
     updateStreamInfoOnLive: true,
@@ -58,12 +68,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   init() {
     super.init();
+    this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-
-    if (this.state.nightMode != null) {
-      const theme = this.state.nightMode ? 'night-theme' : 'day-theme';
-      this.setSettings({ theme, nightMode: null });
-    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {

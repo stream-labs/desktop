@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IListMetadata } from '../../shared/inputs';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import ImagePickerInput from '../../shared/inputs/ImagePickerInput.vue';

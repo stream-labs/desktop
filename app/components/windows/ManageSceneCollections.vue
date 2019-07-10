@@ -8,6 +8,9 @@
         <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
       </div>
 
+      <button class="button button--action" @click="importFromObs">
+        {{ $t('Import from OBS') }}
+      </button>
       <button class="button button--action" @click="create">
         <i class="fa fa-plus" />
         {{ $t('Create New') }}
@@ -27,9 +30,10 @@
 @import "../../styles/index";
 
 .manage-scene-collections__header {
+  .flex();
+  .flex--space-between();
+
   margin-bottom: 20px;
-  .flex;
-  .flex--space-between;
   align-items: center;
 }
 

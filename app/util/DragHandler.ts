@@ -1,13 +1,11 @@
 import { SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
-import { ScenesService, SceneItem } from 'services/scenes';
+import { Inject } from 'services/core/injector';
+import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
-import electron from 'electron';
-
-const { webFrame, screen } = electron;
+import { EditorCommandsService } from 'services/editor-commands';
 
 /*
  * An edge looks like:
@@ -57,10 +55,10 @@ interface IDragHandlerOptions {
 // Encapsulates logic for dragging sources in the overlay editor
 export class DragHandler {
   @Inject() private settingsService: SettingsService;
-  @Inject() private scenesService: ScenesService;
   @Inject() private videoService: VideoService;
   @Inject() private windowsService: WindowsService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   // Settings
   snapEnabled: boolean;
@@ -177,10 +175,11 @@ export class DragHandler {
     const deltaX = rect.x - this.draggedSource.transform.position.x;
     const deltaY = rect.y - this.draggedSource.transform.position.y;
 
-    this.selectionService.getItems().forEach(item => {
-      const pos = item.transform.position;
-      item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
-    });
+    this.editorCommandsService.executeCommand(
+      'MoveItemsCommand',
+      this.selectionService.getActiveSelection(),
+      { x: deltaX, y: deltaY },
+    );
   }
 
   private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {

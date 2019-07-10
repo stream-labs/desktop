@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
   IPlatformAuth,
@@ -6,10 +6,11 @@ import {
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
+  EPlatformCallResult,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
@@ -74,24 +75,27 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return headers;
   }
 
-  setupStreamSettings(auth: IPlatformAuth) {
-    this.fetchStreamKey().then(key => {
-      const settings = this.settingsService.getSettingsFormData('Stream');
+  setupStreamSettings() {
+    return this.fetchStreamKey()
+      .then(key => {
+        const settings = this.settingsService.getSettingsFormData('Stream');
 
-      settings.forEach(subCategory => {
-        subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'service') {
-            parameter.value = 'Mixer.com - FTL';
-          }
+        settings.forEach(subCategory => {
+          subCategory.parameters.forEach(parameter => {
+            if (parameter.name === 'service') {
+              parameter.value = 'Mixer.com - FTL';
+            }
 
-          if (parameter.name === 'key') {
-            parameter.value = key;
-          }
+            if (parameter.name === 'key') {
+              parameter.value = key;
+            }
+          });
         });
-      });
 
-      this.settingsService.setSettings('Stream', settings);
-    });
+        this.settingsService.setSettings('Stream', settings);
+        return EPlatformCallResult.Success;
+      })
+      .catch(() => EPlatformCallResult.Error);
   }
 
   fetchUserInfo() {
@@ -106,7 +110,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
     return fetch(request)
       .then(handlePlatformResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => {
+        this.userService.updatePlatformToken(response.access_token);
+        this.setupStreamSettings();
+      });
   }
 
   @requiresToken()
@@ -143,6 +150,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
   }
 
+  prepopulateInfo() {
+    return this.fetchChannelInfo();
+  }
+
   @requiresToken()
   fetchViewerCount(): Promise<number> {
     const headers = this.getHeaders();
@@ -168,9 +179,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       body: JSON.stringify(data),
     });
 
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(() => true);
+    return fetch(request).then(handlePlatformResponse);
   }
 
   @requiresToken()

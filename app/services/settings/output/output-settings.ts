@@ -1,6 +1,6 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 
 /**
@@ -34,6 +34,7 @@ export enum EEncoderFamily {
   x264 = 'x264',
   qsv = 'qsv',
   nvenc = 'nvenc',
+  jim_nvenc = 'jim_nvenc',
   amd = 'amd',
 }
 
@@ -82,18 +83,25 @@ export interface IOutputSettings {
   inputResolution: string;
   streaming: IStreamingEncoderSettings;
   recording: IRecordingEncoderSettings;
+  replayBuffer: IReplayBufferSettings;
 }
 
 interface IOutputSettingsPatch {
   mode?: TOutputSettingsMode;
   streaming?: Partial<IStreamingEncoderSettings>;
   recording?: Partial<IRecordingEncoderSettings>;
+  replayBuffer?: Partial<IReplayBufferSettings>;
 }
 
 export interface IEncoderSettings {
   encoder: EEncoderFamily;
   outputResolution: string;
   bitrate: number;
+}
+
+export interface IReplayBufferSettings {
+  enabled: boolean;
+  time: number;
 }
 
 export interface IRecordingEncoderSettings extends IEncoderSettings {
@@ -125,6 +133,7 @@ const simpleEncoderToAnvancedEncoderMap: Dictionary<EObsAdvancedEncoder> = {
 export const encoderFieldsMap = {
   [EEncoderFamily.x264]: { preset: 'preset', encoderOptions: 'x264opts' },
   [EEncoderFamily.nvenc]: { preset: 'preset' },
+  [EEncoderFamily.jim_nvenc]: { preset: 'preset' },
   [EEncoderFamily.qsv]: { preset: 'target_usage' },
   [EEncoderFamily.amd]: { preset: 'QualityPreset' },
 };
@@ -146,8 +155,9 @@ export function obsEncoderToEncoderFamily(
       return EEncoderFamily.qsv;
     case EObsSimpleEncoder.nvenc:
     case EObsAdvancedEncoder.ffmpeg_nvenc:
-    case EObsAdvancedEncoder.jim_nvenc:
       return EEncoderFamily.nvenc;
+    case EObsAdvancedEncoder.jim_nvenc:
+      return EEncoderFamily.jim_nvenc;
     case EObsSimpleEncoder.amd:
     case EObsAdvancedEncoder.amd_amf_h264:
       return EEncoderFamily.amd;
@@ -178,12 +188,17 @@ export class OutputSettingsService extends Service {
 
     const streaming = this.getStreamingEncoderSettings(output, video);
     const recording = this.getRecordingEncoderSettings(output, video, mode, streaming);
+    const replayBuffer = {
+      enabled: this.settingsService.findSettingValue(output, 'Replay Buffer', 'RecRB'),
+      time: this.settingsService.findSettingValue(output, 'Replay Buffer', 'RecRBTime'),
+    };
 
     return {
       mode,
       inputResolution,
       streaming,
       recording,
+      replayBuffer,
     };
   }
 
@@ -322,6 +337,17 @@ export class OutputSettingsService extends Service {
 
     if (settingsPatch.recording) {
       this.setRecordingEncoderSettings(currentSettings, settingsPatch.recording);
+    }
+
+    if (settingsPatch.replayBuffer) this.setReplayBufferSettings(settingsPatch.replayBuffer);
+  }
+
+  private setReplayBufferSettings(replayBufferSettings: Partial<IReplayBufferSettings>) {
+    if (replayBufferSettings.enabled != null) {
+      this.settingsService.setSettingValue('Output', 'RecRB', replayBufferSettings.enabled);
+    }
+    if (replayBufferSettings.time != null) {
+      this.settingsService.setSettingValue('Output', 'RecRBTime', replayBufferSettings.time);
     }
   }
 

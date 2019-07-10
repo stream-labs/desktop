@@ -1,5 +1,5 @@
 import { SceneCollectionsService as InternalSceneCollectionsService } from 'services/scene-collections';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 
@@ -48,8 +48,12 @@ export class SceneCollectionsService {
     return this.sceneCollectionsService.create(options);
   }
 
-  load(id: string) {
+  load(id: string): Promise<void> {
     return this.sceneCollectionsService.load(id);
+  }
+
+  rename(newName: string, id: string): Promise<void> {
+    return this.sceneCollectionsService.rename(newName, id);
   }
 
   get collectionAdded(): Observable<ISceneCollectionsManifestEntry> {
@@ -58,6 +62,10 @@ export class SceneCollectionsService {
 
   get collectionRemoved(): Observable<ISceneCollectionsManifestEntry> {
     return this.sceneCollectionsService.collectionRemoved;
+  }
+
+  get collectionWillSwitch(): Observable<void> {
+    return this.sceneCollectionsService.collectionWillSwitch;
   }
 
   get collectionSwitched(): Observable<ISceneCollectionsManifestEntry> {

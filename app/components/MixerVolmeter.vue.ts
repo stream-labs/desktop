@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
 import { AudioSource } from 'services/audio';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
@@ -71,8 +71,8 @@ export default class MixerVolmeter extends Vue {
     if (this.gl) {
       this.initWebglRendering();
     } else {
-      // This machine does not support hardware acceleration, so fall back
-      // to canvas 2D rendering.
+      // This machine does not support hardware acceleration, or it has been
+      // disabled, so we fall back to canvas 2D rendering.
       this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
   }

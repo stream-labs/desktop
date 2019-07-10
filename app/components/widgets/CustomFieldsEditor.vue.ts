@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/widgets';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata, inputComponents, metadata } from 'components/shared/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';

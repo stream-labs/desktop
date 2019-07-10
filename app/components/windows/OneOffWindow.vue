@@ -6,7 +6,7 @@
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component :is="options.componentName"/>
+  <component :is="options.componentName" :title="options.title" />
 </div>
 </template>
 
@@ -18,12 +18,10 @@
 .blank-slate {
   display: flex;
   flex-direction: column;
-
   position: absolute;
   height: 100%;
   width: 100%;
   z-index: -1;
-
   font-size: 24px;
   text-align: center;
 }

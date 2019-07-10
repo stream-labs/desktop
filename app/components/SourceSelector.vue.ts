@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Component, Watch } from 'vue-property-decorator';
+import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection';
@@ -8,6 +8,8 @@ import { EditMenu } from '../util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { EditorCommandsService } from 'services/editor-commands';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -59,6 +61,7 @@ export default class SourceSelector extends Vue {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -124,7 +127,11 @@ export default class SourceSelector extends Vue {
         const parent = this.selectionService.getClosestParent();
         if (parent) parentId = parent.id;
       }
-      this.scenesService.showNameFolder({ itemsToGroup, parentId });
+      this.scenesService.showNameFolder({
+        itemsToGroup,
+        parentId,
+        sceneId: this.scenesService.activeScene.id,
+      });
     }
   }
 
@@ -169,11 +176,26 @@ export default class SourceSelector extends Vue {
     const destNode = this.scene.getNode(position.node.data.id);
 
     if (position.placement === 'before') {
-      nodesToMove.placeBefore(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderNodesCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.Before,
+      );
     } else if (position.placement === 'after') {
-      nodesToMove.placeAfter(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderNodesCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.After,
+      );
     } else if (position.placement === 'inside') {
-      nodesToMove.setParent(destNode.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderNodesCommand',
+        nodesToMove,
+        destNode.id,
+        EPlaceType.Inside,
+      );
     }
     this.selectionService.select(nodesToMove.getIds());
   }
@@ -197,6 +219,21 @@ export default class SourceSelector extends Vue {
     return node.isItem() || node.getNestedItems().length;
   }
 
+  get lastSelectedId() {
+    return this.selectionService.state.lastSelectedId;
+  }
+
+  @Watch('lastSelectedId')
+  async expandSelectedFolders() {
+    const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
+    if (!node || this.selectionService.state.selectedIds.length > 1) return;
+    this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+
+    await this.$nextTick();
+
+    this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
+  }
+
   get activeItemIds() {
     return this.selectionService.getIds();
   }
@@ -208,7 +245,7 @@ export default class SourceSelector extends Vue {
   toggleVisibility(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
-    selection.setSettings({ visible });
+    this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
   }
 
   visibilityClassesForSource(sceneNodeId: string) {

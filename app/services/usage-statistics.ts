@@ -1,4 +1,4 @@
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import fs from 'fs';
@@ -6,7 +6,7 @@ import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import throttle from 'lodash/throttle';
-import { Service } from './service';
+import { Service } from './core/service';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -18,7 +18,7 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent = 'TCP_API_REQUEST'; // add more types if you need
+type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
 
 interface IAnalyticsEvent {
   product: string;

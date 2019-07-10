@@ -40,6 +40,11 @@
           name="navigate_to_live"
           :metadata="{ title: $t('Navigate to Live tab when going live') }"
         />
+        <bool-input
+          v-model="disableHardwareAcceleration"
+          name="disable_ha"
+          :metadata="{ title: $t('Disable hardware acceleration (requires restart)') }"
+        />
         <div class="actions">
           <div class="input-container">
             <button class="button button--default" @click="restartStreamlabelsSession">
@@ -49,6 +54,11 @@
           <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming">
             <button class="button button--default" @click="runAutoOptimizer">
               {{ $t('Run Auto Optimizer') }}
+            </button>
+          </div>
+          <div class="input-container">
+            <button class="button button--action" @click="importFromObs">
+              {{ $t('Import from OBS') }}
             </button>
           </div>
         </div>
@@ -61,6 +71,7 @@
 
 <style lang="less" scoped>
 @import '../styles/mixins';
+
 .actions {
   .flex();
   .flex--space-between();

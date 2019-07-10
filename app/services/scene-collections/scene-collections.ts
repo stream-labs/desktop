@@ -1,5 +1,5 @@
-import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Service } from 'services/core/service';
+import { Inject } from 'services/core/injector';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';

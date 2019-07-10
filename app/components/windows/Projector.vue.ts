@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';

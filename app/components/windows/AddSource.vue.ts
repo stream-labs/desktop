@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, SceneItem } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, ISourceApi, ISourceAddOptions } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
@@ -10,9 +10,11 @@ import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EditorCommandsService } from 'services/editor-commands';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 
 @Component({
-  components: { ModalLayout, Selector, Display },
+  components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
@@ -20,12 +22,14 @@ export default class AddSource extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  sourceAddOptions = this.windowsService.getChildWindowQueryParams()
-    .sourceAddOptions as ISourceAddOptions;
+  sourceAddOptions = (this.windowsService.getChildWindowQueryParams().sourceAddOptions || {
+    propertiesManagerSettings: {},
+  }) as ISourceAddOptions;
 
   get widgetType() {
     return this.sourceAddOptions.propertiesManagerSettings.widgetType;
@@ -55,6 +59,8 @@ export default class AddSource extends Vue {
 
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
+  overrideExistingSource = false;
+
   mounted() {
     if (this.sourceAddOptions.propertiesManager === 'replay') {
       this.name = $t('Instant Replay');
@@ -80,6 +86,11 @@ export default class AddSource extends Vue {
     }
   }
 
+  get isNewSource() {
+    if (this.sourceType === 'scene') return false;
+    return this.overrideExistingSource || !this.existingSources.length;
+  }
+
   addExisting() {
     const scene = this.scenesService.activeScene;
     if (!scene.canAddSource(this.selectedSourceId)) {
@@ -91,7 +102,13 @@ export default class AddSource extends Vue {
       );
       return;
     }
-    this.scenesService.activeScene.addSource(this.selectedSourceId);
+
+    this.editorCommandsService.executeCommand(
+      'CreateExistingItemCommand',
+      this.scenesService.activeSceneId,
+      this.selectedSourceId,
+    );
+
     this.close();
   }
 
@@ -120,12 +137,22 @@ export default class AddSource extends Vue {
           settings.height = size.height;
         }
 
-        source = this.sourcesService.createSource(this.name, this.sourceType, settings, {
-          propertiesManager: this.sourceAddOptions.propertiesManager,
-          propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
-        });
+        // TODO: Return value types for executeCommand
+        const item = this.editorCommandsService.executeCommand(
+          'CreateNewItemCommand',
+          this.scenesService.activeSceneId,
+          this.name,
+          this.sourceType,
+          settings,
+          {
+            sourceAddOptions: {
+              propertiesManager: this.sourceAddOptions.propertiesManager,
+              propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
+            },
+          },
+        ) as SceneItem;
 
-        this.scenesService.activeScene.addSource(source.sourceId);
+        source = item.source;
       }
 
       if (source.hasProps()) {
@@ -134,6 +161,10 @@ export default class AddSource extends Vue {
         this.close();
       }
     }
+  }
+
+  handleSubmit() {
+    return this.isNewSource ? this.addNew() : this.addExisting();
   }
 
   get selectedSource() {

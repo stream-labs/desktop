@@ -1,5 +1,5 @@
 import { IWidgetApiSettings, IWidgetData, WidgetSettingsService } from 'services/widgets';
-import { InheritMutations } from 'services/stateful-service';
+import { InheritMutations } from 'services/core/stateful-service';
 import { handleResponse } from 'util/requests';
 
 interface IBaseGoalData extends IWidgetData {

@@ -2,15 +2,14 @@ import {
   SettingsService,
   OutputSettingsService,
   IStreamingEncoderSettings,
+  EEncoderFamily,
 } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from '../../util/injector';
+import { Inject, mutation, PersistentStatefulService } from 'services/core';
 import { IEncoderProfile } from './definitions';
 import cloneDeep from 'lodash/cloneDeep';
 import { camelize, handleErrors } from '../../util/requests';
 import { UrlService } from '../hosts';
-import { mutation } from 'services/stateful-service';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
 
 export * from './definitions';
 
@@ -80,14 +79,21 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     const settings = this.outputSettingsService.getSettings().streaming;
     const profiles = await this.fetchAvailableGameProfiles(game);
 
+    // We don't have settings for jim_nvenc encoder in DB
+    // use settings for nvenc instead
+    const encoder =
+      settings.encoder === EEncoderFamily.jim_nvenc ? EEncoderFamily.nvenc : settings.encoder;
+
     const filteredProfiles = profiles.filter(profile => {
       return (
-        profile.encoder === settings.encoder &&
+        profile.encoder === encoder &&
         profile.bitrateMax >= settings.bitrate &&
         profile.bitrateMin <= settings.bitrate &&
         (!settings.preset || settings.preset === profile.presetIn)
       );
     });
+
+    if (!filteredProfiles.length) return null;
 
     // find profiles with the closest resolution to current resolution in current settings
     const resInPx = resToPx(settings.outputResolution);
@@ -98,6 +104,9 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       );
     })[0];
 
+    // don't change the current encoder
+    profile.encoder = settings.encoder;
+
     return profile;
   }
 
@@ -105,16 +114,12 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
    * returns profiles according to the game name
    */
   private async fetchAvailableGameProfiles(game: string): Promise<IEncoderProfile[]> {
-    if (!game) {
-      return [];
-    }
-
     let profiles: IEncoderProfile[] = [];
 
     if (game === this.state.lastLoadedGame) {
       profiles = this.state.lastLoadedProfiles;
-    } else {
-      // try to fetch game-specific profile
+    } else if (game) {
+      // try to fetch a game-specific profile
 
       try {
         profiles = await fetch(
@@ -143,7 +148,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     }
 
     if (profiles.length) this.CACHE_PROFILES(game, profiles);
-    return profiles;
+    return cloneDeep(profiles);
   }
 
   applyProfile(encoderProfile: IEncoderProfile) {
@@ -168,11 +173,13 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
     console.log('Apply encoder settings', newStreamingSettings);
 
+    // apply new streaming settings
+    // also migrate simple settings to advanced settings if the current mode is Simple
     this.outputSettingsService.setSettings({
       mode: 'Advanced',
       streaming: newStreamingSettings,
-      // if current mode is Simple we need to pass recording settings as well to the Advanced mode
       recording: currentSettings.recording,
+      replayBuffer: currentSettings.replayBuffer,
     });
 
     this.isUsingEncodingOptimizations = true;

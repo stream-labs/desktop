@@ -8,12 +8,12 @@
     },
     "similar-code": {
       "config": {
-        "threshold": 75
+        "threshold": 150
       }
     },
     "identical-code": {
       "config": {
-        "threshold": 100
+        "threshold": 175
       }
     },
     "method-complexity": {
@@ -23,7 +23,7 @@
     },
     "method-lines": {
       "config": {
-        "threshold": 30
+        "threshold": 32
       }
     },
     "method-count": {
@@ -45,7 +45,7 @@
     "stylelint": {
       "enabled": true,
       "config": ".stylelintrc",
-      "exclude_patterns": ["**/*.vue", "docs/"]
+      "exclude_patterns": ["docs/"]
     }
   },
   "exclude_patterns": [

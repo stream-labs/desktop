@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from './core/stateful-service';
 import electron from 'electron';
 import * as obs from '../../obs-api';
 

@@ -7,9 +7,8 @@ import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import { FacemasksService } from 'services/facemasks';
 
 const alertNameMap = () => ({
   bits: $t('Bits'),
@@ -36,7 +35,7 @@ const alertNameMap = () => ({
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
-  facemasks: $t('Facemask Donations'),
+  loyaltystore: $t('Cloudbot Redemption'),
 });
 
 const triggerAmountMap = {
@@ -71,7 +70,6 @@ const HAS_DONOR_MESSAGE = [
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
-  @Inject() facemasksService: FacemasksService;
 
   $refs: { [key: string]: HTMLElement };
 
@@ -101,10 +99,12 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   editingName: string = null;
   languages: any[] = [];
 
-  facemaskEnabled = this.facemasksService.getEnabledStatus();
-
   get metadata() {
-    return this.service.getMetadata(this.selectedAlert, this.languages);
+    return this.service.getMetadata(
+      this.selectedAlert,
+      this.languages,
+      this.selectedVariation.condition,
+    );
   }
 
   get selectedVariation() {
@@ -143,6 +143,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   get conditions() {
     return this.alertBoxService.conditionsByType(this.selectedAlert);
+  }
+
+  get conditionData() {
+    return this.alertBoxService.conditionDataByCondition(this.selectedVariation);
   }
 
   get minTriggerAmount() {
@@ -213,19 +217,5 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   nameBlurHandler(id: string) {
     this.save();
     this.editingName = null;
-  }
-
-  handleFacemaskInput() {
-    if (this.selectedAlert === 'facemasks') {
-      const { duration } = this.selectedVariation.settings;
-      this.facemasksService
-        .updateFacemaskSettings({
-          duration,
-          enabled: this.facemaskEnabled,
-          device: this.facemasksService.getEnabledDevice(),
-        })
-        .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
-    }
-    this.save();
   }
 }

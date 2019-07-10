@@ -11,7 +11,7 @@
         <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
-      <div v-if="!infoLoading && !infoError && !populatingModels">
+      <form name="editStreamForm" v-if="!infoLoading && !infoError && !populatingModels">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           {{ $t("It looks like you don't have any Pages. Head to ") }}
           <a class="description-link" @click="openFBPageCreateLink">{{
@@ -38,7 +38,7 @@
           v-if="isYoutube || isFacebook"
           v-model="streamDescriptionModel"
           :metadata="{
-            type: 'text-area',
+            type: 'textArea',
             name: 'stream_description',
             title: $t('Description'),
             rows: 4,
@@ -53,6 +53,7 @@
             @search-change="debouncedGameSearch"
             @input="onGameInput"
             :value="gameModel"
+            :placeholder="$t('Start typing to search')"
             :metadata="gameMetadata"
           />
         </h-form-group>
@@ -106,7 +107,7 @@
             >.
           </div>
         </div>
-      </div>
+      </form>
     </div>
     <div slot="controls">
       <button class="button button--default" :disabled="updatingInfo" @click="cancel">
@@ -131,10 +132,6 @@
 .pages-warning,
 .update-warning {
   .warning();
-}
-
-.description-link {
-  text-decoration: underline;
 }
 
 .description-link {

@@ -1,6 +1,6 @@
 import { shell } from 'electron';
 import Component from 'vue-class-component';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { IMediaGalleryMetadata } from './index';
@@ -27,7 +27,11 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   async updateValue() {
     const filter = this.metadata.filter;
     const selectedFile = await this.mediaGalleryService.pickFile({ filter });
-    this.emitInput(selectedFile.href);
+    if (selectedFile) {
+      this.emitInput(selectedFile.href);
+    } else {
+      this.clearImage();
+    }
   }
 
   clearImage() {

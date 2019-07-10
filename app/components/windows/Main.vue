@@ -77,7 +77,7 @@
 .main-contents {
   display: grid;
   grid-template-columns: 1fr;
-  height: 100%;
+  flex-grow: 1;
 }
 
 .main-contents--right {
@@ -121,7 +121,6 @@
   right: 0;
   z-index: 999999;
   background-color: var(--background);
-
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
     top: 34px;
@@ -154,5 +153,12 @@
 .live-dock-resize-bar--left {
   top: 0;
   right: 0;
+}
+
+/deep/ .creator-sites-container .s-loader {
+  .s-loader__bg {
+    position: unset;
+    z-index: unset;
+  }
 }
 </style>

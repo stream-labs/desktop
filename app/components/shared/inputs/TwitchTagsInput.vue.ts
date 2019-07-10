@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import VSelectPage from 'v-selectpage';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { $t, I18nService } from 'services/i18n';
 import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';

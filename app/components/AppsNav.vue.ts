@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';

@@ -1,4 +1,4 @@
-import { ServiceHelper, mutation } from 'services/stateful-service';
+import { ServiceHelper, mutation, Inject } from 'services';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
@@ -13,7 +13,6 @@ import {
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
-import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
@@ -157,6 +156,10 @@ export class Scene {
     if (options.select == null) options.select = true;
     if (options.select) this.selectionService.select(sceneItemId);
 
+    if (options.initialTransform) {
+      sceneItem.setTransform(options.initialTransform);
+    }
+
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
   }
@@ -289,15 +292,24 @@ export class Scene {
 
     this.SET_NODES_ORDER(sceneNodesIds);
 
-    itemsToMove.forEach(item => {
-      let currentIdx: number;
-      this.getObsScene()
+    this.reconcileNodeOrderWithObs();
+  }
+
+  setNodesOrder(order: string[]) {
+    this.SET_NODES_ORDER(order);
+    this.reconcileNodeOrderWithObs();
+  }
+
+  /**
+   * Makes sure all scene items are in the correct order in OBS.
+   */
+  private reconcileNodeOrderWithObs() {
+    this.getItems().forEach((item, index) => {
+      const currentIndex = this.getObsScene()
         .getItems()
         .reverse()
-        .forEach((obsItem, idx) => {
-          if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
-        });
-      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
+        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
+      this.getObsScene().moveItem(currentIndex, index);
     });
   }
 

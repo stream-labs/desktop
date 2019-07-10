@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test, afterAppStart } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { SceneItem, SceneItemNode, ScenesService } from 'services/scenes';
@@ -9,7 +8,7 @@ import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
 
-useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
+useSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let getNode: (name: string) => SceneItemNode;
@@ -21,7 +20,7 @@ let sceneCollectionsService: ISceneCollectionsServiceApi;
 let sourcesService: ISourcesServiceApi;
 let scenesService: ScenesService;
 
-async function afterStart() {
+afterAppStart(async t => {
   const client = await getClient();
   scenesService = client.getResource('ScenesService');
   sourcesService = client.getResource('SourcesService');
@@ -32,7 +31,7 @@ async function afterStart() {
   sceneBuilder = new SceneBuilder(client);
   getNode = name => sceneBuilder.scene.getNodeByName(name);
   getNodeId = name => sceneBuilder.scene.getNodeByName(name).id;
-}
+});
 
 test('Simple copy/paste', async t => {
   sceneBuilder.build(`

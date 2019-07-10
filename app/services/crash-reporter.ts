@@ -1,7 +1,7 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import electron from 'electron';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Subscription } from 'rxjs';
 import path from 'path';
 import fs from 'fs';

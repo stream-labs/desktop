@@ -6,7 +6,7 @@ import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import debounce from 'lodash/debounce';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
@@ -106,25 +106,24 @@ export default class EditStreamInfo extends Vue {
       }
     });
 
-    if (this.streamInfoService.state.channelInfo) {
-      this.populatingModels = true;
-      if (this.isFacebook || this.isYoutube) {
-        const service = getPlatformService(this.userService.platform.type);
-        await service
-          .prepopulateInfo()
-          .then((info: IChannelInfo) => {
-            if (!info) return;
-            return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-          })
-          .then(() => this.populateModels());
-      } else {
-        await this.populateModels();
-      }
-      this.populatingModels = false;
-    } else {
-      // If the stream info pre-fetch failed, we should try again now
-      this.refreshStreamInfo();
+    this.populatingModels = true;
+    // If the stream info pre-fetch failed, we should try again now
+    if (!this.streamInfoService.state.channelInfo) {
+      await this.refreshStreamInfo();
     }
+    if (this.isServicedPlatform) {
+      const service = getPlatformService(this.userService.platform.type);
+      await service
+        .prepopulateInfo()
+        .then((info: IChannelInfo) => {
+          if (!info) return;
+          return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
+        })
+        .then(() => this.populateModels());
+    } else {
+      await this.populateModels();
+    }
+    this.populatingModels = false;
 
     if (this.isTwitch && this.streamInfoService.state.channelInfo) {
       this.twitchService
@@ -140,6 +139,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateModels() {
+    if (!this.streamInfoService.state.channelInfo) return;
     this.facebookPages = await this.fetchFacebookPages();
     this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
     this.gameModel = this.streamInfoService.state.channelInfo.game || '';
@@ -299,9 +299,19 @@ export default class EditStreamInfo extends Vue {
     this.updateAndGoLive();
   }
 
-  goLive() {
-    this.streamingService.toggleStreaming();
-    this.windowsService.closeChildWindow();
+  async goLive() {
+    try {
+      await this.streamingService.toggleStreaming();
+      this.windowsService.closeChildWindow();
+    } catch (e) {
+      this.$toasted.show(e, {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      this.updatingInfo = false;
+    }
   }
 
   cancel() {
@@ -310,7 +320,7 @@ export default class EditStreamInfo extends Vue {
 
   // This should have been pre-fetched, but we can force a refresh
   refreshStreamInfo() {
-    this.streamInfoService.refreshStreamInfo().then(() => {
+    return this.streamInfoService.refreshStreamInfo().then(() => {
       if (this.streamInfoService.state.channelInfo) this.populateModels();
     });
   }
@@ -333,6 +343,10 @@ export default class EditStreamInfo extends Vue {
 
   get isFacebook() {
     return this.userService.platform.type === 'facebook';
+  }
+
+  get isServicedPlatform() {
+    return this.isFacebook || this.isYoutube || this.isTwitch || this.isMixer;
   }
 
   get submitText() {
@@ -360,10 +374,10 @@ export default class EditStreamInfo extends Vue {
 
   get gameMetadata() {
     return {
+      name: 'game',
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
-      placeholder: $t('Search'),
       options: this.gameOptions,
       noResult: $t('No matching game(s) found.'),
     };

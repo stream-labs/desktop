@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
-import { BoolInput, ListInput, ToggleInput, SliderInput } from 'components/shared/inputs/inputs';
-import { ProgressBar, ItemGrid, VirtualItem } from 'streamlabs-beaker';
+import { ListInput, ToggleInput, SliderInput, NumberInput } from 'components/shared/inputs/inputs';
+import { ProgressBar, ItemGrid, VirtualItem, Accordion } from 'streamlabs-beaker';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { FacemasksService } from 'services/facemasks';
 
@@ -32,21 +32,20 @@ interface IFormSettings {
     name: string;
     value: string;
   };
-  sub_duration?: number;
-  bits_duration?: number;
 }
 
 @Component({
   components: {
     ModalLayout,
     HFormGroup,
-    BoolInput,
+    NumberInput,
     ListInput,
     ProgressBar,
     ItemGrid,
     VirtualItem,
     ToggleInput,
     SliderInput,
+    Accordion,
   },
 })
 export default class FacemaskSettings extends Vue {
@@ -55,14 +54,11 @@ export default class FacemaskSettings extends Vue {
   enabledModel = this.facemasksService.state.settings.enabled;
   donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;
   subsEnabledModel = this.facemasksService.state.settings.subs_enabled;
-  subsDurationModel = this.facemasksService.state.settings.sub_duration;
-  bitsDurationModel = this.facemasksService.state.settings.bits_duration;
   bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
   durationModel = this.facemasksService.state.settings.duration;
   videoInputModel = this.facemasksService.state.settings.device.value;
-  t2AvailableMasks = this.facemasksService.state.settings.t2masks as IFacemaskSelection[];
-  t3AvailableMasks = this.facemasksService.state.settings.t3masks as IFacemaskSelection[];
+  availableMasks = this.facemasksService.state.settings.facemasks as IFacemaskSelection[];
 
   inputDevices = this.facemasksService.getInputDevicesList().map(device => {
     return {
@@ -96,11 +92,6 @@ export default class FacemaskSettings extends Vue {
     this.updatingInfo = true;
 
     const newSettings = this.createSettingsObject();
-
-    if (this.showTwitchFeatures) {
-      newSettings.sub_duration = this.subsDurationModel;
-      newSettings.bits_duration = this.bitsDurationModel;
-    }
 
     if (!newSettings.device) {
       newSettings.device = {
@@ -139,11 +130,6 @@ export default class FacemaskSettings extends Vue {
       };
     }
 
-    if (settings.bits_enabled && bitsPrices.indexOf(settings.bits_price) === -1) {
-      error = true;
-      message = 'Error: Please select a bits price';
-    }
-
     if (!settings.device.value) {
       error = true;
       message = 'Error: Please select a video device';
@@ -160,7 +146,7 @@ export default class FacemaskSettings extends Vue {
   }
 
   clickMask(mask: IFacemaskSelection) {
-    this.facemasksService.trigger(mask.uuid, this.facemasksService.state.settings.sub_duration);
+    this.facemasksService.playMask(mask.uuid);
   }
 
   onFailHandler(msg: string) {
@@ -179,25 +165,6 @@ export default class FacemaskSettings extends Vue {
       duration: 3000,
       singleton: true,
     });
-  }
-
-  openTipPage() {
-    electron.remote.shell.openExternal(`https://streamlabs.com/${this.username}/masks`);
-  }
-
-  openExtensionPage() {
-    electron.remote.shell.openExternal(this.extensionUrl);
-  }
-
-  get extensionUrl() {
-    return this.facemasksService.state.settings.extension_url;
-  }
-
-  get showExtensionPromt() {
-    return (
-      this.facemasksService.state.settings.subs_enabled &&
-      !this.facemasksService.state.settings.extension_enabled
-    );
   }
 
   get videoInputMetadata() {
@@ -233,9 +200,6 @@ export default class FacemaskSettings extends Vue {
   }
 
   get showTwitchFeatures() {
-    return (
-      this.facemasksService.state.settings.extension &&
-      this.facemasksService.state.settings.partnered
-    );
+    return this.facemasksService.state.settings.partnered;
   }
 }

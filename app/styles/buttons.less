@@ -76,12 +76,12 @@
 
 .button--trans {
   background: transparent;
-  color: @dark-5;
+  color: var(--paragraph);
   border-color: transparent;
 
   &:hover,
   &:focus {
-    color: @dark-2;
+    color: var(--title);
     background: transparent;
 
     i {
@@ -222,17 +222,5 @@
 .theme-toggle {
   &:focus {
     outline: 0;
-  }
-}
-
-.night-theme {
-  .button--trans {
-    color: @light-4;
-    background-color: transparent;
-    border-color: transparent;
-
-    &:hover {
-      color: @light-1;
-    }
   }
 }
