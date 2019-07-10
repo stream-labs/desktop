@@ -1,6 +1,7 @@
 import { GenericGoalService } from './generic-goal';
-import { WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { WidgetType } from 'services/widgets';
+
 import { InheritMutations } from 'services/stateful-service';
 
 @InheritMutations()
@@ -12,9 +13,9 @@ export class DonationGoalService extends GenericGoalService {
       type: WidgetType.DonationGoal,
       url: `https://${this.getHost()}/widgets/donation-goal?token=${this.getWidgetToken()}`,
       previewUrl: `https://${this.getHost()}/widgets/donation-goal?token=${this.getWidgetToken()}`,
-      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal/settings`,
-      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal/settings`,
-      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal/settings/new`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal/settings/new`,
+      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/donationgoal/new`,
       settingsUpdateEvent: 'donationGoalSettingsUpdate',
       goalCreateEvent: 'donationGoalStart',
       goalResetEvent: 'donationGoalEnd',
