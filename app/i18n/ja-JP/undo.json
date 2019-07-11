@@ -35,7 +35,7 @@
   "Reset %{sourceName}": "%{sourceName}をリセットする",
   "Resize %{sourceName}": "%{sourceName}をリサイズする",
   "Rotate %{sourceName}": "%{sourceName}を回転する",
-  "Change default transition": "デフォルトの切り替え効果を変更する",
+  "Change default transition": "デフォルトのトランジションを変更する",
   "Adjust %{sourceName} volume": "%{sourceName}のボリュームを調節する",
   "Stretch %{sourceName}": "%{sourceName}を引っ張る",
   "Enable %{filterName}": "%{filterName}を有効にする",
