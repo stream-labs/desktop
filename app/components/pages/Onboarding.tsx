@@ -58,7 +58,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       steps.push(<StreamlabsFeatures slot={String(currentSlot)} />);
       return steps;
     }
-    steps.push(<ThemeSelector slot={String(currentSlot)} />);
+    steps.push(<ThemeSelector slot={String(currentSlot)} continue={() => this.continue()} />);
     currentSlot++;
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(<Optimize slot={String(currentSlot)} continue={() => this.continue()} />);
@@ -88,9 +88,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
           stepLocation="top"
           current={this.currentStep}
           skip={true}
+          completeOnSkip={true}
           continueFunc={this.continue}
           completeFunc={this.complete}
-          hideControls={this.currentStep < 3}
         >
           {steps}
         </Onboarding>

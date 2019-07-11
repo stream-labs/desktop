@@ -1,51 +1,64 @@
-import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
+import { Component, Prop } from 'vue-property-decorator';
+import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
+import styles from './ThemeSelector.m.less';
 
 @Component({})
-export default class ObsImport extends TsxComponent<{}> {
+export default class ObsImport extends TsxComponent<{ continue: Function }> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
+
+  @Prop() continue: Function;
+
+  installing = false;
+  progress = 0;
 
   get themesMetadata() {
     return [
       {
         title: 'Borderline [Red Yellow] - by Nerd or Die',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-        image: '',
+        thumbnail: 'borderline',
       },
       {
         title: 'Dark Matter by VBI',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-        image: '',
+        thumbnail: 'darkmatter',
       },
       {
         title: 'Geometic Madness',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-        image: '',
+        thumbnail: 'geometric',
       },
       {
         title: 'Nexus',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-        image: '',
+        thumbnail: 'nexus',
       },
       {
         title: 'Relative Minds',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-        image: '',
+        thumbnail: 'relativeminds',
       },
       {
         title: 'Facebook Gaming Pure Hexagons',
         url: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
-        image: '',
+        thumbnail: 'purehexagon',
       },
     ];
   }
 
-  installTheme(url: string, name: string) {
-    () => this.sceneCollectionsService.installOverlay(url, name);
+  async installTheme(url: string, name: string) {
+    this.installing = true;
+    await this.sceneCollectionsService.installOverlay(
+      url,
+      name,
+      progress => (this.progress = progress.percent),
+    );
+    this.installing = false;
+    this.continue();
   }
 
   render(h: Function) {
@@ -56,14 +69,21 @@ export default class ObsImport extends TsxComponent<{}> {
           {$t(
             'Not seeing a theme that catches your eye? Our theme library has hundreds of free choices available',
           )}
-          <div>
-            {this.themesMetadata.map(theme => (
-              <div onClick={this.installTheme(theme.url, theme.title)}>
-                <img src={theme.image} />
-                <div>{theme.title}</div>
-              </div>
-            ))}
-          </div>
+          {!this.installing ? (
+            <div class={styles.container}>
+              {this.themesMetadata.map(theme => (
+                <div class={styles.cell} onClick={() => this.installTheme(theme.url, theme.title)}>
+                  <img
+                    class={styles.thumbnail}
+                    src={require(`../../../../media/images/onboarding/${theme.thumbnail}.png`)}
+                  />
+                  <div class={styles.title}>{theme.title}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <ProgressBar progressComplete={Math.floor(this.progress * 100)} />
+          )}
         </template>
       </OnboardingStep>
     );
