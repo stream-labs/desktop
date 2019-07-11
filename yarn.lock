@@ -3498,9 +3498,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.36-4/iojs-v5.0.4-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.37/iojs-v5.0.4-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.36-4/iojs-v5.0.4-crash-handler.tar.gz#988a2b2f5c47d005688c51f68b28fa4ac7a45ceb"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.37/iojs-v5.0.4-crash-handler.tar.gz#4c1ed17e87ffd3e4c0b0e2509fce1d750bbd446c"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -7408,9 +7408,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.12/iojs-v5.0.4-node-libuiohook.tar.gz":
   version "0.0.9"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz#3220a6c5d6ed7f847d09faa6d310270acadcb54a"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.12/iojs-v5.0.4-node-libuiohook.tar.gz#fe553b095b94e449c1a1b4b38e129be18aee473e"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
