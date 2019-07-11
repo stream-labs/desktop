@@ -7,10 +7,14 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import styles from './ThemeSelector.m.less';
 
 @Component({})
-export default class ObsImport extends TsxComponent<{ continue: Function }> {
+export default class ObsImport extends TsxComponent<{
+  continue: Function;
+  setProcessing: Function;
+}> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   @Prop() continue: Function;
+  @Prop() setProcessing: Function;
 
   installing = false;
   progress = 0;
@@ -52,12 +56,14 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
 
   async installTheme(url: string, name: string) {
     this.installing = true;
+    this.setProcessing(true);
     await this.sceneCollectionsService.installOverlay(
       url,
       name,
       progress => (this.progress = progress.percent),
     );
     this.installing = false;
+    this.setProcessing(false);
     this.continue();
   }
 

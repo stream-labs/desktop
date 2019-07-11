@@ -10,10 +10,14 @@ import KevinSvg from './KevinSvg';
 import ObsSvg from './ObsSvg';
 
 @Component({})
-export default class ObsImport extends TsxComponent<{ continue: Function }> {
+export default class ObsImport extends TsxComponent<{
+  continue: Function;
+  setProcessing: Function;
+}> {
   @Inject() obsImporterService: ObsImporterService;
 
   @Prop() continue: Function;
+  @Prop() setProcessing: Function;
 
   importing = false;
 
@@ -26,10 +30,12 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
   startImport() {
     if (this.importing) return;
     this.importing = true;
+    this.setProcessing(true);
     defer(async () => {
       try {
         await this.obsImporterService.load(this.selectedProfile);
         this.importing = false;
+        this.setProcessing(false);
         this.continue(true);
       } catch (e) {
         this.$toasted.show($t('Something went wrong.'), {
@@ -37,6 +43,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
           className: 'toast-alert',
           duration: 3000,
         });
+        this.setProcessing(false);
         this.importing = false;
       }
     });
@@ -62,7 +69,7 @@ export default class ObsImport extends TsxComponent<{ continue: Function }> {
           'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',
         ),
         image: KevinSvg,
-        onClick: () => this.continue(),
+        onClick: () => this.continue(false),
       },
     ];
   }
