@@ -36,6 +36,7 @@ if (!gotTheLock) {
   const pid = require('process').pid;
   const crashHandler = require('crash-handler');
   const electronLog = require('electron-log');
+  const nodeLibuiohook = require('node-libuiohook');
 
   // We use a special cache directory for running tests
   if (process.env.SLOBS_CACHE_DIR) {
@@ -222,10 +223,10 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    require('node-libuiohook').startHook();
+    nodeLibuiohook.startHook();
 
     mainWindow.on('closed', () => {
-      require('node-libuiohook').stopHook();
+      nodeLibuiohook.stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
     });
