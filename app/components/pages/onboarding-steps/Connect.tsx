@@ -22,12 +22,8 @@ export default class Connect extends TsxComponent<{ continue: Function }> {
     this.loadingState = true;
     this.userService.startAuth(
       platform,
-      () => {
-        this.loadingState = false;
-      },
-      () => {
-        this.loadingState = true;
-      },
+      () => (this.loadingState = false),
+      () => (this.loadingState = true),
       result => {
         // Currently we do not have special handling for generic errors
         if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
@@ -38,9 +34,8 @@ export default class Connect extends TsxComponent<{ continue: Function }> {
             {
               type: 'error',
               message: $t(
-                'Twitch requires two factor authentication to be enabled ' +
-                  'on your account in order to stream to Twitch. Please enable two ' +
-                  'factor authentication and try again.',
+                'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
+                  'Please enable two factor authentication and try again.',
               ),
               title: $t('Twitch Authentication Error'),
               buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],

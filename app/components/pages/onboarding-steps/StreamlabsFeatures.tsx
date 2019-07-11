@@ -53,7 +53,7 @@ export default class ObsImport extends TsxComponent<{}> {
             'stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ ' +
             'tab of the settings menu.',
         ),
-        image: '',
+        image: 'game-overlay',
       },
       facemasks: {
         title: $t('Facemasks'),
@@ -62,7 +62,7 @@ export default class ObsImport extends TsxComponent<{}> {
             'Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. ' +
             'Head over to the facemask settings to get started.',
         ),
-        image: '',
+        image: 'facemasks',
       },
       videoEncoding: {
         title: $t('Optimized Video Encoding'),
