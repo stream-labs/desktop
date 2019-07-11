@@ -102,6 +102,10 @@ export default class WidgetEditor extends Vue {
     return this.wData && this.wData.settings.custom_enabled;
   }
 
+  get isSaving() {
+    return this.settingsState.pendingRequests > 0;
+  }
+
   mounted() {
     const source = this.widget.getSource();
     this.properties = source ? source.getPropertiesFormData() : [];

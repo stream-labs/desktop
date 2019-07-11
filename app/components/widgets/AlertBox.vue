@@ -31,10 +31,7 @@
         <span class="left-accordion__title">{{ alertName(alert) }}</span>
       </div>
       <div class="left-accordion__input" v-if="wData.settings[alert]">
-        <validated-form v-if="alert !== 'facemasks'" @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
-        <validated-form v-if="alert === 'facemasks'" @input="handleFacemaskInput()">
-          <toggle-input v-model="facemaskEnabled" />
-        </validated-form>
+        <validated-form @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
       </div>
       <div v-if="wData && selectedAlert === alert">
         <div
@@ -92,7 +89,7 @@
       <v-form-group v-model="selectedVariation.settings.text.color2" :metadata="metadata.secondaryColor" />
     </div>
   </validated-form>
-  <validated-form slot="media-properties" :key="`media-properties--${selectedAlert}-${selectedId}`" @input="handleFacemaskInput()" v-if="selectedVariation">
+  <validated-form slot="media-properties" :key="`media-properties--${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
     <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
     <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
     <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
@@ -116,7 +113,7 @@
       <v-form-group v-model="selectedVariation.settings.tts.security" :metadata="metadata.ttsSecurity" />
     </div>
   </validated-form>
-  <validated-form slot="animation-properties" :key="`animation-properties-${selectedAlert}-${selectedId}`" @input="handleFacemaskInput()" v-if="selectedVariation">
+  <validated-form slot="animation-properties" :key="`animation-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
     <v-form-group v-model="selectedVariation.settings.showAnimation" :metadata="metadata.showAnimation" />
     <v-form-group v-model="selectedVariation.settings.hideAnimation" :metadata="metadata.hideAnimation" />
     <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />
@@ -128,8 +125,7 @@
     <v-form-group v-model="minRecentEvents" :metadata="metadata.minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
       <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
-      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variationFrequency" v-if="selectedVariation.condition === 'RANDOM'" />
-      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.conditionData" v-if="selectedVariation.condition !== 'RANDOM'" />
+      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variations" />
     </div>
   </validated-form>
 </widget-editor>

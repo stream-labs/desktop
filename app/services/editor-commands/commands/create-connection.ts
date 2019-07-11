@@ -1,11 +1,12 @@
 import { Command } from './command';
 import { Inject } from 'services/core';
 import { TransitionsService } from 'services/transitions';
+import { $t } from 'services/i18n';
 
 export class CreateConnectionCommand extends Command {
   @Inject() transitionsService: TransitionsService;
 
-  description = 'Create a new connection';
+  description = $t('Create a new connection');
 
   private connectionId: string;
 

@@ -13,8 +13,11 @@ import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
+import WebviewLoader from 'components/WebviewLoader.vue';
 
-@Component({})
+@Component({
+  components: { WebviewLoader },
+})
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;

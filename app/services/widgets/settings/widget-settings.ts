@@ -17,12 +17,12 @@ import { Subject } from 'rxjs';
 import { IInputMetadata } from 'components/shared/inputs/index';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { WebsocketService } from 'services/websocket';
-import electronLog from 'electron-log';
 
 export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   loadingState: 'none',
   data: null,
   rawData: null,
+  pendingRequests: 0,
 };
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
@@ -157,7 +157,13 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    return fetch(request).then(handleResponse);
+    this.SET_PENDING_REQUESTS(this.state.pendingRequests + 1);
+    return fetch(request)
+      .then(res => {
+        this.SET_PENDING_REQUESTS(this.state.pendingRequests - 1);
+        return Promise.resolve(res);
+      })
+      .then(handleResponse);
   }
 
   protected getHost(): string {
@@ -170,6 +176,11 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 
   protected getApiToken(): string {
     return this.userService.apiToken;
+  }
+
+  @mutation()
+  protected SET_PENDING_REQUESTS(pendingRequestsCnt: number) {
+    this.state.pendingRequests = pendingRequestsCnt;
   }
 
   @mutation()

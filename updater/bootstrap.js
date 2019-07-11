@@ -14,6 +14,7 @@
  * designed to be small and mostly standalone. */
 const util = require('util');
 const path = require('path');
+const tasklist = require('tasklist');
 const fs = require('fs');
 const request = require('request');
 const zlib = require('zlib');
@@ -34,6 +35,7 @@ const mkdir = util.promisify(fs.mkdir);
  * anything goes wrong, just don't spawn a window
  * for safety. */
 let statusWindow = null;
+const running_updater_detected = "Updater is running";
 
 function destroyStatusWindow() {
     if (statusWindow) {
@@ -127,6 +129,29 @@ async function checkChance(info, version) {
     return roll <= chance;
 }
 
+async function is_updater_probably_running(updaterPath, updater_name) {
+    let updater_probably_running = false;
+    if (!fs.existsSync(updaterPath)) {
+        return updater_probably_running;
+    } 
+
+    let processes = await tasklist();
+
+    for (process_item in processes) {
+        if (processes[process_item].imageName === updater_name) {
+            console.log("Detected running updater process " + processes[process_item].imageName + ", pid " + processes[process_item].pid);
+
+            try {
+                fs.unlinkSync(updaterPath);
+            } catch (remove_error) {
+                updater_probably_running = true;
+            }
+        }
+    }
+
+    return updater_probably_running;
+}
+
 /* Note that latest-updater.exe never changes
  * in name regardless of what version of the
  * application we're using. The base url should
@@ -145,6 +170,10 @@ async function fetchUpdater(info, progress) {
     };
 
     const updaterPath = path.resolve(info.tempDir, updater_name);
+    let updater_probably_running = await is_updater_probably_running(updaterPath, updater_name);
+    if (updater_probably_running)
+        return running_updater_detected;
+
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
@@ -201,6 +230,27 @@ async function getVersion(info) {
     return response.body.version;
 }
 
+async function is_need_to_update_version(latestVersion, info)
+{
+    let ret = true;
+    /* Latest version need to be greater than the current version! */
+    if (!latestVersion) {
+        log.info('Failed to fetch latest version!');
+        ret = false;
+    } else if (semver.eq(info.version, latestVersion)) {
+        log.info('Already latest version!');
+        ret = false;
+    } else if (semver.gt(info.version, latestVersion)) {
+        log.info('Latest version is less than current version!');
+        ret = false;
+    } else if (!await checkChance(info, latestVersion)) {
+        log.info('Failed the chance lottery. Better luck next time!');
+        ret = false;
+    }
+
+    return ret;
+}
+
 /* Note that we return true when we fail to fetch
  * version correctly! This is to make sure we don't
  * bork the user due to update error. It's better to
@@ -216,7 +266,8 @@ async function entry(info) {
             height: 180,
             frame: false,
             resizable: false,
-            show: false
+            show: false,
+            alwaysOnTop: true
         });
 
         statusWindow.on('closed', () => {
@@ -229,9 +280,11 @@ async function entry(info) {
             statusWindow = null;
         });
 
-        statusWindow.on('ready-to-show', () => {
-            statusWindow.show();
-        });
+        // Never show the status window for now.  There is not enough
+        // time for it to fully render before it is closed.
+        // statusWindow.on('ready-to-show', () => {
+        //     statusWindow.show();
+        // });
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
     } catch (error) {
@@ -241,27 +294,8 @@ async function entry(info) {
     }
 
     const latestVersion = await getVersion(info);
-
-    /* Latest version need to be greater than the current version! */
-    if (!latestVersion) {
-        log.info('Failed to fetch latest version!');
+    if(! (await is_need_to_update_version(latestVersion, info)) )
         return false;
-    }
-
-    if (semver.eq(info.version, latestVersion)) {
-        log.info('Already latest version!');
-        return false;
-    }
-
-    if (semver.gt(info.version, latestVersion)) {
-        log.info('Latest version is less than current version!');
-        return false;
-    }
-
-    if (!await checkChance(info, latestVersion)) {
-        log.info('Failed the chance lottery. Better luck next time!');
-        return false;
-    }
 
     /* App directory is required to be present!
      * The temporary directory may not exist though. */
@@ -270,7 +304,14 @@ async function entry(info) {
     /* We're not what latest specifies. Download
     * updater, generate updater config, start the
     * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, progress => {});
+    const updaterPath = await fetchUpdater(info, progress => { });
+
+    /* Updater already running so no need to launch it again 
+    */
+    if (updaterPath === running_updater_detected) {
+        log.info('Updater is already running!');
+        return true;
+    }
 
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
@@ -306,31 +347,31 @@ async function entry(info) {
 
     log.info('updater process ' + `pid ${update_spawned.pid}`);
 
-    //make promises for app exit , error , data and some timeout
-    const primiseExit = new Promise(resolve => {
+    const returnCode = await new Promise(resolve => {
         update_spawned.on('exit', resolve);
-    });
-
-    const primiseError = new Promise(resolve => {
         update_spawned.on('error', resolve);
-    });
+      })
 
-    //wait for something to happen
-    const promise = await Promise.race([primiseError, primiseExit]);
-    log.info('Updater spawn promise ' + `result \"${promise}\"`);
+    log.info('Updater spawn promise ' + `result \"${returnCode}\"`);
 
     update_spawned.unref();
 
-    return `${promise}` === "0";
+    return `${returnCode}` === "0";
 }
 
-module.exports = async (info) => {
+module.exports = (info, startApp, exit) => {
     return entry(info).then(status => {
-        destroyStatusWindow();
-        return Promise.resolve(status);
+        if (status) {
+            log.info('Closing for update...');
+            destroyStatusWindow();
+            exit();
+        } else {
+            startApp();
+            destroyStatusWindow();
+        }
     }).catch((error) => {
         log.info(error);
+        startApp();
         destroyStatusWindow();
-        return Promise.resolve(false);
     });
 };

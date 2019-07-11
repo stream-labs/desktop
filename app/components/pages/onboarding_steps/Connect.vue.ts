@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
-import { TPlatform } from 'services/platforms';
+import { TPlatform, EPlatformCallResult } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class Connect extends Vue {
@@ -23,8 +24,30 @@ export default class Connect extends Vue {
       () => {
         this.loadingState = true;
       },
-      () => {
-        this.onboardingService.next();
+      result => {
+        // Currently we do not have special handling for generic errors
+        if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
+          this.onboardingService.next();
+        } else if (result === EPlatformCallResult.TwitchTwoFactor) {
+          this.loadingState = false;
+          electron.remote.dialog.showMessageBox(
+            {
+              type: 'error',
+              message: $t(
+                'Twitch requires two factor authentication to be enabled ' +
+                  'on your account in order to stream to Twitch. Please enable two ' +
+                  'factor authentication and try again.',
+              ),
+              title: $t('Twitch Authentication Error'),
+              buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
+            },
+            buttonIndex => {
+              if (buttonIndex === 0) {
+                electron.remote.shell.openExternal('https://twitch.tv/settings/security');
+              }
+            },
+          );
+        }
       },
     );
   }

@@ -18,7 +18,7 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent = 'TCP_API_REQUEST'; // add more types if you need
+type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
 
 interface IAnalyticsEvent {
   product: string;

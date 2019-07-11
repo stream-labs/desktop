@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { AddFilterCommand } from './add-filter';
 import { TSourceFilterType } from 'services/source-filters';
+import { $t } from 'services/i18n';
 
 export interface IFilterData {
   name: string;
@@ -15,8 +16,7 @@ export class PasteFiltersCommand extends Command {
 
   constructor(private sourceId: string, private filterData: IFilterData[]) {
     super();
-    // TODO: More verbose description?
-    this.description = 'Paste filters';
+    this.description = $t('Paste %{filterName}', { filterName: this.filterData[0].name });
   }
 
   execute() {

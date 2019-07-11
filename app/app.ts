@@ -13,6 +13,7 @@ import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
 import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -72,15 +73,19 @@ if (
         return splitArray[splitArray.length - 1];
       };
 
-      if (event.exception) {
+      if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
           frame.filename = normalize(frame.filename);
         });
       }
 
+      if (event.request) {
+        event.request.url = normalize(event.request.url);
+      }
+
       return event;
     },
-    integrations: [new Sentry.Integrations.Vue({ Vue })],
+    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
@@ -167,6 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (Utils.isDevMode()) {
   window.addEventListener('error', () => ipcRenderer.send('showErrorAlert'));
+  window.addEventListener('keyup', ev => {
+    if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
+  });
 }
 
 // ERRORS LOGGING
@@ -177,6 +185,9 @@ electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowI
 // override console.error
 const consoleError = console.error;
 console.error = function(...args: any[]) {
+  // TODO: Suppress N-API error until we upgrade electron to v4.x
+  if (/N\-API is an experimental feature/.test(args[0])) return;
+
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   writeErrorToLog(...args);
   consoleError.call(console, ...args);

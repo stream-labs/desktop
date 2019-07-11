@@ -1,6 +1,7 @@
 import { Command } from './command';
 import { SourceFiltersService, ISourceFilter } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 
 export class RemoveFilterCommand extends Command {
   @Inject() private sourceFiltersService: SourceFiltersService;
@@ -13,7 +14,7 @@ export class RemoveFilterCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.removedFilter.name}`;
+    return $t('Remove %{filterName}', { filterName: this.removedFilter.name });
   }
 
   execute() {

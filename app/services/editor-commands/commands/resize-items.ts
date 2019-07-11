@@ -1,5 +1,6 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export class ResizeItemsCommand extends ModifyTransformCommand {
   constructor(selection: Selection, private deltaScale: IVec2, private origin: IVec2) {
@@ -7,7 +8,7 @@ export class ResizeItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return `Resize ${this.selection.getNodes()[0].name}`;
+    return $t('Resize %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

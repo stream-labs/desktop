@@ -5,6 +5,7 @@ import { SourcesNode } from 'services/scene-collections/nodes/sources';
 import { Source } from 'services/sources';
 import { ResetTransformCommand } from './reset-transform';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
+import { $t } from 'services/i18n';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -35,7 +36,9 @@ export class RemoveItemCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.scenesService.getSceneItem(this.sceneItemId).name}`;
+    return $t('Remove %{sourceName}', {
+      sourceName: this.scenesService.getSceneItem(this.sceneItemId).name,
+    });
   }
 
   async execute() {

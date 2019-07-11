@@ -37,18 +37,18 @@ test('Streaming to Twitch via API', async t => {
 
   streamingService.toggleStreaming();
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Starting);
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Live);
 
   streamingService.toggleStreaming();
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Ending);
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Offline);
 });
 
@@ -73,14 +73,14 @@ test('Recording via API', async (t: TExecutionContext) => {
 
   streamingService.toggleRecording();
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Recording);
 
   streamingService.toggleRecording();
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Stopping);
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Offline);
 });

@@ -2,16 +2,15 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
-import { SourceFiltersService } from 'services/source-filters';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { EditorCommandsService } from 'services/editor-commands';
 
 import ModalLayout from '../ModalLayout.vue';
 import { $t } from 'services/i18n';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
-@Component({
-  components: { ModalLayout, VFormGroup },
-})
+@Component({})
 export default class AddSourceFilter extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
@@ -25,7 +24,7 @@ export default class AddSourceFilter extends Vue {
   error = '';
 
   mounted() {
-    this.setTypeAsName();
+    this.setType(this.form.type);
   }
 
   done() {
@@ -61,10 +60,35 @@ export default class AddSourceFilter extends Vue {
       .map(filterType => ({ title: filterType.description, value: filterType.type }));
   }
 
-  setTypeAsName() {
+  setType(value: TSourceFilterType) {
+    this.form.type = value;
     const name = this.availableTypes.find(({ type }) => {
       return type === this.form.type;
     }).description;
     this.form.name = this.filtersService.suggestName(this.sourceId, name);
+  }
+
+  render(h: Function) {
+    return (
+      <ModalLayout doneHandler={this.done} cancelHandler={this.cancel}>
+        <div slot="content">
+          <VFormGroup
+            value={this.form.type}
+            onInput={this.setType}
+            metadata={metadata.list({
+              title: $t('Filter type'),
+              name: 'type',
+              options: this.typeOptions,
+            })}
+          />
+          <VFormGroup
+            value={this.form.name}
+            onInput={(value: string) => (this.form.name = value)}
+            metadata={metadata.text({ title: $t('Filter name'), name: 'name' })}
+          />
+          {this.error && <p style="color: red;">{this.error}</p>}
+        </div>
+      </ModalLayout>
+    );
   }
 }

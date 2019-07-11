@@ -22,7 +22,7 @@ function testGoal(goalType: string) {
       await client.click('button=End Goal');
     }
 
-    await client.waitForVisible('button=Start Goal');
+    await client.waitForVisible('button=Start Goal', 20000);
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
@@ -38,13 +38,13 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=Start Goal');
   });
 
-  // TODO flaky test
-  test.skip(`${goalType} change settings`, async t => {
+  test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
 
     await addSource(t, goalType, goalType, false);
 
+    await client.waitForExist('li=Visual Settings');
     await client.click('li=Visual Settings');
     const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
@@ -59,7 +59,7 @@ function testGoal(goalType: string) {
     };
 
     await formMonkey.fill(testSet1);
-    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet1));
+    await waitForWidgetSettingsSync(t);
     t.true(await formMonkey.includes(testSet1));
 
     const testSet2 = {
@@ -72,7 +72,8 @@ function testGoal(goalType: string) {
       font: 'Open Sans',
     };
 
-    await waitForWidgetSettingsSync(t, () => formMonkey.fill(testSet2));
+    await formMonkey.fill(testSet2);
+    await waitForWidgetSettingsSync(t);
     t.true(await formMonkey.includes(testSet2));
   });
 }

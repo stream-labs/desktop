@@ -1,5 +1,6 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export enum ECenteringType {
   Screen = 'screen',
@@ -13,7 +14,7 @@ export class CenterItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return `Fit ${this.selection.getNodes()[0].name}`;
+    return $t('Center ${sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

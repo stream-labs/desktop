@@ -14,6 +14,7 @@
       @click="navigateDashboard"
       class="tab-button"
       :class="{ active: page === 'Dashboard' }"
+      v-tooltip.right="responsiveClass && $t('Dashboard')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-dashboard"/> <span class="tab-button__text">{{ $t('Dashboard') }}</span>
     </button>
@@ -22,6 +23,7 @@
       class="tab-button"
       v-if="featureIsEnabled(availableFeatures.chatbot) && chatbotVisible"
       :class="{ active: page === 'Chatbot'}"
+      v-tooltip.right="responsiveClass && $t('Cloudbot')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-community"/> <span class="tab-button__text">{{ $t('Cloudbot') }}</span>
     </button>
@@ -30,6 +32,7 @@
       @click="navigatePlatformAppStore"
       class="tab-button"
       :class="{ 'is-active': page === 'PlatformAppStore' }"
+      v-tooltip.right="responsiveClass && $t('App Store')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span class="tab-button__text">{{ $t('App Store') }}</span>
     </button>
@@ -38,6 +41,7 @@
       @click="navigateCreatorSites"
       class="tab-button"
       :class="{ 'is-active': page === 'CreatorSites' }"
+      v-tooltip.right="responsiveClass && $t('My Website')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span class="tab-button__text">{{ $t('My Website') }}</span>
       <span class="badge badge--new">{{ $t('New') }}</span>
@@ -46,6 +50,7 @@
       @click="navigateOverlays"
       class="tab-button"
       :class="{ 'is-active': page === 'BrowseOverlays' }"
+      v-tooltip.right="responsiveClass && $t('Themes')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-themes"/> <span class="tab-button__text">{{ $t('Themes') }}</span>
     </button>
@@ -53,6 +58,7 @@
       @click="navigateStudio"
       class="tab-button"
       :class="{ 'is-active': page === 'Studio' }"
+      v-tooltip.right="responsiveClass && $t('Editor')"
       :disabled="locked">
       <i class="icon-studio"/> <span class="tab-button__text">{{ $t('Editor') }}</span>
     </button>
@@ -60,6 +66,7 @@
       @click="navigateLive"
       class="tab-button"
       :class="{ 'is-active': page === 'Live' }"
+      v-tooltip.right="responsiveClass && $t('Live')"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-live-dashboard"/> <span class="tab-button__text">{{ $t('Live') }}</span>
     </button>
@@ -91,7 +98,7 @@
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
       </a>
     </div>
-    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive, 'top-nav-item--error': facemasksExtensionError }">
+    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">
       <a
         @click="openFacemaskSettingsWindow"
         class="link">

@@ -34,7 +34,7 @@ export class FormMonkey {
     const formSelector = this.formSelector;
 
     if (formSelector !== DEFAULT_SELECTOR) {
-      await this.client.waitForExist(formSelector, 10000);
+      await this.client.waitForExist(formSelector, 15000);
     }
 
     const result = [];
@@ -217,9 +217,12 @@ export class FormMonkey {
 
   async setBoolValue(selector: string, value: boolean) {
     const checkboxSelector = `${selector} input`;
+
+    // click to change the checkbox state
     await this.client.click(checkboxSelector);
 
-    if (!value && (await this.client.isSelected(checkboxSelector))) {
+    // if the current value is not what we need than click one more time
+    if (value !== (await this.getBoolValue(selector))) {
       await this.client.click(checkboxSelector);
     }
   }
@@ -268,13 +271,17 @@ export class FormMonkey {
       await sleep(100);
 
       moveOffset = moveOffset / 2;
-      if (moveOffset < 0.5) throw new Error('Slider position setup failed');
+      if (moveOffset < 0.3) throw new Error('Slider position setup failed');
     }
   }
 
   async getSliderValue(sliderInputSelector: string): Promise<number> {
     // fetch the value from the slider's tooltip
-    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`));
+    return Number(
+      await this.client.getText(
+        `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
+      ),
+    );
   }
 
   async setInputValue(selector: string, value: string) {

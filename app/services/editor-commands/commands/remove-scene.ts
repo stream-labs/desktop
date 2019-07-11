@@ -2,6 +2,7 @@ import { Command } from './command';
 import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { RemoveNodesCommand } from './remove-nodes';
+import { $t } from 'services/i18n';
 
 export class RemoveSceneCommand extends Command {
   @Inject() private scenesService: ScenesService;
@@ -18,7 +19,7 @@ export class RemoveSceneCommand extends Command {
   }
 
   get description() {
-    return `Remove ${this.sceneName}`;
+    return $t('Remove %{sceneName}', { sceneName: this.sceneName });
   }
 
   async execute() {

@@ -484,7 +484,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
           queryParams: { sourceId },
           size: {
-            width: 900,
+            width: 920,
             height: 1024,
           },
         });
@@ -546,7 +546,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
-        height: 540,
+        height: 320,
       },
     });
   }

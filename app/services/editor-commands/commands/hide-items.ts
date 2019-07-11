@@ -1,5 +1,6 @@
 import { Command } from './command';
 import { Selection } from 'services/selection';
+import { $t } from 'services/i18n';
 
 export class HideItemsCommand extends Command {
   private initialValues: Dictionary<boolean> = {};
@@ -7,8 +8,8 @@ export class HideItemsCommand extends Command {
 
   constructor(private selection: Selection, private hidden: boolean) {
     super();
-    const action = hidden ? 'Hide' : 'Show';
-    this.description = `${action} ${this.selection.getNodes()[0].name}`;
+    const action = hidden ? 'Hide %{sourceName}' : 'Show %{sourceName}';
+    this.description = $t(action, { sourceName: this.selection.getNodes()[0].name });
 
     this.selection.getItems().forEach(item => (this.initialValues[item.id] = item.visible));
   }

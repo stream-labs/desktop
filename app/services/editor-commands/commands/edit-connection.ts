@@ -2,11 +2,12 @@ import { Command } from './command';
 import { Inject } from 'services/core';
 import { TransitionsService, ITransitionConnection } from 'services/transitions';
 import cloneDeep from 'lodash/cloneDeep';
+import { $t } from 'services/i18n';
 
 export class EditConnectionCommand extends Command {
   @Inject() private transitionsService: TransitionsService;
 
-  description = 'Edit a connection';
+  description = $t('Edit a connection');
 
   private beforeConnection: ITransitionConnection;
 

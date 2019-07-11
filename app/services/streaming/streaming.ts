@@ -19,7 +19,6 @@ import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
-import { AnnouncementsService } from 'services/announcements';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
@@ -67,7 +66,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
-  @Inject() private announcementsService: AnnouncementsService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
@@ -158,17 +156,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  toggleStreaming(ctx?: StreamingContext) {
+  async toggleStreaming(ctx?: StreamingContext) {
     this.context = ctx;
 
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      if (this.userService.isLoggedIn && this.userService.platform) {
-        const service = getPlatformService(this.userService.platform.type);
-        service.beforeGoLive().then(() => this.finishStartStreaming());
-        return;
+      try {
+        if (this.userService.isLoggedIn && this.userService.platform) {
+          const service = getPlatformService(this.userService.platform.type);
+          await service.beforeGoLive();
+        }
+        this.finishStartStreaming();
+        return Promise.resolve();
+      } catch (e) {
+        return Promise.reject(e);
       }
-      this.finishStartStreaming();
-      return;
     }
 
     if (
@@ -179,7 +180,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
 
-      if (shouldConfirm && !confirm(confirmText)) return;
+      if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
@@ -197,14 +198,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.stopReplayBuffer();
       }
 
-      this.announcementsService.updateBanner();
-
-      return;
+      return Promise.resolve();
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       obs.NodeObs.OBS_service_stopStreaming(true);
-      return;
+      return Promise.resolve();
     }
   }
 

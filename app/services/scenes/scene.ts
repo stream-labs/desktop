@@ -292,7 +292,7 @@ export class Scene {
 
     this.SET_NODES_ORDER(sceneNodesIds);
 
-    this.reconcileNodeOrderWithObs(itemsToMove);
+    this.reconcileNodeOrderWithObs();
   }
 
   setNodesOrder(order: string[]) {
@@ -301,22 +301,15 @@ export class Scene {
   }
 
   /**
-   * Makes sure all scene items are in the correct order in OBS.  This
-   * is a slow operation if itemsToMove is not provided.
-   * @param itemsToMove optionally restrict to a set of items
+   * Makes sure all scene items are in the correct order in OBS.
    */
-  private reconcileNodeOrderWithObs(itemsToMove?: SceneItem[]) {
-    const items = itemsToMove ? itemsToMove : this.getItems();
-
-    items.forEach(item => {
-      let currentIdx: number;
-      this.getObsScene()
+  private reconcileNodeOrderWithObs() {
+    this.getItems().forEach((item, index) => {
+      const currentIndex = this.getObsScene()
         .getItems()
         .reverse()
-        .forEach((obsItem, idx) => {
-          if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
-        });
-      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
+        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
+      this.getObsScene().moveItem(currentIndex, index);
     });
   }
 
