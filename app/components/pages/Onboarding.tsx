@@ -23,7 +23,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   processing = false;
   fbSetupEnabled: boolean = null;
 
-  stepsState = [{ complete: false }, { complete: false }, { complete: false }, { complete: false }];
+  stepsState = [{ complete: false }, { complete: false }, { complete: false }];
 
   checkFbPageEnabled() {
     if (this.fbSetupEnabled === null || !this.userService.isLoggedIn()) return;
@@ -128,7 +128,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   render(h: Function) {
     const steps = this.steps(h);
 
-    if (this.onboardingService.options.isLogin) {
+    if (!this.onboardingService.options.isLogin) {
       return (
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
           <Connect continue={this.complete.bind(this)} />
