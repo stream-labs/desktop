@@ -53,8 +53,18 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return path.join(this.appService.appDataDirectory, 'log.log');
   }
 
+  private async fileExists(path: string): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      fs.exists(path, exists => {
+        resolve(exists);
+      });
+    });
+  }
+
   private async getInstallDateTimestamp(): Promise<number> {
-    if (!fs.existsSync(this.installDateProxyFilePath)) {
+    const exists = await this.fileExists(this.installDateProxyFilePath);
+
+    if (!exists) {
       return Promise.resolve(Date.now());
     }
 
