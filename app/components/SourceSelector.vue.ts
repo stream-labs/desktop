@@ -74,6 +74,8 @@ export default class SourceSelector extends Vue {
     slVueTree: SlVueTree<ISceneNodeData>;
   };
 
+  callCameFromInsideTheHouse = false;
+
   get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
     const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneNodeData>[] => {
@@ -200,6 +202,7 @@ export default class SourceSelector extends Vue {
 
   makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
+    this.callCameFromInsideTheHouse = true;
     this.selectionService.select(ids);
   }
 
@@ -223,6 +226,10 @@ export default class SourceSelector extends Vue {
 
   @Watch('lastSelectedId')
   async expandSelectedFolders() {
+    if (this.callCameFromInsideTheHouse) {
+      this.callCameFromInsideTheHouse = false;
+      return;
+    }
     const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
     if (!node || this.selectionService.state.selectedIds.length > 1) return;
     this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
