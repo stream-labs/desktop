@@ -18,25 +18,30 @@ test('Go through the onboarding and autoconfig', async t => {
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
 
-  await logIn(t, 'twitch', null, false);
+  await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
 
-  // This will show up if there are scene collections to import
   if (await t.context.app.client.isExisting('button=Continue')) {
     await t.context.app.client.click('button=Continue');
     await sleep(1000);
   }
 
-  // This will only show up if OBS is installed
-  if (await t.context.app.client.isExisting('button=Start Fresh')) {
-    await t.context.app.client.click('button=Start Fresh');
+  // Don't Import from OBS
+  if (await t.context.app.client.isExisting('h2=Start Fresh')) {
+    await t.context.app.client.click('h2=Start Fresh');
+    await sleep(1000);
+  }
+
+  // Skip picking a theme
+  if (await t.context.app.client.isExisting('button=Continue')) {
+    await t.context.app.client.click('button=Continue');
+    await sleep(1000);
   }
 
   // Start auto config
   t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
-  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
-  await app.client.click('button=Next');
+  await app.client.waitForVisible('h2=Sources', 60000);
 
   // success?
   t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
@@ -52,13 +57,22 @@ test('OBS Importer', async t => {
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  await client.click('a=Setup later');
+  if (await t.context.app.client.isExisting('button=Continue')) {
+    await t.context.app.client.click('button=Continue');
+    await sleep(1000);
+  }
 
   // import from OBS
-  t.true(await client.isExisting('button=Import from OBS'), 'OBS detected');
-  await client.click('button=Import from OBS');
-  await client.waitForVisible('button=Continue');
-  await client.click('button=Continue');
+  if (await t.context.app.client.isExisting('h2=Import from OBS')) {
+    await t.context.app.client.click('h2=Import from OBS');
+    await sleep(10000);
+  }
+
+  // Complete onboarding
+  if (await t.context.app.client.isExisting('button=Complete')) {
+    await t.context.app.client.click('button=Complete');
+    await sleep(1000);
+  }
 
   // check collection 1 and sources
   await switchCollection(t, 'Collection 1');
