@@ -5,10 +5,10 @@ import { Inject } from 'services/core/injector';
 import { GuestApiService } from 'services/guest-api';
 import electron from 'electron';
 import { NavigationService, TAppPage } from 'services/navigation';
-import WebviewLoader from 'components/WebviewLoader.vue';
+import BrowserView from 'components/shared/BrowserView';
 
 @Component({
-  components: { WebviewLoader },
+  components: { BrowserView },
 })
 export default class Dashboard extends Vue {
   @Inject() userService: UserService;
@@ -16,24 +16,18 @@ export default class Dashboard extends Vue {
   @Inject() navigationService: NavigationService;
   @Prop() params: Dictionary<string>;
 
-  $refs: {
-    dashboard: Electron.WebviewTag;
-  };
-
-  mounted() {
-    this.$refs.dashboard.addEventListener('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
+  onBrowserViewReady(view: Electron.BrowserView) {
+    view.webContents.on('did-finish-load', () => {
+      this.guestApiService.exposeApi(view.webContents.id, {
         navigate: this.navigate,
       });
     });
 
-    this.$refs.dashboard.addEventListener('new-window', e => {
-      electron.remote.shell.openExternal(e.url);
-    });
-  }
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
-  get loggedIn() {
-    return this.userService.isLoggedIn();
+    view.webContents.on('new-window', (e, url) => {
+      electron.remote.shell.openExternal(url);
+    });
   }
 
   get dashboardUrl() {

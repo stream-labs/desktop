@@ -13,11 +13,9 @@ import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
-import WebviewLoader from 'components/WebviewLoader.vue';
+import BrowserView from 'components/shared/BrowserView';
 
-@Component({
-  components: { WebviewLoader },
-})
+@Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
@@ -28,34 +26,31 @@ export default class BrowseOverlays extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
-  @Inject() private i18nService: I18nService;
 
   @Prop() params: {
     type?: 'overlay' | 'widget-theme';
     id?: string;
   };
 
-  $refs: {
-    overlaysWebview: Electron.WebviewTag;
-  };
-
-  mounted() {
-    this.$refs.overlaysWebview.addEventListener('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.overlaysWebview.getWebContents().id, {
+  onBrowserViewReady(view: Electron.BrowserView) {
+    view.webContents.on('did-finish-load', () => {
+      this.guestApiService.exposeApi(view.webContents.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
       });
     });
 
-    this.$refs.overlaysWebview.addEventListener('new-window', e => {
-      const protocol = urlLib.parse(e.url).protocol;
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
+    view.webContents.on('new-window', (e, url) => {
+      const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(e.url);
+        electron.remote.shell.openExternal(url);
       }
     });
 
-    I18nService.setWebviewLocale(this.$refs.overlaysWebview);
+    I18nService.setBrowserViewLocale(view);
   }
 
   async installOverlay(

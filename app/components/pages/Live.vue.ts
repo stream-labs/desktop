@@ -12,6 +12,7 @@ import { NavigationService } from 'services/navigation';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
 import electron from 'electron';
+import BrowserView from 'components/shared/BrowserView';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -22,6 +23,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     Mixer,
     Display,
     ResizeBar,
+    BrowserView,
   },
 })
 export default class Live extends Vue {
@@ -31,18 +33,14 @@ export default class Live extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
 
-  $refs: {
-    webview: Electron.WebviewTag;
-  };
-
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
-  mounted() {
-    I18nService.setWebviewLocale(this.$refs.webview);
+  onBrowserViewReady(view: Electron.BrowserView) {
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
-    this.$refs.webview.addEventListener('new-window', e => {
-      const match = e.url.match(/dashboard\/([^\/^\?]*)/);
+    view.webContents.on('new-window', (e, url) => {
+      const match = url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         this.popout();
@@ -51,7 +49,7 @@ export default class Live extends Vue {
           subPage: match[1],
         });
       } else {
-        electron.remote.shell.openExternal(e.url);
+        electron.remote.shell.openExternal(url);
       }
     });
   }
