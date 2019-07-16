@@ -79,7 +79,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   static setBrowserViewLocale(view: Electron.BrowserView) {
     if (!view) return;
 
-    // use a static method here because it allows to accept unserializable arguments like webview from other windows
+    // use a static method here because it allows to accept unserializable arguments like browserview from other windows
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     view.webContents.on('dom-ready', () => {

@@ -1,12 +1,6 @@
 <template>
 <modal-layout
   :show-controls="false">
-  <!-- <webview
-    class="recent-events"
-    slot="content"
-    ref="webview"
-    :src="recentEventsUrl">
-  </webview> -->
   <browser-view
     slot="content"
     class="recent-events"
