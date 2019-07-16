@@ -91,10 +91,6 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('Onboarding');
   }
 
-  navigateDesignSystem() {
-    this.navigationService.navigate('DesignSystem');
-  }
-
   navigateHelp() {
     this.navigationService.navigate('Help');
   }

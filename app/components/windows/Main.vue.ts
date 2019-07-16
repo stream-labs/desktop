@@ -27,7 +27,6 @@ import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
-import DesignSystem from '../pages/DesignSystem.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
@@ -50,7 +49,6 @@ import CreatorSites from 'components/pages/CreatorSites';
     PatchNotes,
     NewsBanner,
     Chatbot,
-    DesignSystem,
     PlatformAppMainPage,
     PlatformAppStore,
     Help,
