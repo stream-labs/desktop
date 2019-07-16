@@ -4,6 +4,7 @@
     class="overlays"
     :src="overlaysUrl"
     :enableGuestApi="true"
+    :setLocale="true"
     @ready="onBrowserViewReady" />
 </div>
 </template>

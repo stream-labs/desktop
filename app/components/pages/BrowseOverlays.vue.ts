@@ -49,8 +49,6 @@ export default class BrowseOverlays extends Vue {
         electron.remote.shell.openExternal(url);
       }
     });
-
-    I18nService.setBrowserViewLocale(view);
   }
 
   async installOverlay(

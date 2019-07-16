@@ -104,7 +104,6 @@ export default class BrowserView extends TsxComponent<{
   render(h: Function) {
     if (this.loading) {
       return (
-        // TODO: Replace with beaker once we are upgraded
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <spinner size="large" />
         </div>
