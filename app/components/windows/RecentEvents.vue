@@ -1,12 +1,12 @@
 <template>
 <modal-layout
   :show-controls="false">
-  <webview
-    class="recent-events"
+  <browser-view
     slot="content"
-    ref="webview"
-    :src="recentEventsUrl">
-  </webview>
+    class="recent-events"
+    :src="recentEventsUrl"
+    :setLocale="true"
+    @ready="onBrowserViewReady" />
 </modal-layout>
 </template>
 
@@ -15,5 +15,6 @@
 <style lang="less" scoped>
 .recent-events {
   height: 100%;
+  width: 100%;
 }
 </style>

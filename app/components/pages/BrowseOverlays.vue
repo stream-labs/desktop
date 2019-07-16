@@ -1,34 +1,20 @@
 <template>
 <div>
-  <div class="overlays-container">
-    <webview-loader>
-      <webview
-        class="overlays"
-        id="overlaysWebview"
-        :src="overlaysUrl"
-        ref="overlaysWebview"
-        preload="bundles/guest-api">
-      </webview>
-    </webview-loader>
-  </div>
+  <browser-view
+    class="overlays"
+    :src="overlaysUrl"
+    :enableGuestApi="true"
+    :setLocale="true"
+    @ready="onBrowserViewReady" />
 </div>
 </template>
 
 <script lang="ts" src="./BrowseOverlays.vue.ts"></script>
 
 <style lang="less" scoped>
-.overlays-container {
-  position: absolute;
-  top: -1px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin-top: 20px;
-}
-
 .overlays {
   position: absolute;
-  top: -2px;
+  top: 0;
   right: 0;
   bottom: 0;
   left: 0;

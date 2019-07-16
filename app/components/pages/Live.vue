@@ -3,13 +3,12 @@
 <div class="live-container">
   <div class="flex__column">
     <div class="flex__item mission-control-container">
-      <webview
+      <browser-view
         class="mission-control"
-        :class="{ hidden: windowsService.state.main.hideStyleBlockers }"
-        id="recentEventsWebview"
-        ref="webview"
+        :hidden="windowsService.state.main.hideStyleBlockers"
         :src="recenteventsUrl"
-      ></webview>
+        :setLocale="true"
+        @ready="onBrowserViewReady" />
     </div>
     <resize-bar
       class="flex__item live-page-resizer"
