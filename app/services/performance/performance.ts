@@ -15,6 +15,8 @@ interface IPerformanceState {
   frameRate: number;
 }
 
+const STATS_UPDATE_INTERVAL = 2 * 1000;
+
 // TODO: merge this service with PerformanceMonitorService
 
 // Keeps a store of up-to-date performance metrics
@@ -41,9 +43,13 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    this.intervalId = setInterval(() => {
-      this.updateStatistics();
-    }, 2 * 1000) as any;
+    electron.ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
+      this.processPerformanceStats(stats);
+    });
+
+    this.intervalId = window.setInterval(() => {
+      electron.ipcRenderer.send('requestPerformanceStatistics');
+    }, STATS_UPDATE_INTERVAL);
   }
 
   stop() {
@@ -51,17 +57,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
 
-  private getStatistics(): Partial<IPerformanceState> {
-    if (this.customizationService.pollingPerformanceStatistics) {
-      return nodeObs.OBS_API_getPerformanceStatistics();
-    }
-
-    return {};
-  }
-
-  private updateStatistics(): void {
-    const stats = this.getStatistics();
-
+  processPerformanceStats(stats: IPerformanceState) {
     if (stats.percentageDroppedFrames) {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
     }

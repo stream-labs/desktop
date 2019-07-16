@@ -86,7 +86,6 @@
 }
 
 .sources-browser {
-
   .columns:first-child {
     display: flex;
   }

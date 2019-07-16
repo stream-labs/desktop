@@ -5,18 +5,24 @@
 
   <div slot="content">
     <table>
-      <tr>
-        <th class="device">{{ $t('common.name') }}</th>
-        <th class="volume">{{ $t('audio.volumeInPercent') }}</th>
-        <th class="downmix">{{ $t('audio.downmixToMono') }}</th>
-        <th class="syncOffset">{{ $t('audio.syncOffsetInMs') }}</th>
-        <th class="audioMonitor">{{ $t('audio.audioMonitoring') }}</th>
-        <th class="track">{{ $t('audio.tracks') }}</th>
-      </tr>
+      <thead>
+        <tr>
+          <th class="device">{{ $t('common.name') }}</th>
+          <th class="volume">{{ $t('audio.volumeInPercent') }}</th>
+          <th class="downmix">{{ $t('audio.downmixToMono') }}</th>
+          <th class="syncOffset">{{ $t('audio.syncOffsetInMs') }}</th>
+          <th class="audioMonitor">{{ $t('audio.audioMonitoring') }}</th>
+          <th class="track">{{ $t('audio.tracks') }}</th>
+        </tr>
+      </thead>
 
       <tr v-for="audioSource in audioSources" :key="audioSource.sourceId">
         <td>{{ audioSource.name }}</td>
-        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name" :key="formInput.name">
+        <td
+          v-for="formInput in audioSource.getSettingsForm()"
+          :key="`${audioSource.name}${formInput.name}`"
+          :class="'column-' + formInput.name"
+        >
           <component
               v-if="propertyComponentForType(formInput.type)"
               :is="propertyComponentForType(formInput.type)"

@@ -27,7 +27,6 @@
 @import "../../styles/_colors";
 
 .studio-page {
-  display: flex;
   flex-direction: column;
 }
 

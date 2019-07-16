@@ -26,6 +26,7 @@ export class Display {
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
+  isDestroyed = false;
 
   trackingInterval: number;
   currentPosition: IRectangle = {
@@ -134,10 +135,13 @@ export class Display {
   }
 
   destroy() {
-    remote.getCurrentWindow().removeListener('close', this.boundDestroy);
-    nodeObs.OBS_content_destroyDisplay(this.name);
-    if (this.trackingInterval) clearInterval(this.trackingInterval);
-    if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
+    if (!this.isDestroyed) {
+      remote.getCurrentWindow().removeListener('close', this.boundDestroy);
+      nodeObs.OBS_content_destroyDisplay(this.name);
+      if (this.trackingInterval) clearInterval(this.trackingInterval);
+      if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
+      this.isDestroyed = true;
+    }
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {

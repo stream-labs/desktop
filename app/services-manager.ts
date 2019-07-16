@@ -53,6 +53,7 @@ import {
   JsonrpcService
 } from 'services/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
+import { CrashReporterService } from 'services/crash-reporter';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { ProjectorService } from 'services/projector';
@@ -111,6 +112,7 @@ export class ServicesManager extends Service {
     IpcServerService,
     TcpServerService,
     VideoEncodingOptimizationService,
+    CrashReporterService,
     DismissablesService,
     SceneCollectionsService,
     SceneCollectionsStateService,

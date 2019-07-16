@@ -19,7 +19,7 @@
             <th>{{ $t('transitions.default') }}</th>
             <th>{{ $t('transitions.transitionName') }}</th>
             <th>{{ $t('transitions.transitionType') }}</th>
-            <th></th><!-- Controls has no header -->
+            <th class="table__controls"></th><!-- Controls has no header -->
           </tr>
           <tr v-for="transition in transitions" :key="transition.id">
             <td
@@ -31,7 +31,7 @@
             </td>
             <td>{{ transition.name }}</td>
             <td>{{ nameForType(transition.type) }}</td>
-            <td>
+            <td class="table__controls">
               <i
                 @click="deleteTransition(transition.id)"
                 class="icon-delete transition-control" />
@@ -51,13 +51,13 @@
             <th>{{ $t('transitions.connectionFrom') }}</th>
             <th>{{ $t('transitions.transitionName') }}</th>
             <th>{{ $t('transitions.connectionTo') }}</th>
-            <th></th><!-- Controls has no header -->
+            <th class="table__controls"></th><!-- Controls has no header -->
           </tr>
           <tr v-for="connection in connections" :key="connection.id">
             <td>{{ getSceneName(connection.fromSceneId) }}</td>
             <td>{{ getTransitionName(connection.transitionId) }}</td>
             <td>{{ getSceneName(connection.toSceneId) }}</td>
-            <td>
+            <td class="table__controls">
               <i
                 @click="deleteConnection(connection.id)"
                 class="icon-delete transition-control" />
@@ -102,6 +102,7 @@
 
 <style lang="less" scoped>
 @import "../../styles/_colors";
+@import "../../styles/mixins";
 
 .controls {
   padding-top: 30px;
@@ -129,7 +130,6 @@
 }
 
 .transition-default-selector {
-  text-align: center;
   cursor: pointer;
   width: 90px;
 
@@ -141,12 +141,9 @@
 }
 
 .transition-control {
-  margin-right: 10px;
+  margin-left: 10px;
   cursor: pointer;
-
-  &:hover {
-    color: @white;
-  }
+  .icon-hover;
 }
 
 .transition-redundant {

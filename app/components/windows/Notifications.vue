@@ -9,13 +9,14 @@
       {{ $t('notifications.noNotification') }}
     </h4>
 
-    <div v-for="(notificationsService, groupName) in notificationGroups">
+    <div v-for="(notificationsService, groupName) in notificationGroups" :key="groupName">
       <h4 v-if="notificationsService.length">
         {{ groupName == 'unread' ? $t('notifications.newNotifications') : $t('notifications.log') }}
       </h4>
       <div
         class="notification"
         v-for="notify in notificationsService"
+        :key="notify.id"
         @click="onNotificationClickHandler(notify.id)"
         :class = "{
           'unread': notify.unread,

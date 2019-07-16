@@ -56,7 +56,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     .semibold;
-
   }
 }
 </style>

@@ -20,3 +20,4 @@ electron.VC.db
 plugins/
 AGREEMENT.sjis
 patch-note.txt
+yarn-error.log
