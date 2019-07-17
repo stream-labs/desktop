@@ -173,6 +173,6 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
         hasUpdateTagsPermission: false,
         facebookPageId: '',
       },
-    }
+    };
   }
 }
