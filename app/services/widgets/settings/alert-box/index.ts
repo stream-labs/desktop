@@ -62,7 +62,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation: IAlertBoxVariation) {
     const newSettings = { ...data };
     Object.keys(newSettings).forEach(type => {
-      const variations = newSettings[type].variations;
+      const variations = newSettings[type] && newSettings[type].variations;
       const found =
         variations && variations.find((vari: IAlertBoxVariation) => variation.id === vari.id);
       if (found) {
