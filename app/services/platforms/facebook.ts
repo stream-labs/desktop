@@ -317,6 +317,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return this.capabilities.has(capability);
   }
 
+  fetchRawPageResponse() {
+    const request = this.formRequest(`${this.apiBase}/me/accounts`);
+    return fetch(request).then(handlePlatformResponse);
+  }
+
   private fetchPages(): Promise<IStreamlabsFacebookPages> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;

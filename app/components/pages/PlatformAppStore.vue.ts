@@ -9,8 +9,11 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';
+import WebviewLoader from 'components/WebviewLoader.vue';
 
-@Component({})
+@Component({
+  components: { WebviewLoader },
+})
 export default class PlatformAppStore extends Vue {
   @Inject() userService: UserService;
   @Inject() platformAppsService: PlatformAppsService;

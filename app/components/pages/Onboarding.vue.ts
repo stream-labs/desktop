@@ -10,6 +10,7 @@ import SceneCollectionsImport from './onboarding_steps/SceneCollectionsImport.vu
 import { OnboardingService } from '../../services/onboarding';
 import { Inject } from '../../services/core/injector';
 import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
+import FacebookPageCreation from './onboarding_steps/FacebookPageCreation';
 
 @Component({
   components: {
@@ -21,6 +22,7 @@ import OptimizeBrandDevice from './onboarding_steps/OptimizeBrandDevice.vue';
     SuccessfullyImported,
     SceneCollectionsImport,
     OptimizeBrandDevice,
+    FacebookPageCreation,
   },
 })
 export default class Onboarding extends Vue {

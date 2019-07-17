@@ -280,9 +280,11 @@ async function entry(info) {
             statusWindow = null;
         });
 
-        statusWindow.on('ready-to-show', () => {
-            statusWindow.show();
-        });
+        // Never show the status window for now.  There is not enough
+        // time for it to fully render before it is closed.
+        // statusWindow.on('ready-to-show', () => {
+        //     statusWindow.show();
+        // });
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
     } catch (error) {

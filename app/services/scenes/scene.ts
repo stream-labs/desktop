@@ -304,20 +304,12 @@ export class Scene {
    * Makes sure all scene items are in the correct order in OBS.
    */
   private reconcileNodeOrderWithObs() {
-    const obsScene = this.getObsScene();
-    const destOrder = this.getItems().map(item => item.obsSceneItemId);
-    const currentOrder = this.getObsScene()
-      .getItems()
-      .reverse()
-      .map(item => item.id);
-
-    destOrder.forEach(ind => {
-      if (destOrder[ind] === currentOrder[ind]) return;
-      const itemToMoveInd = currentOrder.indexOf(destOrder[ind]);
-      const itemToMove = currentOrder[itemToMoveInd];
-      currentOrder.splice(itemToMoveInd, 1);
-      currentOrder.splice(ind, 0, itemToMove);
-      obsScene.moveItem(itemToMoveInd, ind);
+    this.getItems().forEach((item, index) => {
+      const currentIndex = this.getObsScene()
+        .getItems()
+        .reverse()
+        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
+      this.getObsScene().moveItem(currentIndex, index);
     });
   }
 

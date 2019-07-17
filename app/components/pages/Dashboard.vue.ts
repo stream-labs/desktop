@@ -3,15 +3,16 @@ import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
 import { GuestApiService } from 'services/guest-api';
-import { FacemasksService } from 'services/facemasks';
 import electron from 'electron';
 import { NavigationService, TAppPage } from 'services/navigation';
+import WebviewLoader from 'components/WebviewLoader.vue';
 
-@Component({})
+@Component({
+  components: { WebviewLoader },
+})
 export default class Dashboard extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
-  @Inject() facemasksService: FacemasksService;
   @Inject() navigationService: NavigationService;
   @Prop() params: Dictionary<string>;
 
@@ -22,12 +23,6 @@ export default class Dashboard extends Vue {
   mounted() {
     this.$refs.dashboard.addEventListener('did-finish-load', () => {
       this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
-        testAudio: this.testAudio,
-        getStatus: this.getStatus,
-        getDevices: this.getDevices,
-        enableMask: this.enableMask,
-        updateSettings: this.updateSettings,
-        getDownloadProgress: this.getDownloadProgress,
         navigate: this.navigate,
       });
     });
@@ -43,34 +38,6 @@ export default class Dashboard extends Vue {
 
   get dashboardUrl() {
     return this.userService.dashboardUrl(this.params.subPage || '');
-  }
-
-  async getStatus() {
-    return this.facemasksService.getDeviceStatus();
-  }
-
-  async getDevices() {
-    return this.facemasksService.getInputDevicesList();
-  }
-
-  async enabledDevice() {
-    return this.facemasksService.getEnabledDevice();
-  }
-
-  async enableMask(uuid: string) {
-    return this.facemasksService.enableMask(uuid);
-  }
-
-  async updateSettings() {
-    return this.facemasksService.startup();
-  }
-
-  async getDownloadProgress() {
-    return this.facemasksService.getDownloadProgress();
-  }
-
-  async testAudio(volume: number) {
-    return;
   }
 
   async navigate(page: TAppPage) {

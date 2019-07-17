@@ -27,22 +27,35 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
     }
   }
 
-  handleKeydown(event: KeyboardEvent, index: number) {
-    event.preventDefault();
+  handlePress(event: KeyboardEvent | MouseEvent, index: number) {
+    // We don't allow binding left or right click
+    if (event instanceof MouseEvent && (event.button === 0 || event.button === 2)) return;
 
-    if (this.isModifierPress(event)) return;
+    // We don't allow binding a modifier by instelf
+    if (event instanceof KeyboardEvent && this.isModifierPress(event)) return;
+
+    event.preventDefault();
 
     const binding = this.bindings[index];
 
+    const key =
+      event instanceof MouseEvent
+        ? {
+            1: 'MiddleMouseButton',
+            3: 'X1MouseButton',
+            4: 'X2MouseButton',
+          }[event.button]
+        : event.code;
+
     binding.binding = {
-      key: event.code,
+      key,
       modifiers: this.getModifiers(event),
     };
 
     this.setBindings();
   }
 
-  getModifiers(event: KeyboardEvent) {
+  getModifiers(event: KeyboardEvent | MouseEvent) {
     return {
       alt: event.altKey,
       ctrl: event.ctrlKey,
@@ -134,6 +147,10 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
 
     const matchKey = binding.key.match(/^Key([A-Z])$/);
     if (matchKey) key = matchKey[1];
+
+    if (key === 'MiddleMouseButton') key = 'Mouse 3';
+    if (key === 'X1MouseButton') key = 'Mouse 4';
+    if (key === 'X2MouseButton') key = 'Mouse 5';
 
     keys.push(key);
 
