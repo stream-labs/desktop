@@ -76,14 +76,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     I18nService.vueI18nInstance = instance;
   }
 
-  static setWebviewLocale(webview: Electron.WebviewTag) {
-    if (!webview) return;
+  static setBrowserViewLocale(view: Electron.BrowserView) {
+    if (!view) return;
 
-    // use a static method here because it allows to accept unserializable arguments like webview from other windows
+    // use a static method here because it allows to accept unserializable arguments like browserview from other windows
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
-    webview.addEventListener('dom-ready', () => {
-      webview.executeJavaScript(`
+    view.webContents.on('dom-ready', () => {
+      view.webContents.executeJavaScript(`
         var langCode = $.cookie('langCode');
         if (langCode !== '${locale}') {
            $.cookie('langCode', '${locale}');

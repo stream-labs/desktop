@@ -90,6 +90,9 @@ export class FormMonkey {
         case 'fontWeight':
           await this.setSliderValue(input.selector, value);
           break;
+        case 'twitchTags':
+          await this.setTwitchTagsValue(input.selector, value);
+          break;
         default:
           throw new Error(`No setter found for input type = ${input.type}`);
       }
@@ -289,6 +292,29 @@ export class FormMonkey {
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
     await ((this.client.keys(value) as any) as Promise<any>); // type text
+  }
+
+  async setTwitchTagsValue(selector: string, values: string[]) {
+    // clear tags
+    const closeSelector = `${selector} .sp-icon-close`;
+    while (await this.client.isExisting(closeSelector)) {
+      await this.client.click(closeSelector);
+    }
+
+    // click to open the popup
+    await this.client.click(selector);
+
+    // select values
+    const inputSelector = `.v-dropdown-container .sp-search-input`;
+    for (const value of values) {
+      await this.setInputValue(inputSelector, value);
+      await ((this.client.keys('ArrowDown') as any) as Promise<any>);
+      await ((this.client.keys('Enter') as any) as Promise<any>);
+    }
+
+    // click away and wait for the control to dismiss
+    await this.client.click('.tags-container .input-label');
+    await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
   }
 
   private async getAttribute(selector: string, attrName: string) {

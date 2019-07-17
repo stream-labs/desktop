@@ -53,6 +53,8 @@
           v-if="isTwitch"
           v-model="channelInfo.tags"
           :tags="channelInfo.availableTags"
+          v-model="twitchTags"
+          name="tags"
           :has-permission="hasUpdateTagsPermission"
         />
         <h-form-group v-if="searchProfilesPending">

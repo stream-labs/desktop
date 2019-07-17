@@ -30,6 +30,7 @@ platforms.forEach(platform => {
         await fillForm(t, 'form[name=editStreamForm]', {
           title: 'SLOBS Test Stream',
           game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+          tags: ['100%', 'AMA'],
         });
         break;
 
