@@ -87,8 +87,6 @@
     "@babel/core": "7.4.5",
     "@babel/plugin-proposal-decorators": "7.4.4",
     "@babel/preset-env": "7.4.5",
-    "@commitlint/cli": "7.6.1",
-    "@commitlint/config-conventional": "7.6.0",
     "@octokit/app": "3.0.0",
     "@octokit/request": "4.1.0",
     "@octokit/rest": "16.26.0",
@@ -116,8 +114,6 @@
     "babel-plugin-transform-decorators-legacy": "1.3.5",
     "babel-plugin-transform-vue-jsx": "3.7.0",
     "classnames": "2.2.6",
-    "commitizen": "3.1.1",
-    "cross-spawn": "6.0.5",
     "css-element-queries": "1.2.0",
     "css-loader": "2.1.0",
     "devtron": "1.4.0",
@@ -129,12 +125,10 @@
     "fuse.js": "3.2.1",
     "hard-source-webpack-plugin": "0.13.1",
     "humps": "2.0.1",
-    "husky": "1.2.0",
     "js-yaml": "3.13.1",
     "less": "3.9.0",
     "less-loader": "4.1.0",
-    "lint-staged": "8.1.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.14",
     "lodash-decorators": "4.3.1",
     "mime": "2.4.3",
     "moment": "2.22.2",
@@ -144,7 +138,6 @@
     "prettier": "1.15.2",
     "progress": "2.0.0",
     "raw-loader": "2.0.0",
-    "read-pkg-up": "4.0.0",
     "recursive-readdir": "2.2.2",
     "reflect-metadata": "0.1.12",
     "rxjs": "6.3.3",
@@ -191,7 +184,6 @@
     "webdriverio": "4.14.1",
     "webpack": "4.26.1",
     "webpack-cli": "3.1.2",
-    "webpack-merge": "4.2.1",
-    "which": "1.3.1"
+    "webpack-merge": "4.2.1"
   }
 }
