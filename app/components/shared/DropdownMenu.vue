@@ -8,7 +8,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      <span class="scene-name">{{ title }}</span><i class="icon-down-arrow"/>
+      <span class="scene-name">{{ title }}</span><i :class="icon || 'icon-down-arrow'"/>
     </button>
 
   </popper>
@@ -68,6 +68,9 @@
 
 .dropdown-menu__item {
   white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: @text-secondary;
 

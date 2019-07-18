@@ -5,7 +5,6 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { Inject } from 'util/injector';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
-import { HostsService } from './hosts';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -13,7 +12,6 @@ import {
   IPlatformService,
   IStreamingSetting
 } from './platforms';
-import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -21,7 +19,6 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { mergeStatic } from 'rxjs/operator/merge';
 import { WindowsService } from 'services/windows';
-import { SettingsService } from 'services/settings';
 import {
   cpu as systemInfoCpu,
   graphics as systemInfoGraphics,
@@ -36,6 +33,7 @@ import {
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
 import uuid from 'uuid/v4';
+import { OnboardingService } from './onboarding';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -43,12 +41,10 @@ interface IUserServiceState {
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
-  @Inject() windowsService: WindowsService;
-  @Inject() settingsService: SettingsService;
+  @Inject() private appService: AppService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private onboardingService: OnboardingService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -174,6 +170,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.channelId;
     }
+  }
+
+  async showLogin() {
+    if (this.isLoggedIn()) await this.logOut();
+    this.onboardingService.start({ isLogin: true });
   }
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {

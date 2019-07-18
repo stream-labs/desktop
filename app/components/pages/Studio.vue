@@ -65,7 +65,6 @@
   flex-grow: 1;
   background-color: @bg-tertiary;
   display: flex;
-  align-items: center;
   justify-content: center;
 
   .message {

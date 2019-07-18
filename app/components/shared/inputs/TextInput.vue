@@ -20,12 +20,14 @@
 <script lang="ts" src="./TextInput.vue.ts"></script>
 
 <style lang="less" scoped>
+  @import "../../../styles/index";
+
   .text-input {
     position: relative;
     width: 75%;
     display: flex;
     .input-error {
-      position: absolute;
+      .absolute(100%);
       white-space: nowrap;
     }
   }

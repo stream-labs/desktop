@@ -134,7 +134,7 @@ isUnskippable: ${this.updateState.isUnskippable}`);
       frame: true,
       closable: true,
       resizable: false,
-      show: false
+      show: false,
     });
 
     browserWindow.setMenuBarVisibility(false);

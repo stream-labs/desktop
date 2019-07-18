@@ -20,10 +20,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    font-size: 12px;
-    letter-spacing: 1px;
-    font-weight: normal;
-    margin-top: 15px;
+    margin-top: 16px;
   }
 }
 
@@ -59,7 +56,6 @@
   color: @text-primary;
   font-size: 22px;
   margin-bottom: 20px;
-  letter-spacing: .5px;
 }
 
 .onboarding-title--sm {
@@ -85,7 +81,8 @@
 
   a {
     text-decoration: underline;
-    transition: all 275ms;
+    .transition();
+
     &:hover {
       color: @white;
     }
@@ -146,7 +143,7 @@
   top: 0;
   height: 240px;
   width: auto;
-  margin: 15px 0;
+  margin: 16px 0;
 
   img {
     height: 100%;

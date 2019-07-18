@@ -1,5 +1,4 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { Multiselect } from 'vue-multiselect';
 import { EInputType, IInputMetadata } from './index';
 import { BaseInput } from './BaseInput';
 import FormInput from './FormInput.vue';
@@ -31,6 +30,7 @@ export default class FormGroup extends BaseInput<any, IInputMetadata> {
     // FormGroup handle the render of the FormInput title
     // so remove the title from FormInput metadata
     delete inputMetadata.title;
+    delete inputMetadata.tooltip;
     return inputMetadata;
   }
 
@@ -40,6 +40,5 @@ export default class FormGroup extends BaseInput<any, IInputMetadata> {
     options.title = this.title || options.title;
     return options;
   }
-
 
 }

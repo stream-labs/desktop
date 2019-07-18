@@ -32,7 +32,7 @@
     .semibold;
 
     i {
-       color: @text-primary;
+      color: @text-primary;
     }
   }
 
@@ -47,8 +47,8 @@
 
   i {
     position: relative;
-    margin-right: -15px;
-    left: -25px;
+    margin-right: -16px;
+    left: -24px;
     width: 16px;
   }
 }

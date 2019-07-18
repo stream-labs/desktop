@@ -1,39 +1,34 @@
 <template>
-<div>
-  <div class="w-form-group__wrapper slider-container">
-    <vue-slider class="slider w-form-group__input"
-      :value="value"
-      @input="value => updateValue(value)"
-      :max="options.max"
-      :min="options.min"
-      :interval="options.interval"
-      :speed="0"
-      :height="4"
-      :formatter="formatter"
-      :piecewise="!!options.interval"
-      ref="slider"
-      :piecewiseStyle="{
-          position: 'absolute',
-          'backgroundColor': nightMode ? '#253239' : '#eaecee',
-          height: '2px',
-          width: '2px',
-          'borderRadius': '1px',
-          top: '12px'
-      }"
-      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
-    />
-    <input
-      v-if="options.hasValueBox && !options.usePercentages"
-      class="slider-input"
-      type="text"
-      :value="value"
-      @change="updateValue(parseFloat($event.target.value))"
-      @keydown="handleKeydown"
-    />
-    <div v-if="options.tooltip" class="w-tooltip">
-      <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
-    </div>
-  </div>
+<div class="w-form-group__wrapper slider-container">
+  <vue-slider class="slider w-form-group__input"
+    :value="value"
+    @input="value => updateValue(value)"
+    :max="options.max"
+    :min="options.min"
+    :interval="options.interval"
+    :speed="0"
+    :height="4"
+    :formatter="formatter"
+    :piecewise="!!options.interval"
+    ref="slider"
+    :piecewiseStyle="{
+        position: 'absolute',
+        'backgroundColor': nightMode ? '#253239' : '#eaecee',
+        height: '2px',
+        width: '2px',
+        'borderRadius': '1px',
+        top: '12px'
+    }"
+    :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
+  />
+  <input
+    v-if="options.hasValueBox && !options.usePercentages"
+    class="slider-input"
+    type="text"
+    :value="value"
+    @change="updateValue(parseFloat($event.target.value))"
+    @keydown="handleKeydown"
+  />
 </div>
 </template>
 
@@ -46,7 +41,6 @@
   width: 100%;
   display: flex;
   position: relative;
-  align-items: center;
 }
 
 .slider-input {

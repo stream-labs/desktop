@@ -1,15 +1,19 @@
 <template>
 <div class="section">
-  <div class="section-title--dropdown">
+  <div
+    class="section-title section-title--dropdown"
+    v-if="title"
+    :class="{ 'section-title--opened': !collapsed }"
+  >
     <h4
       v-if="title"
       @click="collapsed = !collapsed">
       <i
         v-if="collapsed === true"
-        class="icon-plus"/>
+        class="icon-plus section-title__icon"/>
       <i
         v-if="collapsed === false"
-        class="icon-minus"/>
+        class="icon-minus section-title__icon"/>
       {{ title }}
     </h4>
   </div>

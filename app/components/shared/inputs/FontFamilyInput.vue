@@ -6,9 +6,6 @@
       :options="fonts">
     </multiselect>
   </div>
-  <div class="w-tooltip">
-    <i class="icon-question icon-btn" :v-tooltip="tooltipText" />
-  </div>
 </div>
 </template>
 

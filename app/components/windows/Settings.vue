@@ -100,7 +100,8 @@
   .input-container {
     flex-direction: column;
 
-    .input-label, .input-wrapper {
+    .input-label,
+    .input-wrapper {
       width: 100%;
     }
 

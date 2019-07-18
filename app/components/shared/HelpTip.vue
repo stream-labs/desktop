@@ -46,7 +46,7 @@
   font-size: 20px;
   cursor: pointer;
   opacity: .6;
-  .transition;
+  .transition();
 
   &:hover {
     opacity: 1;

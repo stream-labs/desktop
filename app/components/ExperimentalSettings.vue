@@ -1,11 +1,8 @@
 <template>
   <div>
     <div class="section">
-    </div>
-
-    <!--<div class="section">-->
       <!--<GenericForm v-model="settingsFormData" @input="saveSettings" />-->
-    <!--</div>-->
+    </div>
 
   </div>
 </template>

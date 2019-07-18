@@ -26,6 +26,8 @@
 <script lang="ts" src="./Hotkey.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .hotkey {
   display: flex;
   flex-direction: row;
@@ -55,8 +57,9 @@
   }
 }
 
-.bindings-enter-active, .bindings-leave-active {
-  transition: all 0.2s;
+.bindings-enter-active,
+.bindings-leave-active {
+  .transition();
 }
 
 .bindings-enter, .bindings-leave-to {
