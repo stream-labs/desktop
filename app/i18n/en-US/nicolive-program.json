@@ -83,8 +83,8 @@
           "message": "You could not extend the program time because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
-          "title": "Invalid request",
-          "message": "You could not extend the program time because the request you sent was invalid.\nTry again later."
+          "title": "Failed to extend the program",
+          "message": "You could not extend the program.\n%{additionalMessage}"
         },
         "401": {
           "title": "You do not have the authority to extend the program",
