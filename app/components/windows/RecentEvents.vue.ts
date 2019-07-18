@@ -5,9 +5,10 @@ import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
+import BrowserView from 'components/shared/BrowserView';
 
 @Component({
-  components: { ModalLayout },
+  components: { ModalLayout, BrowserView },
 })
 export default class RecentEvents extends Vue {
   @Inject() userService: UserService;
@@ -17,11 +18,11 @@ export default class RecentEvents extends Vue {
     webview: Electron.WebviewTag;
   };
 
-  mounted() {
-    I18nService.setWebviewLocale(this.$refs.webview);
+  onBrowserViewReady(view: Electron.BrowserView) {
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
-    this.$refs.webview.addEventListener('new-window', e => {
-      electron.remote.shell.openExternal(e.url);
+    view.webContents.on('new-window', (e, url) => {
+      electron.remote.shell.openExternal(url);
     });
   }
 

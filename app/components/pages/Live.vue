@@ -3,7 +3,12 @@
 <div class="live-container">
   <div class="flex__column">
     <div class="flex__item mission-control-container">
-      <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
+      <browser-view
+        class="mission-control"
+        :hidden="windowsService.state.main.hideStyleBlockers"
+        :src="recenteventsUrl"
+        :setLocale="true"
+        @ready="onBrowserViewReady" />
     </div>
     <resize-bar
       class="flex__item live-page-resizer"
@@ -79,6 +84,11 @@
 
 .mission-control {
   height: 100%;
+}
+
+.mission-control.hidden {
+  position: absolute;
+  top: -10000px;
 }
 
 .studio-controls {

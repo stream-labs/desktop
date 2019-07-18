@@ -3498,9 +3498,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.35b/iojs-v5.0.4-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.37/iojs-v5.0.4-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.35b/iojs-v5.0.4-crash-handler.tar.gz#92f7c2f81712bd5250eed3dc38fd53e9114064d8"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.37/iojs-v5.0.4-crash-handler.tar.gz#4c1ed17e87ffd3e4c0b0e2509fce1d750bbd446c"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -7408,9 +7408,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.12/iojs-v5.0.4-node-libuiohook.tar.gz":
   version "0.0.9"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.11/iojs-v5.0.4-node-libuiohook.tar.gz#3220a6c5d6ed7f847d09faa6d310270acadcb54a"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.12/iojs-v5.0.4-node-libuiohook.tar.gz#fe553b095b94e449c1a1b4b38e129be18aee473e"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
@@ -7638,9 +7638,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.49-iojs-v5.0.3.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.51-iojs-v5.0.3.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.49-iojs-v5.0.3.tar.gz#7bad9943dc080a3a7d8ba33fd42d8141b00ac043"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-v0.4.51-iojs-v5.0.3.tar.gz#aa0269ca2713a7fc5f2fadbda03c6f553095640a"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
