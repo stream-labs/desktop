@@ -258,7 +258,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     game,
     facebookPageId,
   }: IChannelInfo): Promise<boolean> {
-    console.log('put channel info', title, description, game);
     this.SET_STREAM_PROPERTIES(title, description, game);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {

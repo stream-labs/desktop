@@ -4,7 +4,6 @@
  * @see handleResponse
  */
 export function handlePlatformResponse(response: Response): Promise<any> {
-  console.log('handle response', response.url, response);
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
   const result = isJson ? response.json() : response.text();
