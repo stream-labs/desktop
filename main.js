@@ -496,15 +496,16 @@ ipcMain.on('window-preventLogout', (event, id) => {
 });
 
 /**
- * 番組作成・編集画面からの新ウィンドウ表示を封じる処理
+ * 新ウィンドウ表示は既定のブラウザで開かせる処理
  * rendererプロセスからは処理を止められないのでここに実装がある
  * @see https://github.com/electron/electron/pull/11679#issuecomment-359180722
  **/
-function preventNewWindow(e) {
+function preventNewWindow(e, url) {
   e.preventDefault();
+  electron.shell.openExternal(url);
 }
 
-ipcMain.on('window-preventNewWindow', (event, id) => {
+ipcMain.on('window-preventNewWindow', (_event, id) => {
   const window = BrowserWindow.fromId(id);
   window.webContents.on('new-window', preventNewWindow);
 });
