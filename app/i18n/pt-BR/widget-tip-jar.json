@@ -1,7 +1,7 @@
 {
   "Jar Image": "Imagem da Jarra",
   "Enabled Events": "Eventos ativados",
-  "Minimum Bits": "Minimum Bits",
+  "Minimum Bits": "Bits Mínimos",
   "Minimum Tips": "Gorjetas Mínimas",
   "Background Color": "Cor de Fundo",
   "Text": "Texto",
@@ -14,7 +14,7 @@
   "Mixer Subscriptions": "Inscritos do Mixer",
   "Twitch Resubs": "Reinscritos da Twitch",
   "Youtube Subscriptions": "Inscrições do Youtube",
-  "Youtube Sponsors": "Patrocinadores do Youtube",
+  "Youtube Memberships": "Youtube Memberships",
   "Youtube Super Chats": "Super Bate-papos do YouTube",
   "Periscope Super Hearts": "Super Hearts do Periscope",
   "Picarto Follows": "Seguidores do Picarto",
