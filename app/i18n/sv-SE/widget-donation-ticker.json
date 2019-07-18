@@ -1,17 +1,17 @@
 {
-  "Message Format": "Message Format",
-  "Max Donations": "Max Donations",
-  "Text Scroll Speed": "Text Scroll Speed",
+  "Message Format": "Meddelandeformat",
+  "Max Donations": "Max Donationer",
+  "Text Scroll Speed": "Hastighet För Rullande Text",
   "Background Color": "Background Color",
   "Font": "Font",
   "Font Size": "Font Size",
   "Font Weight": "Font Weight",
   "Text Color": "Text Color",
-  "Name Text Color": "Name Text Color",
-  "Amount Text Color": "Amount Text Color",
-  "The name of the donator,": "The name of the donator,",
-  "The amount that was donated": "The amount that was donated",
-  "Manage List": "Manage List",
+  "Name Text Color": "Namn Textfärg",
+  "Amount Text Color": "Belopp Textfärg",
+  "The name of the donator,": "Namn på doneraren",
+  "The amount that was donated": "Storleken på donationen",
+  "Manage List": "Hantera Lista",
   "Font Settings": "Font Settings",
-  "A hex color for the text of the": "A hex color for the text of the"
+  "A hex color for the text of the": "En hex-färg för texten på"
 }
