@@ -1,6 +1,6 @@
 {
-  "Vers": "Vers",
-  "Reload": "Reload",
-  "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
+  "Vers": "Ver",
+  "Reload": "Ladda om",
+  "Unpacked vers loaded": "Okomprimerad version laddad",
+  "You must unload unpacked version before enabling this app.": "Du måste stänga av den uppackade versionen innan du aktiverar denna app."
 }
