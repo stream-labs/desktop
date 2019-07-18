@@ -49,63 +49,63 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     const devices: IDevice[] = [];
     const dshowDevices: IDevice[] = [];
 
-    // Avoid initializing any devices by passing a device id that doesn't exist
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid(), {
-      device_id: 'does_not_exist',
-    });
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid(), {
-      device_id: 'does_not_exist',
-    });
-    const obsVideoInput = obs.InputFactory.create('dshow_input', uuid(), {
-      audio_device_id: 'does_not_exist',
-      video_device_id: 'does_not_exist',
-    });
+    // // Avoid initializing any devices by passing a device id that doesn't exist
+    // const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid(), {
+    //   device_id: 'does_not_exist',
+    // });
+    // const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid(), {
+    //   device_id: 'does_not_exist',
+    // });
+    // const obsVideoInput = obs.InputFactory.create('dshow_input', uuid(), {
+    //   audio_device_id: 'does_not_exist',
+    //   video_device_id: 'does_not_exist',
+    // });
 
-    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
-      (item: { name: string; value: string }) => {
-        devices.push({
-          id: item.value,
-          description: item.name,
-          type: EDeviceType.audioInput,
-        });
-      },
-    );
+    // (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
+    //   (item: { name: string; value: string }) => {
+    //     devices.push({
+    //       id: item.value,
+    //       description: item.name,
+    //       type: EDeviceType.audioInput,
+    //     });
+    //   },
+    // );
 
-    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
-      (item: { name: string; value: string }) => {
-        devices.push({
-          id: item.value,
-          description: item.name,
-          type: EDeviceType.audioOutput,
-        });
-      },
-    );
+    // (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
+    //   (item: { name: string; value: string }) => {
+    //     devices.push({
+    //       id: item.value,
+    //       description: item.name,
+    //       type: EDeviceType.audioOutput,
+    //     });
+    //   },
+    // );
 
-    (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items.forEach(
-      (item: { name: string; value: string }) => {
-        dshowDevices.push({
-          id: item.value,
-          description: item.name,
-          type: EDeviceType.videoInput,
-        });
-      },
-    );
+    // (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items.forEach(
+    //   (item: { name: string; value: string }) => {
+    //     dshowDevices.push({
+    //       id: item.value,
+    //       description: item.name,
+    //       type: EDeviceType.videoInput,
+    //     });
+    //   },
+    // );
 
-    const audioDeviceIdProp = obsVideoInput.properties.get('audio_device_id') as obs.IListProperty;
-    // audioDeviceIdProp can be null if no devices exist
-    if (audioDeviceIdProp) {
-      audioDeviceIdProp.details.items.forEach((item: { name: string; value: string }) => {
-        dshowDevices.push({
-          id: item.value,
-          description: item.name,
-          type: EDeviceType.audioInput,
-        });
-      });
-    }
+    // const audioDeviceIdProp = obsVideoInput.properties.get('audio_device_id') as obs.IListProperty;
+    // // audioDeviceIdProp can be null if no devices exist
+    // if (audioDeviceIdProp) {
+    //   audioDeviceIdProp.details.items.forEach((item: { name: string; value: string }) => {
+    //     dshowDevices.push({
+    //       id: item.value,
+    //       description: item.name,
+    //       type: EDeviceType.audioInput,
+    //     });
+    //   });
+    // }
 
-    obsAudioInput.release();
-    obsAudioOutput.release();
-    obsVideoInput.release();
+    // obsAudioInput.release();
+    // obsAudioOutput.release();
+    // obsVideoInput.release();
     return { devices, dshowDevices };
   }
 
