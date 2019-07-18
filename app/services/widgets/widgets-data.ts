@@ -53,7 +53,7 @@ export const WidgetTesters: IWidgetTester[] = [
     platforms: ['twitch', 'mixer'],
   },
   {
-    name: 'Sponsor',
+    name: 'Membership',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
