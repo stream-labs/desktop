@@ -56,7 +56,7 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   migrate(version: number) {
-    // Added transitions node in version 2
+    // Changed name of transition node in version 2
     if (version < 2) {
       this.data.transitions = this.data['transition'];
     }
