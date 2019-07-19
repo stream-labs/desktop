@@ -56,9 +56,13 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   migrate(version: number) {
-    if (version === 1) {
+    // Added transitions node in version 2
+    if (version < 2) {
       this.data.transitions = this.data['transition'];
-    } else if (version === 2) {
+    }
+
+    // Added baseResolution in version 3
+    if (version < 3) {
       this.data.baseResolution = this.videoService.baseResolution;
     }
   }
