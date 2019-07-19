@@ -145,7 +145,7 @@ export default class StudioEditor extends Vue {
       // Find out if we are over any currently selected sources
       const overSelected = this.selectionService
         .getItems()
-        .find(item => overSources.find(source => source.id === item.id));
+        .find(item => overSources.some(source => source.id === item.id));
 
       if (event.button === 0) {
         if (overSources.length) {
