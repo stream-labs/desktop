@@ -19,6 +19,14 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
+const path = require('path');
+const rimraf = require('rimraf');
+
+app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+if (process.argv.includes('--clearCacheDir')) {
+  rimraf.sync(app.getPath('userData'));
+}
 
 // This ensures that only one copy of our app can run at once.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -29,8 +37,6 @@ if (!gotTheLock) {
   const fs = require('fs');
   const bootstrap = require('./updater/bootstrap.js');
   const uuid = require('uuid/v4');
-  const rimraf = require('rimraf');
-  const path = require('path');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
   const pid = require('process').pid;
@@ -45,11 +51,6 @@ if (!gotTheLock) {
       'slobs-client',
       'log.log'
     );
-  }
-  app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
-
-  if (process.argv.includes('--clearCacheDir')) {
-    rimraf.sync(app.getPath('userData'));
   }
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
