@@ -91,23 +91,23 @@ export default class StudioEditor extends Vue {
     }
 
     // prevent dragging if the clicking is past the source
-    if (!this.getOverSource(event)) this.canDrag = false;
+    if (!this.getOverSources(event).length) this.canDrag = false;
 
     this.updateCursor(event);
   }
 
   handleMouseDblClick(event: MouseEvent) {
-    const overSource = this.getOverSource(event);
+    const overSources = this.getOverSources(event);
 
-    if (!overSource) return;
+    if (!overSources.length) return;
 
-    const parent = overSource.getParent();
+    const parent = overSources[0].getParent();
 
     if (
       this.customizationService.getSettings().folderSelection &&
       (!parent || (parent && parent.isSelected()))
     ) {
-      this.selectionService.select(overSource.id);
+      this.selectionService.select(overSources[0].id);
     } else if (parent) {
       this.selectionService.select(parent.id);
     }
@@ -140,40 +140,60 @@ export default class StudioEditor extends Vue {
     // If neither a drag or resize was initiated, it must have been
     // an attempted selection or right click.
     if (!this.dragHandler && !this.resizeRegion) {
-      const overSource = this.getOverSource(event);
+      const overSources = this.getOverSources(event);
 
-      // Either select a new source, or deselect all sources
-      if (overSource) {
-        let overNode: TSceneNode = overSource;
-        if (this.customizationService.getSettings().folderSelection) {
-          overNode = overSource.hasParent() ? overSource.getParent() : overSource;
-        }
+      // Find out if we are over any currently selected sources
+      const overSelected = this.selectionService
+        .getItems()
+        .find(item => overSources.find(source => source.id === item.id));
 
-        if (event.ctrlKey) {
-          if (overNode.isSelected()) {
-            overNode.deselect();
-          } else {
-            overNode.addToSelection();
+      if (event.button === 0) {
+        if (overSources.length) {
+          let overNode: TSceneNode = overSources[0];
+          if (this.customizationService.getSettings().folderSelection) {
+            overNode = overSources[0].hasParent() ? overSources[0].getParent() : overSources[0];
           }
-        } else if (event.button === 0) {
-          overNode.select();
-        }
-      } else if (event.button === 0) {
-        this.selectionService.reset();
-      }
 
-      if (event.button === 2) {
+          // Ctrl adds or removes from a multiselection
+          if (event.ctrlKey) {
+            if (overNode.isSelected()) {
+              overNode.deselect();
+            } else {
+              overNode.addToSelection();
+            }
+          } else {
+            if (overSelected && overSources.length > 1) {
+              const currentIndex = overSources.findIndex(source => source.id === overSelected.id);
+
+              overSources[(currentIndex + 1) % overSources.length].select();
+            } else {
+              overNode.select();
+            }
+          }
+        } else {
+          // Click was not over any sources so empty the selection
+          this.selectionService.reset();
+        }
+      } else if (event.button === 2) {
         let menu: EditMenu;
-        if (overSource) {
-          this.selectionService.add(overSource.sceneItemId);
+
+        if (overSelected) {
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
-            selectedSourceId: overSource.sourceId,
+            selectedSourceId: overSelected.sourceId,
+          });
+        } else if (overSources.length) {
+          this.selectionService.select(overSources[0].sceneItemId);
+          menu = new EditMenu({
+            selectedSceneId: this.scene.id,
+            showSceneItemMenu: true,
+            selectedSourceId: overSources[0].sourceId,
           });
         } else {
           menu = new EditMenu({ selectedSceneId: this.scene.id });
         }
+
         menu.popup();
       }
     }
@@ -381,7 +401,7 @@ export default class StudioEditor extends Vue {
       if (overResize) {
         this.$refs.display.style.cursor = overResize.cursor;
       } else {
-        const overSource = this.getOverSource(event);
+        const overSource = this.getOverSources(event)[0];
 
         if (overSource) {
           this.$refs.display.style.cursor = '-webkit-grab';
@@ -432,10 +452,10 @@ export default class StudioEditor extends Vue {
   }
 
   /**
-   * returns the source under the cursor
+   * returns the sources under the cursor
    */
-  private getOverSource(event: MouseEvent): SceneItem {
-    return this.sceneItems.find(source => {
+  private getOverSources(event: MouseEvent): SceneItem[] {
+    return this.sceneItems.filter(source => {
       return this.isOverSource(event, source);
     });
   }
