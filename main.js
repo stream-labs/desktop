@@ -21,6 +21,17 @@ process.env.SLOBS_VERSION = pjson.version;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
+const electronLog = require('electron-log');
+
+// We use a special cache directory for running tests
+if (process.env.SLOBS_CACHE_DIR) {
+  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
+}
 
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
@@ -41,17 +52,6 @@ if (!gotTheLock) {
   const windowStateKeeper = require('electron-window-state');
   const pid = require('process').pid;
   const crashHandler = require('crash-handler');
-  const electronLog = require('electron-log');
-
-  // We use a special cache directory for running tests
-  if (process.env.SLOBS_CACHE_DIR) {
-    app.setPath('appData', process.env.SLOBS_CACHE_DIR);
-    electronLog.transports.file.file = path.join(
-      process.env.SLOBS_CACHE_DIR,
-      'slobs-client',
-      'log.log'
-    );
-  }
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
