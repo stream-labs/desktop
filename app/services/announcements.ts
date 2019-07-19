@@ -1,8 +1,11 @@
 import { StatefulService, mutation } from './core/stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
+import { AppService } from 'services/app';
 import { Inject } from './core/injector';
 import { authorizedHeaders } from '../util/requests';
+import path from 'path';
+import fs from 'fs';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -19,6 +22,7 @@ interface IAnnouncementsInfo {
 export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() private appService: AppService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -45,8 +49,44 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     await this.postBannerClose();
   }
 
+  private get installDateProxyFilePath() {
+    return path.join(this.appService.appDataDirectory, 'log.log');
+  }
+
+  private async fileExists(path: string): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      fs.exists(path, exists => {
+        resolve(exists);
+      });
+    });
+  }
+
+  private async getInstallDateTimestamp(): Promise<number> {
+    const exists = await this.fileExists(this.installDateProxyFilePath);
+
+    if (!exists) {
+      return Promise.resolve(Date.now());
+    }
+
+    return new Promise<number>(resolve => {
+      fs.stat(this.installDateProxyFilePath, (err, stats) => {
+        if (err) {
+          resolve(Date.now());
+        }
+
+        resolve(stats.birthtimeMs);
+      });
+    });
+  }
+
+  private async recentlyInstalled() {
+    const installationTimestamp = await this.getInstallDateTimestamp();
+    return Date.now() - installationTimestamp < 1000 * 60 * 60 * 24 * 7;
+  }
+
   private async fetchBanner() {
-    if (!this.userService.isLoggedIn()) return this.state;
+    const recentlyInstalled = await this.recentlyInstalled();
+    if (!this.userService.isLoggedIn() || recentlyInstalled) return this.state;
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {
