@@ -177,7 +177,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('button=Continue');
         await t.context.app.client.click('h2=Start Fresh');
-        await t.context.app.client.click('button=Complete');
+        await t.context.app.client.click('p=Skip');
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');
