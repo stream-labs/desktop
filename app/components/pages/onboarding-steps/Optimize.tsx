@@ -42,6 +42,7 @@ export default class Optimize extends TsxComponent<{
           };
         }
       } else if (progress.event === 'done') {
+        this.setProcessing(false);
         this.continue();
       } else {
         this.setProcessing(false);

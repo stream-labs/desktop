@@ -11,6 +11,7 @@ import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -46,6 +47,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   proceed() {
+    if (this.processing) return;
     if (this.currentStep === this.stepsState.length) return this.complete();
 
     this.stepsState[this.currentStep - 1].complete = true;
@@ -120,6 +122,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       return (
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
           <Connect continue={this.complete.bind(this)} />
+          <span>{$t('Skip')}</span>
         </div>
       );
     }
