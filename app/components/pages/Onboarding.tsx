@@ -12,6 +12,7 @@ import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
+import styles from './Onboarding.m.less';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -120,15 +121,17 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
     if (this.onboardingService.options.isLogin) {
       return (
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class={styles.container}>
           <Connect continue={this.complete.bind(this)} />
-          <span>{$t('Skip')}</span>
+          <span class={styles.skipButton} onClick={this.complete.bind(this)}>
+            {$t('Skip')}
+          </span>
         </div>
       );
     }
 
     return (
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <div class={styles.container}>
         <Onboarding
           steps={this.stepsState}
           stepLocation="top"
