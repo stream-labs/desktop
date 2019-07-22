@@ -121,36 +121,40 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
     if (this.onboardingService.options.isLogin) {
       return (
-        <div class={styles.container}>
-          <Connect continue={this.complete.bind(this)} />
-          <span class={styles.skipButton} onClick={this.complete.bind(this)}>
-            {$t('Skip')}
-          </span>
+        <div>
+          <div class={styles.container}>
+            <Connect continue={this.complete.bind(this)} />
+            <span class={styles.skipButton} onClick={this.complete.bind(this)}>
+              {$t('Skip')}
+            </span>
+          </div>
         </div>
       );
     }
 
     return (
-      <div class={styles.container}>
-        <Onboarding
-          steps={this.stepsState}
-          stepLocation="top"
-          skippable={true}
-          currentStep={this.currentStep}
-          disableControls={this.processing || this.currentStep === 2}
-          continueHandler={this.continue.bind(this)}
-          completeHandler={this.complete.bind(this)}
-          skipHandler={this.proceed.bind(this)}
-          prevHandler={() => {}}
-          hideBack={true}
-          hideSkip={this.currentStep === 2}
-          hideButton={
-            [1, 2, 4].includes(this.currentStep) ||
-            (this.currentStep === 3 && !this.importedFromObs)
-          }
-        >
-          {steps}
-        </Onboarding>
+      <div>
+        <div class={styles.container}>
+          <Onboarding
+            steps={this.stepsState}
+            stepLocation="top"
+            skippable={true}
+            currentStep={this.currentStep}
+            disableControls={this.processing || this.currentStep === 2}
+            continueHandler={this.continue.bind(this)}
+            completeHandler={this.complete.bind(this)}
+            skipHandler={this.proceed.bind(this)}
+            prevHandler={() => {}}
+            hideBack={true}
+            hideSkip={this.currentStep === 2}
+            hideButton={
+              [1, 2, 4].includes(this.currentStep) ||
+              (this.currentStep === 3 && !this.importedFromObs)
+            }
+          >
+            {steps}
+          </Onboarding>
+        </div>
       </div>
     );
   }
