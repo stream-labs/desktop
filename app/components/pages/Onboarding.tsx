@@ -1,4 +1,4 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Onboarding } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
@@ -45,14 +45,8 @@ export default class OnboardingPage extends TsxComponent<{}> {
     this.proceed();
   }
 
-  previous() {
-    this.currentStep = this.currentStep - 1;
-  }
-
   proceed() {
-    if (this.currentStep === this.stepsState.length) {
-      return this.complete();
-    }
+    if (this.currentStep === this.stepsState.length) return this.complete();
 
     this.stepsState[this.currentStep - 1].complete = true;
     this.currentStep = this.currentStep + 1;
@@ -73,16 +67,8 @@ export default class OnboardingPage extends TsxComponent<{}> {
   adjustStepsState(importedObs?: boolean) {
     if (importedObs === true) {
       this.importedFromObs = true;
-      while (this.stepsState.length > 2) {
-        this.stepsState.pop();
-      }
-      this.stepsState.push({ complete: false });
     } else if (importedObs === false) {
       this.importedFromObs = false;
-      while (this.stepsState.length > 2) {
-        this.stepsState.pop();
-      }
-      this.stepsState.push({ complete: false });
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
@@ -101,32 +87,28 @@ export default class OnboardingPage extends TsxComponent<{}> {
         setProcessing={this.setProcessing.bind(this)}
       />,
     ];
-    let currentSlot = 3;
 
     if (this.importedFromObs) {
-      steps.push(<StreamlabsFeatures slot={String(currentSlot)} />);
+      steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
     steps.push(
       <ThemeSelector
-        slot={String(currentSlot)}
+        slot="3"
         continue={this.continue.bind(this)}
         setProcessing={this.setProcessing.bind(this)}
       />,
     );
-    currentSlot++;
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(
         <Optimize
-          slot={String(currentSlot)}
+          slot="4"
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(
-        <FacebookPageCreation slot={String(currentSlot)} continue={this.continue.bind(this)} />,
-      );
+      steps.push(<FacebookPageCreation slot="4" continue={this.continue.bind(this)} />);
     }
     return steps;
   }
@@ -153,7 +135,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
           continueHandler={this.continue.bind(this)}
           completeHandler={this.complete.bind(this)}
           skipHandler={this.proceed.bind(this)}
-          prevHandler={this.previous.bind(this)}
+          prevHandler={() => {}}
           hideBack={true}
           hideSkip={this.currentStep === 2}
           hideButton={

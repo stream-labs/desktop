@@ -4,7 +4,6 @@ import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
 import { Inject } from '../../../services/core/injector';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
 import { $t } from 'services/i18n';
-import { Span } from '@sentry/hub';
 
 interface IConfigStepPresentation {
   description: string;
