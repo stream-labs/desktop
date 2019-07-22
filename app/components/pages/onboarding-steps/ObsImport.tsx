@@ -53,7 +53,7 @@ export default class ObsImport extends TsxComponent<{
     return [
       {
         title: $t('Import from OBS'),
-        time: $t('~1 min'),
+        time: $t('< 1 min'),
         timeColor: '--blue',
         description: $t(
           'We import all of your settings, including scenes, output, configurations, and much more',
@@ -63,7 +63,7 @@ export default class ObsImport extends TsxComponent<{
       },
       {
         title: $t('Start Fresh'),
-        time: $t('~5 min'),
+        time: $t('~2 min'),
         timeColor: '--teal',
         description: $t(
           'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',

@@ -13,15 +13,20 @@ interface IConfigStepPresentation {
 }
 
 @Component({})
-export default class Optimize extends TsxComponent<{ continue: Function }> {
+export default class Optimize extends TsxComponent<{
+  continue: Function;
+  setProcessing: Function;
+}> {
   @Inject() autoConfigService: AutoConfigService;
   @Prop() continue: Function;
+  @Prop() setProcessing: Function;
 
   stepInfo: IConfigStepPresentation = null;
   optimizing = false;
 
   optimize() {
     this.optimizing = true;
+    this.setProcessing(true);
     this.autoConfigService.start(progress => {
       if (
         progress.event === 'starting_step' ||
@@ -39,6 +44,8 @@ export default class Optimize extends TsxComponent<{ continue: Function }> {
         }
       } else if (progress.event === 'done') {
         this.continue();
+      } else {
+        this.setProcessing(false);
       }
     });
   }

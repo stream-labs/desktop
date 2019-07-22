@@ -88,7 +88,7 @@ export default class Connect extends TsxComponent<{ continue: Function }> {
         <div slot="desc">
           {this.isSecurityUpgrade
             ? this.securityUpgradeLink(h)
-            : $t('Sign in with your streaming account to get started with Streamlabs')}
+            : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
         </div>
         <div class={styles.signupButtons}>
           {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (

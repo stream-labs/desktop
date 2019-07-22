@@ -116,7 +116,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
     currentSlot++;
     if (this.onboardingService.isTwitchAuthed) {
-      steps.push(<Optimize slot={String(currentSlot)} continue={this.continue.bind(this)} />);
+      steps.push(
+        <Optimize
+          slot={String(currentSlot)}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />,
+      );
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
       steps.push(
         <FacebookPageCreation slot={String(currentSlot)} continue={this.continue.bind(this)} />,
@@ -148,6 +154,12 @@ export default class OnboardingPage extends TsxComponent<{}> {
           completeHandler={this.complete.bind(this)}
           skipHandler={this.proceed.bind(this)}
           prevHandler={this.previous.bind(this)}
+          hideBack={true}
+          hideSkip={this.currentStep === 2}
+          hideButton={
+            [1, 2, 4].includes(this.currentStep) ||
+            (this.currentStep === 3 && !this.importedFromObs)
+          }
         >
           {steps}
         </Onboarding>
