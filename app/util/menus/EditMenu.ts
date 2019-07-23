@@ -222,12 +222,12 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Copy Filters'),
-        click: () => this.clipboardService.copyFilters(),
+        click: () => this.clipboardService.copyFilters(this.source.sourceId),
       });
 
       this.append({
         label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(),
+        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters(),
       });
 
