@@ -6,6 +6,7 @@ export { CreateSceneCommand } from './create-scene';
 export { RenameSceneCommand } from './rename-scene';
 export { RemoveSceneCommand } from './remove-scene';
 export { UngroupSceneCommand } from './ungroup-scene';
+export { AddFilesCommand } from './add-files';
 
 // Scene Nodes (Items or Folders)
 export { RemoveNodesCommand } from './remove-nodes';
