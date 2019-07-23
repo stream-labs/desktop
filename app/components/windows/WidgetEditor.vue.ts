@@ -18,6 +18,7 @@ import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import { ERenderingMode } from '../../../obs-api';
 
 @Component({
   components: {
@@ -137,7 +138,10 @@ export default class WidgetEditor extends Vue {
   }
 
   createProjector() {
-    this.projectorService.createProjector(this.widget.previewSourceId);
+    this.projectorService.createProjector(
+      ERenderingMode.OBS_MAIN_RENDERING,
+      this.widget.previewSourceId,
+    );
   }
 
   retryDataFetch() {

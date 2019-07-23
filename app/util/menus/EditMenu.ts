@@ -14,6 +14,7 @@ import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ERenderingMode } from '../../../obs-api';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -112,7 +113,10 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Create Source Projector'),
             click: () => {
-              this.projectorService.createProjector(selectedItem.sourceId);
+              this.projectorService.createProjector(
+                ERenderingMode.OBS_MAIN_RENDERING,
+                selectedItem.sourceId,
+              );
             },
           });
         } else {
@@ -270,7 +274,7 @@ export class EditMenu extends Menu {
 
     this.append({
       label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector(),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_MAIN_RENDERING),
     });
 
     this.append({ type: 'separator' });

@@ -16,6 +16,7 @@ import { $t } from 'services/i18n';
 import electron from 'electron';
 import { EditorCommandsService } from 'services/editor-commands';
 import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
+import { ERenderingMode } from '../../obs-api';
 
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree },
@@ -69,7 +70,11 @@ export default class SceneSelector extends Vue {
     });
     menu.append({
       label: $t('Create Scene Projector'),
-      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id),
+      click: () =>
+        this.projectorService.createProjector(
+          ERenderingMode.OBS_MAIN_RENDERING,
+          this.scenesService.activeScene.id,
+        ),
     });
     menu.popup();
   }

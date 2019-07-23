@@ -258,6 +258,14 @@ export class Selection implements ISceneItemActions {
     return this.selection.setVisibility(visible);
   }
 
+  setStreamVisible(streamVisible: boolean): void {
+    return this.selection.setStreamVisible(streamVisible);
+  }
+
+  setRecordingVisible(recordingVisible: boolean): void {
+    return this.selection.setRecordingVisible(recordingVisible);
+  }
+
   setTransform(transform: IPartialTransform): void {
     return this.selection.setTransform(transform);
   }

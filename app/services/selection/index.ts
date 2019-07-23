@@ -86,6 +86,8 @@ export class SelectionService extends StatefulService<ISelectionState> {
   getClosestParent: () => SceneItemFolder;
   getRootNodes: () => TSceneNode[];
   getSources: () => Source[];
+  setStreamVisible: (streamVisible: boolean) => void;
+  setRecordingVisible: (recordingVisible: boolean) => void;
 
   // SCENE_ITEM METHODS
 

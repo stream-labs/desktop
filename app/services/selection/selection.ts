@@ -287,7 +287,7 @@ export class Selection {
    * in the selection is visible.
    */
   isVisible(): boolean {
-    return !!this.getItems().find(item => item.visible);
+    return this.getItems().some(item => item.visible);
   }
 
   /**
@@ -295,7 +295,15 @@ export class Selection {
    * selection are locked.
    */
   isLocked(): boolean {
-    return !this.getItems().find(item => !item.locked);
+    return this.getItems().every(item => item.locked);
+  }
+
+  isStreamVisible(): boolean {
+    return this.getItems().every(item => item.streamVisible);
+  }
+
+  isRecordingVisible(): boolean {
+    return this.getItems().every(item => item.recordingVisible);
   }
 
   /**
@@ -369,6 +377,14 @@ export class Selection {
   }
 
   // SCENE_ITEM METHODS
+
+  setStreamVisible(streamVisible: boolean) {
+    this.getItems().forEach(item => item.setStreamVisible(streamVisible));
+  }
+
+  setRecordingVisible(recordingVisible: boolean) {
+    this.getItems().forEach(item => item.setRecordingVisible(recordingVisible));
+  }
 
   setSettings(settings: Partial<ISceneItemSettings>) {
     this.getItems().forEach(item => item.setSettings(settings));

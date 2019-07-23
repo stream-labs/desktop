@@ -10,6 +10,7 @@ interface IDisplayCreateOptions {
   sourceId?: string;
   paddingColor?: IRGBColor;
   paddingSize?: number;
+  renderingMode?: number;
 }
 
 interface IDisplayEntry {
