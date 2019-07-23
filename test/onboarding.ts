@@ -33,8 +33,8 @@ test('Go through the onboarding and autoconfig', async t => {
   }
 
   // Skip picking a theme
-  if (await t.context.app.client.isExisting('button=Continue')) {
-    await t.context.app.client.click('button=Continue');
+  if (await t.context.app.client.isExisting('p=Skip')) {
+    await t.context.app.client.click('p=Skip');
     await sleep(1000);
   }
 
