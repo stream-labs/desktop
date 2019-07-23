@@ -13,6 +13,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import { throws } from 'assert';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -116,20 +117,24 @@ export default class OnboardingPage extends TsxComponent<{}> {
     return steps;
   }
 
+  loginPage(h: Function) {
+    return (
+      <div>
+        <div class={styles.container}>
+          <Connect continue={this.complete.bind(this)} />
+          <span class={styles.skipButton} onClick={this.complete.bind(this)}>
+            {$t('Skip')}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   render(h: Function) {
     const steps = this.steps(h);
 
     if (this.onboardingService.options.isLogin) {
-      return (
-        <div>
-          <div class={styles.container}>
-            <Connect continue={this.complete.bind(this)} />
-            <span class={styles.skipButton} onClick={this.complete.bind(this)}>
-              {$t('Skip')}
-            </span>
-          </div>
-        </div>
-      );
+      return this.loginPage(h);
     }
 
     return (
