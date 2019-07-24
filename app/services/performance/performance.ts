@@ -47,7 +47,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     });
 
     this.intervalId = window.setInterval(() => {
-      ipcRenderer.send('requestPerformanceStatistics');
+      if (this.customizationService.pollingPerformanceStatistics) {
+        ipcRenderer.send('requestPerformanceStatistics');
+      } else {
+        this.processPerformanceStats({} as any);
+      }
     }, STATS_UPDATE_INTERVAL);
   }
 
