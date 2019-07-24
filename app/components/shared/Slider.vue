@@ -30,8 +30,7 @@
 <script lang="ts" src="./Slider.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .slider-container {
   width: 100%;

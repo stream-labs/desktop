@@ -25,7 +25,7 @@
 <script lang="ts" src="./ObsSliderInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
+@import "../../../styles/index";
 
 .slider-container {
   height: 45px;

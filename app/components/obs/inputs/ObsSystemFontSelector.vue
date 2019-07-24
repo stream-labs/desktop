@@ -58,7 +58,7 @@
 <script lang="ts" src="./ObsSystemFontSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
+@import "../../../styles/index";
 
 .multiselect--font {
   margin-bottom: 0px;

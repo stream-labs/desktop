@@ -3,7 +3,7 @@
     <div class="program-description-header">
       <p class="program-description-title">番組詳細</p>
       <div class="color-change-wrapper">
-        <span class="color-change-label">背景色</span>　
+        <span class="color-change-label">背景色</span>
         <input class="radio-btn" type="radio" id="change-dark-mode-btn" value="dark-mode" v-model="bgColorMode"><label for="change-dark-mode-btn" class="dark-mode-label"></label>
         <input class="radio-btn" type="radio" id="change-light-mode-btn" value="light-mode" v-model="bgColorMode"><label for="change-light-mode-btn" class="light-mode-label"></label>
       </div>
@@ -16,8 +16,7 @@
 
 <script lang="ts" src="./ProgramDescription.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .program-description {
   display: flex;
@@ -68,12 +67,12 @@
       }
 
       &.dark-mode-label {
-        background-color: @bg-secondary; 
+        background-color: @bg-secondary;
       }
 
       &.light-mode-label {
        background-color: @white;
-      } 
+      }
     }
 
     &:checked {

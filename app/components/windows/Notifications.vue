@@ -40,8 +40,7 @@
 <script lang="ts" src="./Notifications.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .notification {
   color: @text-primary;

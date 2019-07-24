@@ -7,8 +7,7 @@
 <script lang="ts" src="./Onboarding.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .onboarding {
   display: flex;

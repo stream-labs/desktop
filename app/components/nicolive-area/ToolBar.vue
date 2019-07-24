@@ -15,8 +15,7 @@
 </template>
 <script lang="ts" src="./ToolBar.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .tool-bar {
   display: flex;
@@ -65,7 +64,7 @@
   &:disabled {
     i {
       opacity: 0.26;
-      cursor: inherit;   
+      cursor: inherit;
     }
   }
 }

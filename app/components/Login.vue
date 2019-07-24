@@ -23,8 +23,7 @@
 <script lang="ts" src="./Login.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
-@import "../styles/mixins";
+@import "../styles/index";
 
 .login__status {
   display: flex;

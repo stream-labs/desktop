@@ -42,7 +42,7 @@
 <script lang="ts" src="./AdvancedAudio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 table {
   min-width: 1060px;

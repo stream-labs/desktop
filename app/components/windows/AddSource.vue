@@ -64,7 +64,7 @@
 <script lang="ts" src="./AddSource.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .NameSource-label {
   margin-bottom: 8px;

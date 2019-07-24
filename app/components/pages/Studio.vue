@@ -24,7 +24,7 @@
 <script lang="ts" src="./Studio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .studio-page {
   flex-direction: column;

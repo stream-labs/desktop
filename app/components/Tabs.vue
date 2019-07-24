@@ -21,7 +21,7 @@
 <script lang="ts" src="./Tabs.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .tabs {
   display: flex;

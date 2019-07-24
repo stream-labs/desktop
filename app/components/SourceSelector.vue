@@ -70,8 +70,7 @@
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
 
 <style lang="less" >
-@import "../styles/_colors";
-@import "../styles/mixins";
+@import "../styles/index";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .source-selector-action {

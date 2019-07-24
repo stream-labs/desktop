@@ -29,8 +29,7 @@
 
 <script lang="ts" src="./NicoliveArea.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .root {
   display: flex;

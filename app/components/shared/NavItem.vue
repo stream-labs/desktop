@@ -12,8 +12,7 @@
 <script lang="ts" src="./NavItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .nav-item {
   cursor: pointer;

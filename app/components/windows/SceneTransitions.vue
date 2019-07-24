@@ -101,8 +101,7 @@
 <script lang="ts" src="./SceneTransitions.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .controls {
   padding-top: 30px;

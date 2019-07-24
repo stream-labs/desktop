@@ -34,7 +34,7 @@
 <script lang="ts" src="./Informations.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .informations {
   display: flex;

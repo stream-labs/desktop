@@ -33,7 +33,7 @@
 <script lang="ts" src="./ObsEditableListInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
+@import "../../../styles/index";
 
 .editable-list__list {
   background: @bg-secondary;

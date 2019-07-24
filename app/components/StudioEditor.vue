@@ -20,7 +20,7 @@
 <script lang="ts" src="./StudioEditor.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .studio-editor-display-container {
   position: relative;

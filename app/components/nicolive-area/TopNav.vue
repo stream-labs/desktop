@@ -10,15 +10,14 @@
       <div class="top-nav-item">
         <a @click="copyProgramURL" class="link"><i :class="hasProgramUrlCopied ? 'icon-check' : 'icon-clipboard-copy'"></i>番組URLをコピー</a>
       </div>
-    </div>  
+    </div>
   </div>
 </template>
 
 <script lang="ts" src="./TopNav.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 // TODO: app/components/TopNav.vue のスタイルを継承
 
@@ -62,5 +61,5 @@
     }
   }
 }
-    
+
 </style>

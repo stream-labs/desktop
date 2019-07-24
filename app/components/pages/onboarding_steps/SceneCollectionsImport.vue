@@ -20,7 +20,7 @@
 <script lang="ts" src="./SceneCollectionsImport.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
+@import "../../../styles/index";
 
 .scene-collections-list {
   margin-left: 0;

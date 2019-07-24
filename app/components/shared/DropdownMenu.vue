@@ -17,8 +17,7 @@
 <script lang="ts" src="./DropdownMenu.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .dropdown-menu {
   width: 124%;

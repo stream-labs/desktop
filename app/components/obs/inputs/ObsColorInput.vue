@@ -32,8 +32,7 @@
 <script lang="ts" src="./ObsColorInput.vue.ts"></script>
 
 <style lang="less">
-@import "../../../styles/_colors";
-@import "../../../styles/mixins";
+@import "../../../styles/index";
 .colorpicker {
   position: relative;
   width: 220px;

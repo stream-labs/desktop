@@ -103,7 +103,7 @@
 <script lang="ts" src="./Troubleshooter.vue.ts"></script>
 
 <style lang="less" scoped>
-  @import "../../styles/_colors";
+  @import "../../styles/index";
 
   .icon-warning {
     color: @red;

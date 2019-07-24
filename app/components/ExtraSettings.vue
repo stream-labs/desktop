@@ -62,7 +62,7 @@
 <script lang="ts" src="./ExtraSettings.vue.ts"></script>
 
 <style lang="less">
-@import "../styles/_colors";
+@import "../styles/index";
 
 .optional-item {
   margin-left: 24px;

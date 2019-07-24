@@ -14,7 +14,7 @@
 <script lang="ts" src="./TitleBar.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .titlebar {
   display: flex;

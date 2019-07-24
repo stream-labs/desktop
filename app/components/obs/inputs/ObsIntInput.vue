@@ -29,8 +29,7 @@
 <script lang="ts" src="./ObsIntInput.vue.ts"></script>
 
 <style lang="less">
-@import "../../../styles/_colors";
-@import "../../../styles/mixins";
+@import "../../../styles/index";
 
 .int-input {
   position: relative;

@@ -38,8 +38,7 @@
 <script lang="ts" src="./OptimizeForNiconico.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .input-container {
   flex-direction: column;
