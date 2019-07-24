@@ -110,6 +110,18 @@
       </form>
     </div>
     <div slot="controls">
+      <button class="button button--default" :disabled="updatingInfo" @click="getTwitterStatus">
+        Status
+      </button>
+      <button class="button button--default" :disabled="updatingInfo" @click="tweet">
+        Twwet
+      </button>
+      <button class="button button--default" :disabled="updatingInfo" @click="unlinkTwitter">
+        Unlink Twitter
+      </button>
+      <button class="button button--default" :disabled="updatingInfo" @click="linkTwitter">
+        Link Twitter
+      </button>
       <button class="button button--default" :disabled="updatingInfo" @click="cancel">
         {{ isSchedule ? $t('Close') : $t('Cancel') }}
       </button>

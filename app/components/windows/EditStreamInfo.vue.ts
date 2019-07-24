@@ -162,6 +162,26 @@ export default class EditStreamInfo extends Vue {
     await this.loadAvailableProfiles();
   }
 
+  linkTwitter() {
+    this.userService.openLinkTwitterDialog(() => { console.log('linkd') });
+  }
+
+  unlinkTwitter() {
+    this.userService.unlinkTwitter().then(() => {
+      console.log('fuk0');
+    });
+  }
+
+  tweet() {
+    this.userService.postTweet('test');
+  }
+
+  getTwitterStatus() {
+    this.userService.getTwitterStatus().then(res => {
+      console.log(res);
+    });
+  }
+
   onGameSearchChange(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
