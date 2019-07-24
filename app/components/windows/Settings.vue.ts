@@ -42,6 +42,8 @@ export default class Settings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
 
+  $refs: { settingsContainer: HTMLElement }
+
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
@@ -87,6 +89,7 @@ export default class Settings extends Vue {
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+    this.$refs.settingsContainer.scrollTop = 0;
   }
 
 }

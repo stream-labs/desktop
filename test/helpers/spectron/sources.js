@@ -61,6 +61,8 @@ export async function addSource(t, type, name, closeProps = true) {
   // Close source properties too
   if (closeProps) {
     await app.client.click('[data-test="Done"]');
+  } else {
+    await focusChild(t);
   }
 }
 

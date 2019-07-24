@@ -17,7 +17,7 @@
         {{ $t(`settings.${category}.name`, { fallback: category }) }}
       </NavItem>
     </NavMenu>
-    <div class="settings-container">
+    <div class="settings-container" ref="settingsContainer">
       <aside class="notice-section" v-if="isStreaming">
         <p class="notice-message">
           <i class="icon-warning"/>{{ $t('settings.noticeWhileStreaming')}}
