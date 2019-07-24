@@ -173,11 +173,11 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.streamVisible !== void 0) {
-      this.getObsSceneItem().showingStreaming = newSettings.streamVisible;
+      this.getObsSceneItem().streamVisible = newSettings.streamVisible;
     }
 
-    if (changed.streamVisible !== void 0) {
-      this.getObsSceneItem().showingRecording = newSettings.streamVisible;
+    if (changed.recordingVisible !== void 0) {
+      this.getObsSceneItem().recordingVisible = newSettings.recordingVisible;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
