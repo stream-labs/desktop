@@ -117,6 +117,10 @@ i.disabled {
   }
 }
 
+.sl-vue-tree.sl-vue-tree-root {
+  border-color: @text-secondary;
+}
+
 .sl-vue-tree-node-item {
   cursor: pointer;
   margin-top: -1px;

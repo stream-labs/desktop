@@ -1,11 +1,10 @@
 <template>
 <div class="container">
-  <div class="google-font-selector input-wrapper">
-    <multiselect
-      :value="value"
-      :options="fonts">
-    </multiselect>
-  </div>
+  <list-input
+    :value="value"
+    :metadata="listInputMetadata"
+    @input="value => emitInput(value)"
+  />
 </div>
 </template>
 

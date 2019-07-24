@@ -5,9 +5,7 @@
     v-if="title"
     :class="{ 'section-title--opened': !collapsed }"
   >
-    <h4
-      v-if="title"
-      @click="collapsed = !collapsed">
+    <h4>
       <i
         v-if="collapsed === true"
         class="icon-plus section-title__icon"/>
@@ -21,7 +19,9 @@
       v-show="!collapsed"
       class="section-content section-content--dropdown"
   >
-    <hotkey v-for="(hotkey, index) in hotkeys" :hotkey="hotkey" :key="index" />
+    <div v-for="hotkey in hotkeys" :key="hotkey.resourceId">
+      <hotkey :hotkey="hotkey" />
+    </div>
   </div>
 </div>
 </template>

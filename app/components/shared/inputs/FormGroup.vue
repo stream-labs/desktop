@@ -47,6 +47,7 @@
     font-size: 16px;
     align-self: center;
     display: inline-block;
+    z-index: 1;
     color: @icon;
   }
 
