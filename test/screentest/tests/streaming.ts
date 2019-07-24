@@ -28,30 +28,31 @@ platforms.forEach(platform => {
     switch (platform) {
       case 'twitch':
         await fillForm(t, 'form[name=editStreamForm]', {
-          stream_title: 'SLOBS Test Stream',
+          title: 'SLOBS Test Stream',
           game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+          tags: ['100%', 'AMA'],
         });
         break;
 
       case 'facebook':
         await fillForm(t, 'form[name=editStreamForm]', {
-          stream_title: 'SLOBS Test Stream',
+          title: 'SLOBS Test Stream',
           game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-          stream_description: 'SLOBS Test Stream Description',
+          description: 'SLOBS Test Stream Description',
         });
         break;
 
       case 'mixer':
         await fillForm(t, 'form[name=editStreamForm]', {
-          stream_title: 'SLOBS Test Stream',
+          title: 'SLOBS Test Stream',
           game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
         });
         break;
 
       case 'youtube':
         await fillForm(t, 'form[name=editStreamForm]', {
-          stream_title: 'SLOBS Test Stream',
-          stream_description: 'SLOBS Test Stream Description',
+          title: 'SLOBS Test Stream',
+          description: 'SLOBS Test Stream Description',
         });
         break;
     }
@@ -69,6 +70,42 @@ platforms.forEach(platform => {
     await focusChild(t);
     await app.client.waitForExist('input', 20 * 1000);
     await makeScreenshots(t, 'in_stream');
+    t.pass();
+  });
+});
+
+// test scheduling for each platform
+const schedulingPlatforms: TPlatform[] = ['facebook', 'youtube'];
+schedulingPlatforms.forEach(platform => {
+  test(`Schedule stream to ${platform}`, async t => {
+    // login into the account
+    if (!(await logIn(t, platform))) return;
+    const app = t.context.app;
+
+    // open EditStreamInfo window
+    await focusMain(t);
+    await app.client.click('button=Schedule Stream');
+    await focusChild(t);
+
+    // fill streaming data
+    switch (platform) {
+      case 'facebook':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          title: 'SLOBS Test Stream',
+          game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+          description: 'SLOBS Test Stream Description',
+        });
+        break;
+
+      case 'youtube':
+        await fillForm(t, 'form[name=editStreamForm]', {
+          title: 'SLOBS Test Stream',
+          description: 'SLOBS Test Stream Description',
+        });
+        break;
+    }
+
+    await makeScreenshots(t, 'before schedule');
     t.pass();
   });
 });

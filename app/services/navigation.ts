@@ -9,7 +9,6 @@ export type TAppPage =
   | 'BrowseOverlays'
   | 'PatchNotes'
   | 'Chatbot'
-  | 'DesignSystem'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'Help'

@@ -38,6 +38,8 @@ import { Subject } from 'rxjs';
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
 import SubGoal from 'components/widgets/goal/SubGoal.vue';
+import StarsGoal from 'components/widgets/goal/StarsGoal.vue';
+import SupporterGoal from 'components/widgets/goal/SupporterGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -89,6 +91,8 @@ export function getComponents() {
     BitGoal,
     DonationGoal,
     FollowerGoal,
+    StarsGoal,
+    SupporterGoal,
     ChatBox,
     ViewerCount,
     DonationTicker,

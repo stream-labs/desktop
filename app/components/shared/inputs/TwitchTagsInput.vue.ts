@@ -13,6 +13,8 @@ export default class TwitchTagsInput extends Vue {
   @Inject() i18nService: I18nService;
   @Inject() customizationService: CustomizationService;
 
+  @Prop() name: string;
+
   @Prop() value: TTwitchTagWithLabel[];
 
   @Prop() tags: TTwitchTag[];

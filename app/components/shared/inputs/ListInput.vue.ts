@@ -10,7 +10,10 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
-  @Prop({ default: 'Select Option' }) readonly placeholder: string;
+
+  get placeholder() {
+    return this.options.placeholder || 'Select Option';
+  }
 
   onInputHandler(option: IListOption<string>) {
     // Fixes a render issue when reselecting the same option as currently selected

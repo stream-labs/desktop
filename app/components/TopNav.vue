@@ -88,9 +88,6 @@
     <div class="top-nav-item" v-if="isDevMode" style="z-index: 99999;">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
-    <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="navigateDesignSystem">Design System</a>
-    </div>
     <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
         @click="studioMode"

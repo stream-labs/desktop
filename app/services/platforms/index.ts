@@ -1,7 +1,7 @@
 import { TwitchService } from './twitch';
 import { YoutubeService } from './youtube';
 import { MixerService } from './mixer';
-import { FacebookService } from './facebook';
+import { FacebookService, IStreamlabsFacebookPages } from './facebook';
 import { StreamingContext } from '../streaming';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
@@ -14,6 +14,8 @@ export interface IChannelInfo {
   description?: string;
   tags?: Tag[];
   availableTags?: Tag[];
+  hasUpdateTagsPermission?: boolean;
+  facebookPageId?: string;
 }
 
 export interface IGame {

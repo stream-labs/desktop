@@ -1,7 +1,7 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <div v-if="infoLoading || populatingModels"><i class="fa fa-spinner fa-pulse" /></div>
+      <div v-if="infoLoading"><i class="fa fa-spinner fa-pulse" /></div>
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="refreshStreamInfo">{{
@@ -11,7 +11,7 @@
         <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
-      <form name="editStreamForm" v-if="!infoLoading && !infoError && !populatingModels">
+      <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           {{ $t("It looks like you don't have any Pages. Head to ") }}
           <a class="description-link" @click="openFBPageCreateLink">{{
@@ -21,55 +21,47 @@
         </div>
         <h-form-group
           v-if="isFacebook && hasPages && !midStreamMode"
-          :value="pageModel"
-          @input="pageId => setFacebookPageId(pageId)"
+          :v-model="channelInfo.facebookPageId"
           :metadata="{
             type: 'list',
             name: 'stream_page',
             title: $t('Facebook Page'),
-            options: pageOptions,
+            options: facebookService.state.facebookPages.options,
           }"
         />
         <h-form-group
-          v-model="streamTitleModel"
-          :metadata="{ type: 'text', name: 'stream_title', title: $t('Title'), fullWidth: true }"
+          v-model="channelInfo.title"
+          :metadata="formMetadata.title"
         />
         <h-form-group
           v-if="isYoutube || isFacebook"
-          v-model="streamDescriptionModel"
-          :metadata="{
-            type: 'textArea',
-            name: 'stream_description',
-            title: $t('Description'),
-            rows: 4,
-          }"
+          v-model="channelInfo.description"
+          :metadata="formMetadata.description"
         />
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
-          :title="$t('Game')"
-          name="stream_game"
+          :metadata="formMetadata.game"
         >
           <list-input
-            @search-change="debouncedGameSearch"
+            @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
-            :value="gameModel"
-            :placeholder="$t('Start typing to search')"
-            :metadata="gameMetadata"
+            v-model="channelInfo.game"
+            :metadata="formMetadata.game"
           />
         </h-form-group>
         <TwitchTagsInput
           v-if="isTwitch"
-          v-model="twitchTags"
-          :tags="allTwitchTags"
+          v-model="channelInfo.tags"
+          :tags="channelInfo.availableTags"
+          name="tags"
           :has-permission="hasUpdateTagsPermission"
-          @input="setTags"
         />
         <h-form-group v-if="searchProfilesPending">
-          {{ $t('Checking optimized setting for') }} {{ gameModel }}...
+          {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
-          <h-form-group type="text" v-model="startTimeModel.date" :metadata="dateMetadata" />
-          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="timeMetadata" />
+          <h-form-group type="text" v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"
@@ -107,7 +99,7 @@
             >.
           </div>
         </div>
-      </form>
+      </validated-form>
     </div>
     <div slot="controls">
       <button class="button button--default" :disabled="updatingInfo" @click="getTwitterStatus">
