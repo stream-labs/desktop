@@ -51,7 +51,7 @@
   grid-template-columns: 30px 1fr 130px;
   background: @hover;
   border-color: @hover;
-  .border;
+  .border();
 
   &.has-action:hover {
     color: @white;

@@ -143,7 +143,7 @@
 .transition-control {
   margin-left: 10px;
   cursor: pointer;
-  .icon-hover;
+  .icon-hover();
 }
 
 .transition-redundant {

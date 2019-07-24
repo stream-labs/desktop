@@ -106,7 +106,7 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover;
+  .icon-hover();
 }
 
 </style>

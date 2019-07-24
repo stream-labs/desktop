@@ -45,25 +45,7 @@
       <template slot="title" slot-scope="{ node }">
         <div class="title-container">
           <span class="layer-icon">
-            <i v-if="!node.isLeaf" class="icon-folder"/>
-            <i v-else-if="node.data.type === 'ffmpeg_source'" class="icon-media"/>
-            <i v-else-if="node.data.type === 'image_source'" class="icon-image"/>
-            <i v-else-if="node.data.type === 'slideshow'" class="icon-slideshow"/>
-            <i v-else-if="node.data.type === 'text_gdiplus'" class="icon-text"/>
-            <i v-else-if="node.data.type === 'text_ft2_source'" class="icon-text"/>
-            <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"/>
-            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"/>
-            <i v-else-if="node.data.type === 'ndi_source'" class="icon-NDI"/>
-            <i v-else-if="node.data.type === 'decklink-input'" class="icon-blackmagic"/>
-            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"/>
-            <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"/>
-            <i v-else-if="node.data.type === 'game_capture'" class="icon-game-capture"/>
-            <i v-else-if="node.data.type === 'browser_source'" class="icon-browser"/>
-            <i v-else-if="node.data.type === 'scene'" class="icon-studio-mode"/>
-            <i v-else-if="node.data.type === 'color_source'" class="icon-color"/>
-            <i v-else-if="node.data.type === 'openvr_capture'" class="icon-vr-google"/>
-            <i v-else-if="node.data.type === 'liv_capture'" class="icon-vr-google"/>
-            <i v-else class="icon-file"/>
+            <i :class="determineIcon(node.isLeaf, node.data.sourceId)"></i>
           </span>
           <span class="item-title" :data-test="node.title">{{ node.title }}</span>
         </div>
