@@ -335,6 +335,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       overlay.setPosition(overlayId, position.x, position.y, width, height);
       overlay.setTransparency(overlayId, this.state.opacity * 2.55);
+      overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
+
       win.webContents.executeJavaScript(hideInteraction);
 
       win.webContents.on('paint', (event, dirty, image) => {
