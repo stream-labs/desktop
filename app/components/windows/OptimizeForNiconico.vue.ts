@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import BoolInput from 'components/obs/inputs/ObsBoolInput.vue';
-import windowMixin from '../mixins/window';
 import { CustomizationService } from '../../services/customization';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { StreamingService } from '../../services/streaming';
@@ -18,7 +17,6 @@ import { CategoryIcons } from './CategoryIcons';
     ModalLayout,
     BoolInput
   },
-  mixins: [windowMixin]
 })
 export default class OptimizeNiconico extends Vue {
   @Inject() customizationService: CustomizationService;

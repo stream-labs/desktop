@@ -374,8 +374,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   showSourceProperties(sourceId: string) {
-    this.windowsService.closeChildWindow();
-
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
       queryParams: { sourceId },

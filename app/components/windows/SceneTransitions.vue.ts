@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import ModalLayout from 'components/ModalLayout.vue';
 import TransitionSettings from 'components/TransitionSettings.vue';
 import { $t } from 'services/i18n';
@@ -15,7 +14,6 @@ import VModal from 'vue-js-modal';
 Vue.use(VModal);
 
 @Component({
-  mixins: [windowMixin],
   components: {
     ModalLayout,
     TransitionSettings,

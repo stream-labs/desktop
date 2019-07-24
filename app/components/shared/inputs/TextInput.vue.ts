@@ -19,5 +19,4 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
       alpha: this.options.alpha
     };
   }
-
 }

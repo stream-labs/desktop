@@ -11,7 +11,6 @@ import { UserService } from '../../services/user';
 import { CustomizationService } from '../../services/customization';
 import { SettingsService, ISettingsSubCategory } from '../../services/settings';
 import { StreamingService } from '../../services/streaming';
-import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
@@ -35,7 +34,6 @@ import { CategoryIcons } from './CategoryIcons';
     ExperimentalSettings,
     LanguageSettings
   },
-  mixins: [windowMixin]
 })
 export default class Settings extends Vue {
   @Inject() settingsService: SettingsService;

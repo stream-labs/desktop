@@ -2,6 +2,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const plugins = [
   new VueLoaderPlugin()
@@ -137,7 +138,7 @@ module.exports = {
   },
 
   optimization: {
-    minimize: false
+    minimizer: [new UglifyJsPlugin({ uglifyOptions: { mangle: false } })]
   },
 
   plugins,

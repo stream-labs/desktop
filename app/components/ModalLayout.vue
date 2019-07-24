@@ -20,7 +20,7 @@
     </button>
     <button
       class="button button--action"
-      @click="doneHandler"
+      @click="done"
       data-test="Done">
       {{ $t('common.done') }}
     </button>

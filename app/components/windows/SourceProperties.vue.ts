@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { ISourcesServiceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
@@ -19,7 +18,6 @@ import electron from 'electron';
     Display,
     GenericForm
   },
-  mixins: [windowMixin]
 })
 export default class SourceProperties extends Vue {
 

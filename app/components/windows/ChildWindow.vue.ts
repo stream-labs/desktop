@@ -1,8 +1,7 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, WindowsService } from 'services/windows';
-
 
 @Component({
   components: {
@@ -20,7 +19,6 @@ export default class ChildWindow extends Vue {
     { name: '', isShown: false},
   ];
 
-
   private widowUpdatedSubscr = this.windowsService.windowUpdated.subscribe(params => {
     if (params.windowId !== 'child') return;
     this.onWindowUpdatedHandler();
@@ -32,14 +30,6 @@ export default class ChildWindow extends Vue {
 
   get componentName() {
     return this.options.componentName;
-  }
-  //
-  // destroy() {
-  //   this.widowUpdatedSubscr.unsubscribe();
-  // }
-
-  destroy() {
-    this.widowUpdatedSubscr.unsubscribe();
   }
 
   private onWindowUpdatedHandler() {
@@ -64,10 +54,15 @@ export default class ChildWindow extends Vue {
       return;
     }
 
-    this.$set(this.components, this.activeComponentInd, {
-      name: this.options.componentName,
-      isShown: this.options.isShown
-    });
+    // This is essentially a race condition, but make a best effort
+    // at having a successful paint cycle before loading a component
+    // that will do a bunch of synchronous IO.
+    setTimeout(() => {
+      this.$set(this.components, this.activeComponentInd, {
+        name: this.options.componentName,
+        isShown: this.options.isShown
+      });
+    }, 50);
 
   }
 }

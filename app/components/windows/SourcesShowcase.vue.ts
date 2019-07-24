@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -52,7 +51,6 @@ interface ISelectSourceOptions {
     NdiSourceIcon,
     BlackmagicSourceIcon
   },
-  mixins: [windowMixin],
 })
 export default class SourcesShowcase extends Vue {
   @Inject() sourcesService: SourcesService;
