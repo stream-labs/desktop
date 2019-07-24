@@ -3,8 +3,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { nodeObs } from 'services/obs-api';
-import electron from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { Inject } from 'util/injector';
 
 interface IPerformanceState {
@@ -43,12 +42,12 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    electron.ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
+    ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
       this.processPerformanceStats(stats);
     });
 
     this.intervalId = window.setInterval(() => {
-      electron.ipcRenderer.send('requestPerformanceStatistics');
+      ipcRenderer.send('requestPerformanceStatistics');
     }, STATS_UPDATE_INTERVAL);
   }
 
@@ -62,7 +61,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
     }
 
-    stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
+    stats.CPU = remote.app.getAppMetrics().map(proc => {
       return proc.cpu.percentCPUUsage;
     }).reduce((sum, usage) => sum + usage);
 
