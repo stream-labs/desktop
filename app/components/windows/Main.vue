@@ -8,6 +8,7 @@
     :class="{
       'main-contents--right': renderDock && leftDock && hasLiveDock,
       'main-contents--left': renderDock && !leftDock && hasLiveDock }">
+    <side-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading" />
     <div class="live-dock-wrapper" v-if="renderDock && leftDock">
       <live-dock :onLeft="true" />
       <resize-bar
@@ -21,10 +22,6 @@
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
       <resize-observer @notify="handleResize"></resize-observer>
-
-      <top-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading"></top-nav>
-      <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
-
       <component
         class="main-page-container"
         v-if="!showLoadingSpinner"
@@ -81,11 +78,11 @@
 }
 
 .main-contents--right {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto 1fr;
 }
 
 .main-contents--left {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
 }
 
 .main-middle {

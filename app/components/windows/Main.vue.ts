@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../SideNav';
+import SideNav from '../SideNav';
 import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
@@ -36,7 +36,7 @@ import CreatorSites from 'components/pages/CreatorSites';
 @Component({
   components: {
     TitleBar,
-    TopNav,
+    SideNav,
     AppsNav,
     Studio,
     Dashboard,

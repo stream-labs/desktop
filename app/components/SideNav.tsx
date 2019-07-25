@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import cx from 'classnames';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
@@ -17,6 +18,7 @@ import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import UndoControls from 'components/UndoControls';
+import styles from './SideNav.m.less';
 Vue.use(VueResize);
 
 @Component({
@@ -55,7 +57,7 @@ export default class TopNav extends Vue {
 
   mounted() {
     this.topNav = this.$refs.top_nav;
-    this.openSettingsWindow();
+    this.openDevTools();
   }
 
   get availableFeatures() {
@@ -128,6 +130,30 @@ export default class TopNav extends Vue {
   }
 
   render(h: Function) {
-    return <div />;
+    const pageData = [
+      { title: 'Studio', icon: 'icon-studio' },
+      { title: 'Live', icon: 'icon-live-dashboard' },
+      { title: 'Cloudbot', icon: 'icon-cloudbot' },
+      { title: 'Themes', icon: 'icon-themes' },
+      { title: 'Store', icon: 'icon-store' },
+    ];
+
+    return (
+      <div class={styles.container}>
+        {pageData.map(page => (
+          <div
+            class={cx(styles.cell, { [styles.active]: this.page === page.title })}
+            onClick={() => this.navigate(page.title as TAppPage)}
+            v-tooltip={{ content: $t(page.title), placement: 'bottom' }}
+          >
+            <i class={page.icon} />
+          </div>
+        ))}
+
+        <div>
+          <i class="icon-gear" />
+        </div>
+      </div>
+    );
   }
 }

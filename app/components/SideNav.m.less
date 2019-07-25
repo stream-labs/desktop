@@ -1,0 +1,35 @@
+.container {
+  position: relative;
+  height: 100%;
+  width: 52px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid var(--section-alt);
+}
+
+.cell {
+  height: 46px;
+  width: 52px;
+  position: relative;
+  border-bottom: 1px solid var(--section-alt);
+
+  i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: var(--title);
+
+    i {
+      color: var(--background);
+    }
+  }
+}
