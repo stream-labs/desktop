@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
-import { NavigationService } from 'services/navigation';
+import { NavigationService, TAppPage } from 'services/navigation';
 import { UserService } from 'services/user';
 import electron from 'electron';
 import Login from 'components/Login.vue';
@@ -43,14 +43,19 @@ export default class TopNav extends Vue {
   settingsTooltip = $t('Settings');
   helpTooltip = $t('Get Help');
   logoutTooltip = $t('Logout');
-  sunTooltip = $t('Day mode');
-  moonTooltip = $t('Night mode');
-  facemasksTooltip = $t('Face Mask Settings');
 
   availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
 
+  $refs: {
+    top_nav: HTMLDivElement;
+  };
+
+  topNav: HTMLDivElement;
+  responsiveClass = false;
+
   mounted() {
     this.topNav = this.$refs.top_nav;
+    this.openSettingsWindow();
   }
 
   get availableFeatures() {
@@ -59,40 +64,8 @@ export default class TopNav extends Vue {
 
   @Prop() locked: boolean;
 
-  navigateStudio() {
-    this.navigationService.navigate('Studio');
-  }
-
-  navigateChatBot() {
-    this.navigationService.navigate('Chatbot');
-  }
-
-  navigateDashboard() {
-    this.navigationService.navigate('Dashboard');
-  }
-
-  navigatePlatformAppStore() {
-    this.navigationService.navigate('PlatformAppStore');
-  }
-
-  navigateCreatorSites() {
-    this.navigationService.navigate('CreatorSites');
-  }
-
-  navigateOverlays() {
-    this.navigationService.navigate('BrowseOverlays');
-  }
-
-  navigateLive() {
-    this.navigationService.navigate('Live');
-  }
-
-  navigateOnboarding() {
-    this.navigationService.navigate('Onboarding');
-  }
-
-  navigateHelp() {
-    this.navigationService.navigate('Help');
+  navigate(page: TAppPage) {
+    this.navigationService.navigate(page);
   }
 
   featureIsEnabled(feature: EAvailableFeatures) {
@@ -111,27 +84,8 @@ export default class TopNav extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
-  get facemasksActive() {
-    return this.facemasksService.state.active;
-  }
-
   openSettingsWindow() {
     this.settingsService.showSettings();
-  }
-
-  openFacemaskSettingsWindow() {
-    this.facemasksService.showSettings();
-  }
-
-  toggleNightTheme() {
-    const newTheme =
-      this.customizationService.currentTheme === 'night-theme' ? 'day-theme' : 'night-theme';
-    this.customizationService.setTheme(newTheme);
-  }
-
-  get modeToggleIcon() {
-    const icon = this.customizationService.currentTheme === 'night-theme' ? 'moon' : 'sun';
-    return require(`../../media/images/${icon}.png`);
   }
 
   openDiscord() {
@@ -165,22 +119,15 @@ export default class TopNav extends Vue {
     );
   }
 
-  get creatorSitesVisible() {
-    return this.userService.isLoggedIn() && this.featureIsEnabled(EAvailableFeatures.creatorSites);
-  }
-
   get loading() {
     return this.appService.state.loading;
   }
 
-  $refs: {
-    top_nav: HTMLDivElement;
-  };
-
-  topNav: HTMLDivElement;
-  responsiveClass = false;
-
   handleResize() {
     this.responsiveClass = this.topNav.clientWidth < 1200;
+  }
+
+  render(h: Function) {
+    return <div />;
   }
 }

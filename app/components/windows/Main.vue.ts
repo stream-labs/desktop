@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
+import TopNav from '../SideNav';
 import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';

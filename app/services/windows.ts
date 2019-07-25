@@ -25,7 +25,6 @@ import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
-import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
@@ -83,7 +82,6 @@ export function getComponents() {
     RecentEvents,
     MediaGallery,
     PlatformAppPopOut,
-    FacemaskSettings,
     EditTransform,
     OverlayWindow,
     OverlayPlaceholder,
