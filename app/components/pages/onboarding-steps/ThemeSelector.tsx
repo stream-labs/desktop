@@ -8,13 +8,13 @@ import styles from './ThemeSelector.m.less';
 
 @Component({})
 export default class ObsImport extends TsxComponent<{
-  continue: Function;
-  setProcessing: Function;
+  continue: () => void;
+  setProcessing: (bool: boolean) => void;
 }> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
-  @Prop() continue: Function;
-  @Prop() setProcessing: Function;
+  @Prop() continue: () => void;
+  @Prop() setProcessing: (bool: boolean) => void;
 
   installing = false;
   progress = 0;

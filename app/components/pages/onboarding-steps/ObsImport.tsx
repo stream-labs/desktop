@@ -11,13 +11,13 @@ import ObsSvg from './ObsSvg';
 
 @Component({})
 export default class ObsImport extends TsxComponent<{
-  continue: Function;
+  continue: (bool: boolean) => void;
   setProcessing: Function;
 }> {
   @Inject() obsImporterService: ObsImporterService;
 
-  @Prop() continue: Function;
-  @Prop() setProcessing: Function;
+  @Prop() continue: (bool: boolean) => void;
+  @Prop() setProcessing: (bool: boolean) => void;
 
   importing = false;
 

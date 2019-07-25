@@ -10,11 +10,11 @@ import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
 
 @Component({})
-export default class Connect extends TsxComponent<{ continue: Function }> {
+export default class Connect extends TsxComponent<{ continue: () => void }> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
 
-  @Prop() continue: Function;
+  @Prop() continue: () => void;
 
   loadingState = false;
 

@@ -29,7 +29,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   stepsState = [{ complete: false }, { complete: false }, { complete: false }];
 
   checkFbPageEnabled() {
-    if (this.fbSetupEnabled === null || !this.userService.isLoggedIn()) return;
+    if (this.fbSetupEnabled !== null || !this.userService.isLoggedIn()) return;
     // This will do a second unnecessary fetch, but it's the only
     // way to be sure we have fetched features
     this.incrementalRolloutService.fetchAvailableFeatures().then(() => {

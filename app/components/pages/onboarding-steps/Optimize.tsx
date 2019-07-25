@@ -13,12 +13,12 @@ interface IConfigStepPresentation {
 
 @Component({})
 export default class Optimize extends TsxComponent<{
-  continue: Function;
-  setProcessing: Function;
+  continue: () => void;
+  setProcessing: (bool: boolean) => void;
 }> {
   @Inject() autoConfigService: AutoConfigService;
-  @Prop() continue: Function;
-  @Prop() setProcessing: Function;
+  @Prop() continue: () => void;
+  @Prop() setProcessing: (bool: boolean) => void;
 
   stepInfo: IConfigStepPresentation = null;
   optimizing = false;

@@ -10,11 +10,11 @@ import { FacebookService } from 'services/platforms/facebook';
 import { $t } from 'services/i18n';
 
 @Component({})
-export default class FacebookPageCreation extends TsxComponent<{ continue: Function }> {
+export default class FacebookPageCreation extends TsxComponent<{ continue: () => void }> {
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
-  @Prop() continue: Function;
+  @Prop() continue: () => void;
 
   pageCount: number = null;
   loading = true;
