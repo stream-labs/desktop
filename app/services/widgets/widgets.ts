@@ -88,7 +88,6 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
       rect.y = widget.y * this.videoService.baseHeight;
     });
 
-    // TODO: Handle return value type properly
     const item = this.editorCommandsService.executeCommand(
       'CreateNewItemCommand',
       this.scenesService.activeSceneId,
@@ -117,7 +116,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
           },
         },
       },
-    ) as SceneItem;
+    );
 
     return item;
   }

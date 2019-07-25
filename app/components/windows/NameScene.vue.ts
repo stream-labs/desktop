@@ -70,12 +70,11 @@ export default class NameScene extends Vue {
         };
       }
 
-      // TODO: Return values for executeCommand
-      const newSceneId = (await this.editorCommandsService.executeCommand(
+      const newSceneId = await this.editorCommandsService.executeCommand(
         'CreateSceneCommand',
         this.name,
         options,
-      )) as string;
+      );
 
       this.scenesService.getScene(newSceneId).makeActive();
 
