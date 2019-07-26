@@ -133,16 +133,17 @@ export default class TopNav extends Vue {
     const pageData = [
       { title: 'Studio', icon: 'icon-studio' },
       { title: 'Live', icon: 'icon-live-dashboard' },
-      { title: 'Cloudbot', icon: 'icon-cloudbot' },
       { title: 'Themes', icon: 'icon-themes' },
-      { title: 'Store', icon: 'icon-store' },
     ];
+
+    if (this.chatbotVisible) pageData.push({ title: 'Cloudbot', icon: 'icon-cloudbot' });
+    if (this.appStoreVisible) pageData.push({ title: 'Store', icon: 'icon-store' });
 
     return (
       <div class={styles.container}>
         {pageData.map(page => (
           <div
-            class={cx(styles.cell, { [styles.active]: this.page === page.title })}
+            class={cx(styles.mainCell, { [styles.active]: this.page === page.title })}
             onClick={() => this.navigate(page.title as TAppPage)}
             v-tooltip={{ content: $t(page.title), placement: 'bottom' }}
           >
@@ -150,8 +151,21 @@ export default class TopNav extends Vue {
           </div>
         ))}
 
-        <div>
-          <i class="icon-gear" />
+        <div class={styles.bottomTools}>
+          {this.isDevMode && (
+            <div class={styles.cell} onClick={this.openDevTools.bind(this)}>
+              <i class="icon-developer" />
+            </div>
+          )}
+          <div
+            class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
+            onClick={this.studioMode.bind(this)}
+          >
+            <i class="icon-studio-mode-3" />
+          </div>
+          <div class={styles.cell} onClick={this.openSettingsWindow.bind(this)}>
+            <i class="icon-settings" />
+          </div>
         </div>
       </div>
     );
