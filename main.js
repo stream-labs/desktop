@@ -159,8 +159,8 @@ if (!gotTheLock) {
           'https://sentry.io/api/1283430/minidump/' +
           '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
         extra: {
-          version: pjson.version,
-          processType: 'main'
+          'sentry[release]': pjson.version,
+          processType: 'main',
         }
       });
     }

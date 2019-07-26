@@ -173,14 +173,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
-    if (await t.context.app.client.isExisting('a=Setup later')) {
+    if (await t.context.app.client.isExisting('p=Skip')) {
       if (options.skipOnboarding) {
-        await t.context.app.client.click('a=Setup later');
-
-        // This will only show up if OBS is installed
-        if (await t.context.app.client.isExisting('button=Start Fresh')) {
-          await t.context.app.client.click('button=Start Fresh');
-        }
+        await t.context.app.client.click('p=Skip');
+        await t.context.app.client.click('h2=Start Fresh');
+        await t.context.app.client.click('p=Skip');
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');

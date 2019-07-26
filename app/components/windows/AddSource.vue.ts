@@ -137,7 +137,6 @@ export default class AddSource extends Vue {
           settings.height = size.height;
         }
 
-        // TODO: Return value types for executeCommand
         const item = this.editorCommandsService.executeCommand(
           'CreateNewItemCommand',
           this.scenesService.activeSceneId,
@@ -150,7 +149,7 @@ export default class AddSource extends Vue {
               propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
             },
           },
-        ) as SceneItem;
+        );
 
         source = item.source;
       }
