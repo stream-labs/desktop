@@ -114,11 +114,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.
-    electron.ipcRenderer.on('testing-fakeAuth', async (e: Electron.Event, auth: IPlatformAuth) => {
-      const service = getPlatformService(auth.platform.type);
-      await this.login(service, auth);
-      this.onboardingService.next();
-    });
+    electron.ipcRenderer.on(
+      'testing-fakeAuth',
+      async (e: Electron.Event, auth: IPlatformAuth, isOnboardingTest: boolean) => {
+        const service = getPlatformService(auth.platform.type);
+        await this.login(service, auth);
+        if (!isOnboardingTest) this.onboardingService.finish();
+      },
+    );
   }
 
   // Makes sure the user's login is still good
@@ -332,34 +335,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     this.userLogout.next();
     this.platformAppsService.unloadAllApps();
-  }
-
-  getFacebookPages() {
-    if (this.platform.type !== 'facebook') return;
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
-  }
-
-  postFacebookPage(pageId: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.apiToken);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
-    });
-    try {
-      fetch(request).then(() => this.updatePlatformChannelId(pageId));
-    } catch {
-      console.error(new Error('Could not set Facebook page'));
-    }
   }
 
   /**

@@ -19,6 +19,25 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
+const path = require('path');
+const rimraf = require('rimraf');
+const electronLog = require('electron-log');
+
+// We use a special cache directory for running tests
+if (process.env.SLOBS_CACHE_DIR) {
+  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+  electronLog.transports.file.file = path.join(
+    process.env.SLOBS_CACHE_DIR,
+    'slobs-client',
+    'log.log'
+  );
+}
+
+app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+
+if (process.argv.includes('--clearCacheDir')) {
+  rimraf.sync(app.getPath('userData'));
+}
 
 // This ensures that only one copy of our app can run at once.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -29,28 +48,10 @@ if (!gotTheLock) {
   const fs = require('fs');
   const bootstrap = require('./updater/bootstrap.js');
   const uuid = require('uuid/v4');
-  const rimraf = require('rimraf');
-  const path = require('path');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
   const pid = require('process').pid;
   const crashHandler = require('crash-handler');
-  const electronLog = require('electron-log');
-
-  // We use a special cache directory for running tests
-  if (process.env.SLOBS_CACHE_DIR) {
-    app.setPath('appData', process.env.SLOBS_CACHE_DIR);
-    electronLog.transports.file.file = path.join(
-      process.env.SLOBS_CACHE_DIR,
-      'slobs-client',
-      'log.log'
-    );
-  }
-  app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
-
-  if (process.argv.includes('--clearCacheDir')) {
-    rimraf.sync(app.getPath('userData'));
-  }
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
@@ -158,8 +159,8 @@ if (!gotTheLock) {
           'https://sentry.io/api/1283430/minidump/' +
           '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
         extra: {
-          version: pjson.version,
-          processType: 'main'
+          'sentry[release]': pjson.version,
+          processType: 'main',
         }
       });
     }

@@ -232,6 +232,14 @@ export class VideoService extends Service {
     };
   }
 
+  setBaseResolution(resolution: { width: number; height: number }) {
+    this.settingsService.setSettingValue(
+      'Video',
+      'Base',
+      `${resolution.width}x${resolution.height}`,
+    );
+  }
+
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
    */

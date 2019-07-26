@@ -461,6 +461,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.BitGoal,
       WidgetType.DonationGoal,
       WidgetType.FollowerGoal,
+      WidgetType.StarsGoal,
+      WidgetType.SupporterGoal,
       WidgetType.ChatBox,
       WidgetType.ViewerCount,
       WidgetType.DonationTicker,

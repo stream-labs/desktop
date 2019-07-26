@@ -7,22 +7,23 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../services/core/injector';
-import debounce from 'lodash/debounce';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
-import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { FacebookService } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
 import { shell } from 'electron';
-import { IListOption } from '../shared/inputs';
+import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
-import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
+import { cloneDeep } from 'lodash';
+import { Debounce } from 'lodash-decorators';
+import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -31,6 +32,7 @@ import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platfo
     BoolInput,
     ListInput,
     TwitchTagsInput,
+    ValidatedForm,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -41,6 +43,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
+  @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
 
   // UI State Flags
@@ -48,20 +51,8 @@ export default class EditStreamInfo extends Vue {
   updatingInfo = false;
   updateError = false;
   selectedProfile: IEncoderProfile = null;
-  hasPages = false;
-  populatingModels = false;
 
-  // Form Models:
-
-  streamTitleModel: string = '';
-
-  streamDescriptionModel: string = '';
-
-  gameModel: string = '';
   gameOptions: IListOption<string>[] = [];
-
-  pageModel: string = '';
-  pageOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
 
@@ -70,18 +61,64 @@ export default class EditStreamInfo extends Vue {
     date: null,
   };
 
-  facebookPages: IStreamlabsFacebookPages;
-
-  // Debounced Functions:
-  debouncedGameSearch: (search: string) => void;
-
   searchProfilesPending = false;
+  channelInfo: IChannelInfo = null;
 
-  allTwitchTags: TTwitchTag[] = null;
+  $refs: {
+    form: ValidatedForm;
+  };
 
-  twitchTags: TTwitchTagWithLabel[] = null;
+  get hasUpdateTagsPermission() {
+    return this.channelInfo.hasUpdateTagsPermission;
+  }
 
-  hasUpdateTagsPermission: boolean = true;
+  get hasPages() {
+    return (
+      !this.infoLoading &&
+      this.isFacebook &&
+      this.facebookService.state.facebookPages &&
+      this.facebookService.state.facebookPages.pages.length
+    );
+  }
+
+  get formMetadata() {
+    return formMetadata({
+      game: metadata.list({
+        title: $t('Game'),
+        placeholder: $t('Start typing to search'),
+        options: this.gameOptions,
+        loading: this.searchingGames,
+        internalSearch: false,
+        allowEmpty: true,
+        noResult: $t('No matching game(s) found.'),
+        required: true,
+      }),
+      title: metadata.text({
+        title: $t('Title'),
+        fullWidth: true,
+        required: true,
+      }),
+      description: metadata.textArea({
+        title: $t('Description'),
+      }),
+      date: metadata.text({
+        title: $t('Scheduled Date'),
+        dateFormat: 'MM/dd/yyyy',
+        placeholder: 'MM/DD/YYYY',
+        required: true,
+        description: this.isFacebook
+          ? $t(
+              'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+            )
+          : undefined,
+      }),
+      time: metadata.timer({
+        title: $t('Scheduled Time'),
+        format: 'hm',
+        max: 24 * 3600,
+      }),
+    });
+  }
 
   get useOptimizedProfile() {
     return this.videoEncodingOptimizationService.state.useOptimizedProfile;
@@ -92,77 +129,11 @@ export default class EditStreamInfo extends Vue {
   }
 
   async created() {
-    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
-
-    this.streamInfoService.streamInfoChanged.subscribe(() => {
-      if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-        if (!this.allTwitchTags && !this.twitchTags) {
-          this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-          this.twitchTags = prepareOptions(
-            this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-            this.streamInfoService.state.channelInfo.tags,
-          );
-        }
-      }
-    });
-
-    this.populatingModels = true;
-    // If the stream info pre-fetch failed, we should try again now
-    if (!this.streamInfoService.state.channelInfo) {
-      await this.refreshStreamInfo();
-    }
-    if (this.isServicedPlatform) {
-      const service = getPlatformService(this.userService.platform.type);
-      await service
-        .prepopulateInfo()
-        .then((info: IChannelInfo) => {
-          if (!info) return;
-          return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-        })
-        .then(() => this.populateModels());
-    } else {
-      await this.populateModels();
-    }
-    this.populatingModels = false;
-
-    if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-      this.twitchService
-        .hasScope('user:edit:broadcast')
-        .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
-
-      this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-      this.twitchTags = prepareOptions(
-        this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-        this.streamInfoService.state.channelInfo.tags,
-      );
-    }
+    await this.refreshStreamInfo();
   }
 
-  async populateModels() {
-    if (!this.streamInfoService.state.channelInfo) return;
-    this.facebookPages = await this.fetchFacebookPages();
-    this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
-    this.gameModel = this.streamInfoService.state.channelInfo.game || '';
-    this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
-    this.gameOptions = [
-      {
-        title: this.streamInfoService.state.channelInfo.game,
-        value: this.streamInfoService.state.channelInfo.game,
-      },
-    ];
-
-    if (this.facebookPages) {
-      this.pageModel = this.facebookPages.page_id;
-      this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
-        value: page.id,
-        title: `${page.name} | ${page.category}`,
-      }));
-      this.hasPages = !!this.facebookPages.pages.length;
-    }
-    await this.loadAvailableProfiles();
-  }
-
-  onGameSearchChange(searchString: string) {
+  @Debounce(500)
+  async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
       const platform = this.userService.platform.type;
@@ -170,7 +141,7 @@ export default class EditStreamInfo extends Vue {
 
       this.gameOptions = [];
 
-      service.searchGames(searchString).then(games => {
+      return service.searchGames(searchString).then(games => {
         this.searchingGames = false;
         if (games && games.length) {
           games.forEach(game => {
@@ -188,14 +159,14 @@ export default class EditStreamInfo extends Vue {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
     this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
-      this.gameModel,
+      this.channelInfo.game,
     );
     this.searchProfilesPending = false;
   }
 
   // For some reason, v-model doesn't work with ListInput
   onGameInput(gameModel: string) {
-    this.gameModel = gameModel;
+    this.channelInfo.game = gameModel;
     this.loadAvailableProfiles();
   }
 
@@ -214,12 +185,7 @@ export default class EditStreamInfo extends Vue {
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
     this.streamInfoService
-      .setStreamInfo(
-        this.streamTitleModel,
-        this.streamDescriptionModel,
-        this.gameModel,
-        this.isTwitch && this.twitchTags && this.twitchTags.length ? this.twitchTags : undefined,
-      )
+      .setChannelInfo(this.channelInfo)
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -252,14 +218,9 @@ export default class EditStreamInfo extends Vue {
 
     const scheduledStartTime = this.formatDateString();
     const service = getPlatformService(this.userService.platform.type);
-    const streamInfo = {
-      title: this.streamTitleModel,
-      description: this.streamDescriptionModel,
-      game: this.gameModel,
-    };
     if (scheduledStartTime) {
       await service
-        .scheduleStream(scheduledStartTime, streamInfo)
+        .scheduleStream(scheduledStartTime, this.channelInfo)
         .then(() => (this.startTimeModel = { time: null, date: null }))
         .then(() => {
           this.$toasted.show(
@@ -294,7 +255,8 @@ export default class EditStreamInfo extends Vue {
     this.updatingInfo = false;
   }
 
-  handleSubmit() {
+  async handleSubmit() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
     this.updateAndGoLive();
   }
@@ -318,15 +280,20 @@ export default class EditStreamInfo extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  // This should have been pre-fetched, but we can force a refresh
-  refreshStreamInfo() {
-    return this.streamInfoService.refreshStreamInfo().then(() => {
-      if (this.streamInfoService.state.channelInfo) this.populateModels();
-    });
-  }
+  async refreshStreamInfo() {
+    // This should have been pre-fetched, but we can force a refresh
+    await this.streamInfoService.refreshStreamInfo();
 
-  setTags(tags: TTwitchTagWithLabel[]) {
-    this.twitchTags = tags;
+    // set a local state of the channelInfo
+    this.channelInfo = cloneDeep(this.streamInfoService.state.channelInfo);
+
+    // the ListInput component requires the selected game to be in the options list
+    if (this.channelInfo.game) {
+      this.gameOptions = [{ value: this.channelInfo.game, title: this.channelInfo.game }];
+    }
+
+    // check available profiles for the selected game
+    await this.loadAvailableProfiles();
   }
 
   get isTwitch() {
@@ -365,31 +332,11 @@ export default class EditStreamInfo extends Vue {
   }
 
   get infoLoading() {
-    return this.streamInfoService.state.fetching;
+    return !this.channelInfo || this.streamInfoService.state.fetching;
   }
 
   get infoError() {
     return this.streamInfoService.state.error;
-  }
-
-  get gameMetadata() {
-    return {
-      name: 'game',
-      loading: this.searchingGames,
-      internalSearch: false,
-      allowEmpty: true,
-      options: this.gameOptions,
-      noResult: $t('No matching game(s) found.'),
-    };
-  }
-
-  fetchFacebookPages() {
-    return this.userService.getFacebookPages();
-  }
-
-  setFacebookPageId(value: string) {
-    this.pageModel = value;
-    this.userService.postFacebookPage(value);
   }
 
   openFBPageCreateLink() {
@@ -398,7 +345,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get optimizedProfileMetadata() {
-    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.gameModel}` : '';
+    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.channelInfo.game}` : '';
     return {
       title: $t('Use optimized encoder settings ') + game,
       tooltip: $t(
@@ -406,23 +353,6 @@ export default class EditStreamInfo extends Vue {
           'resolution may be changed for a better quality of experience',
       ),
     };
-  }
-
-  get dateMetadata() {
-    return {
-      title: $t('Scheduled Date'),
-      dateFormat: 'MM/dd/yyyy',
-      placeholder: 'MM/DD/YYYY',
-      description: this.isFacebook
-        ? $t(
-            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-          )
-        : undefined,
-    };
-  }
-
-  get timeMetadata() {
-    return { title: $t('Scheduled Time'), format: 'hm', max: 24 * 3600 };
   }
 
   private formatDateString() {
