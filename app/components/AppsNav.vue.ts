@@ -16,10 +16,8 @@ const DEFAULT_SCROLL_DELTA = 250;
   components: { HScroll },
 })
 export default class AppsNav extends Vue {
-  @Inject()
-  platformAppsService: PlatformAppsService;
-  @Inject()
-  navigationService: NavigationService;
+  @Inject() platformAppsService: PlatformAppsService;
+  @Inject() navigationService: NavigationService;
 
   scrollModel: IHScrollModel = {
     canScroll: false,
@@ -77,7 +75,7 @@ export default class AppsNav extends Vue {
     this.scrollNav(DEFAULT_SCROLL_DELTA);
   }
 
-  private scrollNav(horizontal: number) {
-    this.$refs.scroll.scrollBy(horizontal, 0, true);
+  private scrollNav(vertical: number) {
+    this.$refs.scroll.scrollBy(0, vertical, true);
   }
 }

@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import cx from 'classnames';
+import electron from 'electron';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { UserService } from 'services/user';
-import electron from 'electron';
 import Login from 'components/Login.vue';
+import AppsNav from 'components/AppsNav.vue';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
@@ -17,16 +18,10 @@ import { FacemasksService } from 'services/facemasks';
 import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
-import UndoControls from 'components/UndoControls';
 import styles from './SideNav.m.less';
 Vue.use(VueResize);
 
-@Component({
-  components: {
-    Login,
-    UndoControls,
-  },
-})
+@Component({})
 export default class TopNav extends Vue {
   @Inject() appService: AppService;
   @Inject() settingsService: SettingsService;
@@ -110,6 +105,10 @@ export default class TopNav extends Vue {
     return this.userService.state.auth;
   }
 
+  get leftDock() {
+    return this.customizationService.state.leftDock;
+  }
+
   get appStoreVisible() {
     return this.platformAppsService.state.storeVisible;
   }
@@ -140,7 +139,7 @@ export default class TopNav extends Vue {
     if (this.appStoreVisible) pageData.push({ title: 'Store', icon: 'icon-store' });
 
     return (
-      <div class={styles.container}>
+      <div class={cx(styles.container, { [styles.leftDock]: this.leftDock })}>
         {pageData.map(page => (
           <div
             class={cx(styles.mainCell, { [styles.active]: this.page === page.title })}
@@ -150,6 +149,7 @@ export default class TopNav extends Vue {
             <i class={page.icon} />
           </div>
         ))}
+        {this.platformAppsService.enabledApps.length > 0 && <AppsNav />}
 
         <div class={styles.bottomTools}>
           {this.isDevMode && (
@@ -162,6 +162,9 @@ export default class TopNav extends Vue {
             onClick={this.studioMode.bind(this)}
           >
             <i class="icon-studio-mode-3" />
+          </div>
+          <div class={styles.cell} onClick={() => this.navigate('Help')}>
+            <i class="icon-question" />
           </div>
           <div class={styles.cell} onClick={this.openSettingsWindow.bind(this)}>
             <i class="icon-settings" />
