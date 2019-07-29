@@ -408,7 +408,7 @@ if (!gotTheLock) {
 
   ipcMain.on('window-closeChildWindow', (event) => {
     // never close the child window, hide it instead
-    childWindow.hide();
+    if (!childWindow.isDestroyed()) childWindow.hide();
   });
 
 
