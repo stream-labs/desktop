@@ -102,12 +102,30 @@ export class EditMenu extends Menu {
 
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
+        const streamVisLabel = selectedItem.streamVisible
+          ? $t('Hide on Stream')
+          : $t('Show on Stream');
+        const recordingVisLabel = selectedItem.recordingVisible
+          ? $t('Hide on Recording')
+          : $t('Show on Recording');
 
         if (!isMultipleSelection) {
           this.append({
             label: visibilityLabel,
             click: () => {
               selectedItem.setVisibility(!selectedItem.visible);
+            },
+          });
+          this.append({
+            label: streamVisLabel,
+            click: () => {
+              selectedItem.setStreamVisible(!selectedItem.streamVisible);
+            },
+          });
+          this.append({
+            label: recordingVisLabel,
+            click: () => {
+              selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
             },
           });
           this.append({
@@ -275,6 +293,16 @@ export class EditMenu extends Menu {
     this.append({
       label: $t('Create Output Projector'),
       click: () => this.projectorService.createProjector(ERenderingMode.OBS_MAIN_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Stream Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_STREAMING_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Recording Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_RECORDING_RENDERING),
     });
 
     this.append({ type: 'separator' });
