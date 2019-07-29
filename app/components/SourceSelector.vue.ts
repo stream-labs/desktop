@@ -10,7 +10,7 @@ import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
-import { Global } from '../../obs-api';
+import { CustomizationService } from 'services/customization';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -63,6 +63,7 @@ export default class SourceSelector extends Vue {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private customizationService: CustomizationService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -257,28 +258,30 @@ export default class SourceSelector extends Vue {
   }
 
   get selectiveRecordingEnabled() {
-    return Global.multipleRendering;
+    return this.customizationService.state.selectiveRecordingEnabled;
   }
 
   toggleSelectiveRecording(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
-    if (selection.isStreamVisible && selection.isRecordingVisible) {
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setStreamVisible(false);
-    } else if (selection.isRecordingVisible) {
+    } else if (selection.isRecordingVisible()) {
       selection.setStreamVisible(true);
       selection.setRecordingVisible(false);
     } else {
       selection.setStreamVisible(true);
       selection.setRecordingVisible(true);
     }
+    console.log('stream visible', selection.isStreamVisible);
+    console.log('recording visible', selection.isRecordingVisible);
   }
 
-  selectiveRecordingClassesForSouce(sceneNodeId: string) {
+  selectiveRecordingClassesForSource(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
-    if (selection.isStreamVisible && selection.isRecordingVisible) {
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       return 'icon-multistream';
     }
-    return selection.isStreamVisible ? 'icon-platforms' : 'icon-studio';
+    return selection.isStreamVisible() ? 'icon-platforms' : 'icon-studio';
   }
 
   visibilityClassesForSource(sceneNodeId: string) {
