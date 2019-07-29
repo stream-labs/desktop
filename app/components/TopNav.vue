@@ -73,7 +73,6 @@
   </div>
 
   <div class="top-nav-right">
-    <undo-controls class="top-nav-item" />
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <div class="theme-toggle__bg"></div>
@@ -93,6 +92,11 @@
         @click="studioMode"
         class="link">
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
+      </a>
+    </div>
+    <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': selectiveRecordingEnabled }">
+      <a @click="toggleSelectiveRecording" class="link">
+        <i class="icon-empty" v-tooltip.right="$t('Toggle Selective Recording')" />
       </a>
     </div>
     <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">

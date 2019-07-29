@@ -17,6 +17,7 @@ import { AppService } from '../services/app';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import UndoControls from 'components/UndoControls';
+import { Global } from '../../obs-api';
 Vue.use(VueResize);
 
 @Component({
@@ -51,6 +52,7 @@ export default class TopNav extends Vue {
 
   mounted() {
     this.topNav = this.$refs.top_nav;
+    this.openDevTools();
   }
 
   get availableFeatures() {
@@ -97,6 +99,14 @@ export default class TopNav extends Vue {
 
   featureIsEnabled(feature: EAvailableFeatures) {
     return this.incrementalRolloutService.featureIsEnabled(feature);
+  }
+
+  toggleSelectiveRecording() {
+    Global.multipleRendering = !Global.multipleRendering;
+  }
+
+  get selectiveRecordingEnabled() {
+    return Global.multipleRendering;
   }
 
   studioMode() {

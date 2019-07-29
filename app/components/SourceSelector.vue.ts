@@ -10,6 +10,7 @@ import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
+import { Global } from '../../obs-api';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -253,6 +254,31 @@ export default class SourceSelector extends Vue {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  get selectiveRecordingEnabled() {
+    return Global.multipleRendering;
+  }
+
+  toggleSelectiveRecording(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isStreamVisible && selection.isRecordingVisible) {
+      selection.setStreamVisible(false);
+    } else if (selection.isRecordingVisible) {
+      selection.setStreamVisible(true);
+      selection.setRecordingVisible(false);
+    } else {
+      selection.setStreamVisible(true);
+      selection.setRecordingVisible(true);
+    }
+  }
+
+  selectiveRecordingClassesForSouce(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isStreamVisible && selection.isRecordingVisible) {
+      return 'icon-multistream';
+    }
+    return selection.isStreamVisible ? 'icon-platforms' : 'icon-studio';
   }
 
   visibilityClassesForSource(sceneNodeId: string) {
