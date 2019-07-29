@@ -189,7 +189,7 @@ export class AppService extends StatefulService<IAppState> {
   }
 
   @track('app_close')
-  private async shutdownHandler() {
+  private shutdownHandler() {
     this.START_LOADING();
     obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
