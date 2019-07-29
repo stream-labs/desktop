@@ -9,6 +9,7 @@ import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
+import { AppService } from 'services/app';
 
 @Component({
   components: {
@@ -23,6 +24,7 @@ export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private appService: AppService;
 
   $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
@@ -47,6 +49,10 @@ export default class Studio extends Vue {
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
+  }
+
+  get appLoading() {
+    return this.appService.state.loading;
   }
 
   get displayEnabled() {

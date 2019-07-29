@@ -272,8 +272,6 @@ export default class SourceSelector extends Vue {
       selection.setStreamVisible(true);
       selection.setRecordingVisible(true);
     }
-    console.log('stream visible', selection.isStreamVisible);
-    console.log('recording visible', selection.isRecordingVisible);
   }
 
   selectiveRecordingClassesForSource(sceneNodeId: string) {

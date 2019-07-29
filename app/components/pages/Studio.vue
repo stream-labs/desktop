@@ -30,7 +30,7 @@
     :min="minHeight"
     :reverse="true"
   />
-  <studio-controls :style="{height: height + 'px'}" />
+  <studio-controls v-if="!appLoading" :style="{height: height + 'px'}" />
 </div>
 </template>
 
