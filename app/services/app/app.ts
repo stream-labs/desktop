@@ -189,21 +189,20 @@ export class AppService extends StatefulService<IAppState> {
   }
 
   @track('app_close')
-  private shutdownHandler() {
+  private async shutdownHandler() {
     this.START_LOADING();
     obs.NodeObs.StopCrashHandler();
-
     this.crashReporterService.beginShutdown();
 
-    this.ipcServerService.stopListening();
-    this.tcpServerService.stopListening();
-
     window.setTimeout(async () => {
+      this.windowsService.closeChildWindow();
+      await this.windowsService.closeAllOneOffs();
+      this.ipcServerService.stopListening();
+      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
-      this.windowsService.closeAllOneOffs();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();

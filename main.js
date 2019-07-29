@@ -199,7 +199,6 @@ if (!gotTheLock) {
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
         shutdownStarted = true;
-        childWindow.destroy();
         mainWindow.send('shutdown');
 
         // We give the main window 10 seconds to acknowledge a request
