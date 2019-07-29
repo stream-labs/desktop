@@ -15,30 +15,30 @@ export interface ITransitionsServiceState {
 export class TransitionsService implements ISerializable {
   @Fallback()
   @Inject()
-  protected transitionService: InternalTransitionsService;
+  protected transitionsService: InternalTransitionsService;
 
   get studioModeChanged(): Observable<boolean> {
-    return this.transitionService.studioModeChanged;
+    return this.transitionsService.studioModeChanged;
   }
 
   getModel(): ITransitionsServiceState {
     return {
-      studioMode: this.transitionService.state.studioMode,
+      studioMode: this.transitionsService.state.studioMode,
     };
   }
 
   enableStudioMode() {
-    this.transitionService.enableStudioMode();
+    this.transitionsService.enableStudioMode();
   }
 
   disableStudioMode() {
-    this.transitionService.disableStudioMode();
+    this.transitionsService.disableStudioMode();
   }
 
   /**
    * While in studio mode, will execute a studio mode transition
    */
   executeStudioModeTransition() {
-    this.transitionService.executeStudioModeTransition();
+    this.transitionsService.executeStudioModeTransition();
   }
 }

@@ -9,14 +9,14 @@ test('Transitions', async t => {
   const transitionsService = api.getResource<TransitionsService>('TransitionsService');
 
   // test enable studio mode
-  let eventWatcher = api.watchForEvents(['TransitionService.studioModeChanged']);
+  let eventWatcher = api.watchForEvents(['TransitionsService.studioModeChanged']);
   transitionsService.enableStudioMode();
   await eventWatcher.waitForAll();
   t.true(eventWatcher.receivedEvents[0].data);
   t.true(transitionsService.getModel().studioMode);
 
   // test disable studio mode
-  eventWatcher = api.watchForEvents(['TransitionService.studioModeChanged']);
+  eventWatcher = api.watchForEvents(['TransitionsService.studioModeChanged']);
   transitionsService.disableStudioMode();
   await eventWatcher.waitForAll();
   t.false(eventWatcher.receivedEvents[0].data);
