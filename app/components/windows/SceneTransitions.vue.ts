@@ -123,13 +123,12 @@ export default class SceneTransitions extends Vue {
   }
 
   addConnection() {
-    // TODO: Return types for executeCommand
     const connection = this.editorCommandsService.executeCommand(
       'CreateConnectionCommand',
       this.scenesService.scenes[0].id,
       this.scenesService.scenes[1].id,
       this.transitions[0].id,
-    ) as ITransitionConnection;
+    );
 
     this.editConnection(connection.id);
   }
