@@ -5,6 +5,7 @@ import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
 import * as obs from '../../../../obs-api';
 import { ScenesService } from 'services/scenes';
+import defaultTo from 'lodash/defaultTo';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -200,11 +201,17 @@ export class SourcesNode extends Node<ISchema, {}> {
         this.audioService
           .getSource(sourceInfo.id)
           .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
+
+        const defaultMonitoring =
+          (source.id as TSourceType) === 'browser_source'
+            ? obs.EMonitoringType.MonitoringOnly
+            : obs.EMonitoringType.None;
+
         this.audioService.getSource(sourceInfo.id).setSettings({
-          forceMono: sourceInfo.forceMono,
-          syncOffset: sourceInfo.syncOffset ? AudioService.timeSpecToMs(sourceInfo.syncOffset) : 0,
-          audioMixers: sourceInfo.audioMixers,
-          monitoringType: sourceInfo.monitoringType,
+          forceMono: defaultTo(sourceInfo.forceMono, false),
+          syncOffset: defaultTo(AudioService.timeSpecToMs(sourceInfo.syncOffset), 0),
+          audioMixers: defaultTo(sourceInfo.audioMixers, 255),
+          monitoringType: defaultTo(sourceInfo.monitoringType, defaultMonitoring),
         });
         this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
