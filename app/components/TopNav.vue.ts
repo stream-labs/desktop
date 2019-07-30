@@ -51,6 +51,7 @@ export default class TopNav extends Vue {
 
   mounted() {
     this.topNav = this.$refs.top_nav;
+    this.customizationService.initializeMultiRendering();
   }
 
   get availableFeatures() {

@@ -72,6 +72,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+  }
+
+  initializeMultiRendering() {
     Global.multipleRendering = this.state.selectiveRecordingEnabled;
   }
 
