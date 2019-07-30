@@ -149,8 +149,8 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   pasteFilters(sourceId?: string) {
     const source = sourceId
-      ? this.selectionService.getLastSelected()
-      : this.sourcesService.getSource(sourceId);
+      ? this.sourcesService.getSource(sourceId)
+      : this.selectionService.getLastSelected();
     if (!source) return;
 
     const filterData: IFilterData[] = [];
