@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import AppsNav from '../AppsNav.vue';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -37,7 +36,6 @@ import CreatorSites from 'components/pages/CreatorSites';
   components: {
     TitleBar,
     SideNav,
-    AppsNav,
     Studio,
     Dashboard,
     BrowseOverlays,

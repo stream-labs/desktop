@@ -120,8 +120,12 @@ export interface ILoadedApp {
   appPath?: string;
   appUrl?: string;
   devPort?: number;
-  icon?: string;
   enabled: boolean;
+
+  // Thumbnail in store
+  icon?: string;
+  // Nav icon
+  logo?: string;
 }
 
 interface IPlatformAppServiceState {

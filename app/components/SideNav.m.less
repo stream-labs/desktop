@@ -1,5 +1,7 @@
 .container {
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 52px;
   left: 0;
@@ -16,6 +18,7 @@
   height: 46px;
   width: 52px;
   position: relative;
+  flex-shrink: 0;
 
   i {
     position: absolute;
@@ -50,6 +53,7 @@
 }
 
 .bottom-tools {
-  position: absolute;
-  bottom: 0;
+  margin-top: auto;
+  flex-shrink: 0;
+  background: var(--background);
 }

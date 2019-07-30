@@ -6,8 +6,7 @@ import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { UserService } from 'services/user';
-import Login from 'components/Login.vue';
-import AppsNav from 'components/AppsNav.vue';
+import AppsNav from 'components/AppsNav';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
@@ -124,6 +123,25 @@ export default class TopNav extends Vue {
     return this.appService.state.loading;
   }
 
+  handleAuth() {
+    if (this.userService.isLoggedIn()) {
+      electron.remote.dialog.showMessageBox(
+        {
+          title: $t('Confirm'),
+          message: $t('Are you sure you want to log out?'),
+          buttons: [$t('Yes'), $t('No')],
+        },
+        index => {
+          if (index === 0) {
+            this.userService.logOut();
+          }
+        },
+      );
+    } else {
+      this.userService.showLogin();
+    }
+  }
+
   handleResize() {
     this.responsiveClass = this.topNav.clientWidth < 1200;
   }
@@ -162,6 +180,11 @@ export default class TopNav extends Vue {
             onClick={this.studioMode.bind(this)}
           >
             <i class="icon-studio-mode-3" />
+          </div>
+          <div class={styles.cell} onClick={() => this.handleAuth()}>
+            <i
+              class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'}
+            />
           </div>
           <div class={styles.cell} onClick={() => this.navigate('Help')}>
             <i class="icon-question" />

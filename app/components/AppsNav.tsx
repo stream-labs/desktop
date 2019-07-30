@@ -1,10 +1,12 @@
 import Vue from 'vue';
+import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';
 import HScroll, { IHScrollModel } from './shared/HScroll.vue';
+import styles from './AppsNav.m.less';
 Vue.use(VueResize);
 
 /**
@@ -35,7 +37,7 @@ export default class AppsNav extends Vue {
     );
   }
 
-  get topNavApps() {
+  get navApps() {
     return this.platformAppsService.enabledApps.filter(app => {
       return !!app.manifest.pages.find(page => {
         return page.slot === EAppPageSlot.TopNav;
@@ -77,5 +79,21 @@ export default class AppsNav extends Vue {
 
   private scrollNav(vertical: number) {
     this.$refs.scroll.scrollBy(0, vertical, true);
+  }
+
+  render(h: Function) {
+    return (
+      <div class={styles.wrapper}>
+        {this.navApps.map(app => (
+          <div
+            onClick={() => this.navigateApp(app.id)}
+            class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
+          >
+            <i class="icon-integrations" />
+            {app.logo && <img src={app.logo} />}
+          </div>
+        ))}
+      </div>
+    );
   }
 }

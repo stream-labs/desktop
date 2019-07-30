@@ -1,0 +1,32 @@
+@import '../styles/index';
+
+.wrapper {
+  background: var(--section-alt);
+  width: 52px;
+  height: auto;
+  padding-top: 6px;
+  overflow-y: auto;
+  flex-grow: 1;
+  flex-basis: 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.app-tab {
+  position: relative;
+  background: var(--background);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-bottom: 6px;
+  margin-left: 6px;
+
+  i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
