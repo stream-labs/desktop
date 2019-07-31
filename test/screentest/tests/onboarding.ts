@@ -1,13 +1,12 @@
-import { useSpectron, test, focusMain, focusChild } from '../../helpers/spectron';
+import { useSpectron, test, focusMain } from '../../helpers/spectron';
 import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
 import { logIn } from '../../helpers/spectron/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
-useSpectron({ skipOnboarding: false });
+useSpectron({ skipOnboarding: false, appArgs: '--nosync' });
 useScreentest();
 
 test('Onboarding steps', async t => {
@@ -16,56 +15,56 @@ test('Onboarding steps', async t => {
 
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
-  await makeScreenshots(t, 'Auth Buttons');
 
-  await logIn(t, 'twitch', null, false);
+  await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
+  await app.client.click('p=Skip');
 
-  // This will show up if there are scene collections to import
-  if (await t.context.app.client.isExisting('button=Continue')) {
-    await t.context.app.client.click('button=Continue');
-  }
-  await sleep(1000);
+  await app.client.waitForVisible('h2=Start Fresh', 15000);
+  await makeScreenshots(t, 'Start fresh or import from OBS');
+  await app.client.click('h2=Start Fresh');
 
-  // Start auto config
-  t.true(await app.client.isExisting('button=Start'));
-  await disableGifAnimations(t);
-  await makeScreenshots(t, 'Autoconfig');
+  await app.client.waitForVisible('h1=Add a Theme');
+  await makeScreenshots(t, 'Add a Theme');
+  await app.client.click('p=Skip');
+
+  await app.client.waitForVisible('h1=Optimize');
+  await makeScreenshots(t, 'Before optimize');
   await app.client.click('button=Start');
-  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
-  await makeScreenshots(t, 'Autoconfig is Finished');
+  await app.client.waitForVisible('h1=Optimizing... 33%');
+  await makeScreenshots(t, 'Optimization progress');
 
+  // success?
+  await app.client.waitForVisible('h2=Sources', 60000);
+  await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
 
-test('Onboarding OBS Importer', async t => {
+test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // extract OBS config to the cache dir
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
-  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
-  console.log(dataDir);
+  const dataDir = path.resolve(__dirname, '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  await client.click('a=Setup later');
+  await client.click('p=Skip');
+  await sleep(1000);
 
   // import from OBS
-  t.true(await client.isExisting('button=Import from OBS'), 'OBS detected');
-  await makeScreenshots(t, 'OBS detected');
-  await client.click('button=Import from OBS');
-  await client.waitForVisible('button=Continue');
-  await makeScreenshots(t, 'OBS completed');
-  await client.click('button=Continue');
+  await client.waitForVisible('h2=Import from OBS');
+  await makeScreenshots(t, 'Import button');
+  await client.click('h2=Import from OBS');
 
-  // check sources exist in the main window
-  await focusMain(t);
-  await makeScreenshots(t, 'Sources exist');
+  // benefits page
+  await client.waitForVisible('h1=A few benefits of using Streamlabs OBS');
+  await makeScreenshots(t, 'Benefits');
+  await client.click('button=Complete');
 
-  // check settings
-  await client.click('.top-nav .icon-settings');
-  await focusChild(t);
-  await client.click('li=Output');
-  await makeScreenshots(t, 'Settings are applied');
+  // success?
+  await client.waitForVisible('h2=Sources', 60000);
+  await makeScreenshots(t, 'Import from OBS is completed');
+  t.pass();
 });

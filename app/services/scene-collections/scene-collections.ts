@@ -292,8 +292,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
     const newId = uuid();
-    await this.stateService.copyCollectionFile(id, newId);
-    await this.insertCollection(newId, name);
+    await this.insertCollection(newId, name, false, id);
     this.stateService.SET_NEEDS_RENAME(newId);
     this.enableAutoSave();
   }
@@ -606,9 +605,15 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   /**
    * Creates and persists new collection from the current application state
+   * or from another scene collection's contents.
    */
-  private async insertCollection(id: string, name: string, auto = false) {
-    await this.saveCurrentApplicationStateAs(id);
+  private async insertCollection(id: string, name: string, auto = false, fromId?: string) {
+    if (fromId) {
+      await this.stateService.copyCollectionFile(fromId, id);
+    } else {
+      await this.saveCurrentApplicationStateAs(id);
+    }
+
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), auto);
     await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
