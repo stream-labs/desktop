@@ -53,8 +53,9 @@ export default class AppsNav extends Vue {
     return topNavPage.allowPopout == null ? true : topNavPage.allowPopout;
   }
 
-  popOut(appId: string) {
-    this.platformAppsService.popOutAppPage(appId, EAppPageSlot.TopNav);
+  popOut(app: ILoadedApp) {
+    if (!this.isPopOutAllowed(app)) return;
+    this.platformAppsService.popOutAppPage(app.id, EAppPageSlot.TopNav);
   }
 
   refreshApp(appId: string) {
@@ -86,7 +87,10 @@ export default class AppsNav extends Vue {
       <div class={styles.wrapper}>
         {this.navApps.map(app => (
           <div
+            title={app.manifest.name}
             onClick={() => this.navigateApp(app.id)}
+            draggable
+            onDragEnd={() => this.popOut(app)}
             class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
           >
             <i class="icon-integrations" />
