@@ -83,13 +83,14 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
 
   render(h: Function) {
     return (
-      <OnboardingStep>
-        <div slot="title">{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</div>
-        <div slot="desc">
+      <div class={styles.container}>
+        <div class={styles.progressCover} />
+        <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
+        <p>
           {this.isSecurityUpgrade
             ? this.securityUpgradeLink(h)
             : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
-        </div>
+        </p>
         <div class={styles.signupButtons}>
           {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
             <button
@@ -102,7 +103,10 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
             </button>
           ))}
         </div>
-      </OnboardingStep>
+        <span class={styles.skipButton} onClick={this.continue}>
+          {$t('Skip')}
+        </span>
+      </div>
     );
   }
 }
