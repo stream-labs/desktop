@@ -36,6 +36,26 @@ export default class Live extends Vue {
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
+  maxHeight: number = null;
+
+  mounted() {
+    this.handleWindowResize();
+
+    window.addEventListener('resize', this.handleWindowResize);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.handleWindowResize);
+  }
+
+  handleWindowResize() {
+    this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
+
+    const clampedHeight = Math.min(this.height, this.maxHeight);
+
+    if (clampedHeight !== this.height) this.height = clampedHeight;
+  }
+
   onBrowserViewReady(view: Electron.BrowserView) {
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
@@ -89,12 +109,6 @@ export default class Live extends Vue {
   get displayWidth() {
     // 29 pixels is roughly the size of the title control label
     return (16 / 9) * (this.height - 29);
-  }
-
-  get maxHeight() {
-    // Roughly 400 pixels below the top is a good top limit for
-    // resizing. It allows plenty of room for the title bar and header.
-    return this.$root.$el.getBoundingClientRect().height - 400;
   }
 
   get minHeight() {
