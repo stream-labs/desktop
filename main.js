@@ -479,13 +479,21 @@ if (!gotTheLock) {
      executed synchronously and therefore default actions
      cannot be prevented. */
   ipcMain.on('webContents-preventNavigation', (e, id) => {
-    webContents.fromId(id).on('will-navigate', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('will-navigate', e => {
       e.preventDefault();
     });
   });
 
   ipcMain.on('webContents-preventPopup', (e, id) => {
-    webContents.fromId(id).on('new-window', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('new-window', e => {
       e.preventDefault();
     });
   });
