@@ -92,4 +92,11 @@ export interface ISceneCollectionsManifestEntry {
   deleted: boolean;
   modified: string;
   needsRename: boolean;
+
+  /**
+   * This scene collection was created automatically this session because
+   * there were no scene collections present.  This attribute is not persisted
+   * past a single app life cycle.
+   */
+  auto?: boolean;
 }
