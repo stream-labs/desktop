@@ -110,23 +110,3 @@ schedulingPlatforms.forEach(platform => {
     t.pass();
   });
 });
-
-
-test('Go live error', async t => {
-
-  // login into the account
-  if (!(await logIn(t))) return;
-  const app = t.context.app;
-
-  // disable network
-  await setResponseCode(t, 404);
-
-  // open EditStreamInfo window
-  await app.client.click('button=Go Live');
-
-  // check that the error text is shown
-  await makeScreenshots(t, 'Go live error');
-
-  await resetResponseCode(t);
-});
-
