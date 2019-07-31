@@ -90,7 +90,8 @@ export default class AppsNav extends Vue {
             title={app.manifest.name}
             onClick={() => this.navigateApp(app.id)}
             draggable
-            onDragEnd={() => this.popOut(app)}
+            // funky casing since vue is dumb
+            onDragend={() => this.popOut(app)}
             class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
           >
             <i class="icon-integrations" />

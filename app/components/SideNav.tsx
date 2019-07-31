@@ -164,7 +164,7 @@ export default class TopNav extends Vue {
           <div
             class={cx(styles.mainCell, { [styles.active]: this.page === page.target })}
             onClick={() => this.navigate(page.target as TAppPage)}
-            v-tooltip={{ content: $t(page.title || page.target), placement: 'bottom' }}
+            title={$t(page.title || page.target)}
           >
             <i class={page.icon} />
           </div>
@@ -173,27 +173,35 @@ export default class TopNav extends Vue {
 
         <div class={styles.bottomTools}>
           {this.isDevMode && (
-            <div class={styles.cell} onClick={this.openDevTools.bind(this)}>
-              <i class="icon-developer" v-tooltip={$t('Dev Tools')} />
+            <div class={styles.cell} onClick={this.openDevTools.bind(this)} title={$t('Dev Tools')}>
+              <i class="icon-developer" />
             </div>
           )}
           <div
             class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
             onClick={this.studioMode.bind(this)}
+            title={$t('Studio Mode')}
           >
-            <i class="icon-studio-mode-3" v-tooltip={$t('Studio Mode')} />
+            <i class="icon-studio-mode-3" />
           </div>
-          <div class={styles.cell} onClick={() => this.handleAuth()}>
+          <div
+            class={styles.cell}
+            onClick={() => this.handleAuth()}
+            title={this.userService.isLoggedIn() ? $t('Logout') : $t('Login')}
+          >
             <i
               class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'}
-              v-tooltip={this.userService.isLoggedIn() ? $t('Logout') : $t('Login')}
             />
           </div>
-          <div class={styles.cell} onClick={() => this.navigate('Help')}>
-            <i class="icon-question" v-tooltip={$t('Get Help')} />
+          <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
+            <i class="icon-question" />
           </div>
-          <div class={styles.cell} onClick={this.openSettingsWindow.bind(this)}>
-            <i class="icon-settings" v-tooltip={$t('Settings')} />
+          <div
+            class={styles.cell}
+            onClick={this.openSettingsWindow.bind(this)}
+            title={$t('Settings')}
+          >
+            <i class="icon-settings" />
           </div>
         </div>
       </div>
