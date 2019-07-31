@@ -209,7 +209,9 @@ export class SourcesNode extends Node<ISchema, {}> {
 
         this.audioService.getSource(sourceInfo.id).setSettings({
           forceMono: defaultTo(sourceInfo.forceMono, false),
-          syncOffset: AudioService.timeSpecToMs(defaultTo(sourceInfo.syncOffset, { sec: 0, nsec: 0 })),
+          syncOffset: AudioService.timeSpecToMs(
+            defaultTo(sourceInfo.syncOffset, { sec: 0, nsec: 0 }),
+          ),
           audioMixers: defaultTo(sourceInfo.audioMixers, 255),
           monitoringType: defaultTo(sourceInfo.monitoringType, defaultMonitoring),
         });
