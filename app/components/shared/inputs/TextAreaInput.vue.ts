@@ -1,21 +1,16 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
-import { IInputMetadata } from './index';
+import { ITextAreaMetadata } from './index';
 
-interface IWTextMetadata extends IInputMetadata {
-  placeholder: string;
-  max: number;
-  min: number;
-  blockReturn: boolean;
-}
+
 
 @Component({})
-export default class TextAreaInput extends BaseInput<string, IWTextMetadata> {
+export default class TextAreaInput extends BaseInput<string, ITextAreaMetadata> {
   @Prop()
   readonly value: string;
 
   @Prop({ default: () => ({}) })
-  readonly metadata: IWTextMetadata;
+  readonly metadata: ITextAreaMetadata;
 
   @Prop()
   readonly title: string;
