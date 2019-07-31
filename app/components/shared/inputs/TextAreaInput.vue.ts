@@ -2,8 +2,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { ITextAreaMetadata } from './index';
 
-
-
 @Component({})
 export default class TextAreaInput extends BaseInput<string, ITextAreaMetadata> {
   @Prop()
