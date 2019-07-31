@@ -148,21 +148,23 @@ export default class TopNav extends Vue {
 
   render(h: Function) {
     const pageData = [
-      { title: 'Studio', icon: 'icon-studio' },
-      { title: 'Live', icon: 'icon-live-dashboard' },
-      { title: 'Themes', icon: 'icon-themes' },
+      { target: 'Studio', icon: 'icon-studio' },
+      { target: 'Live', icon: 'icon-live-dashboard' },
+      { target: 'BroseOverlays', icon: 'icon-themes', title: 'Themes' },
     ];
 
-    if (this.chatbotVisible) pageData.push({ title: 'Cloudbot', icon: 'icon-cloudbot' });
-    if (this.appStoreVisible) pageData.push({ title: 'Store', icon: 'icon-store' });
+    if (this.chatbotVisible) pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot' });
+    if (this.appStoreVisible) {
+      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: 'Store' });
+    }
 
     return (
       <div class={cx(styles.container, { [styles.leftDock]: this.leftDock })}>
         {pageData.map(page => (
           <div
-            class={cx(styles.mainCell, { [styles.active]: this.page === page.title })}
-            onClick={() => this.navigate(page.title as TAppPage)}
-            v-tooltip={{ content: $t(page.title), placement: 'bottom' }}
+            class={cx(styles.mainCell, { [styles.active]: this.page === page.target })}
+            onClick={() => this.navigate(page.target as TAppPage)}
+            v-tooltip={{ content: $t(page.title || page.target), placement: 'bottom' }}
           >
             <i class={page.icon} />
           </div>
@@ -172,25 +174,26 @@ export default class TopNav extends Vue {
         <div class={styles.bottomTools}>
           {this.isDevMode && (
             <div class={styles.cell} onClick={this.openDevTools.bind(this)}>
-              <i class="icon-developer" />
+              <i class="icon-developer" v-tooltip={$t('Dev Tools')} />
             </div>
           )}
           <div
             class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
             onClick={this.studioMode.bind(this)}
           >
-            <i class="icon-studio-mode-3" />
+            <i class="icon-studio-mode-3" v-tooltip={$t('Studio Mode')} />
           </div>
           <div class={styles.cell} onClick={() => this.handleAuth()}>
             <i
               class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'}
+              v-tooltip={this.userService.isLoggedIn() ? $t('Logout') : $t('Login')}
             />
           </div>
           <div class={styles.cell} onClick={() => this.navigate('Help')}>
-            <i class="icon-question" />
+            <i class="icon-question" v-tooltip={$t('Get Help')} />
           </div>
           <div class={styles.cell} onClick={this.openSettingsWindow.bind(this)}>
-            <i class="icon-settings" />
+            <i class="icon-settings" v-tooltip={$t('Settings')} />
           </div>
         </div>
       </div>
