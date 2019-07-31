@@ -23,6 +23,7 @@ import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
+import { Spinner } from 'streamlabs-beaker';
 import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
@@ -33,6 +34,7 @@ import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
     ListInput,
     TwitchTagsInput,
     ValidatedForm,
+    Spinner,
   },
 })
 export default class EditStreamInfo extends Vue {
