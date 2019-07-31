@@ -1,6 +1,6 @@
 import { EVideoCodes } from 'obs-studio-node';
 import { test } from '../../helpers/spectron';
-import { apiInitErrorResultToMessage as rtm } from '../../../app/services/app';
+import { apiInitErrorResultToMessage as rtm } from '../../../app/app';
 
 test('returns user-friendly error for ModuleNotFound status', t => {
   t.regex(rtm(EVideoCodes.ModuleNotFound), /DirectX could not be found/);
