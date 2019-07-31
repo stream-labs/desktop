@@ -7,6 +7,7 @@ import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
 import { WindowsService } from 'services/windows';
+import { async } from 'rxjs/internal/scheduler/async';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -108,6 +109,15 @@ let stopApp: (clearCache?: boolean) => Promise<any>;
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopApp(false);
   return await startApp(t);
+}
+
+let skipCheckingErrorsInLogFlag = false;
+
+/**
+ * Disable checking errors in the log file for a single test
+ */
+export function skipCheckingErrorsInLog() {
+  skipCheckingErrorsInLogFlag = true;
 }
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
@@ -236,7 +246,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (errors.length) {
+    if (errors.length && !skipCheckingErrorsInLogFlag) {
       fail(`The log-file has errors \n ${logs}`);
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
@@ -252,6 +262,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
+    skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);

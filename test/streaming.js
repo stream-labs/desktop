@@ -1,10 +1,17 @@
-import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
+import {
+  useSpectron,
+  focusMain,
+  focusChild,
+  test,
+  skipCheckingErrorsInLog
+} from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
 import { setOutputResolution } from './helpers/spectron/output';
 const moment = require('moment');
 import { sleep } from './helpers/sleep';
+import { resetResponseCode, setResponseCode } from './helpers/spectron/network';
 
 
 useSpectron({ appArgs: '--nosync' });
@@ -211,4 +218,27 @@ schedulingPlatforms.forEach(platform => {
     }
 
   });
+});
+
+
+
+test('Go live error', async t => {
+
+  // login into the account
+  if (!(await logIn(t))) return;
+  const app = t.context.app;
+
+  // disable network
+  await setResponseCode(t, 404);
+  skipCheckingErrorsInLog();
+
+  // open EditStreamInfo window
+  await app.client.click('button=Go Live');
+  await focusChild(t);
+
+  // check that the error text is shown
+  await app.client.waitForVisible('a=just go live.');
+
+  await resetResponseCode(t);
+  t.pass();
 });
