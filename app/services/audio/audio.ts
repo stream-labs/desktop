@@ -309,7 +309,9 @@ export class AudioSource implements IAudioSourceApi {
 
   constructor(sourceId: string) {
     this.audioSourceState = this.audioService.state.audioSources[sourceId];
-    const sourceState = this.sourcesService.state.sources[sourceId];
+    const sourceState =
+      this.sourcesService.state.sources[sourceId] ||
+      this.sourcesService.state.temporarySources[sourceId];
     Utils.applyProxy(this, this.audioSourceState);
     Utils.applyProxy(this, sourceState);
   }
