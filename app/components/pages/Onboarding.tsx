@@ -122,9 +122,6 @@ export default class OnboardingPage extends TsxComponent<{}> {
       <div>
         <div class={styles.container}>
           <Connect continue={this.complete.bind(this)} />
-          <span class={styles.skipButton} onClick={this.complete.bind(this)}>
-            {$t('Skip')}
-          </span>
         </div>
       </div>
     );
@@ -151,7 +148,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
             skipHandler={this.proceed.bind(this)}
             prevHandler={() => {}}
             hideBack={true}
-            hideSkip={this.currentStep === 2}
+            hideSkip={[1, 2].includes(this.currentStep)}
             hideButton={
               [1, 2, 4].includes(this.currentStep) ||
               (this.currentStep === 3 && !this.importedFromObs)
