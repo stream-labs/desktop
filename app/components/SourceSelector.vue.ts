@@ -277,9 +277,19 @@ export default class SourceSelector extends Vue {
   selectiveRecordingClassesForSource(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      return 'icon-multistream';
+      return 'icon-smart-record';
     }
     return selection.isStreamVisible() ? 'icon-platforms' : 'icon-studio';
+  }
+
+  selectiveRecordingTooltip(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      return $t('Visible on both Stream and Recording');
+    }
+    return selection.isStreamVisible()
+      ? $t('Only visible on Stream')
+      : $t('Only visible on Recording');
   }
 
   visibilityClassesForSource(sceneNodeId: string) {

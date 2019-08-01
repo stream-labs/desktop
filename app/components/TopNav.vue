@@ -96,7 +96,7 @@
     </div>
     <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': selectiveRecordingEnabled }">
       <a @click="toggleSelectiveRecording" class="link">
-        <i class="icon-empty" v-tooltip.right="$t('Toggle Selective Recording')" />
+        <i class="icon-smart-record" v-tooltip.right="$t('Toggle Selective Recording')" />
       </a>
     </div>
     <div v-if="isUserLoggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': facemasksActive }">
