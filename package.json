@@ -122,6 +122,7 @@
     "electron": "5.0.6",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "2.2.4",
+    "fetch-mock": "^7.3.9",
     "file-loader": "1.1.11",
     "fuse.js": "3.2.1",
     "hard-source-webpack-plugin": "0.13.1",

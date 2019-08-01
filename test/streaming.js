@@ -11,7 +11,7 @@ import { logIn } from './helpers/spectron/user';
 import { setOutputResolution } from './helpers/spectron/output';
 const moment = require('moment');
 import { sleep } from './helpers/sleep';
-import { resetResponseCode, setResponseCode } from './helpers/spectron/network';
+import { fetchMock, resetFetchMock } from './helpers/spectron/network';
 
 
 useSpectron({ appArgs: '--nosync' });
@@ -225,11 +225,11 @@ schedulingPlatforms.forEach(platform => {
 test('Go live error', async t => {
 
   // login into the account
-  if (!(await logIn(t))) return;
+  if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
 
-  // disable network
-  await setResponseCode(t, 404);
+  // simulate issues with the twitch api
+  await fetchMock(t, /api\.twitch\.tv/, 404);
   skipCheckingErrorsInLog();
 
   // open EditStreamInfo window
@@ -239,6 +239,6 @@ test('Go live error', async t => {
   // check that the error text is shown
   await app.client.waitForVisible('a=just go live.');
 
-  await resetResponseCode(t);
+  await resetFetchMock(t);
   t.pass();
 });

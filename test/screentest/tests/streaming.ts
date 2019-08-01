@@ -4,7 +4,6 @@ import { fillForm } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
-import { resetResponseCode, setResponseCode } from '../../helpers/spectron/network';
 
 useSpectron({ appArgs: '--nosync' });
 useScreentest();

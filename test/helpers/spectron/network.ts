@@ -1,29 +1,28 @@
-import { focusMain, TExecutionContext } from './index';
+import { TExecutionContext } from './index';
 
 /**
- * Replaces the `fetch` method to simulate network issues
+ * install the fetch-mock lib
  */
-export async function setResponseCode(t: TExecutionContext, code: number) {
+export async function installFetchMock(t: TExecutionContext) {
   await t.context.app.webContents.executeJavaScript(`
-    window.originalFetch = window.fetch;
-    window.fetch = (...args) => {
-      const resp = new Proxy(new Response(), { 
-        get: (obj, prop) => {
-          const patch = {
-             ok: false,
-             status: ${code},
-             text: () => Promise.resolve(''),
-             json: () => Promise.resolve({})
-          }
-          return patch[prop] || obj[prop]} 
-        })
-      return Promise.resolve(resp)
-    };
+    window.fetchMock = require('fetch-mock');
   `);
 }
 
-export async function resetResponseCode(t: TExecutionContext) {
+/**
+ * mock fetch requests
+ */
+export async function fetchMock(t: TExecutionContext, regExp: RegExp, code: number) {
   await t.context.app.webContents.executeJavaScript(`
-    window.fetch = window.originalFetch;
+    fetchMock.mock(${regExp.toString()}, ${code});
+  `);
+}
+
+/**
+ * reset all mocks
+ */
+export async function resetFetchMock(t: TExecutionContext) {
+  await t.context.app.webContents.executeJavaScript(`
+    fetchMock.reset();
   `);
 }

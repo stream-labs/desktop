@@ -8,6 +8,7 @@ import { sleep } from '../sleep';
 import { uniq } from 'lodash';
 import { WindowsService } from 'services/windows';
 import { async } from 'rxjs/internal/scheduler/async';
+import { installFetchMock } from './network';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -172,6 +173,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     `;
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+
+    // allow usage of fetch-mock library
+    await installFetchMock(t);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
