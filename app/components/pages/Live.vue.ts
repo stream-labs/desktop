@@ -57,6 +57,8 @@ export default class Live extends Vue {
   }
 
   onBrowserViewReady(view: Electron.BrowserView) {
+    if (view.isDestroyed()) return;
+
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
     view.webContents.on('new-window', (e, url) => {
