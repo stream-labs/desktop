@@ -19,7 +19,10 @@ test('Onboarding steps', async t => {
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
   console.log('skip auth');
-  await app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
+    await sleep(1000);
+  }
 
   await app.client.waitForVisible('h2=Start Fresh', 15000);
   await makeScreenshots(t, 'Start fresh or import from OBS');
@@ -55,8 +58,10 @@ test('OBS Importer', async t => {
 
   // skip auth
   console.log('click skip auth');
-  await client.click('p=Skip');
-  await sleep(1000);
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
+    await sleep(1000);
+  }
 
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');
