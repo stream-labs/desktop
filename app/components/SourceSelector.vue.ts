@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { CustomizationService } from 'services/customization';
+import { StreamingService } from 'services/streaming';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -64,6 +65,7 @@ export default class SourceSelector extends Vue {
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private streamingService: StreamingService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -262,6 +264,7 @@ export default class SourceSelector extends Vue {
   }
 
   toggleSelectiveRecording(sceneNodeId: string) {
+    if (this.streamingService.isStreaming || this.streamingService.isRecording) return;
     const selection = this.scene.getSelection(sceneNodeId);
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setStreamVisible(false);
