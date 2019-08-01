@@ -5,31 +5,25 @@ import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import VueResize from 'vue-resize';
-import HScroll, { IHScrollModel } from './shared/HScroll.vue';
 import styles from './AppsNav.m.less';
 Vue.use(VueResize);
 
 /**
  * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
  */
-const DEFAULT_SCROLL_DELTA = 250;
+const DEFAULT_SCROLL_DELTA = 43;
 
-@Component({
-  components: { HScroll },
-})
+@Component({})
 export default class AppsNav extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() navigationService: NavigationService;
 
-  scrollModel: IHScrollModel = {
-    canScroll: false,
-    canScrollLeft: false,
-    canScrollRight: false,
+  $refs: {
+    scroll: HTMLElement;
   };
 
-  $refs: {
-    scroll: HScroll;
-  };
+  upArrowVisible = false;
+  downArrowVisible = true;
 
   isSelectedApp(appId: string) {
     return (
@@ -70,34 +64,61 @@ export default class AppsNav extends Vue {
     this.navigationService.navigate('PlatformAppMainPage', { appId });
   }
 
-  scrollLeft() {
+  scrollUp() {
     this.scrollNav(-DEFAULT_SCROLL_DELTA);
   }
 
-  scrollRight() {
+  scrollDown() {
     this.scrollNav(DEFAULT_SCROLL_DELTA);
   }
 
+  handleScroll() {
+    const el = this.$refs.scroll;
+    if (!el) return;
+    if (el.scrollTop > 0) {
+      this.upArrowVisible = true;
+    } else {
+      this.upArrowVisible = false;
+    }
+    if (el.scrollHeight - el.scrollTop === el.clientHeight) {
+      this.downArrowVisible = false;
+    } else {
+      this.downArrowVisible = true;
+    }
+  }
+
   private scrollNav(vertical: number) {
-    this.$refs.scroll.scrollBy(0, vertical, true);
+    this.$refs.scroll.scrollBy({ top: vertical, behavior: 'smooth' });
   }
 
   render(h: Function) {
     return (
       <div class={styles.wrapper}>
-        {this.navApps.map(app => (
-          <div
-            title={app.manifest.name}
-            onClick={() => this.navigateApp(app.id)}
-            draggable
-            // funky casing since vue is dumb
-            onDragend={() => this.popOut(app)}
-            class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
-          >
-            <i class="icon-integrations" />
-            {app.logo && <img src={app.logo} />}
+        <div class={styles.scroll} ref="scroll" onScroll={this.handleScroll.bind(this)}>
+          {this.navApps.map(app => (
+            <div
+              title={app.manifest.name}
+              onClick={() => this.navigateApp(app.id)}
+              draggable
+              // funky casing since vue is dumb
+              onDragend={() => this.popOut(app)}
+              class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
+            >
+              <i class="icon-integrations" />
+              {app.logo && <img src={app.logo} />}
+            </div>
+          ))}
+        </div>
+        {this.upArrowVisible && (
+          <div class={cx(styles.arrow, styles.up)} onClick={this.scrollUp.bind(this)}>
+            <i class="icon-down" />
           </div>
-        ))}
+        )}
+        {this.downArrowVisible && (
+          <div class={cx(styles.arrow, styles.down)} onClick={this.scrollDown.bind(this)}>
+            <i class="icon-down" />
+          </div>
+        )}
       </div>
     );
   }

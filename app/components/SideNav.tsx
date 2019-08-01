@@ -51,7 +51,6 @@ export default class TopNav extends Vue {
 
   mounted() {
     this.topNav = this.$refs.top_nav;
-    this.openDevTools();
   }
 
   get availableFeatures() {
@@ -150,7 +149,7 @@ export default class TopNav extends Vue {
     const pageData = [
       { target: 'Studio', icon: 'icon-studio' },
       { target: 'Live', icon: 'icon-live-dashboard' },
-      { target: 'BroseOverlays', icon: 'icon-themes', title: 'Themes' },
+      { target: 'BrowseOverlays', icon: 'icon-themes', title: 'Themes' },
     ];
 
     if (this.chatbotVisible) pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot' });

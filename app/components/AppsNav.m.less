@@ -2,12 +2,18 @@
 
 .wrapper {
   background: var(--section-alt);
+  position: relative;
   width: 52px;
-  height: auto;
+  height: 0;
   padding-top: 6px;
-  overflow-y: auto;
   flex-grow: 1;
   flex-basis: 0;
+  overflow: hidden;
+}
+
+.scroll {
+  overflow-y: auto;
+  height: 100%;
 
   &::-webkit-scrollbar {
     display: none;
@@ -33,4 +39,49 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.app-tab.is-active {
+  &::after {
+    .radius();
+
+    content: '';
+    display: block;
+    position: absolute;
+    left: -12px;
+    top: 0;
+    height: 40px;
+    width: 10px;
+    background: var(--title);
+  }
+}
+
+.arrow {
+  width: 52px;
+  height: 24px;
+  position: absolute;
+  background: var(--section-alt);
+
+  i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.arrow.up {
+  top: 0;
+
+  i {
+    transform: translate(-50%, -50%) rotate(180deg);
+  }
+}
+
+.arrow.down {
+  bottom: 0;
 }
