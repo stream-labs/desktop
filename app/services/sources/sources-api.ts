@@ -43,6 +43,7 @@ export interface ISourceApi extends ISource {
   setName(newName: string): void;
   setDeinterlaceMode(newMode: obs.EDeinterlaceMode): void;
   setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder): void;
+  refresh(): void;
 }
 
 

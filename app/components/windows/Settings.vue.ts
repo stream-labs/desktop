@@ -9,7 +9,7 @@ import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
 import { UserService } from '../../services/user';
 import { CustomizationService } from '../../services/customization';
-import { SettingsService, ISettingsSubCategory } from '../../services/settings';
+import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
 import { StreamingService } from '../../services/streaming';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
@@ -36,7 +36,7 @@ import { CategoryIcons } from './CategoryIcons';
   },
 })
 export default class Settings extends Vue {
-  @Inject() settingsService: SettingsService;
+  @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
@@ -44,6 +44,7 @@ export default class Settings extends Vue {
 
   $refs: { settingsContainer: HTMLElement }
 
+  categoryName: string;
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
@@ -57,6 +58,8 @@ export default class Settings extends Vue {
       // reopen settings because new categories may not have previous category
       this.settingsService.showSettings();
     });
+    this.categoryName = this.getInitialCategoryName();
+    this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
 
   beforeDestroy() {
@@ -69,12 +72,11 @@ export default class Settings extends Vue {
     return this.streamingService.isStreaming;
   }
 
-  get categoryName() {
-    return this.windowsService.state.child.queryParams.categoryName || 'General';
-  }
-
-  set categoryName(name) {
-    this.settingsService.showSettings(name);
+  getInitialCategoryName() {
+    if (this.windowsService.state.child.queryParams) {
+      return this.windowsService.state.child.queryParams.categoryName || 'General';
+    }
+    return 'General';
   }
 
   save(settingsData: ISettingsSubCategory[]) {

@@ -19,7 +19,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    margin-top: 16px;
+    .margin-top(2);
   }
 }
 
@@ -54,7 +54,7 @@
 .onboarding-title {
   color: @text-primary;
   font-size: 22px;
-  margin-bottom: 20px;
+  .margin-bottom(3);
 }
 
 .onboarding-title--sm {
@@ -96,7 +96,7 @@
   margin-bottom: 20px;
   height: 270px;
   position: relative;
-  .radius;
+  .radius();
 
   &.optimizing {
     .running-setup-row {
