@@ -5,6 +5,7 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { Inject } from 'util/injector';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -46,8 +47,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
-  @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
   }
@@ -77,6 +78,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.validateLogin().then(() => {
       this.updatePlatformUserInfo();
     });
+    this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
   mounted() {

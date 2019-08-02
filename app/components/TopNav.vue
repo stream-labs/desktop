@@ -59,7 +59,6 @@
 
 <style lang="less" scoped>
 @import "../styles/index";
-
 .top-nav {
   display: flex;
   flex-direction: row;

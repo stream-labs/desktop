@@ -44,6 +44,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -134,6 +135,7 @@ export class ServicesManager extends Service {
     InformationsStateService,
     NicoliveProgramService,
     NicoliveProgramStateService,
+    IncrementalRolloutService,
   };
 
   private instances: Dictionary<Service> = {};
