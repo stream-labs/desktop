@@ -28,6 +28,7 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 import { Subject } from 'rxjs/Subject';
+import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -254,14 +255,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
+  @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<string> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
+  @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }

@@ -8,7 +8,9 @@
   </div>
   <div class="modal-layout-content" :class="{ bareContent }">
     <slot name="content" v-if="!loading"/>
-    <i class="icon-spinner icon-spin modal-layout-spinner" v-else/>
+    <div class="spinner-container" v-else>
+      <i class="icon-spinner icon-spin modal-layout-spinner"/>
+    </div>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button
@@ -66,12 +68,18 @@
   }
 }
 
+.spinner-container {
+  position: absolute;
+  width: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .modal-layout-spinner {
   font-size: 36px;
   display: inline-block;
-  width: 100%;
-  text-align: center;
-  margin: 100px 0;
+  height: 36px;
 }
 
 .modal-layout-controls {
