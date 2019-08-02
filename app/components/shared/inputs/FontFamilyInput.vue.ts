@@ -737,7 +737,7 @@ const fonts = [
   components: { ListInput }
 })
 export default class FontFamilyInput extends BaseInput<string, IInputMetadata> {
-  @Prop() value: string;
+  @Prop() readonly value: string;
 
   fonts = fonts;
 

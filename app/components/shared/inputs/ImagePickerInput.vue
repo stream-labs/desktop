@@ -28,8 +28,9 @@
   height: 80px;
   border: 1px solid @day-input-border;
   margin: 2px;
-  transition: all .1s linear;
+  .transition();
   position: relative;
+  .radius();
 
   &:hover {
     border-color: @teal-light-opac;

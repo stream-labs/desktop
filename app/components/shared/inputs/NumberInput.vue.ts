@@ -6,10 +6,10 @@ import { INumberMetadata } from './index';
 export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
 
   @Prop()
-  value: number | string; // the string type is for empty field
+  readonly value: number | string; // the string type is for empty field
 
   @Prop()
-  metadata: INumberMetadata;
+  readonly metadata: INumberMetadata;
 
   emitInput(eventData: string) {
     if (!isNaN(parseFloat(eventData))) {

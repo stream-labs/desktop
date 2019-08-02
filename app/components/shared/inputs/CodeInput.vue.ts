@@ -14,10 +14,10 @@ import { IInputMetadata } from './index';
 export default class CodeInput extends BaseInput<string, IInputMetadata> {
 
   @Prop({ default: '' })
-  value: string;
+  readonly value: string;
 
   @Prop({ default: () => ({ type: 'html' }) })
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   // codemirror options
   editorOptions = {

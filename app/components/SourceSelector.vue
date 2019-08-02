@@ -103,10 +103,10 @@ i.disabled {
 .sl-vue-tree-node {
   &:hover,
   &.sl-vue-tree-selected {
-    .transition;
+    .transition();
 
     .source-selector-action {
-      .transition;
+      .transition();
       opacity: 1;
       color: @text-primary;
     }

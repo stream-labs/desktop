@@ -61,9 +61,9 @@
   height: 30px;
   max-width: 100%;
   line-height: 30px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 3px;
+  .padding-left();
+  .padding-right();
+  .radius();
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

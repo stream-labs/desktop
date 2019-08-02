@@ -13,10 +13,10 @@ import { metadata } from 'components/shared/inputs'
 })
 export default class FontSize extends BaseInput<string, IInputMetadata>{
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   sliderOptions = metadata.slider({min: 8, max: 144});
 

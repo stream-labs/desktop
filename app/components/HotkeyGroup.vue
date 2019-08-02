@@ -4,6 +4,7 @@
     class="section-title section-title--dropdown"
     v-if="title"
     :class="{ 'section-title--opened': !collapsed }"
+    @click="collapsed = !collapsed"
   >
     <h4>
       <i

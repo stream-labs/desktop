@@ -83,7 +83,7 @@
   z-index: 10;
 
   .button {
-    margin-left: 8px;
+    .margin-left();
   }
 }
 

@@ -11,16 +11,16 @@ import FormInput from './FormInput.vue';
 export default class FormWrapper extends BaseInput<any, IInputMetadata> {
 
   @Prop()
-  type: EInputType;
+  readonly type: EInputType;
 
   @Prop()
-  value: undefined;
+  readonly value: undefined;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
   get formInputMetadata() {
     const options = this.options;
