@@ -199,7 +199,6 @@ if (!gotTheLock) {
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
         shutdownStarted = true;
-        childWindow.destroy();
         mainWindow.send('shutdown');
 
         // We give the main window 10 seconds to acknowledge a request
@@ -409,7 +408,7 @@ if (!gotTheLock) {
 
   ipcMain.on('window-closeChildWindow', (event) => {
     // never close the child window, hide it instead
-    childWindow.hide();
+    if (!childWindow.isDestroyed()) childWindow.hide();
   });
 
 
