@@ -14,29 +14,22 @@ test('Onboarding steps', async t => {
   await focusMain(t);
 
   // Wait for the auth screen to appear
-  await app.client.isExisting('button=Twitch');
+  await app.client.waitForVisible('button=Twitch');
 
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
-  console.log('skip auth');
-  if (await t.context.app.client.isExisting('span=Skip')) {
-    await t.context.app.client.click('span=Skip');
-    await sleep(1000);
-  }
+  await t.context.app.client.click('span=Skip');
 
   await app.client.waitForVisible('h2=Start Fresh', 15000);
   await makeScreenshots(t, 'Start fresh or import from OBS');
-  console.log('click start fresh');
   await app.client.click('h2=Start Fresh');
 
   await app.client.waitForVisible('h1=Add a Theme');
   await makeScreenshots(t, 'Add a Theme');
-  console.log('click skip theme');
   await app.client.click('p=Skip');
 
   await app.client.waitForVisible('h1=Optimize');
   await makeScreenshots(t, 'Before optimize');
-  console.log('click start optimize');
   await app.client.click('button=Start');
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
@@ -57,22 +50,17 @@ test('OBS Importer', async t => {
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  console.log('click skip auth');
-  if (await t.context.app.client.isExisting('span=Skip')) {
-    await t.context.app.client.click('span=Skip');
-    await sleep(1000);
-  }
+  await client.waitForVisible('button=Twitch');
+  await t.context.app.client.click('span=Skip');
 
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');
   await makeScreenshots(t, 'Import button');
-  console.log('import from obs');
   await client.click('h2=Import from OBS');
 
   // benefits page
   await client.waitForVisible('h1=A few benefits of using Streamlabs OBS');
   await makeScreenshots(t, 'Benefits');
-  console.log('click complete');
   await client.click('button=Complete');
 
   // success?
