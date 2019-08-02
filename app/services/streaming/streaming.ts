@@ -211,6 +211,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.toggleRecording();
       }
 
+      this.announcementsService.updateBanner();
+
       return;
     }
 

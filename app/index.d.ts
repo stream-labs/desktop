@@ -58,6 +58,7 @@ declare module 'recursive-readdir';
 declare module 'vue-toasted';
 declare module 'hyperform';
 declare module '*.svg';
+declare module 'emojione';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence
