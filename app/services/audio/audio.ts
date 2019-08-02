@@ -188,6 +188,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   showAdvancedSettings() {
     this.windowsService.showWindow({
       componentName: 'AdvancedAudio',
+      title: $t('audio.advancedAudioSettings'),
       size: {
         width: 720,
         height: 600

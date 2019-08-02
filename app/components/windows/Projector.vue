@@ -9,7 +9,6 @@
   <modal-layout
     v-else
     bare-content
-    :title="title"
     :showControls="false">
     <div slot="content" class="projector-windowed">
       <div class="projector-buttons">

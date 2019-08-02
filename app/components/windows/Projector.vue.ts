@@ -66,15 +66,4 @@ export default class Projector extends Vue {
     currentWindow.setFullScreen(false);
     currentWindow.setBounds(this.oldBounds);
   }
-
-  get title() {
-    if (this.sourceId) {
-      const source = this.sourcesService.getSource(this.sourceId);
-      if (source) {
-        return $t('scenes.projectorPrefix') + source.name;
-      }
-    }
-    return $t('scenes.outputProjector');
-  }
-
 }

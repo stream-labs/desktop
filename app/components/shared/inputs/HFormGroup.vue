@@ -4,7 +4,8 @@
       {{ options.title }}
     </div>
     <div class="col-xs-8">
-      <div class="input-container">
+
+      <div class="input-container input-container--no-margin">
         <form-input
           :value="value"
           :metadata="formInputMetadata"
@@ -17,18 +18,29 @@
           <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
         </div>
       </div>
-      <div v-if="options.description" class="whisper">
-        {{ options.description }}
+
+      <div class="input-footer">
+        <div class="whisper" v-if="options.description && !inputErrors.length">
+          {{ options.description }}
+        </div>
+        <div class="input-error" v-if="inputErrors.length">
+          {{ inputErrors[0].msg }}
+        </div>
       </div>
+
     </div>
   </div>
 </template>
 
 
-<script lang="ts" src="./FormGroup.vue.ts"></script>
+<script lang="ts" src="./HFormGroup.vue.ts"></script>
 
 <style lang="less" scoped>
   @import "../../../styles/index";
+
+  .row {
+    .margin-bottom(1);
+  }
 
   .input-container {
     display: flex;
@@ -36,6 +48,8 @@
     width: 100%;
     justify-content: flex-start;
   }
+
+
 
   .slots {
     width: 100%;
@@ -51,9 +65,13 @@
     color: @icon;
   }
 
-  .whisper {
+  .input-footer {
     margin-top: 6px;
+    min-height: 16px;
     font-size: 11px;
-    font-style: italic;
+
+    .whisper { font-style: italic; }
+    .input-error { color: @red; }
   }
+
 </style>

@@ -19,6 +19,7 @@ import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
+import { SceneSourceNode } from './nodes/overlays/scene';
 
 const NODE_TYPES = {
   RootNode,
@@ -28,7 +29,8 @@ const NODE_TYPES = {
   TextNode,
   WebcamNode,
   VideoNode,
-  TransitionNode
+  TransitionNode,
+  SceneSourceNode,
 };
 
 export interface IDownloadProgress {

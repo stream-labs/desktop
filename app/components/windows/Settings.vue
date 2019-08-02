@@ -1,7 +1,6 @@
 <template>
 <modal-layout
   bare-content
-  :title="$t('common.settings')"
   :show-cancel="false"
   :done-handler="done">
 

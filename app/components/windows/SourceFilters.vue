@@ -1,6 +1,5 @@
 <template>
   <modal-layout
-    :title="$t('sources.layerFilters') + ' (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"

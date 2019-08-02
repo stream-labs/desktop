@@ -1,8 +1,5 @@
 <template>
-<modal-layout
-    :title="$t('common.notifications')"
-    :showControls="false"
->
+<modal-layout :showControls="false">
   <div slot="content">
 
     <h4 v-if="!notificationsCount">

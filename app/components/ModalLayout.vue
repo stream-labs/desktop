@@ -1,6 +1,5 @@
 <template>
 <div id="mainWrapper" class="modal-layout" data-test="ModalLayout">
-  <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -39,16 +38,12 @@
 @import "../styles/index";
 
 .modal-layout {
-  height: 100%;
+  height: calc(~"100% - 30px"); // Compensate for titlebar living in ChildWindow
   display: flex;
   flex-direction: column;
   padding: 0 2px 2px;
   color: @text-primary;
   background-color: @bg-primary;
-}
-
-.modal-layout-titlebar {
-  flex-shrink: 0;
 }
 
 .ModalLayout-fixed {

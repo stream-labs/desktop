@@ -9797,9 +9797,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.19/iojs-v2.0.4-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v2.0.8-signed.tar.gz":
   version "0.3.18"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.19/iojs-v2.0.4-signed.tar.gz#3720ec67b404d544e744da3bf20441f832fd7c08"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v2.0.8-signed.tar.gz#dc7ab88a15b4af2641074e1fa8ce73a8e20cd5b0"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -13174,10 +13174,10 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vee-validate@^2.0.9:
-  version "2.2.12"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.12.tgz#dec527f4455590840d49d82d47139669d0e2c050"
-  integrity sha512-JaQBZ1x8IiuPfe6JHAbrg6JR2/9QXXzpkgo1H1P08LxL+07R9kJluXqNBDnxFIMKSPjAAC2gYu7Q4Qb4mHmtXA==
+vee-validate@^2.2.13:
+  version "2.2.13"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.13.tgz#d77714eeb1bedea24efaaf1774bb2eb3165551ce"
+  integrity sha512-Mj5vFyrSnqIAFZOfhF1asLqymV/rEWQNv7gjWCQIydQ1evKoQ7TzP0F9HZzuWEIWotI2/UumMK5QI8wRkeL0kQ==
 
 verror@1.10.0:
   version "1.10.0"

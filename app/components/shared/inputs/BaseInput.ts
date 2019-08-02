@@ -7,15 +7,18 @@ import { IInputMetadata } from './index';
 export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
   @Prop()
-  value: TValueType;
+  readonly value: TValueType;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
   @Prop()
-  metadata: TMetadataType;
+  readonly metadata: TMetadataType;
 
-  uuid = uuid(); // uuid serves to link input field and validator message
+  /**
+   * uuid serves to link input field and validator message
+   */
+  readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
@@ -50,5 +53,6 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
   get options(): TMetadataType {
     return this.getOptions();
   }
+
 }
 

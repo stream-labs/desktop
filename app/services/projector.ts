@@ -1,9 +1,12 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
+import { $t } from './i18n';
+import { SourcesService } from './sources';
 
 export class ProjectorService extends Service {
   @Inject() windowsService: WindowsService;
+  @Inject() sourcesService: SourcesService;
 
   /**
    * Create a new projector window.
@@ -12,8 +15,12 @@ export class ProjectorService extends Service {
    * @param sourceId The id of the source
    */
   createProjector(sourceId?: string) {
+    const source = sourceId ? this.sourcesService.getSource(sourceId) : null;
+    const sourceName = source ? source.name : null;
+    const title = sourceName ? ': ' + sourceName || $t('scenes.defaultTitle') : '';
     this.windowsService.createOneOffWindow({
       componentName: 'Projector',
+      title: $t('scenes.projectorPrefix') + title,
       queryParams: { sourceId },
       size: {
         width: 640,

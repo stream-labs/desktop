@@ -23,9 +23,15 @@
         <slot></slot>
       </div>
 
-      <div v-if="options.description" class="whisper">
-        {{ options.description }}
+      <div class="input-footer">
+        <div class="whisper" v-if="options.description && !inputErrors.length">
+          {{ options.description }}
+        </div>
+        <div class="input-error" v-if="inputErrors.length">
+          {{ inputErrors[0].msg }}
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -59,9 +65,12 @@
     line-height: 0;
   }
 
-  .whisper {
+  .input-footer {
     margin-top: 6px;
+    min-height: 16px;
     font-size: 11px;
-    font-style: italic;
+
+    .whisper { font-style: italic; }
+    .input-error { color: @red; }
   }
 </style>

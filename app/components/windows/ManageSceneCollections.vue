@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('scenes.manageSceneCollections')"
   :show-cancel="false"
   :done-handler="close">
   <div slot="content">

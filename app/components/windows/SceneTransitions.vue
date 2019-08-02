@@ -1,7 +1,7 @@
 <template>
 <modal-layout
-  :title="$t('transitions.sceneTransition')"
   bare-content
+  :content-styles="{ padding: 0 }"
   :show-cancel="false"
   :done-handler="done">
 

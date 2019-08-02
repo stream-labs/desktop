@@ -2,7 +2,7 @@
 <modal-layout
   bare-content
   :show-controls="false"
-  :title="$t('sources.addSourceTitle')">
+>
 
   <div slot="content"
     class="add-source"

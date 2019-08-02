@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   :showControls="false"
-  :title="$t('sources.addSourceTitle')">
+>
 
   <div slot="content" data-test="AddSource">
 

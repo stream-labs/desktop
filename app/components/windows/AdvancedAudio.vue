@@ -1,7 +1,7 @@
 <template>
 <modal-layout
-  :showControls="false"
-  :title="$t('audio.advancedAudioSettings')">
+  :show-controls="false"
+>
 
   <div slot="content">
     <table>

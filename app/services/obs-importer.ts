@@ -230,6 +230,10 @@ export class ObsImporterService extends Service {
     const sourcesJSON = configJSON.sources;
     const currentScene = configJSON.current_scene;
 
+    // OBS uses unique scene names instead id
+    // so create a mapping variable
+    const nameToIdMap: Dictionary<string> = {};
+
     if (Array.isArray(sourcesJSON)) {
       // Create all the scenes
       sourcesJSON.forEach(sourceJSON => {
@@ -237,13 +241,14 @@ export class ObsImporterService extends Service {
           const scene = this.scenesService.createScene(sourceJSON.name, {
             makeActive: sourceJSON.name === currentScene
           });
+          nameToIdMap[scene.name] = scene.id;
         }
       });
 
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getSceneByName(sourceJSON.name);
+          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;

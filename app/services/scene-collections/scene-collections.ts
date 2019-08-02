@@ -327,11 +327,33 @@ export class SceneCollectionsService extends Service
   }
 
   /**
+   * Show the window to name a new scene collection
+   * @param options options
+   */
+  showNameConfig(
+    options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
+  ) {
+    this.windowsService.showWindow({
+      componentName: 'NameSceneCollection',
+      title: $t('scenes.nameSceneCollection'),
+      queryParams: {
+        sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
+        rename: options.rename ? 'true' : ''
+      },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+  /**
    * Show the window to manage scene collections
    */
   showManageWindow() {
     this.windowsService.showWindow({
       componentName: 'ManageSceneCollections',
+      title: $t('scenes.manageSceneCollections'),
       size: {
         width: 700,
         height: 800

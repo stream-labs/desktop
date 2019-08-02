@@ -5,12 +5,12 @@
     @submit.prevent="submit">
     <p
       v-if="!error"
-      class="NameSource-label">
-      {{ $t('sources.enterTheNameOfFolder') }}
+      class="NameScene-label">
+      {{ $t('Please enter the name of the Scenes Collection') }}
     </p>
     <p
       v-if="error"
-      class="NameSource-label NameSource-label__error">
+      class="NameScene-label NameScene-label__error">
       {{ error }}
     </p>
     <input
@@ -21,14 +21,14 @@
 </modal-layout>
 </template>
 
-<script lang="ts" src="./NameFolder.vue.ts"></script>
+<script lang="ts" src="./NameSceneCollection.vue.ts"></script>
 
 <style lang="less" scoped>
-.NameSource-label {
+.NameScene-label {
   margin-bottom: 10px;
 }
 
-.NameSource-label__error {
+.NameScene-label__error {
   color: red;
 }
 </style>

@@ -32,6 +32,7 @@ import {
   release as nodeOsRelease,
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
+import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 
@@ -374,6 +375,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   popoutRecentEvents() {
     this.windowsService.createOneOffWindow({
       componentName: 'RecentEvents',
+      title: $t('Recent Events'),
       size: {
         width: 800,
         height: 600

@@ -16,7 +16,7 @@ import {
   Source,
   TPropertiesManager
 } from './index';
-import { $t } from '../i18n';
+import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 
 
@@ -374,8 +374,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   showSourceProperties(sourceId: string) {
+    const source = this.getSource(sourceId);
+
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
+      title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
       queryParams: { sourceId },
       size: {
         width: 600,
@@ -387,6 +390,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showShowcase() {
     this.windowsService.showWindow({
       componentName: 'SourcesShowcase',
+      title: $t('sources.addSourceTitle'),
       size: {
         width: 680,
         height: 600
@@ -398,6 +402,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
+      title: $t('sources.addSourceTitle'),
       queryParams: { sourceType, propertiesManager },
       size: {
         width: 640,
@@ -409,6 +414,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'RenameSource',
+      title: $t('sources.renameSource'),
       queryParams: { sourceId },
       size: {
         width: 400,
