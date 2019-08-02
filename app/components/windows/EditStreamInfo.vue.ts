@@ -52,6 +52,8 @@ export default class EditStreamInfo extends Vue {
   updateError = false;
   selectedProfile: IEncoderProfile = null;
 
+  link = '';
+
   gameOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
@@ -130,50 +132,6 @@ export default class EditStreamInfo extends Vue {
 
   async created() {
     await this.refreshStreamInfo();
-  }
-
-  async populateModels() {
-    if (!this.streamInfoService.state.channelInfo) return;
-    this.facebookPages = await this.fetchFacebookPages();
-    this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
-    this.gameModel = this.streamInfoService.state.channelInfo.game || '';
-    this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
-    this.gameOptions = [
-      {
-        title: this.streamInfoService.state.channelInfo.game,
-        value: this.streamInfoService.state.channelInfo.game,
-      },
-    ];
-
-    if (this.facebookPages) {
-      this.pageModel = this.facebookPages.page_id;
-      this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
-        value: page.id,
-        title: `${page.name} | ${page.category}`,
-      }));
-      this.hasPages = !!this.facebookPages.pages.length;
-    }
-    await this.loadAvailableProfiles();
-  }
-
-  linkTwitter() {
-    this.userService.openLinkTwitterDialog(() => { console.log('linkd') });
-  }
-
-  unlinkTwitter() {
-    this.userService.unlinkTwitter().then(() => {
-      console.log('fuk0');
-    });
-  }
-
-  tweet() {
-    this.userService.postTweet('test');
-  }
-
-  getTwitterStatus() {
-    this.userService.getTwitterStatus().then(res => {
-      console.log(res);
-    });
   }
 
   @Debounce(500)
@@ -381,6 +339,29 @@ export default class EditStreamInfo extends Vue {
 
   get infoError() {
     return this.streamInfoService.state.error;
+  }
+
+  linkTwitter() {
+    this.userService.openLinkTwitterDialog(() => { console.log('linkd') });
+  }
+
+  unlinkTwitter() {
+    this.userService.unlinkTwitter().then(() => {
+      console.log('fuk0');
+    });
+  }
+
+  tweet() {
+    console.log(this.link);
+    console.log(this.channelInfo.title);
+    const tweet = `${this.channelInfo.title} - ${this.link}`;
+    this.userService.postTweet(tweet);
+  }
+
+  getTwitterStatus() {
+    this.userService.getTwitterStatus().then(res => {
+      this.link = res.cs_url;
+    });
   }
 
   openFBPageCreateLink() {

@@ -85,6 +85,15 @@
             :metadata="{ title: $t('Do not show this message when going live') }"
           />
         </h-form-group>
+        <h-form-group v-if="!midStreamMode && !isFacebook">
+          <div class="section">
+            <p>Share Your Stream</p>
+            <p>Tweet to let your followers know you're going live</p>
+            <button class="button button--default" :disabled="updatingInfo" @click="linkTwitter">
+              Connect to Twitter
+            </button>
+          </div>
+        </h-form-group>
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -132,6 +141,10 @@
 
 <style lang="less" scoped>
 @import '../../styles/index';
+
+.section {
+  background: var(--section-alt);
+}
 
 .pages-warning,
 .update-warning {
