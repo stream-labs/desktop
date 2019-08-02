@@ -94,7 +94,7 @@
     "@types/extract-zip": "1.6.2",
     "@types/fs-extra": "8.0.0",
     "@types/humps": "1.1.2",
-    "@types/lodash": "4.14.132",
+    "@types/lodash": "4.14.136",
     "@types/mime": "2.0.1",
     "@types/mkdirp": "0.5.2",
     "@types/node": "8.10.48",
