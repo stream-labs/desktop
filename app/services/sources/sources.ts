@@ -406,24 +406,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-
-  showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
-    this.windowsService.showWindow({
-      componentName: 'NameSource',
-      preservePrevWindow: true,
-      queryParams: { sourceType, propertiesManager },
-      size: {
-        width: 400,
-        height: 250
-      }
-    });
-  }
-
-
   showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
-      componentName: 'NameSource',
-      queryParams: { renameId: sourceId },
+      componentName: 'RenameSource',
+      queryParams: { sourceId },
       size: {
         width: 400,
         height: 250

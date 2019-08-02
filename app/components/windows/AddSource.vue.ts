@@ -33,7 +33,7 @@ export default class AddSource extends Vue {
     return { name: source.name, value: source.sourceId };
   });
 
-  selectedSourceId = this.sources[0].sourceId;
+  selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
     const sourceType =
