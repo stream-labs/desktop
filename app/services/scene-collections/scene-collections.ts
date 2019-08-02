@@ -53,6 +53,8 @@ interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOp
    * This should really only be used by the OBS importer.
    */
   setupFunction?: () => boolean;
+
+  auto?: boolean;
 }
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';
@@ -123,7 +125,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       await this.load(latestId);
     } else {
-      await this.create();
+      await this.create({ auto: true });
     }
     this.initialized = true;
   }
@@ -201,7 +203,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id = uuid();
 
-    await this.insertCollection(id, name);
+    await this.insertCollection(id, name, options.auto || false);
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
 
@@ -290,7 +292,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
     const newId = uuid();
-    await this.insertCollection(newId, name, id);
+    await this.insertCollection(newId, name, false, id);
     this.stateService.SET_NEEDS_RENAME(newId);
     this.enableAutoSave();
   }
@@ -605,14 +607,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Creates and persists new collection from the current application state
    * or from another scene collection's contents.
    */
-  private async insertCollection(id: string, name: string, fromId?: string) {
+  private async insertCollection(id: string, name: string, auto = false, fromId?: string) {
     if (fromId) {
       await this.stateService.copyCollectionFile(fromId, id);
     } else {
       await this.saveCurrentApplicationStateAs(id);
     }
 
-    this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
+    this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), auto);
     await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
@@ -775,19 +777,29 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       // We already dealt with the overlap above
       if (!onServer) {
         if (!inManifest.serverId) {
-          const success = await this.performSyncStep('Insert on server', async () => {
-            const data = this.stateService.readCollectionFile(inManifest.id);
-
-            const response = await this.serverApi.createSceneCollection({
-              data,
-              name: inManifest.name,
-              last_updated_at: inManifest.modified,
+          // Delete any auto collections if there are any collections that were
+          // downloaded from the server.
+          if (serverCollections.length && inManifest.auto) {
+            const success = this.performSyncStep('Delete from server', async () => {
+              this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
             });
 
-            this.stateService.SET_SERVER_ID(inManifest.id, response.id);
-          });
+            if (!success) failed = true;
+          } else {
+            const success = await this.performSyncStep('Insert on server', async () => {
+              const data = this.stateService.readCollectionFile(inManifest.id);
 
-          if (!success) failed = true;
+              const response = await this.serverApi.createSceneCollection({
+                data,
+                name: inManifest.name,
+                last_updated_at: inManifest.modified,
+              });
+
+              this.stateService.SET_SERVER_ID(inManifest.id, response.id);
+            });
+
+            if (!success) failed = true;
+          }
         } else {
           const success = this.performSyncStep('Delete from server', async () => {
             this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
