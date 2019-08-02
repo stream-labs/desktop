@@ -2,7 +2,7 @@
   <span class="number-input">
     <input
         type="number"
-        :placeholder="metadata.placeholder"
+        :placeholder="options.placeholder"
         :value="value"
         @input="emitInput($event.target.value)"
         :name="uuid"

@@ -48,6 +48,7 @@
 
 .ModalLayout-fixed {
   flex-shrink: 0;
+  z-index: 1;
 }
 
 .modal-layout-content {

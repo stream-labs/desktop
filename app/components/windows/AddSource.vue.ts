@@ -8,6 +8,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
+import { log } from 'lodash-decorators/utils';
 
 @Component({
   components: { ModalLayout, Selector, Display }
