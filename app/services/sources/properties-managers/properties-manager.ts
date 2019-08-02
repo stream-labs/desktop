@@ -46,6 +46,12 @@ export abstract class PropertiesManager implements IPropertyManager {
    */
   settings: Dictionary<any>;
 
+  /**
+   * Will be true when the manager has been destroyed.  This should
+   * be checked before accessing the obsInput reference.
+   */
+  protected destroyed = false;
+
 
   /**
    * Can be used to attach custom startup behavior to this
@@ -60,6 +66,7 @@ export abstract class PropertiesManager implements IPropertyManager {
    * properties manager.
    */
   destroy() {
+    this.destroyed = true;
   }
 
 

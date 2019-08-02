@@ -49,6 +49,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
+  @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
   }
@@ -75,9 +76,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   init() {
     super.init();
     this.setRavenContext();
-    this.validateLogin().then(() => {
-      this.updatePlatformUserInfo();
-    });
+    this.validateLogin();
     this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
@@ -149,16 +148,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return this.state.auth.platform.username;
     }
   }
+
   get userIcon() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.userIcon;
     }
   }
+
   get platformId() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.id;
     }
   }
+
   get platformUserPageURL() {
     if (this.isLoggedIn()) {
       const platform = getPlatformService(this.state.auth.platform.type);

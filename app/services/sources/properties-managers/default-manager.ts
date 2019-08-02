@@ -78,6 +78,9 @@ export class DefaultManager extends PropertiesManager {
     const fontPath =
       await this.fontLibraryService.downloadFont(filename);
 
+    // Make sure this wasn't destroyed while fetching the font
+    if (this.destroyed) return;
+
     const fontInfo = fi.getFontInfo(fontPath);
 
     if (!fontInfo) {
