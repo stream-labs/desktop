@@ -1,7 +1,8 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <div v-if="infoLoading"><i class="fa fa-spinner fa-pulse" /></div>
+      <div v-if="infoLoading"><spinner/></div>
+
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="refreshStreamInfo">{{

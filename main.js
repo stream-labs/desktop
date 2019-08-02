@@ -159,8 +159,8 @@ if (!gotTheLock) {
           'https://sentry.io/api/1283430/minidump/' +
           '?sentry_key=01fc20f909124c8499b4972e9a5253f2',
         extra: {
-          version: pjson.version,
-          processType: 'main'
+          'sentry[release]': pjson.version,
+          processType: 'main',
         }
       });
     }
@@ -479,13 +479,21 @@ if (!gotTheLock) {
      executed synchronously and therefore default actions
      cannot be prevented. */
   ipcMain.on('webContents-preventNavigation', (e, id) => {
-    webContents.fromId(id).on('will-navigate', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('will-navigate', e => {
       e.preventDefault();
     });
   });
 
   ipcMain.on('webContents-preventPopup', (e, id) => {
-    webContents.fromId(id).on('new-window', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('new-window', e => {
       e.preventDefault();
     });
   });

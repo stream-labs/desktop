@@ -31,7 +31,13 @@ export default class Studio extends Vue {
 
   sizeCheckInterval: number;
 
+  maxHeight: number = null;
+
   mounted() {
+    this.handleWindowResize();
+
+    window.addEventListener('resize', this.handleWindowResize);
+
     this.sizeCheckInterval = window.setInterval(() => {
       if (this.studioMode && this.$refs.studioModeContainer) {
         const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
@@ -47,6 +53,16 @@ export default class Studio extends Vue {
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
+
+    window.removeEventListener('resize', this.handleWindowResize);
+  }
+
+  handleWindowResize() {
+    this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
+
+    const clampedHeight = Math.min(this.height, this.maxHeight);
+
+    if (clampedHeight !== this.height) this.height = clampedHeight;
   }
 
   get displayEnabled() {
@@ -75,10 +91,6 @@ export default class Studio extends Vue {
 
   set height(value) {
     this.customizationService.setSettings({ bottomdockSize: value });
-  }
-
-  get maxHeight() {
-    return this.$root.$el.getBoundingClientRect().height - 400;
   }
 
   get minHeight() {
