@@ -14,11 +14,11 @@ test('Onboarding steps', async t => {
   await focusMain(t);
 
   // Wait for the auth screen to appear
-  await app.client.isExisting('button=Twitch');
+  await app.client.waitForVisible('button=Twitch');
 
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
-  await app.client.click('p=Skip');
+  await t.context.app.client.click('span=Skip');
 
   await app.client.waitForVisible('h2=Start Fresh', 15000);
   await makeScreenshots(t, 'Start fresh or import from OBS');
@@ -38,6 +38,7 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
+
 });
 
 test('OBS Importer', async t => {
@@ -50,8 +51,8 @@ test('OBS Importer', async t => {
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  await client.click('p=Skip');
-  await sleep(1000);
+  await client.waitForVisible('button=Twitch');
+  await t.context.app.client.click('span=Skip');
 
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');
