@@ -38,6 +38,7 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
+
 });
 
 test('OBS Importer', async t => {
