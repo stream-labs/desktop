@@ -173,9 +173,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
-    if (await t.context.app.client.isExisting('p=Skip')) {
+    if (await t.context.app.client.isExisting('span=Skip')) {
       if (options.skipOnboarding) {
-        await t.context.app.client.click('p=Skip');
+        await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('p=Skip');
       } else {
