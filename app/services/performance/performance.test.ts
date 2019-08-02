@@ -53,7 +53,7 @@ test('processPerformanceStats', () => {
   const { PerformanceService } = require('./performance');
   const { instance } = PerformanceService;
   instance.SET_PERFORMANCE_STATS = jest.fn();
-  instance.processPerformanceStats({ dummy: 'obs result' });
+  instance.processPerformanceStats({ dummy: 'obs result', CPU: 0 });
   expect(instance.SET_PERFORMANCE_STATS).toHaveBeenNthCalledWith(1, {
     dummy: 'obs result', CPU: 3
   });
