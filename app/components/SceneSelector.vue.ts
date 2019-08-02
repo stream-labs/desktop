@@ -98,7 +98,9 @@ export default class SceneSelector extends Vue {
       ok => {
         if (!ok) return;
         if (!this.scenesService.canRemoveScene()) {
-          alert($t('There needs to be at least one scene.'));
+          electron.remote.dialog.showMessageBox({
+            message: $t('There needs to be at least one scene.'),
+          });
           return;
         }
 

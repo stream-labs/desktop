@@ -182,7 +182,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.attemptRecovery(id);
       } else {
         console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
-        alert('Failed to load scene collection.  A new one will be created instead.');
+        electron.remote.dialog.showMessageBox({
+          message: $t('Failed to load scene collection.  A new one will be created instead.'),
+        });
         await this.create();
       }
     }
