@@ -81,9 +81,9 @@
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
-    "@babel/core": "7.4.5",
+    "@babel/core": "7.5.5",
     "@babel/plugin-proposal-decorators": "7.4.4",
-    "@babel/preset-env": "7.4.5",
+    "@babel/preset-env": "7.5.5",
     "@octokit/app": "3.0.0",
     "@octokit/request": "4.1.0",
     "@octokit/rest": "16.26.0",
