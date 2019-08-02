@@ -85,7 +85,7 @@
     "@babel/plugin-proposal-decorators": "7.4.4",
     "@babel/preset-env": "7.5.5",
     "@octokit/app": "3.0.0",
-    "@octokit/request": "4.1.0",
+    "@octokit/request": "4.1.1",
     "@octokit/rest": "16.28.7",
     "@sentry/browser": "5.4.0",
     "@sentry/integrations": "5.4.1",
