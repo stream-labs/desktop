@@ -109,7 +109,7 @@
     "moment": "^2.17.1",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.1/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.6/iojs-v2.0.4-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.7/iojs-v2.0.4-signed.tar.gz",
     "progress": "^2.0.0",
     "raven-js": "^3.20.1",
     "recursive-readdir": "^2.2.2",

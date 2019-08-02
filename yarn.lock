@@ -9787,9 +9787,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.6/iojs-v2.0.4-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.7/iojs-v2.0.4-signed.tar.gz":
   version "0.3.4"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.6/iojs-v2.0.4-signed.tar.gz#6610ffe9f491bb08682b6ff4c48a32859c3af915"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.7/iojs-v2.0.4-signed.tar.gz#57435f42f9bbddead6fb97eeda5dd903624838c0"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
