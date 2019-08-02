@@ -90,7 +90,7 @@
     "@sentry/browser": "5.4.0",
     "@sentry/integrations": "5.4.1",
     "@types/archiver": "2.1.3",
-    "@types/classnames": "2.2.8",
+    "@types/classnames": "2.2.9",
     "@types/extract-zip": "1.6.2",
     "@types/fs-extra": "8.0.0",
     "@types/humps": "1.1.2",
