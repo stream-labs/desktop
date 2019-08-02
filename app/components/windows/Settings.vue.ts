@@ -44,8 +44,8 @@ export default class Settings extends Vue {
 
   $refs: { settingsContainer: HTMLElement }
 
-  categoryName: string;
-  settingsData = this.settingsService.getSettingsFormData(this.categoryName);
+  categoryName: string = 'General';
+  settingsData: ISettingsSubCategory[] = [];
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
   icons = CategoryIcons;
@@ -58,6 +58,7 @@ export default class Settings extends Vue {
       // reopen settings because new categories may not have previous category
       this.settingsService.showSettings();
     });
+
     this.categoryName = this.getInitialCategoryName();
     this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
