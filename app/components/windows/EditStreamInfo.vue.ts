@@ -17,7 +17,7 @@ import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
-import { shell } from 'electron';
+import electron, { shell } from 'electron';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
@@ -176,10 +176,11 @@ export default class EditStreamInfo extends Vue {
     this.updatingInfo = true;
 
     if (this.doNotShowAgainModel) {
-      alert(
-        $t('You will not be asked again to update your stream info when going live. ') +
+      electron.remote.dialog.showMessageBox({
+        message:
+          $t('You will not be asked again to update your stream info when going live. ') +
           $t('You can re-enable this from the settings.'),
-      );
+      });
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
