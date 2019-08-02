@@ -1,5 +1,7 @@
 import { focusMain } from './index';
 import { GenericTestContext } from 'ava';
+import { getPlatformService } from 'services/platforms';
+import { testSourceExists, selectTestSource, clickRemoveSource } from './sources';
 
 export async function logOut(t: GenericTestContext<any>) {
   await focusMain(t);
@@ -15,7 +17,8 @@ export async function logIn(t: GenericTestContext<any>): Promise<boolean> {
     SLOBS_TEST_WIDGET_TOKEN: '',
     SLOBS_TEST_PLATFORM_TYPE: '',
     SLOBS_TEST_PLATFORM_TOKEN: '',
-    SLOBS_TEST_PLATFORM_USER_ID: ''
+    SLOBS_TEST_PLATFORM_USER_ID: '',
+    SLOBS_TEST_USERNAME: ''
   };
 
   let canAuth = true;
@@ -33,17 +36,28 @@ export async function logIn(t: GenericTestContext<any>): Promise<boolean> {
   }
 
   await focusMain(t);
-  
-  await app.webContents.send('testing-fakeAuth', {
-    widgetToken: authInfo.SLOBS_TEST_WIDGET_TOKEN,
-    apiToken: authInfo.SLOBS_TEST_API_TOKEN,
-    platform: {
-      type: authInfo.SLOBS_TEST_PLATFORM_TYPE,
-      id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
-      token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
-      username: 'StreamlabsUITest'
+
+  await app.webContents.send(
+    'testing-fakeAuth',
+    {
+      widgetToken: authInfo.SLOBS_TEST_WIDGET_TOKEN,
+      apiToken: authInfo.SLOBS_TEST_API_TOKEN,
+      platform: {
+        type: authInfo.SLOBS_TEST_PLATFORM_TYPE,
+        id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
+        token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
+        username: authInfo.SLOBS_TEST_USERNAME
+      }
     }
-  });
+  );
 
   return true;
 }
+
+export const blankSlate = async (t: GenericTestContext<any>) => {
+  await focusMain(t);
+  while (await testSourceExists(t)) {
+    await selectTestSource(t);
+    await clickRemoveSource(t);
+  }
+};

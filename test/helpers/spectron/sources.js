@@ -32,6 +32,10 @@ export async function selectSource(t, name) {
   await t.context.app.client.click(sel);
 }
 
+export async function selectTestSource(t) {
+  await t.context.app.client.click('.item-title*=__')
+}
+
 export async function rightClickSource(t, name) {
   const sel = `[data-test="SourceSelector"] [data-test="${name}"]`;
   t.context.app.client.execute((selector) => {
@@ -92,4 +96,8 @@ export async function sourceIsExisting(t, sourceName) {
   return app.client
     .$('[data-test="SourceSelector"]')
     .isExisting(`[data-test="${sourceName}"]`);
+}
+
+export async function testSourceExists(t) {
+  return t.context.app.client.isExisting('.item-title*=__')
 }

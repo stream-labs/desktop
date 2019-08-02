@@ -82,9 +82,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // This is used for faking authentication in tests
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      (e: Electron.Event, auth: any) => {
+      async (e: Electron.Event, auth: any) => {
         this.LOGIN(auth);
-        this.setRavenContext();
+        await this.sceneCollectionsService.setupNewUser();
       }
     );
   }
