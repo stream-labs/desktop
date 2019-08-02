@@ -105,7 +105,7 @@
     "@xkeshi/vue-qrcode": "0.3.0",
     "ava": "1.4.1",
     "awesome-typescript-loader": "5.2.1",
-    "babel-helper-vue-jsx-merge-props": "2.0.0",
+    "babel-helper-vue-jsx-merge-props": "2.0.3",
     "babel-loader": "8.0.6",
     "babel-plugin-syntax-jsx": "6.18.0",
     "babel-plugin-transform-class-properties": "6.24.1",

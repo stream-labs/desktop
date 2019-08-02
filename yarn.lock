@@ -2015,10 +2015,10 @@ babel-helper-get-function-arity@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
-babel-helper-vue-jsx-merge-props@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-2.0.0.tgz#a5eea94b03d7be4e61865a775263b17c61bb2a65"
-  integrity sha1-pe6pSwPXvk5hhlp3UmOxfGG7KmU=
+babel-helper-vue-jsx-merge-props@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-2.0.3.tgz#22aebd3b33902328e513293a8e4992b384f9f1b6"
+  integrity sha512-gsLiKK7Qrb7zYJNgiXKpXblxbV5ffSwR0f5whkPAaBAR4fhi6bwRZxX9wBlIc5M/v8CCkXUbXZL4N/nSE97cqg==
 
 babel-loader@8.0.6:
   version "8.0.6"
