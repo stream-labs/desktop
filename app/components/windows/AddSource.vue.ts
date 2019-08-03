@@ -12,7 +12,7 @@ import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import electron from "electron";
+import electron from 'electron';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
