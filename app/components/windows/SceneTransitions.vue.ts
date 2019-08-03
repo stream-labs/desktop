@@ -11,7 +11,7 @@ import { ScenesService } from 'services/scenes';
 import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
-import electron from "electron";
+import electron from 'electron';
 
 Vue.use(VModal);
 
