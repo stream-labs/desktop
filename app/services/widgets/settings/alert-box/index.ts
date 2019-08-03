@@ -176,9 +176,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     Object.keys(settings).forEach(key => {
       let testSuccess = false;
       REGEX_TESTERS.forEach(test => {
-        const newKey = /show/.test(key)
-          ? key.replace(test.tester, 'show_')
-          : key.replace(test.tester, '');
+        const newKey =
+          /show/.test(key) && !/show_animation/.test(key)
+            ? key.replace(test.tester, 'show_')
+            : key.replace(test.tester, '');
         if (test.tester.test(key)) {
           testSuccess = true;
           if (!newSettings[test.name]) {
