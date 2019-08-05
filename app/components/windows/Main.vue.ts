@@ -4,6 +4,7 @@ import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
@@ -62,6 +63,7 @@ export default class Main extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() editorCommandsService: EditorCommandsService;
 
   mounted() {
     const dockWidth = this.customizationService.state.livedockSize;
@@ -129,13 +131,17 @@ export default class Main extends Vue {
   }
 
   onDropHandler(event: DragEvent) {
-    const files = event.dataTransfer.files;
+    const fileList = event.dataTransfer.files;
+    const files: string[] = [];
 
-    let fi = files.length;
-    while (fi--) {
-      const file = files.item(fi);
-      this.scenesService.activeScene.addFile(file.path);
-    }
+    let fi = fileList.length;
+    while (fi--) files.push(fileList.item(fi).path);
+
+    this.editorCommandsService.executeCommand(
+      'AddFilesCommand',
+      this.scenesService.activeSceneId,
+      files,
+    );
   }
 
   $refs: {

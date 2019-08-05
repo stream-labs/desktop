@@ -136,15 +136,20 @@ export class ClipboardService extends StatefulService<IClipboardState>
     }
   }
 
-  copyFilters() {
-    const source = this.selectionService.getLastSelected();
+  copyFilters(sourceId?: string) {
+    const source = sourceId
+      ? this.sourcesService.getSource(sourceId)
+      : this.selectionService.getLastSelected();
+
     if (!source) return;
     this.SET_FILTERS_IDS([source.sourceId]);
     this.SET_UNLOADED_CLIPBOARD_FILTERS([]);
   }
 
-  pasteFilters() {
-    const source = this.selectionService.getItems()[0];
+  pasteFilters(sourceId?: string) {
+    const source = sourceId
+      ? this.sourcesService.getSource(sourceId)
+      : this.selectionService.getLastSelected();
     if (!source) return;
 
     const filterData: IFilterData[] = [];

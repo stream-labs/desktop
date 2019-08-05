@@ -199,7 +199,6 @@ if (!gotTheLock) {
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
         shutdownStarted = true;
-        childWindow.destroy();
         mainWindow.send('shutdown');
 
         // We give the main window 10 seconds to acknowledge a request
@@ -409,7 +408,7 @@ if (!gotTheLock) {
 
   ipcMain.on('window-closeChildWindow', (event) => {
     // never close the child window, hide it instead
-    childWindow.hide();
+    if (!childWindow.isDestroyed()) childWindow.hide();
   });
 
 
@@ -479,13 +478,21 @@ if (!gotTheLock) {
      executed synchronously and therefore default actions
      cannot be prevented. */
   ipcMain.on('webContents-preventNavigation', (e, id) => {
-    webContents.fromId(id).on('will-navigate', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('will-navigate', e => {
       e.preventDefault();
     });
   });
 
   ipcMain.on('webContents-preventPopup', (e, id) => {
-    webContents.fromId(id).on('new-window', e => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('new-window', e => {
       e.preventDefault();
     });
   });

@@ -49,7 +49,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
       type: WidgetType.MediaShare,
       url: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
       previewUrl: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
-      settingsUpdateEvent: 'mediaShareSettingsUpdate',
+      settingsUpdateEvent: 'mediaSharingSettingsUpdate',
       goalCreateEvent: 'newmediaShare',
       goalResetEvent: 'mediaShareEnd',
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,

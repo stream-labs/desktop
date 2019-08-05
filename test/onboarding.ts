@@ -21,8 +21,8 @@ test('Go through the onboarding and autoconfig', async t => {
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
 
-  if (await t.context.app.client.isExisting('p=Skip')) {
-    await t.context.app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
     await sleep(1000);
   }
 
@@ -57,8 +57,8 @@ test('OBS Importer', async t => {
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  if (await t.context.app.client.isExisting('p=Skip')) {
-    await t.context.app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
     await sleep(1000);
   }
 

@@ -14,6 +14,7 @@ import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
+import defaultTo from 'lodash/defaultTo';
 
 interface Source {
   name?: string;
@@ -196,13 +197,18 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
             );
 
             if (source.audio) {
+              const defaultMonitoring =
+                source.type === 'browser_source'
+                  ? obs.EMonitoringType.MonitoringOnly
+                  : obs.EMonitoringType.None;
+
               this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
               this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
               this.audioService.getSource(source.sourceId).setSettings({
-                ['audioMixers']: sourceJSON.mixers,
-                ['monitoringType']: sourceJSON.monitoring_type,
-                ['syncOffset']: sourceJSON.sync / 1000000,
-                ['forceMono']: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
+                audioMixers: defaultTo(sourceJSON.mixers, 255),
+                monitoringType: defaultTo(sourceJSON.monitoring_type, defaultMonitoring),
+                syncOffset: defaultTo(sourceJSON.sync / 1000000, 0),
+                forceMono: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
               });
             }
 

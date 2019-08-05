@@ -3,10 +3,10 @@ import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
 import { FileManagerService } from 'services/file-manager';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
+import omit from 'lodash/omit';
 
 interface ISceneCollectionsManifest {
   activeId: string;
@@ -91,7 +91,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    * service, persisted to disk.
    */
   flushManifestFile() {
-    const data = JSON.stringify(this.state, null, 2);
+    const data = JSON.stringify(omit(this.state, 'auto'), null, 2);
     this.writeDataToCollectionFile('manifest', data);
   }
 
@@ -180,11 +180,12 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   }
 
   @mutation()
-  ADD_COLLECTION(id: string, name: string, modified: string) {
+  ADD_COLLECTION(id: string, name: string, modified: string, auto = false) {
     this.state.collections.unshift({
       id,
       name,
       modified,
+      auto,
       deleted: false,
       needsRename: false,
     });

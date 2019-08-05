@@ -1,11 +1,41 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+
+  h1 {
+    margin-bottom: 8px;
+  }
+}
+
+.progress-cover {
+  position: absolute;
+  background: var(--background);
+  width: 700px;
+  height: 32px;
+  top: -30px;
+  left: -16px;
+  z-index: 10;
+}
+
 .signup-buttons {
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 400px;
   align-items: center;
 
   button {
     margin: 8px 0;
     width: 100%;
+  }
+}
+
+.skip-button {
+  text-decoration: underline;
+
+  &:hover {
+    cursor: pointer;
   }
 }
