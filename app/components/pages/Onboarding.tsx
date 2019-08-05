@@ -25,7 +25,6 @@ export default class OnboardingPage extends TsxComponent<{}> {
   importedFromObs = false;
   processing = false;
   fbSetupEnabled: boolean = null;
-  skippable = true;
 
   stepsState = [{ complete: false }, { complete: false }, { complete: false }];
 
