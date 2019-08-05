@@ -7,7 +7,8 @@
     class="main-contents"
     :class="{
       'main-contents--right': renderDock && leftDock && hasLiveDock,
-      'main-contents--left': renderDock && !leftDock && hasLiveDock }">
+      'main-contents--left': renderDock && !leftDock && hasLiveDock,
+      'main-contents--onboarding': page === 'Onboarding' }">
     <side-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading" />
     <div class="live-dock-wrapper" v-if="renderDock && leftDock">
       <live-dock :onLeft="true" />
@@ -83,6 +84,10 @@
 
 .main-contents--left {
   grid-template-columns: auto 1fr auto;
+}
+
+.main-contents--onboarding {
+  grid-template-columns: 1fr;
 }
 
 .main-middle {
