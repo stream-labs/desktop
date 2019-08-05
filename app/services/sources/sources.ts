@@ -519,9 +519,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
     }
 
+    let propertiesName = SourceDisplayData()[source.type].name;
+    if (propertiesManagerType === 'replay') propertiesName = $t('Instant Replay');
+    if (propertiesManagerType === 'streamlabels') propertiesName = $t('Stream Label');
+
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
-      title: $t('Settings for ') + SourceDisplayData()[source.type].name,
+      title: $t('Settings for ') + propertiesName,
       queryParams: { sourceId },
       size: {
         width: 600,
