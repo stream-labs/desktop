@@ -43,6 +43,10 @@ export default class CodeEditor extends Vue {
     this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
   }
 
+  destroyed() {
+    this.save();
+  }
+
   get alertBoxValue() {
     const capitalizedType =
       this.metadata.type.charAt(0).toUpperCase() + this.metadata.type.slice(1);
