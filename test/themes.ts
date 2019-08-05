@@ -15,8 +15,8 @@ test('Installing a theme', async (t: any) => {
 
   await logIn(t);
 
-  await app.client.waitForExist('.top-nav.loading', 5000, true);
-  await app.client.click('button=Themes');
+  // await app.client.waitForExist('button=themes', 5000, true);
+  await app.client.click('div[title=Themes]');
 
   await focusLibrary(t);
 

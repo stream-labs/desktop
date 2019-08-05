@@ -23,7 +23,7 @@ test('Replay Buffer', async t => {
   t.is(files.length, 1);
 
   // disable replay buffer
-  await client.click('.top-nav .icon-settings');
+  await client.click('.side-nav .icon-settings');
   await focusChild(t);
   await client.click('li=Output');
   await client.click('label=Enable Replay Buffer');

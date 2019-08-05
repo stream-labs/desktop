@@ -158,7 +158,7 @@ export default class TopNav extends Vue {
     }
 
     return (
-      <div class={cx(styles.container, { [styles.leftDock]: this.leftDock })}>
+      <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
         {pageData.map(page => (
           <div
             class={cx(styles.mainCell, { [styles.active]: this.page === page.target })}
