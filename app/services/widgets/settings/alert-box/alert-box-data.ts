@@ -146,7 +146,12 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
     customJson: '',
     duration: 8,
     hideAnimation: 'fadeOut',
-    image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
+    image: {
+      href:
+        type === 'merch'
+          ? 'https://cdn.streamlabs.com/merch/Mug_mockup.png'
+          : 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif',
+    },
     layout: 'above',
     showAnimation: 'fadeIn',
     sound: { href: '', volume: 80 },
