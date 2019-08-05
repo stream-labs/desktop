@@ -2,7 +2,7 @@ import { TExecutionContext, test, useSpectron, closeWindow } from '../../../help
 import { logIn, logOut } from '../../../helpers/spectron/user';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
-import { addWidget, EWidgetType } from '../../../helpers/widget-helpers';
+import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
@@ -65,6 +65,7 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
       font: 'Roboto'
     };
     await formMonkey.fill(testSet);
+    await waitForWidgetSettingsSync(t);
 
     await makeScreenshots(t, 'Settings');
 
