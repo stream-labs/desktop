@@ -69,7 +69,7 @@ export default class SideNav extends Vue {
     return (
       <div class={styles.bottomTools}>
         {this.isDevMode && (
-          <div class={styles.cell} onClick={this.openDevTools.bind(this)} title={$t('Dev Tools')}>
+          <div class={styles.cell} onClick={() => this.openDevTools()} title={$t('Dev Tools')}>
             <i class="icon-developer" />
           </div>
         )}
@@ -90,11 +90,7 @@ export default class SideNav extends Vue {
         <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
           <i class="icon-question" />
         </div>
-        <div
-          class={styles.cell}
-          onClick={this.openSettingsWindow.bind(this)}
-          title={$t('Settings')}
-        >
+        <div class={styles.cell} onClick={() => this.openSettingsWindow()} title={$t('Settings')}>
           <i class="icon-settings" />
         </div>
       </div>
