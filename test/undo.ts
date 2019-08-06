@@ -14,15 +14,13 @@ import { sleep } from './helpers/sleep';
 useSpectron();
 
 async function undo(t: TExecutionContext) {
-  t.context.app.client.keys(['Control', 'z']);
-  t.context.app.client.keys('Control');
-  await sleep(500);
+  await ((t.context.app.client.keys(['Control', 'z']) as any) as Promise<any>);
+  await ((t.context.app.client.keys('Control') as any) as Promise<any>);
 }
 
 async function redo(t: TExecutionContext) {
-  t.context.app.client.keys(['Control', 'y']);
-  t.context.app.client.keys('Control');
-  await sleep(500);
+  await ((t.context.app.client.keys(['Control', 'y']) as any) as Promise<any>);
+  await ((t.context.app.client.keys('Control') as any) as Promise<any>);
 }
 
 test('Creating some sources with undo/redo', async t => {
