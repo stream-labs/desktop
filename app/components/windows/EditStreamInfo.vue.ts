@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import moment from 'moment';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
+import { BoolInput, ListInput, ToggleInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
@@ -21,9 +21,10 @@ import { shell } from 'electron';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
+import { TwitterService } from 'services/integrations/twitter';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
-import { Spinner } from 'streamlabs-beaker';
+import { Spinner, TextArea, Button } from 'streamlabs-beaker';
 import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
@@ -32,9 +33,12 @@ import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
     HFormGroup,
     BoolInput,
     ListInput,
+    ToggleInput,
     TwitchTagsInput,
     ValidatedForm,
     Spinner,
+    TextArea,
+    Button,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -45,6 +49,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
+  @Inject() twitterService: TwitterService;
   @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
 
@@ -65,6 +70,10 @@ export default class EditStreamInfo extends Vue {
     date: null,
   };
 
+  shouldTweetModel: boolean = this.twitterService.state.tweetWhenGoingLive;
+  priorTitle: string = '';
+  tweetModel: string = '';
+
   searchProfilesPending = false;
   channelInfo: IChannelInfo = null;
 
@@ -83,6 +92,30 @@ export default class EditStreamInfo extends Vue {
       this.facebookService.state.facebookPages &&
       this.facebookService.state.facebookPages.pages.length
     );
+  }
+
+  get isPrime() {
+    return this.twitterService.state.prime;
+  }
+
+  get hasTwitter() {
+    return this.twitterService.state.linked;
+  }
+
+  get shouldTweet() {
+    return this.twitterService.state.tweetWhenGoingLive;
+  }
+
+  get twitterScreenName() {
+    return this.twitterService.state.screenName;
+  }
+
+  get csOnboardingComplete() {
+    return this.twitterService.state.creatorSiteOnboardingComplete;
+  }
+
+  get siteUrl() {
+    return this.twitterService.state.creatorSiteUrl;
   }
 
   get formMetadata() {
@@ -186,6 +219,10 @@ export default class EditStreamInfo extends Vue {
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
+    if (this.hasTwitter && this.shouldTweet) {
+      this.twitterService.postTweet(this.tweetModel);
+    }
+
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
     this.streamInfoService
@@ -262,7 +299,31 @@ export default class EditStreamInfo extends Vue {
   async handleSubmit() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
+    if (this.hasTwitter && this.shouldTweet) {
+      const tweetedSuccessfully = await this.handlePostTweet();
+      if (!tweetedSuccessfully) return;
+    }
     this.updateAndGoLive();
+  }
+
+  async handlePostTweet() {
+    this.updatingInfo = true;
+    let success = false;
+    try {
+      await this.twitterService.postTweet(this.tweetModel);
+      success = true;
+    } catch {
+      this.$toasted.show($t('Failed to post tweet'), {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      success = false;
+      this.updateError = true;
+    }
+    this.updatingInfo = false;
+    return success;
   }
 
   async goLive() {
@@ -278,6 +339,10 @@ export default class EditStreamInfo extends Vue {
       });
       this.updatingInfo = false;
     }
+  }
+
+  async getTwitterStatus() {
+    await this.twitterService.getTwitterStatus();
   }
 
   cancel() {
@@ -298,6 +363,10 @@ export default class EditStreamInfo extends Vue {
 
     // check available profiles for the selected game
     await this.loadAvailableProfiles();
+
+    // Get up-to-date twitter status
+    await this.getTwitterStatus();
+    this.setInitialTweetBody();
   }
 
   get isTwitch() {
@@ -323,6 +392,7 @@ export default class EditStreamInfo extends Vue {
   get submitText() {
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
+    if (this.hasTwitter && this.shouldTweet) return $t('Tweet & Go Live');
 
     return $t('Confirm & Go Live');
   }
@@ -343,32 +413,66 @@ export default class EditStreamInfo extends Vue {
     return this.streamInfoService.state.error;
   }
 
+  get primeButtonText() {
+    return $t('Customize your URL');
+  }
+
+  get composeTweetText() {
+    return $t('Compose Tweet');
+  }
+
   linkTwitter() {
-    this.userService.openLinkTwitterDialog(() => { console.log('linkd') });
+    this.twitterService.openLinkTwitterDialog();
   }
 
   unlinkTwitter() {
-    this.userService.unlinkTwitter().then(() => {
-      console.log('fuk0');
-    });
+    this.twitterService.unlinkTwitter().then(() => this.getTwitterStatus());
   }
 
   tweet() {
-    console.log(this.link);
-    console.log(this.channelInfo.title);
-    const tweet = `${this.channelInfo.title} - ${this.link}`;
-    this.userService.postTweet(tweet);
+    this.twitterService.postTweet(this.tweetModel);
   }
 
-  getTwitterStatus() {
-    this.userService.getTwitterStatus().then(res => {
-      this.link = res.cs_url;
-    });
+  setInitialTweetBody() {
+    let url = `${this.siteUrl}/home`;
+    if (!this.csOnboardingComplete && this.isTwitch) {
+      url = `https://twitch.tv/${this.userService.platform.username}`;
+    }
+    this.tweetModel = `${this.channelInfo.title} ${url}`;
+  }
+
+  @Watch('channelInfo.title')
+  onTitleUpdate(item: string) {
+    if (this.tweetModel.indexOf(this.priorTitle) !== -1 && this.tweetModel.length < 280) {
+      this.tweetModel = this.tweetModel.replace(this.priorTitle, item);
+    }
+    this.priorTitle = item;
+  }
+
+  @Watch('shouldTweetModel')
+  onShouldTweetChange() {
+    this.twitterService.setTweetPreference(this.shouldTweetModel);
+  }
+
+  @Watch('siteUrl')
+  onSiteUrlChange() {
+    this.setInitialTweetBody();
+  }
+
+  @Watch('doNotShowAgainModel')
+  onDoNotShow(doNotShow: boolean) {
+    if (doNotShow) {
+      this.shouldTweetModel = false;
+    }
   }
 
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/pages/creation/');
     this.windowsService.closeChildWindow();
+  }
+
+  openPrime() {
+    shell.openExternal('https://streamlabs.com/editor/domain?ref=slobs_twitter&redirect=false');
   }
 
   get optimizedProfileMetadata() {
