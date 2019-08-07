@@ -91,6 +91,16 @@ export default class AppsNav extends Vue {
     this.$refs.scroll.scrollBy({ top: vertical, behavior: 'smooth' });
   }
 
+  refreshIcon(h: Function, app: ILoadedApp) {
+    return (
+      app.unpacked && (
+        <div class={styles.refreshIcon} onClick={() => this.refreshApp(app.id)}>
+          <i class="icon-repeat" />
+        </div>
+      )
+    );
+  }
+
   render(h: Function) {
     return (
       <div class={styles.wrapper}>
@@ -108,11 +118,7 @@ export default class AppsNav extends Vue {
                 <i class="icon-integrations" />
                 {app.logo && <img src={app.logo} />}
               </div>
-              {app.unpacked && (
-                <div class={styles.refreshIcon} onClick={() => this.refreshApp(app.id)}>
-                  <i class="icon-repeat" />
-                </div>
-              )}
+              {this.refreshIcon(h, app)}
             </div>
           ))}
         </div>
