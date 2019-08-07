@@ -170,10 +170,9 @@
 <script lang="ts" src="./EditStreamInfo.vue.ts"></script>
 
 <style lang="less">
-@import '../../styles/index';
-
 .twitter-tweet-input {
-  textarea, .s-form-area__label {
+  textarea,
+  .s-form-area__label {
     background: var(--section-alt);
   }
 }
@@ -222,7 +221,7 @@
   font-size: 12px;
 
   .button {
-    margin-right: 0px;
+    margin-right: 0;
   }
 }
 
