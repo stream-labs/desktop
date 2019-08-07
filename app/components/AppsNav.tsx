@@ -96,16 +96,23 @@ export default class AppsNav extends Vue {
       <div class={styles.wrapper}>
         <div class={styles.scroll} ref="scroll" onScroll={this.handleScroll.bind(this)}>
           {this.navApps.map(app => (
-            <div
-              title={app.manifest.name}
-              onClick={() => this.navigateApp(app.id)}
-              draggable
-              // funky casing since vue is dumb
-              onDragend={() => this.popOut(app)}
-              class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
-            >
-              <i class="icon-integrations" />
-              {app.logo && <img src={app.logo} />}
+            <div style="position: relative;">
+              <div
+                title={app.manifest.name}
+                onClick={() => this.navigateApp(app.id)}
+                draggable
+                // funky casing since vue is dumb
+                onDragend={() => this.popOut(app)}
+                class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
+              >
+                <i class="icon-integrations" />
+                {app.logo && <img src={app.logo} />}
+              </div>
+              {app.unpacked && (
+                <div class={styles.refreshIcon} onClick={() => this.refreshApp(app.id)}>
+                  <i class="icon-repeat" />
+                </div>
+              )}
             </div>
           ))}
         </div>
