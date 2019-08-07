@@ -375,78 +375,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  unlinkTwitter() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/unlink`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
-  }
-
-  getTwitterStatus() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/status`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
-  }
-
-  postTweet(tweet: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/tweet`;
-    const headers = authorizedHeaders(this.apiToken);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify({ tweet }),
-    });
-    try {
-      fetch(request).then(() => { console.log('tweeted') });
-    } catch {
-      console.error(new Error('Could not set Facebook page'));
-    }
-  }
-
-  openLinkTwitterDialog(onLinkSuccess: () => void) {
-    const partition = `persist:${uuid()}`;
-
-    const twitterWindow = new electron.remote.BrowserWindow({
-      width: 600,
-      height: 800,
-      alwaysOnTop: false,
-      show: false,
-      webPreferences: {
-        partition,
-        nodeIntegration: false,
-        nativeWindowOpen: true,
-        sandbox: true,
-      },
-    });
-
-    twitterWindow.once('ready-to-show', () => {
-      twitterWindow.show();
-    });
-
-    twitterWindow.webContents.on('did-navigate', async (e, url) => {
-      const parsed = this.parseTwitterResultFromUrl(url);
-
-      if (parsed) {
-        twitterWindow.close();
-        onLinkSuccess();
-      }
-    });
-
-    console.log(this.linkTwitterUrl());
-
-    twitterWindow.setMenu(null);
-    twitterWindow.loadURL(this.linkTwitterUrl());
-  }
-
   /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
@@ -524,20 +452,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           id: query.platform_id,
         },
       } as IPlatformAuth;
-    }
-
-    return false;
-  }
-
-  /**
-   * Parses tokens out of the auth URL
-   */
-  private parseTwitterResultFromUrl(url: string) {
-    console.log(url);
-    const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
-    console.log(query);
-    if (query.twitter) {
-      return { success: !!query.success };
     }
 
     return false;
