@@ -59,8 +59,6 @@ export default class EditStreamInfo extends Vue {
   updateError = false;
   selectedProfile: IEncoderProfile = null;
 
-  link = '';
-
   gameOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
@@ -217,10 +215,6 @@ export default class EditStreamInfo extends Vue {
       );
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
-    }
-
-    if (this.hasTwitter && this.shouldTweet) {
-      this.twitterService.postTweet(this.tweetModel);
     }
 
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);

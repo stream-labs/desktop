@@ -254,17 +254,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
-  linkTwitterUrl() {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
-    const token = this.apiToken;
-    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
-    const locale = i18nService.state.locale;
-
-    return `https://${host}/slobs/twitter/link?oauth_token=${token}&mode=${nightMode}&l=${locale}`;
-  }
-
-
   appStoreUrl(appId?: string) {
     const host = this.hostsService.platform;
     const token = this.apiToken;
@@ -345,34 +334,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     this.userLogout.next();
     this.platformAppsService.unloadAllApps();
-  }
-
-  getFacebookPages() {
-    if (this.platform.type !== 'facebook') return;
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
-  }
-
-  postFacebookPage(pageId: string) {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.apiToken);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
-    });
-    try {
-      fetch(request).then(() => this.updatePlatformChannelId(pageId));
-    } catch {
-      console.error(new Error('Could not set Facebook page'));
-    }
   }
 
   /**
