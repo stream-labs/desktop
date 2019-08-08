@@ -53,6 +53,8 @@ import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
+import PerformanceMetrics from 'components/PerformanceMetrics.vue';
+
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
@@ -87,6 +89,7 @@ export function getComponents() {
     EditTransform,
     OverlayWindow,
     OverlayPlaceholder,
+    PerformanceMetrics,
 
     BitGoal,
     DonationGoal,
