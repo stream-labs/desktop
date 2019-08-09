@@ -90,6 +90,7 @@
     </div>
   </validated-form>
   <validated-form slot="media-properties" :key="`media-properties--${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
+    <v-form-group v-model="selectedVariation.settings.useSkillImage" :metadata="metadata.skillImage" v-if="selectedVariation.settings.useSkillImage !== undefined" />
     <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
     <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
     <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
@@ -121,6 +122,10 @@
     <v-form-group v-model="selectedVariation.settings.textDelay" :metadata="metadata.textDelay" />
   </validated-form>
   <validated-form slot="alert-properties" :key="`alert-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
+    <v-form-group v-model="selectedVariation.settings.sparksEnabled" :metadata="metadata.sparksEnabled" v-if="selectedVariation.settings.sparksEnabled !== undefined" />
+    <v-form-group v-model="selectedVariation.settings.minSparksTrigger" :metadata="metadata.minSparksTrigger" v-if="selectedVariation.settings.minSparksTrigger !== undefined" />
+    <v-form-group v-model="selectedVariation.settings.embersEnabled" :metadata="metadata.embersEnabled" v-if="selectedVariation.settings.embersEnabled !== undefined" />
+    <v-form-group v-model="selectedVariation.settings.minEmbersTrigger" :metadata="metadata.minEmbersTrigger" v-if="selectedVariation.settings.minEmbersTrigger !== undefined" />
     <v-form-group v-model="minTriggerAmount" :metadata="metadata.minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
     <v-form-group v-model="minRecentEvents" :metadata="metadata.minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
     <div v-if="selectedId !== 'default'">
