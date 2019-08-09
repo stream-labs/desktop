@@ -60,5 +60,10 @@
   "As Default": "设为默认",
   "Frequently": "频繁",
   "Very Frequently": "非常频繁",
-  "Recent Events": "最近活动"
+  "Recent Events": "最近活动",
+  "Effects/Rallies": "Effects/Rallies",
+  "Sparks sent are at least <amount>": "Sparks sent are at least <amount>",
+  "Sparks sent are exactly <amount>": "Sparks sent are exactly <amount>",
+  "Ember amount is at least <amount>": "Ember amount is at least <amount>",
+  "Ember amount is exactly <amopunt>": "Ember amount is exactly <amopunt>"
 }
