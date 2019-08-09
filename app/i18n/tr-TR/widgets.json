@@ -60,5 +60,10 @@
   "As Default": "Varsayılan Olarak",
   "Frequently": "Sık sık",
   "Very Frequently": "Çok sık",
-  "Recent Events": "Son Etkinlikler"
+  "Recent Events": "Son Etkinlikler",
+  "Effects/Rallies": "Effects/Rallies",
+  "Sparks sent are at least <amount>": "Sparks sent are at least <amount>",
+  "Sparks sent are exactly <amount>": "Sparks sent are exactly <amount>",
+  "Ember amount is at least <amount>": "Ember amount is at least <amount>",
+  "Ember amount is exactly <amopunt>": "Ember amount is exactly <amopunt>"
 }
