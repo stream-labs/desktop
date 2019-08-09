@@ -3,6 +3,7 @@ import { logIn, logOut } from '../../../helpers/spectron/user';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
+import moment = require('moment');
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
@@ -26,12 +27,17 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
 
     await makeScreenshots(t, 'Empty Form');
 
+    // set the date to tomorrow
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
       title: 'My Goal',
       goal_amount: 100,
       manual_goal_amount: 0,
-      ends_at: '12/12/2030',
+      ends_at: moment(tomorrow).format('MM/DD/YYYY'),
     });
 
     await makeScreenshots(t, 'Filled Form');
@@ -62,7 +68,7 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
       bar_bg_color: '#FF0000',
       text_color: '#FF0000',
       bar_text_color: '#FF0000',
-      font: 'Roboto'
+      font: 'Roboto',
     };
     await formMonkey.fill(testSet);
     await waitForWidgetSettingsSync(t);

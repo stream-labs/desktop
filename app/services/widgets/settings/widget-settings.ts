@@ -180,6 +180,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 
   @mutation()
   protected SET_PENDING_REQUESTS(pendingRequestsCnt: number) {
+    console.log('SET_PENDING_REQUESTS', pendingRequestsCnt);
     this.state.pendingRequests = pendingRequestsCnt;
   }
 
