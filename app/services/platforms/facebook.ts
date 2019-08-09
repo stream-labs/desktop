@@ -6,13 +6,14 @@ import {
   TPlatformCapability,
   TPlatformCapabilityMap,
   EPlatformCallResult,
+  IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
-import { handlePlatformResponse, requiresToken } from './utils';
+import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
 
@@ -108,15 +109,16 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return this.state.activePage.access_token;
   }
 
-  getHeaders(token = this.oauthToken): Headers {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    headers.append('Authorization', `Bearer ${token}`);
-    return headers;
+  getHeaders(req: IPlatformRequest, useToken: boolean | string) {
+    const token = typeof useToken === 'string' ? useToken : this.oauthToken;
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
   }
 
   formRequest(url: string, data?: any, token = this.oauthToken) {
-    const headers = this.getHeaders(token);
+    const headers = new Headers(this.getHeaders({ url }, token));
     return new Request(url, { headers, ...data });
   }
 
@@ -261,29 +263,23 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     this.SET_STREAM_PROPERTIES(title, description, game);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {
-      const headers = this.getHeaders(this.state.activePage.access_token);
-      const data = { title, description, game_specs: { name: game } };
-      const request = new Request(`${this.apiBase}/${this.state.liveVideoId}`, {
-        headers,
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      return fetch(request)
-        .then(handlePlatformResponse)
-        .then(() => true);
+      return platformRequest(
+        {
+          url: `${this.apiBase}/${this.state.liveVideoId}`,
+          method: 'POST',
+          body: JSON.stringify({ title, description, game_specs: { name: game } }),
+        },
+        this.state.activePage.access_token,
+      ).then(() => true);
     }
     return Promise.resolve(true);
   }
 
-  @requiresToken()
   async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return;
-    const url = `${this.apiBase}/v3.2/search?type=game&q=${searchString}`;
-    const headers = this.getHeaders();
-    const request = new Request(url, { headers, method: 'GET' });
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then((json: any) => json.data);
+    return platformAuthorizedRequest(
+      `${this.apiBase}/v3.2/search?type=game&q=${searchString}`,
+    ).then(json => json.data);
   }
 
   getChatUrl(): Promise<string> {
