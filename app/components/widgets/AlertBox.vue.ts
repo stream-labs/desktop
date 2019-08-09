@@ -36,6 +36,8 @@ const alertNameMap = () => ({
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
   loyaltystore: $t('Cloudbot Redemption'),
+  stickers: $t('Stickers'),
+  effects: $t('Effects/Rallies'),
 });
 
 const triggerAmountMap = {
@@ -45,7 +47,7 @@ const triggerAmountMap = {
   raids: 'raid_raider_minimum',
 };
 
-const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids'];
+const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids', 'effects', 'stickers'];
 const HAS_DONOR_MESSAGE = [
   'donations',
   'bits',
