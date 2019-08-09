@@ -69,7 +69,8 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
 
   get sliderAutohideMetadata() {
     return metadata.slider({
-      title: $t('Overlay autohide timeout'),
+      title: $t('Fade Time (s)'),
+      description: $t('Set to 0 to disable a fade by timeout'),
       min: 0,
       max: 120,
       interval: 1,
