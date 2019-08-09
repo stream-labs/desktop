@@ -27,18 +27,21 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
 
     await makeScreenshots(t, 'Empty Form');
 
-    // set the date to tomorrow
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
       title: 'My Goal',
       goal_amount: 100,
       manual_goal_amount: 0,
-      ends_at: moment(tomorrow).format('MM/DD/YYYY'),
+      ends_at: '12/12/2030',
     });
+
+    // because of a different latency of api.streamlabs.com
+    // we may see a different date after goal creation
+    // for example `1 day` or `23 hours`
+    // just disable displaying ends_at field to make screenshots consistent
+    await t.context.app.webContents.executeJavaScript(`
+      $('.goal-row:nth-child(4) span:nth-child(2)').innerText = '2 days to go';
+    `);
 
     await makeScreenshots(t, 'Filled Form');
 
