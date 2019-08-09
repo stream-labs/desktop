@@ -60,5 +60,10 @@
   "As Default": "Als Vorgabe",
   "Frequently": "Häufig",
   "Very Frequently": "Sehr häufig",
-  "Recent Events": "Letzte Ereignisse"
+  "Recent Events": "Letzte Ereignisse",
+  "Effects/Rallies": "Effects/Rallies",
+  "Sparks sent are at least <amount>": "Sparks sent are at least <amount>",
+  "Sparks sent are exactly <amount>": "Sparks sent are exactly <amount>",
+  "Ember amount is at least <amount>": "Ember amount is at least <amount>",
+  "Ember amount is exactly <amopunt>": "Ember amount is exactly <amopunt>"
 }
