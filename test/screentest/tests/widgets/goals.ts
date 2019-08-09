@@ -46,7 +46,7 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
     // for example `1 day` or `23 hours`
     // just disable displaying ends_at field to make screenshots consistent
     await t.context.app.webContents.executeJavaScript(`
-      $('.goal-row:nth-child(4) span:nth-child(2)').innerText = '2 days to go';
+      document.querySelector('.goal-row:nth-child(4) span:nth-child(2)').innerText = '2 days to go';
     `);
     await makeScreenshots(t, 'Created Goal');
 
