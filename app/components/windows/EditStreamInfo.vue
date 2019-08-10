@@ -86,56 +86,12 @@
             :metadata="{ title: $t('Do not show this message when going live') }"
           />
         </h-form-group>
-        <h-form-group v-if="!midStreamMode && !updatingInfo && !hasTwitter">
-          <div class="section">
-            <p class="twitter-share-text">{{ $t('Share Your Stream') }}</p>
-            <p>{{ $t('Tweet to let your followers know you\'re going live') }}</p>
-            <button class="button button--default" :disabled="updatingInfo" @click="linkTwitter">
-              {{ $t('Connect to Twitter') }} <i class="fab fa-twitter"></i>
-            </button>
-          </div>
-        </h-form-group>
-        <h-form-group v-if="!midStreamMode && hasTwitter">
-          <div class="section">
-            <p class="twitter-share-text">{{ $t('Share Your Stream') }}</p>
-            <div class="twitter-row">
-              <div class="twitter-toggle-block">
-                <span>{{ $t('Enable Tweet Sharing') }}</span>
-                <toggle-input
-                  v-model="shouldTweetModel"
-                  name="shouldTweet"
-                  class="twitter-tweet-toggle"
-                  :metadata="{ title: $t('Tweet when going live') }"
-                />
-              </div>
-              <p>@{{ twitterScreenName }}</p>
-            </div>
-            <text-area
-              name="tweetInput"
-              v-model="tweetModel"
-              autoResize="true"
-              :label="composeTweetText"
-              class="twitter-tweet-input"
-              placeholder="Come check out my stream"
-              :maxLength="280"
-              :maxHeight="100"
-              slot="input"
-            ></text-area>
-            <div class="twitter-buttons">
-              <Button
-                v-if="!isPrime"
-                :type="'button'"
-                :size="'small'"
-                :variation="'prime'"
-                :title="primeButtonText"
-                @click="openPrime">
-              </Button>
-              <button class="button button--default margin-right-0 margin-left-10" :disabled="updatingInfo" @click="unlinkTwitter">
-                {{ $t('Unlink Twitter') }}
-              </button>
-            </div>
-          </div>
-        </h-form-group>
+        <Twitter
+          :streamTitle="channelInfo.title"
+          :midStreamMode="midStreamMode"
+          :updatingInfo="updatingInfo"
+          v-model="tweetModel"
+        />
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -169,70 +125,8 @@
 
 <script lang="ts" src="./EditStreamInfo.vue.ts"></script>
 
-<style lang="less">
-.twitter-tweet-input {
-  textarea,
-  .s-form-area__label {
-    background: var(--section-alt);
-  }
-}
-
-.night-theme {
-  .twitter-tweet-input {
-    .s-form-area__label {
-      background: var(--section-alt);
-    }
-  }
-}
-</style>
-
 <style lang="less" scoped>
 @import '../../styles/index';
-
-.section {
-  background: var(--section-alt);
-}
-
-.twitter-share-text {
-  font-size: 16px;
-  margin-bottom: 6px;
-}
-
-.twitter-buttons {
-  margin-top: 6px;
-  display: inline-flex;
-  width: 100%;
-  justify-content: flex-end;
-}
-
-.margin-right-0 {
-  margin-right: 0;
-}
-
-.margin-left-10 {
-  margin-left: 10px;
-}
-
-.twitter-row {
-  display: inline-flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: end;
-  font-size: 12px;
-
-  .button {
-    margin-right: 0;
-  }
-}
-
-.twitter-tweet-toggle {
-  margin-left: 12px;
-}
-
-.twitter-toggle-block {
-  display: inline-flex;
-  align-items: center;
-}
 
 .pages-warning,
 .update-warning {
