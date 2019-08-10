@@ -32,6 +32,7 @@ interface ITwitterStatusResponse {
 export class TwitterService extends PersistentStatefulService<ITwitterServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() i18nService: I18nService;
 
   apiToken = this.userService.state.auth.apiToken;
 
@@ -65,8 +66,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   private linkTwitterUrl() {
     const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
-    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
-    const locale = i18nService.state.locale;
+    const locale = this.i18nService.state.locale;
 
     return `https://${host}/slobs/twitter/link?oauth_token=${token}&l=${locale}`;
   }
