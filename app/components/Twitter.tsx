@@ -26,9 +26,9 @@ export class Twitter extends TsxComponent<{
   @Prop() streamTitle: string;
   @Prop() midStreamMode: boolean;
   @Prop() updatingInfo: boolean;
+  @Prop() value: string;
 
   priorTitle: string = '';
-  tweetModel: string = '';
   shouldTweetModel: boolean = this.twitterService.state.tweetWhenGoingLive;
 
   get isTwitch() {
@@ -84,7 +84,7 @@ export class Twitter extends TsxComponent<{
     if (!this.csOnboardingComplete && this.isTwitch) {
       url = `https://twitch.tv/${this.userService.platform.username}`;
     }
-    this.tweetModel = `${this.streamTitle} ${url}`;
+    this.onTweetChange(`${this.streamTitle} ${url}`);
   }
 
   async getTwitterStatus() {
@@ -98,14 +98,13 @@ export class Twitter extends TsxComponent<{
   }
 
   updateTweetModel(tweet: string) {
-    this.tweetModel = tweet;
+    this.onTweetChange(tweet);
   }
 
   updateShouldTweetModel(shouldTweet: boolean) {
     this.shouldTweetModel = shouldTweet;
   }
 
-  @Watch('tweetModel')
   onTweetChange(tweet: string) {
     this.$emit('input', tweet);
   }
@@ -121,11 +120,12 @@ export class Twitter extends TsxComponent<{
   }
 
   @Watch('streamTitle')
-  onTitleUpdate(item: string) {
-    if (this.tweetModel.indexOf(this.priorTitle) !== -1 && this.tweetModel.length < 280) {
-      this.tweetModel = this.tweetModel.replace(this.priorTitle, item);
+  onTitleUpdate(title: string) {
+    const newTweet = this.value.replace(this.priorTitle, title);
+    if (this.value.indexOf(this.priorTitle) !== -1 && newTweet.length <= 280) {
+      this.onTweetChange(newTweet);
     }
-    this.priorTitle = item;
+    this.priorTitle = title;
   }
 
   primeButton(h: Function) {
@@ -178,7 +178,7 @@ export class Twitter extends TsxComponent<{
           <TextArea
             name="tweetInput"
             onInput={this.updateTweetModel.bind(this)}
-            value={this.tweetModel}
+            value={this.value}
             autoResize="true"
             label={this.composeTweetText}
             class={styles.twitterTweetInput}
