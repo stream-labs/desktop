@@ -380,10 +380,6 @@ export default class EditStreamInfo extends Vue {
     return this.streamInfoService.state.error;
   }
 
-  tweet() {
-    this.twitterService.postTweet(this.tweetModel);
-  }
-
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/pages/creation/');
     this.windowsService.closeChildWindow();
