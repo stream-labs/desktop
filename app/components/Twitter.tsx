@@ -142,63 +142,77 @@ export class Twitter extends TsxComponent<{
     }
   }
 
-  twitter(h: Function) {
-    if (!this.updatingInfo && !this.hasTwitter) {
-      return (
-        <div class={styles.section}>
-          <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
-          <p>{$t("Tweet to let your followers know you're going live")}</p>
+  tweetInput(h: Function) {
+    return(
+      <TextArea
+        name="tweetInput"
+        onInput={this.updateTweetModel.bind(this)}
+        value={this.value}
+        autoResize="true"
+        label={this.composeTweetText}
+        class={styles.twitterTweetInput}
+        placeholder="Come check out my stream"
+        maxLength={280}
+        maxHeight={140}
+        slot="input"
+      />
+    );
+  }
+
+  unlinkedView(h: Function) {
+    return (
+      <div class={styles.section}>
+        <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
+        <p>{$t("Tweet to let your followers know you're going live")}</p>
+        <button
+          class="button button--default"
+          disabled={this.updatingInfo}
+          onClick={this.linkTwitter}
+        >
+          {$t('Connect to Twitter')} <i class="fab fa-twitter" />
+        </button>
+      </div>
+    );
+  }
+
+  linkedView(h: Function) {
+    return (
+      <div class={cx('section', styles.section)}>
+        <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
+        <div class={styles.twitterRow}>
+          <div class={styles.twitterToggleBlock}>
+            <span>{$t('Enable Tweet Sharing')}</span>
+            <ToggleInput
+              onInput={this.updateShouldTweetModel.bind(this)}
+              value={this.shouldTweetModel}
+              class={styles.twitterTweetToggle}
+              metadata={{ title: $t('Tweet when going live') }}
+            />
+          </div>
+          <p>@{this.twitterScreenName}</p>
+        </div>
+        {this.tweetInput(h)}
+        <div class={styles.twitterButtons}>
+          {this.primeButton(h)}
           <button
-            class="button button--default"
+            class={cx('button', 'button--default', styles.adjustButton)}
             disabled={this.updatingInfo}
-            onClick={this.linkTwitter}
+            onClick={this.unlinkTwitter}
           >
-            {$t('Connect to Twitter')} <i class="fab fa-twitter" />
+            {$t('Unlink Twitter')}
           </button>
         </div>
-      );
+      </div>
+    );
+  }
+
+  twitter(h: Function) {
+    if (!this.updatingInfo && !this.hasTwitter) {
+      return this.unlinkedView(h);
     }
 
     if (this.hasTwitter) {
-      return (
-        <div class={cx('section', styles.section)}>
-          <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
-          <div class={styles.twitterRow}>
-            <div class={styles.twitterToggleBlock}>
-              <span>{$t('Enable Tweet Sharing')}</span>
-              <ToggleInput
-                onInput={this.updateShouldTweetModel.bind(this)}
-                value={this.shouldTweetModel}
-                class={styles.twitterTweetToggle}
-                metadata={{ title: $t('Tweet when going live') }}
-              />
-            </div>
-            <p>@{this.twitterScreenName}</p>
-          </div>
-          <TextArea
-            name="tweetInput"
-            onInput={this.updateTweetModel.bind(this)}
-            value={this.value}
-            autoResize="true"
-            label={this.composeTweetText}
-            class={styles.twitterTweetInput}
-            placeholder="Come check out my stream"
-            maxLength={280}
-            maxHeight={140}
-            slot="input"
-          />
-          <div class={styles.twitterButtons}>
-            {this.primeButton(h)}
-            <button
-              class={cx('button', 'button--default', styles.adjustButton)}
-              disabled={this.updatingInfo}
-              onClick={this.unlinkTwitter}
-            >
-              {$t('Unlink Twitter')}
-            </button>
-          </div>
-        </div>
-      );
+      return this.linkedView(h);
     }
   }
 
