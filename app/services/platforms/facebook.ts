@@ -110,7 +110,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {
-    const token = typeof useToken === 'string' ? useToken : this.oauthToken;
+    const token = typeof useToken === 'string' ? useToken : useToken && this.oauthToken;
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
