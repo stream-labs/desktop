@@ -3,7 +3,6 @@ import { logIn, logOut } from '../../../helpers/spectron/user';
 import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
-import moment = require('moment');
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
