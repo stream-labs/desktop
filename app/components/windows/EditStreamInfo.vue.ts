@@ -89,12 +89,8 @@ export default class EditStreamInfo extends Vue {
     );
   }
 
-  get shouldTweet() {
-    return this.twitterService.state.tweetWhenGoingLive;
-  }
-
-  get hasTwitter() {
-    return this.twitterService.state.linked;
+  get shouldPostTweet() {
+    return this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive;
   }
 
   get formMetadata() {
@@ -274,7 +270,7 @@ export default class EditStreamInfo extends Vue {
   async handleSubmit() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
-    if (this.hasTwitter && this.shouldTweet) {
+    if (this.shouldPostTweet) {
       const tweetedSuccessfully = await this.handlePostTweet();
       if (!tweetedSuccessfully) return;
     }
@@ -359,7 +355,7 @@ export default class EditStreamInfo extends Vue {
   get submitText() {
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
-    if (this.hasTwitter && this.shouldTweet) return $t('Tweet & Go Live');
+    if (this.shouldPostTweet) return $t('Tweet & Go Live');
 
     return $t('Confirm & Go Live');
   }
