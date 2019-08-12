@@ -94,6 +94,7 @@ interface IAppManifest {
   pages: IAppPage[];
   authorizationUrls: string[];
   mediaDomains: string[];
+  icon?: string;
 }
 
 interface IProductionAppResponse {
@@ -121,11 +122,7 @@ export interface ILoadedApp {
   appUrl?: string;
   devPort?: number;
   enabled: boolean;
-
-  // Thumbnail in store
   icon?: string;
-  // Nav icon
-  logo?: string;
 }
 
 interface IPlatformAppServiceState {

@@ -64,6 +64,10 @@ export default class AppsNav extends Vue {
     this.navigationService.navigate('PlatformAppMainPage', { appId });
   }
 
+  iconSrc(appId: string, path: string) {
+    return this.platformAppsService.getAssetUrl(appId, path);
+  }
+
   scrollUp() {
     this.scrollNav(-DEFAULT_SCROLL_DELTA);
   }
@@ -116,7 +120,7 @@ export default class AppsNav extends Vue {
                 class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
               >
                 <i class="icon-integrations" />
-                {app.logo && <img src={app.logo} />}
+                {app.manifest.icon && <img src={this.iconSrc(app.id, app.manifest.icon)} />}
               </div>
               {this.refreshIcon(h, app)}
             </div>
