@@ -292,6 +292,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return fetch(request).then(handleResponse);
   }
 
+  getPlatformService(): IPlatformService {
+    return getPlatformService(this.platform.type);
+  }
+
   async showLogin() {
     if (this.isLoggedIn()) await this.logOut();
     this.onboardingService.start({ isLogin: true });
@@ -501,22 +505,4 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
     } as LoginLifecycle;
   }
-}
-
-/**
- * You can use this decorator to ensure the user is logged in
- * before proceeding
- */
-export function requiresLogin() {
-  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
-    const original = descriptor.value;
-
-    return {
-      ...descriptor,
-      value(...args: any[]) {
-        // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
-      },
-    };
-  };
 }

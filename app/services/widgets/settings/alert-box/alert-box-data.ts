@@ -29,6 +29,8 @@ export const API_NAME_MAP = {
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
   loyalty_store_redemption: 'loyaltystore',
+  effect: 'effects',
+  sticker: 'stickers',
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
@@ -113,8 +115,20 @@ export const conditions = () => ({
     { value: 'MERCH_PREORDER', title: $t('Preorder') },
   ],
   loyaltystore: [
-    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: 'Item type is <type>' },
-    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: 'Item name is <name>' },
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: $t('Item type is <type>') },
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
+  ],
+  effects: [
+    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
+    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
+    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
+    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
+  ],
+  stickers: [
+    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
+    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
+    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
+    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
   ],
 });
 
@@ -146,7 +160,12 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
     customJson: '',
     duration: 8,
     hideAnimation: 'fadeOut',
-    image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
+    image: {
+      href:
+        type === 'merch'
+          ? 'https://cdn.streamlabs.com/merch/Mug_mockup.png'
+          : 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif',
+    },
     layout: 'above',
     showAnimation: 'fadeIn',
     sound: { href: '', volume: 80 },

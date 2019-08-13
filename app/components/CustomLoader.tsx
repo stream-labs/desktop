@@ -7,7 +7,7 @@ export default class CustomLoader extends Vue {
   loadingStrings = [
     'Initiating doggo petting engine...',
     'Compiling food pic library...',
-    'Callibrating RNG blame threshold...',
+    'Calibrating RNG blame threshold...',
     'Dropping fire mixtape...',
     'Reticulating emoji splines...',
     'Waking up 24/7 support team...',

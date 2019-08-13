@@ -7,6 +7,8 @@ import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
 import { WindowsService } from 'services/windows';
+import { async } from 'rxjs/internal/scheduler/async';
+import { installFetchMock } from './network';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -110,6 +112,15 @@ export async function restartApp(t: TExecutionContext): Promise<Application> {
   return await startApp(t);
 }
 
+let skipCheckingErrorsInLogFlag = false;
+
+/**
+ * Disable checking errors in the log file for a single test
+ */
+export function skipCheckingErrorsInLog() {
+  skipCheckingErrorsInLogFlag = true;
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -162,6 +173,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     `;
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+
+    // allow usage of fetch-mock library
+    await installFetchMock(t);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
@@ -236,7 +250,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (errors.length) {
+    if (errors.length && !skipCheckingErrorsInLogFlag) {
       fail(`The log-file has errors \n ${logs}`);
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
@@ -252,6 +266,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
+    skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);

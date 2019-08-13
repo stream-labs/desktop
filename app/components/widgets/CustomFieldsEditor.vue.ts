@@ -9,6 +9,7 @@ import { IInputMetadata, inputComponents, metadata } from 'components/shared/inp
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import electron from 'electron';
 
 const { ToggleInput } = inputComponents;
 
@@ -219,7 +220,7 @@ export default class CustomFieldsEditor extends Vue {
     try {
       newCustomFields = JSON.parse(this.editorInputValue);
     } catch (e) {
-      alert('Invalid JSON');
+      electron.remote.dialog.showErrorBox($t('Error'), $t('Invalid JSON'));
       return;
     }
 

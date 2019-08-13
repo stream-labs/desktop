@@ -1,9 +1,10 @@
 import { Observable, EMPTY } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import { concatMap, expand, filter, map, toArray } from 'rxjs/operators';
+import { concatMap, expand, filter, toArray } from 'rxjs/operators';
 import sortBy from 'lodash/sortBy';
 import { TTwitchPagination } from './pagination';
 import { ITwitchRequestHeaders } from '../twitch';
+import { platformAuthorizedRequest } from '../utils';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 /**
  * A tag on Twitch that could be assigned to a Stream.
@@ -53,25 +54,18 @@ interface IPaginatedResponse {
 
 /**
  * Map a Twitch tags response to an object containing items and cursor for pagination
- * @param headers Request headers
  * @param cursor To be used for pagination, the empty string specifies the initial page
  * @see {ITwitchRequestHeaders}
  */
-const requestTags = (
-  headers: ITwitchRequestHeaders,
-  cursor: string,
-): Observable<IPaginatedResponse> =>
-  ajax
-    .getJSON<TTwitchTagsResponse>(
+const requestTags = (cursor: string): Observable<IPaginatedResponse> =>
+  fromPromise(
+    platformAuthorizedRequest(
       `https://api.twitch.tv/helix/tags/streams?first=100&after=${cursor}`,
-      headers,
-    )
-    .pipe(
-      map(response => ({
-        cursor: response.pagination.cursor,
-        items: response.data,
-      })),
-    );
+    ).then(response => ({
+      cursor: response.pagination.cursor,
+      items: response.data,
+    })),
+  );
 
 /**
  * Fetch all available tags that Twitch provides that are not
@@ -79,16 +73,15 @@ const requestTags = (
  *
  * This will use the provided pagination to request the whole dataset of tags.
  *
- * @param headers Headers including OAuth Token and App ID
  * @see https://rxjs-dev.firebaseapp.com/api/operators/expand
  */
-export const getAllTags = (headers: ITwitchRequestHeaders): Promise<TTwitchTag[]> =>
+export const getAllTags = (): Promise<TTwitchTag[]> =>
   /*
    * Recursively request tags until we get `null` as a cursor, signaling the end of results
    */
-  requestTags(headers, '')
+  requestTags('')
     .pipe(
-      expand(({ cursor }) => (cursor ? requestTags(headers, cursor) : EMPTY)),
+      expand(({ cursor }) => (cursor ? requestTags(cursor) : EMPTY)),
       concatMap(({ items }) => items),
       // Auto tags can't be set or unset by the user, so we filter these out
       filter(tag => !tag.is_auto),
@@ -103,21 +96,10 @@ export const getAllTags = (headers: ITwitchRequestHeaders): Promise<TTwitchTag[]
  * @param headers Request headers
  * @see {ITwitchRequestHeaders}
  */
-export const getStreamTags = (
-  broadcasterId: string,
-  headers: ITwitchRequestHeaders,
-): Promise<TTwitchTag[]> =>
-  ajax
-    .getJSON<TTwitchTagsResponse>(
-      `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${broadcasterId}`,
-      headers,
-    )
-    .pipe(
-      concatMap(({ data }) => data),
-      filter(tag => !tag.is_auto),
-      toArray(),
-    )
-    .toPromise();
+export const getStreamTags = (broadcasterId: string): Promise<TTwitchTag[]> =>
+  platformAuthorizedRequest<TTwitchTagsResponse>(
+    `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${broadcasterId}`,
+  ).then(res => res.data.filter(tag => !tag.is_auto));
 
 /**
  * Fetch a string translation from the Twitch response, or fallback to `en-us`
@@ -179,17 +161,12 @@ export const prepareOptions = (
  *
  * Replace the set of stream tags with the given tag list `tag_id`'s.
  *
- * @param headers Twitch request headers, so we can preset them
  * @returns Function that takes the list of tags to update and returns a promise of the request.
  * @see {ITwitchRequestHeaders}
  */
-export const updateTags = (headers: ITwitchRequestHeaders) => (tags: TTwitchTag[]) => (
-  streamId: string,
-) =>
-  ajax
-    .put(
-      `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${streamId}`,
-      JSON.stringify({ tag_ids: tags ? tags.map(tag => tag.tag_id) : [] }),
-      headers,
-    )
-    .toPromise();
+export const updateTags = () => (tags: TTwitchTag[]) => (streamId: string) =>
+  platformAuthorizedRequest({
+    url: `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${streamId}`,
+    method: 'PUT',
+    body: JSON.stringify({ tag_ids: tags ? tags.map(tag => tag.tag_id) : [] }),
+  });

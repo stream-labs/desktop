@@ -1,7 +1,7 @@
 import { afterAppStart, test, useSpectron } from '../../../helpers/spectron';
 import { logIn } from '../../../helpers/spectron/user';
 import { fillForm } from '../../../helpers/form-monkey';
-import { addWidget, EWidgetType } from '../../../helpers/widget-helpers';
+import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 import { useScreentest } from '../../screenshoter';
 
 useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
@@ -26,6 +26,7 @@ test('Chatbox Visual Settings', async t => {
     background_color: '#000000',
     message_hide_delay: 60,
   });
+  await waitForWidgetSettingsSync(t);
   t.pass();
 });
 
@@ -35,10 +36,12 @@ test('Chatbox Font Settings', async t => {
     text_color: '#FF0000',
     text_size: 20,
   });
+  await waitForWidgetSettingsSync(t);
   t.pass();
 });
 
 test('Chatbox Font Chatter', async t => {
   await t.context.app.client.click('li=Chatter');
+  await waitForWidgetSettingsSync(t);
   t.pass();
 });

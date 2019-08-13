@@ -11,6 +11,7 @@ import { ScenesService } from 'services/scenes';
 import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
+import electron from 'electron';
 
 Vue.use(VModal);
 
@@ -105,7 +106,9 @@ export default class SceneTransitions extends Vue {
 
   deleteTransition(id: string) {
     if (this.transitionsService.state.transitions.length === 1) {
-      alert($t('You need at least 1 transition.'));
+      electron.remote.dialog.showMessageBox({
+        message: $t('You need at least 1 transition.'),
+      });
       return;
     }
 
