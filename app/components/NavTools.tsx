@@ -83,7 +83,11 @@ export default class SideNav extends Vue {
         <div
           class={styles.cell}
           onClick={() => this.handleAuth()}
-          title={this.userService.isLoggedIn() ? $t('Logout') : $t('Login')}
+          title={
+            this.userService.isLoggedIn()
+              ? $t('Logout %{username}', { username: this.userService.username })
+              : $t('Login')
+          }
         >
           <i class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
         </div>
