@@ -65,7 +65,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   private linkTwitterUrl() {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
+    const host = this.hostsService.streamlabs;
     const token = this.apiToken;
     const locale = this.i18nService.state.locale;
 
