@@ -26,7 +26,7 @@ test('Streaming to Twitch without auth', async t => {
   const app = t.context.app;
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Stream');
@@ -173,12 +173,6 @@ schedulingPlatforms.forEach(platform => {
     await focusChild(t);
 
     const formMonkey = new FormMonkey(t, 'form[name=editStreamForm]');
-    await ({
-      title: 'SLOBS Test Stream',
-      game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-      description: 'SLOBS Test Stream Description',
-    });
-
 
     // fill streaming data
     switch (platform) {
