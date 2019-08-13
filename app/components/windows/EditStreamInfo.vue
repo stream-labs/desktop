@@ -86,6 +86,12 @@
             :metadata="{ title: $t('Do not show this message when going live') }"
           />
         </h-form-group>
+        <Twitter
+          :streamTitle="channelInfo.title"
+          :midStreamMode="midStreamMode"
+          :updatingInfo="updatingInfo"
+          v-model="tweetModel"
+        />
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -97,7 +103,7 @@
               )
             }}
             <a @click="goLive">{{ $t('just go live') }}</a
-            >.
+            >
           </div>
         </div>
       </validated-form>
