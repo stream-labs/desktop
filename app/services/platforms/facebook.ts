@@ -133,7 +133,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   async fetchActivePage() {
     await this.fetchPages();
-    return platformRequest(`${this.apiBase}/me/accounts`).then(async json => {
+    return platformAuthorizedRequest(`${this.apiBase}/me/accounts`).then(async json => {
       const pageId = this.userService.platform.channelId || this.state.facebookPages.page_id;
       const activePage =
         json.data.filter((page: IFacebookPage) => pageId === page.id)[0] || json.data[0];
