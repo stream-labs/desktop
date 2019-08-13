@@ -59,10 +59,6 @@ export class Twitter extends TsxComponent<{
     return this.twitterService.state.creatorSiteUrl;
   }
 
-  get primeButtonText() {
-    return $t('Customize your URL');
-  }
-
   get composeTweetText() {
     return $t('Compose Tweet');
   }
@@ -131,19 +127,17 @@ export class Twitter extends TsxComponent<{
   primeButton(h: Function) {
     if (!this.isPrime) {
       return (
-        <Button
-          type="button"
-          size="small"
-          variation="prime"
-          title={this.primeButtonText}
-          onClick={this.openPrime}
-        />
+        <a onClick={this.openPrime} class={styles.primeLink}>
+          {$t('Custom URL with')}
+          &nbsp;
+          <strong>{$t('Prime')}</strong>
+        </a>
       );
     }
   }
 
   tweetInput(h: Function) {
-    return(
+    return (
       <TextArea
         name="tweetInput"
         onInput={this.updateTweetModel.bind(this)}
