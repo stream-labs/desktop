@@ -35,6 +35,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   @Inject() i18nService: I18nService;
 
   apiToken = this.userService.state.auth.apiToken;
+  authWindowOpen = false;
 
   static defaultState: ITwitterServiceState = {
     linked: false,
@@ -110,6 +111,9 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   openLinkTwitterDialog() {
+    if (this.authWindowOpen) return;
+
+    this.authWindowOpen = true;
     const partition = `persist:${uuid()}`;
 
     const twitterWindow = new electron.remote.BrowserWindow({
@@ -127,6 +131,10 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
 
     twitterWindow.once('ready-to-show', () => {
       twitterWindow.show();
+    });
+
+    twitterWindow.once('close', () => {
+      this.authWindowOpen = false;
     });
 
     twitterWindow.webContents.on('did-navigate', async (e, url) => {
