@@ -25,7 +25,6 @@ import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
-import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
@@ -83,7 +82,6 @@ export function getComponents() {
     RecentEvents,
     MediaGallery,
     PlatformAppPopOut,
-    FacemaskSettings,
     EditTransform,
     OverlayWindow,
     OverlayPlaceholder,
@@ -286,6 +284,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: (options.size && options.size.height) || 400,
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
+      x: options.x,
+      y: options.y,
       title: options.title || 'New Window',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true, webviewTag: true },
@@ -301,9 +301,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor(windowId);
     newWindow.on('move', () => this.updateScaleFactor(windowId));
 
-    if (Util.isDevMode()) {
-      newWindow.webContents.openDevTools({ mode: 'detach' });
-    }
+    if (Util.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);

@@ -231,7 +231,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(context.cacheDir, resolve);
+      rimraf(cacheDir, resolve);
     });
   };
 
