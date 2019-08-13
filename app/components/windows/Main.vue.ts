@@ -182,7 +182,7 @@ export default class Main extends Vue {
 
     clearTimeout(this.windowResizeTimeout);
 
-    this.hasLiveDock = this.windowWidth >= 1100;
+    this.hasLiveDock = this.windowWidth >= 1070;
     this.windowResizeTimeout = window.setTimeout(
       () => this.windowsService.updateStyleBlockers('main', false),
       200,
