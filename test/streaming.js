@@ -173,12 +173,6 @@ schedulingPlatforms.forEach(platform => {
     await focusChild(t);
 
     const formMonkey = new FormMonkey(t, 'form[name=editStreamForm]');
-    await ({
-      title: 'SLOBS Test Stream',
-      game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-      description: 'SLOBS Test Stream Description',
-    });
-
 
     // fill streaming data
     switch (platform) {
