@@ -97,13 +97,14 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openMetricsWindow() {
+    const mousePos = electron.screen.getCursorScreenPoint();
+
     this.windowsService.createOneOffWindow({
       componentName: 'PerformanceMetrics',
       title: $t('Performance Metrics'),
-      size: {
-        width: 450,
-        height: 75,
-      },
+      size: { width: 450, height: 75 },
+      x: mousePos.x,
+      y: mousePos.y,
     });
   }
 
