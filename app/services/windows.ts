@@ -301,9 +301,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor(windowId);
     newWindow.on('move', () => this.updateScaleFactor(windowId));
 
-    if (Util.isDevMode()) {
-      newWindow.webContents.openDevTools({ mode: 'detach' });
-    }
+    if (Util.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
