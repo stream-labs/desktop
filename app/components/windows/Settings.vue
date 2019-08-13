@@ -27,6 +27,7 @@
       <experimental-settings v-if="categoryName === 'Experimental'" />
       <remote-control-settings v-if="categoryName === 'Remote Control'" />
       <game-overlay-settings v-if="categoryName === 'Game Overlay'" />
+      <facemask-settings v-if="categoryName === 'Facemasks'" />
       <GenericFormGroups
         v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
         :categoryName="categoryName"

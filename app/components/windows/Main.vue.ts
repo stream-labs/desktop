@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
-import AppsNav from '../AppsNav.vue';
+import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -37,8 +36,7 @@ import CreatorSites from 'components/pages/CreatorSites';
 @Component({
   components: {
     TitleBar,
-    TopNav,
-    AppsNav,
+    SideNav,
     Studio,
     Dashboard,
     BrowseOverlays,
@@ -184,7 +182,7 @@ export default class Main extends Vue {
 
     clearTimeout(this.windowResizeTimeout);
 
-    this.hasLiveDock = this.windowWidth >= 1100;
+    this.hasLiveDock = this.windowWidth >= 1070;
     this.windowResizeTimeout = window.setTimeout(
       () => this.windowsService.updateStyleBlockers('main', false),
       200,

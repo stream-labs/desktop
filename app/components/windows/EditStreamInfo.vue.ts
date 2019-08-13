@@ -21,6 +21,8 @@ import electron, { shell } from 'electron';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
+import { TwitterService } from 'services/integrations/twitter';
+import { Twitter } from '../Twitter';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Spinner } from 'streamlabs-beaker';
@@ -35,6 +37,7 @@ import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
     TwitchTagsInput,
     ValidatedForm,
     Spinner,
+    Twitter,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -45,6 +48,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
+  @Inject() twitterService: TwitterService;
   @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
 
@@ -62,6 +66,8 @@ export default class EditStreamInfo extends Vue {
     time: null,
     date: null,
   };
+
+  tweetModel: string = '';
 
   searchProfilesPending = false;
   channelInfo: IChannelInfo = null;
@@ -81,6 +87,10 @@ export default class EditStreamInfo extends Vue {
       this.facebookService.state.facebookPages &&
       this.facebookService.state.facebookPages.pages.length
     );
+  }
+
+  get shouldPostTweet() {
+    return this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive;
   }
 
   get formMetadata() {
@@ -261,7 +271,31 @@ export default class EditStreamInfo extends Vue {
   async handleSubmit() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
+    if (this.shouldPostTweet) {
+      const tweetedSuccessfully = await this.handlePostTweet();
+      if (!tweetedSuccessfully) return;
+    }
     this.updateAndGoLive();
+  }
+
+  async handlePostTweet() {
+    this.updatingInfo = true;
+    let success = false;
+    try {
+      await this.twitterService.postTweet(this.tweetModel);
+      success = true;
+    } catch {
+      this.$toasted.show($t('Failed to post tweet'), {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      success = false;
+      this.updateError = true;
+    }
+    this.updatingInfo = false;
+    return success;
   }
 
   async goLive() {
@@ -322,6 +356,7 @@ export default class EditStreamInfo extends Vue {
   get submitText() {
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
+    if (this.shouldPostTweet) return $t('Tweet & Go Live');
 
     return $t('Confirm & Go Live');
   }
