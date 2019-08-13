@@ -284,6 +284,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: (options.size && options.size.height) || 400,
       minWidth: options.size && options.size.minWidth,
       minHeight: options.size && options.size.minHeight,
+      x: options.x,
+      y: options.y,
       title: options.title || 'New Window',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true, webviewTag: true },

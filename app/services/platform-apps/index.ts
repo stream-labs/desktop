@@ -1,3 +1,4 @@
+import electron from 'electron';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
@@ -612,6 +613,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
+    const mousePos = electron.screen.getCursorScreenPoint();
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
@@ -621,6 +623,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         queryParams: { appId, pageSlot },
         title: app.manifest.name,
         size: this.getPagePopOutSize(appId, pageSlot),
+        x: mousePos.x,
+        y: mousePos.y,
       },
       windowId,
     );
