@@ -195,6 +195,9 @@ export class Source implements ISourceApi {
     } else if (button === 2) {
       obsFlags = obs.EInteractionFlags.MouseRight;
       obsButton = obs.EMouseButtonType.Right;
+    } else {
+      // Other button types are not supported
+      return;
     }
 
     this.getObsInput().sendMouseClick(
