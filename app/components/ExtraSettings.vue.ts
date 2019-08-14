@@ -55,7 +55,7 @@ export default class ExtraSettings extends Vue {
   deleteCacheDir() {
     if (
       confirm(
-        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!'),
+        $t('Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member.'),
       )
     ) {
       electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
