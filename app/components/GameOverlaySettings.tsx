@@ -115,7 +115,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
         <button
           class="button button--action"
           onClick={this.resetPosition}
-          style="margin-bottom: 16px;"
+          style="margin-bottom: 16px; margin-top: 16px;"
         >
           {$t('Reset Overlay Position')}
         </button>
