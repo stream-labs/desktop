@@ -35,7 +35,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   @Inject() i18nService: I18nService;
 
   apiToken = this.userService.state.auth.apiToken;
-  authWindowOpen = false;
 
   static defaultState: ITwitterServiceState = {
     linked: false,
@@ -111,43 +110,42 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   openLinkTwitterDialog() {
-    if (this.authWindowOpen) return;
+    return new Promise(resolve => {
+      const partition = `persist:${uuid()}`;
 
-    this.authWindowOpen = true;
-    const partition = `persist:${uuid()}`;
+      const twitterWindow = new electron.remote.BrowserWindow({
+        width: 600,
+        height: 800,
+        alwaysOnTop: false,
+        show: false,
+        webPreferences: {
+          partition,
+          nodeIntegration: false,
+          nativeWindowOpen: true,
+          sandbox: true,
+        },
+      });
 
-    const twitterWindow = new electron.remote.BrowserWindow({
-      width: 600,
-      height: 800,
-      alwaysOnTop: false,
-      show: false,
-      webPreferences: {
-        partition,
-        nodeIntegration: false,
-        nativeWindowOpen: true,
-        sandbox: true,
-      },
+      twitterWindow.once('ready-to-show', () => {
+        twitterWindow.show();
+      });
+
+      twitterWindow.once('close', () => {
+        resolve();
+      });
+
+      twitterWindow.webContents.on('did-navigate', async (e, url) => {
+        const parsed = this.parseTwitterResultFromUrl(url);
+
+        if (parsed) {
+          twitterWindow.close();
+          this.getTwitterStatus();
+        }
+      });
+
+      twitterWindow.setMenu(null);
+      twitterWindow.loadURL(this.linkTwitterUrl());
     });
-
-    twitterWindow.once('ready-to-show', () => {
-      twitterWindow.show();
-    });
-
-    twitterWindow.once('close', () => {
-      this.authWindowOpen = false;
-    });
-
-    twitterWindow.webContents.on('did-navigate', async (e, url) => {
-      const parsed = this.parseTwitterResultFromUrl(url);
-
-      if (parsed) {
-        twitterWindow.close();
-        this.getTwitterStatus();
-      }
-    });
-
-    twitterWindow.setMenu(null);
-    twitterWindow.loadURL(this.linkTwitterUrl());
   }
 
   /**

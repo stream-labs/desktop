@@ -30,6 +30,7 @@ export class Twitter extends TsxComponent<{
 
   priorTitle: string = '';
   shouldTweetModel: boolean = this.twitterService.state.tweetWhenGoingLive;
+  awaitingAuth = false;
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
@@ -68,7 +69,10 @@ export class Twitter extends TsxComponent<{
   }
 
   linkTwitter() {
-    this.twitterService.openLinkTwitterDialog();
+    this.awaitingAuth = true;
+    this.twitterService.openLinkTwitterDialog().then(() => {
+      this.awaitingAuth = false;
+    });
   }
 
   unlinkTwitter() {
@@ -160,10 +164,11 @@ export class Twitter extends TsxComponent<{
         <p>{$t("Tweet to let your followers know you're going live")}</p>
         <button
           class="button button--default"
-          disabled={this.updatingInfo}
+          disabled={this.awaitingAuth}
           onClick={this.linkTwitter}
         >
-          {$t('Connect to Twitter')} <i class="fab fa-twitter" />
+          {this.awaitingAuth ? <i class="fa fa-spinner fa-pulse" /> : ''} {$t('Connect to Twitter')}{' '}
+          <i class="fab fa-twitter" />
         </button>
       </div>
     );
