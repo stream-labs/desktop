@@ -48,19 +48,15 @@
   }
 }
 
-.app-tab.is-active {
-  &::after {
-    .radius();
+.active-app {
+  .radius();
 
-    content: '';
-    display: block;
-    position: absolute;
-    left: -12px;
-    top: 0;
-    height: 40px;
-    width: 10px;
-    background: var(--title);
-  }
+  position: absolute;
+  left: -6px;
+  top: 0;
+  height: 40px;
+  width: 10px;
+  background: var(--title);
 }
 
 .refresh-icon {
