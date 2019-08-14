@@ -42,7 +42,7 @@ export default class ObsImport extends TsxComponent<{}> {
         description: $t(
           'Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music ' +
             'to stunning overlays to more tools to engage with your community. Head over to the app store in the main ' +
-            'naviagtion to browse our selection of free and paid apps.',
+            'navigation to browse our selection of free and paid apps.',
         ),
         image: 'app-store',
       },
@@ -69,7 +69,7 @@ export default class ObsImport extends TsxComponent<{}> {
         description: $t(
           'Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these ' +
             'improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. ' +
-            'To enable, check the box ‘Use optimized encoder settings’ while editing your stream information',
+            'To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.',
         ),
         image: 'video-encoding',
       },

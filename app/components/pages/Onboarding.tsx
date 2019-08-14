@@ -146,7 +146,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
             skipHandler={this.proceed.bind(this)}
             prevHandler={() => {}}
             hideBack={true}
-            hideSkip={[1, 2].includes(this.currentStep)}
+            hideSkip={[1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)}
             hideButton={
               [1, 2, 4].includes(this.currentStep) ||
               (this.currentStep === 3 && !this.importedFromObs)
