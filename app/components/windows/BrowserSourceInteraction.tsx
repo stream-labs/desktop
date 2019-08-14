@@ -32,9 +32,15 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
   }
 
   eventLocationInSourceSpace(e: MouseEvent): IVec2 {
+    const factor = this.windowsService.state.child.scaleFactor;
+
     return {
-      x: ((e.offsetX - this.currentRegion.x) / this.currentRegion.width) * this.source.width,
-      y: ((e.offsetY - this.currentRegion.y) / this.currentRegion.height) * this.source.height,
+      x:
+        ((e.offsetX * factor - this.currentRegion.x) / this.currentRegion.width) *
+        this.source.width,
+      y:
+        ((e.offsetY * factor - this.currentRegion.y) / this.currentRegion.height) *
+        this.source.height,
     };
   }
 
