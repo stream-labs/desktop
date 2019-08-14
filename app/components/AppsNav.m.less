@@ -52,11 +52,16 @@
   .radius();
 
   position: absolute;
-  left: -6px;
   top: 0;
   height: 40px;
   width: 10px;
   background: var(--title);
+  transform: translateX(-12px);
+  transition: 0.2s all;
+}
+
+.active-app.active {
+  transform: translateX(-6px);
 }
 
 .refresh-icon {
