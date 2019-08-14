@@ -23,7 +23,11 @@ export default class AppsNav extends Vue {
   };
 
   upArrowVisible = false;
-  downArrowVisible = true;
+  downArrowVisible = false;
+
+  mounted() {
+    this.handleScroll();
+  }
 
   isSelectedApp(appId: string) {
     return (
@@ -86,7 +90,7 @@ export default class AppsNav extends Vue {
     }
     if (el.scrollHeight - el.scrollTop === el.clientHeight) {
       this.downArrowVisible = false;
-    } else {
+    } else if (el.scrollHeight > el.clientHeight) {
       this.downArrowVisible = true;
     }
   }
