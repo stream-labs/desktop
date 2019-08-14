@@ -28,6 +28,7 @@ const actions = {};
 
 const plugins: any[] = [];
 
+let mutationId = 1;
 let makeStoreReady: Function;
 let storeCanReceiveMutations = Util.isMainWindow();
 
@@ -42,6 +43,7 @@ plugins.push((store: Store<any>) => {
     const internalApiService: InternalApiService = InternalApiService.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
       const mutationToSend: IMutation = {
+        id: mutationId++,
         type: mutation.type,
         payload: mutation.payload,
       };
