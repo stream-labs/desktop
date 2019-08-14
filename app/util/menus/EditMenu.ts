@@ -201,6 +201,13 @@ export class EditMenu extends Menu {
           }
         },
       });
+
+      if (this.source.type === 'browser_source') {
+        this.append({
+          label: $t('Interact'),
+          click: () => this.sourcesService.showInteractWindow(this.source.sourceId),
+        });
+      }
     }
 
     if (this.source && !isMultipleSelection) {
