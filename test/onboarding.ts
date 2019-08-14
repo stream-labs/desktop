@@ -86,7 +86,7 @@ test('OBS Importer', async t => {
   await switchCollection(t, 'Collection 2');
 
   // check settings
-  await client.click('.top-nav .icon-settings');
+  await client.click('.side-nav .icon-settings');
   await focusChild(t);
   await client.click('li=Output');
   t.is(await getFormInput(t, 'Video Bitrate'), '5000');

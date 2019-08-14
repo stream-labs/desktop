@@ -8,8 +8,8 @@ test('Populates stream settings while logged in', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await app.client.waitForExist('.top-nav.loading', 5000, true);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.waitForExist('.side-nav.loading', 5000, true);
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Stream');
@@ -23,8 +23,8 @@ test('Populates stream key when logged in', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await app.client.waitForExist('.top-nav.loading', 5000, true);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.waitForExist('.side-nav.loading', 5000, true);
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Stream');

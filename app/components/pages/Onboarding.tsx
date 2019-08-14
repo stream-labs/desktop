@@ -11,9 +11,7 @@ import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
-import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
-import { throws } from 'assert';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {

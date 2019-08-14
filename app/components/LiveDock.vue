@@ -136,7 +136,7 @@
     padding: 0;
   }
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1070px) {
     display: none;
   }
 }

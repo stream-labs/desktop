@@ -127,6 +127,10 @@ export interface IPlatformService {
   prepopulateInfo: () => Promise<any>;
 
   scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
+
+  fetchNewToken: () => Promise<void>;
+
+  getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
 }
 
 export interface IPlatformAuth {
@@ -160,4 +164,8 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     mixer: MixerService.instance,
     facebook: FacebookService.instance,
   }[platform];
+}
+
+export interface IPlatformRequest extends RequestInit {
+  url: string;
 }

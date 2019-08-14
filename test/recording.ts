@@ -16,7 +16,7 @@ test('Recording', async t => {
   // Record 2s video in every format
   for (const format of formats) {
     await focusMain(t);
-    await app.client.click('.top-nav .icon-settings');
+    await app.client.click('.side-nav .icon-settings');
 
     await focusChild(t);
     await app.client.click('li=Output');

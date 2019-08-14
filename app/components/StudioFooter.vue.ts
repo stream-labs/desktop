@@ -34,6 +34,8 @@ export default class StudioFooterComponent extends Vue {
 
   @Prop() locked: boolean;
 
+  metricsShown = false;
+
   mounted() {
     this.confirmYoutubeEnabled();
   }
@@ -92,6 +94,23 @@ export default class StudioFooterComponent extends Vue {
         service.verifyAbleToStream();
       }
     }
+  }
+
+  openMetricsWindow() {
+    const mousePos = electron.screen.getCursorScreenPoint();
+
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'PerformanceMetrics',
+        title: $t('Performance Metrics'),
+        size: { width: 450, height: 75 },
+        x: mousePos.x,
+        y: mousePos.y,
+        resizable: false,
+        maximizable: false,
+      },
+      'performance-metrics',
+    );
   }
 
   get replayBufferEnabled() {
