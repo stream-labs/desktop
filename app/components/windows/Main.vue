@@ -149,11 +149,11 @@
 
 .live-dock-resize-bar {
   position: absolute;
-  height: 100%;
+  height: calc(100% - 20px);
+  bottom: 0;
 }
 
 .live-dock-resize-bar--left {
-  top: 0;
   right: 0;
 }
 

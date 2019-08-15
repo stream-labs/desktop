@@ -21,7 +21,6 @@
     </div>
   </div>
   <resize-bar
-    class="studio-resizer"
     position="top"
     v-model="height"
     @onresizestop="onResizeStopHandler()"
@@ -43,10 +42,6 @@
   height: 100%;
   flex-direction: column;
   .padding-bottom(2);
-}
-
-.studio-resizer {
-  margin: 4px 0;
 }
 
 .studio-mode-container {
