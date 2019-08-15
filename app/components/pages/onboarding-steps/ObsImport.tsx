@@ -112,6 +112,7 @@ export default class ObsImport extends TsxComponent<{
                 <Multiselect
                   class={styles.profileSelect}
                   value={this.selectedProfile}
+                  onInput={(val: string) => (this.selectedProfile = val)}
                   options={this.profiles}
                   allowEmpty={false}
                   showLabels={false}
