@@ -161,6 +161,104 @@ export class Source implements ISourceApi {
     (obsInput.properties.get('refreshnocache') as obs.IButtonProperty).buttonClicked(obsInput);
   }
 
+  /**
+   * Used for browser source interaction
+   * @param pos the cursor position in source space
+   */
+  mouseMove(pos: IVec2) {
+    this.getObsInput().sendMouseMove(
+      {
+        modifiers: 0,
+        x: Math.floor(pos.x),
+        y: Math.floor(pos.y),
+      },
+      false,
+    );
+  }
+
+  /**
+   * Used for browser source interaction
+   * @param button the JS event button number
+   * @param pos the cursor position in source space
+   * @param mouseUp whether this is a mouseup (false for mousedown)
+   */
+  mouseClick(button: number, pos: IVec2, mouseUp: boolean) {
+    let obsFlags: obs.EInteractionFlags;
+    let obsButton: obs.EMouseButtonType;
+
+    if (button === 0) {
+      obsFlags = obs.EInteractionFlags.MouseLeft;
+      obsButton = obs.EMouseButtonType.Left;
+    } else if (button === 1) {
+      obsFlags = obs.EInteractionFlags.MouseMiddle;
+      obsButton = obs.EMouseButtonType.Middle;
+    } else if (button === 2) {
+      obsFlags = obs.EInteractionFlags.MouseRight;
+      obsButton = obs.EMouseButtonType.Right;
+    } else {
+      // Other button types are not supported
+      return;
+    }
+
+    this.getObsInput().sendMouseClick(
+      {
+        modifiers: obsFlags,
+        x: Math.floor(pos.x),
+        y: Math.floor(pos.y),
+      },
+      obsButton,
+      mouseUp,
+      1,
+    );
+  }
+
+  /**
+   * Used for browser source interaction
+   * @param pos the cursor position in source space
+   * @param delta the amount the wheel was scrolled
+   */
+  mouseWheel(pos: IVec2, delta: IVec2) {
+    console.log(pos, delta);
+
+    this.getObsInput().sendMouseWheel(
+      {
+        modifiers: obs.EInteractionFlags.None,
+        x: Math.floor(pos.x),
+        y: Math.floor(pos.y),
+      },
+      0, // X scrolling is currently unsupported
+      Math.floor(delta.y) * -1,
+    );
+  }
+
+  /**
+   * Used for browser source interaction
+   * @param key The string representation of the key
+   * @param code The numberical key code
+   * @param keyup whether this is a keyup (false for keydown)
+   * @param modifiers an object representing which modifiers were pressed
+   */
+  keyInput(
+    key: string,
+    code: number,
+    keyup: boolean,
+    modifiers: { alt: boolean; ctrl: boolean; shift: boolean },
+  ) {
+    this.getObsInput().sendKeyClick(
+      {
+        modifiers:
+          (modifiers.alt && obs.EInteractionFlags.AltKey) |
+          (modifiers.ctrl && obs.EInteractionFlags.ControlKey) |
+          (modifiers.shift && obs.EInteractionFlags.ShiftKey),
+        text: key,
+        nativeModifiers: 0,
+        nativeScancode: 0,
+        nativeVkey: code,
+      },
+      keyup,
+    );
+  }
+
   @Inject()
   protected sourcesService: SourcesService;
 

@@ -155,5 +155,6 @@
   "LIV Client Capture": "LIV Client Capture",
   "VLC Source": "VLC Source",
   "Add playlists of videos to your scene.": "Add playlists of videos to your scene.",
-  "Settings for ": "Settings for "
+  "Settings for ": "Settings for ",
+  "Interact: %{sourceName}": "Interact: %{sourceName}"
 }
