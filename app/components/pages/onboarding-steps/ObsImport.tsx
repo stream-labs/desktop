@@ -1,5 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { OnboardingStep } from 'streamlabs-beaker';
+import Multiselect from 'vue-multiselect';
 import TsxComponent from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { ObsImporterService } from 'services/obs-importer';
@@ -20,6 +21,7 @@ export default class ObsImport extends TsxComponent<{
   @Prop() setProcessing: (bool: boolean) => void;
 
   importing = false;
+  pathChosen = false;
 
   sceneCollections = this.obsImporterService.getSceneCollections();
 
@@ -27,8 +29,11 @@ export default class ObsImport extends TsxComponent<{
 
   selectedProfile = this.profiles[0] || null;
 
-  startImport() {
+  startImport(forceStart?: boolean) {
     if (this.importing) return;
+    this.pathChosen = true;
+    if (this.profiles.length > 1 && !forceStart) return;
+
     this.importing = true;
     this.setProcessing(true);
     defer(async () => {
@@ -81,7 +86,7 @@ export default class ObsImport extends TsxComponent<{
         <template slot="desc">
           {$t('Import your existing settings from OBS in less than a minute and go live')}
         </template>
-        {!this.importing ? (
+        {!this.pathChosen ? (
           <div style="display: flex; justify-content: space-between;">
             {this.optionsMetadata.map(data => (
               <div class={styles.optionCard} onClick={data.onClick}>
@@ -98,7 +103,26 @@ export default class ObsImport extends TsxComponent<{
             ))}
           </div>
         ) : (
-          <i class="fa fa-spinner fa-pulse" />
+          <div>
+            {this.profiles.length > 1 && !this.importing && (
+              <div>
+                <span class={styles.profileSelectTitle}>
+                  {$t('Select an OBS profile to import')}
+                </span>
+                <Multiselect
+                  class={styles.profileSelect}
+                  value={this.selectedProfile}
+                  options={this.profiles}
+                  allowEmpty={false}
+                  showLabels={false}
+                />
+                <button class="button button--action" onClick={() => this.startImport(true)}>
+                  {$t('Start')}
+                </button>
+              </div>
+            )}
+            {this.importing && <i class="fa fa-spinner fa-pulse" />}
+          </div>
         )}
       </OnboardingStep>
     );
