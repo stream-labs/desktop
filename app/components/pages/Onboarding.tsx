@@ -128,7 +128,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   render(h: Function) {
     const steps = this.steps(h);
 
-    if (!this.onboardingService.options.isLogin) {
+    if (this.onboardingService.options.isLogin) {
       return this.loginPage(h);
     }
 
