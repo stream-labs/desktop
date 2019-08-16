@@ -91,7 +91,7 @@ export default class StudioFooterComponent extends Vue {
       const platform = this.userService.platform.type;
       const service = getPlatformService(platform);
       if (service instanceof YoutubeService) {
-        service.verifyAbleToStream();
+        service.prepopulateInfo();
       }
     }
   }

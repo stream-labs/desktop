@@ -16,11 +16,6 @@ interface IStreamInfoServiceState {
   channelInfo: IChannelInfo;
 }
 
-interface IStreamInfo {
-  viewerCount: number;
-  channelInfo: IChannelInfo;
-}
-
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
 /**
@@ -44,7 +39,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   init() {
     this.RESET();
-    this.refreshStreamInfo().catch(e => null);
+    this.userService.userLogin.subscribe(_ => this.refreshStreamInfo().catch(e => null));
     this.userService.userLogout.subscribe(_ => this.RESET());
 
     this.viewerCountInterval = window.setInterval(() => {
@@ -72,8 +67,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
     const platform = getPlatformService(this.userService.platform.type);
     try {
-      await platform.prepopulateInfo();
-      const info = await platform.fetchChannelInfo();
+      const info = await platform.prepopulateInfo();
       this.SET_CHANNEL_INFO(info);
 
       if (this.userService.platform.type === 'twitch') {
