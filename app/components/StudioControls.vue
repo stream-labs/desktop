@@ -14,9 +14,10 @@
 .studio-controls {
   .padding-h-sides();
 
-  height: 240px;
+  height: 100%;
   width: 100%;
   margin: 0;
+  padding-bottom: 8px;
 }
 </style>
 

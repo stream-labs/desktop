@@ -11,7 +11,7 @@
       </div>
     </div>
   </div>
-  <div v-else class="no-preview" :style="{ height: `calc(100% - ${height + 18}px)` }">
+  <div v-else class="no-preview" :style="{ height: `calc(100% - ${height + 18}px` }">
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
@@ -29,7 +29,10 @@
     :min="minHeight"
     :reverse="true"
   />
-  <studio-controls :style="{height: height + 'px'}" />
+  <div :style="{ height: `${height}px`, display: 'flex', flexDirection: 'column' }">
+    <recent-events />
+    <studio-controls />
+  </div>
 </div>
 </template>
 
