@@ -81,7 +81,6 @@ interface IYoutubeLiveStream {
        */
       streamName: string;
       ingestionAddress: string;
-      backupIngestionAddress: string;
     };
     resolution: string;
     frameRate: string;
@@ -233,7 +232,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
             this.SET_ENABLED_STATUS(false);
           }
         });
-        return null;
+        throw new Error('liveStreamingNotEnabled');
       });
   }
 
