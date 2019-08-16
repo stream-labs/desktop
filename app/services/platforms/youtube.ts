@@ -264,13 +264,11 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         id: this.state.liveBroadcast.id,
         snippet: {
           title,
+          scheduledStartTime,
           description: fullDescription,
         },
         status: { privacyStatus: 'public' },
       };
-      if (scheduledStartTime) {
-        data.snippet.scheduledStartTime = scheduledStartTime;
-      }
 
       return platformRequest({
         body: JSON.stringify(data),
