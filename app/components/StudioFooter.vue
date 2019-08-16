@@ -26,6 +26,9 @@
     <div class="nav-item">
       <test-widgets v-if="loggedIn" />
     </div>
+    <div v-if="streamingService.isRecording" class="nav-item record-time">
+      {{ recordingTime }}
+    </div>
     <div class="nav-item">
       <button
         :disabled="locked"
@@ -158,6 +161,10 @@
   &:focus {
     outline: none;
   }
+}
+
+.record-time {
+  color: var(--warning);
 }
 
 @keyframes pulse {
