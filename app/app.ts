@@ -29,6 +29,9 @@ import * as obs from '../obs-api';
 import path from 'path';
 import uuid from 'uuid/v4';
 
+// install moment-duration-format plugin for moment.js
+import 'moment-duration-format';
+
 const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
