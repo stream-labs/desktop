@@ -44,9 +44,7 @@ export default class StudioFooterComponent extends Vue {
     // update recording time
     setInterval(() => {
       if (!this.streamingService.isRecording) return;
-      const startTime = +new Date(this.streamingService.state.recordingStatusTime);
-      const duration = moment.duration(Date.now() - startTime) as any;
-      this.recordingTime = duration.format('hh:mm:ss', { trim: false });
+      this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
   }
 
