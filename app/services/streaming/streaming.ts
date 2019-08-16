@@ -311,6 +311,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return formattedTime;
   }
 
+  get formattedDurationInCurrentRecordingState() {
+    return this.formattedDurationSince(moment(this.state.recordingStatusTime));
+  }
+
   get streamingStateChangeTime() {
     return moment(this.state.streamingStatusTime);
   }
