@@ -50,8 +50,6 @@ export class AppModule extends Module {
       this.navigationService.navigate('Dashboard');
     } else if (page === EPage.Editor) {
       this.navigationService.navigate('Studio');
-    } else if (page === EPage.Live) {
-      this.navigationService.navigate('Live');
     } else if (page === EPage.Themes) {
       this.navigationService.navigate('BrowseOverlays');
     } else if (page === EPage.AppDetailsPage) {

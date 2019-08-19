@@ -14,7 +14,6 @@ import Dashboard from '../pages/Dashboard.vue';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding';
 import TitleBar from '../TitleBar.vue';
 import { Inject } from '../../services/core/injector';
@@ -40,7 +39,6 @@ import CreatorSites from 'components/pages/CreatorSites';
     Studio,
     Dashboard,
     BrowseOverlays,
-    Live,
     Onboarding,
     LiveDock,
     StudioFooter,

@@ -42,6 +42,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
+    if (!events.data) return;
     Object.keys(events.data).forEach(key => {
       eventArray = eventArray.concat(events.data[key]);
     });
