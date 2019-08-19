@@ -72,7 +72,9 @@ export default class SideNav extends Vue {
       { target: 'BrowseOverlays', icon: 'icon-themes', title: 'Themes' },
     ];
 
-    if (this.chatbotVisible) pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot' });
+    if (this.chatbotVisible) {
+      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: 'Cloudbot' });
+    }
     if (this.appStoreVisible) {
       pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: 'Store' });
     }
