@@ -10,7 +10,9 @@ interface IRecentEvent {
   from: string;
   from_display_name?: string;
   amount?: string;
+  type: string;
   created_at: string;
+  message?: string;
 }
 
 interface IRecentEventsState {

@@ -15,6 +15,12 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.state.recentEvents;
   }
 
+  formatMoney(amount: string, type: string) {
+    const prefix = type === 'donation' ? '$' : '';
+    const numAmount = Number.parseFloat(amount);
+    return `${prefix}${type === 'donation' ? numAmount.toFixed(2) : numAmount.toFixed(0)}`;
+  }
+
   render(h: Function) {
     return (
       <div class={styles.container}>
@@ -24,10 +30,15 @@ export default class RecentEvents extends TsxComponent<{}> {
         <div class={styles.eventContainer}>
           {this.recentEvents &&
             this.recentEvents.map(event => (
-              <div style="display: flex;">
-                <span>{moment(event.created_at).fromNow()}</span>
+              <div class={styles.cell}>
+                <span class={styles.timestamp}>{moment(event.created_at).fromNow(true)}</span>
                 <span>{event.from}</span>
-                {JSON.stringify(event)}
+                <span>{event.type}</span>
+                {event.amount && (
+                  <span class={styles.money}>{this.formatMoney(event.amount, event.type)}</span>
+                )}
+                {event.message && <span class={styles.whisper}>{event.message}</span>}
+                <i class="icon-reset" />
               </div>
             ))}
         </div>

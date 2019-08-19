@@ -1,3 +1,5 @@
+@import "../styles/index.less";
+
 .container {
   padding: 0 16px;
   height: 150px;
@@ -15,6 +17,38 @@
 }
 
 .eventContainer {
-  max-height: 99px;
+  max-height: 111px;
   overflow-y: auto;
+}
+
+.cell {
+  .radius();
+
+  display: flex;
+  padding: 8px 16px;
+
+  span {
+    margin-right: 8px;
+  }
+
+  i {
+    margin-left: auto;
+  }
+}
+
+.cell:nth-child(odd) {
+  background: var(--section);
+}
+
+.money {
+  color: var(--teal);
+}
+
+.timestamp {
+  opacity: 0.5;
+}
+
+.whisper {
+  font-style: italic;
+  opacity: 0.5;
 }
