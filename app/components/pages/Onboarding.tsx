@@ -12,7 +12,6 @@ import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import styles from './Onboarding.m.less';
-import { throttleSetter } from 'lodash-decorators';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
