@@ -33,6 +33,8 @@ export default class SideNav extends Vue {
   @Prop() locked: boolean;
 
   navigate(page: TAppPage) {
+    if (!this.userService.isLoggedIn()) return;
+
     this.navigationService.navigate(page);
   }
 
@@ -42,10 +44,6 @@ export default class SideNav extends Vue {
 
   get page() {
     return this.navigationService.state.currentPage;
-  }
-
-  get isUserLoggedIn() {
-    return this.userService.state.auth;
   }
 
   get leftDock() {
@@ -83,7 +81,10 @@ export default class SideNav extends Vue {
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
         {pageData.map(page => (
           <div
-            class={cx(styles.mainCell, { [styles.active]: this.page === page.target })}
+            class={cx(styles.mainCell, {
+              [styles.active]: this.page === page.target,
+              [styles.disabled]: !this.userService.isLoggedIn(),
+            })}
             onClick={() => this.navigate(page.target as TAppPage)}
             title={$t(page.title || page.target)}
           >
