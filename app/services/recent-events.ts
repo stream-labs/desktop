@@ -3,16 +3,27 @@ import { StatefulService, Inject, mutation } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, handleResponse } from '../util/requests';
 
-interface IRecentEvent {
+export interface IRecentEvent {
   id: number;
   name: string;
-  display_name?: string;
   from: string;
+  type: string;
+  platform: string;
+  display_name?: string;
   from_display_name?: string;
   amount?: string;
-  type: string;
   created_at: string;
   message?: string;
+  viewers?: number;
+  host_type?: 'manual' | 'auto';
+  raiders?: number;
+  currency?: string;
+  skill?: string;
+  crate_item?: any;
+  formatted_amount?: string;
+  sub_plan?: string;
+  months?: number;
+  streak_months?: number;
 }
 
 interface IRecentEventsState {
