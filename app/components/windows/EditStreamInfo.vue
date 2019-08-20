@@ -114,7 +114,7 @@
       </button>
       <button
         class="button button--action"
-        :disabled="updatingInfo || (isFacebook && !hasPages)"
+        :disabled="infoLoading || updatingInfo || (isFacebook && !hasPages)"
         @click="handleSubmit"
       >
         <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" /> {{ submitText }}
