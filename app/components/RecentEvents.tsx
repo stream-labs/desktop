@@ -22,43 +22,14 @@ export default class RecentEvents extends TsxComponent<{}> {
     return `${prefix}${type === 'donation' ? numAmount.toFixed(2) : numAmount.toFixed(0)}`;
   }
 
-  subscriptionMap(subPlan: string) {
-    return {
-      '1000': $t('Tier 1'),
-    }[subPlan];
+  eventString(event: IRecentEvent) {
+    return this.recentEventsService.getEventString(event);
   }
 
-  eventString(event: IRecentEvent) {
-    switch (event.type) {
-      case 'donation':
-        return (
-          $t('has donated') +
-          (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : '')
-        );
-      case 'follow':
-        return $t('has followed');
-      case 'subscription':
-        if (event.months > 1) {
-          return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
-            tier: this.subscriptionMap(event.sub_plan),
-            streak: event.streak_months,
-            months: event.months,
-          });
-        }
-        return $t('has subscribed (%{tier})', { tier: this.subscriptionMap(event.sub_plan) });
-      case 'bits':
-        return $t('has used %{amount} bits', { amount: event.amount });
-      case 'host':
-        return $t('has hosted you with %{viewers} viewers', { viewers: event.viewers });
-      case 'raid':
-        return $t('has raided you with a party of %{viewers}', { viewers: event.raiders });
-      case 'sticker':
-        return $t('has used %{amount} %{currency} for %{skill}', {
-          amount: event.amount,
-          currency: event.currency,
-          skill: event.skill,
-        });
-    }
+  getName(event: IRecentEvent) {
+    if (event.gifter) return event.gifter;
+    if (event.from) return event.from;
+    return event.name;
   }
 
   render(h: Function) {
@@ -72,12 +43,19 @@ export default class RecentEvents extends TsxComponent<{}> {
             this.recentEvents.map(event => (
               <div class={styles.cell}>
                 <span class={styles.timestamp}>{moment(event.created_at).fromNow(true)}</span>
-                <span class={styles.name}>{event.from}</span>
+                <span class={styles.name}>{this.getName(event)}</span>
                 <span>{this.eventString(event)}</span>
+                {event.gifter && (
+                  <span class={styles.name}>{event.from ? event.from : event.name}</span>
+                )}
                 {event.formatted_amount && (
                   <span class={styles.money}>{event.formatted_amount}</span>
                 )}
-                {event.message && <span class={styles.whisper}>{event.message}</span>}
+                {(event.comment || event.message) && (
+                  <span class={styles.whisper}>
+                    {event.comment ? event.comment : event.message}
+                  </span>
+                )}
                 <i class="icon-reset" />
               </div>
             ))}
