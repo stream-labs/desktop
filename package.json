@@ -129,6 +129,7 @@
     "less-loader": "4.1.0",
     "lodash": "4.17.14",
     "lodash-decorators": "4.3.1",
+    "mark.js": "^8.11.1",
     "mime": "2.4.3",
     "moment": "2.22.2",
     "node-win32-np": "1.0.6",
