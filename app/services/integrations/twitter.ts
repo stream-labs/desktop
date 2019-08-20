@@ -155,7 +155,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
         }
       });
 
-      twitterWindow.setMenu(null);
+      twitterWindow.removeMenu();
       twitterWindow.loadURL(this.linkTwitterUrl());
     });
   }

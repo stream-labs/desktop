@@ -30,8 +30,8 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
           this.continue();
         } else if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
-          electron.remote.dialog.showMessageBox(
-            {
+          electron.remote.dialog
+            .showMessageBox({
               type: 'error',
               message: $t(
                 'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
@@ -39,13 +39,12 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
               ),
               title: $t('Twitch Authentication Error'),
               buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
-            },
-            buttonIndex => {
-              if (buttonIndex === 0) {
+            })
+            .then(({ response }) => {
+              if (response === 0) {
                 electron.remote.shell.openExternal('https://twitch.tv/settings/security');
               }
-            },
-          );
+            });
         }
       },
     );

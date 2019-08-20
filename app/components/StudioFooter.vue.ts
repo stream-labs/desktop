@@ -97,7 +97,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openMetricsWindow() {
-    const mousePos = electron.screen.getCursorScreenPoint();
+    const mousePos = electron.remote.screen.getCursorScreenPoint();
 
     this.windowsService.createOneOffWindow(
       {
