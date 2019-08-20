@@ -173,13 +173,13 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     const endpoint = 'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
 
-    return platformRequest(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`).then(
-      json => {
-        if (json.items.length) {
-          this.SET_STREAM_ID(json.items[0].id);
-        }
-      },
-    );
+    return platformAuthorizedRequest(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    ).then(json => {
+      if (json.items.length) {
+        this.SET_STREAM_ID(json.items[0].id);
+      }
+    });
   }
 
   fetchViewerCount(): Promise<number> {
@@ -188,7 +188,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       const url = `${this.apiBase}/${endpoint}&id=${this.state.liveStreamId}&access_token=${
         this.oauthToken
       }`;
-      return platformRequest(url).then(
+      return platformAuthorizedRequest(url).then(
         json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
       );
     });
@@ -202,7 +202,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const query = `part=snippet,contentDetails,status&broadcastStatus=upcoming&access_token=${
       this.oauthToken
     }`;
-    return platformRequest(`${this.apiBase}/liveBroadcasts?${query}`).then(json => {
+    return platformAuthorizedRequest(`${this.apiBase}/liveBroadcasts?${query}`).then(json => {
       if (!json.items.length) return;
       this.SET_STREAM_ID(json.items[0].id);
       this.SET_SCHEDULED_START_TIME(json.items[0].snippet.scheduledStartTime);
