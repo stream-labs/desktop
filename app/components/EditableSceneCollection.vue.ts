@@ -86,17 +86,21 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
-      type: 'warning',
-      message: $t('Are you sure you want to remove %{collectionName}?', {
-        collectionName: this.collection.name,
-      }),
-      buttons: [$t('Cancel'), $t('OK')],
-      noLink: true,
-    });
-
-    if (ok) {
-      this.sceneCollectionsService.delete(this.collectionId);
-    }
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: $t('Are you sure you want to remove %{collectionName}?', {
+          collectionName: this.collection.name,
+        }),
+        buttons: [$t('Cancel'), $t('OK')],
+        noLink: true,
+      },
+      index => {
+        if (index === 1) {
+          this.sceneCollectionsService.delete(this.collectionId);
+        }
+      },
+    );
   }
 }
