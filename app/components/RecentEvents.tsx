@@ -26,6 +26,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.getEventString(event);
   }
 
+  repeatAlert(event: IRecentEvent) {
+    return this.recentEventsService.repeatAlert(event);
+  }
+
   getName(event: IRecentEvent) {
     if (event.gifter) return event.gifter;
     if (event.from) return event.from;
@@ -56,7 +60,7 @@ export default class RecentEvents extends TsxComponent<{}> {
                     {event.comment ? event.comment : event.message}
                   </span>
                 )}
-                <i class="icon-reset" />
+                <i class="icon-reset" onClick={() => this.repeatAlert(event)} />
               </div>
             ))}
         </div>

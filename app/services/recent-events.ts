@@ -83,6 +83,33 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.SET_RECENT_EVENTS(eventArray);
   }
 
+  async repeatAlert(event: IRecentEvent) {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/repeatalert`;
+    const body = JSON.stringify({
+      data: {
+        hash: `${event.type}:${event.from}`,
+        priority: 10,
+        read: false,
+        repeat: false,
+        success: false,
+        forceRepeat: false,
+        forceShow: false,
+        historical: true,
+        isTest: false,
+        message: '',
+        to: '',
+        wotcCode: null,
+        payload: {},
+        _id: '',
+        ...event,
+      },
+      type: event.type,
+      token: this.userService.widgetToken,
+    });
+    return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
+  }
+
   getSubString(event: IRecentEvent) {
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
