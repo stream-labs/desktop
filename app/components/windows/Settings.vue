@@ -83,7 +83,6 @@
   .disabled {
     opacity: 0.2;
   }
-
 }
 
 .settings-container {
