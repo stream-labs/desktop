@@ -11,7 +11,8 @@
         v-model="searchStr"
         :metadata="{
           type: 'text',
-          placeholder: 'Type to search'
+          placeholder: 'Search',
+          icon: 'search'
         }"
         class='search'
        />
@@ -32,7 +33,9 @@
       :page="categoryName"
       :pages="categoryNames"
       :searchStr="searchStr"
-      @searchCompleted="pages => searchResultPages = pages"
+      @searchCompleted="onSearchCompletedHandler"
+      @beforePageScan="page => settingsData = getSettingsData(page)"
+      @scanCompleted="settingsData = getSettingsData(categoryName)"
       v-slot:default="{ page }"
     >
       <extra-settings v-if="page === 'General'" />
@@ -72,10 +75,9 @@
   flex: 1;
   margin: -16px;
 
-
   .search {
     .margin-left();
-    .margin-bottom();
+    .margin-bottom(2);
   }
 
   .disabled {

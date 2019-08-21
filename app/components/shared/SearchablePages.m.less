@@ -1,5 +1,23 @@
 .searchable-pages {
-  :global(.mark) {
+  :global(mark) {
     border-radius: 2px;
+  }
+
+  :global(.search-highlight) {
+    input {
+      border: 1px solid yellow;
+      box-shadow: 0 0 10px yellow;
+    }
+
+    :global(.checkbox) input:checked ~ label::before,
+    :global(.checkbox) label::before {
+      border: 1px solid yellow;
+      box-shadow: 0 0 10px yellow;
+    }
+  }
+
+  button:global(.search-highlight) {
+    border: 1px solid yellow;
+    box-shadow: 0 0 10px yellow;
   }
 }

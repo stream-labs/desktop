@@ -67,6 +67,7 @@ export interface ITextMetadata extends IInputMetadata {
   masked?: boolean;
   fullWidth?: boolean;
   blockReturn?: boolean;
+  icon?: string;
 
   /**
    * When true will only emit on change events instead of input events
