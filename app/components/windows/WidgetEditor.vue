@@ -305,6 +305,7 @@
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
+    overflow-y: auto;
 
     &:last-of-type {
       flex-shrink: 1;
