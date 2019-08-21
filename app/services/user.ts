@@ -443,20 +443,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     };
   }
 
-  popoutRecentEvents() {
-    this.windowsService.createOneOffWindow(
-      {
-        componentName: 'RecentEvents',
-        title: $t('Recent Events'),
-        size: {
-          width: 800,
-          height: 600,
-        },
-      },
-      'RecentEvents',
-    );
-  }
-
   /**
    * Abstracts a common pattern of performing an action if the user is logged in, listening for user
    * login events to perform that action at the point the user logs in, and doing cleanup on logout.

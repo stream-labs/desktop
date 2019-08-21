@@ -3,6 +3,7 @@ import { StatefulService, Inject, mutation } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
+import { WindowsService } from 'services/windows';
 
 export interface IRecentEvent {
   id: number;
@@ -35,6 +36,7 @@ export interface IRecentEvent {
 
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
+  muted: boolean;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -49,12 +51,14 @@ const subscriptionMap = (subPlan: string) => {
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() windowsService: WindowsService;
 
-  static initialState: IRecentEventsState = { recentEvents: null };
+  static initialState: IRecentEventsState = { recentEvents: null, muted: false };
 
   init() {
     super.init();
     this.formEventsArray();
+    this.fetchMutedState();
   }
 
   fetchRecentEvents() {
@@ -66,6 +70,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(request)
       .then(handleResponse)
       .catch(() => null);
+  }
+
+  fetchMutedState() {
+    const url = `https://${
+      this.hostsService.streamlabs
+    }/api/v5/slobs/widget/config?widget=recent_events&token=${this.userService.widgetToken}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return fetch(new Request(url, { headers }))
+      .then(handleResponse)
+      .then(resp => this.SET_MUTED(resp.eventsPanelMuted));
   }
 
   async formEventsArray() {
@@ -84,26 +98,13 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async repeatAlert(event: IRecentEvent) {
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/repeatalert`;
     const body = JSON.stringify({
-      data: {
-        hash: `${event.type}:${event.from}`,
-        priority: 10,
-        read: false,
-        repeat: false,
-        success: false,
-        forceRepeat: false,
-        forceShow: false,
-        historical: true,
-        isTest: false,
-        message: '',
-        to: '',
-        wotcCode: null,
-        payload: {},
-        _id: '',
-        ...event,
-      },
+      data: event,
       type: event.type,
       token: this.userService.widgetToken,
     });
@@ -169,8 +170,38 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }[event.type];
   }
 
+  async toggleMuteEvents() {
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const url = `https://${
+      this.hostsService.streamlabs
+    }/api/v5/slobs/widget/recentevents/eventspanel/${this.userService.widgetToken}`;
+    const body = JSON.stringify({ muted: !this.state.muted });
+    return await fetch(new Request(url, { headers, body, method: 'POST' }))
+      .then(handleResponse)
+      .then(() => this.SET_MUTED(!this.state.muted));
+  }
+
+  openRecentEventsWindow() {
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'RecentEvents',
+        title: $t('Recent Events'),
+        size: { width: 800, height: 600 },
+      },
+      'RecentEvents',
+    );
+  }
+
   @mutation()
   SET_RECENT_EVENTS(eventArray: IRecentEvent[]) {
     this.state.recentEvents = eventArray;
+  }
+
+  @mutation()
+  SET_MUTED(muted: boolean) {
+    this.state.muted = muted;
   }
 }

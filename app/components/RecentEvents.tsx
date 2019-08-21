@@ -12,8 +12,11 @@ export default class RecentEvents extends TsxComponent<{}> {
   @Inject() recentEventsService: RecentEventsService;
 
   get recentEvents() {
-    console.log(this.recentEventsService.state.recentEvents);
     return this.recentEventsService.state.recentEvents;
+  }
+
+  get muted() {
+    return this.recentEventsService.state.muted;
   }
 
   formatMoney(amount: string, type: string) {
@@ -30,6 +33,14 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.repeatAlert(event);
   }
 
+  popoutRecentEvents() {
+    return this.recentEventsService.openRecentEventsWindow();
+  }
+
+  muteEvents() {
+    return this.recentEventsService.toggleMuteEvents();
+  }
+
   getName(event: IRecentEvent) {
     if (event.gifter) return event.gifter;
     if (event.from) return event.from;
@@ -41,6 +52,14 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <div class={styles.topBar}>
           <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
+          <i class="icon-music action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i class="icon-pop-out-2 action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i class="icon-pause action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i class="icon-skip action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i
+            class={cx('icon-mute action-icon', { 'input-error': this.muted })}
+            onClick={() => this.muteEvents()}
+          />
         </div>
         <div class={styles.eventContainer}>
           {this.recentEvents &&
@@ -60,7 +79,7 @@ export default class RecentEvents extends TsxComponent<{}> {
                     {event.comment ? event.comment : event.message}
                   </span>
                 )}
-                <i class="icon-reset" onClick={() => this.repeatAlert(event)} />
+                <i class="icon-repeat action-icon" onClick={() => this.repeatAlert(event)} />
               </div>
             ))}
         </div>
