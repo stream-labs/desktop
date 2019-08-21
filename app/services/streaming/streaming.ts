@@ -262,7 +262,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       queryParams: {},
       size: {
         width: 600,
-        height: 620,
+        height: 550,
       },
     });
   }
