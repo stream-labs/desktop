@@ -126,10 +126,11 @@ export default class AppsNav extends Vue {
                 draggable
                 // funky casing since vue is dumb
                 onDragend={() => this.popOut(app)}
-                class={cx(styles.appTab)}
+                class={styles.appTab}
               >
                 <i class="icon-integrations" />
                 {app.manifest.icon && <img src={this.iconSrc(app.id, app.manifest.icon)} />}
+                <div />
               </div>
               {this.refreshIcon(h, app)}
             </div>
