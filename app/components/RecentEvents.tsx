@@ -57,7 +57,7 @@ export default class RecentEvents extends TsxComponent<{}> {
           <i class="icon-pause action-icon" onClick={() => this.popoutRecentEvents()} />
           <i class="icon-skip action-icon" onClick={() => this.popoutRecentEvents()} />
           <i
-            class={cx('icon-mute action-icon', { 'input-error': this.muted })}
+            class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
             onClick={() => this.muteEvents()}
           />
         </div>

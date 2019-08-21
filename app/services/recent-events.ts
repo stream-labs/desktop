@@ -177,7 +177,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
     const url = `https://${
       this.hostsService.streamlabs
-    }/api/v5/slobs/widget/recentevents/eventspanel/${this.userService.widgetToken}`;
+    }/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
     return await fetch(new Request(url, { headers, body, method: 'POST' }))
       .then(handleResponse)
