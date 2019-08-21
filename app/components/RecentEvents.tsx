@@ -56,13 +56,30 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <div class={styles.topBar}>
           <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
-          <i class="icon-music action-icon" onClick={() => this.popoutMediaShare()} />
-          <i class="icon-pop-out-2 action-icon" onClick={() => this.popoutRecentEvents()} />
-          <i class="icon-pause action-icon" onClick={() => this.popoutRecentEvents()} />
-          <i class="icon-skip action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i
+            class="icon-music action-icon"
+            onClick={() => this.popoutMediaShare()}
+            v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
+          />
+          <i
+            class="icon-pop-out-2 action-icon"
+            onClick={() => this.popoutRecentEvents()}
+            v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
+          />
+          <i
+            class="icon-pause action-icon"
+            onClick={() => {}}
+            v-tooltip={{ content: $t('Pause Alert Queue'), placement: 'bottom' }}
+          />
+          <i
+            class="icon-skip action-icon"
+            onClick={() => {}}
+            v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
+          />
           <i
             class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
             onClick={() => this.muteEvents()}
+            v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
           />
         </div>
         <div class={styles.eventContainer}>
@@ -83,7 +100,11 @@ export default class RecentEvents extends TsxComponent<{}> {
                     {event.comment ? event.comment : event.message}
                   </span>
                 )}
-                <i class="icon-repeat action-icon" onClick={() => this.repeatAlert(event)} />
+                <i
+                  class="icon-repeat action-icon"
+                  onClick={() => this.repeatAlert(event)}
+                  v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
+                />
               </div>
             ))}
         </div>
