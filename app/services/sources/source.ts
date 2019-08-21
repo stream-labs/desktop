@@ -244,13 +244,18 @@ export class Source implements ISourceApi {
     keyup: boolean,
     modifiers: { alt: boolean; ctrl: boolean; shift: boolean },
   ) {
+    let normalizedText = key;
+
+    // Enter key
+    if (code === 13) normalizedText = '\r';
+
     this.getObsInput().sendKeyClick(
       {
         modifiers:
           (modifiers.alt && obs.EInteractionFlags.AltKey) |
           (modifiers.ctrl && obs.EInteractionFlags.ControlKey) |
           (modifiers.shift && obs.EInteractionFlags.ShiftKey),
-        text: key,
+        text: normalizedText,
         nativeModifiers: 0,
         nativeScancode: 0,
         nativeVkey: code,
