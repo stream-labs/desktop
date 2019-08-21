@@ -133,6 +133,10 @@ export default class SearchablePages extends TsxComponent<{
       if (!$btn.querySelectorAll('mark').length) return;
       $btn.classList.add('search-highlight');
     });
+
+    // scroll to the first highlighted element
+    const $scrollToEl = this.$refs.pageSlot.querySelector('mark, .search-highlight');
+    if ($scrollToEl) $scrollToEl.scrollIntoView({ block: 'nearest' });
   }
 
   private getPageInputs(): HTMLDivElement[] {
