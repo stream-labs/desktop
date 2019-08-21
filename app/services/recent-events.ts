@@ -184,10 +184,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .then(() => this.SET_MUTED(!this.state.muted));
   }
 
-  openRecentEventsWindow() {
+  openRecentEventsWindow(isMediaShare?: boolean) {
     this.windowsService.createOneOffWindow(
       {
         componentName: 'RecentEvents',
+        queryParams: { isMediaShare },
         title: $t('Recent Events'),
         size: { width: 800, height: 600 },
       },

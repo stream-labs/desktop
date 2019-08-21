@@ -37,6 +37,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.openRecentEventsWindow();
   }
 
+  popoutMediaShare() {
+    return this.recentEventsService.openRecentEventsWindow(true);
+  }
+
   muteEvents() {
     return this.recentEventsService.toggleMuteEvents();
   }
@@ -52,7 +56,7 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <div class={styles.topBar}>
           <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
-          <i class="icon-music action-icon" onClick={() => this.popoutRecentEvents()} />
+          <i class="icon-music action-icon" onClick={() => this.popoutMediaShare()} />
           <i class="icon-pop-out-2 action-icon" onClick={() => this.popoutRecentEvents()} />
           <i class="icon-pause action-icon" onClick={() => this.popoutRecentEvents()} />
           <i class="icon-skip action-icon" onClick={() => this.popoutRecentEvents()} />
