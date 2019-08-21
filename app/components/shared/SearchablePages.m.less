@@ -1,23 +1,29 @@
+
+// a mixin for highlighting
+.highlight() {
+  border: 1px solid yellow;
+  box-shadow: 0 0 10px yellow;
+}
+
 .searchable-pages {
+  // text
   :global(mark) {
     border-radius: 2px;
   }
 
   :global(.search-highlight) {
-    input {
-      border: 1px solid yellow;
-      box-shadow: 0 0 10px yellow;
-    }
+    // inputs
+    input { .highlight(); }
 
+    // checkboxes
     :global(.checkbox) input:checked ~ label::before,
     :global(.checkbox) label::before {
-      border: 1px solid yellow;
-      box-shadow: 0 0 10px yellow;
+      .highlight();
     }
   }
 
+  // buttons
   button:global(.search-highlight) {
-    border: 1px solid yellow;
-    box-shadow: 0 0 10px yellow;
+    .highlight();
   }
 }

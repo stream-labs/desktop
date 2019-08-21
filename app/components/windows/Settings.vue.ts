@@ -110,7 +110,7 @@ export default class Settings extends Vue {
 
   onSearchCompletedHandler(foundPages: string[]) {
     this.searchResultPages = foundPages;
-    // if there are not search results for the current page than switch to the found page
+    // if there are not search results for the current page than switch to the first found page
     if (foundPages.length && !foundPages.includes(this.categoryName)) {
       this.categoryName = foundPages[0];
     }

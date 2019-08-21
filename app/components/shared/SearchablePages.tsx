@@ -4,10 +4,19 @@ import Mark from 'mark.js';
 import styles from './SearchablePages.m.less';
 
 interface IPageInfo {
+  /**
+   * text fetched from the page via .innerText attribute
+   */
   text: string;
+  /**
+   * text fetched from page inputs
+   */
   inputs: string[];
 }
 
+/**
+ * A component for the client-side text search
+ */
 @Component({})
 export default class SearchablePages extends TsxComponent<{
   page: string;
@@ -26,9 +35,10 @@ export default class SearchablePages extends TsxComponent<{
 
   @Watch('searchStr')
   private async onSearchHandler(searchStr: string) {
-    if (!this.pagesInfo) {
-      await this.scanPages();
-    }
+    // build the pages cache if it's empty
+    if (!this.pagesInfo) await this.scanPages();
+
+    // find pages matches to the search string in the cache
     const searchResultPages: string[] = [];
     Object.keys(this.pagesInfo).forEach(pageName => {
       const pageInfo = this.pagesInfo[pageName];
@@ -36,8 +46,11 @@ export default class SearchablePages extends TsxComponent<{
       if (pageText.match(new RegExp(searchStr, 'i'))) searchResultPages.push(pageName);
     });
     this.searchResultPages = searchResultPages;
-    await this.$nextTick();
+
     this.$emit('searchCompleted', this.searchResultPages);
+
+    // after we sent `searchCompleted` event to the external component, it may re-render the slot content
+    // so call `$nextTick` before `highlightPage()` to highlight the relevant content
     await this.$nextTick();
     await this.highlightPage();
   }
@@ -45,14 +58,21 @@ export default class SearchablePages extends TsxComponent<{
   @Watch('page')
   private async onPageChangeHandler(page: string) {
     this.currentPage = page;
+
+    // if search is active then highlight the current page
     if (this.searchStr && this.pagesInfo) {
       await this.$nextTick();
       await this.highlightPage();
     }
   }
 
+  /**
+   * fetch and cache all text information from the page
+   */
   private async scanPages() {
     this.pagesInfo = {};
+
+    // switch and render each page
     for (const page of this.pages) {
       this.$emit('beforePageScan', page);
       // render the page
@@ -77,11 +97,19 @@ export default class SearchablePages extends TsxComponent<{
         }),
       };
     }
+
+    // don't forget to switch back to the original page from the `page` property
     this.currentPage = this.page;
     await this.$nextTick();
+
     this.$emit('scanCompleted');
   }
 
+  /**
+   * this method highlights search matches by modifying DOM elements inside `pageSlot`
+   * this is not a recommended way to interact with elements in Vue.js
+   * so it should be used carefully
+   */
   private async highlightPage() {
     // highlight the page text via Mark.js
     const mark = new Mark(this.$refs.pageSlot);
