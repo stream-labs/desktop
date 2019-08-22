@@ -101,20 +101,18 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   notifyFailure() {
     this.SET_ACTIVE(false);
-    const ok = electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
         message: $t('We encountered an issue setting up your Face Mask Library'),
         detail: $t('Click Retry to try again'),
         buttons: ['Retry', 'OK'],
-      },
-      btnIndex => {
-        if (btnIndex === 0) {
+      })
+      .then(({ response }) => {
+        if (response === 0) {
           this.startup();
         }
-      },
-    );
+      });
   }
 
   notifyPluginMissing() {

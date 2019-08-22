@@ -18,6 +18,10 @@ export default class TitleBar extends Vue {
     electron.remote.getCurrentWindow().minimize();
   }
 
+  get isMaximizable() {
+    return electron.remote.getCurrentWindow().isMaximizable() !== false;
+  }
+
   maximize() {
     const win = electron.remote.getCurrentWindow();
 

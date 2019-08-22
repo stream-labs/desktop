@@ -40,7 +40,15 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
 
+    // because of a different latency of api.streamlabs.com
+    // we may see a different date after goal creation
+    // for example `1 day` or `23 hours`
+    // just disable displaying ends_at field to make screenshots consistent
+    await t.context.app.webContents.executeJavaScript(`
+      document.querySelector('.goal-row:nth-child(4) span:nth-child(2)').innerText = '2 days to go';
+    `);
     await makeScreenshots(t, 'Created Goal');
+
     await closeWindow(t);
     await logOut(t);
   });
@@ -62,7 +70,7 @@ function testGoal(goalType: string, widgetType: EWidgetType) {
       bar_bg_color: '#FF0000',
       text_color: '#FF0000',
       bar_text_color: '#FF0000',
-      font: 'Roboto'
+      font: 'Roboto',
     };
     await formMonkey.fill(testSet);
     await waitForWidgetSettingsSync(t);

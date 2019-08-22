@@ -89,6 +89,34 @@ export const WidgetTesters: IWidgetTester[] = [
     },
     platforms: ['youtube'],
   },
+  {
+    name: 'Share',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/share`;
+    },
+    platforms: ['facebook'],
+  },
+  {
+    name: 'Support',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/support`;
+    },
+    platforms: ['facebook'],
+  },
+  {
+    name: 'Stars',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/stars`;
+    },
+    platforms: ['facebook'],
+  },
+  {
+    name: 'Like',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/like`;
+    },
+    platforms: ['facebook'],
+  },
 ];
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {

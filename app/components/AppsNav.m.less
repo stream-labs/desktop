@@ -31,14 +31,16 @@
   overflow: hidden;
 
   i,
-  img {
+  img,
+  div {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
 
-  img {
+  img,
+  div {
     width: 40px;
     height: 40px;
   }
@@ -48,19 +50,20 @@
   }
 }
 
-.app-tab.is-active {
-  &::after {
-    .radius();
+.active-app {
+  .radius();
 
-    content: '';
-    display: block;
-    position: absolute;
-    left: -12px;
-    top: 0;
-    height: 40px;
-    width: 10px;
-    background: var(--title);
-  }
+  position: absolute;
+  top: 0;
+  height: 40px;
+  width: 10px;
+  background: var(--title);
+  transform: translateX(-12px);
+  transition: 0.2s all;
+}
+
+.active-app.active {
+  transform: translateX(-6px);
 }
 
 .refresh-icon {

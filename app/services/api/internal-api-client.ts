@@ -25,7 +25,7 @@ export class InternalApiClient {
    */
   private subscriptions: Dictionary<Subject<any>> = {};
 
-  private skippedMutationsCount = 0;
+  private skippedMutations: number[] = [];
 
   constructor() {
     this.listenMainWindowMessages();
@@ -92,7 +92,7 @@ export class InternalApiClient {
           mutations.forEach(mutation => commitMutation(mutation));
           // we'll still receive already committed mutations from async IPC event
           // mark them as ignored
-          this.skippedMutationsCount += mutations.length;
+          this.skippedMutations.push(...mutations.map(m => m.id));
 
           if (result && result._type === 'SUBSCRIPTION') {
             if (result.emitter === 'PROMISE') {
@@ -136,9 +136,10 @@ export class InternalApiClient {
   }
 
   handleMutation(mutation: IMutation) {
-    if (this.skippedMutationsCount) {
+    const ind = this.skippedMutations.indexOf(mutation.id);
+    if (ind !== -1) {
       // this mutation is already committed
-      this.skippedMutationsCount--;
+      this.skippedMutations.splice(ind, 1);
       return;
     }
     commitMutation(mutation);

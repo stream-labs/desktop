@@ -6,6 +6,7 @@ import { Inject } from './core/injector';
 import { authorizedHeaders } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
+import { PatchNotesService } from 'services/patch-notes';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -23,6 +24,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
+  @Inject() private patchNotesService: PatchNotesService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -84,9 +86,29 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return Date.now() - installationTimestamp < 1000 * 60 * 60 * 24 * 7;
   }
 
+  private get recentlyUpdatedTo017() {
+    const lastUpdatedVersion = this.patchNotesService.state.lastVersionSeen;
+
+    if (!lastUpdatedVersion) return false;
+
+    const minorVersionRegex = /^(\d+\.\d+)\.\d+$/;
+    const minorVersion = lastUpdatedVersion.match(minorVersionRegex);
+
+    if (!minorVersion || !minorVersion[1]) return false;
+    if (minorVersion[1] !== '0.17') return false;
+    if (!this.patchNotesService.state.updateTimestamp) return false;
+
+    const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000;
+
+    return Date.parse(this.patchNotesService.state.updateTimestamp) > twoDaysAgo;
+  }
+
   private async fetchBanner() {
     const recentlyInstalled = await this.recentlyInstalled();
-    if (!this.userService.isLoggedIn() || recentlyInstalled) return this.state;
+
+    if (!this.userService.isLoggedIn() || recentlyInstalled || this.recentlyUpdatedTo017) {
+      return this.state;
+    }
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
     const req = this.formRequest(endpoint);
     try {

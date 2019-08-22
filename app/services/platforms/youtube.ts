@@ -200,7 +200,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const url = `${this.apiBase}/${endpoint}&id=${this.state.liveBroadcast.id}&access_token=${
       this.oauthToken
     }`;
-    return platformRequest(url).then(
+    return platformAuthorizedRequest(url).then(
       json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
     );
   }
@@ -270,7 +270,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         status: { privacyStatus: 'public' },
       };
 
-      return platformRequest({
+      return platformAuthorizedRequest({
         body: JSON.stringify(data),
         method: 'PUT',
         url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,

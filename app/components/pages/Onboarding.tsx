@@ -125,11 +125,27 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
+  optimizePage(h: Function) {
+    return (
+      <div>
+        <div class={styles.container}>
+          <Optimize
+            continue={this.complete.bind(this)}
+            setProcessing={this.setProcessing.bind(this)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   render(h: Function) {
     const steps = this.steps(h);
 
     if (this.onboardingService.options.isLogin) {
       return this.loginPage(h);
+    }
+    if (this.onboardingService.options.isOptimize) {
+      return this.optimizePage(h);
     }
 
     return (
@@ -146,7 +162,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
             skipHandler={this.proceed.bind(this)}
             prevHandler={() => {}}
             hideBack={true}
-            hideSkip={[1, 2].includes(this.currentStep)}
+            hideSkip={
+              [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
+            }
             hideButton={
               [1, 2, 4].includes(this.currentStep) ||
               (this.currentStep === 3 && !this.importedFromObs)

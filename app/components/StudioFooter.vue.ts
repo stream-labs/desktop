@@ -97,15 +97,20 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openMetricsWindow() {
-    const mousePos = electron.screen.getCursorScreenPoint();
+    const mousePos = electron.remote.screen.getCursorScreenPoint();
 
-    this.windowsService.createOneOffWindow({
-      componentName: 'PerformanceMetrics',
-      title: $t('Performance Metrics'),
-      size: { width: 450, height: 75 },
-      x: mousePos.x,
-      y: mousePos.y,
-    });
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'PerformanceMetrics',
+        title: $t('Performance Metrics'),
+        size: { width: 450, height: 75 },
+        x: mousePos.x,
+        y: mousePos.y,
+        resizable: false,
+        maximizable: false,
+      },
+      'performance-metrics',
+    );
   }
 
   get replayBufferEnabled() {

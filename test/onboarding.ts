@@ -69,8 +69,8 @@ test('OBS Importer', async t => {
   }
 
   // Complete onboarding
-  if (await t.context.app.client.isExisting('p=Skip')) {
-    await t.context.app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('button=Complete')) {
+    await t.context.app.client.click('button=Complete');
     await sleep(1000);
   }
 

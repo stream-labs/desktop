@@ -23,7 +23,11 @@ export default class AppsNav extends Vue {
   };
 
   upArrowVisible = false;
-  downArrowVisible = true;
+  downArrowVisible = false;
+
+  mounted() {
+    this.handleScroll();
+  }
 
   isSelectedApp(appId: string) {
     return (
@@ -86,7 +90,7 @@ export default class AppsNav extends Vue {
     }
     if (el.scrollHeight - el.scrollTop === el.clientHeight) {
       this.downArrowVisible = false;
-    } else {
+    } else if (el.scrollHeight > el.clientHeight) {
       this.downArrowVisible = true;
     }
   }
@@ -111,16 +115,22 @@ export default class AppsNav extends Vue {
         <div class={styles.scroll} ref="scroll" onScroll={this.handleScroll.bind(this)}>
           {this.navApps.map(app => (
             <div style="position: relative;">
+              {
+                <div
+                  class={cx(styles.activeApp, { [styles.active]: this.isSelectedApp(app.id) })}
+                />
+              }
               <div
                 title={app.manifest.name}
                 onClick={() => this.navigateApp(app.id)}
                 draggable
                 // funky casing since vue is dumb
                 onDragend={() => this.popOut(app)}
-                class={cx(styles.appTab, { [styles.isActive]: this.isSelectedApp(app.id) })}
+                class={styles.appTab}
               >
                 <i class="icon-integrations" />
                 {app.manifest.icon && <img src={this.iconSrc(app.id, app.manifest.icon)} />}
+                <div />
               </div>
               {this.refreshIcon(h, app)}
             </div>

@@ -2,7 +2,7 @@
   <div class="help-page-wrapper">
     <div class="help-page">
       <div class="callout callout--discord">
-        <span>Join 200K+ others on the <a @click="openDiscord">Streamlabs OBS Discord</a> for free 24h support.</span>
+        <span>Join 200K+ others on the <a @click="openDiscord">Streamlabs OBS Discord</a> for community support.</span>
         <button class="button button--discord" @click="openDiscord">Join Discord <i class="icon-discord"></i></button>
       </div>
       <div class="help-page__section">

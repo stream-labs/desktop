@@ -88,15 +88,14 @@ export default class SceneSelector extends Vue {
 
   removeScene() {
     const name = this.scenesService.activeScene.name;
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
         message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
         buttons: [$t('Cancel'), $t('OK')],
-      },
-      ok => {
-        if (!ok) return;
+      })
+      .then(({ response }) => {
+        if (!response) return;
         if (!this.scenesService.canRemoveScene()) {
           electron.remote.dialog.showMessageBox({
             message: $t('There needs to be at least one scene.'),
@@ -108,8 +107,7 @@ export default class SceneSelector extends Vue {
           'RemoveSceneCommand',
           this.scenesService.activeSceneId,
         );
-      },
-    );
+      });
   }
 
   showTransitions() {

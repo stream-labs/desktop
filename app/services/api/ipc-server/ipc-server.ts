@@ -12,7 +12,7 @@ const { ipcRenderer } = electron;
  */
 export class IpcServerService extends Service {
   servicesEventsSubscription: Subscription;
-  requestHandler: Function;
+  requestHandler: (event: Electron.Event, request: IJsonRpcRequest) => void;
 
   @Inject() private internalApiService: InternalApiService;
 

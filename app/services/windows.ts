@@ -28,6 +28,7 @@ import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
+import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -88,6 +89,7 @@ export function getComponents() {
     OverlayWindow,
     OverlayPlaceholder,
     PerformanceMetrics,
+    BrowserSourceInteraction,
 
     BitGoal,
     DonationGoal,
@@ -283,18 +285,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
-      width: (options.size && options.size.width) || 400,
-      height: (options.size && options.size.height) || 400,
-      minWidth: options.size && options.size.minWidth,
-      minHeight: options.size && options.size.minHeight,
-      x: options.x,
-      y: options.y,
-      title: options.title || 'New Window',
+      width: 400,
+      height: 400,
+      title: 'New Window',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true, webviewTag: true },
+      ...options,
+      ...options.size,
     }));
 
-    newWindow.setMenu(null);
+    newWindow.removeMenu();
     newWindow.on('closed', () => {
       this.windowDestroyed.next(windowId);
       delete this.windows[windowId];

@@ -44,6 +44,7 @@ export interface IJsonRpcEvent {
 }
 
 export interface IMutation {
+  id: number;
   type: string;
   payload: any;
 }
