@@ -273,33 +273,33 @@ function uploadToSentry(org, project, release, artifactPath) {
 /**
  * This is the main function of the script
  */
-async function runScript() {
+async function runScript({
+  githubApiServer = 'https://api.github.com',
+
+  organization = 'n-air-app',
+  repository = 'n-air-app',
+  remote = 'origin',
+
+  targetBranch = 'n-air_development',
+
+  sentryOrganization = 'n-air-app',
+  sentryProject = 'n-air-app',
+
+  draft = true,
+  prerelease = false,
+
+  generateNoteTs = true, // generate note.ts from git logs
+
+  skipLocalModificationCheck = false, // for DEBUG
+  skipBuild = false, // for DEBUG
+
+  enableUploadToS3 = true,
+  enableUploadToGitHub = true,
+  enableUploadToSentry = true,
+}) {
   info(colors.magenta('|----------------------------------|'));
   info(colors.magenta('| N Air Interactive Release Script |'));
   info(colors.magenta('|----------------------------------|'));
-
-  const githubApiServer = 'https://api.github.com';
-
-  const organization = 'n-air-app';
-  const repository = 'n-air-app';
-  const remote = 'origin';
-
-  const targetBranch = 'n-air_development';
-
-  const sentryOrganization = 'n-air-app';
-  const sentryProject = 'n-air-app';
-
-  const draft = true;
-  const prerelease = false;
-
-  const generateNoteTs = true; // generate note.ts from git logs
-
-  const skipLocalModificationCheck = false; // for DEBUG
-  const skipBuild = false; // for DEBUG
-
-  const enableUploadToS3 = true;
-  const enableUploadToGitHub = true;
-  const enableUploadToSentry = true;
 
   // Start by figuring out if this environment is configured properly
   // for releasing.
