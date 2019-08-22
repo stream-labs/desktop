@@ -24,22 +24,16 @@ export default class StartStreamingButton extends Vue {
       this.streamingService.toggleStreaming();
     } else {
       if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
-        const goLive = await new Promise<boolean>(resolve => {
-          electron.remote.dialog.showMessageBox(
-            electron.remote.getCurrentWindow(),
-            {
-              title: $t('Cloud Backup'),
-              type: 'warning',
-              message:
-                $t('Your media files are currently being synced with the cloud. ') +
-                $t('It is recommended that you wait until this finishes before going live.'),
-              buttons: [$t('Wait'), $t('Go Live Anyway')],
-            },
-            goLive => {
-              resolve(!!goLive);
-            },
-          );
-        });
+        const goLive = await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: $t('Cloud Backup'),
+            type: 'warning',
+            message:
+              $t('Your media files are currently being synced with the cloud. ') +
+              $t('It is recommended that you wait until this finishes before going live.'),
+            buttons: [$t('Wait'), $t('Go Live Anyway')],
+          })
+          .then(({ response }) => !!response);
 
         if (!goLive) return;
       }

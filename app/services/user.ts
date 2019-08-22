@@ -382,7 +382,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       defer(onWindowShow);
     });
 
-    authWindow.setMenu(null);
+    authWindow.removeMenu();
     authWindow.loadURL(service.authUrl);
   }
 
