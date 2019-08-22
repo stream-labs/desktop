@@ -11,7 +11,7 @@ class ObsPathInput extends ObsInput<IObsPathInputValue> {
 
   @Prop() value: IObsPathInputValue;
 
-  showFileDialog() {
+  async showFileDialog() {
     const options: OpenDialogOptions = {
       defaultPath: this.value.value,
       filters: this.value.filters,
@@ -26,10 +26,10 @@ class ObsPathInput extends ObsInput<IObsPathInputValue> {
       options.properties.push('openDirectory');
     }
 
-    const paths = electron.remote.dialog.showOpenDialog(options);
+    const { filePaths } = await electron.remote.dialog.showOpenDialog(options);
 
-    if (paths) {
-      this.handleChange(paths[0]);
+    if (filePaths[0]) {
+      this.handleChange(filePaths[0]);
     }
   }
 
