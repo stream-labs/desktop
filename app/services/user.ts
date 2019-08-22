@@ -239,9 +239,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
       console.log(this.windowsService.state);
-      const isMediaShare = this.windowsService.state.RecentEvents.queryParams.isMediaShare
-        ? '&view=media-share'
-        : '';
+      const isMediaShare =
+        this.windowsService.state.RecentEvents &&
+        this.windowsService.state.RecentEvents.queryParams.isMediaShare
+          ? '&view=media-share'
+          : '';
 
       return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
     }

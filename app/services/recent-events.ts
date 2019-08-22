@@ -1,6 +1,6 @@
 import { HostsService } from 'services/hosts';
 import { StatefulService, Inject, mutation } from 'services/core';
-import { UserService } from 'services/user';
+import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
@@ -55,10 +55,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   static initialState: IRecentEventsState = { recentEvents: null, muted: false };
 
-  init() {
-    super.init();
+  lifecycle: LoginLifecycle;
+
+  async initialize() {
+    this.lifecycle = await this.userService.withLifecycle({
+      init: this.syncEventsState,
+      destroy: () => Promise.resolve(),
+      context: this,
+    });
+  }
+
+  syncEventsState() {
     this.formEventsArray();
-    this.fetchMutedState();
+    return this.fetchMutedState();
   }
 
   fetchRecentEvents() {

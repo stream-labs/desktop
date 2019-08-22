@@ -27,11 +27,10 @@ import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
-import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { GameOverlayService } from 'services/game-overlay';
 import { RunInLoadingMode } from './app-decorators';
-import { CustomizationService } from 'services/customization';
+import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 
 interface IAppState {
@@ -79,6 +78,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private recentEventsService: RecentEventsService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   readonly pid = require('process').pid;
@@ -142,6 +142,7 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
 
     await this.gameOverlayService.initialize();
+    await this.recentEventsService.initialize();
   }
 
   @track('app_close')
