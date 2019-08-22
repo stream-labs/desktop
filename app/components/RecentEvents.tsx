@@ -17,6 +17,8 @@ const getName = (event: IRecentEvent) => {
 export default class RecentEvents extends TsxComponent<{}> {
   @Inject() recentEventsService: RecentEventsService;
 
+  queuePaused = false;
+
   get recentEvents() {
     return this.recentEventsService.state.recentEvents;
   }
@@ -51,6 +53,19 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.toggleMuteEvents();
   }
 
+  skipAlert() {
+    return this.recentEventsService.skipAlert();
+  }
+
+  async toggleQueue() {
+    try {
+      this.queuePaused
+        ? await this.recentEventsService.unpauseAlertQueue()
+        : await this.recentEventsService.pauseAlertQueue();
+      this.queuePaused = !this.queuePaused;
+    } catch (e) {}
+  }
+
   render(h: Function) {
     return (
       <div class={styles.container}>
@@ -58,6 +73,9 @@ export default class RecentEvents extends TsxComponent<{}> {
           popoutMediaShare={() => this.popoutMediaShare()}
           popoutRecentEvents={() => this.popoutRecentEvents()}
           muteEvents={() => this.muteEvents()}
+          skipAlert={() => this.skipAlert()}
+          toggleQueue={() => this.toggleQueue()}
+          queuePaused={this.queuePaused}
           muted={this.muted}
         />
         <div class={styles.eventContainer}>
@@ -79,15 +97,21 @@ interface IToolbarProps {
   popoutMediaShare: Function;
   popoutRecentEvents: Function;
   muteEvents: Function;
+  skipAlert: Function;
+  toggleQueue: Function;
+  queuePaused: boolean;
   muted: boolean;
 }
 
 // TODO: Refactor into stateless functional component
 @Component({})
 class Toolbar extends TsxComponent<IToolbarProps> {
-  @Prop() popoutMediaShare: Function;
-  @Prop() popoutRecentEvents: Function;
-  @Prop() muteEvents: Function;
+  @Prop() popoutMediaShare: () => void;
+  @Prop() popoutRecentEvents: () => void;
+  @Prop() muteEvents: () => void;
+  @Prop() skipAlert: () => void;
+  @Prop() toggleQueue: () => void;
+  @Prop() queuePaused: boolean;
   @Prop() muted: boolean;
 
   render(h: Function) {
@@ -105,13 +129,16 @@ class Toolbar extends TsxComponent<IToolbarProps> {
           v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
         />
         <i
-          class="icon-pause action-icon"
-          onClick={() => {}}
-          v-tooltip={{ content: $t('Pause Alert Queue'), placement: 'bottom' }}
+          class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
+          onClick={this.toggleQueue}
+          v-tooltip={{
+            content: this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue'),
+            placement: 'bottom',
+          }}
         />
         <i
           class="icon-skip action-icon"
-          onClick={() => {}}
+          onClick={this.skipAlert}
           v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
         />
         <i
@@ -128,12 +155,12 @@ class Toolbar extends TsxComponent<IToolbarProps> {
 @Component({})
 class EventCell extends TsxComponent<{
   event: IRecentEvent;
-  eventString: Function;
-  repeatAlert: Function;
+  eventString: (event: IRecentEvent) => string;
+  repeatAlert: (event: IRecentEvent) => void;
 }> {
   @Prop() event: IRecentEvent;
-  @Prop() eventString: Function;
-  @Prop() repeatAlert: Function;
+  @Prop() eventString: (event: IRecentEvent) => string;
+  @Prop() repeatAlert: (event: IRecentEvent) => void;
 
   render(h: Function) {
     return (

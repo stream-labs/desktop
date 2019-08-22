@@ -75,7 +75,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   fetchMutedState() {
     const url = `https://${
       this.hostsService.streamlabs
-    }/api/v5/slobs/widget/config?widget=recent_events&token=${this.userService.widgetToken}`;
+    }/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return fetch(new Request(url, { headers }))
       .then(handleResponse)
@@ -109,6 +109,27 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       token: this.userService.widgetToken,
     });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
+  }
+
+  async skipAlert() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/skip`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers, method: 'POST' });
+    return await fetch(request).then(handleResponse);
+  }
+
+  async pauseAlertQueue() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/pause_queue`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers, method: 'POST' });
+    return fetch(request).then(handleResponse);
+  }
+
+  async unpauseAlertQueue() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/unpause_queue`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers, method: 'POST' });
+    return fetch(request).then(handleResponse);
   }
 
   getSubString(event: IRecentEvent) {

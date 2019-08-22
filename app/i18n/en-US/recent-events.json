@@ -24,5 +24,12 @@
   "has donated to Tiltify": "has donated to Tiltify",
   "has donated to Donor Drive": "has donated to Donor Drive",
   "has donated to Just Giving": "has donated to Just Giving",
-  "has given a treat %{title}": "has given a treat %{title}"
+  "has given a treat %{title}": "has given a treat %{title}",
+  "Popout Media Share Controls": "Popout Media Share Controls",
+  "Popout Recent Events": "Popout Recent Events",
+  "Pause Alert Queue": "Pause Alert Queue",
+  "Unpause Alert Queue": "Unpause Alert Queue",
+  "Skip Alert": "Skip Alert",
+  "Mute Event Sounds": "Mute Event Sounds",
+  "Repeat Alert": "Repeat Alert"
 }
