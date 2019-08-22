@@ -15,9 +15,7 @@
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
-    "package": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.getlicensenair_key=%NAIR_LICENSE_API_KEY%",
-    "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-preview\" --config.productName=\"N Air Preview\" --config.appId=\"jp.nicovideo.n-air-app.preview\"",
-    "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-ipc\" --config.productName=\"N Air IPC\" --config.appId=\"jp.nicovideo.n-air-app.ipc\"",
+    "package": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/stable.config.js",
     "release": "yarn install --cwd bin && node bin/mini-release.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
@@ -30,47 +28,6 @@
     "version": "git add app/services/patch-notes/notes.ts"
   },
   "buildProductName": "N Air",
-  "build": {
-    "appId": "jp.nicovideo.nair",
-    "productName": "N Air",
-    "icon": "media/images/icon.ico",
-    "files": [
-      "bundles",
-      "node_modules",
-      "vendor",
-      "app/i18n",
-      "updater/index.html",
-      "updater/Updater.js",
-      "index.html",
-      "main.js",
-      "obs-api"
-    ],
-    "extraFiles": [
-      "LICENSE",
-      "AGREEMENT.sjis"
-    ],
-    "detectUpdateChannel": false,
-    "publish": {
-      "provider": "generic",
-      "useMultipleRangeRequest": false,
-      "channel": "latest",
-      "url": "https://n-air-app.nicovideo.jp/download/windows"
-    },
-    "nsis": {
-      "license": "AGREEMENT.sjis",
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "artifactName": "n-air-app-setup.${version}.${ext}",
-      "include": "installer.nsh"
-    },
-    "win": {
-      "publisherName": [
-        "DWANGO Co.,Ltd."
-      ],
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
-    }
-  },
   "ava": {
     "files": [
       "test-dist/test/e2e/*.js",
