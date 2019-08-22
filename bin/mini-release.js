@@ -110,16 +110,11 @@ function generateNewVersion(previousTag, now = Date.now()) {
   if (!result || result.length < 5) {
     result = ['', '0', '1', '', '1'];
   }
-  let [matched, major, minor, date, ord] = result;
+  const [, major, minor, date, ord] = result;
 
   const today = moment(now).format('YYYYMMDD');
-  if (date === today) {
-    ++ord;
-  } else {
-    date = today;
-    ord = 1;
-  }
-  return `${major}.${minor}.${date}-${ord}`;
+  const newOrd = date === today ? ord + 1 : 1;
+  return `${major}.${minor}.${today}-${newOrd}`;
 }
 
 function generateNotesTsContent(version, title, notes) {
@@ -143,7 +138,7 @@ ${notes
 
 function splitToLines(lines) {
   if (typeof lines === 'string') {
-    lines = lines.split(/\r?\n/g);
+    return lines.split(/\r?\n/g);
   }
   return lines;
 }
@@ -165,8 +160,8 @@ function readPatchNoteFile(patchNoteFileName) {
   }
 }
 
-function writePatchNoteFile(patchNoteFileName, version, lines) {
-  lines = splitToLines(lines);
+function writePatchNoteFile(patchNoteFileName, version, contents) {
+  const lines = splitToLines(contents);
   const body = [version, ...lines].join('\n');
   fs.writeFileSync(patchNoteFileName, body);
 }
@@ -184,9 +179,9 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
     if (!pr || pr.length < 2) {
       continue;
     }
-    const pull_number = parseInt(pr[1], 10);
+    const pullNumber = parseInt(pr[1], 10);
     promises.push(
-      octokit.pullRequests.get({ owner, repo, pull_number }).catch(e => {
+      octokit.pullRequests.get({ owner, repo, pull_number: pullNumber }).catch(e => {
         info(e);
         return { data: {} };
       })
@@ -385,9 +380,9 @@ async function runScript() {
     info('skipping to generate notes.ts...');
   } else {
     const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
-    const patchNote = generateNotesTsContent(newVersion, newVersion, notes);
+    const generatedPatchNote = generateNotesTsContent(newVersion, newVersion, notes);
 
-    fs.writeFileSync(noteFilename, patchNote);
+    fs.writeFileSync(noteFilename, generatedPatchNote);
     info(`generated patch-note file: ${noteFilename}.`);
   }
 
@@ -474,14 +469,11 @@ async function runScript() {
     prerelease,
   });
 
-  async function uploadToGithub({ url, name, pathname, contentType }) {
-    if (!name) {
-      name = path.basename(pathname);
-    }
+  async function uploadToGithub({ url, pathname, name = path.basename(pathname), contentType }) {
     info(`uploading ${name} to github...`);
 
     const MAX_RETRY = 3;
-    for (let retry = 0; retry < MAX_RETRY; ++retry) {
+    for (let retry = 0; retry < MAX_RETRY; retry += 1) {
       try {
         const result = await octokit.repos.uploadReleaseAsset({
           url,
