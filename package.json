@@ -16,6 +16,7 @@
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/stable.config.js",
+    "package:unstable": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/unstable.config.js",
     "release": "yarn install --cwd bin && node bin/mini-release.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
