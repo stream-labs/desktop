@@ -37,15 +37,20 @@ export default class StudioFooterComponent extends Vue {
 
   metricsShown = false;
   recordingTime = '';
+  private recordingTimeIntervalId: number;
 
   mounted() {
     this.confirmYoutubeEnabled();
 
     // update recording time
-    setInterval(() => {
+    this.recordingTimeIntervalId = window.setInterval(() => {
       if (!this.streamingService.isRecording) return;
       this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
+  }
+
+  destroyed() {
+    clearInterval(this.recordingTimeIntervalId);
   }
 
   toggleRecording() {
