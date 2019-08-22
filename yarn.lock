@@ -11620,7 +11620,7 @@ sisteransi@^1.0.0:
 
 "sl-vue-tree@https://github.com/stream-labs/sl-vue-tree.git":
   version "1.5.1"
-  resolved "https://github.com/stream-labs/sl-vue-tree.git#aaa1f528c7ab6f8239a4499bee55e76ea050a65b"
+  resolved "https://github.com/stream-labs/sl-vue-tree.git#03ff989b20e4d3441afa3f9c47839d4b7fcc37d8"
 
 slash@^1.0.0:
   version "1.0.0"
