@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import moment from 'moment';
 import { RecentEventsService, IRecentEvent } from 'services/recent-events';
@@ -6,6 +6,12 @@ import TsxComponent from './tsx-component';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
 import styles from './RecentEvents.m.less';
+
+const getName = (event: IRecentEvent) => {
+  if (event.gifter) return event.gifter;
+  if (event.from) return event.from;
+  return event.name;
+};
 
 @Component({})
 export default class RecentEvents extends TsxComponent<{}> {
@@ -45,69 +51,112 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.toggleMuteEvents();
   }
 
-  getName(event: IRecentEvent) {
-    if (event.gifter) return event.gifter;
-    if (event.from) return event.from;
-    return event.name;
-  }
-
   render(h: Function) {
     return (
       <div class={styles.container}>
-        <div class={styles.topBar}>
-          <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
-          <i
-            class="icon-music action-icon"
-            onClick={() => this.popoutMediaShare()}
-            v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
-          />
-          <i
-            class="icon-pop-out-2 action-icon"
-            onClick={() => this.popoutRecentEvents()}
-            v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
-          />
-          <i
-            class="icon-pause action-icon"
-            onClick={() => {}}
-            v-tooltip={{ content: $t('Pause Alert Queue'), placement: 'bottom' }}
-          />
-          <i
-            class="icon-skip action-icon"
-            onClick={() => {}}
-            v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
-          />
-          <i
-            class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
-            onClick={() => this.muteEvents()}
-            v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
-          />
-        </div>
+        <Toolbar
+          popoutMediaShare={() => this.popoutMediaShare()}
+          popoutRecentEvents={() => this.popoutRecentEvents()}
+          muteEvents={() => this.muteEvents()}
+          muted={this.muted}
+        />
         <div class={styles.eventContainer}>
           {this.recentEvents &&
             this.recentEvents.map(event => (
-              <div class={styles.cell}>
-                <span class={styles.timestamp}>{moment(event.created_at).fromNow(true)}</span>
-                <span class={styles.name}>{this.getName(event)}</span>
-                <span>{this.eventString(event)}</span>
-                {event.gifter && (
-                  <span class={styles.name}>{event.from ? event.from : event.name}</span>
-                )}
-                {event.formatted_amount && (
-                  <span class={styles.money}>{event.formatted_amount}</span>
-                )}
-                {(event.comment || event.message) && (
-                  <span class={styles.whisper}>
-                    {event.comment ? event.comment : event.message}
-                  </span>
-                )}
-                <i
-                  class="icon-repeat action-icon"
-                  onClick={() => this.repeatAlert(event)}
-                  v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
-                />
-              </div>
+              <EventCell
+                event={event}
+                repeatAlert={this.repeatAlert.bind(this)}
+                eventString={this.eventString.bind(this)}
+              />
             ))}
         </div>
+      </div>
+    );
+  }
+}
+
+interface IToolbarProps {
+  popoutMediaShare: Function;
+  popoutRecentEvents: Function;
+  muteEvents: Function;
+  muted: boolean;
+}
+
+// TODO: Refactor into stateless functional component
+@Component({})
+class Toolbar extends TsxComponent<IToolbarProps> {
+  @Prop() popoutMediaShare: Function;
+  @Prop() popoutRecentEvents: Function;
+  @Prop() muteEvents: Function;
+  @Prop() muted: boolean;
+
+  render(h: Function) {
+    return (
+      <div class={styles.topBar}>
+        <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
+        <i
+          class="icon-music action-icon"
+          onClick={this.popoutMediaShare}
+          v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
+        />
+        <i
+          class="icon-pop-out-2 action-icon"
+          onClick={this.popoutRecentEvents}
+          v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
+        />
+        <i
+          class="icon-pause action-icon"
+          onClick={() => {}}
+          v-tooltip={{ content: $t('Pause Alert Queue'), placement: 'bottom' }}
+        />
+        <i
+          class="icon-skip action-icon"
+          onClick={() => {}}
+          v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
+        />
+        <i
+          class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
+          onClick={this.muteEvents}
+          v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
+        />
+      </div>
+    );
+  }
+}
+
+// TODO: Refactor into stateless functional component
+@Component({})
+class EventCell extends TsxComponent<{
+  event: IRecentEvent;
+  eventString: Function;
+  repeatAlert: Function;
+}> {
+  @Prop() event: IRecentEvent;
+  @Prop() eventString: Function;
+  @Prop() repeatAlert: Function;
+
+  render(h: Function) {
+    return (
+      <div class={styles.cell}>
+        <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
+        <span class={styles.name}>{getName(this.event)}</span>
+        <span>{this.eventString(this.event)}</span>
+        {this.event.gifter && (
+          <span class={styles.name}>{this.event.from ? this.event.from : this.event.name}</span>
+        )}
+        {this.event.formatted_amount && (
+          <span class={styles.money}>{this.event.formatted_amount}</span>
+        )}
+        {(this.event.comment || this.event.message) && (
+          <span class={styles.whisper}>
+            {this.event.comment ? this.event.comment : this.event.message}
+          </span>
+        )}
+        <i
+          class="icon-repeat action-icon"
+          onClick={() => this.repeatAlert(this.event)}
+          v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
+        />
       </div>
     );
   }
