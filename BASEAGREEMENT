@@ -4,6 +4,7 @@ CONTENTS:
   I. Software License Agreement
  II. Terms of Service
 III. Privacy Policy
+ IV. Third Party Components
 
 -----------------------------------
 I. Software License Agreement
@@ -1903,254 +1904,414 @@ SYMBOLS OR LABELS ON THE WEBSITES.
 III. Privacy Policy
 -----------------------------------
 
-Privacy Policy https://streamlabs.com/privacy
-Lasted Updated on November 28, 2018
-Streamlabs is committed to your privacy. We created this Privacy Policy to give
-you an understanding of what information we collect, how we use it, and to help
-protect your information. We value your trust, which is why we’re committed to providing
-exceptional service in a secure environment. We only collect information from You
-that is necessary to provide our Services and Products.
+General Workings Inc. dba Streamlabs (“Streamlabs”, “we”, “our” or “us”) is
+committed to protecting your privacy. This Privacy Policy explains how your
+personal information is collected, used, and disclosed by Streamlabs. This
+Privacy Policy applies to our website, https://streamlabs.com/, Streamlabs OBS,
+and our mobile apps for iPhone or Android mobile devices (collectively, our
+“Service”). Before accessing or using our Service, please ensure that you have
+read and understood our collection, storage, use, and disclosure of your
+personal information as described in this Privacy Policy and our Terms of
+Service.
 
-THE INFORMATION STREAMLABS COLLECTS
+Streamlabs is the controller of your personal information. This means that
+Streamlabs is the entity responsible for, and controls the processing of your
+personal information. Our data collection officer can be reached at
+support@streamlabs.com with the header ATTN: Legal.
 
-At Streamlabs, we’re constantly looking for ways to improve our offerings and develop
-new features that our users find valuable. In order to do so, we collect information
-to help us analyze behavior and interests so that we can continue to make Streamlabs
-better.
+1. WHAT INFORMATION DO WE COLLECT?
 
-As a general visitor to the site, you may browse our site to find more information
-about our offerings. You are not required to provide us with any personally identifiable
-information as a visitor. However, we do utilize third party Google Analytics to
-look at trends and to help us improve our offerings.
+The categories of personal information we collect can include:
 
-As a User of our site, you maybe be required to provide us with personally identifiable
-information. We are the sole owners of any information collected on this site, and
-do not share this information with others unless it is explicitly necessary to provide
-our Services to You. We only have access to/collect information that you voluntarily
-give us during sign up, or that is passed through our platform as part of the user
-experience. We may also obtain information, including personal information, from
-third parties and other sources, such as information from the Twitch service through
-the Twitch API, Facebook through the Facebook API and YouTube through the YouTube
-API and other secure third party information sharing practices.
+Information you provide to us directly. We may collect personal information,
+such as your name, phone number, location, payment information, and email
+address when you register for our Service, sign up for our mailing list, enter a
+contest or sweepstakes, or otherwise communicate with us. We may also collect
+any communications between you and Streamlabs and any other information you
+provide to Streamlabs.
 
-If you became a new user of Streamlabs OBS through downloading Streamlabs OBS via
-a link from an Affiliate of Streamlabs, we track your IP upon download and sign-up
-as an anti-fraud measure.  We do not share this information, and are the sole owners
-of this information. We delete IP data after 90 days.
+Information collected through the use of the Service. We collect information
+about how you use the Service, your actions on the Service, and content you post
+to the Service, including photos and videos you post to the Service, and any
+content you provide through in-app messages, chat, or other functionality (“User
+Content”). To share photos and video, we will access your device camera roll and
+camera with your permission. If you need to update your permissions, you can do
+so in the “Settings” app of your device. Please remember that Streamlabs may,
+but has no obligation to, monitor, record, and store User Content in order to
+protect your safety or the safety of other users, to assist with regulatory or
+law enforcement efforts, or to protect and defend our rights and property.
 
-You have the right to know what information we have on record for you, and you may
-submit the request to support@streamlabs.com.
+Information we receive from third-party sites you connect to our Service. We may
+receive personal information about you from third parties and combine that with
+the information we collect through our Service. For example, we may obtain
+information when you log in through a third-party social network or
+authentication service, such as Twitch, YouTube, or Facebook, among others. We
+may obtain information, including personal information, from third parties and
+other sources, such as information from the Twitch service through the Twitch
+API, Facebook through the Facebook API and YouTube through the YouTube API and
+other secure third party information sharing practices. These services will
+authenticate your identity and provide you the option to share certain personal
+information with us, which could include your name, email address, address book
+and contacts, or other information. Similarly, when you interact with us through
+a social media site or third-party service, such as when you like, follow, or
+share Streamlabs content on Facebook, Twitter, Pinterest, Instagram, or other
+sites, we may receive information from the social network, including your
+profile information, picture, user ID associated with your social media account,
+and any other information you permit the social network to share with third
+parties. The data we receive from these third-party sites is dependent upon that
+third party’s policies and your privacy settings on that third-party site. You
+should always review and, if necessary, adjust your privacy settings on
+third-party websites and services before linking or connecting them to our
+website or Service. You can find more information on YouTube and Google’s
+privacy at https://policies.google.com/.
 
-HOW STREAMLABS USES INFORMATION
+Information collected automatically when you visit, interact with and use our
+Service. We and our third party service providers may collect certain types of
+usage information when you use our Service, read our emails, or otherwise engage
+with us. We use this information to enhance and personalize your user
+experience, to recognize and contact you, and to monitor and improve our
+websites and Service. In some instances, we and our third party service
+providers may combine this usage information with personal information. If we do
+combine any usage information with personal information, the combined
+information will be treated by us as personal information hereunder (as long as
+it is so combined). We typically collect this information through a variety of
+tracking technologies, including cookies, web beacons, embedded scripts,
+location-identifying technologies, file information, and similar technology
+(collectively, “tracking technologies”). We, and our third party partners, use
+tracking technologies to automatically collect usage and device information,
+such as:
 
-We use the information we receive in a variety of ways, the core of which is to
-improve Streamlabs. We may also use this information to maintain our services; to
-customize our service to meet your needs; to process transactions and donations;
-to collect fees or other charges; to verify your identity and prevent fraudulent
-transactions; to provide customer support; and to contact you.
-Unless you ask us not to, we may contact you via email in the future to tell you
-about new products or services and other information we believe you’d find valuable.
-Streamlabs does not sell or rent Personal Data to marketers or unaffiliated third
-parties. We only share your Personal Data with trusted entities, through industry
-standard privacy practices, which enables us to provide our services, and optimize
-our product experience to You.
+Information about your device and its software, such as your IP address, browser
+type, Internet service provider, device type/model/manufacturer, operating
+system, date and time stamp, and a unique ID that allows us to uniquely identify
+your browser, mobile device, or your account (including, for example, a
+persistent device identifier or an Ad ID), and other such information. We may
+also work with third-party partners to employ technologies, including the
+application of statistical modeling tools, which permit us to recognize and
+contact you across multiple devices. Information about the way you access and
+use our Service, for example, the site from which you came and the site to which
+you are going when you leave our Service, the pages you visit, the links you
+click, whether you open emails or click the links contained in emails, whether
+you access the Service from multiple devices, and other actions you take on the
+Service. Information about your location, including GPS coordinates (e.g.,
+latitude and/or longitude) or similar information regarding the location of your
+mobile device, or we may be able to approximate or infer a device’s location by
+analyzing other information, like an IP address. Analytics information. We may
+collect analytics data or use third-party analytics tools such as Google
+Analytics to help us measure traffic and usage trends for the Service and to
+understand more about the demographics of our users. You can learn more about
+Google’s practices at http://www.google.com/policies/privacy/partners and view
+its currently available opt-out options at
+https://tools.google.com/dlpage/gaoptout. If you would prefer not to accept
+cookies, most browsers will allow you to: (i) change your browser settings to
+notify you when you receive a cookie, which lets you choose whether or not to
+accept it; (ii) disable existing cookies; or (iii) set your browser to
+automatically reject cookies; however, doing so may negatively impact your
+experience using the Service, as some features and services on our Service may
+not work properly. You may also set your email options to prevent the automatic
+downloading of images that may contain technologies that would allow us to know
+whether you have accessed our email and performed certain functions with it. We
+and our third-party partners may also use tracking technologies for advertising
+purposes. For more information about tracking technologies, please see “Third
+Party Tracking and Online Advertising” below.
 
-WHEN STREAMLABS SHARES INFORMATION
+How We Respond to Do Not Track Signals. Although we do our best to honor the
+privacy preferences of our users, we are unable to respond to Do Not Track
+signals set by your browser at this time.
 
-Our policy is to maintain the confidentiality of the personally identifiable information
-of individuals except in cases when the law requires disclosure or when we have
-your permission to do so. Occasionally, we may share aggregated statistics of user
-behavior (e.g. usage patterns, donation trends, user growth, etc.) with our partners
-and other interested parties. This information will never identify any individual
-personally or contain any personally identifiable information.
-Streamlabs does not sell, lease, share, rent, or otherwise provide any personally
-identifiable information for marketing purposes to any companies or persons outside
-of Streamlabs. We may provide your personally identifiable information to service
-providers and affiliates that provide services in conjunction with our offerings,
-such as payment processors, fraud protection services, or other parties assisting
-in improving Streamlabs. Information is securely transmitted to these affiliates,
-and such affiliates will only receive information necessary to provide their respective
-services and will be bound by confidentiality agreements limiting the use of such
-information. Please be aware that any personal information that you voluntarily
-choose to display in any public location through the use of our platform becomes
-publicly available and may be collected and used by others.
-Streamlabs will only disclose personally identifiable information to government
-officials and law enforcement agencies when it is required by law (e.g. in compliance
-with a subpoena or court order) or if we believe in good faith that such action
-is appropriate and necessary to protect and defend the rights of Streamlabs, or
-to protect the safety of Streamlabs users, employees, affiliates, and the general
-public.
+2. HOW DO WE USE YOUR INFORMATION?
 
-In the event that Streamlabs or some or all assets related to our services are acquired
-by or merged with a third party entity, we reserve the right to transfer or assign
-any information we have collected from users as part of that merger, acquisition,
-sale, or other change of control.
+To fulfil your requests and provide our Services to you. For example, we use
+your information to complete your requests and transactions on our Service and
+to respond to your customer service requests or feedback. We may also use your
+information to personalize your experience with us.
 
-YOUR ACCESS TO AND CONTROL OVER INFORMATION
+To enroll you in our Loyalty Programs. To learn more about our Loyalty programs,
+please see the All-Stars section in our Terms of Service
 
-If desired, you may decline to share your personal information with Streamlabs,
-at which time we will no longer be able to provide you with a majority of the functionality
-of our offerings. If you would like to access, review, correct, update, suppress,
-or otherwise limit our use of your personal information, you may contact us at support@streamlabs.com.
-Please note that in order to protect your privacy and security, we take reasonable
-steps to verify your identity before making any changes to your personal information.
+For marketing purposes. We may send you communications about new features,
+updates, products and special offers. We might also use your information to
+serve you ads about special offers on our Service we think you might find
+interesting. We also use information about you and others to inform our
+marketing and advertising campaigns. For more information on your choices about
+marketing communications, see “Control Over Your Information” below.
 
-LINKS
+To communicate with you. For example, if you register with us, we’ll enroll you
+in our email newsletter. We may send you user surveys and promotional
+communications. We may communicate with you by email, postal mail, or other
+means. We may use push notifications on our mobile apps. For more information on
+your communications preferences, see “Control Over Your Information” below.
 
-The Streamlabs website contains links to other sites that are not under our direct
-control. Please note that the Streamlabs Privacy Policy does not apply to these
-sites and Streamlabs is not responsible for, nor do we endorse, the privacy practices
-or the content of these sites. You should check the individual privacy policies
-of these sites to understand how they will utilize your personal information.
+To protect the security and integrity of our business and comply with legal
+requirements and obligations. We may use information to protect our company, our
+customers, and our websites. We may also use information in order to comply with
+laws, regulations, court orders, or other legal obligations or to assist in an
+investigation, to protect and defend our rights and property, or the rights or
+safety of third parties, to enforce our Terms of Service, this Privacy Policy,
+or agreements with third parties, to detect and prevent fraud or for
+crime-prevention purposes.
 
-THIRD-PARTY PROVIDERS AND DO NOT TRACK
+As otherwise permitted by law.
 
-Streamlabs may use third-party Web analytics services on our site, such as Google
-Analytics, to analyze how people use Streamlabs. Information collected by such technologies
-will be disclosed to or collected by these services providers, who use this information
-to evaluate your use of Streamlabs. You may choose to opt out of their services
-if you do not wish to have your information collected by them.
+3. LEGAL BASIS FOR PROCESSING IN THE EU
 
-YOUTUBE API
+As required under applicable data protection law, the legal basis which we rely
+on to process your personal information are as follows:
 
-Streamlabs utilizes YouTube’s API, and as a user of Streamlabs, you are agreeing
-to be bound to YouTube’s Terms of Service and Privacy Policy.  You can find more
-information on YouTube and Google’s privacy here.
+The processing is necessary for the performance of a contract (and to take steps
+prior to entering into a contract) with you, namely, our Terms of Service.
 
-Do Not Track (DNT) is a privacy preference that users can set in certain web browsers.
-DNT is a way for users to tell websites and services that they do not want certain
-information about their visits collected. We currently do not recognize or respond
-to browser-initiated DNT signals at this time though, as the Internet industry is
-currently working towards accepted standardization and practices around DNT.
+The processing is necessary for our legitimate interests, namely:
 
+To maintain and provide to you the features and functionality of the Service; To
+send Service-related emails and to contact you and respond to your requests and
+enquiries; To monitor and improve the Service and business and to help us
+develop new products and services; For business administration, including
+statistical analysis; and For fraud prevention and detection. We will only
+process your personal data to contact you to tell you about new products and
+services and other information we think you might find valuable to the extent
+you have given us your consent. You have the right to withdraw consent to such
+marketing at any time by contacting us.
 
-DATA SECURITY
-Streamlabs has strict security measures in place to protect the loss, misuse, and
-alteration of information under our control. We use secure technology, privacy protection
-controls, and restrictions on employee access in order to safeguard your information.
-While we take precautions to protect sensitive information that’s transmitted online,
-we also protect your information offline . Only employees who need the information
-to perform a specific job, such as billing or customer service, are granted access
-to personally identifiable information. The computers/serves in which we store personally
-identifiable information are kept in a secure environment.
+4. SHARING OF YOUR INFORMATION
 
-Please note that while we continually make every effort to implement safeguards
-to protect your personal information, the very nature of the Internet makes it impossible
-to guarantee the security of transmitted data. Streamlabs makes no warranties or
-representations as to the security and confidentiality of any data you transmit.
-Any data you transmit to Streamlabs is at your own risk, and we cannot guarantee
-that information may not be accessed, disclosed, altered, or destroyed by any breach
-of our physical, technical, or managerial safeguards.
-We make reasonable efforts to ensure a level of security appropriate to the risk
-associated with the processing of Personal Data. We maintain organizational, technical
-and administrative measures designed to protect Personal Data within our organization
-against unauthorized access, destruction, loss, alteration or misuse. Your Personal
-Data is only accessible to a limited number of personnel who need access to the
-information to perform their duties. Unfortunately, no data transmission or storage
-system can be guaranteed to be 100% secure. If you have reason to believe that your
-interaction with us is no longer secure (for example, if you feel that the security
-of your account has been compromised), please contact us immediately at support@streamlabs.com.
+We may share your personal information in the instances described below. For
+further information on your choices regarding your information, see the “Control
+Over Your Information” section below.
 
-PRIVACY OF CHILDREN
+Please be aware that any personal information that you voluntarily choose to
+display in any public location through the use of our Service on a third party
+service, such as YouTube or Twitch, becomes publicly available and may be
+collected and used by others.
 
-If you are under the age of 18, please make sure that you provide your personally
-identifiable information only after obtaining parental consent. If you are under
-the age of 13, please do not use or access Streamlabs at any time or in any manner.
-We do not knowingly collect or maintain personal information from persons under
-13 years of age. If Streamlabs learns that personal information of persons under
-13 years of age has been collected, we will take appropriate steps to delete this
-information. If you are a parent of a child under 13 who has been using Streamlabs,
-please contact us at support@streamlabs.com to have that child’s account remove
-and information deleted.
+We may share your personal information with:
 
-APPLICATION OF PRIVACY POLICY
+The public and other members of the Service. Your profile information and
+content you post to public areas of the Service, including public groups, will
+be viewable by others on the Service and the public. Please do not provide
+personal information you would not want to be public. You may be able to control
+the visibility of some of your information and actions in your Settings (see
+“Control Over Your Information” below); Third parties at your request. For
+example, you may have the option to share your activities on the Service with
+your friends through email, or on various social media sites; Other companies
+and brands owned or controlled by Streamlabs, including but not limited to any
+of the Streamlabs products and services, and other companies owned by or under
+common ownership as Streamlabs, which also includes our subsidiaries (i.e., any
+organization we own or control) or our ultimate holding company (i.e., any
+organization that owns or controls us) and any subsidiaries it owns. These
+companies will use your personal information in the same way as we can under
+this Privacy Policy; Third parties with whom we partner to provide contests and
+sweepstakes, which will usually be identified by name in the Official Rules of
+the contest or sweepstakes; Third-party vendors and other service providers that
+perform services on our behalf, as needed to carry out their work for us, which
+may include identifying and serving targeted advertisements, providing mailing
+services, providing tax and accounting services, contest fulfilment, web
+hosting, or providing analytic services. These vendors are bound by
+confidentiality agreements limiting the use of such information; Other parties
+in connection with a company transaction, such as a merger, sale of company
+assets or shares, reorganization, financing, change of control or acquisition of
+all or a portion of our business by another company or third party, or in the
+event of a bankruptcy or related or similar proceedings; and Third parties as
+required by law or subpoena or if we reasonably believe that such action is
+necessary to (a) comply with the law and the reasonable requests of law
+enforcement; (b) to enforce our Terms of Service or to protect the security or
+integrity of our Service; and/or (c) to exercise or protect the rights,
+property, or personal safety of Streamlabs, our visitors, or others. We may also
+share information with others in an aggregated or otherwise anonymized form that
+does not reasonably identify you directly as an individual.
 
-For users visiting Streamlabs from the European Economic Area or other non-US territories,
-please note that any data that passes through Streamlabs will be transferred outside
-the European Economic Area or those other non-US territories for use by Streamlabs
-and our affiliates for the purposes outlined in this Privacy Policy. By providing
-data to Streamlabs, you hereby expressly consent to such transfers of your data
-to the United States or other countries, except in the case of data transfers from
-the European Economic Area or Switzerland, which are covered under our EU-US and
-Swiss-US Safe Harbor Certifications detailed below. For users from outside the US,
-Switzerland, or the European Economic Area, please note that last in the US may
-not provide the same level of information protection as the laws of the user’s country
-of residence.
+5. CONTROL OVER YOUR INFORMATION
 
-Streamlabs also adheres to the Safe Harbor Privacy Principles of notice, choice,
-onward transfer, security, data integrity, access, and enforcement. In compliance
-with such policies, Streamlabs is committed to addressing and resolving any complaints
-about your privacy and our collection or use of your personal information. For all
-inquiries or complaints regarding this Privacy Policy, including European Union
-or Swiss citizens, please first contact Streamlabs at support@streamlabs.com.
+Profile and Data Sharing Settings. You may update your profile information, such
+as your user name and may change some of your data sharing preferences within
+your user Dashboard, or should you need assistance you can email customer
+support at support@streamlabs.com
 
-HOW STREAMLABS USES COOKIES
+How to control your communications preferences. You can stop receiving
+promotional email communications from us by clicking on the “unsubscribe link”
+provided in such communications. We make every effort to promptly process all
+unsubscribe requests. You may not opt out of service-related communications
+(e.g., account verification, transactional communications, changes/updates to
+features of the Service, technical and security notices).
 
-Like many other sites on the Internet, Streamlabs uses cookies—small text files
-containing a string of alphanumeric characters. Streamlabs uses cookies and collects
-IP addresses and other automatically collected information in order to better facilitate
-the services provided to you, and to collect non-personal aggregate data for marketing
-and research purposes. If you accept the cookies used on our site, we may be able
-to identify your system by reading the cookie stored on your system, but we will
-not be able to identify you unless you’ve entered your personal information.
-We may also allow third-party companies to serve ads and/or collect certain anonymous
-information from you when you visit our website or use our services.
+Modifying or deleting your information. If desired, you may decline to share
+your personal information with Streamlabs, at which time we will no longer be
+able to provide you with a majority of the functionality of our offerings. If
+you would like to access, review, correct, update, suppress/remove, or otherwise
+limit our use of your personal information and/or User Content, you may contact
+us at support@streamlabs.com. Please note that in order to protect your privacy
+and security, we take reasonable steps to verify your identity before making any
+changes to your personal information.
 
-CHANGES TO PRIVACY POLICY
+6. THIRD-PARTY TRACKING AND ONLINE ADVERTISING
 
-We reserve the right to change, modify, add, or remove portions of this Privacy
-Policy at any time. You should review this Privacy Policy frequently. If we make
-significant changes to this policy, we may notify you through a blog post, by email,
-or by any method we determine at our discretion. If you feel that we are not abiding
-by this privacy policy, you should contact us immediately at support@streamlabs.com.
+We participate in interest-based advertising and use third party advertising
+companies to serve you targeted advertisements based on your online browsing
+history and your interests. We permit third party online advertising networks,
+social media companies and other third party services, to collect, information
+about your use of our Service over time so that they may play or display ads on
+our Service, on other websites, apps or services you may use, and on other
+devices you may use. Typically, though not always, the information used for
+interest-based advertising is collected through cookies or similar tracking
+technologies. We may share a common account identifier (such as an email address
+or user ID) or hashed data with our third party advertising partners to help
+identify you across devices. We and our third party partners use this
+information to make the advertisements you see online more relevant to your
+interests, as well as to provide advertising-related services such as reporting,
+attribution, analytics and market research.
 
-YOUR RIGHTS AND CHOICES
+To learn more about interest-based advertising and how you may be able to
+opt-out of some of this advertising, you may wish to visit the Network
+Advertising Initiative’s online resources, at
+http://www.networkadvertising.org/choices, and/or the DAA’s resources at
+www.aboutads.info/choices. You may also be able to set your browser to delete or
+notify you of cookies by actively managing the settings on your browser or
+mobile device. Please note that some advertising opt-outs may not be effective
+unless your browser is set to accept cookies. Furthermore, if you use a
+different device, change browsers or delete the opt-out cookies, you may need to
+perform the opt-out task again.
 
-You have choices regarding our use and disclosure of your Personal Data:
-Opting out of receiving electronic communications from us. If you no longer want
-to receive marketing-related emails from us, you may opt-out via the unsubscribe
-link included in such emails. We will try to comply with your request(s) as soon
-as reasonably practicable. Please note that if you opt-out of receiving marketing-related
-emails from us, we may still send you important administrative messages that are
-required to provide you with our Services.
+You may also be able to limit certain interest-based mobile advertising through
+the settings on your mobile device by selecting “limit ad tracking” (iOS) or
+“opt-out of interest based ads” (Android).
 
-How you can see or change your account Personal Data. If You would like to review,
-correct, or update Personal Data that You have previously disclosed to us, You may
-do so by signing in to your Streamlabs account or by contacting us at support@streamlabs.com.
-Your data protection rights. Depending on your location and subject to applicable
-law, you may have the following rights with regard to the Personal Data we control
-about you:
-The right to request confirmation of whether Streamlabs processes Personal Data
-relating to you, and if so, to request a copy of that Personal Data;
-The right to request that Streamlabs rectifies or updates your Personal Data that
-is inaccurate, incomplete or outdated;
-The right to request that Streamlabs erase your Personal Data in certain circumstances
-provided by law;
-The right to request that Streamlabs restrict the use of your Personal Data in certain
-circumstances, such as while Streamlabs considers another request that you have
-submitted (including a request that Stripe make an update to your Personal Data);
-and
-The right to request that we export to another company, where technically feasible,
-your Personal Data that we hold in order to provide Services to you.
-Where the processing of your Personal Data is based on your previously given consent,
-you have the right to withdraw your consent at any time. You may also have the right
-to object to the processing of your Personal Data on grounds relating to your particular
-situation.
-Process for exercising data protection rights. In order to exercise your data protection
-rights, you may contact Streamlabs at support@streamlabs.com. We take each request
-seriously. We will comply with your request to the extent required by applicable
-law. We will not be able to respond to a request if we no longer hold your Personal
-Data. If you feel that you have not received a satisfactory response from us, you
-may consult with the data protection authority in your country.
-For your protection, we may need to verify your identity before responding to your
-request, such as verifying information you provide matches what we have on file.
-If we no longer need to process Personal Data about you in order to provide our
-Services or our Sites, we will not maintain, acquire or process additional information
-in order to identify you for the purpose of responding to your request.
+Google Analytics and Advertising. We use Google Analytics to recognize you and
+link the devices you use when you visit our site or Service on your browser or
+mobile device, log in to your account on our Service, or otherwise engage with
+us. We share a unique identifier, like a user ID or hashed email address, with
+Google to facilitate the service. Google Analytics allows us to better
+understand how our users interact with our Service and to tailor our
+advertisements and content to you. For information on how Google Analytics
+collects and processes data, as well as how you can control information sent to
+Google, review Google's site “How Google uses data when you use our partners’
+sites or apps” located at www.google.com/policies/privacy/partners/. You can
+learn about Google Analytics’ currently available opt-outs, including the Google
+Analytics Browser Ad-On here https://tools.google.com/dlpage/gaoptout/.
 
-CONTACT INFORMATION
+We may also utilize certain forms of display advertising and other advanced
+features through Google Analytics, such as Remarketing with Google Analytics,
+Google Display Network Impression Reporting, the DoubleClick Campaign Manager
+Integration, and Google Analytics Demographics and Interest Reporting[GS16] .
+These features enable us to use first-party cookies (such as the Google
+Analytics cookie) and third-party cookies (such as the DoubleClick advertising
+cookie) or other third-party cookies together to inform, optimize, and display
+ads based on your past visits to the Service. You may control your advertising
+preferences or opt-out of certain Google advertising products by visiting the
+Google Ads Preferences Manager, currently available at
+https://google.com/ads/preferences, or by visiting NAI’s online resources at
+http://www.networkadvertising.org/choices.
 
-Questions about the Streamlabs Privacy Policy can be sent to support@streamlabs.com.
+7. HOW WE STORE AND PROTECT YOUR INFORMATION
 
+Data storage and transfer: Your information collected through our website may be
+stored and processed in the United States or any other country in which
+Streamlabs or its affiliates or service providers maintain facilities. If you
+are located in other regions with laws governing data collection and use that
+may differ from U.S. law, please note that we may transfer information,
+including personal information, to a country and jurisdiction that does not have
+the same data protection laws as your jurisdiction, and you consent to the
+transfer of information to the U.S. or any other country in which Streamlabs or
+its parent, subsidiaries, affiliates, or service providers maintain facilities
+and the use and disclosure of information about you as described in this Privacy
+Policy. If you wish to enquire further about these transfers, please contact us
+using the details set out in the "How to Contact Us" section below.
 
-END OF LICENSE, TERMS & PRIVACY
+Data retention: We will retain your personal information only for as long as
+reasonably necessary to maintain the Service (if you are connected through
+Facebook, we maintain your information up to 90 days) to meet legal and
+accounting obligations, and for the purposes described in this Privacy Policy.
+To determine the appropriate retention period for personal information, we
+consider the amount, nature, and sensitivity of the personal information, the
+potential risk of harm from unauthorized use or disclosure of your personal
+information, the purposes for which we process your personal information and the
+applicable legal requirements. We may anonymize and/or aggregate personal
+information and store it in order to analyze aggregate metrics and trends.
+
+Keeping your information safe: We care about the security of your information
+and employ physical, administrative, and technological safeguards designed to
+preserve the integrity and security of all information collected through our
+Service. However, no security system is impenetrable, and we cannot guarantee
+the security of our systems 100%. In the event that any information under our
+control is compromised as a result of a breach of security, we will take
+reasonable steps to investigate the situation and, where appropriate, notify
+those individuals whose information may have been compromised and take other
+steps, in accordance with any applicable laws and regulations.
+
+8. CHILDREN’S PRIVACY
+
+Streamlabs does not knowingly collect or solicit any information from anyone
+under the age of 16 on this Service. In the event that we learn that we have
+inadvertently collected personal information from a child under age 16, we will
+delete that information as quickly as possible. If you believe that we might
+have any information from a child under 16, please contact us at
+support@streamlabs.com.
+
+9. LINKS TO OTHER WEB SITES AND SERVICES
+
+The Service may contain links to and from third-party websites of our business
+partners, advertisers, and social media sites and our users may post links to
+third-party websites. If you follow a link to any of these websites, please note
+that these websites have their own privacy policies and that we do not accept
+any responsibility or liability for their policies. We strongly recommend that
+you read their privacy policies and terms and conditions of use to understand
+how they collect, use, and share information. We are not responsible for the
+privacy practices or the content on the websites of third-party sites.
+
+10. FOR RESIDENTS IN THE EU AND SWITZERLAND
+
+If you are located in the EU or Switzerland, you have the following rights in
+respect of your personal information that we hold:
+
+a. Right to object. You have a right to object to any processing based on our
+legitimate interests where there are grounds relating to your particular
+situation. You can object to marketing activities for any reason whatsoever.
+
+b. Right of access. The right to obtain access to your personal information
+along with certain information.
+
+c. Right to rectification. The right to obtain rectification of your personal
+information without undue delay where that personal information is inaccurate or
+incomplete.
+
+d. Right to erasure. The right to obtain the erasure of your personal
+information without undue delay in certain circumstances, such as where the
+personal information is no longer necessary in relation to the purposes for
+which it was collected or processed.
+
+e. Right to restriction. The right to obtain the restriction of the processing
+undertaken by us on your personal information in certain circumstances, such as
+where the accuracy of the personal information is contested by you, for a period
+enabling us to verify the accuracy of that personal information.
+
+f. Right to portability. You have the right, in certain circumstances, to
+receive a copy of the personal information you have provided to us in a
+structured, commonly used, machine-readable format that supports re-use, or to
+request the transfer of your personal data to another person.
+
+If you wish to exercise one of these rights, please contact us using the contact
+details set out in the "How to Contact Us" section below.
+
+You also have the right to lodge a complaint to your local data protection
+authority. Further information about how to contact your local data protection
+authority is available at
+http://ec.europa.eu/justice/data-protection/bodies/authorities/index_en.htm.
+
+11. HOW TO CONTACT US
+
+If you have any questions about this Privacy Policy or the Service, please
+contact us at support@streamlabs.com.
+
+12. CHANGES TO OUR PRIVACY POLICY
+
+We may modify or update this Privacy Policy from time to time to reflect the
+changes in our business and practices, so you should review this page
+periodically. When we change the policy in a material manner, we will let you
+know and update the ‘last updated date at the top of this page. If you object to
+any changes, you may close your account. Continuing to use our Service after we
+publish changes to this Privacy Policy means that you are consenting to the
+changes.
+
+-----------------------------------
+IV. Third Party Components
+-----------------------------------
+
