@@ -228,6 +228,41 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
   });
 }
 
+async function uploadToGithub({octokit, url, pathname, name = path.basename(pathname), contentType }) {
+  info(`uploading ${name} to github...`);
+
+  const MAX_RETRY = 3;
+  for (let retry = 0; retry < MAX_RETRY; retry += 1) {
+    try {
+      const result = await octokit.repos.uploadReleaseAsset({
+        url,
+        headers: {
+          'content-length': fs.statSync(pathname).size,
+          'content-type': contentType,
+        },
+        name,
+        file: fs.createReadStream(pathname),
+      });
+      info('done.');
+      return result;
+    } catch (e) {
+      if ('status' in e) {
+        error(`${e.name}: '${e.message}', status = ${e.status}`);
+        if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
+          // retry
+        } else {
+          break;
+        }
+      } else {
+        error(`${e.name}: ${e.message}`);
+        break;
+      }
+    }
+  }
+  error('failed!');
+  throw new Error('reached to a retry limit');
+}
+
 function uploadToSentry(org, project, release, artifactPath) {
   const sentryCli = path.resolve('bin', 'node_modules/.bin/sentry-cli');
   executeCmd(`${sentryCli} releases -o ${org} -p ${project} new ${release}`);
@@ -469,55 +504,23 @@ async function runScript() {
     prerelease,
   });
 
-  async function uploadToGithub({ url, pathname, name = path.basename(pathname), contentType }) {
-    info(`uploading ${name} to github...`);
-
-    const MAX_RETRY = 3;
-    for (let retry = 0; retry < MAX_RETRY; retry += 1) {
-      try {
-        const result = await octokit.repos.uploadReleaseAsset({
-          url,
-          headers: {
-            'content-length': fs.statSync(pathname).size,
-            'content-type': contentType,
-          },
-          name,
-          file: fs.createReadStream(pathname),
-        });
-        info('done.');
-        return result;
-      } catch (e) {
-        if ('status' in e) {
-          error(`${e.name}: '${e.message}', status = ${e.status}`);
-          if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
-            // retry
-          } else {
-            break;
-          }
-        } else {
-          error(`${e.name}: ${e.message}`);
-          break;
-        }
-      }
-    }
-    error('failed!');
-    sh.exit(1);
-  }
-
   if (enableUploadToGitHub) {
     await uploadToGithub({
+      octokit,
       url: result.data.upload_url,
       pathname: latestYml,
       contentType: 'application/json',
     });
 
     await uploadToGithub({
+      octokit,
       url: result.data.upload_url,
       pathname: blockmapFilePath,
       contentType: 'application/octet-stream',
     });
 
     await uploadToGithub({
+      octokit,
       url: result.data.upload_url,
       pathname: binaryFilePath,
       contentType: 'application/octet-stream',
