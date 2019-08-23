@@ -286,11 +286,11 @@ export default class EditStreamInfo extends Vue {
     try {
       await this.twitterService.postTweet(this.tweetModel);
       success = true;
-    } catch {
-      this.$toasted.show($t('Failed to post tweet'), {
+    } catch (e) {
+      this.$toasted.show(`Twitter: ${e.error}`, {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 1000,
+        duration: 2000,
         singleton: true,
       });
       success = false;
