@@ -199,21 +199,35 @@ async function releaseToGitHubRoutine({
 
 /**
  * This is the main function of the script
+ * @param {object} param0
+ * @param {'public' | 'internal'} param0.releaseEnvironment
+ * @param {'stable' | 'unstable'} param0.releaseChannel
+ * @param {object} param0.target
+ * @param {string} param0.target.host
+ * @param {string} param0.target.organization
+ * @param {string} param0.target.repository
+ * @param {string} param0.target.remote
+ * @param {string} param0.target.branch
+ * @param {object} param0.sentry
+ * @param {string} param0.sentry.organization
+ * @param {string} param0.sentry.project
+ * @param {object} param0.upload
+ * @param {string} param0.upload.githubToken
+ * @param {string} param0.upload.s3BucketName
+ * @param {boolean} [param0.generateNoteTs=true]
+ * @param {boolean} [param0.skipLocalModificationCheck=true]
+ * @param {boolean} [param0.skipBuild=false]
+ * @param {boolean} [param0.enableUploadToS3=true]
+ * @param {boolean} [param0.enableUploadToGitHub=true]
+ * @param {boolean} [param0.enableUploadToSentry=true]
+ * @param {string} param0.githubTokenForReadPullRequest
  */
 async function runScript({
-  githubApiServer,
-
-  organization,
-  repository,
-  remote,
-
-  targetBranch,
-
-  sentryOrganization,
-  sentryProject,
-
-  draft = true,
-  prerelease = false,
+  releaseEnvironment,
+  releaseChannel,
+  target,
+  sentry,
+  upload,
 
   generateNoteTs = true, // generate note.ts from git logs
 
@@ -224,42 +238,11 @@ async function runScript({
   enableUploadToGitHub = true,
   enableUploadToSentry = true,
 
-  internalRelease, // FIXME: 表に出るときにtrueになるような名前にする
-
   githubTokenForReadPullRequest,
-  githubTokenForUploadArtifacts,
-  s3BucketNameForUploadArtifacts,
 }) {
   info(colors.magenta('|----------------------------------|'));
   info(colors.magenta('| N Air Interactive Release Script |'));
   info(colors.magenta('|----------------------------------|'));
-
-  if (
-    !githubApiServer
-    || !organization
-    || !repository
-    || !remote
-    || !targetBranch
-    || !sentryOrganization
-    || !sentryProject
-    || !githubTokenForReadPullRequest
-    || !githubTokenForUploadArtifacts
-    || !s3BucketNameForUploadArtifacts
-    || internalRelease == null
-  ) {
-    if (!githubApiServer) error('githubApiServer is not given');
-    if (!organization) error('organization is not given');
-    if (!repository) error('repository is not given');
-    if (!remote) error('remote is not given');
-    if (!targetBranch) error('targetBranch is not given');
-    if (!sentryOrganization) error('sentryOrganization is not given');
-    if (!sentryProject) error('sentryProject is not given');
-    if (!githubTokenForReadPullRequest) error('githubTokenForReadPullRequest is not given');
-    if (!githubTokenForUploadArtifacts) error('githubTokenForUploadArtifacts is not given');
-    if (!s3BucketNameForUploadArtifacts) error('s3BucketNameForUploadArtifacts is not given');
-
-    sh.exit(1);
-  }
 
   // Start by figuring out if this environment is configured properly
   // for releasing.
@@ -269,27 +252,6 @@ async function runScript({
   checkEnv('SENTRY_AUTH_TOKEN');
   checkEnv('AWS_ACCESS_KEY_ID');
   checkEnv('AWS_SECRET_ACCESS_KEY');
-
-  const releaseEnvironment = internalRelease ? 'internal' : 'public';
-  const releaseChannel = prerelease ? 'unstable' : 'stable';
-
-  const target = {
-    host: githubApiServer,
-    organization,
-    repository,
-    remote,
-    branch: targetBranch,
-  };
-
-  const sentry = {
-    organization: sentryOrganization,
-    project: sentryProject,
-  };
-
-  const upload = {
-    githubToken: githubTokenForUploadArtifacts,
-    s3BucketName: s3BucketNameForUploadArtifacts,
-  };
 
   info(`check whether remote ${target.remote} exists`);
   executeCmd(`git remote get-url ${target.remote}`);
@@ -317,7 +279,7 @@ async function runScript({
 
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
 
-  let defaultVersion = generateNewVersion(previousTag, internalRelease);
+  let defaultVersion = generateNewVersion(previousTag, releaseEnvironment === 'internal');
   let notes = '';
 
   info('checking patch-note.txt...');
@@ -376,12 +338,6 @@ async function runScript({
     info(`updated version ${newVersion} to  ${patchNoteFileName}.`);
   }
 
-  if (draft) {
-    info('draft is true.');
-  }
-  if (prerelease) {
-    info('prerelease is true.');
-  }
   if (!(await confirm(`Are you sure you want to release as version ${newVersion}?`, false))) sh.exit(0);
   const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
 
@@ -446,18 +402,13 @@ async function runScript({
     binaryFilePath
   });
 
-  if (draft) {
-    // open release edit page on github
-    const editUrl = result.data.html_url.replace('/tag/', '/edit/');
-    executeCmd(`start ${editUrl}`);
 
-    info(`finally, release Version ${newVersion} on the browser!`);
-  } else {
-    // open release page on github
-    executeCmd(`start ${result.data.html_url}`);
+  // open release edit page on github
+  const editUrl = result.data.html_url.replace('/tag/', '/edit/');
+  executeCmd(`start ${editUrl}`);
 
-    info(`Version ${newVersion} is released!`);
-  }
+  info(`finally, release Version ${newVersion} on the browser!`);
+
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');

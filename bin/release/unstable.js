@@ -1,16 +1,23 @@
+// @ts-check
 const releaseScript = require('./mini-release');
 
 releaseScript({
-  prerelease: true,
-  internalRelease: false,
-  githubApiServer: 'https://api.github.com',
-  organization: 'n-air-app',
-  repository: 'n-air-app',
-  remote: 'origin',
-  targetBranch: 'unstable',
-  sentryOrganization: 'n-air-app',
-  sentryProject: 'n-air-app',
+  releaseChannel: 'unstable',
+  releaseEnvironment: 'public',
+  target: {
+    host: 'https://api.github.com',
+    organization: 'n-air-app',
+    repository: 'n-air-app',
+    remote: 'origin',
+    branch: 'unstable',
+  },
+  sentry: {
+    organization: 'n-air-app',
+    project: 'n-air-app',
+  },
+  upload: {
+    githubToken: process.env.NAIR_GITHUB_TOKEN,
+    s3BucketName: process.env.RELEASE_S3_BUCKET_NAME,
+  },
   githubTokenForReadPullRequest: process.env.NAIR_GITHUB_TOKEN,
-  githubTokenForUploadArtifacts: process.env.NAIR_GITHUB_TOKEN,
-  s3BucketNameForUploadArtifacts: process.env.RELEASE_S3_BUCKET_NAME,
 });
