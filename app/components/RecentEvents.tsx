@@ -115,6 +115,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() muted: boolean;
 
   render(h: Function) {
+    const pauseTooltip = this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue');
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
@@ -131,10 +132,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         <i
           class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
           onClick={this.toggleQueue}
-          v-tooltip={{
-            content: this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue'),
-            placement: 'bottom',
-          }}
+          v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
         />
         <i
           class="icon-skip action-icon"
