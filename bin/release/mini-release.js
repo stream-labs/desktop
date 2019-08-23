@@ -31,158 +31,6 @@ const {
   uploadToSentry
 } = require('./scripts/uploadArtifacts');
 
-function packagingRoutine({
-  skipBuild,
-  skipCleaningNodeModules,
-  releaseEnvironment,
-  releaseChannel,
-}) {
-  if (skipBuild) {
-    info('SKIP build process since skipBuild is set...');
-  } else {
-    if (skipCleaningNodeModules) {
-      // clean
-      info('Removing old packages...');
-      sh.rm('-rf', 'node_modules');
-    }
-
-    info('Installing yarn packages...');
-    executeCmd('yarn install');
-
-    info('Compiling assets...');
-    executeCmd('yarn compile:production');
-
-    info('Making the package...');
-    const envPrefix = releaseEnvironment === 'public' ? '' : `${releaseEnvironment}-`;
-    executeCmd(`yarn package:${envPrefix}${releaseChannel}`);
-  }
-}
-
-function tapArtifactsRoutine({
-  notes
-}) {
-  const distDir = path.resolve('.', 'dist');
-  const latestYml = path.join(distDir, 'latest.yml');
-  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml, 'utf-8'));
-
-  // add releaseNotes into latest.yml
-  parsedLatestYml.releaseNotes = notes;
-  fs.writeFileSync(latestYml, yaml.safeDump(parsedLatestYml));
-
-  const binaryFile = parsedLatestYml.path;
-  const binaryFilePath = path.join(distDir, binaryFile);
-  if (!fs.existsSync(binaryFilePath)) {
-    error(`Counld not find ${path.resolve(binaryFilePath)}`);
-    sh.exit(1);
-  }
-  const blockmapFile = `${binaryFile}.blockmap`;
-  const blockmapFilePath = path.join(distDir, blockmapFile);
-  if (!fs.existsSync(blockmapFilePath)) {
-    error(`Counld not find ${path.resolve(blockmapFilePath)}`);
-    sh.exit(1);
-  }
-
-  executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
-
-  return {
-    latestYml,
-    binaryFilePath,
-    blockmapFilePath
-  };
-}
-
-async function uploadToS3Routine({
-  latestYml,
-  binaryFilePath,
-  blockmapFilePath,
-  uploadS3BucketName,
-  releaseChannel,
-}) {
-  // upload to releases s3 bucket via aws-sdk...
-  // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
-  // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
-  // electron-updaterがエラーとなってしまう可能性がある
-
-  info('uploading artifacts to s3...');
-  await uploadS3File({
-    name: path.basename(binaryFilePath),
-    bucketName: uploadS3BucketName,
-    filePath: binaryFilePath,
-    isUnstable: releaseChannel !== 'stable',
-  });
-  await uploadS3File({
-    name: path.basename(blockmapFilePath),
-    bucketName: uploadS3BucketName,
-    filePath: blockmapFilePath,
-    isUnstable: releaseChannel !== 'stable',
-  });
-  await uploadS3File({
-    name: path.basename(latestYml),
-    bucketName: uploadS3BucketName,
-    filePath: latestYml,
-    isUnstable: releaseChannel !== 'stable',
-  });
-}
-
-async function releaseToGitHubRoutine({
-  targetHost,
-  targetOrganization,
-  targetRepository,
-  uploadGitHubToken,
-  newTag,
-  notes,
-  releaseChannel,
-  enableUploadToGitHub,
-  latestYml,
-  blockmapFilePath,
-  binaryFilePath
-}) {
-  // upload to the github directly via GitHub API...
-
-  const octokit = new OctoKit({
-    baseUrl: targetHost,
-    auth: `token ${uploadGitHubToken}`,
-  });
-
-  info(`creating release ${newTag}...`);
-  const result = await octokit.repos.createRelease({
-    owner: targetOrganization,
-    repo: targetRepository,
-    tag_name: newTag,
-    name: newTag,
-    body: notes,
-    draft: true,
-    prerelease: releaseChannel !== 'stable',
-  });
-
-  if (enableUploadToGitHub) {
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: latestYml,
-      contentType: 'application/json',
-    });
-
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: blockmapFilePath,
-      contentType: 'application/octet-stream',
-    });
-
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: binaryFilePath,
-      contentType: 'application/octet-stream',
-    });
-  } else {
-    info('uploading to GitHub: SKIP');
-  }
-
-  return result;
-}
-
 /**
  * This is the main function of the script
  * @param {object} param0
@@ -203,7 +51,6 @@ async function releaseToGitHubRoutine({
  * @param {object} param0.patchNote
  * @param {string} param0.patchNote.version
  * @param {string} param0.patchNote.notes
- * @param {boolean} param0.generateNoteTs
  * @param {boolean} param0.skipLocalModificationCheck
  * @param {boolean} param0.skipBuild
  * @param {boolean} param0.enableUploadToS3
@@ -217,8 +64,6 @@ async function runScript({
   sentry,
   upload,
   patchNote,
-
-  generateNoteTs, // generate note.ts from git logs
 
   skipLocalModificationCheck, // for DEBUG
   skipBuild, // for DEBUG
@@ -280,27 +125,36 @@ async function runScript({
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
   const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
 
-  if (!generateNoteTs) {
-    info('skipping to generate notes.ts...');
-  } else {
-    updateNotesTs({
-      filePath: noteFilename,
-      title: newVersion,
-      ...patchNote,
-    });
-    info(`generated patch-note file: ${noteFilename}.`);
-  }
+  updateNotesTs({
+    filePath: noteFilename,
+    title: newVersion,
+    ...patchNote,
+  });
+  info(`generated patch-note file: ${noteFilename}.`);
 
   // update package.json with newVersion and git tag
   executeCmd(`yarn version --new-version=${newVersion}`);
 
   const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
-  packagingRoutine({
-    skipBuild,
-    skipCleaningNodeModules,
-    releaseEnvironment,
-    releaseChannel,
-  });
+  if (skipBuild) {
+    info('SKIP build process since skipBuild is set...');
+  } else {
+    if (skipCleaningNodeModules) {
+      // clean
+      info('Removing old packages...');
+      sh.rm('-rf', 'node_modules');
+    }
+
+    info('Installing yarn packages...');
+    executeCmd('yarn install');
+
+    info('Compiling assets...');
+    executeCmd('yarn compile:production');
+
+    info('Making the package...');
+    const envPrefix = releaseEnvironment === 'public' ? '' : `${releaseEnvironment}-`;
+    executeCmd(`yarn package:${envPrefix}${releaseChannel}`);
+  }
 
   info('Pushing to the repository...');
   executeCmd(`git push ${target.remote} ${target.branch}`);
@@ -308,45 +162,107 @@ async function runScript({
 
   info(`version: ${newVersion}`);
 
-  const {
-    latestYml,
-    binaryFilePath,
-    blockmapFilePath,
-  } = tapArtifactsRoutine({ notes: patchNote.notes });
+  info('Checking artifacts...');
+  const distDir = path.resolve('.', 'dist');
+  const latestYmlFilePath = path.join(distDir, 'latest.yml');
+  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYmlFilePath, 'utf-8'));
+
+  // add releaseNotes into latest.yml
+  parsedLatestYml.releaseNotes = patchNote.notes;
+  fs.writeFileSync(latestYmlFilePath, yaml.safeDump(parsedLatestYml));
+
+  const binaryFile = parsedLatestYml.path;
+  const binaryFilePath = path.join(distDir, binaryFile);
+  if (!fs.existsSync(binaryFilePath)) {
+    error(`Counld not find ${path.resolve(binaryFilePath)}`);
+    sh.exit(1);
+  }
+  const blockmapFile = `${binaryFile}.blockmap`;
+  const blockmapFilePath = path.join(distDir, blockmapFile);
+  if (!fs.existsSync(blockmapFilePath)) {
+    error(`Counld not find ${path.resolve(blockmapFilePath)}`);
+    sh.exit(1);
+  }
+
+  executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYmlFilePath}`);
 
   if (enableUploadToS3) {
-    await uploadToS3Routine({
-      latestYml,
-      binaryFilePath,
-      blockmapFilePath,
-      uploadS3BucketName: upload.s3BucketName,
-      releaseChannel,
+    // upload to releases s3 bucket via aws-sdk...
+    // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
+    // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
+    // electron-updaterがエラーとなってしまう可能性がある
+
+    info('uploading artifacts to s3...');
+    await uploadS3File({
+      name: path.basename(binaryFilePath),
+      bucketName: upload.s3BucketName,
+      filePath: binaryFilePath,
+      isUnstable: releaseChannel !== 'stable',
+    });
+    await uploadS3File({
+      name: path.basename(blockmapFilePath),
+      bucketName: upload.s3BucketName,
+      filePath: blockmapFilePath,
+      isUnstable: releaseChannel !== 'stable',
+    });
+    await uploadS3File({
+      name: path.basename(latestYmlFilePath),
+      bucketName: upload.s3BucketName,
+      filePath: latestYmlFilePath,
+      isUnstable: releaseChannel !== 'stable',
     });
   } else {
     info('uploading artifacts to s3: SKIP');
   }
 
-  const result = await releaseToGitHubRoutine({
-    targetHost: target.host,
-    targetOrganization: target.organization,
-    targetRepository: target.repository,
-    uploadGitHubToken: upload.githubToken,
-    newTag,
-    notes: patchNote.notes,
-    releaseChannel,
-    enableUploadToGitHub,
-    latestYml,
-    blockmapFilePath,
-    binaryFilePath
-  });
+  // upload to the github directly via GitHub API...
 
+  if (enableUploadToGitHub) {
+    const octokit = new OctoKit({
+      baseUrl: target.host,
+      auth: `token ${upload.githubToken}`,
+    });
 
-  // open release edit page on github
-  const editUrl = result.data.html_url.replace('/tag/', '/edit/');
-  executeCmd(`start ${editUrl}`);
+    info(`creating release ${newTag}...`);
+    const result = await octokit.repos.createRelease({
+      owner: target.organization,
+      repo: target.repository,
+      tag_name: newTag,
+      name: newTag,
+      body: patchNote.notes,
+      draft: true,
+      prerelease: releaseChannel !== 'stable',
+    });
 
-  info(`finally, release Version ${newVersion} on the browser!`);
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: latestYmlFilePath,
+      contentType: 'application/json',
+    });
 
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: blockmapFilePath,
+      contentType: 'application/octet-stream',
+    });
+
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: binaryFilePath,
+      contentType: 'application/octet-stream',
+    });
+
+    // open release edit page on github
+    const editUrl = result.data.html_url.replace('/tag/', '/edit/');
+    executeCmd(`start ${editUrl}`);
+
+    info(`finally, release Version ${newVersion} on the browser!`);
+  } else {
+    info('uploading to GitHub: SKIP');
+  }
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
@@ -412,7 +328,6 @@ async function releaseRoutine() {
     releaseEnvironment,
     releaseChannel,
     ...config,
-    generateNoteTs: true,
     skipLocalModificationCheck: false,
     skipBuild: false,
     enableUploadToS3: true,
