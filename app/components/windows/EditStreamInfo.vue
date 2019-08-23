@@ -90,6 +90,7 @@
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"
           :updatingInfo="updatingInfo"
+          v-if="twitterIsEnabled"
           v-model="tweetModel"
         />
         <div class="update-warning" v-if="updateError">
