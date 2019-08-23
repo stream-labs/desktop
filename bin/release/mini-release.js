@@ -22,6 +22,7 @@ const {
   getTagCommitId,
 } = require('./scripts/util');
 const {
+  validateVersionContext,
   updateNotesTs,
   readPatchNote,
 } = require('./scripts/patchNote');
@@ -320,8 +321,11 @@ async function releaseRoutine() {
     throw new Error(`Tag "v${patchNote.version}" has already been released.`);
   }
 
-  // TODO: versionの値がpublicReleaseとreleaseChannelの条件を満たしているか確認する
-
+  validateVersionContext({
+    versionTag: `v${patchNote.version}`,
+    releaseEnvironment,
+    releaseChannel,
+  });
 
   await runScript({
     patchNote,

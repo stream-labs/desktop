@@ -9,20 +9,51 @@ const {
 } = require('./prompt');
 const { getTagCommitId } = require('./util');
 
-function generateNewVersion(previousTag, internalRelease, now = Date.now()) {
-  // previous tag should be following rule:
-  //  v{major}.{minor}.{yyyymmdd}-{ord}
+// previous tag should be following rule:
+//  v{major}.{minor}.{yyyymmdd}-[{channel}.]{ord}[internalMark]
+const VERSION_REGEXP = /v(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel>\w+)\.)?(?<ord>\d+)(?<internalMark>d)?/;
 
-  const re = /v(\d+)\.(\d+)\.(\d{8})-(\d+)/g;
-  let result = re.exec(previousTag);
-  if (!result || result.length < 5) {
-    result = ['', '0', '1', '', '1'];
+function parseVersionTag(tag) {
+  const result = VERSION_REGEXP.exec(tag);
+  if (result && result.groups) return result.groups;
+  throw new Error(`cannot parse a given tag: ${tag}`)
+}
+
+function validateVersionContext({
+  versionTag,
+  releaseEnvironment,
+  releaseChannel,
+}) {
+  const result = VERSION_REGEXP.exec(versionTag);
+  const { internalMark, channel } = result.groups;
+
+  const versionEnvironment = internalMark ? 'internal' : 'public';
+  const versionChannel = channel || 'stable';
+
+  if (channel === 'stable') {
+    throw new Error('stable channel has no prefix');
   }
-  const [, major, minor, date, ord] = result;
+
+  if (
+    releaseChannel !== versionChannel
+    || releaseEnvironment !== versionEnvironment
+  ) {
+    throw new Error('invalid version context');
+  }
+}
+
+function generateNewVersion({
+  previousTag,
+  now = Date.now(),
+}) {
+  const {
+    major, minor, date, channel, ord, internalMark
+  } = parseVersionTag(previousTag);
 
   const today = moment(now).format('YYYYMMDD');
-  const newOrd = date === today ? ord + 1 : 1;
-  return `${major}.${minor}.${today}-${newOrd}${internalRelease ? 'd' : ''}`;
+  const newOrd = date === today ? parseInt(ord, 10) + 1 : 1;
+  const channelPrefix = channel ? `${channel}.` : '';
+  return `${major}.${minor}.${today}-${channelPrefix}${newOrd}${internalMark || ''}`;
 }
 
 function splitToLines(lines) {
@@ -168,7 +199,9 @@ function readPatchNote({
 }
 
 module.exports = {
+  parseVersionTag,
   generateNewVersion,
+  validateVersionContext,
   readPatchNoteFile,
   writePatchNoteFile,
   collectPullRequestMerges,

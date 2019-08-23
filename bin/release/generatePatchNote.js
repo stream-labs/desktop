@@ -17,6 +17,7 @@ const {
   getTagCommitId,
 } = require('./scripts/util');
 const {
+  validateVersionContext,
   generateNewVersion,
   readPatchNoteFile,
   writePatchNoteFile,
@@ -25,7 +26,8 @@ const {
 
 async function generatePatchNote({
   patchNoteFileName,
-  publicRelease,
+  releaseEnvironment,
+  releaseChannel,
   githubTokenForReadPullRequest
 }) {
   info('checking current tag ...');
@@ -43,7 +45,14 @@ async function generatePatchNote({
     }
   }
 
-  const defaultVersion = generateNewVersion(previousTag, !publicRelease);
+  validateVersionContext({
+    versionTag: previousTag,
+    releaseEnvironment,
+    releaseChannel,
+  });
+  const defaultVersion = generateNewVersion({
+    previousTag,
+  });
   const newVersion = await input('What should the new version number be?', defaultVersion);
 
   if (getTagCommitId(`v${newVersion}`)) {
@@ -87,23 +96,24 @@ if (!module.parent) {
     const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
     const patchNoteFileName = `${baseDir}patch-note.txt`;
 
-    const { releaseEnv } = await inq.prompt({
+    const { releaseEnvironment } = await inq.prompt({
       type: 'list',
-      name: 'releaseEnv',
+      name: 'releaseEnvironment',
       message: 'What environment do you want to release?',
       choices: ['internal', 'public'],
     });
 
-    // const { releaseChannel } = await inq.prompt({
-    //   type: 'list',
-    //   name: 'releaseChannel',
-    //   message: 'What channel do you want to release?',
-    //   choices: ['unstable', 'stable'],
-    // });
+    const { releaseChannel } = await inq.prompt({
+      type: 'list',
+      name: 'releaseChannel',
+      message: 'What channel do you want to release?',
+      choices: ['unstable', 'stable'],
+    });
 
     await generatePatchNote({
       patchNoteFileName,
-      publicRelease: releaseEnv === 'public',
+      releaseEnvironment,
+      releaseChannel,
       githubTokenForReadPullRequest: process.env.NAIR_GITHUB_TOKEN,
     });
   })();
