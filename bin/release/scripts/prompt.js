@@ -4,8 +4,8 @@ const sh = require('shelljs');
 const colors = require('colors/safe');
 const inq = require('inquirer');
 
-function log(msg) {
-  sh.echo(msg);
+function log(...msg) {
+  sh.echo(...msg);
 }
 
 function info(msg) {

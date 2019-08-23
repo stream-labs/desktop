@@ -6,44 +6,30 @@
 const fs = require('fs');
 const path = require('path');
 const OctoKit = require('@octokit/rest');
+const inq = require('inquirer');
+const sh = require('shelljs');
+const colors = require('colors/safe');
+const yaml = require('js-yaml');
 const {
+  log,
   info,
   error,
   executeCmd,
   confirm,
-  input,
 } = require('./scripts/prompt');
 const {
   checkEnv,
   getTagCommitId,
 } = require('./scripts/util');
 const {
-  generateNewVersion,
-  readPatchNoteFile,
-  writePatchNoteFile,
-  collectPullRequestMerges,
   updateNotesTs,
+  readPatchNote,
 } = require('./scripts/patchNote');
 const {
   uploadS3File,
   uploadToGithub,
   uploadToSentry
 } = require('./scripts/uploadArtifacts');
-
-let sh;
-let colors;
-let yaml;
-
-try {
-  sh = require('shelljs');
-  colors = require('colors/safe');
-  yaml = require('js-yaml');
-} catch (e) {
-  if (e.message.startsWith('Cannot find module')) {
-    throw new Error(`先に\`yarn install\`を実行する必要があります: ${e.message}`);
-  }
-  throw e;
-}
 
 function packagingRoutine({
   skipBuild,
@@ -77,7 +63,7 @@ function tapArtifactsRoutine({
 }) {
   const distDir = path.resolve('.', 'dist');
   const latestYml = path.join(distDir, 'latest.yml');
-  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml));
+  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml, 'utf-8'));
 
   // add releaseNotes into latest.yml
   parsedLatestYml.releaseNotes = notes;
@@ -214,13 +200,15 @@ async function releaseToGitHubRoutine({
  * @param {object} param0.upload
  * @param {string} param0.upload.githubToken
  * @param {string} param0.upload.s3BucketName
- * @param {boolean} [param0.generateNoteTs=true]
- * @param {boolean} [param0.skipLocalModificationCheck=true]
- * @param {boolean} [param0.skipBuild=false]
- * @param {boolean} [param0.enableUploadToS3=true]
- * @param {boolean} [param0.enableUploadToGitHub=true]
- * @param {boolean} [param0.enableUploadToSentry=true]
- * @param {string} param0.githubTokenForReadPullRequest
+ * @param {object} param0.patchNote
+ * @param {string} param0.patchNote.version
+ * @param {string} param0.patchNote.notes
+ * @param {boolean} param0.generateNoteTs
+ * @param {boolean} param0.skipLocalModificationCheck
+ * @param {boolean} param0.skipBuild
+ * @param {boolean} param0.enableUploadToS3
+ * @param {boolean} param0.enableUploadToGitHub
+ * @param {boolean} param0.enableUploadToSentry
  */
 async function runScript({
   releaseEnvironment,
@@ -228,30 +216,45 @@ async function runScript({
   target,
   sentry,
   upload,
+  patchNote,
 
-  generateNoteTs = true, // generate note.ts from git logs
+  generateNoteTs, // generate note.ts from git logs
 
-  skipLocalModificationCheck = false, // for DEBUG
-  skipBuild = false, // for DEBUG
+  skipLocalModificationCheck, // for DEBUG
+  skipBuild, // for DEBUG
 
-  enableUploadToS3 = true,
-  enableUploadToGitHub = true,
-  enableUploadToSentry = true,
-
-  githubTokenForReadPullRequest,
+  enableUploadToS3,
+  enableUploadToGitHub,
+  enableUploadToSentry,
 }) {
-  info(colors.magenta('|----------------------------------|'));
-  info(colors.magenta('| N Air Interactive Release Script |'));
-  info(colors.magenta('|----------------------------------|'));
+  const newVersion = patchNote.version;
+  const newTag = `v${newVersion}`;
 
-  // Start by figuring out if this environment is configured properly
-  // for releasing.
-  checkEnv('CSC_LINK');
-  checkEnv('CSC_KEY_PASSWORD');
-  checkEnv('NAIR_LICENSE_API_KEY');
-  checkEnv('SENTRY_AUTH_TOKEN');
-  checkEnv('AWS_ACCESS_KEY_ID');
-  checkEnv('AWS_SECRET_ACCESS_KEY');
+  info('Release summary:');
+  log('releaseEnvironment: ', releaseEnvironment === 'public' ? colors.red(releaseEnvironment) : releaseEnvironment);
+  log('releaseChannel: ', releaseChannel === 'stable' ? colors.red(releaseChannel) : releaseChannel);
+  log('---- ---- ---- ----');
+  log('version:', colors.cyan(patchNote.version));
+  log('notes:', colors.cyan(patchNote.notes));
+  log('---- ---- ---- ----');
+  log('target:');
+  log('         host:', colors.cyan(target.host));
+  log(' organization:', colors.cyan(target.organization));
+  log('   repository:', colors.cyan(target.repository));
+  log('       remote:', colors.cyan(target.remote));
+  log('       branch:', colors.cyan(target.branch));
+  log('sentry:');
+  log(' organization:', colors.cyan(sentry.organization));
+  log('      project:', colors.cyan(sentry.project));
+  log('upload:');
+  log('   githubHost:', colors.cyan(target.host));
+  log('  githubToken:', colors.cyan(upload.githubToken));
+  log(' s3BucketName:', colors.cyan(upload.s3BucketName));
+  log('---- ---- ---- ----\n\n');
+
+  if (!await confirm('Are you sure to release with these configs?', false)) {
+    sh.exit(0);
+  }
 
   info(`check whether remote ${target.remote} exists`);
   executeCmd(`git remote get-url ${target.remote}`);
@@ -274,82 +277,16 @@ async function runScript({
   info('pulling fresh repogitory...');
   executeCmd('git pull');
 
-  info('checking current tag...');
-  const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
-
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
-
-  let defaultVersion = generateNewVersion(previousTag, releaseEnvironment === 'internal');
-  let notes = '';
-
-  info('checking patch-note.txt...');
-  const patchNoteFileName = `${baseDir}patch-note.txt`;
-  const patchNote = readPatchNoteFile(patchNoteFileName);
-  if (patchNote.version) {
-    if (patchNote.version === defaultVersion || !getTagCommitId(patchNote.version)) {
-      defaultVersion = patchNote.version;
-      notes = patchNote.lines.join('\n');
-      info(`${patchNoteFileName} loaded: ${defaultVersion}\n${notes}`);
-    } else {
-      info(`${patchNoteFileName} 's version ${patchNote.version} already exists.`);
-    }
-  } else {
-    info(`${patchNoteFileName} not found.`);
-  }
-
-  const newVersion = await input('What should the new version number be?', defaultVersion);
-
-  const newTag = `v${newVersion}`;
-  if (getTagCommitId(newTag)) {
-    error(`tag ${newTag} already exists!`);
-    sh.exit(1);
-  }
-
-  if (!notes) {
-    // get pull request description from github.com
-    const github = new OctoKit({
-      baseUrl: 'https://api.github.com',
-      auth: `token ${githubTokenForReadPullRequest}`,
-    });
-    const prMerges = await collectPullRequestMerges(
-      {
-        octokit: github,
-        owner: 'n-air-app',
-        repo: 'n-air-app',
-      },
-      previousTag
-    );
-    notes = prMerges;
-
-    const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {
-      silent: true,
-    }).stdout;
-    if (directCommits) {
-      notes = `${prMerges}\nDirect Commits:\n${directCommits}`;
-    }
-
-    info(notes);
-
-    writePatchNoteFile(patchNoteFileName, newVersion, notes);
-    info(`generated ${patchNoteFileName}.`);
-    if (await confirm(`Do you want to edit ${patchNoteFileName}?`, true)) sh.exit(0);
-  } else if (newVersion !== defaultVersion) {
-    writePatchNoteFile(patchNoteFileName, newVersion, notes);
-    info(`updated version ${newVersion} to  ${patchNoteFileName}.`);
-  }
-
-  if (!(await confirm(`Are you sure you want to release as version ${newVersion}?`, false))) sh.exit(0);
-  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
-
   const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
+
   if (!generateNoteTs) {
     info('skipping to generate notes.ts...');
   } else {
     updateNotesTs({
       filePath: noteFilename,
       title: newVersion,
-      version: newVersion,
-      notes
+      ...patchNote,
     });
     info(`generated patch-note file: ${noteFilename}.`);
   }
@@ -357,6 +294,7 @@ async function runScript({
   // update package.json with newVersion and git tag
   executeCmd(`yarn version --new-version=${newVersion}`);
 
+  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
   packagingRoutine({
     skipBuild,
     skipCleaningNodeModules,
@@ -374,7 +312,7 @@ async function runScript({
     latestYml,
     binaryFilePath,
     blockmapFilePath,
-  } = tapArtifactsRoutine({ notes });
+  } = tapArtifactsRoutine({ notes: patchNote.notes });
 
   if (enableUploadToS3) {
     await uploadToS3Routine({
@@ -394,7 +332,7 @@ async function runScript({
     targetRepository: target.repository,
     uploadGitHubToken: upload.githubToken,
     newTag,
-    notes,
+    notes: patchNote.notes,
     releaseChannel,
     enableUploadToGitHub,
     latestYml,
@@ -420,4 +358,69 @@ async function runScript({
   // done.
 }
 
-module.exports = runScript;
+async function releaseRoutine() {
+  info(colors.magenta('|----------------------------------|'));
+  info(colors.magenta('| N Air Interactive Release Script |'));
+  info(colors.magenta('|----------------------------------|'));
+
+  checkEnv('CSC_LINK');
+  checkEnv('CSC_KEY_PASSWORD');
+  checkEnv('NAIR_LICENSE_API_KEY');
+  checkEnv('SENTRY_AUTH_TOKEN');
+  checkEnv('AWS_ACCESS_KEY_ID');
+  checkEnv('AWS_SECRET_ACCESS_KEY');
+
+  const { releaseEnvironment } = await inq.prompt({
+    type: 'list',
+    name: 'releaseEnvironment',
+    message: 'What environment do you want to release?',
+    choices: ['internal', 'public'],
+  });
+
+  const config = releaseEnvironment === 'public' ? require('./public.config') : require('./internal.config');
+
+  const { releaseChannel } = await inq.prompt({
+    type: 'list',
+    name: 'releaseChannel',
+    message: 'What channel do you want to release?',
+    choices: ['unstable', 'stable'],
+  });
+
+  const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
+  const patchNoteFileName = `${baseDir}patch-note.txt`;
+
+  const patchNote = readPatchNote({ patchNoteFileName });
+
+  if (!patchNote) {
+    error(`patchNote is not found in ${patchNoteFileName}.`);
+    info('Use `yarn patch-note` to generate patchNote.');
+    throw new Error(`patchNote is not found in ${patchNoteFileName}.`);
+  }
+
+  if (getTagCommitId(`v${patchNote.version}`)) {
+    error(`Tag "v${patchNote.version}" has already been released.`);
+    info('Generate new patchNote with new version.');
+    info('If you want to retry current release, remove the tag and related release commit.');
+    throw new Error(`Tag "v${patchNote.version}" has already been released.`);
+  }
+
+  // TODO: versionの値がpublicReleaseとreleaseChannelの条件を満たしているか確認する
+
+
+  await runScript({
+    patchNote,
+    releaseEnvironment,
+    releaseChannel,
+    ...config,
+    generateNoteTs: true,
+    skipLocalModificationCheck: false,
+    skipBuild: false,
+    enableUploadToS3: true,
+    enableUploadToGitHub: true,
+    enableUploadToSentry: true,
+  });
+}
+
+if (!module.parent) {
+  releaseRoutine();
+}
