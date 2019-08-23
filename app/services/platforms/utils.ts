@@ -32,10 +32,10 @@ export async function platformRequest<T = any>(
     const headers = new Headers(platformService.getHeaders(req, useToken));
     return fetch(new Request(req.url, { ...req, headers })).then(handlePlatformResponse);
   };
-
   // try to fetch and retry fetching with a new token if the API responds with 401 (unauthorized)
+  // or 403 that usually means that 2FA is required for Twitch
   return requestFn().catch(error => {
-    if (useToken && error.status === 401) {
+    if (useToken && (error.status === 401 || error.status === 403)) {
       return platformService.fetchNewToken().then(() => {
         return requestFn();
       });
