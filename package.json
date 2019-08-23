@@ -18,8 +18,8 @@
     "watch-app": "yarn clear && yarn webpack-cli --watch --progress --config dev-app.config.js",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
-    "package": "rimraf dist && build -w --x64 --config electron-builder/base.config.js",
-    "package:preview": "rimraf dist && build -w --x64 --config electron-builder/preview.config.js",
+    "package": "yarn generate-agreement && rimraf dist && build -w --x64 --config electron-builder/base.config.js",
+    "package:preview": "yarn generate-agreement && rimraf dist && build -w --x64 --config electron-builder/preview.config.js",
     "lint": "tslint --project tsconfig.json {app,guest-api,obs-api,updater}/**/*.ts",
     "lint:ci": "yarn lint --format json --out tslint-results.json",
     "test": "tsc -p test && ava -v",
@@ -33,7 +33,8 @@
     "screentest": "node test/screentest/runner.js",
     "commit": "commit",
     "postinstall": "scripts/facemask-plugin-move.bat",
-    "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js"
+    "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
+    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT"
   },
   "prettier": {
     "singleQuote": true,

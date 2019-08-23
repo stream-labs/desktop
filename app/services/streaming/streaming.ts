@@ -447,10 +447,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           'Disconnected from the streaming server.  Please check your internet connection.',
         );
       } else if (info.code === obs.EOutputCode.InvalidStream) {
-        errorText =
-          $t(
-            'Could not access the specified channel or stream key, please double-check your stream key.  ',
-          ) + $t('If it is correct, there may be a problem connecting to the server.');
+        errorText = $t(
+          'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
+        );
       } else if (info.code === obs.EOutputCode.NoSpace) {
         errorText = $t('There is not sufficient disk space to continue recording.');
       } else if (info.code === obs.EOutputCode.Unsupported) {
