@@ -20,6 +20,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   queuePaused = false;
 
   get recentEvents() {
+    console.log(this.recentEventsService.state.recentEvents);
     return this.recentEventsService.state.recentEvents;
   }
 
@@ -118,7 +119,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
     const pauseTooltip = this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue');
     return (
       <div class={styles.topBar}>
-        <h2 class="studio-controls__label">{$t('Recent Events')}</h2>
+        <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
         <i
           class="icon-music action-icon"
           onClick={this.popoutMediaShare}
@@ -149,6 +150,21 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   }
 }
 
+const classForType = (event: IRecentEvent) => {
+  if (event.type === 'sticker' || event.type === 'effect') return event.currency;
+  if (event.type === 'superchat' || event.formatted_amount) return 'donation';
+  return event.type;
+};
+
+const amountString = (event: IRecentEvent) => {
+  if (event.formatted_amount) return event.formatted_amount;
+  if (event.type === 'superchat') return event.displayString;
+  if (event.type === 'sticker' || event.type === 'effect') {
+    return `${event.amount} ${event.currency}`;
+  }
+  return `${event.amount} ${event.type}`;
+};
+
 // TODO: Refactor into stateless functional component
 @Component({})
 class EventCell extends TsxComponent<{
@@ -169,8 +185,8 @@ class EventCell extends TsxComponent<{
         {this.event.gifter && (
           <span class={styles.name}>{this.event.from ? this.event.from : this.event.name}</span>
         )}
-        {this.event.formatted_amount && (
-          <span class={styles.money}>{this.event.formatted_amount}</span>
+        {this.event.amount && (
+          <span class={styles[classForType(this.event)]}>{amountString(this.event)}</span>
         )}
         {(this.event.comment || this.event.message) && (
           <span class={styles.whisper}>

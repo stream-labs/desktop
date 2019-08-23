@@ -207,27 +207,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       follow: $t('has followed'),
       subscription: this.getSubString(event),
       // Twitch
-      bits: $t('has used %{amount} bits', { amount: event.amount }),
+      bits: $t('has used'),
       host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
       raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
       // Mixer
-      sticker: $t('has used %{amount} %{currency} for %{skill}', {
-        amount: event.amount,
-        currency: event.currency,
-        skill: event.skill,
-      }),
-      effect: $t('has used %{amount} %{currency} for %{skill}', {
-        amount: event.amount,
-        currency: event.currency,
-        skill: event.skill,
-      }),
+      sticker: $t('has used %{skill} for', { skill: event.skill }),
+      effect: $t('has used %{skill} for', { skill: event.skill }),
       // Facebook
       like: $t('has liked'),
-      stars: $t('has used %{amount} stars', { amount: event.amount }),
+      stars: $t('has used'),
       support: $t('has supported for %{mounths} months', { months: event.months }),
       share: $t('has shared'),
       // Youtube
-      superchat: $t('has superchatted %{amount}', { amount: event.displayString }),
+      superchat: $t('has superchatted'),
       // Integrations
       pledge: $t('has pledged on Patreon'),
       eldonation: $t('has donated to ExtraLife'),

@@ -238,7 +238,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-      console.log(this.windowsService.state);
       const isMediaShare =
         this.windowsService.state.RecentEvents &&
         this.windowsService.state.RecentEvents.queryParams.isMediaShare
