@@ -1,3 +1,4 @@
+// @ts-check
 /*
  * All-in-one interactive N Air release script.
  */
@@ -5,21 +6,37 @@
 const fs = require('fs');
 const path = require('path');
 const OctoKit = require('@octokit/rest');
-const AWS = require('aws-sdk');
+const {
+  info,
+  error,
+  executeCmd,
+  confirm,
+  input,
+} = require('./scripts/prompt');
+const {
+  checkEnv,
+  getTagCommitId,
+} = require('./scripts/util');
+const {
+  generateNewVersion,
+  readPatchNoteFile,
+  writePatchNoteFile,
+  collectPullRequestMerges,
+  generateNotesTsContent,
+} = require('./scripts/patchNote');
+const {
+  uploadS3File,
+  uploadToGithub,
+  uploadToSentry
+} = require('./scripts/uploadArtifacts');
 
 let sh;
-let moment;
-let inq;
 let colors;
-let ProgressBar;
 let yaml;
 
 try {
   sh = require('shelljs');
-  moment = require('moment');
-  inq = require('inquirer');
   colors = require('colors/safe');
-  ProgressBar = require('progress');
   yaml = require('js-yaml');
 } catch (e) {
   if (e.message.startsWith('Cannot find module')) {
@@ -31,246 +48,6 @@ try {
 /**
  * CONFIGURATION
  */
-
-function info(msg) {
-  sh.echo(colors.magenta(msg));
-}
-
-function error(msg) {
-  sh.echo(colors.red(`ERROR: ${msg}`));
-}
-
-function executeCmd(cmd, options) {
-  const result = sh.exec(cmd, options);
-
-  if (result.code !== 0) {
-    error(`Command Failed >>> ${cmd}`);
-    sh.exit(1);
-  }
-
-  // returns {code:..., stdout:..., stderr:...}
-  return result;
-}
-
-async function confirm(msg, defaultValue = true) {
-  const result = await inq.prompt({
-    type: 'confirm',
-    name: 'conf',
-    message: msg,
-    default: defaultValue,
-  });
-
-  return result.conf;
-}
-
-function checkEnv(varName) {
-  if (!process.env[varName]) {
-    error(`Missing environment variable ${varName}`);
-    sh.exit(1);
-  }
-}
-
-async function uploadS3File({
-  name, bucketName, filePath, isUnstable
-}) {
-  info(`Starting upload of ${name}...`);
-
-  const stream = fs.createReadStream(filePath);
-  const upload = new AWS.S3.ManagedUpload({
-    params: {
-      Bucket: bucketName,
-      Key: `download/windows${isUnstable ? '-unstable' : ''}/${name}`,
-      Body: stream,
-    },
-    queueSize: 1,
-  });
-
-  const bar = new ProgressBar(`${name} [:bar] :percent :etas`, {
-    total: 100,
-    clear: true,
-  });
-
-  upload.on('httpUploadProgress', progress => {
-    bar.update(progress.loaded / progress.total);
-  });
-
-  try {
-    await upload.promise();
-  } catch (err) {
-    error(`Upload of ${name} failed`);
-    sh.echo(err);
-    sh.exit(1);
-  }
-}
-
-function generateNewVersion(previousTag, internalRelease, now = Date.now()) {
-  // previous tag should be following rule:
-  //  v{major}.{minor}.{yyyymmdd}-{ord}
-
-  const re = /v(\d+)\.(\d+)\.(\d{8})-(\d+)/g;
-  let result = re.exec(previousTag);
-  if (!result || result.length < 5) {
-    result = ['', '0', '1', '', '1'];
-  }
-  const [, major, minor, date, ord] = result;
-
-  const today = moment(now).format('YYYYMMDD');
-  const newOrd = date === today ? ord + 1 : 1;
-  return `${major}.${minor}.${today}-${newOrd}${internalRelease ? 'd' : ''}`;
-}
-
-function generateNotesTsContent(version, title, notes) {
-  const patchNote = `import { IPatchNotes } from '.';
-
-export const notes: IPatchNotes = {
-  version: '${version}',
-  title: '${title}',
-  notes: [
-${notes
-    .trim()
-    .split('\n')
-    .map(s => `    '${s}'`)
-    .join(',\n')}
-  ]
-};
-`;
-  info(`patch-note: '${patchNote}'`);
-  return patchNote;
-}
-
-function splitToLines(lines) {
-  if (typeof lines === 'string') {
-    return lines.split(/\r?\n/g);
-  }
-  return lines;
-}
-
-function readPatchNoteFile(patchNoteFileName) {
-  try {
-    const lines = splitToLines(fs.readFileSync(patchNoteFileName, { encoding: 'utf8' }));
-    const version = lines.shift();
-    return {
-      version,
-      lines,
-    };
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-    return {
-      version: '',
-      lines: [],
-    };
-  }
-}
-
-function writePatchNoteFile(patchNoteFileName, version, contents) {
-  const lines = splitToLines(contents);
-  const body = [version, ...lines].join('\n');
-  fs.writeFileSync(patchNoteFileName, body);
-}
-
-function getTagCommitId(tag) {
-  return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, { silent: true }).stdout;
-}
-
-async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
-  const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, { silent: true }).stdout;
-
-  const promises = [];
-  for (const line of merges.split(/\r?\n/)) {
-    const pr = line.match(/.*Merge pull request #([0-9]*).*/);
-    if (!pr || pr.length < 2) {
-      continue;
-    }
-    const pullNumber = parseInt(pr[1], 10);
-    promises.push(
-      octokit.pullRequests.get({ owner, repo, pull_number: pullNumber }).catch(e => {
-        info(e);
-        return { data: {} };
-      })
-    );
-  }
-
-  function level(line) {
-    if (line.startsWith('追加:')) {
-      return 0;
-    }
-    if (line.startsWith('変更:')) {
-      return 1;
-    }
-    if (line.startsWith('修正:')) {
-      return 2;
-    }
-    return 3;
-  }
-
-  return Promise.all(promises).then(results => {
-    const summary = [];
-    for (const result of results) {
-      const { data } = result;
-      if ('title' in data) {
-        summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
-      }
-    }
-
-    summary.sort((a, b) => {
-      const d = level(a) - level(b);
-      if (d) {
-        return d;
-      }
-      if (a < b) {
-        return -1;
-      }
-      if (a === b) {
-        return 0;
-      }
-      return 1;
-    });
-
-    return summary.join('');
-  });
-}
-
-async function uploadToGithub({octokit, url, pathname, name = path.basename(pathname), contentType }) {
-  info(`uploading ${name} to github...`);
-
-  const MAX_RETRY = 3;
-  for (let retry = 0; retry < MAX_RETRY; retry += 1) {
-    try {
-      const result = await octokit.repos.uploadReleaseAsset({
-        url,
-        headers: {
-          'content-length': fs.statSync(pathname).size,
-          'content-type': contentType,
-        },
-        name,
-        file: fs.createReadStream(pathname),
-      });
-      info('done.');
-      return result;
-    } catch (e) {
-      if ('status' in e) {
-        error(`${e.name}: '${e.message}', status = ${e.status}`);
-        if (e.code === 500 && e.message.indexOf('ECONNRESET') >= 0) {
-          // retry
-        } else {
-          break;
-        }
-      } else {
-        error(`${e.name}: ${e.message}`);
-        break;
-      }
-    }
-  }
-  error('failed!');
-  throw new Error('reached to a retry limit');
-}
-
-function uploadToSentry(org, project, release, artifactPath) {
-  const sentryCli = path.resolve('bin', 'node_modules/.bin/sentry-cli');
-  executeCmd(`${sentryCli} releases -o ${org} -p ${project} new ${release}`);
-  executeCmd(`${sentryCli} releases -o ${org} -p ${project} files ${release} upload-sourcemaps ${artifactPath}`);
-  executeCmd(`${sentryCli} releases -o ${org} -p ${project} finalize ${release}`);
-}
 
 /**
  * This is the main function of the script
@@ -389,12 +166,7 @@ async function runScript({
     info(`${patchNoteFileName} not found.`);
   }
 
-  const { newVersion } = await inq.prompt({
-    type: 'input',
-    name: 'newVersion',
-    message: 'What should the new version number be?',
-    default: defaultVersion,
-  });
+  const newVersion = await input('What should the new version number be?', defaultVersion);
 
   const newTag = `v${newVersion}`;
   if (getTagCommitId(newTag)) {
@@ -404,7 +176,7 @@ async function runScript({
 
   if (!notes) {
     // get pull request description from github.com
-    const github = OctoKit({
+    const github = new OctoKit({
       baseUrl: 'https://api.github.com',
       auth: `token ${githubTokenForReadPullRequest}`,
     });
@@ -536,7 +308,7 @@ async function runScript({
 
   // upload to the github directly via GitHub API...
 
-  const octokit = OctoKit({
+  const octokit = new OctoKit({
     baseUrl: githubApiServer,
     auth: `token ${githubTokenForUploadArtifacts}`,
   });
