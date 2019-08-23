@@ -45,9 +45,167 @@ try {
   throw e;
 }
 
-/**
- * CONFIGURATION
- */
+function generateNoteTsRoutine({
+  filePath,
+  version,
+  notes,
+}) {
+  const generatedPatchNote = generateNotesTsContent(version, version, notes);
+
+  fs.writeFileSync(filePath, generatedPatchNote);
+}
+
+function packagingRoutine({
+  skipBuild,
+  skipCleaningNodeModules,
+  internalRelease,
+  prerelease,
+}) {
+  if (skipBuild) {
+    info('SKIP build process since skipBuild is set...');
+  } else {
+    if (skipCleaningNodeModules) {
+      // clean
+      info('Removing old packages...');
+      sh.rm('-rf', 'node_modules');
+    }
+
+    info('Installing yarn packages...');
+    executeCmd('yarn install');
+
+    info('Compiling assets...');
+    executeCmd('yarn compile:production');
+
+    info('Making the package...');
+    executeCmd(`yarn package:${internalRelease ? 'internal-' : ''}${prerelease ? 'unstable' : 'stable'}`);
+  }
+}
+
+function tapArtifactsRoutine({
+  notes
+}) {
+  const distDir = path.resolve('.', 'dist');
+  const latestYml = path.join(distDir, 'latest.yml');
+  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml));
+
+  // add releaseNotes into latest.yml
+  parsedLatestYml.releaseNotes = notes;
+  fs.writeFileSync(latestYml, yaml.safeDump(parsedLatestYml));
+
+  const binaryFile = parsedLatestYml.path;
+  const binaryFilePath = path.join(distDir, binaryFile);
+  if (!fs.existsSync(binaryFilePath)) {
+    error(`Counld not find ${path.resolve(binaryFilePath)}`);
+    sh.exit(1);
+  }
+  const blockmapFile = `${binaryFile}.blockmap`;
+  const blockmapFilePath = path.join(distDir, blockmapFile);
+  if (!fs.existsSync(blockmapFilePath)) {
+    error(`Counld not find ${path.resolve(blockmapFilePath)}`);
+    sh.exit(1);
+  }
+
+  executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
+
+  return {
+    latestYml,
+    binaryFilePath,
+    blockmapFilePath
+  };
+}
+
+async function uploadToS3Routine({
+  latestYml,
+  binaryFilePath,
+  blockmapFilePath,
+  s3BucketNameForUploadArtifacts,
+  prerelease,
+}) {
+  // upload to releases s3 bucket via aws-sdk...
+  // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
+  // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
+  // electron-updaterがエラーとなってしまう可能性がある
+
+  info('uploading artifacts to s3...');
+  await uploadS3File({
+    name: path.basename(binaryFilePath),
+    bucketName: s3BucketNameForUploadArtifacts,
+    filePath: binaryFilePath,
+    isUnstable: prerelease,
+  });
+  await uploadS3File({
+    name: path.basename(blockmapFilePath),
+    bucketName: s3BucketNameForUploadArtifacts,
+    filePath: blockmapFilePath,
+    isUnstable: prerelease,
+  });
+  await uploadS3File({
+    name: path.basename(latestYml),
+    bucketName: s3BucketNameForUploadArtifacts,
+    filePath: latestYml,
+    isUnstable: prerelease,
+  });
+}
+
+async function releaseToGitHubRoutine({
+  githubApiServer,
+  githubTokenForUploadArtifacts,
+  newTag,
+  organization,
+  repository,
+  notes,
+  draft,
+  prerelease,
+  enableUploadToGitHub,
+  latestYml,
+  blockmapFilePath,
+  binaryFilePath
+}) {
+  // upload to the github directly via GitHub API...
+
+  const octokit = new OctoKit({
+    baseUrl: githubApiServer,
+    auth: `token ${githubTokenForUploadArtifacts}`,
+  });
+
+  info(`creating release ${newTag}...`);
+  const result = await octokit.repos.createRelease({
+    owner: organization,
+    repo: repository,
+    tag_name: newTag,
+    name: newTag,
+    body: notes,
+    draft,
+    prerelease,
+  });
+
+  if (enableUploadToGitHub) {
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: latestYml,
+      contentType: 'application/json',
+    });
+
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: blockmapFilePath,
+      contentType: 'application/octet-stream',
+    });
+
+    await uploadToGithub({
+      octokit,
+      url: result.data.upload_url,
+      pathname: binaryFilePath,
+      contentType: 'application/octet-stream',
+    });
+  } else {
+    info('uploading to GitHub: SKIP');
+  }
+
+  return result;
+}
 
 /**
  * This is the main function of the script
@@ -216,37 +374,27 @@ async function runScript({
   if (!(await confirm(`Are you sure you want to release as version ${newVersion}?`, false))) sh.exit(0);
   const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
 
+  const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
   if (!generateNoteTs) {
     info('skipping to generate notes.ts...');
   } else {
-    const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
-    const generatedPatchNote = generateNotesTsContent(newVersion, newVersion, notes);
-
-    fs.writeFileSync(noteFilename, generatedPatchNote);
+    generateNoteTsRoutine({
+      filePath: noteFilename,
+      version: newVersion,
+      notes
+    });
     info(`generated patch-note file: ${noteFilename}.`);
   }
 
   // update package.json with newVersion and git tag
   executeCmd(`yarn version --new-version=${newVersion}`);
 
-  if (skipBuild) {
-    info('SKIP build process since skipBuild is set...');
-  } else {
-    if (skipCleaningNodeModules) {
-      // clean
-      info('Removing old packages...');
-      sh.rm('-rf', 'node_modules');
-    }
-
-    info('Installing yarn packages...');
-    executeCmd('yarn install');
-
-    info('Compiling assets...');
-    executeCmd('yarn compile:production');
-
-    info('Making the package...');
-    executeCmd(`yarn package:${internalRelease ? 'internal-' : ''}${prerelease ? 'unstable' : 'stable'}`);
-  }
+  packagingRoutine({
+    skipBuild,
+    skipCleaningNodeModules,
+    internalRelease,
+    prerelease,
+  });
 
   info('Pushing to the repository...');
   executeCmd(`git push ${remote} ${targetBranch}`);
@@ -254,100 +402,38 @@ async function runScript({
 
   info(`version: ${newVersion}`);
 
-  const distDir = path.resolve('.', 'dist');
-  const latestYml = path.join(distDir, 'latest.yml');
-  const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml));
-
-  // add releaseNotes into latest.yml
-  parsedLatestYml.releaseNotes = notes;
-  fs.writeFileSync(latestYml, yaml.safeDump(parsedLatestYml));
-
-  const binaryFile = parsedLatestYml.path;
-  const binaryFilePath = path.join(distDir, binaryFile);
-  if (!fs.existsSync(binaryFilePath)) {
-    error(`Counld not find ${path.resolve(binaryFilePath)}`);
-    sh.exit(1);
-  }
-  const blockmapFile = `${binaryFile}.blockmap`;
-  const blockmapFilePath = path.join(distDir, blockmapFile);
-  if (!fs.existsSync(blockmapFilePath)) {
-    error(`Counld not find ${path.resolve(blockmapFilePath)}`);
-    sh.exit(1);
-  }
-
-  executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
+  const {
+    latestYml,
+    binaryFilePath,
+    blockmapFilePath,
+  } = tapArtifactsRoutine({ notes });
 
   if (enableUploadToS3) {
-    // upload to releases s3 bucket via aws-sdk...
-    // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
-    // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
-    // electron-updaterがエラーとなってしまう可能性がある
-
-    info('uploading artifacts to s3...');
-    await uploadS3File({
-      name: path.basename(binaryFilePath),
-      bucketName: s3BucketNameForUploadArtifacts,
-      filePath: binaryFilePath,
-      isUnstable: prerelease,
-    });
-    await uploadS3File({
-      name: path.basename(blockmapFilePath),
-      bucketName: s3BucketNameForUploadArtifacts,
-      filePath: blockmapFilePath,
-      isUnstable: prerelease,
-    });
-    await uploadS3File({
-      name: path.basename(latestYml),
-      bucketName: s3BucketNameForUploadArtifacts,
-      filePath: latestYml,
-      isUnstable: prerelease,
+    await uploadToS3Routine({
+      latestYml,
+      binaryFilePath,
+      blockmapFilePath,
+      s3BucketNameForUploadArtifacts,
+      prerelease,
     });
   } else {
     info('uploading artifacts to s3: SKIP');
   }
 
-  // upload to the github directly via GitHub API...
-
-  const octokit = new OctoKit({
-    baseUrl: githubApiServer,
-    auth: `token ${githubTokenForUploadArtifacts}`,
-  });
-
-  info(`creating release ${newTag}...`);
-  const result = await octokit.repos.createRelease({
-    owner: organization,
-    repo: repository,
-    tag_name: newTag,
-    name: newTag,
-    body: notes,
+  const result = await releaseToGitHubRoutine({
+    githubApiServer,
+    githubTokenForUploadArtifacts,
+    newTag,
+    organization,
+    repository,
+    notes,
     draft,
     prerelease,
+    enableUploadToGitHub,
+    latestYml,
+    blockmapFilePath,
+    binaryFilePath
   });
-
-  if (enableUploadToGitHub) {
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: latestYml,
-      contentType: 'application/json',
-    });
-
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: blockmapFilePath,
-      contentType: 'application/octet-stream',
-    });
-
-    await uploadToGithub({
-      octokit,
-      url: result.data.upload_url,
-      pathname: binaryFilePath,
-      contentType: 'application/octet-stream',
-    });
-  } else {
-    info('uploading to GitHub: SKIP');
-  }
 
   if (draft) {
     // open release edit page on github
