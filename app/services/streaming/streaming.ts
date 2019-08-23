@@ -24,6 +24,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { NavigationService } from 'services/navigation';
 import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -66,6 +67,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
@@ -256,15 +258,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showEditStreamInfo() {
+    const height = this.twitterIsEnabled ? 620 : 550;
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
       title: $t('Update Stream Info'),
       queryParams: {},
       size: {
+        height,
         width: 600,
-        height: 620,
       },
     });
+  }
+
+  get twitterIsEnabled() {
+    return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
   }
 
   get delayEnabled() {
