@@ -127,10 +127,21 @@ ${notes
   return patchNote;
 }
 
+function updateNotesTs({
+  title,
+  version,
+  notes,
+  filePath
+}) {
+  const generatedPatchNote = generateNotesTsContent(title, version, notes);
+
+  fs.writeFileSync(filePath, generatedPatchNote);
+}
+
 module.exports = {
   generateNewVersion,
   readPatchNoteFile,
   writePatchNoteFile,
   collectPullRequestMerges,
-  generateNotesTsContent,
+  updateNotesTs,
 };

@@ -22,7 +22,7 @@ const {
   readPatchNoteFile,
   writePatchNoteFile,
   collectPullRequestMerges,
-  generateNotesTsContent,
+  updateNotesTs,
 } = require('./scripts/patchNote');
 const {
   uploadS3File,
@@ -43,16 +43,6 @@ try {
     throw new Error(`先に\`yarn install\`を実行する必要があります: ${e.message}`);
   }
   throw e;
-}
-
-function generateNoteTsRoutine({
-  filePath,
-  version,
-  notes,
-}) {
-  const generatedPatchNote = generateNotesTsContent(version, version, notes);
-
-  fs.writeFileSync(filePath, generatedPatchNote);
 }
 
 function packagingRoutine({
@@ -378,8 +368,9 @@ async function runScript({
   if (!generateNoteTs) {
     info('skipping to generate notes.ts...');
   } else {
-    generateNoteTsRoutine({
+    updateNotesTs({
       filePath: noteFilename,
+      title: newVersion,
       version: newVersion,
       notes
     });
