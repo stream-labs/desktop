@@ -24,6 +24,7 @@
     "release:unstable": "yarn install --cwd bin && node bin/release/unstable.js",
     "release:internal-stable": "yarn install --cwd bin && node bin/release/internal-stable.js",
     "release:internal-unstable": "yarn install --cwd bin && node bin/release/internal-unstable.js",
+    "patch-note": "node bin/release/generatePatchNote.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
     "test:unit": "jest --silent",
