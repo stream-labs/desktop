@@ -70,14 +70,16 @@ function checkEnv(varName) {
   }
 }
 
-async function uploadS3File(name, bucketName, filePath) {
+async function uploadS3File({
+  name, bucketName, filePath, isUnstable
+}) {
   info(`Starting upload of ${name}...`);
 
   const stream = fs.createReadStream(filePath);
   const upload = new AWS.S3.ManagedUpload({
     params: {
       Bucket: bucketName,
-      Key: `download/windows/${name}`,
+      Key: `download/windows${isUnstable ? '-unstable' : ''}/${name}`,
       Body: stream,
     },
     queueSize: 1,
@@ -510,9 +512,24 @@ async function runScript({
     // electron-updaterがエラーとなってしまう可能性がある
 
     info('uploading artifacts to s3...');
-    await uploadS3File(path.basename(binaryFilePath), s3BucketNameForUploadArtifacts, binaryFilePath);
-    await uploadS3File(path.basename(blockmapFilePath), s3BucketNameForUploadArtifacts, blockmapFilePath);
-    await uploadS3File(path.basename(latestYml), s3BucketNameForUploadArtifacts, latestYml);
+    await uploadS3File({
+      name: path.basename(binaryFilePath),
+      bucketName: s3BucketNameForUploadArtifacts,
+      filePath: binaryFilePath,
+      isUnstable: prerelease,
+    });
+    await uploadS3File({
+      name: path.basename(blockmapFilePath),
+      bucketName: s3BucketNameForUploadArtifacts,
+      filePath: blockmapFilePath,
+      isUnstable: prerelease,
+    });
+    await uploadS3File({
+      name: path.basename(latestYml),
+      bucketName: s3BucketNameForUploadArtifacts,
+      filePath: latestYml,
+      isUnstable: prerelease,
+    });
   } else {
     info('uploading artifacts to s3: SKIP');
   }

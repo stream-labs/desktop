@@ -5,7 +5,7 @@ if (!process.env.INTERNAL_PUBLISH_URL) {
 }
 
 config.productName += '(社内版)';
-config.publish.url = process.env.INTERNAL_PUBLISH_URL;
+config.publish.url = `${process.env.INTERNAL_PUBLISH_URL}/windows-unstable`;
 config.extraMetadata.buildProductName = config.productName;
 
 module.exports = config;
