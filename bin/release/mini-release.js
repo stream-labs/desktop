@@ -48,8 +48,8 @@ try {
 function packagingRoutine({
   skipBuild,
   skipCleaningNodeModules,
-  internalRelease,
-  prerelease,
+  releaseEnvironment,
+  releaseChannel,
 }) {
   if (skipBuild) {
     info('SKIP build process since skipBuild is set...');
@@ -67,7 +67,8 @@ function packagingRoutine({
     executeCmd('yarn compile:production');
 
     info('Making the package...');
-    executeCmd(`yarn package:${internalRelease ? 'internal-' : ''}${prerelease ? 'unstable' : 'stable'}`);
+    const envPrefix = releaseEnvironment === 'public' ? '' : `${releaseEnvironment}-`;
+    executeCmd(`yarn package:${envPrefix}${releaseChannel}`);
   }
 }
 
@@ -108,8 +109,8 @@ async function uploadToS3Routine({
   latestYml,
   binaryFilePath,
   blockmapFilePath,
-  s3BucketNameForUploadArtifacts,
-  prerelease,
+  uploadS3BucketName,
+  releaseChannel,
 }) {
   // upload to releases s3 bucket via aws-sdk...
   // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
@@ -119,33 +120,32 @@ async function uploadToS3Routine({
   info('uploading artifacts to s3...');
   await uploadS3File({
     name: path.basename(binaryFilePath),
-    bucketName: s3BucketNameForUploadArtifacts,
+    bucketName: uploadS3BucketName,
     filePath: binaryFilePath,
-    isUnstable: prerelease,
+    isUnstable: releaseChannel !== 'stable',
   });
   await uploadS3File({
     name: path.basename(blockmapFilePath),
-    bucketName: s3BucketNameForUploadArtifacts,
+    bucketName: uploadS3BucketName,
     filePath: blockmapFilePath,
-    isUnstable: prerelease,
+    isUnstable: releaseChannel !== 'stable',
   });
   await uploadS3File({
     name: path.basename(latestYml),
-    bucketName: s3BucketNameForUploadArtifacts,
+    bucketName: uploadS3BucketName,
     filePath: latestYml,
-    isUnstable: prerelease,
+    isUnstable: releaseChannel !== 'stable',
   });
 }
 
 async function releaseToGitHubRoutine({
-  githubApiServer,
-  githubTokenForUploadArtifacts,
+  targetHost,
+  targetOrganization,
+  targetRepository,
+  uploadGitHubToken,
   newTag,
-  organization,
-  repository,
   notes,
-  draft,
-  prerelease,
+  releaseChannel,
   enableUploadToGitHub,
   latestYml,
   blockmapFilePath,
@@ -154,19 +154,19 @@ async function releaseToGitHubRoutine({
   // upload to the github directly via GitHub API...
 
   const octokit = new OctoKit({
-    baseUrl: githubApiServer,
-    auth: `token ${githubTokenForUploadArtifacts}`,
+    baseUrl: targetHost,
+    auth: `token ${uploadGitHubToken}`,
   });
 
   info(`creating release ${newTag}...`);
   const result = await octokit.repos.createRelease({
-    owner: organization,
-    repo: repository,
+    owner: targetOrganization,
+    repo: targetRepository,
     tag_name: newTag,
     name: newTag,
     body: notes,
-    draft,
-    prerelease,
+    draft: true,
+    prerelease: releaseChannel !== 'stable',
   });
 
   if (enableUploadToGitHub) {
@@ -269,6 +269,9 @@ async function runScript({
   checkEnv('SENTRY_AUTH_TOKEN');
   checkEnv('AWS_ACCESS_KEY_ID');
   checkEnv('AWS_SECRET_ACCESS_KEY');
+
+  const releaseEnvironment = internalRelease ? 'internal' : 'public';
+  const releaseChannel = prerelease ? 'unstable' : 'stable';
 
   info(`check whether remote ${remote} exists`);
   executeCmd(`git remote get-url ${remote}`);
@@ -383,8 +386,8 @@ async function runScript({
   packagingRoutine({
     skipBuild,
     skipCleaningNodeModules,
-    internalRelease,
-    prerelease,
+    releaseEnvironment,
+    releaseChannel,
   });
 
   info('Pushing to the repository...');
@@ -404,22 +407,21 @@ async function runScript({
       latestYml,
       binaryFilePath,
       blockmapFilePath,
-      s3BucketNameForUploadArtifacts,
-      prerelease,
+      uploadS3BucketName: s3BucketNameForUploadArtifacts,
+      releaseChannel,
     });
   } else {
     info('uploading artifacts to s3: SKIP');
   }
 
   const result = await releaseToGitHubRoutine({
-    githubApiServer,
-    githubTokenForUploadArtifacts,
+    targetHost: githubApiServer,
+    targetOrganization: organization,
+    targetRepository: repository,
+    uploadGitHubToken: githubTokenForUploadArtifacts,
     newTag,
-    organization,
-    repository,
     notes,
-    draft,
-    prerelease,
+    releaseChannel,
     enableUploadToGitHub,
     latestYml,
     blockmapFilePath,
