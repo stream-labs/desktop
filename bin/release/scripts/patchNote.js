@@ -4,8 +4,10 @@ const fs = require('fs');
 const moment = require('moment');
 const {
   info,
+  error,
   executeCmd,
 } = require('./prompt');
+const { getTagCommitId } = require('./util');
 
 function generateNewVersion(previousTag, internalRelease, now = Date.now()) {
   // previous tag should be following rule:
@@ -138,10 +140,38 @@ function updateNotesTs({
   fs.writeFileSync(filePath, generatedPatchNote);
 }
 
+/**
+ * @param {object} param0
+ * @param {string} param0.patchNoteFileName
+ * @returns {{version: string, notes: string}}
+ */
+function readPatchNote({
+  patchNoteFileName,
+}) {
+  info(`checking ${patchNoteFileName} ...`);
+  const patchNote = readPatchNoteFile(patchNoteFileName);
+
+  if (!patchNote) {
+    error(`${patchNoteFileName} is absent. Generate it before release.`);
+    throw new Error(`${patchNoteFileName} is absent.`);
+  }
+
+  if (getTagCommitId(`v${patchNote.version}`)) {
+    error(`tag 'v${patchNote.version}' has already been released.`);
+    throw new Error(`tag 'v${patchNote.version}' has already been released.`);
+  }
+
+  return {
+    version: patchNote.version,
+    notes: patchNote.lines.join('\n'),
+  };
+}
+
 module.exports = {
   generateNewVersion,
   readPatchNoteFile,
   writePatchNoteFile,
   collectPullRequestMerges,
   updateNotesTs,
+  readPatchNote,
 };
