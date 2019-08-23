@@ -273,8 +273,26 @@ async function runScript({
   const releaseEnvironment = internalRelease ? 'internal' : 'public';
   const releaseChannel = prerelease ? 'unstable' : 'stable';
 
-  info(`check whether remote ${remote} exists`);
-  executeCmd(`git remote get-url ${remote}`);
+  const target = {
+    host: githubApiServer,
+    organization,
+    repository,
+    remote,
+    branch: targetBranch,
+  };
+
+  const sentry = {
+    organization: sentryOrganization,
+    project: sentryProject,
+  };
+
+  const upload = {
+    githubToken: githubTokenForUploadArtifacts,
+    s3BucketName: s3BucketNameForUploadArtifacts,
+  };
+
+  info(`check whether remote ${target.remote} exists`);
+  executeCmd(`git remote get-url ${target.remote}`);
 
   if (skipLocalModificationCheck) {
     info('make sure there is nothing to commit on local directory');
@@ -285,8 +303,8 @@ async function runScript({
 
   info('checking current branch...');
   const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
-  if (currentBranch !== targetBranch) {
-    if (!(await confirm(`current branch '${currentBranch}' is not '${targetBranch}'. continue?`, false))) {
+  if (currentBranch !== target.branch) {
+    if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
       sh.exit(1);
     }
   }
@@ -391,8 +409,8 @@ async function runScript({
   });
 
   info('Pushing to the repository...');
-  executeCmd(`git push ${remote} ${targetBranch}`);
-  executeCmd(`git push ${remote} ${newTag}`);
+  executeCmd(`git push ${target.remote} ${target.branch}`);
+  executeCmd(`git push ${target.remote} ${newTag}`);
 
   info(`version: ${newVersion}`);
 
@@ -407,7 +425,7 @@ async function runScript({
       latestYml,
       binaryFilePath,
       blockmapFilePath,
-      uploadS3BucketName: s3BucketNameForUploadArtifacts,
+      uploadS3BucketName: upload.s3BucketName,
       releaseChannel,
     });
   } else {
@@ -415,10 +433,10 @@ async function runScript({
   }
 
   const result = await releaseToGitHubRoutine({
-    targetHost: githubApiServer,
-    targetOrganization: organization,
-    targetRepository: repository,
-    uploadGitHubToken: githubTokenForUploadArtifacts,
+    targetHost: target.host,
+    targetOrganization: target.organization,
+    targetRepository: target.repository,
+    uploadGitHubToken: upload.githubToken,
     newTag,
     notes,
     releaseChannel,
@@ -443,7 +461,7 @@ async function runScript({
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
-    uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+    uploadToSentry(sentry.organization, sentry.project, newVersion, path.resolve('.', 'bundles'));
   } else {
     info('uploading to sentry: SKIP');
   }
