@@ -48,7 +48,6 @@
 @import "../../styles/index";
 
 .studio-page {
-  height: 100%;
   flex-direction: column;
   .padding-bottom(2);
 }

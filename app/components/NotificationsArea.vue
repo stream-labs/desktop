@@ -3,7 +3,7 @@
   <div
     class="notifications__counter notifications__counter--warning"
     v-if="unreadCount"
-    v-tooltip="showUnreadNotificationsTooltip"
+    v-tooltip.right="showUnreadNotificationsTooltip"
     @click="showNotifications">
     <span class="fa fa-exclamation-triangle"></span>
     {{ unreadCount }}
@@ -13,7 +13,7 @@
     class="notifications__counter"
     v-if="!unreadCount"
     @click="showNotifications"
-    v-tooltip="showNotificationsTooltip">
+    v-tooltip.right="showNotificationsTooltip">
     <span class="icon-information"></span>
   </div>
 

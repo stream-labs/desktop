@@ -1,6 +1,7 @@
 import { ILoadedApp, EAppPageSlot } from '.';
 import electron from 'electron';
 import trim from 'lodash/trim';
+import trimStart from 'lodash/trimStart';
 import compact from 'lodash/compact';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
@@ -244,11 +245,13 @@ export class PlatformContainerManager {
   getAssetUrl(app: ILoadedApp, asset: string) {
     let url: string;
 
+    const trimmedAsset = trimStart(asset, '/');
+
     if (app.unpacked) {
       const trimmed = trim(app.manifest.buildPath, '/ ');
-      url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
+      url = compact([`http://localhost:${app.devPort}`, trimmed, trimmedAsset]).join('/');
     } else {
-      url = compact([app.appUrl, asset]).join('/');
+      url = compact([app.appUrl, trimmedAsset]).join('/');
     }
 
     return url;

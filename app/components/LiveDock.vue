@@ -42,7 +42,7 @@
           <a
             @click="showEditStreamInfo"
             v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
-            v-tooltip="editStreamInfoTooltip">
+            v-tooltip.right="editStreamInfoTooltip">
             <i class="icon-edit" />
           </a>
           <a
