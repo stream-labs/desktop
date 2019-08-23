@@ -1,17 +1,19 @@
 import { getResource } from '../core';
 import { UserService } from '../user';
 import { IPlatformRequest } from './index';
+import { async } from 'rxjs/internal/scheduler/async';
 
 /**
  * same as handleResponse but passes a Response object instead a response body
  * in the case of Promise rejection
  * @see handleResponse
  */
-export function handlePlatformResponse(response: Response): Promise<any> {
+export async function handlePlatformResponse(response: Response): Promise<any> {
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
-  const result = isJson ? response.json() : response.text();
-  return response.ok ? result : Promise.reject(response);
+  const result = await (isJson ? response.json() : response.text());
+  const serializedResponse = { ok: response.ok, url: response.url, status: response.status };
+  return response.ok ? result : Promise.reject({ result, ...serializedResponse });
 }
 
 /**
