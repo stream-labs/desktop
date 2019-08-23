@@ -4,6 +4,7 @@ import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
+import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 
 export interface IRecentEvent {
   id: number;
@@ -48,10 +49,35 @@ const subscriptionMap = (subPlan: string) => {
   }[subPlan];
 };
 
+const SUPPORTED_EVENTS = [
+  'merch',
+  'donation',
+  'facemaskdonation',
+  'follow',
+  'subscription',
+  'bits',
+  'host',
+  'raid',
+  'sticker',
+  'effect',
+  'like',
+  'stars',
+  'support',
+  'share',
+  'superchat',
+  'pledge',
+  'eldonation',
+  'tiltifydonation',
+  'donordrivedonation',
+  'justgivingdonation',
+  'treat',
+];
+
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
+  @Inject() websocketService: WebsocketService;
 
   static initialState: IRecentEventsState = { recentEvents: null, muted: false };
 
@@ -67,6 +93,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   syncEventsState() {
     this.formEventsArray();
+    this.websocketService.socketEvent.subscribe(this.onSocketEvent.bind(this));
     return this.fetchMutedState();
   }
 
@@ -160,6 +187,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
   }
 
+  onSocketEvent(e: TSocketEvent) {
+    if (SUPPORTED_EVENTS.includes(e.type)) {
+      this.onEventSocket(e as IEventSocketEvent);
+    }
+  }
+
+  onEventSocket(e: IEventSocketEvent) {
+    e.message.forEach((msg: IRecentEvent) => (msg.type = e.type));
+    this.ADD_RECENT_EVENT(e.message);
+  }
+
   getEventString(event: IRecentEvent) {
     return {
       donation:
@@ -224,6 +262,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       },
       'RecentEvents',
     );
+  }
+
+  @mutation()
+  ADD_RECENT_EVENT(events: IRecentEvent[]) {
+    this.state.recentEvents = events.concat(this.state.recentEvents);
   }
 
   @mutation()
