@@ -22,7 +22,7 @@
     </div>
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
-      <resize-observer @notify="handleResize"></resize-observer>
+      <resize-observer @notify="handleResize" />
       <component
         class="main-page-container"
         v-if="!showLoadingSpinner"

@@ -5,6 +5,11 @@
   height: 150px;
   overflow: none;
   flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.container:global(.perf-mode) {
+  height: 500px;
 }
 
 .top-bar {
@@ -23,7 +28,7 @@
 }
 
 .eventContainer {
-  max-height: 111px;
+  max-height: calc(100% - 30px);
   overflow-y: auto;
 }
 
