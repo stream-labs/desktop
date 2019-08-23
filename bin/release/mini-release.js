@@ -70,13 +70,13 @@ function checkEnv(varName) {
   }
 }
 
-async function uploadS3File(name, filePath) {
+async function uploadS3File(name, bucketName, filePath) {
   info(`Starting upload of ${name}...`);
 
   const stream = fs.createReadStream(filePath);
   const upload = new AWS.S3.ManagedUpload({
     params: {
-      Bucket: process.env.RELEASE_S3_BUCKET_NAME,
+      Bucket: bucketName,
       Key: `download/windows/${name}`,
       Body: stream,
     },
@@ -101,7 +101,7 @@ async function uploadS3File(name, filePath) {
   }
 }
 
-function generateNewVersion(previousTag, now = Date.now()) {
+function generateNewVersion(previousTag, internalRelease, now = Date.now()) {
   // previous tag should be following rule:
   //  v{major}.{minor}.{yyyymmdd}-{ord}
 
@@ -114,7 +114,7 @@ function generateNewVersion(previousTag, now = Date.now()) {
 
   const today = moment(now).format('YYYYMMDD');
   const newOrd = date === today ? ord + 1 : 1;
-  return `${major}.${minor}.${today}-${newOrd}`;
+  return `${major}.${minor}.${today}-${newOrd}${internalRelease ? 'd' : ''}`;
 }
 
 function generateNotesTsContent(version, title, notes) {
@@ -274,16 +274,16 @@ function uploadToSentry(org, project, release, artifactPath) {
  * This is the main function of the script
  */
 async function runScript({
-  githubApiServer = 'https://api.github.com',
+  githubApiServer,
 
-  organization = 'n-air-app',
-  repository = 'n-air-app',
-  remote = 'origin',
+  organization,
+  repository,
+  remote,
 
-  targetBranch = 'n-air_development',
+  targetBranch,
 
-  sentryOrganization = 'n-air-app',
-  sentryProject = 'n-air-app',
+  sentryOrganization,
+  sentryProject,
 
   draft = true,
   prerelease = false,
@@ -296,19 +296,50 @@ async function runScript({
   enableUploadToS3 = true,
   enableUploadToGitHub = true,
   enableUploadToSentry = true,
+
+  internalRelease, // FIXME: 表に出るときにtrueになるような名前にする
+
+  githubTokenForReadPullRequest,
+  githubTokenForUploadArtifacts,
+  s3BucketNameForUploadArtifacts,
 }) {
   info(colors.magenta('|----------------------------------|'));
   info(colors.magenta('| N Air Interactive Release Script |'));
   info(colors.magenta('|----------------------------------|'));
+
+  if (
+    !githubApiServer
+    || !organization
+    || !repository
+    || !remote
+    || !targetBranch
+    || !sentryOrganization
+    || !sentryProject
+    || !githubTokenForReadPullRequest
+    || !githubTokenForUploadArtifacts
+    || !s3BucketNameForUploadArtifacts
+    || internalRelease == null
+  ) {
+    if (!githubApiServer) error('githubApiServer is not given');
+    if (!organization) error('organization is not given');
+    if (!repository) error('repository is not given');
+    if (!remote) error('remote is not given');
+    if (!targetBranch) error('targetBranch is not given');
+    if (!sentryOrganization) error('sentryOrganization is not given');
+    if (!sentryProject) error('sentryProject is not given');
+    if (!githubTokenForReadPullRequest) error('githubTokenForReadPullRequest is not given');
+    if (!githubTokenForUploadArtifacts) error('githubTokenForUploadArtifacts is not given');
+    if (!s3BucketNameForUploadArtifacts) error('s3BucketNameForUploadArtifacts is not given');
+
+    sh.exit(1);
+  }
 
   // Start by figuring out if this environment is configured properly
   // for releasing.
   checkEnv('CSC_LINK');
   checkEnv('CSC_KEY_PASSWORD');
   checkEnv('NAIR_LICENSE_API_KEY');
-  checkEnv('NAIR_GITHUB_TOKEN');
   checkEnv('SENTRY_AUTH_TOKEN');
-  checkEnv('RELEASE_S3_BUCKET_NAME');
   checkEnv('AWS_ACCESS_KEY_ID');
   checkEnv('AWS_SECRET_ACCESS_KEY');
 
@@ -338,7 +369,7 @@ async function runScript({
 
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
 
-  let defaultVersion = generateNewVersion(previousTag);
+  let defaultVersion = generateNewVersion(previousTag, internalRelease);
   let notes = '';
 
   info('checking patch-note.txt...');
@@ -373,7 +404,7 @@ async function runScript({
     // get pull request description from github.com
     const github = OctoKit({
       baseUrl: 'https://api.github.com',
-      auth: `token ${process.env.NAIR_GITHUB_TOKEN}`,
+      auth: `token ${githubTokenForReadPullRequest}`,
     });
     const prMerges = await collectPullRequestMerges(
       {
@@ -479,9 +510,9 @@ async function runScript({
     // electron-updaterがエラーとなってしまう可能性がある
 
     info('uploading artifacts to s3...');
-    await uploadS3File(path.basename(binaryFilePath), binaryFilePath);
-    await uploadS3File(path.basename(blockmapFilePath), blockmapFilePath);
-    await uploadS3File(path.basename(latestYml), latestYml);
+    await uploadS3File(path.basename(binaryFilePath), s3BucketNameForUploadArtifacts, binaryFilePath);
+    await uploadS3File(path.basename(blockmapFilePath), s3BucketNameForUploadArtifacts, blockmapFilePath);
+    await uploadS3File(path.basename(latestYml), s3BucketNameForUploadArtifacts, latestYml);
   } else {
     info('uploading artifacts to s3: SKIP');
   }
@@ -490,7 +521,7 @@ async function runScript({
 
   const octokit = OctoKit({
     baseUrl: githubApiServer,
-    auth: `token ${process.env.NAIR_GITHUB_TOKEN}`,
+    auth: `token ${githubTokenForUploadArtifacts}`,
   });
 
   info(`creating release ${newTag}...`);
@@ -552,6 +583,4 @@ async function runScript({
   // done.
 }
 
-runScript().then(() => {
-  sh.exit(0);
-});
+module.exports = runScript;
