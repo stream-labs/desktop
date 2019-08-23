@@ -471,7 +471,7 @@ async function runScript({
     executeCmd('yarn compile:production');
 
     info('Making the package...');
-    executeCmd('yarn package');
+    executeCmd(`yarn package:${internalRelease ? 'internal-' : ''}${prerelease ? 'unstable' : 'stable'}`);
   }
 
   info('Pushing to the repository...');
