@@ -1,7 +1,6 @@
 import { getResource } from '../core';
 import { UserService } from '../user';
 import { IPlatformRequest } from './index';
-import { async } from 'rxjs/internal/scheduler/async';
 
 /**
  * same as handleResponse but passes a Response object instead a response body
