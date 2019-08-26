@@ -62,9 +62,11 @@ export default class Studio extends Vue {
   handleWindowResize() {
     this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
 
-    const clampedHeight = Math.min(this.height, this.maxHeight);
+    const clampedHeight = Math.min(this.eventsHeight + this.controlsHeight, this.maxHeight);
 
-    if (clampedHeight !== this.height) this.height = clampedHeight;
+    if (clampedHeight !== this.eventsHeight + this.controlsHeight) {
+      this.eventsHeight = clampedHeight - this.controlsHeight;
+    }
   }
 
   get displayEnabled() {
@@ -87,12 +89,24 @@ export default class Studio extends Vue {
     this.customizationService.setSettings({ performanceMode: false });
   }
 
-  get height() {
-    return this.customizationService.state.bottomdockSize;
+  get eventsHeight() {
+    return this.customizationService.state.eventsSize;
   }
 
-  set height(value) {
-    this.customizationService.setSettings({ bottomdockSize: value });
+  set eventsHeight(value) {
+    this.customizationService.setSettings({ eventsSize: value });
+  }
+
+  get controlsHeight() {
+    return this.customizationService.state.controlsSize;
+  }
+
+  set controlsHeight(value) {
+    const eventsSize =
+      value > this.controlsHeight
+        ? this.eventsHeight - (value - this.controlsHeight)
+        : this.eventsHeight + (this.controlsHeight - value);
+    this.customizationService.setSettings({ eventsSize, controlsSize: value });
   }
 
   get minHeight() {

@@ -20,7 +20,6 @@ export default class RecentEvents extends TsxComponent<{}> {
   queuePaused = false;
 
   get recentEvents() {
-    console.log(this.recentEventsService.state.recentEvents);
     return this.recentEventsService.state.recentEvents;
   }
 
@@ -121,14 +120,14 @@ class Toolbar extends TsxComponent<IToolbarProps> {
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
         <i
-          class="icon-music action-icon"
-          onClick={this.popoutMediaShare}
-          v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
-        />
-        <i
           class="icon-pop-out-2 action-icon"
           onClick={this.popoutRecentEvents}
           v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
+        />
+        <i
+          class="icon-music action-icon"
+          onClick={this.popoutMediaShare}
+          v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
         />
         <i
           class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}

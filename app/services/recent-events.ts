@@ -74,10 +74,10 @@ const SUPPORTED_EVENTS = [
 ];
 
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
-  @Inject() hostsService: HostsService;
-  @Inject() userService: UserService;
-  @Inject() windowsService: WindowsService;
-  @Inject() websocketService: WebsocketService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private websocketService: WebsocketService;
 
   static initialState: IRecentEventsState = { recentEvents: null, muted: false };
 
@@ -97,7 +97,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return this.fetchMutedState();
   }
 
-  fetchRecentEvents() {
+  fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent> }> {
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
       this.userService.widgetToken
     }`;
@@ -118,7 +118,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .then(resp => this.SET_MUTED(resp.eventsPanelMuted));
   }
 
-  async formEventsArray() {
+  private async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
@@ -257,17 +257,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  ADD_RECENT_EVENT(events: IRecentEvent[]) {
+  private ADD_RECENT_EVENT(events: IRecentEvent[]) {
     this.state.recentEvents = events.concat(this.state.recentEvents);
   }
 
   @mutation()
-  SET_RECENT_EVENTS(eventArray: IRecentEvent[]) {
+  private SET_RECENT_EVENTS(eventArray: IRecentEvent[]) {
     this.state.recentEvents = eventArray;
   }
 
   @mutation()
-  SET_MUTED(muted: boolean) {
+  private SET_MUTED(muted: boolean) {
     this.state.muted = muted;
   }
 }

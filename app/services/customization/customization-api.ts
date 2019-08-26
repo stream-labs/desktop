@@ -13,7 +13,8 @@ export interface ICustomizationServiceState {
   folderSelection: boolean;
   livedockCollapsed: boolean;
   livedockSize: number;
-  bottomdockSize: number;
+  eventsSize: number;
+  controlsSize: number;
   performanceMode: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;

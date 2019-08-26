@@ -15,7 +15,7 @@
     v-else
     class="no-preview"
     :class="{ 'perf-mode': performanceMode }"
-    :style="{ height: performanceMode ? '100px' : `calc(100% - ${height + 18}px` }"
+    :style="{ height: performanceMode ? '100px' : `calc(100% - ${eventsHeight + controlsHeight + 18}px` }"
   >
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
@@ -28,16 +28,25 @@
   <resize-bar
     v-if="!performanceMode"
     position="top"
-    v-model="height"
+    v-model="eventsHeight"
     @onresizestop="onResizeStopHandler()"
     @onresizestart="onResizeStartHandler()"
     :max="maxHeight"
     :min="minHeight"
     :reverse="true"
   />
-  <div :style="{ height: `${height}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
-    <recent-events :class="{ 'perf-mode': performanceMode }" />
-    <studio-controls />
+  <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
+    <recent-events :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" />
+    <resize-bar
+      position="top"
+      v-model="controlsHeight"
+      @onresizestop="onResizeStopHandler()"
+      @onresizestart="onResizeStartHandler()"
+      :max="maxHeight"
+      :min="minHeight"
+      :reverse="true"
+    />
+    <studio-controls :style="{ height: `${controlsHeight}px` }" />
   </div>
 </div>
 </template>
