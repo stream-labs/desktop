@@ -8,6 +8,7 @@ import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { SourcesService } from 'services/sources';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -16,6 +17,7 @@ export default class StartStreamingButton extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() sourcesService: SourcesService;
 
   @Prop() disabled: boolean;
 
@@ -32,6 +34,30 @@ export default class StartStreamingButton extends Vue {
               $t('Your media files are currently being synced with the cloud. ') +
               $t('It is recommended that you wait until this finishes before going live.'),
             buttons: [$t('Wait'), $t('Go Live Anyway')],
+          })
+          .then(({ response }) => !!response);
+
+        if (!goLive) return;
+      }
+
+      const visibleSources = this.sourcesService
+        .getSources()
+        .filter(source => source.type !== 'scene' && source.video);
+
+      if (!visibleSources.length) {
+        const goLive = await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: $t('No Sources'),
+            type: 'warning',
+            message:
+              $t(
+                "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
+              ) +
+              $t('Are you sure you want to do this?') +
+              $t(
+                'You can add sources by clicking the + icon under the Sources box in the main window at any time',
+              ),
+            buttons: [$t('Cancel'), $t('Go Live Anyway')],
           })
           .then(({ response }) => !!response);
 
