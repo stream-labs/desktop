@@ -287,6 +287,27 @@ async function releaseRoutine() {
   checkEnv('AWS_ACCESS_KEY_ID');
   checkEnv('AWS_SECRET_ACCESS_KEY');
 
+  const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
+  const patchNoteFileName = `${baseDir}patch-note.txt`;
+
+  info(`checking ${patchNoteFileName} ...`);
+  const patchNote = readPatchNote({ patchNoteFileName });
+  if (!patchNote) {
+    error(`patchNote is not found in ${patchNoteFileName}.`);
+    info('Use `yarn patch-note` to generate patchNote.');
+    throw new Error(`patchNote is not found in ${patchNoteFileName}.`);
+  }
+
+  const versionTag = `v${patchNote.version}`;
+  info(`patch-note.txt for ${versionTag} found`);
+
+  if (getTagCommitId(versionTag)) {
+    error(`Tag "${versionTag}" has already been released.`);
+    info('Generate new patchNote with new version.');
+    info('If you want to retry current release, remove the tag and related release commit.');
+    throw new Error(`Tag "${versionTag}" has already been released.`);
+  }
+
   const { releaseEnvironment } = await inq.prompt({
     type: 'list',
     name: 'releaseEnvironment',
@@ -303,26 +324,11 @@ async function releaseRoutine() {
     choices: ['unstable', 'stable'],
   });
 
-  const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
-  const patchNoteFileName = `${baseDir}patch-note.txt`;
-
-  const patchNote = readPatchNote({ patchNoteFileName });
-
-  if (!patchNote) {
-    error(`patchNote is not found in ${patchNoteFileName}.`);
-    info('Use `yarn patch-note` to generate patchNote.');
-    throw new Error(`patchNote is not found in ${patchNoteFileName}.`);
-  }
-
-  if (getTagCommitId(`v${patchNote.version}`)) {
-    error(`Tag "v${patchNote.version}" has already been released.`);
-    info('Generate new patchNote with new version.');
-    info('If you want to retry current release, remove the tag and related release commit.');
-    throw new Error(`Tag "v${patchNote.version}" has already been released.`);
-  }
-
+  log('version', colors.cyan(versionTag));
+  log('environment', colors.cyan(releaseEnvironment));
+  log('channel', colors.cyan(releaseChannel));
   validateVersionContext({
-    versionTag: `v${patchNote.version}`,
+    versionTag,
     releaseEnvironment,
     releaseChannel,
   });
@@ -341,5 +347,8 @@ async function releaseRoutine() {
 }
 
 if (!module.parent) {
-  releaseRoutine();
+  releaseRoutine().catch(e => {
+    error(e);
+    sh.exit(1);
+  });
 }
