@@ -39,6 +39,8 @@ export type TPlatformCapabilityMap = {
   'stream-schedule': IPlatformCapabilityScheduleStream;
   /** Ability to check whether we're authorized to perform actions under a given scope **/
   'scope-validation': IPlatformCapabilityScopeValidation;
+  /** This service supports Streamlabs account merging within SLOBS **/
+  'account-merging': IPlatformCapabilityAccountMerging;
 };
 
 export type TPlatformCapability = keyof TPlatformCapabilityMap;
@@ -67,6 +69,10 @@ interface IPlatformCapabilityScheduleStream {
 
 interface IPlatformCapabilityScopeValidation {
   hasScope: (scope: TOAuthScope) => Promise<boolean>;
+}
+
+interface IPlatformCapabilityAccountMerging {
+  mergeUrl: string;
 }
 
 /**

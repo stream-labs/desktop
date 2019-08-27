@@ -349,9 +349,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     onWindowShow: () => void,
     onAuthStart: () => void,
     onAuthFinish: (result: EPlatformCallResult) => void,
+    merge = false,
   ) {
     const service = getPlatformService(platform);
     const partition = `persist:${uuid()}`;
+    const authUrl =
+      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+
+    if (merge && !this.isLoggedIn()) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
@@ -366,7 +373,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
+      console.log('AUTH NAV', url);
       const parsed = this.parseAuthFromUrl(url);
+      console.log('PARSED', parsed);
 
       if (parsed) {
         parsed.partition = partition;
@@ -383,7 +392,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.removeMenu();
-    authWindow.loadURL(service.authUrl);
+    authWindow.loadURL(authUrl);
   }
 
   updatePlatformToken(token: string) {
