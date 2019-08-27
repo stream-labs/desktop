@@ -79,7 +79,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
 
-  static initialState: IRecentEventsState = { recentEvents: null, muted: false };
+  static initialState: IRecentEventsState = { recentEvents: [], muted: false };
 
   lifecycle: LoginLifecycle;
 

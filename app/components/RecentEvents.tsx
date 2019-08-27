@@ -79,7 +79,7 @@ export default class RecentEvents extends TsxComponent<{}> {
           muted={this.muted}
         />
         <div class={styles.eventContainer}>
-          {this.recentEvents &&
+          {!!this.recentEvents.length &&
             this.recentEvents.map(event => (
               <EventCell
                 event={event}
@@ -87,6 +87,9 @@ export default class RecentEvents extends TsxComponent<{}> {
                 eventString={this.eventString.bind(this)}
               />
             ))}
+          {this.recentEvents.length === 0 && (
+            <div class={styles.empty}>{$t('There are no events to display')}</div>
+          )}
         </div>
       </div>
     );

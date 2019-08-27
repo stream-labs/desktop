@@ -27,8 +27,12 @@
 }
 
 .eventContainer {
-  max-height: calc(100% - 46px);
+  .radius();
+
+  height: calc(100% - 46px);
   overflow-y: auto;
+  position: relative;
+  background: var(--section);
 }
 
 .cell {
@@ -48,8 +52,8 @@
   }
 }
 
-.cell:nth-child(odd) {
-  background: var(--section);
+.cell:nth-child(even) {
+  background: var(--background);
 }
 
 .donation {
@@ -86,4 +90,10 @@
 
 :global(.action-icon).red {
   color: var(--warning);
+}
+
+.empty {
+  .center();
+
+  opacity: 0.5;
 }
