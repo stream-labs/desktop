@@ -373,11 +373,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
-      console.log('AUTH NAV', url);
       const parsed = this.parseAuthFromUrl(url);
-      console.log('PARSED', parsed);
 
       if (parsed) {
+        // This is a hack to work around the fact that the merge endpoint
+        // returns the wrong token.
+        if (merge) parsed.apiToken = this.apiToken;
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
