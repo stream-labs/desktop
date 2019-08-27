@@ -4,6 +4,9 @@ import path from 'path';
 import { I18nService } from 'services/i18n';
 import { Spinner } from 'streamlabs-beaker';
 import { Component, Prop } from 'vue-property-decorator';
+import { Subscription } from 'rxjs';
+import { AppService } from 'services/app';
+import { Inject } from 'services';
 
 @Component({ components: { Spinner } })
 export default class BrowserView extends TsxComponent<{
@@ -24,6 +27,8 @@ export default class BrowserView extends TsxComponent<{
   @Prop({ default: false }) setLocale: boolean;
   @Prop({ default: false }) enableGuestApi: boolean;
 
+  @Inject() appService: AppService;
+
   $refs: {
     sizeContainer: HTMLDivElement;
   };
@@ -34,6 +39,8 @@ export default class BrowserView extends TsxComponent<{
   currentSize: IVec2;
 
   loading = true;
+
+  shutdownSubscription: Subscription;
 
   mounted() {
     this.options.webPreferences = this.options.webPreferences || {};
@@ -63,12 +70,18 @@ export default class BrowserView extends TsxComponent<{
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
     }, 100);
+
+    this.shutdownSubscription = this.appService.shutdownStarted.subscribe(() => {
+      // Prevent zombie processes by destroying the browser view
+      if (this.browserView && !this.browserView.isDestroyed()) this.browserView.destroy();
+    });
   }
 
   destroyed() {
     electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
     this.browserView.destroy();
     clearInterval(this.resizeInterval);
+    this.shutdownSubscription.unsubscribe();
   }
 
   checkResize() {
