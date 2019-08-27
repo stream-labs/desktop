@@ -64,6 +64,10 @@ export default class SideNav extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
+  openDashboard() {
+    electron.remote.shell.openExternal(this.userService.dashboardUrl(''));
+  }
+
   render(h: Function) {
     return (
       <div class={styles.bottomTools}>
@@ -72,6 +76,9 @@ export default class SideNav extends Vue {
             <i class="icon-developer" />
           </div>
         )}
+        <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
+          <i class="icon-dashboard" />
+        </div>
         <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}
