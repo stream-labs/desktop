@@ -10,6 +10,7 @@ import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { $t } from 'services/i18n';
 import styles from './SideNav.m.less';
+import { MagicLinkService } from 'services/magic-link';
 
 @Component({})
 export default class SideNav extends Vue {
@@ -17,6 +18,7 @@ export default class SideNav extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() settingsService: SettingsService;
   @Inject() navigationService: NavigationService;
+  @Inject() magicLinkService: MagicLinkService;
 
   get isDevMode() {
     return Utils.isDevMode();
@@ -64,8 +66,23 @@ export default class SideNav extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
-  openDashboard() {
-    electron.remote.shell.openExternal(this.userService.dashboardUrl(''));
+  dashboardOpening = false;
+
+  async openDashboard() {
+    if (this.dashboardOpening) return;
+    this.dashboardOpening = true;
+
+    let link: string;
+
+    try {
+      link = await this.magicLinkService.getDashboardMagicLink();
+    } catch (e) {
+      console.error('Error generating dashboard magic link', e);
+      this.dashboardOpening = false;
+    }
+
+    electron.remote.shell.openExternal(link);
+    this.dashboardOpening = false;
   }
 
   render(h: Function) {
