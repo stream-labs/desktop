@@ -33,11 +33,11 @@ export class MagicLinkService extends Service {
   }
 
   private isTokenExpired() {
-    // This service always hands out tokens with at least 1 hour
+    // This service always hands out tokens with at least 5 minutes
     // of validity.
-    const oneHourFromNow = Math.floor(Date.now() / 1000) + 60 * 60;
+    const fiveMinutesFromNow = Math.floor(Date.now() / 1000) + 5 * 60;
 
-    return this.currentExpiration < oneHourFromNow;
+    return this.currentExpiration < fiveMinutesFromNow;
   }
 
   private currentToken: string;
