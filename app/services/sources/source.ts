@@ -133,10 +133,15 @@ export class Source implements ISourceApi {
 
   duplicate(newSourceId?: string): Source {
     if (this.doNotDuplicate) return null;
+
+    // the server's source_id for should be re-generated for correct working of the media backup
+    const propertiesManagerSettings = this.getPropertiesManagerSettings();
+    if (propertiesManagerSettings.mediaBackup) delete propertiesManagerSettings.mediaBackup;
+
     return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
+      propertiesManagerSettings,
       sourceId: newSourceId,
       propertiesManager: this.getPropertiesManagerType(),
-      propertiesManagerSettings: this.getPropertiesManagerSettings(),
     });
   }
 

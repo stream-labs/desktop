@@ -6,6 +6,7 @@ import {
 import { ServiceHelper, Inject } from 'services';
 import { ISerializable } from '../../rpc-api';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { Fallback } from '../../external-api';
 
 export interface ISourceModel {
   sourceId: string;
@@ -38,7 +39,7 @@ export class Source implements ISourceModel, ISerializable {
   readonly channel?: number;
   readonly resourceId: string;
 
-  private source: InternalSource;
+  @Fallback() private source: InternalSource;
 
   constructor(public readonly sourceId: string) {
     this.source = this.sourcesService.getSource(sourceId);
