@@ -4,9 +4,11 @@ import path from 'path';
 import { I18nService } from 'services/i18n';
 import { Spinner } from 'streamlabs-beaker';
 import { Component, Prop } from 'vue-property-decorator';
+import { Inject } from 'services';
+import { WindowsService } from 'services/windows';
+import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
-import { Inject } from 'services';
 
 @Component({ components: { Spinner } })
 export default class BrowserView extends TsxComponent<{
@@ -27,6 +29,7 @@ export default class BrowserView extends TsxComponent<{
   @Prop({ default: false }) setLocale: boolean;
   @Prop({ default: false }) enableGuestApi: boolean;
 
+  @Inject() windowsService: WindowsService;
   @Inject() appService: AppService;
 
   $refs: {
@@ -84,13 +87,18 @@ export default class BrowserView extends TsxComponent<{
     this.shutdownSubscription.unsubscribe();
   }
 
+  get hideStyleBlockers() {
+    return this.windowsService.state[Utils.getWindowId()].hideStyleBlockers;
+  }
+
   checkResize() {
     if (this.loading) return;
     if (!this.$refs.sizeContainer) return;
 
-    const rect: { left: number; top: number; width: number; height: number } = this.hidden
-      ? { left: 0, top: 0, width: 0, height: 0 }
-      : this.$refs.sizeContainer.getBoundingClientRect();
+    const rect: { left: number; top: number; width: number; height: number } =
+      this.hidden || this.hideStyleBlockers
+        ? { left: 0, top: 0, width: 0, height: 0 }
+        : this.$refs.sizeContainer.getBoundingClientRect();
 
     if (this.currentPosition == null || this.currentSize == null || this.rectChanged(rect)) {
       this.currentPosition = { x: rect.left, y: rect.top };

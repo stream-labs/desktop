@@ -5,7 +5,6 @@
     <div class="flex__item mission-control-container">
       <browser-view
         class="mission-control"
-        :hidden="windowsService.state.main.hideStyleBlockers"
         :src="recenteventsUrl"
         :setLocale="true"
         @ready="onBrowserViewReady" />
