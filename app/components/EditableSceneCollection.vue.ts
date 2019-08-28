@@ -4,6 +4,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { $t } from 'services/i18n';
+import electron from 'electron';
 
 @Component({})
 export default class EditableSceneCollection extends Vue {
@@ -85,15 +86,21 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    if (
-      !confirm(
-        $t('Are you sure you want to remove %{collectionName}?', {
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: $t('Are you sure you want to remove %{collectionName}?', {
           collectionName: this.collection.name,
         }),
-      )
-    ) {
-      return;
-    }
-    this.sceneCollectionsService.delete(this.collectionId);
+        buttons: [$t('Cancel'), $t('OK')],
+        noLink: true,
+      },
+      index => {
+        if (index === 1) {
+          this.sceneCollectionsService.delete(this.collectionId);
+        }
+      },
+    );
   }
 }
