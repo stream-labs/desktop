@@ -413,7 +413,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (!merge) requiredFields.push('token', 'oauth_token');
 
-    if (requiredFields.every(field => query[field])) {
+    if (requiredFields.every(field => !!query[field])) {
       return {
         widgetToken: merge ? this.widgetToken : query.token,
         apiToken: merge ? this.apiToken : query.oauth_token,
