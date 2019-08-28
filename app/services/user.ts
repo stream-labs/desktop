@@ -373,9 +373,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
-      console.log('NAV', url);
       const parsed = this.parseAuthFromUrl(url, merge);
-      console.log('PARSED', parsed);
 
       if (parsed) {
         // This is a hack to work around the fact that the merge endpoint
@@ -414,8 +412,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
 
     if (!merge) requiredFields.push('token', 'oauth_token');
-
-    debugger;
 
     if (requiredFields.every(field => query[field])) {
       return {
