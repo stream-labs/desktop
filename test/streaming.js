@@ -131,7 +131,7 @@ test('Streaming to Mixer', async t => {
   t.pass();
 });
 
-test('Streaming to Youtube', async t => {
+test.skip('Streaming to Youtube', async t => {
 
   // login into the account
   if (!(await logIn(t, 'youtube'))) return;
@@ -160,7 +160,8 @@ test('Streaming to Youtube', async t => {
 
 
 // test scheduling for each platform
-const schedulingPlatforms = ['facebook', 'youtube'];
+// TODO: add 'youtube'
+const schedulingPlatforms = ['facebook'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
     // login into the account
