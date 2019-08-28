@@ -28,6 +28,7 @@ import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Spinner } from 'streamlabs-beaker';
 import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
+import Utils from 'services/utils';
 
 @Component({
   components: {
@@ -356,7 +357,10 @@ export default class EditStreamInfo extends Vue {
   }
 
   get twitterIsEnabled() {
-    return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
+    return (
+      Utils.isPreview() ||
+      this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter)
+    );
   }
 
   get submitText() {
