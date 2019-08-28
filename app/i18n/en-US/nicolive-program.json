@@ -119,6 +119,10 @@
         "404": {
           "title": "There is no program",
           "message": "You can not post a comment because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create A Program\" button."
+        },
+        "500": {
+          "title": "Failed to post a comment",
+          "message": "Failed to post a comment.\n%{additionalMessage}"
         }
       }
     },
