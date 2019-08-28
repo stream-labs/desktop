@@ -19,24 +19,49 @@ function parseVersionTag(tag) {
   throw new Error(`cannot parse a given tag: ${tag}`)
 }
 
+/** @typedef {{ channel: 'stable' | 'unstable', environment: 'public' | 'internal' }} VersionContext */
+
+/**
+ * @param {string} tag
+ * @returns {VersionContext}
+ */
+function getVersionContext(tag) {
+  const result = parseVersionTag(tag);
+  if (result.channel === 'stable') {
+    throw new Error('stable channel must have no prefix');
+  }
+
+  const channel = result.channel || 'stable';
+  const environment = result.internalMark ? 'internal' : 'public';
+
+  if (channel !== 'stable' && channel !== 'unstable') {
+    throw new Error(`invalid channel: ${channel}`);
+  }
+
+  return {
+    channel,
+    environment,
+  };
+}
+
+/**
+ * @param {VersionContext} a
+ * @param {VersionContext} b
+ */
+function isSameVersionContext(a, b) {
+  return a.channel === b.channel && a.environment === b.environment;
+}
+
 function validateVersionContext({
   versionTag,
   releaseEnvironment,
   releaseChannel,
 }) {
-  const result = VERSION_REGEXP.exec(versionTag);
-  const { internalMark, channel } = result.groups;
-
-  const versionEnvironment = internalMark ? 'internal' : 'public';
-  const versionChannel = channel || 'stable';
-
-  if (channel === 'stable') {
-    throw new Error('stable channel has no prefix');
-  }
+  const { channel, environment } = getVersionContext(versionTag);
 
   if (
-    releaseChannel !== versionChannel
-    || releaseEnvironment !== versionEnvironment
+    releaseChannel !== channel
+    || releaseEnvironment !== environment
   ) {
     throw new Error('invalid version context');
   }
@@ -200,7 +225,9 @@ function readPatchNote({
 
 module.exports = {
   parseVersionTag,
+  getVersionContext,
   generateNewVersion,
+  isSameVersionContext,
   validateVersionContext,
   readPatchNoteFile,
   writePatchNoteFile,

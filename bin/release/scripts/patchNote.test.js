@@ -1,4 +1,4 @@
-const { parseVersionTag, validateVersionContext, generateNewVersion } = require('./patchNote');
+const { parseVersionTag, getVersionContext, validateVersionContext, generateNewVersion } = require('./patchNote');
 
 const fixtures = {
   public: {
@@ -45,61 +45,111 @@ for (const fixtureSet of channelEnvironmentSets()) {
   });
 }
 
-test('stableチャンネルの場合はバージョン中のチャンネル部分があったらエラー', () => {
-  expect(() => validateVersionContext({
-    versionTag: 'v1.0.20190826-stable.2',
-    releaseChannel: 'stable',
-    releaseEnvironment: 'public'
-  })).toThrow();
-});
-
 test('バージョンがパースできる(public stable)', () => {
   expect(parseVersionTag(fixtures.public.stable)).toMatchInlineSnapshot(`
-        Object {
-          "channel": undefined,
-          "date": "20190826",
-          "internalMark": undefined,
-          "major": "1",
-          "minor": "0",
-          "ord": "2",
-        }
-    `);
+                Object {
+                  "channel": undefined,
+                  "date": "20190826",
+                  "internalMark": undefined,
+                  "major": "1",
+                  "minor": "0",
+                  "ord": "2",
+                }
+        `);
 });
 test('バージョンがパースできる(public unstable)', () => {
   expect(parseVersionTag(fixtures.public.unstable)).toMatchInlineSnapshot(`
-        Object {
-          "channel": "unstable",
-          "date": "20190826",
-          "internalMark": undefined,
-          "major": "1",
-          "minor": "0",
-          "ord": "2",
-        }
-    `);
+                Object {
+                  "channel": "unstable",
+                  "date": "20190826",
+                  "internalMark": undefined,
+                  "major": "1",
+                  "minor": "0",
+                  "ord": "2",
+                }
+        `);
 });
 test('バージョンがパースできる(internal stable)', () => {
   expect(parseVersionTag(fixtures.internal.stable)).toMatchInlineSnapshot(`
-        Object {
-          "channel": undefined,
-          "date": "20190826",
-          "internalMark": "d",
-          "major": "1",
-          "minor": "0",
-          "ord": "2",
-        }
-    `);
+                Object {
+                  "channel": undefined,
+                  "date": "20190826",
+                  "internalMark": "d",
+                  "major": "1",
+                  "minor": "0",
+                  "ord": "2",
+                }
+        `);
 });
 test('バージョンがパースできる(internal unstable)', () => {
   expect(parseVersionTag(fixtures.internal.unstable)).toMatchInlineSnapshot(`
-        Object {
-          "channel": "unstable",
-          "date": "20190826",
-          "internalMark": "d",
-          "major": "1",
-          "minor": "0",
-          "ord": "2",
-        }
-    `);
+                Object {
+                  "channel": "unstable",
+                  "date": "20190826",
+                  "internalMark": "d",
+                  "major": "1",
+                  "minor": "0",
+                  "ord": "2",
+                }
+        `);
+});
+
+test('stableチャンネルの場合はバージョン中のチャンネル部分があったらエラー', () => {
+  expect(() => getVersionContext('v1.0.20190826-stable.2')).toThrow();
+});
+
+test('知らないチャンネルを名乗っていたらエラー', () => {
+  expect(() => getVersionContext('v1.0.20190826-hogehoge.2')).toThrow();
+});
+
+test('バージョンがパースできる(public stable)', () => {
+  expect(getVersionContext(fixtures.public.stable)).toMatchInlineSnapshot(`
+    Object {
+      "channel": "stable",
+      "environment": "public",
+    }
+  `);
+});
+test('バージョンがパースできる(public unstable)', () => {
+  expect(getVersionContext(fixtures.public.unstable)).toMatchInlineSnapshot(`
+    Object {
+      "channel": "unstable",
+      "environment": "public",
+    }
+  `);
+});
+test('バージョンがパースできる(internal stable)', () => {
+  expect(getVersionContext(fixtures.internal.stable)).toMatchInlineSnapshot(`
+    Object {
+      "channel": "stable",
+      "environment": "internal",
+    }
+  `);
+});
+test('バージョンがパースできる(internal unstable)', () => {
+  expect(getVersionContext(fixtures.internal.unstable)).toMatchInlineSnapshot(`
+    Object {
+      "channel": "unstable",
+      "environment": "internal",
+    }
+  `);
+});
+
+const versionContexts = [...channelEnvironmentSets()].map(o => ({
+  channel: o.releaseChannel,
+  environment: o.releaseEnvironment,
+}));
+
+test('ふたつのVersionContextが同じか否か判定できる', () => {
+  versionContexts.forEach((a, i) => {
+    versionContexts.forEach((b, j) => {
+      if (i === j) {
+        expect(a).toEqual(b);
+      } else {
+        expect(a).not.toEqual(b);
+      }
+    });
+  });
 });
 
 test('次のバージョンを生成する(当日、publicでstable)', () => {
