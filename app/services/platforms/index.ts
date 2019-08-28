@@ -108,10 +108,6 @@ export interface IPlatformService {
 
   fetchViewerCount: () => Promise<number>;
 
-  fetchStreamKey: () => Promise<string>;
-
-  fetchChannelInfo: () => Promise<IChannelInfo>;
-
   fetchUserInfo: () => Promise<IUserInfo>;
 
   putChannelInfo: (channelInfo: IChannelInfo) => Promise<boolean>;
@@ -124,7 +120,7 @@ export interface IPlatformService {
 
   afterGoLive?: (context?: StreamingContext) => Promise<void>;
 
-  prepopulateInfo: () => Promise<any>;
+  prepopulateInfo: () => Promise<IChannelInfo>;
 
   scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
 

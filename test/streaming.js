@@ -131,7 +131,7 @@ test('Streaming to Mixer', async t => {
   t.pass();
 });
 
-test('Streaming to Youtube', async t => {
+test.skip('Streaming to Youtube', async t => {
 
   // login into the account
   if (!(await logIn(t, 'youtube'))) return;
@@ -160,7 +160,8 @@ test('Streaming to Youtube', async t => {
 
 
 // test scheduling for each platform
-const schedulingPlatforms = ['facebook', 'youtube'];
+// TODO: add 'youtube'
+const schedulingPlatforms = ['facebook'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
     // login into the account
@@ -205,11 +206,8 @@ schedulingPlatforms.forEach(platform => {
       date: moment(tomorrow).format('MM/DD/YYYY')
     });
 
-    // TODO: youtube always returns an error: User requests exceed the rate limit
-    if (platform !== 'youtube') {
-      await app.client.click('button=Schedule');
-      await app.client.waitForVisible('.toast-success', 20000);
-    }
+    await app.client.click('button=Schedule');
+    await app.client.waitForVisible('.toast-success', 20000);
 
   });
 });
