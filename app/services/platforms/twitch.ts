@@ -130,7 +130,7 @@ export class TwitchService extends Service implements IPlatformService {
     return this.fetchRawChannelInfo().then(json => json.stream_key);
   }
 
-  fetchChannelInfo(): Promise<IChannelInfo> {
+  prepopulateInfo(): Promise<IChannelInfo> {
     return Promise.all([
       this.fetchRawChannelInfo().then(json => ({
         title: json.status,
@@ -186,13 +186,6 @@ export class TwitchService extends Service implements IPlatformService {
 
   getAllTags(): Promise<TTwitchTag[]> {
     return getAllTags();
-  }
-
-  prepopulateInfo() {
-    return this.fetchRawChannelInfo().then(json => ({
-      title: json.status,
-      game: json.game,
-    }));
   }
 
   getStreamTags(): Promise<TTwitchTag[]> {

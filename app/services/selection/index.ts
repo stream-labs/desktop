@@ -124,18 +124,16 @@ export class SelectionService extends StatefulService<ISelectionState> {
         ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
         : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
 
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         message,
         type: 'warning',
         buttons: [$t('Cancel'), $t('OK')],
-      },
-      ok => {
-        if (!ok) return;
+      })
+      .then(({ response }) => {
+        if (!response) return;
         this.editorCommandsService.executeCommand('RemoveNodesCommand', this.getActiveSelection());
-      },
-    );
+      });
   }
 
   openEditTransform() {

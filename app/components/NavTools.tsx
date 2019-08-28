@@ -36,18 +36,17 @@ export default class SideNav extends Vue {
 
   handleAuth() {
     if (this.userService.isLoggedIn()) {
-      electron.remote.dialog.showMessageBox(
-        {
+      electron.remote.dialog
+        .showMessageBox({
           title: $t('Confirm'),
           message: $t('Are you sure you want to log out?'),
           buttons: [$t('Yes'), $t('No')],
-        },
-        index => {
-          if (index === 0) {
+        })
+        .then(({ response }) => {
+          if (response === 0) {
             this.userService.logOut();
           }
-        },
-      );
+        });
     } else {
       this.userService.showLogin();
     }
