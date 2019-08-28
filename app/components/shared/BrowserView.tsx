@@ -7,6 +7,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
+import { Subscription } from 'rxjs';
+import { AppService } from 'services/app';
 
 @Component({ components: { Spinner } })
 export default class BrowserView extends TsxComponent<{
@@ -28,6 +30,7 @@ export default class BrowserView extends TsxComponent<{
   @Prop({ default: false }) enableGuestApi: boolean;
 
   @Inject() windowsService: WindowsService;
+  @Inject() appService: AppService;
 
   $refs: {
     sizeContainer: HTMLDivElement;
@@ -39,6 +42,8 @@ export default class BrowserView extends TsxComponent<{
   currentSize: IVec2;
 
   loading = true;
+
+  shutdownSubscription: Subscription;
 
   mounted() {
     this.options.webPreferences = this.options.webPreferences || {};
@@ -68,12 +73,18 @@ export default class BrowserView extends TsxComponent<{
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
     }, 100);
+
+    this.shutdownSubscription = this.appService.shutdownStarted.subscribe(() => {
+      // Prevent zombie processes by destroying the browser view
+      if (this.browserView && !this.browserView.isDestroyed()) this.browserView.destroy();
+    });
   }
 
   destroyed() {
     electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
     this.browserView.destroy();
     clearInterval(this.resizeInterval);
+    this.shutdownSubscription.unsubscribe();
   }
 
   get hideStyleBlockers() {

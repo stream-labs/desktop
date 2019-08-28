@@ -15,6 +15,7 @@ import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
+import * as moment from 'moment';
 
 @Component({
   components: {
@@ -35,9 +36,21 @@ export default class StudioFooterComponent extends Vue {
   @Prop() locked: boolean;
 
   metricsShown = false;
+  recordingTime = '';
+  private recordingTimeIntervalId: number;
 
   mounted() {
     this.confirmYoutubeEnabled();
+
+    // update recording time
+    this.recordingTimeIntervalId = window.setInterval(() => {
+      if (!this.streamingService.isRecording) return;
+      this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
+    }, 1000);
+  }
+
+  destroyed() {
+    clearInterval(this.recordingTimeIntervalId);
   }
 
   toggleRecording() {
