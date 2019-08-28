@@ -205,11 +205,8 @@ schedulingPlatforms.forEach(platform => {
       date: moment(tomorrow).format('MM/DD/YYYY')
     });
 
-    // TODO: youtube always returns an error: User requests exceed the rate limit
-    if (platform !== 'youtube') {
-      await app.client.click('button=Schedule');
-      await app.client.waitForVisible('.toast-success', 20000);
-    }
+    await app.client.click('button=Schedule');
+    await app.client.waitForVisible('.toast-success', 20000);
 
   });
 });
