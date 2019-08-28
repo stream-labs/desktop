@@ -31,8 +31,8 @@
     v-model="eventsHeight"
     @onresizestop="onResizeStopHandler()"
     @onresizestart="onResizeStartHandler()"
-    :max="maxHeight"
-    :min="minHeight"
+    :max="maxHeight - controlsHeight"
+    :min="32"
     :reverse="true"
   />
   <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
@@ -42,7 +42,7 @@
       v-model="controlsHeight"
       @onresizestop="onResizeStopHandler()"
       @onresizestart="onResizeStartHandler()"
-      :max="maxHeight"
+      :max="eventsHeight + controlsHeight - 32"
       :min="minHeight"
       :reverse="true"
     />
