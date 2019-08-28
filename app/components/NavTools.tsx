@@ -72,17 +72,13 @@ export default class SideNav extends Vue {
     if (this.dashboardOpening) return;
     this.dashboardOpening = true;
 
-    let link: string;
-
     try {
-      link = await this.magicLinkService.getDashboardMagicLink();
+      const link = await this.magicLinkService.getDashboardMagicLink();
+      electron.remote.shell.openExternal(link);
     } catch (e) {
       console.error('Error generating dashboard magic link', e);
-      this.dashboardOpening = false;
-      return;
     }
 
-    electron.remote.shell.openExternal(link);
     this.dashboardOpening = false;
   }
 
