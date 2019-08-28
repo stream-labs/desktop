@@ -67,6 +67,10 @@ export default class Studio extends Vue {
     if (clampedHeight !== this.eventsHeight + this.controlsHeight) {
       this.eventsHeight = clampedHeight - this.controlsHeight;
     }
+
+    if (this.controlsHeight > this.eventsHeight - 32) {
+      this.controlsHeight = this.eventsHeight - 32;
+    }
   }
 
   get displayEnabled() {
