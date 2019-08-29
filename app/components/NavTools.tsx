@@ -10,6 +10,7 @@ import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { $t } from 'services/i18n';
 import styles from './SideNav.m.less';
+import { MagicLinkService } from 'services/magic-link';
 
 @Component({})
 export default class SideNav extends Vue {
@@ -17,6 +18,7 @@ export default class SideNav extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() settingsService: SettingsService;
   @Inject() navigationService: NavigationService;
+  @Inject() magicLinkService: MagicLinkService;
 
   get isDevMode() {
     return Utils.isDevMode();
@@ -64,6 +66,22 @@ export default class SideNav extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
+  dashboardOpening = false;
+
+  async openDashboard() {
+    if (this.dashboardOpening) return;
+    this.dashboardOpening = true;
+
+    try {
+      const link = await this.magicLinkService.getDashboardMagicLink();
+      electron.remote.shell.openExternal(link);
+    } catch (e) {
+      console.error('Error generating dashboard magic link', e);
+    }
+
+    this.dashboardOpening = false;
+  }
+
   render(h: Function) {
     return (
       <div class={styles.bottomTools}>
@@ -72,6 +90,9 @@ export default class SideNav extends Vue {
             <i class="icon-developer" />
           </div>
         )}
+        <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
+          <i class="icon-dashboard" />
+        </div>
         <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}

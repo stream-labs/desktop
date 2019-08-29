@@ -75,6 +75,7 @@ export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 export { ChatService } from 'services/chat';
+export { MagicLinkService } from 'services/magic-link';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
