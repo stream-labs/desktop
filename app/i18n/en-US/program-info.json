@@ -1,3 +1,4 @@
 {
-    "start-streaming-confirmation": "The program has started. But since streaming is not started yet, currently broadcasting without any images and sounds. Start streaming?"
+    "start-streaming-confirmation": "The program has started. But you do not show the movie and the sound to the viewers because you have not started streaming yet. \nGo live and start streaming?",
+    "later": "later"
 }

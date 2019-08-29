@@ -65,7 +65,7 @@ export default class ProgramInfo extends Vue {
             {
               type: 'warning',
               message: $t('program-info.start-streaming-confirmation'),
-              buttons: [$t('common.yes'), $t('common.no')],
+              buttons: [$t('streaming.goLive'), $t('program-info.later')],
               noLink: true,
             },
             idx => resolve(idx === 0)
