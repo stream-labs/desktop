@@ -53,6 +53,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
+export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 
 export { MediaGalleryService } from 'services/media-gallery';
