@@ -64,7 +64,7 @@ export default class ProgramInfo extends Vue {
             remote.getCurrentWindow(),
             {
               type: 'warning',
-              message: '配信を開始していないため、現在無音・真っ黒な放送になっています。配信も開始しますか？',
+              message: $t('program-info.start-streaming-confirmation'),
               buttons: [$t('common.yes'), $t('common.no')],
               noLink: true,
             },
