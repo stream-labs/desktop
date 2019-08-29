@@ -11,6 +11,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from 'services/i18n';
 import styles from './SideNav.m.less';
 import { MagicLinkService } from 'services/magic-link';
+import { throttle } from 'lodash-decorators';
 
 @Component({})
 export default class SideNav extends Vue {
@@ -68,6 +69,7 @@ export default class SideNav extends Vue {
 
   dashboardOpening = false;
 
+  @throttle(2000, { trailing: false })
   async openDashboard() {
     if (this.dashboardOpening) return;
     this.dashboardOpening = true;
