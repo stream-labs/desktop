@@ -128,9 +128,11 @@ export default class AppsNav extends Vue {
                 onDragend={() => this.popOut(app)}
                 class={styles.appTab}
               >
-                <i class="icon-integrations" />
-                {app.manifest.icon && <img src={this.iconSrc(app.id, app.manifest.icon)} />}
-                <div />
+                {app.manifest.icon ? (
+                  <img src={this.iconSrc(app.id, app.manifest.icon)} />
+                ) : (
+                  <i class="icon-integrations" />
+                )}
               </div>
               {this.refreshIcon(h, app)}
             </div>
