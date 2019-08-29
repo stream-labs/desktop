@@ -12,9 +12,17 @@ import { setOutputResolution } from './helpers/spectron/output';
 const moment = require('moment');
 import { sleep } from './helpers/sleep';
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
+import { getClient } from './helpers/api-client';
+import { ScenesService } from 'services/api/external-api/scenes';
 
 
 useSpectron({ appArgs: '--nosync' });
+
+async function addColorSource() {
+  const api = await getClient();
+  api.getResource('ScenesService').activeScene.createAndAddSource('MyColorSource', 'color_source');
+}
+
 
 test('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
@@ -40,6 +48,10 @@ test('Streaming to Twitch without auth', async t => {
   await app.client.click('button=Done');
 
   await setOutputResolution(t, '100x100');
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
+
   await focusMain(t);
   await app.client.click('button=Go Live');
 
@@ -59,6 +71,9 @@ test('Streaming to Twitch', async t => {
   // open EditStreamInfo window
   await focusMain(t);
   await app.client.click('button=Go Live');
+
+  // add a single source to prevent showing the No-Sources dialog
+  await addColorSource();
 
   // set stream info, and start stream
   await focusChild(t);
@@ -82,6 +97,9 @@ test('Streaming to Facebook', async t => {
 
   // decrease resolution to reduce CPU usage
   await setOutputResolution(t, '100x100');
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
 
   // open EditStreamInfo window
   await focusMain(t);
@@ -112,6 +130,9 @@ test('Streaming to Mixer', async t => {
   // decrease resolution to reduce CPU usage
   await setOutputResolution(t, '100x100');
 
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
+
   // open EditStreamInfo window
   await focusMain(t);
   await app.client.click('button=Go Live');
@@ -139,6 +160,9 @@ test('Streaming to Youtube', async t => {
 
   // decrease resolution to reduce CPU usage
   await setOutputResolution(t, '100x100');
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
 
   // open EditStreamInfo window
   await focusMain(t);
@@ -221,6 +245,9 @@ test('Go live error', async t => {
   // login into the account
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
 
   // simulate issues with the twitch api
   await fetchMock(t, /api\.twitch\.tv/, 404);
