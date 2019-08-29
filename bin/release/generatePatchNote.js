@@ -17,6 +17,7 @@ const {
 } = require('./scripts/util');
 const {
   getVersionContext,
+  isSameVersionContext,
   generateNewVersion,
   readPatchNoteFile,
   writePatchNoteFile,
@@ -50,7 +51,8 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
     info(`current version: ${previousTag}`);
   }
 
-  const { channel, environment } = getVersionContext(previousTag);
+  const previousVersionContext = getVersionContext(previousTag);
+  const { channel, environment } = previousVersionContext;
 
   log('current version', colors.cyan(previousTag));
   log('environment', (environment === 'public' ? colors.red : colors.cyan)(environment));
@@ -72,6 +74,32 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
   log('\nestimated version', colors.cyan(defaultVersion));
 
   const newVersion = await input('What should the new version number be?', defaultVersion);
+
+  const newVersionContext = getVersionContext(`v${newVersion}`);
+  if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
+    log('version', colors.cyan(previousTag), ' -> ', colors.cyan(`v${newVersion}`));
+    const environmentIsMatched = previousVersionContext.environment === newVersionContext.environment;
+    const channelIsMatched = previousVersionContext.channel === newVersionContext.channel;
+    const colorize = flag => flag ? colors.red : colors.cyan;
+    log(
+      'environment:',
+      colorize(!environmentIsMatched)(environmentIsMatched ? 'matched  ' : 'unmatched'),
+      colorize(previousVersionContext.environment === 'public')(previousVersionContext.environment),
+      '->',
+      colorize(newVersionContext.environment === 'public')(newVersionContext.environment)
+    );
+    log(
+      'channel    :',
+      colorize(!channelIsMatched)(channelIsMatched ? 'matched  ' : 'unmatched'),
+      colorize(previousVersionContext.channel === 'stable')(previousVersionContext.channel),
+      '->',
+      colorize(newVersionContext.channel === 'stable')(newVersionContext.channel)
+    );
+
+    if (!await confirm('Version contexts are not matched. Are you sure?', false)) {
+      sh.exit(0);
+    }
+  }
 
   if (getTagCommitId(`v${newVersion}`)) {
     error(`version ${newVersion} has already been released`);
