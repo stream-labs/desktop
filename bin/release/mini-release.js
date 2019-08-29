@@ -119,7 +119,7 @@ async function runScript({
   info(`check whether remote ${target.remote} exists`);
   executeCmd(`git remote get-url ${target.remote}`);
 
-  if (skipLocalModificationCheck) {
+  if (!skipLocalModificationCheck) {
     info('make sure there is nothing to commit on local directory');
 
     executeCmd('git status'); // there should be nothing to commit
