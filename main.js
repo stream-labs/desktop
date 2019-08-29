@@ -47,7 +47,7 @@ function log(...args) {
 
 if (process.argv.includes('--clearCacheDir')) {
   // __installer.exe は electron-updater 差分アップデートの比較元になるので消してはいけない
-  const rmPath = path.join(app.getPath('appData'), 'n-air-app', '!(__installer.exe)');
+  const rmPath = path.join(app.getPath('userData'), '!(__installer.exe)');
   log('clear cache directory!: ', rmPath);
   rimraf.sync(rmPath);
 }
@@ -306,8 +306,8 @@ function startApp() {
 // We use a special cache directory for running tests
 if (process.env.NAIR_CACHE_DIR) {
   app.setPath('appData', process.env.NAIR_CACHE_DIR);
+  app.setPath('userData', path.join(app.getPath('appData'), pjson.name));
 }
-app.setPath('userData', path.join(app.getPath('appData'), 'n-air-app'));
 
 app.setAsDefaultProtocolClient('nair');
 
