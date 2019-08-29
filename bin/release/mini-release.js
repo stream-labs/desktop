@@ -22,7 +22,8 @@ const {
   getTagCommitId,
 } = require('./scripts/util');
 const {
-  validateVersionContext,
+  getVersionContext,
+  isSameVersionContext,
   updateNotesTs,
   readPatchNote,
 } = require('./scripts/patchNote');
@@ -77,10 +78,10 @@ async function runScript({
   const newTag = `v${newVersion}`;
 
   info('Release summary:');
-  log('releaseEnvironment: ', releaseEnvironment === 'public' ? colors.red(releaseEnvironment) : releaseEnvironment);
-  log('releaseChannel: ', releaseChannel === 'stable' ? colors.red(releaseChannel) : releaseChannel);
-  log('---- ---- ---- ----');
   log('version:', colors.cyan(patchNote.version));
+  log('environment: ', (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment));
+  log('channel: ', (releaseChannel === 'stable' ? colors.red : colors.cyan)(releaseChannel));
+  log('---- ---- ---- ----');
   log('notes:', colors.cyan(patchNote.notes));
   log('---- ---- ---- ----');
   log('target:');
@@ -96,10 +97,23 @@ async function runScript({
   log('   githubHost:', colors.cyan(target.host));
   log('  githubToken:', colors.cyan(upload.githubToken));
   log(' s3BucketName:', colors.cyan(upload.s3BucketName));
-  log('---- ---- ---- ----\n\n');
+  log('---- ---- ---- ----');
+  info('repeat again');
+  log('version:', colors.cyan(patchNote.version));
+  log('environment: ', (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment));
+  log('channel: ', (releaseChannel === 'stable' ? colors.red : colors.cyan)(releaseChannel));
+  log('---- ---- ---- ----\n');
+
+  info('checking current branch...');
+  const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
+  if (currentBranch !== target.branch) {
+    if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
+      sh.exit(1);
+    }
+  }
 
   if (!await confirm('Are you sure to release with these configs?', false)) {
-    sh.exit(0);
+    sh.exit(1);
   }
 
   info(`check whether remote ${target.remote} exists`);
@@ -110,14 +124,6 @@ async function runScript({
 
     executeCmd('git status'); // there should be nothing to commit
     executeCmd('git diff -s --exit-code'); // and nothing changed
-  }
-
-  info('checking current branch...');
-  const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
-  if (currentBranch !== target.branch) {
-    if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
-      sh.exit(1);
-    }
   }
 
   info('pulling fresh repogitory...');
@@ -308,35 +314,23 @@ async function releaseRoutine() {
     throw new Error(`Tag "${versionTag}" has already been released.`);
   }
 
-  const { releaseEnvironment } = await inq.prompt({
-    type: 'list',
-    name: 'releaseEnvironment',
-    message: 'What environment do you want to release?',
-    choices: ['internal', 'public'],
-  });
+  info('checking current tag ...');
+  const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
+  const previousVersionContext = getVersionContext(previousTag);
 
-  const config = releaseEnvironment === 'public' ? require('./public.config') : require('./internal.config');
+  const newVersionContext = getVersionContext(versionTag);
+  if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
+    throw new Error(`previous version ${previousTag} and releasing version ${versionTag} have different context.`);
+  }
 
-  const { releaseChannel } = await inq.prompt({
-    type: 'list',
-    name: 'releaseChannel',
-    message: 'What channel do you want to release?',
-    choices: ['unstable', 'stable'],
-  });
+  const { channel, environment } = newVersionContext;
 
-  log('version', colors.cyan(versionTag));
-  log('environment', colors.cyan(releaseEnvironment));
-  log('channel', colors.cyan(releaseChannel));
-  validateVersionContext({
-    versionTag,
-    releaseEnvironment,
-    releaseChannel,
-  });
+  const config = environment === 'public' ? require('./public.config') : require('./internal.config');
 
   await runScript({
     patchNote,
-    releaseEnvironment,
-    releaseChannel,
+    releaseEnvironment: environment,
+    releaseChannel: channel,
     ...config,
     skipLocalModificationCheck: false,
     skipBuild: false,

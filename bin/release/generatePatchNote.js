@@ -2,7 +2,6 @@
 
 const OctoKit = require('@octokit/rest');
 const sh = require('shelljs');
-const inq = require('inquirer');
 const colors = require('colors/safe');
 const {
   log,
@@ -17,7 +16,7 @@ const {
   getTagCommitId,
 } = require('./scripts/util');
 const {
-  validateVersionContext,
+  getVersionContext,
   generateNewVersion,
   readPatchNoteFile,
   writePatchNoteFile,
@@ -51,32 +50,27 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
     info(`current version: ${previousTag}`);
   }
 
-  const { releaseEnvironment } = await inq.prompt({
-    type: 'list',
-    name: 'releaseEnvironment',
-    message: 'What environment do you want to release?',
-    choices: ['internal', 'public'],
-  });
+  const { channel, environment } = getVersionContext(previousTag);
 
-  const { releaseChannel } = await inq.prompt({
-    type: 'list',
-    name: 'releaseChannel',
-    message: 'What channel do you want to release?',
-    choices: ['unstable', 'stable'],
-  });
+  log('current version', colors.cyan(previousTag));
+  log('environment', (environment === 'public' ? colors.red : colors.cyan)(environment));
+  log('channel', (channel === 'stable' ? colors.red : colors.cyan)(channel));
 
-  log('version', colors.cyan(previousTag));
-  log('environment', colors.cyan(releaseEnvironment));
-  log('channel', colors.cyan(releaseChannel));
-  validateVersionContext({
-    versionTag: previousTag,
-    releaseEnvironment,
-    releaseChannel,
-  });
+  const config = environment === 'public' ? require('./public.config') : require('./internal.config');
+
+  info('checking current branch...');
+  const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
+  if (currentBranch !== config.target.branch) {
+    if (!(await confirm(`current branch '${currentBranch}' is not '${config.target.branch}'. continue?`, false))) {
+      sh.exit(1);
+    }
+  }
 
   const defaultVersion = generateNewVersion({
     previousTag,
   });
+  log('\nestimated version', colors.cyan(defaultVersion));
+
   const newVersion = await input('What should the new version number be?', defaultVersion);
 
   if (getTagCommitId(`v${newVersion}`)) {

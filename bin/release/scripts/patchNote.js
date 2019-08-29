@@ -204,7 +204,6 @@ function updateNotesTs({
 function readPatchNote({
   patchNoteFileName,
 }) {
-  info(`checking ${patchNoteFileName} ...`);
   const patchNote = readPatchNoteFile(patchNoteFileName);
 
   if (!patchNote) {
