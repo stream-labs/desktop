@@ -143,9 +143,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
 
     if (this.validateSyncLock(localId, syncLock)) {
-      console.log('set serverId');
       file.serverId = data.id;
-      console.log('serverId is set');
       file.status = EMediaFileStatus.Synced;
       this.UPDATE_FILE(localId, file);
       return file;

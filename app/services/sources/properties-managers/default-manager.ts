@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 export interface IDefaultManagerSettings {
   mediaBackup?: {
@@ -39,8 +40,7 @@ export class DefaultManager extends PropertiesManager {
     this.downloadGoogleFont();
   }
 
-  setPropertiesFormData(properties: input.TObsFormData) {
-    super.setPropertiesFormData(properties);
+  handleSettingsChange(settings: Dictionary<TObsValue>) {
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
       this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
       this.uploadNewMediaFile();
@@ -95,11 +95,12 @@ export class DefaultManager extends PropertiesManager {
 
     this.mediaBackupService
       .createNewFile(
-        this.settings.mediaBackup.localId,
+        this.mediaBackupService.getLocalFileId(),
         this.obsSource.settings[this.mediaBackupFileSetting],
       )
       .then(file => {
         if (file) {
+          this.settings.mediaBackup.localId = file.id;
           this.settings.mediaBackup.serverId = file.serverId;
           this.settings.mediaBackup.originalPath = this.obsSource.settings[
             this.mediaBackupFileSetting

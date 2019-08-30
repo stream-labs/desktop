@@ -1,6 +1,7 @@
 import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import compact from 'lodash/compact';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 /**
  * This is the interface that the rest of the app uses
@@ -12,6 +13,7 @@ export interface IPropertyManager {
   setPropertiesFormData(property: input.TObsFormData): void;
   settings: Dictionary<any>;
   applySettings(settings: Dictionary<any>): void;
+  handleSettingsChange(settings: Dictionary<any>): void;
   customUIComponent: string;
 }
 
@@ -123,6 +125,12 @@ export abstract class PropertiesManager implements IPropertyManager {
    * @param properties The OBS properties
    */
   setPropertiesFormData(properties: input.TObsFormData) {
-    input.setPropertiesFormData(this.obsSource, properties);
+    this.handleSettingsChange(input.setPropertiesFormData(this.obsSource, properties));
   }
+
+  /**
+   * This method must be called when source settings has been changed
+   * Can be overridden to handle extra logic on settings change event
+   */
+  handleSettingsChange(settings: Dictionary<TObsValue>) {}
 }
