@@ -335,7 +335,9 @@ async function releaseRoutine() {
 
   const { channel, environment } = newVersionContext;
 
-  const config = environment === 'public' ? require('./public.config') : require('./internal.config');
+  /** @type {import('./configs/type').ReleaseConfig} */
+  // eslint-disable-next-line import/no-dynamic-require
+  const config = require(`./configs/${environment}-${channel}`);
 
   await runScript({
     patchNote,

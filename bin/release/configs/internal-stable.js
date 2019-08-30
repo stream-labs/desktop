@@ -1,6 +1,6 @@
 // @ts-check
 
-const { checkEnv } = require('./scripts/util');
+const { checkEnv } = require('../scripts/util');
 
 checkEnv('INTERNAL_GITHUB_API_SERVER');
 checkEnv('INTERNAL_GITHUB_ORGANIZATION');
