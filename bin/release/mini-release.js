@@ -319,7 +319,14 @@ async function releaseRoutine() {
 
   const newVersionContext = getVersionContext(versionTag);
   if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
-    throw new Error(`previous version ${previousTag} and releasing version ${versionTag} have different context.`);
+    const msg = `previous version ${previousTag} and releasing version ${versionTag} have different context.`;
+    if (process.env.NAIR_IGNORE_VERSION_CONTEXT_CHECK) {
+      await confirm(`${msg} Are you sure?`, false);
+    } else {
+      error(msg);
+      log('if you wish to release the first release of a new channel or environment, set "NAIR_IGNORE_VERSION_CONTEXT_CHECK".');
+      throw new Error(msg);
+    }
   }
 
   const { channel, environment } = newVersionContext;
