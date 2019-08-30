@@ -81,7 +81,8 @@ export default class Studio extends Vue {
 
     // Something needs to be adjusted to fit
     if (this.controlsHeight + this.eventsHeight > this.maxHeight) {
-      // If we're resizing the controls
+      // If we're resizing the controls then we should be more aggressive
+      // taking size from events
       const minEventsHeight = isControlsResize
         ? this.minEventsHeight
         : reasonableMinimumEventsHeight;
