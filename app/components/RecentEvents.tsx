@@ -42,6 +42,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   }
 
   popoutRecentEvents() {
+    this.$emit('popout');
     return this.recentEventsService.openRecentEventsWindow();
   }
 
@@ -122,11 +123,10 @@ class Toolbar extends TsxComponent<IToolbarProps> {
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
-        <i
-          class="icon-pop-out-2 action-icon"
-          onClick={this.popoutRecentEvents}
-          v-tooltip={{ content: $t('Popout Recent Events'), placement: 'bottom' }}
-        />
+        <span class="action-icon" onClick={this.popoutRecentEvents}>
+          <i class="icon-pop-out-2" />
+          <span style={{ marginLeft: '8px' }}>Pop Out Full Events View</span>
+        </span>
         <i
           class="icon-music action-icon"
           onClick={this.popoutMediaShare}

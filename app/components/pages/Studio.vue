@@ -36,7 +36,7 @@
     :reverse="true"
   />
   <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
-    <recent-events :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" />
+    <recent-events :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
     <resize-bar
       position="top"
       v-model="controlsHeight"
