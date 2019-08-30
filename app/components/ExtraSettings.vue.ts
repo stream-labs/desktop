@@ -55,7 +55,9 @@ export default class ExtraSettings extends Vue {
   deleteCacheDir() {
     if (
       confirm(
-        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!'),
+        $t(
+          'WARNING! You will lose all stream and encoder settings. If you are logged in, your scenes and sources will be restored from the cloud. This cannot be undone.',
+        ),
       )
     ) {
       electron.remote.app.relaunch({ args: ['--clearCacheDir'] });

@@ -135,12 +135,12 @@ test('Adding and removing a Render Delay filter', async t => {
   await addFilter(t, sourceName, filterName, filterName);
   await openFiltersWindow(t, sourceName);
   await focusChild(t);
-  t.true(await app.client.isExisting('label=Delay (milliseconds)'));
+  t.true(await app.client.isExisting('label=Delay'));
 
   await removeFilter(t, sourceName, filterName);
   await openFiltersWindow(t, sourceName);
 
-  t.false(await app.client.isExisting('label=Delay (milliseconds)'));
+  t.false(await app.client.isExisting('label=Delay'));
 });
 
 test('Adding and removing a Color Key filter', async t => {

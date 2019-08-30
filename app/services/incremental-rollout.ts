@@ -10,6 +10,7 @@ export enum EAvailableFeatures {
   platform = 'slobs--platform',
   creatorSites = 'slobs--creator-sites',
   facebookOnboarding = 'slobs--facebook-onboarding',
+  twitter = 'slobs--twitter',
 }
 
 interface IIncrementalRolloutServiceState {

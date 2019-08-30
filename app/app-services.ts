@@ -53,6 +53,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
+export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 
 export { MediaGalleryService } from 'services/media-gallery';
@@ -76,6 +77,7 @@ export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 export { ChatService } from 'services/chat';
 export { RecentEventsService } from 'services/recent-events';
+export { MagicLinkService } from 'services/magic-link';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';

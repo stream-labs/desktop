@@ -32,6 +32,7 @@ import { GameOverlayService } from 'services/game-overlay';
 import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
+import { Subject } from 'rxjs';
 
 interface IAppState {
   loading: boolean;
@@ -145,6 +146,8 @@ export class AppService extends StatefulService<IAppState> {
     await this.recentEventsService.initialize();
   }
 
+  shutdownStarted = new Subject();
+
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
@@ -152,6 +155,8 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.beginShutdown();
 
     window.setTimeout(async () => {
+      this.shutdownStarted.next();
+      this.platformAppsService.unloadAllApps();
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();
