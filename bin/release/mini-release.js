@@ -159,8 +159,7 @@ async function runScript({
     executeCmd('yarn compile:production');
 
     info('Making the package...');
-    const envPrefix = releaseEnvironment === 'public' ? '' : `${releaseEnvironment}-`;
-    executeCmd(`yarn package:${envPrefix}${releaseChannel}`);
+    executeCmd(`yarn package:${releaseEnvironment}-${releaseChannel}`);
   }
 
   info('Pushing to the repository...');
