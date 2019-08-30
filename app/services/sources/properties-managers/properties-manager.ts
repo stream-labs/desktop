@@ -1,7 +1,6 @@
 import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import compact from 'lodash/compact';
-import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 /**
  * This is the interface that the rest of the app uses
@@ -132,5 +131,5 @@ export abstract class PropertiesManager implements IPropertyManager {
    * This method must be called when source settings has been changed
    * Can be overridden to handle extra logic on settings change event
    */
-  handleSettingsChange(settings: Dictionary<TObsValue>) {}
+  handleSettingsChange(settings: Dictionary<input.TObsValue>) {}
 }
