@@ -62,6 +62,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
         data-type="text"
         data-name={this.options.name}
       >
+        {this.options.icon && <i class={`fa fa-${this.options.icon}`} />}
         <input
           type={this.textVisible ? 'text' : 'password'}
           placeholder={this.options.placeholder}
