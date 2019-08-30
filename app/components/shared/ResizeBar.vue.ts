@@ -81,7 +81,12 @@ export default class ResizeBar extends Vue {
     // handle max and min constraints
     if (this.hasConstraints) {
       const value = this.reverse ? this.value - mouseOffset : this.value + mouseOffset;
-      if (value <= this.max && value >= this.min) {
+
+      if (value > this.max) {
+        this.barOffset = this.reverse ? this.value - this.max : this.max - this.value;
+      } else if (value < this.min) {
+        this.barOffset = this.reverse ? this.value - this.min : this.min - this.value;
+      } else {
         this.barOffset = mouseOffset;
       }
     } else {
