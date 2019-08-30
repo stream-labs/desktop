@@ -7,6 +7,9 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
+if (pjson.name === 'n-air-app-unstable') {
+  process.env.NAIR_UNSTABLE = true;
+}
 if (pjson.name === 'n-air-app-preview') {
   process.env.NAIR_PREVIEW = true;
 }

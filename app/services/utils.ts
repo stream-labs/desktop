@@ -37,6 +37,10 @@ export default class Utils {
     return process.env.NODE_ENV !== 'production';
   }
 
+  static isUnstable(): boolean {
+    return electron.remote.process.env.NAIR_UNSTABLE;
+  }
+
   static isPreview(): boolean {
     return electron.remote.process.env.NAIR_PREVIEW;
   }
