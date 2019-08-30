@@ -10,7 +10,8 @@ useSpectron({ appArgs: '--nosync' });
 useScreentest();
 
 // test streaming for each platform
-const platforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'mixer'];
+// TODO: add 'youtube'
+const platforms: TPlatform[] = ['twitch', 'facebook', 'mixer'];
 platforms.forEach(platform => {
   test(`Streaming to ${platform}`, async t => {
     // login into the account
@@ -76,7 +77,8 @@ platforms.forEach(platform => {
 });
 
 // test scheduling for each platform
-const schedulingPlatforms: TPlatform[] = ['facebook', 'youtube'];
+// TODO: add 'youtube'
+const schedulingPlatforms: TPlatform[] = ['facebook'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
     // login into the account

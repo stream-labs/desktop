@@ -101,14 +101,12 @@ interface IAppManifest {
 interface IProductionAppResponse {
   app_token: string;
   cdn_url: string;
-  description: string;
   icon: string;
   id_hash: string;
   is_beta: boolean;
   manifest: IAppManifest;
   name: string;
   screenshots: string[];
-  subscription: ISubscriptionResponse;
   version: string;
 }
 
@@ -130,16 +128,6 @@ interface IPlatformAppServiceState {
   devMode: boolean;
   loadedApps: ILoadedApp[];
   storeVisible: boolean;
-}
-
-interface ISubscriptionResponse {
-  id: number;
-  user_id: number;
-  app_id: number;
-  subscription_id: string;
-  status: string;
-  plan_id: number;
-  expires_at: string;
 }
 
 export class PlatformAppsService extends StatefulService<IPlatformAppServiceState> {
@@ -613,7 +601,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
-    const mousePos = electron.screen.getCursorScreenPoint();
+    const mousePos = electron.remote.screen.getCursorScreenPoint();
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.

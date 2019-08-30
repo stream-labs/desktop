@@ -24,6 +24,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { NavigationService } from 'services/navigation';
 import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -66,6 +67,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() streamInfoService: StreamInfoService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
@@ -256,15 +258,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showEditStreamInfo() {
+    const height = this.twitterIsEnabled ? 620 : 550;
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
       title: $t('Update Stream Info'),
       queryParams: {},
       size: {
+        height,
         width: 600,
-        height: 620,
       },
     });
+  }
+
+  get twitterIsEnabled() {
+    return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
   }
 
   get delayEnabled() {
@@ -309,6 +316,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       });
     }
     return formattedTime;
+  }
+
+  get formattedDurationInCurrentRecordingState() {
+    return this.formattedDurationSince(moment(this.state.recordingStatusTime));
   }
 
   get streamingStateChangeTime() {
@@ -447,10 +458,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           'Disconnected from the streaming server.  Please check your internet connection.',
         );
       } else if (info.code === obs.EOutputCode.InvalidStream) {
-        errorText =
-          $t(
-            'Could not access the specified channel or stream key, please double-check your stream key.  ',
-          ) + $t('If it is correct, there may be a problem connecting to the server.');
+        errorText = $t(
+          'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
+        );
       } else if (info.code === obs.EOutputCode.NoSpace) {
         errorText = $t('There is not sufficient disk space to continue recording.');
       } else if (info.code === obs.EOutputCode.Unsupported) {

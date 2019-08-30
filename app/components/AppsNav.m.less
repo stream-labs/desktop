@@ -31,14 +31,16 @@
   overflow: hidden;
 
   i,
-  img {
+  img,
+  div {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
 
-  img {
+  img,
+  div {
     width: 40px;
     height: 40px;
   }
@@ -57,7 +59,7 @@
   width: 10px;
   background: var(--title);
   transform: translateX(-12px);
-  transition: 0.2s all;
+  transition: transform 0.2s;
 }
 
 .active-app.active {

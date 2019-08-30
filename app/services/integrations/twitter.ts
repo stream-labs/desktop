@@ -35,6 +35,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   @Inject() i18nService: I18nService;
 
   apiToken = this.userService.state.auth.apiToken;
+  authWindowOpen = false;
 
   static defaultState: ITwitterServiceState = {
     linked: false,
@@ -64,7 +65,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   private linkTwitterUrl() {
-    const host = this.hostsService.streamlabs;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const locale = this.i18nService.state.locale;
 
@@ -110,42 +111,43 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   openLinkTwitterDialog() {
-    return new Promise(resolve => {
-      const partition = `persist:${uuid()}`;
+    if (this.authWindowOpen) return;
 
-      const twitterWindow = new electron.remote.BrowserWindow({
-        width: 600,
-        height: 800,
-        alwaysOnTop: false,
-        show: false,
-        webPreferences: {
-          partition,
-          nodeIntegration: false,
-          nativeWindowOpen: true,
-          sandbox: true,
-        },
-      });
+    this.authWindowOpen = true;
+    const partition = `persist:${uuid()}`;
 
-      twitterWindow.once('ready-to-show', () => {
-        twitterWindow.show();
-      });
-
-      twitterWindow.once('close', () => {
-        resolve();
-      });
-
-      twitterWindow.webContents.on('did-navigate', async (e, url) => {
-        const parsed = this.parseTwitterResultFromUrl(url);
-
-        if (parsed) {
-          twitterWindow.close();
-          this.getTwitterStatus();
-        }
-      });
-
-      twitterWindow.setMenu(null);
-      twitterWindow.loadURL(this.linkTwitterUrl());
+    const twitterWindow = new electron.remote.BrowserWindow({
+      width: 600,
+      height: 800,
+      alwaysOnTop: false,
+      show: false,
+      webPreferences: {
+        partition,
+        nodeIntegration: false,
+        nativeWindowOpen: true,
+        sandbox: true,
+      },
     });
+
+    twitterWindow.once('ready-to-show', () => {
+      twitterWindow.show();
+    });
+
+    twitterWindow.once('close', () => {
+      this.authWindowOpen = false;
+    });
+
+    twitterWindow.webContents.on('did-navigate', async (e, url) => {
+      const parsed = this.parseTwitterResultFromUrl(url);
+
+      if (parsed) {
+        twitterWindow.close();
+        this.getTwitterStatus();
+      }
+    });
+
+    twitterWindow.setMenu(null);
+    twitterWindow.loadURL(this.linkTwitterUrl());
   }
 
   /**

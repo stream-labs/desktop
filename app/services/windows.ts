@@ -294,7 +294,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       ...options.size,
     }));
 
-    newWindow.setMenu(null);
+    newWindow.removeMenu();
     newWindow.on('closed', () => {
       this.windowDestroyed.next(windowId);
       delete this.windows[windowId];

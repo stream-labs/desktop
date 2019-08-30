@@ -5,6 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService } from 'services/stream-info';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from '../../services/user';
 import { Inject } from '../../services/core/injector';
 import { getPlatformService, IChannelInfo } from 'services/platforms';
@@ -27,6 +28,7 @@ import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Spinner } from 'streamlabs-beaker';
 import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
+import Utils from 'services/utils';
 
 @Component({
   components: {
@@ -51,6 +53,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() twitterService: TwitterService;
   @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   // UI State Flags
   searchingGames = false;
@@ -271,7 +274,7 @@ export default class EditStreamInfo extends Vue {
   async handleSubmit() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
-    if (this.shouldPostTweet) {
+    if (this.twitterIsEnabled && this.shouldPostTweet) {
       const tweetedSuccessfully = await this.handlePostTweet();
       if (!tweetedSuccessfully) return;
     }
@@ -284,11 +287,11 @@ export default class EditStreamInfo extends Vue {
     try {
       await this.twitterService.postTweet(this.tweetModel);
       success = true;
-    } catch {
-      this.$toasted.show($t('Failed to post tweet'), {
+    } catch (e) {
+      this.$toasted.show(`Twitter: ${e.error}`, {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 1000,
+        duration: 2000,
         singleton: true,
       });
       success = false;
@@ -353,10 +356,17 @@ export default class EditStreamInfo extends Vue {
     return this.isFacebook || this.isYoutube || this.isTwitch || this.isMixer;
   }
 
+  get twitterIsEnabled() {
+    return (
+      Utils.isPreview() ||
+      this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter)
+    );
+  }
+
   get submitText() {
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
-    if (this.shouldPostTweet) return $t('Tweet & Go Live');
+    if (this.twitterIsEnabled && this.shouldPostTweet) return $t('Tweet & Go Live');
 
     return $t('Confirm & Go Live');
   }

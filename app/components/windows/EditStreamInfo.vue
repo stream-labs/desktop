@@ -90,6 +90,7 @@
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"
           :updatingInfo="updatingInfo"
+          v-if="twitterIsEnabled"
           v-model="tweetModel"
         />
         <div class="update-warning" v-if="updateError">
@@ -114,7 +115,7 @@
       </button>
       <button
         class="button button--action"
-        :disabled="updatingInfo || (isFacebook && !hasPages)"
+        :disabled="infoLoading || updatingInfo || (isFacebook && !hasPages)"
         @click="handleSubmit"
       >
         <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" /> {{ submitText }}

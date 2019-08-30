@@ -26,7 +26,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
     title: 'App Token',
     description:
       'This token allows you app to authenticate with the ' +
-      'streamlabs API.  Visit dev-platform.streamlabs.com to create a developer account ' +
+      'streamlabs API.  Visit platform.streamlabs.com to create a developer account ' +
       'and get a test app token.',
   });
 
