@@ -107,6 +107,10 @@ async function runScript({
   info('checking current branch...');
   const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
   if (currentBranch !== target.branch) {
+    if (releaseEnvironment === 'public') {
+      throw new Error(`branch mismatch: '${currentBranch}' is not '${target.branch}'`);
+    }
+
     if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
       sh.exit(1);
     }
