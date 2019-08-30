@@ -51,12 +51,20 @@ export default class ResizeBar extends Vue {
       },
       { once: true },
     );
+    this.$root.$el.addEventListener(
+      'mouseleave',
+      (event: MouseEvent) => {
+        this.$root.$el.removeEventListener('mousemove', mouseMoveListener);
+        this.stopMouseTracking(event);
+      },
+      { once: true },
+    );
+
     this.mouseInitial = this.isHorizontal ? event.pageX : event.pageY;
     this.$emit('onresizestart', event);
   }
 
   stopMouseTracking(event: MouseEvent) {
-    this.$root.$off('mousemove', this.onMouseMoveHandler);
     this.active = false;
     let offset = this.barOffset;
     if (this.reverse) offset = -offset;
