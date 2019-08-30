@@ -4,12 +4,11 @@
   :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
   :style="{ width: (liveDockSize) + 'px' }">
   <div
-    class="live-dock-chevron icon-button"
-    v-if="collapsed"
-    @click="setCollapsed(false)">
+    class="live-dock-chevron"
+    @click="collapsed ? setCollapsed(false) : setCollapsed(true)">
     <i :class="{
-      'icon-down icon-left': !onLeft,
-      'icon-down icon-right': onLeft
+      'icon-back': (!onLeft && collapsed) || (onLeft && !collapsed),
+      'icon-down icon-right': (onLeft && collapsed) || (!onLeft && !collapsed)
     }" />
   </div>
 
@@ -17,15 +16,6 @@
     <div
       v-if="!collapsed"
       class="live-dock-expanded-contents">
-      <div
-        class="live-dock-chevron icon-button"
-        @click="setCollapsed(true)">
-        <i
-          :class="{
-          'icon-down icon-left': onLeft,
-          'icon-down icon-right': !onLeft
-          }" />
-      </div>
       <div class="live-dock-header">
         <div class="flex flex--center">
           <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
@@ -110,8 +100,7 @@
 @import '../styles/index';
 
 .live-dock {
-  .padding(2);
-
+  padding-left: 16px;
   position: relative;
   z-index: 1000;
   width: 28%;
@@ -123,17 +112,9 @@
   }
 
   &.live-dock--left {
+    padding-left: 0;
+    padding-right: 16px;
     border-right: 1px solid var(--border);
-
-    .live-dock-chevron {
-      right: 5px;
-      left: inherit;
-    }
-  }
-
-  &.collapsed {
-    width: 20px !important;
-    padding: 0;
   }
 
   @media (max-width: 1070px) {
@@ -141,21 +122,46 @@
   }
 }
 
-.live-dock-chevron {
-  .absolute(@top: 0, @bottom: 0, @left: 0);
-
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding-left: 4px;
-
-  &:hover {
-    opacity: 1;
+.live-dock--left {
+  .live-dock-chevron {
+    right: 0;
+    left: auto;
   }
 
+  .live-dock-expanded-contents {
+    border-right: 1px solid var(--border);
+    border-left: none;
+  }
+}
+
+.live-dock.collapsed {
+  width: 20px !important;
+  padding: 0;
+
+  .live-dock-chevron {
+    .center();
+
+    border: none;
+  }
+}
+
+.live-dock-chevron {
+  width: 16px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+
   i {
-    font-size: 10px;
+    .center();
+
+    font-size: 12px;
+
+    &.icon-right {
+      transform: translate(-50%, -50%) rotate(-90deg);
+    }
   }
 }
 
@@ -182,6 +188,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 16px;
+  border-left: 1px solid var(--border);
 }
 
 .live-dock-info {

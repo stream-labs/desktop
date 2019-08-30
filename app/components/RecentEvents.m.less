@@ -1,0 +1,99 @@
+@import "../styles/index.less";
+
+.container {
+  padding: 0 16px;
+  height: 150px;
+  overflow: none;
+  flex-shrink: 0;
+}
+
+.container:global(.perf-mode) {
+  height: 500px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 8px;
+
+  h2 {
+    margin-right: auto;
+  }
+
+  i {
+    margin-left: 16px;
+  }
+}
+
+.eventContainer {
+  .radius();
+
+  height: calc(100% - 46px);
+  overflow-y: auto;
+  position: relative;
+  background: var(--section);
+}
+
+.cell {
+  .radius();
+
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+
+  span {
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+
+  i {
+    margin-left: auto;
+  }
+}
+
+.cell:nth-child(even) {
+  background: var(--background);
+}
+
+.donation {
+  color: var(--teal);
+}
+
+.bits {
+  color: var(--accent);
+}
+
+.sparks {
+  color: var(--blue);
+}
+
+.embers {
+  color: var(--warning);
+}
+
+.name {
+  color: var(--title);
+  font-weight: 500;
+}
+
+.timestamp {
+  opacity: 0.5;
+}
+
+.whisper {
+  font-style: italic;
+  opacity: 0.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.action-icon).red {
+  color: var(--warning);
+}
+
+.empty {
+  .center();
+
+  opacity: 0.5;
+}

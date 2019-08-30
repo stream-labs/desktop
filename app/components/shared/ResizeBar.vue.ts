@@ -51,12 +51,20 @@ export default class ResizeBar extends Vue {
       },
       { once: true },
     );
+    this.$root.$el.addEventListener(
+      'mouseleave',
+      (event: MouseEvent) => {
+        this.$root.$el.removeEventListener('mousemove', mouseMoveListener);
+        this.stopMouseTracking(event);
+      },
+      { once: true },
+    );
+
     this.mouseInitial = this.isHorizontal ? event.pageX : event.pageY;
     this.$emit('onresizestart', event);
   }
 
   stopMouseTracking(event: MouseEvent) {
-    this.$root.$off('mousemove', this.onMouseMoveHandler);
     this.active = false;
     let offset = this.barOffset;
     if (this.reverse) offset = -offset;
@@ -73,7 +81,12 @@ export default class ResizeBar extends Vue {
     // handle max and min constraints
     if (this.hasConstraints) {
       const value = this.reverse ? this.value - mouseOffset : this.value + mouseOffset;
-      if (value <= this.max && value >= this.min) {
+
+      if (value > this.max) {
+        this.barOffset = this.reverse ? this.value - this.max : this.max - this.value;
+      } else if (value < this.min) {
+        this.barOffset = this.reverse ? this.value - this.min : this.min - this.value;
+      } else {
         this.barOffset = mouseOffset;
       }
     } else {

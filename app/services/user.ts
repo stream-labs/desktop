@@ -238,8 +238,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+      const isMediaShare =
+        this.windowsService.state.RecentEvents &&
+        this.windowsService.state.RecentEvents.queryParams.isMediaShare
+          ? '&view=media-share'
+          : '';
 
-      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
+      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
     }
   }
 
@@ -441,20 +446,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       username: this.username,
       platform: this.platform.type,
     };
-  }
-
-  popoutRecentEvents() {
-    this.windowsService.createOneOffWindow(
-      {
-        componentName: 'RecentEvents',
-        title: $t('Recent Events'),
-        size: {
-          width: 800,
-          height: 600,
-        },
-      },
-      'RecentEvents',
-    );
   }
 
   /**

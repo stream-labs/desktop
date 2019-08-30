@@ -22,7 +22,7 @@
     </div>
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
-      <resize-observer @notify="handleResize"></resize-observer>
+      <resize-observer @notify="handleResize" />
       <component
         class="main-page-container"
         v-if="!showLoadingSpinner"
@@ -149,11 +149,11 @@
 
 .live-dock-resize-bar {
   position: absolute;
-  height: 100%;
+  height: calc(100% - 20px);
+  bottom: 0;
 }
 
 .live-dock-resize-bar--left {
-  top: 0;
   right: 0;
 }
 

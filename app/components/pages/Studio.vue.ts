@@ -9,6 +9,7 @@ import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
+import RecentEvents from 'components/RecentEvents';
 
 @Component({
   components: {
@@ -17,6 +18,7 @@ import { WindowsService } from 'services/windows';
     Display,
     StudioModeControls,
     ResizeBar,
+    RecentEvents,
   },
 })
 export default class Studio extends Vue {
@@ -34,9 +36,9 @@ export default class Studio extends Vue {
   maxHeight: number = null;
 
   mounted() {
-    this.handleWindowResize();
+    this.reconcileHeightsWithinContraints();
 
-    window.addEventListener('resize', this.handleWindowResize);
+    window.addEventListener('resize', this.windowResizeHandler);
 
     this.sizeCheckInterval = window.setInterval(() => {
       if (this.studioMode && this.$refs.studioModeContainer) {
@@ -54,15 +56,58 @@ export default class Studio extends Vue {
   destroyed() {
     clearInterval(this.sizeCheckInterval);
 
-    window.removeEventListener('resize', this.handleWindowResize);
+    window.removeEventListener('resize', this.windowResizeHandler);
   }
 
-  handleWindowResize() {
+  windowResizeHandler() {
+    this.reconcileHeightsWithinContraints();
+  }
+
+  /**
+   * Makes sure both the controls and events heights are reasonable sizes that
+   * fit within the window. If controls and events together are larger than the
+   * max height, then the events view will be reduced in size until a reasonable
+   * minimum, at which point the controls will start being reduced in size.
+   */
+  reconcileHeightsWithinContraints(isControlsResize = false) {
+    // This is the maximum height we can use
     this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
 
-    const clampedHeight = Math.min(this.height, this.maxHeight);
+    // Roughly 3 lines of events
+    const reasonableMinimumEventsHeight = 156;
 
-    if (clampedHeight !== this.height) this.height = clampedHeight;
+    // Roughly 1 mixer item
+    const reasonableMinimumControlsHeight = 150;
+
+    // Something needs to be adjusted to fit
+    if (this.controlsHeight + this.eventsHeight > this.maxHeight) {
+      // If we're resizing the controls then we should be more aggressive
+      // taking size from events
+      const minEventsHeight = isControlsResize
+        ? this.minEventsHeight
+        : reasonableMinimumEventsHeight;
+
+      if (this.eventsHeight > minEventsHeight) {
+        this.eventsHeight = Math.max(this.maxHeight - this.controlsHeight, minEventsHeight);
+
+        // If we are under max height, we are done
+        if (this.controlsHeight + this.eventsHeight <= this.maxHeight) return;
+      }
+
+      if (this.controlsHeight > reasonableMinimumControlsHeight) {
+        this.controlsHeight = Math.max(
+          this.maxHeight - this.eventsHeight,
+          reasonableMinimumControlsHeight,
+        );
+
+        // If we are under max height, we are done
+        if (this.controlsHeight + this.eventsHeight <= this.maxHeight) return;
+      }
+
+      // The final strategy is to just split the remaining space
+      this.controlsHeight = this.maxHeight / 2;
+      this.eventsHeight = this.maxHeight / 2;
+    }
   }
 
   get displayEnabled() {
@@ -85,15 +130,29 @@ export default class Studio extends Vue {
     this.customizationService.setSettings({ performanceMode: false });
   }
 
-  get height() {
-    return this.customizationService.state.bottomdockSize;
+  get eventsHeight() {
+    return this.customizationService.state.eventsSize;
   }
 
-  set height(value) {
-    this.customizationService.setSettings({ bottomdockSize: value });
+  set eventsHeight(value) {
+    this.customizationService.setSettings({ eventsSize: value });
+    this.reconcileHeightsWithinContraints();
   }
 
-  get minHeight() {
+  get controlsHeight() {
+    return this.customizationService.state.controlsSize;
+  }
+
+  set controlsHeight(value) {
+    this.customizationService.setSettings({ controlsSize: value });
+    this.reconcileHeightsWithinContraints(true);
+  }
+
+  get minEventsHeight() {
+    return 32;
+  }
+
+  get minControlsHeight() {
     return 50;
   }
 

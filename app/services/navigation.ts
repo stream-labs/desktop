@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 export type TAppPage =
   | 'Studio'
   | 'Dashboard'
-  | 'Live'
   | 'Onboarding'
   | 'BrowseOverlays'
   | 'PatchNotes'

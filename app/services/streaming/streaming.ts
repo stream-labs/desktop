@@ -138,7 +138,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.userService.isLoggedIn() &&
       this.customizationService.state.navigateToLiveOnStreamStart
     ) {
-      this.navigationService.navigate('Live');
+      this.navigationService.navigate('Studio');
     }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
