@@ -31,6 +31,7 @@ import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import CreatorSites from 'components/pages/CreatorSites';
+import FacebookMerge from 'components/pages/FacebookMerge';
 
 @Component({
   components: {
@@ -51,6 +52,7 @@ import CreatorSites from 'components/pages/CreatorSites';
     Help,
     ResizeBar,
     CreatorSites,
+    FacebookMerge,
   },
 })
 export default class Main extends Vue {
