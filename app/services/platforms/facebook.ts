@@ -56,6 +56,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     'user-info',
     'viewer-count',
     'stream-schedule',
+    'account-merging',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
@@ -99,6 +100,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&facebook&force_verify&origin=slobs`;
     return `https://${host}/slobs/login?${query}`;
+  }
+
+  get mergeUrl() {
+    const host = this.hostsService.streamlabs;
+    const token = this.userService.apiToken;
+    return `https://${host}/slobs/merge/${token}/facebook_account`;
   }
 
   get oauthToken() {

@@ -16,6 +16,13 @@
         }"
         class='search'
        />
+      <button
+        class="button button--default clear-search-button"
+        v-if="searchStr"
+        @click="searchStr = ''"
+      >
+        <i class="fa fa-times"></i>
+      </button>
       <NavItem
         v-for="category in categoryNames"
         :key="category"
@@ -70,6 +77,11 @@
 .settings {
   .transition();
 
+  & /deep/ h2 {
+    // reset 'capitalize' transform that works weird when text has a highlight caused by the search
+    text-transform: none;
+  }
+
   display: flex;
   align-content: stretch;
   align-items: stretch;
@@ -77,8 +89,17 @@
   margin: -16px;
 
   .search {
-    .margin-left();
+    .margin-left(2);
     .margin-bottom(2);
+  }
+
+  .clear-search-button {
+    position: absolute;
+    left: 188px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    i { margin-right: 0; }
   }
 
   .disabled {
