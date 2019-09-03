@@ -103,7 +103,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   get mergeUrl() {
-    const host = this.hostsService.beta3;
+    const host = this.hostsService.streamlabs;
     const token = this.userService.apiToken;
     return `https://${host}/slobs/merge/${token}/facebook_account`;
   }
