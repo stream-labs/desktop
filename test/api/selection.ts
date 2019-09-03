@@ -221,6 +221,9 @@ test('Scale', async t => {
       Item2: color_source
   `);
 
+  // TODO: find a reason why this test fails without `sleep` here
+  await sleep(1000);
+
   selectionService.select([getNodeId('Item1'), getNodeId('Item2')]);
   const item1 = scene.getItem(getNodeId('Item1'));
   const item2 = scene.getItem(getNodeId('Item2'));
