@@ -291,9 +291,7 @@ test('isSceneFolder', async t => {
   `);
 
   selectionService.selectAll();
-
   t.false(selectionService.isSceneFolder());
-  t.pass();
 
   selectionService.select([getNodeId('Folder1')]);
   t.true(selectionService.isSceneFolder());
