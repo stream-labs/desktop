@@ -69,7 +69,7 @@ export default class SearchablePages extends TsxComponent<{
   /**
    * fetch and cache all text information from the page
    */
-  private async scanPages() {
+  async scanPages() {
     this.pagesInfo = {};
 
     // switch and render each page
