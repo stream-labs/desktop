@@ -221,9 +221,6 @@ test('Scale', async t => {
       Item2: color_source
   `);
 
-  // TODO: find a reason why this test fails without `sleep` here
-  await sleep(1000);
-
   selectionService.select([getNodeId('Item1'), getNodeId('Item2')]);
   const item1 = scene.getItem(getNodeId('Item1'));
   const item2 = scene.getItem(getNodeId('Item2'));
@@ -283,4 +280,30 @@ test('Scale', async t => {
     y: 0.25
   });
 
+});
+
+test('isSceneFolder', async t => {
+  sceneBuilder.build(`
+    Folder1
+    Folder2
+      Folder3
+        Item3:
+  `);
+
+  selectionService.selectAll();
+
+  t.false(selectionService.isSceneFolder());
+  t.pass();
+
+  selectionService.select([getNodeId('Folder1')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Folder2')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Folder3')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Item3')]);
+  t.false(selectionService.isSceneFolder());
 });
