@@ -56,7 +56,7 @@
 
   </sl-vue-tree>
 
-  <help-tip :dismissable-key="helpTipDismissable">
+  <help-tip :dismissable-key="helpTipDismissable" :position="{ top: '-8px', left: '102px' }">
     <div slot="title">
       {{ $t('Scene Collections') }}
     </div>

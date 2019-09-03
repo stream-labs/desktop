@@ -84,6 +84,8 @@ export class AppService extends StatefulService<IAppState> {
 
   readonly pid = require('process').pid;
 
+  onboarded: boolean;
+
   @track('app_start')
   @RunInLoadingMode()
   async load() {
@@ -109,7 +111,7 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.sceneCollectionsService.initialize();
 
-    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    this.onboarded = this.onboardingService.startOnboardingIfRequired();
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
@@ -133,7 +135,7 @@ export class AppService extends StatefulService<IAppState> {
     this.ipcServerService.listen();
     this.tcpServerService.listen();
 
-    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.patchNotesService.showPatchNotesIfRequired(this.onboarded);
     this.announcementsService.updateBanner();
 
     const _outageService = this.outageNotificationsService;

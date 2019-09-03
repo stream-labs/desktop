@@ -11,6 +11,8 @@ import { UserService } from 'services/user';
 import electron from 'electron';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
+import HelpTip from './shared/HelpTip.vue';
+import { EDismissable, DismissablesService } from 'services/dismissables';
 
 const getName = (event: IRecentEvent) => {
   if (event.gifter) return event.gifter;
@@ -24,6 +26,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
+  @Inject() dismissablesService: DismissablesService;
 
   queuePaused = false;
   eventsCollapsed = false;
@@ -84,6 +87,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     if (!native && this.customizationService.state.eventsSize < 250) {
       // Switch to a reasonably sized events feed
       this.customizationService.setSettings({ eventsSize: 250 });
+    }
+
+    if (!native) {
+      this.dismissablesService.dismiss(EDismissable.RecentEventsHelpTip);
     }
 
     this.customizationService.setSettings({ legacyEvents: !native });
@@ -153,6 +160,18 @@ export default class RecentEvents extends TsxComponent<{}> {
           onNativeswitch={val => this.setNative(val)}
         />
         {this.native ? this.renderNativeEvents(h) : this.renderEmbeddedEvents(h)}
+        <HelpTip
+          dismissableKey={EDismissable.RecentEventsHelpTip}
+          position={{ top: '-8px', right: '360px' }}
+          tipPosition="right"
+        >
+          <div slot="title">{$t('New Events Feed')}</div>
+          <div slot="content">
+            {$t(
+              'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
+            )}
+          </div>
+        </HelpTip>
       </div>
     );
   }
