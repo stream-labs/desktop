@@ -60,6 +60,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     mediaBackupOptOut: false,
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
+    legacyEvents: false,
     experimental: {
       // put experimental features here
     },

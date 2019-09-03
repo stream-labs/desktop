@@ -6,6 +6,11 @@ import TsxComponent from './tsx-component';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
 import styles from './RecentEvents.m.less';
+import BrowserView from 'components/shared/BrowserView';
+import { UserService } from 'services/user';
+import electron from 'electron';
+import { NavigationService } from 'services/navigation';
+import { CustomizationService } from 'services/customization';
 
 const getName = (event: IRecentEvent) => {
   if (event.gifter) return event.gifter;
@@ -16,8 +21,16 @@ const getName = (event: IRecentEvent) => {
 @Component({})
 export default class RecentEvents extends TsxComponent<{}> {
   @Inject() recentEventsService: RecentEventsService;
+  @Inject() userService: UserService;
+  @Inject() navigationService: NavigationService;
+  @Inject() customizationService: CustomizationService;
 
   queuePaused = false;
+  eventsCollapsed = false;
+
+  get native() {
+    return !this.customizationService.state.legacyEvents;
+  }
 
   get recentEvents() {
     return this.recentEventsService.state.recentEvents;
@@ -67,6 +80,64 @@ export default class RecentEvents extends TsxComponent<{}> {
     } catch (e) {}
   }
 
+  setNative(native: boolean) {
+    if (!native && this.customizationService.state.eventsSize < 250) {
+      // Switch to a reasonably sized events feed
+      this.customizationService.setSettings({ eventsSize: 250 });
+    }
+
+    this.customizationService.setSettings({ legacyEvents: !native });
+  }
+
+  handleBrowserViewReady(view: Electron.BrowserView) {
+    if (view.isDestroyed()) return;
+
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
+    view.webContents.on('new-window', (e, url) => {
+      const match = url.match(/dashboard\/([^\/^\?]*)/);
+
+      if (match && match[1] === 'recent-events') {
+        this.popoutRecentEvents();
+      } else if (match) {
+        this.navigationService.navigate('Dashboard', {
+          subPage: match[1],
+        });
+      } else {
+        electron.remote.shell.openExternal(url);
+      }
+    });
+  }
+
+  renderNativeEvents(h: Function) {
+    return (
+      <div class={styles.eventContainer}>
+        {!!this.recentEvents.length &&
+          this.recentEvents.map(event => (
+            <EventCell
+              event={event}
+              repeatAlert={this.repeatAlert.bind(this)}
+              eventString={this.eventString.bind(this)}
+            />
+          ))}
+        {this.recentEvents.length === 0 && (
+          <div class={styles.empty}>{$t('There are no events to display')}</div>
+        )}
+      </div>
+    );
+  }
+
+  renderEmbeddedEvents(h: Function) {
+    return (
+      <BrowserView
+        class={styles.eventContainer}
+        src={this.userService.recentEventsUrl()}
+        setLocale={true}
+        onReady={view => this.handleBrowserViewReady(view)}
+      />
+    );
+  }
+
   render(h: Function) {
     return (
       <div class={styles.container}>
@@ -78,20 +149,10 @@ export default class RecentEvents extends TsxComponent<{}> {
           toggleQueue={() => this.toggleQueue()}
           queuePaused={this.queuePaused}
           muted={this.muted}
+          native={this.native}
+          onNativeswitch={val => this.setNative(val)}
         />
-        <div class={styles.eventContainer}>
-          {!!this.recentEvents.length &&
-            this.recentEvents.map(event => (
-              <EventCell
-                event={event}
-                repeatAlert={this.repeatAlert.bind(this)}
-                eventString={this.eventString.bind(this)}
-              />
-            ))}
-          {this.recentEvents.length === 0 && (
-            <div class={styles.empty}>{$t('There are no events to display')}</div>
-          )}
-        </div>
+        {this.native ? this.renderNativeEvents(h) : this.renderEmbeddedEvents(h)}
       </div>
     );
   }
@@ -105,6 +166,8 @@ interface IToolbarProps {
   toggleQueue: Function;
   queuePaused: boolean;
   muted: boolean;
+  native: boolean;
+  onNativeswitch: (native: boolean) => void;
 }
 
 // TODO: Refactor into stateless functional component
@@ -117,36 +180,51 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() toggleQueue: () => void;
   @Prop() queuePaused: boolean;
   @Prop() muted: boolean;
+  @Prop() native: boolean;
 
   render(h: Function) {
     const pauseTooltip = this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue');
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
-        <span class="action-icon" onClick={this.popoutRecentEvents}>
+        <span class="action-icon" onClick={() => this.$emit('nativeswitch', !this.native)}>
+          <i class="icon-live-dashboard" />
+          <span style={{ marginLeft: '8px' }}>
+            {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
+          </span>
+        </span>
+        {/* <span class="action-icon" onClick={this.popoutRecentEvents}>
           <i class="icon-pop-out-2" />
           <span style={{ marginLeft: '8px' }}>Pop Out Full Events View</span>
-        </span>
-        <i
-          class="icon-music action-icon"
-          onClick={this.popoutMediaShare}
-          v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
-        />
-        <i
-          class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
-          onClick={this.toggleQueue}
-          v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
-        />
-        <i
-          class="icon-skip action-icon"
-          onClick={this.skipAlert}
-          v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
-        />
-        <i
-          class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
-          onClick={this.muteEvents}
-          v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
-        />
+        </span> */}
+        {this.native && (
+          <i
+            class="icon-music action-icon"
+            onClick={this.popoutMediaShare}
+            v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
+          />
+        )}
+        {this.native && (
+          <i
+            class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
+            onClick={this.toggleQueue}
+            v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
+          />
+        )}
+        {this.native && (
+          <i
+            class="icon-skip action-icon"
+            onClick={this.skipAlert}
+            v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
+          />
+        )}
+        {this.native && (
+          <i
+            class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
+            onClick={this.muteEvents}
+            v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
+          />
+        )}
       </div>
     );
   }
