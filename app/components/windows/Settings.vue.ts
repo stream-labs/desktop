@@ -48,7 +48,7 @@ export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
 
-  $refs: { settingsContainer: HTMLElement };
+  $refs: { settingsContainer: HTMLElement & SearchablePages };
 
   searchStr = '';
   searchResultPages: string[] = [];
@@ -108,11 +108,24 @@ export default class Settings extends Vue {
     return this.settingsService.getSettingsFormData(categoryName);
   }
 
+  onBeforePageScanHandler(page: string) {
+    this.settingsData = this.getSettingsData(page);
+  }
+
+  onPageRenderHandler(page: string) {
+    // hotkeys.vue has a delayed rendering, we have to wait before scanning
+    if (page === 'Hotkeys') return new Promise(r => setTimeout(r, 500));
+  }
+
   onSearchCompletedHandler(foundPages: string[]) {
     this.searchResultPages = foundPages;
     // if there are not search results for the current page than switch to the first found page
     if (foundPages.length && !foundPages.includes(this.categoryName)) {
       this.categoryName = foundPages[0];
     }
+  }
+
+  highlightSearch(searchStr: string) {
+    this.$refs.settingsContainer.highlightPage(searchStr);
   }
 }

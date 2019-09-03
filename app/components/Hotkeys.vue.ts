@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services';
 import { HotkeysService, IHotkeysSet, IHotkey } from 'services/hotkeys';
 import { ScenesService } from '../services/scenes';
@@ -30,7 +30,21 @@ export default class Hotkeys extends Vue {
 
   hotkeySet: IHotkeysSet = null;
 
-  searchString = '';
+  // sync global search and local search
+  @Prop()
+  globalSearchStr: string;
+  @Watch('globalSearchStr')
+  onGlobalSearchChange(val: string) {
+    this.searchString = val;
+  }
+
+  @Prop()
+  highlightSearch: (searchStr: string) => any;
+  searchString = this.globalSearchStr || '';
+  @Watch('searchString')
+  onSearchStringChangedHandler(val: string) {
+    this.highlightSearch(val);
+  }
 
   mounted() {
     // We don't want hotkeys registering while trying to bind.

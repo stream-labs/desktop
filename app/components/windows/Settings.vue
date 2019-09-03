@@ -33,14 +33,15 @@
       :page="categoryName"
       :pages="categoryNames"
       :searchStr="searchStr"
+      :onBeforePageScan="onBeforePageScanHandler"
+      :onPageRender="onPageRenderHandler"
       @searchCompleted="onSearchCompletedHandler"
-      @beforePageScan="page => settingsData = getSettingsData(page)"
       @scanCompleted="settingsData = getSettingsData(categoryName)"
       v-slot:default="{ page }"
     >
       <extra-settings v-if="page === 'General'" />
       <language-settings v-if="page === 'General'" />
-      <hotkeys v-if="page === 'Hotkeys'" />
+      <hotkeys v-if="page === 'Hotkeys'" :globalSearchStr="searchStr" :highlightSearch="highlightSearch"/>
       <developer-settings v-if="page === 'Developer'" />
       <installed-apps v-if="page === 'Installed Apps'" />
       <overlay-settings v-if="page === 'Scene Collections'" />
