@@ -10,7 +10,6 @@ Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
-import Dashboard from '../pages/Dashboard.vue';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
@@ -30,7 +29,6 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import CreatorSites from 'components/pages/CreatorSites';
 import FacebookMerge from 'components/pages/FacebookMerge';
 
 @Component({
@@ -38,7 +36,6 @@ import FacebookMerge from 'components/pages/FacebookMerge';
     TitleBar,
     SideNav,
     Studio,
-    Dashboard,
     BrowseOverlays,
     Onboarding,
     LiveDock,
@@ -51,7 +48,6 @@ import FacebookMerge from 'components/pages/FacebookMerge';
     PlatformAppStore,
     Help,
     ResizeBar,
-    CreatorSites,
     FacebookMerge,
   },
 })
