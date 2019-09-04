@@ -24,7 +24,7 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
     // Some keys have extra show criteria
     if (key === EDismissable.RecentEventsHelpTip && !this.state[key]) {
       // If this is a fresh cache, never show the tip
-      if (this.appService.onboarded) {
+      if (this.appService.state.onboarded) {
         this.dismiss(key);
         return false;
       }
