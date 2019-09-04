@@ -34,6 +34,8 @@ export interface IRecentEvent {
   displayString?: string;
   comment?: string;
   title?: string;
+  isTest?: boolean;
+  repeat?: boolean;
 }
 
 interface IRecentEventsState {
@@ -228,8 +230,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onEventSocket(e: IEventSocketEvent) {
-    e.message.forEach((msg: IRecentEvent) => (msg.type = e.type));
-    this.ADD_RECENT_EVENT(e.message);
+    const messages = e.message.filter(msg => !msg.isTest && !msg.repeat);
+    messages.forEach(msg => (msg.type = e.type));
+    this.ADD_RECENT_EVENT(messages);
   }
 
   getEventString(event: IRecentEvent) {
