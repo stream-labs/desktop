@@ -26,7 +26,7 @@
     </div>
   </div>
   <resize-bar
-    v-if="!performanceMode"
+    v-if="!performanceMode && isLoggedIn"
     position="top"
     v-model="eventsHeight"
     @onresizestop="onResizeStopHandler()"
@@ -36,7 +36,7 @@
     :reverse="true"
   />
   <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
-    <recent-events :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
+    <recent-events v-if="isLoggedIn" :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
     <resize-bar
       position="top"
       v-model="controlsHeight"
