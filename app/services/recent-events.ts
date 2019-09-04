@@ -34,6 +34,7 @@ export interface IRecentEvent {
   displayString?: string;
   comment?: string;
   title?: string;
+  iso8601Created?: string;
 }
 
 interface IRecentEventsState {
@@ -228,7 +229,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onEventSocket(e: IEventSocketEvent) {
-    e.message.forEach((msg: IRecentEvent) => (msg.type = e.type));
+    e.message.forEach((msg: IRecentEvent) => {
+      msg.type = e.type;
+      msg.iso8601Created = new Date().toISOString();
+    });
     this.ADD_RECENT_EVENT(e.message);
   }
 

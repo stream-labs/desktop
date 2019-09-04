@@ -1,11 +1,11 @@
-import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import moment from 'moment';
-import { RecentEventsService, IRecentEvent } from 'services/recent-events';
-import TsxComponent from './tsx-component';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
+import { IRecentEvent, RecentEventsService } from 'services/recent-events';
+import { Component, Prop } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
+import TsxComponent from './tsx-component';
 
 const getName = (event: IRecentEvent) => {
   if (event.gifter) return event.gifter;
@@ -83,6 +83,7 @@ export default class RecentEvents extends TsxComponent<{}> {
           {!!this.recentEvents.length &&
             this.recentEvents.map(event => (
               <EventCell
+                key={event.id.toString()}
                 event={event}
                 repeatAlert={this.repeatAlert.bind(this)}
                 eventString={this.eventString.bind(this)}
@@ -178,10 +179,39 @@ class EventCell extends TsxComponent<{
   @Prop() eventString: (event: IRecentEvent) => string;
   @Prop() repeatAlert: (event: IRecentEvent) => void;
 
+  timestamp = '';
+  timestampInterval: number;
+
+  mounted() {
+    this.updateTimestamp();
+
+    this.timestampInterval = window.setInterval(() => {
+      this.updateTimestamp();
+    }, 60 * 1000);
+  }
+
+  destroyed() {
+    if (this.timestampInterval) clearInterval(this.timestampInterval);
+  }
+
+  updateTimestamp() {
+    this.timestamp = moment.utc(this.createdAt).fromNow(true);
+  }
+
+  get createdAt(): moment.Moment {
+    if (this.event.iso8601Created) {
+      return moment(this.event.iso8601Created);
+    }
+
+    return moment.utc(this.event.created_at);
+  }
+
   render(h: Function) {
+    console.log(this.event);
+
     return (
       <div class={styles.cell}>
-        <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
+        <span class={styles.timestamp}>{this.timestamp}</span>
         <span class={styles.name}>{getName(this.event)}</span>
         <span>{this.eventString(this.event)}</span>
         {this.event.gifter && (
