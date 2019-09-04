@@ -68,12 +68,12 @@ test('Streaming to Twitch', async t => {
 
   await setOutputResolution(t, '100x100');
 
+  // add a single source to prevent showing the No-Sources dialog
+  await addColorSource();
+
   // open EditStreamInfo window
   await focusMain(t);
   await app.client.click('button=Go Live');
-
-  // add a single source to prevent showing the No-Sources dialog
-  await addColorSource();
 
   // set stream info, and start stream
   await focusChild(t);
