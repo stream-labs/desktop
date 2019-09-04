@@ -11,7 +11,7 @@ const request = require('request');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
-const TIMEOUT = 3; // timeout in minutes
+const TIMEOUT = 20; // timeout in minutes
 
 (function main() {
   try {
