@@ -239,6 +239,10 @@ export class AppService extends StatefulService<IAppState> {
     return returningValue;
   }
 
+  openDevTools() {
+    electron.ipcRenderer.send('openDevTools');
+  }
+
   @mutation()
   private START_LOADING() {
     this.state.loading = true;

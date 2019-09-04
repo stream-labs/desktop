@@ -7,8 +7,8 @@ import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
 import { WindowsService } from 'services/windows';
-import { async } from 'rxjs/internal/scheduler/async';
 import { installFetchMock } from './network';
+import { AppService } from '../../../app/services/app';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -184,6 +184,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // await sleep(10000);
 
+    const client = await getClient();
+    if (options.pauseIfFailed) {
+      client.getResource<AppService>('AppService').openDevTools();
+    }
+
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
@@ -199,7 +204,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
 
     // disable the popups that prevents context menu to be shown
-    const client = await getClient();
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
