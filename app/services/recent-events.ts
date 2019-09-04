@@ -87,7 +87,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async initialize() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
-      destroy: () => Promise.resolve(),
+      destroy: () => Promise.resolve(this.SET_RECENT_EVENTS([])),
       context: this,
     });
   }
