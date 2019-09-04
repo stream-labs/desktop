@@ -38,7 +38,7 @@ export default class Utils {
   }
 
   static isUnstable(): boolean {
-    return electron.remote.process.env.NAIR_UNSTABLE;
+    return !!electron.remote.process.env.NAIR_UNSTABLE;
   }
 
   static isPreview(): boolean {
