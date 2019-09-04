@@ -6,8 +6,6 @@ import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
-import { WindowsService } from 'services/windows';
-import { async } from 'rxjs/internal/scheduler/async';
 import { installFetchMock } from './network';
 
 // save names of all running tests to use them in the retrying mechanism
@@ -104,12 +102,20 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
-let startApp: (t: TExecutionContext) => Promise<any>;
-let stopApp: (clearCache?: boolean) => Promise<any>;
+let startAppFn: (t: TExecutionContext) => Promise<any>;
+let stopAppFn: (clearCache?: boolean) => Promise<any>;
+
+export async function startApp(t: TExecutionContext) {
+  return startAppFn(t);
+}
+
+export async function stopApp(clearCache?: boolean) {
+  return stopAppFn(clearCache);
+}
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
-  await stopApp(false);
-  return await startApp(t);
+  await stopAppFn(false);
+  return await startAppFn(t);
 }
 
 let skipCheckingErrorsInLogFlag = false;
@@ -133,7 +139,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let logFileLastReadingPos = 0;
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  startApp = async function startApp(t: TExecutionContext): Promise<Application> {
+  startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -218,7 +224,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     return app;
   };
 
-  stopApp = async function stopApp(clearCache = true) {
+  stopAppFn = async function stopApp(clearCache = true) {
     try {
       await app.stop();
     } catch (e) {
@@ -269,7 +275,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
+    if (options.restartAppAfterEachTest || !appIsRunning) await startAppFn(t);
   });
 
   test.afterEach(async t => {
@@ -291,7 +297,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp();
+        await stopAppFn();
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -311,7 +317,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
-    await stopApp();
+    await stopAppFn();
     if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
