@@ -48,20 +48,20 @@ plugins.push((store: Store<any>) => {
         payload: mutation.payload,
       };
       internalApiService.handleMutation(mutationToSend);
-      ipcRenderer.send('vuex-mutation', mutationToSend);
+      ipcRenderer.send('vuex-mutation', JSON.stringify(mutationToSend));
     }
   });
 
   // Only the main window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
-    win.webContents.send('vuex-loadState', store.state);
+    win.webContents.send('vuex-loadState', JSON.stringify(store.state));
   });
 
   // Only child windows should ever receive this
   ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
-      state,
+      state: JSON.parse(state),
       __vuexSyncIgnore: true,
     });
 
@@ -72,8 +72,10 @@ plugins.push((store: Store<any>) => {
   });
 
   // All windows can receive this
-  ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutation: any) => {
+  ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutationString: string) => {
     if (!storeCanReceiveMutations) return;
+
+    const mutation = JSON.parse(mutationString);
 
     // for main window commit mutation directly
     if (Util.isMainWindow()) {

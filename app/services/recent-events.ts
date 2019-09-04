@@ -5,6 +5,7 @@ import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
+import pick from 'lodash/pick';
 
 export interface IRecentEvent {
   id: number;
@@ -97,7 +98,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return this.fetchMutedState();
   }
 
-  fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent> }> {
+  fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
       this.userService.widgetToken
     }`;
@@ -123,7 +124,40 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
     Object.keys(events.data).forEach(key => {
-      eventArray = eventArray.concat(events.data[key]);
+      // This server response returns a ton of stuff. We remove the noise
+      // before adding it to the store.
+      const culledEvents: IRecentEvent[] = events.data[key].map(event => {
+        return pick(event, [
+          'id',
+          'name',
+          'from',
+          'type',
+          'platform',
+          'created_at',
+          'display_name',
+          'from_display_name',
+          'amount',
+          'crate_item',
+          'message',
+          'product',
+          'viewers',
+          'host_type',
+          'raiders',
+          'formatted_amount',
+          'sub_plan',
+          'months',
+          'streak_months',
+          'gifter',
+          'currency',
+          'skill',
+          'since',
+          'displayString',
+          'comment',
+          'title',
+        ]);
+      });
+
+      eventArray = eventArray.concat(culledEvents);
     });
 
     eventArray.sort((a: IRecentEvent, b: IRecentEvent) => {
