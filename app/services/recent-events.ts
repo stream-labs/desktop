@@ -57,6 +57,12 @@ const subscriptionMap = (subPlan: string) => {
   }[subPlan];
 };
 
+/**
+ * This function duplicates per-event logic from streamlabs.com for
+ * creating cache keys used in fetching read status of events and
+ * serves as the best proxy for a unique identifier for each
+ * event. Should be refactored when backend is rewritten for consistency
+ */
 function getHashForRecentEvent(event: IRecentEvent) {
   switch (event.type) {
     case 'donation':
@@ -185,18 +191,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   private async formEventsArray() {
     const events = await this.fetchRecentEvents();
-    // const readReciepts = await this.fetchReadReceipts();
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
     Object.keys(events.data).forEach(key => {
-      const fortifiedEvents: IRecentEvent[] = events.data[key].map(event => {
+      const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
         return event;
       });
 
       // This server response returns a ton of stuff. We remove the noise
       // before adding it to the store.
-      const culledEvents: IRecentEvent[] = fortifiedEvents.map(event => {
+      const culledEvents = fortifiedEvents.map(event => {
         return pick(event, [
           'name',
           'from',
@@ -406,9 +411,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   @mutation()
   private TOGGLE_RECENT_EVENT_READ(eventHash: string) {
-    const matches = this.state.recentEvents.forEach((event, index) => {
+    this.state.recentEvents.forEach((event, index) => {
       if (event.hash === eventHash) {
-        this.state.recentEvents[index].read = !this.state.recentEvents[index].read;
+        event.read = !event.read;
       }
     });
   }
