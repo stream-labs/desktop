@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsInput, TObsValue } from './ObsInput';
 import { propertyComponentForType } from './Components';
@@ -28,7 +27,6 @@ export default class GenericForm extends TsxComponent<{
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
 
-    if (this.onInput) this.onInput(newValue, index);
     this.$emit('input', newValue, index);
   }
 
