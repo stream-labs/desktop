@@ -40,14 +40,6 @@ export default class ExtraSettings extends Vue {
     this.customizationService.setUpdateStreamInfoOnLive(value);
   }
 
-  get navigateToLive() {
-    return this.customizationService.state.navigateToLiveOnStreamStart;
-  }
-
-  set navigateToLive(value: boolean) {
-    this.customizationService.setNavigateToLive(value);
-  }
-
   showCacheDir() {
     electron.remote.shell.openItem(this.appService.appDataDirectory);
   }

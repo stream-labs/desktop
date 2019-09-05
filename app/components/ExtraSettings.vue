@@ -36,11 +36,6 @@
           :metadata="{ title: $t('Confirm stream title and game before going live') }"
         />
         <bool-input
-          v-model="navigateToLive"
-          name="navigate_to_live"
-          :metadata="{ title: $t('Navigate to Live tab when going live') }"
-        />
-        <bool-input
           v-model="disableHardwareAcceleration"
           name="disable_ha"
           :metadata="{ title: $t('Disable hardware acceleration (requires restart)') }"

@@ -59,7 +59,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
     folderSelection: false,
-    navigateToLiveOnStreamStart: true,
     experimental: {
       // put experimental features here
     },
@@ -126,10 +125,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setMediaBackupOptOut(optOut: boolean) {
     this.setSettings({ mediaBackupOptOut: optOut });
-  }
-
-  setNavigateToLive(enabled: boolean) {
-    this.setSettings({ navigateToLiveOnStreamStart: enabled });
   }
 
   getSettingsFormData(): TObsFormData {
