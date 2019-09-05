@@ -227,22 +227,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       });
 
       eventArray = eventArray.concat(culledEvents);
-      // eventArray.forEach(event => {
-      //   event.hash = getHashForRecentEvent(event);
-      // });
     });
-    
-    console.log(eventArray);
-    // ridiculous
+
+    // Format string of keys to look for in server event cache
     const hashValues = eventArray.map(event => event.hash).join('|##|');
-    console.log(hashValues);
+
+    // Get read status for all events
     const readReceipts = await this.fetchReadReceipts(hashValues);
-    console.log(readReceipts);
     eventArray.forEach(event => {
       event.read = readReceipts[event.hash] ? readReceipts[event.hash] : false;
     });
-
-    console.log(eventArray);
 
     eventArray.sort((a: IRecentEvent, b: IRecentEvent) => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
