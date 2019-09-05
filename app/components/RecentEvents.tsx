@@ -225,10 +225,6 @@ class Toolbar extends TsxComponent<IToolbarProps> {
             {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
           </span>
         </span>
-        {/* <span class="action-icon" onClick={this.popoutRecentEvents}>
-          <i class="icon-pop-out-2" />
-          <span style={{ marginLeft: '8px' }}>Pop Out Full Events View</span>
-        </span> */}
         {this.native && (
           <i
             class="icon-music action-icon"
@@ -252,7 +248,12 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         )}
         {this.native && (
           <i
-            class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
+            class={cx('action-icon', {
+              [styles.red]: this.muted,
+              fa: !this.muted,
+              'fa-volume-up': !this.muted,
+              'icon-mute': this.muted,
+            })}
             onClick={this.muteEvents}
             v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
           />

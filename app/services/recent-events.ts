@@ -224,6 +224,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onSocketEvent(e: TSocketEvent) {
+    if (e.type === 'eventsPanelSettingsUpdate') {
+      if (e.message.muted != null) {
+        this.SET_MUTED(e.message.muted);
+      }
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
@@ -276,9 +282,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
-    return await fetch(new Request(url, { headers, body, method: 'POST' }))
-      .then(handleResponse)
-      .then(() => this.SET_MUTED(!this.state.muted));
+    return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
 
   openRecentEventsWindow(isMediaShare?: boolean) {
