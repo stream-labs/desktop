@@ -33,6 +33,7 @@ export interface IRecentEvent {
   displayString?: string;
   comment?: string;
   title?: string;
+  iso8601Created?: string;
   createdAt?: string;
   streamer?: string;
   giftType?: string;
@@ -352,6 +353,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
       msg.read = false;
+      msg.iso8601Created = new Date().toISOString();
     });
     this.ADD_RECENT_EVENT(messages);
   }
