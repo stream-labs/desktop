@@ -38,7 +38,6 @@ export default class RecentEvents extends TsxComponent<{}> {
   }
 
   repeatAlert(event: IRecentEvent) {
-    console.log('repeating', event);
     return this.recentEventsService.repeatAlert(event);
   }
 
@@ -60,7 +59,6 @@ export default class RecentEvents extends TsxComponent<{}> {
   }
 
   readAlert(event: IRecentEvent) {
-    console.log('read event', event);
     return this.recentEventsService.readAlert(event);
   }
 
