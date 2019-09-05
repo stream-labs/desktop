@@ -59,6 +59,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
     folderSelection: false,
+    legacyEvents: false,
     experimental: {
       // put experimental features here
     },

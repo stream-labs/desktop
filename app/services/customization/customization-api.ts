@@ -21,6 +21,7 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   experimental: any;
+  legacyEvents: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}
