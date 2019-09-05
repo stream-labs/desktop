@@ -14,6 +14,7 @@
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
+    "start:unstable": "cross-env NAIR_UNSTABLE=1 electron .",
     "clear-plugins": "rimraf plugins",
     "package": "yarn package:stable",
     "package:stable": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/stable.config.js",
