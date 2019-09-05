@@ -135,6 +135,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * scene collections backed up on the server, it will reset
    * the manifest and load from the server.
    */
+  @RunInLoadingMode()
   async setupNewUser() {
     await this.initialize();
   }

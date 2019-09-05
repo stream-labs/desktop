@@ -354,9 +354,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     onWindowShow: () => void,
     onAuthStart: () => void,
     onAuthFinish: (result: EPlatformCallResult) => void,
+    merge = false,
   ) {
     const service = getPlatformService(platform);
     const partition = `persist:${uuid()}`;
+    const authUrl =
+      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+
+    if (merge && !this.isLoggedIn()) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
@@ -371,9 +378,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
-      const parsed = this.parseAuthFromUrl(url);
+      const parsed = this.parseAuthFromUrl(url, merge);
 
       if (parsed) {
+        // This is a hack to work around the fact that the merge endpoint
+        // returns the wrong token.
+        if (merge) parsed.apiToken = this.apiToken;
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
@@ -388,7 +398,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.removeMenu();
-    authWindow.loadURL(service.authUrl);
+    authWindow.loadURL(authUrl);
   }
 
   updatePlatformToken(token: string) {
@@ -402,19 +412,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   /**
    * Parses tokens out of the auth URL
    */
-  private parseAuthFromUrl(url: string) {
+  private parseAuthFromUrl(url: string, merge: boolean) {
     const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
+    const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
 
-    if (
-      query.token &&
-      query.platform_username &&
-      query.platform_token &&
-      query.platform_id &&
-      query.oauth_token
-    ) {
+    if (!merge) requiredFields.push('token', 'oauth_token');
+
+    if (requiredFields.every(field => !!query[field])) {
       return {
-        widgetToken: query.token,
-        apiToken: query.oauth_token,
+        widgetToken: merge ? this.widgetToken : query.token,
+        apiToken: merge ? this.apiToken : query.oauth_token,
         platform: {
           type: query.platform,
           username: query.platform_username,

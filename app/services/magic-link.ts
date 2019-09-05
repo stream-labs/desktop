@@ -13,10 +13,12 @@ export class MagicLinkService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
 
-  async getDashboardMagicLink() {
+  async getDashboardMagicLink(subPage = '') {
     const token = (await this.fetchNewToken()).login_token;
 
-    return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/magic/dashboard?login_token=${token}&r=${subPage}`;
   }
 
   private fetchNewToken(): Promise<ILoginTokenResponse> {
