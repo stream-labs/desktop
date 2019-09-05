@@ -76,6 +76,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.skipAlert();
   }
 
+  readAlert(event: IRecentEvent) {
+    return this.recentEventsService.readAlert(event);
+  }
+
   async toggleQueue() {
     try {
       this.queuePaused
@@ -138,6 +142,7 @@ export default class RecentEvents extends TsxComponent<{}> {
               event={event}
               repeatAlert={this.repeatAlert.bind(this)}
               eventString={this.eventString.bind(this)}
+              readAlert={this.readAlert.bind(this)}
             />
           ))}
         {this.recentEvents.length === 0 && (
@@ -284,14 +289,19 @@ class EventCell extends TsxComponent<{
   event: IRecentEvent;
   eventString: (event: IRecentEvent) => string;
   repeatAlert: (event: IRecentEvent) => void;
+  readAlert: (event: IRecentEvent) => void;
 }> {
   @Prop() event: IRecentEvent;
   @Prop() eventString: (event: IRecentEvent) => string;
   @Prop() repeatAlert: (event: IRecentEvent) => void;
+  @Prop() readAlert: (event: IRecentEvent) => void;
 
   render(h: Function) {
     return (
-      <div class={styles.cell}>
+      <div
+        class={cx(styles.cell, this.event.read ? styles.cellRead : '')}
+        onClick={() => this.readAlert(this.event)}
+      >
         <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
         <span class={styles.name}>{getName(this.event)}</span>
         <span>{this.eventString(this.event)}</span>
@@ -308,7 +318,10 @@ class EventCell extends TsxComponent<{
         )}
         <i
           class="icon-repeat action-icon"
-          onClick={() => this.repeatAlert(this.event)}
+          onClick={(event: any) => {
+            event.stopPropagation();
+            this.repeatAlert(this.event);
+          }}
           v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
         />
       </div>
