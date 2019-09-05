@@ -13,6 +13,7 @@ import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import HelpTip from './shared/HelpTip.vue';
 import { EDismissable, DismissablesService } from 'services/dismissables';
+import { MagicLinkService } from 'services/magic-link';
 
 const getName = (event: IRecentEvent) => {
   if (event.gifter) return event.gifter;
@@ -27,6 +28,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() dismissablesService: DismissablesService;
+  @Inject() magicLinkService: MagicLinkService;
 
   queuePaused = false;
   eventsCollapsed = false;
@@ -96,20 +98,31 @@ export default class RecentEvents extends TsxComponent<{}> {
     this.customizationService.setSettings({ legacyEvents: !native });
   }
 
+  magicLinkDisabled = false;
+
   handleBrowserViewReady(view: Electron.BrowserView) {
     if (view.isDestroyed()) return;
 
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
-    view.webContents.on('new-window', (e, url) => {
+    view.webContents.on('new-window', async (e, url) => {
       const match = url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         this.popoutRecentEvents();
       } else if (match) {
-        this.navigationService.navigate('Dashboard', {
-          subPage: match[1],
-        });
+        // Prevent spamming our API
+        if (this.magicLinkDisabled) return;
+        this.magicLinkDisabled = true;
+
+        try {
+          const link = await this.magicLinkService.getDashboardMagicLink(match[1]);
+          electron.remote.shell.openExternal(link);
+        } catch (e) {
+          console.error('Error generating dashboard magic link', e);
+        }
+
+        this.magicLinkDisabled = false;
       } else {
         electron.remote.shell.openExternal(url);
       }
