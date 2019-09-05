@@ -38,6 +38,7 @@ interface IAppState {
   loading: boolean;
   argv: string[];
   errorAlert: boolean;
+  onboarded: boolean;
 }
 
 /**
@@ -62,6 +63,7 @@ export class AppService extends StatefulService<IAppState> {
     loading: true,
     argv: electron.remote.process.argv,
     errorAlert: false,
+    onboarded: false,
   };
 
   readonly appDataDirectory = electron.remote.app.getPath('userData');
@@ -109,7 +111,7 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.sceneCollectionsService.initialize();
 
-    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
@@ -133,7 +135,7 @@ export class AppService extends StatefulService<IAppState> {
     this.ipcServerService.listen();
     this.tcpServerService.listen();
 
-    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
     this.announcementsService.updateBanner();
 
     const _outageService = this.outageNotificationsService;
@@ -257,5 +259,10 @@ export class AppService extends StatefulService<IAppState> {
   @mutation()
   private SET_ARGV(argv: string[]) {
     this.state.argv = argv;
+  }
+
+  @mutation()
+  private SET_ONBOARDED(onboarded: boolean) {
+    this.state.onboarded = onboarded;
   }
 }
