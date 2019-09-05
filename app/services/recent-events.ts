@@ -226,7 +226,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   onSocketEvent(e: TSocketEvent) {
     if (e.type === 'eventsPanelSettingsUpdate') {
       if (e.message.muted != null) {
-        console.log('SETTING MUTED', e.message.muted);
         this.SET_MUTED(e.message.muted);
       }
     }
