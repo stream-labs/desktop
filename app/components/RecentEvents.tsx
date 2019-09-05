@@ -38,6 +38,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   }
 
   repeatAlert(event: IRecentEvent) {
+    console.log('repeating', event);
     return this.recentEventsService.repeatAlert(event);
   }
 
@@ -56,6 +57,11 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   skipAlert() {
     return this.recentEventsService.skipAlert();
+  }
+
+  readAlert(event: IRecentEvent) {
+    console.log('read event', event);
+    return this.recentEventsService.readAlert(event);
   }
 
   async toggleQueue() {
@@ -86,6 +92,7 @@ export default class RecentEvents extends TsxComponent<{}> {
                 event={event}
                 repeatAlert={this.repeatAlert.bind(this)}
                 eventString={this.eventString.bind(this)}
+                readAlert={this.readAlert.bind(this)}
               />
             ))}
           {this.recentEvents.length === 0 && (
@@ -173,14 +180,16 @@ class EventCell extends TsxComponent<{
   event: IRecentEvent;
   eventString: (event: IRecentEvent) => string;
   repeatAlert: (event: IRecentEvent) => void;
+  readAlert: (event: IRecentEvent) => void;
 }> {
   @Prop() event: IRecentEvent;
   @Prop() eventString: (event: IRecentEvent) => string;
   @Prop() repeatAlert: (event: IRecentEvent) => void;
+  @Prop() readAlert: (event: IRecentEvent) => void;
 
   render(h: Function) {
     return (
-      <div class={styles.cell}>
+      <div class={styles.cell} onClick={() => this.readAlert(this.event)}>
         <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
         <span class={styles.name}>{getName(this.event)}</span>
         <span>{this.eventString(this.event)}</span>
