@@ -20,8 +20,8 @@ export interface ICustomizationServiceState {
   enableBTTVEmotes: boolean;
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
-  navigateToLiveOnStreamStart: boolean;
   experimental: any;
+  legacyEvents: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

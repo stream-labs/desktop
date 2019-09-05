@@ -1,6 +1,6 @@
 <template>
-  <div class="help-tip" v-if="shouldShow">
-    <div class="help-tip__arrow"></div>
+  <div class="help-tip" v-if="shouldShow" :style="position">
+    <div class="help-tip__arrow" :class="{ 'help-tip__arrow-right': tipPosition === 'right' }"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
       <i class="fa fa-info-circle" />
@@ -22,12 +22,10 @@
   position: absolute;
   background: var(--teal);
   color: var(--white);
-  top: -8px;
-  right: 102px;
   width: 260px;
   padding: 10px;
   font-size: 14px;
-  animation: bounce 18s ease-in-out 2s 3 both;
+  z-index: 9999;
 }
 
 .help-tip__arrow {
@@ -38,6 +36,12 @@
   border-color: transparent @teal transparent transparent;
   position: absolute;
   left: -8px;
+
+  &.help-tip__arrow-right {
+    left: auto;
+    right: -8px;
+    transform: rotate(180deg);
+  }
 }
 
 .help-tip__close {
@@ -66,40 +70,6 @@
   .fa {
     margin-right: 8px;
     font-size: 16px;
-  }
-}
-
-@keyframes bounce {
-  from,
-  3%,
-  6%,
-  10%,
-  to {
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-    transform: translateX(0);
-  }
-
-  4%,
-  5% {
-    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-    transform: translateX(30px);
-  }
-
-  8% {
-    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-    transform: translateX(15px);
-  }
-
-  11% {
-    transform: translateX(4px);
-  }
-
-  12% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(0);
   }
 }
 </style>

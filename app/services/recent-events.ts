@@ -39,6 +39,8 @@ export interface IRecentEvent {
   _id?: string;
   read: boolean;
   hash: string;
+  isTest?: boolean;
+  repeat?: boolean;
 }
 
 interface IRecentEventsState {
@@ -149,7 +151,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async initialize() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
-      destroy: () => Promise.resolve(),
+      destroy: () => Promise.resolve(this.SET_RECENT_EVENTS([])),
       context: this,
     });
   }
@@ -334,8 +336,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onEventSocket(e: IEventSocketEvent) {
-    e.message.forEach((msg: IRecentEvent) => (msg.type = e.type));
-    this.ADD_RECENT_EVENT(e.message);
+    const messages = e.message.filter(msg => !msg.isTest && !msg.repeat);
+    messages.forEach(msg => (msg.type = e.type));
+    this.ADD_RECENT_EVENT(messages);
   }
 
   getEventString(event: IRecentEvent) {

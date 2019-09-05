@@ -134,13 +134,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const confirmText = $t('Are you sure you want to start streaming?');
     if (shouldConfirm && !confirm(confirmText)) return;
 
-    if (
-      this.userService.isLoggedIn() &&
-      this.customizationService.state.navigateToLiveOnStreamStart
-    ) {
-      this.navigationService.navigate('Studio');
-    }
-
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
 
     obs.NodeObs.OBS_service_startStreaming();

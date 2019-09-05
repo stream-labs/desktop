@@ -112,8 +112,8 @@ export class Scene {
     return newItem ? this.getItem(newItem.sceneItemId) : null;
   }
 
-  createAndAddSource(name: string, type: TSourceType): SceneItem {
-    const newItem = this.scene.createAndAddSource(name, type);
+  createAndAddSource(name: string, type: TSourceType, settings?: Dictionary<any>): SceneItem {
+    const newItem = this.scene.createAndAddSource(name, type, settings);
     return newItem ? this.getItem(newItem.sceneItemId) : null;
   }
 

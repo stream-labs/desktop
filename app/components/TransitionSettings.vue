@@ -6,6 +6,7 @@
     :metadata="{ title: $t('Type'), type: 'list', name: 'type', options: typeOptions, fullWidth: true }"
   />
   <h-form-group
+    v-show="transition.type !== 'obs_stinger_transition'"
     v-model="durationModel"
     :metadata="{ type: 'number', isInteger: true, title: $t('Duration'), name: 'duration', fullWidth: true }"
   />
