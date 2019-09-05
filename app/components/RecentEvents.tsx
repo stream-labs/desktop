@@ -189,7 +189,10 @@ class EventCell extends TsxComponent<{
 
   render(h: Function) {
     return (
-      <div class={styles.cell} onClick={() => this.readAlert(this.event)}>
+      <div
+        class={cx(styles.cell, this.event.read ? styles.cellRead : '')}
+        onClick={() => this.readAlert(this.event)}
+      >
         <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
         <span class={styles.name}>{getName(this.event)}</span>
         <span>{this.eventString(this.event)}</span>
