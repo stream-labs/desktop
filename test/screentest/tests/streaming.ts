@@ -10,7 +10,8 @@ useSpectron({ appArgs: '--nosync' });
 useScreentest();
 
 // test streaming for each platform
-const platforms: TPlatform[] = ['twitch', 'facebook', 'mixer', 'youtube'];
+// TODO: Re-enable Mixer streaming
+const platforms: TPlatform[] = ['twitch', 'facebook', 'youtube'];
 platforms.forEach(platform => {
   test(`Streaming to ${platform}`, async t => {
     // login into the account
