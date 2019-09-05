@@ -9,7 +9,6 @@ interface INavigation {
 enum EPage {
   Editor = 'Editor',
   Live = 'Live',
-  Dashboard = 'Dashboard',
   Themes = 'Themes',
   AppDetailsPage = 'AppDetailsPage',
 }
@@ -46,9 +45,7 @@ export class AppModule extends Module {
 
   @apiMethod()
   navigate(ctx: IApiContext, page: EPage) {
-    if (page === EPage.Dashboard) {
-      this.navigationService.navigate('Dashboard');
-    } else if (page === EPage.Editor) {
+    if (page === EPage.Editor) {
       this.navigationService.navigate('Studio');
     } else if (page === EPage.Themes) {
       this.navigationService.navigate('BrowseOverlays');

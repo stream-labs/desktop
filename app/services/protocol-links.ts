@@ -60,14 +60,6 @@ export class ProtocolLinksService extends Service {
     }
   }
 
-  @protocolHandler('dashboard')
-  private navigateDashboard(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
-
-    const subPage = info.path.replace('/', '');
-    this.navigationService.navigate('Dashboard', { subPage });
-  }
-
   @protocolHandler('library')
   private navigateLibrary(info: IProtocolLinkInfo) {
     if (!this.userService.isLoggedIn()) return;

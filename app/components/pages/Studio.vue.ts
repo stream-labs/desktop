@@ -10,6 +10,7 @@ import StudioModeControls from 'components/StudioModeControls.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
 import RecentEvents from 'components/RecentEvents';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -25,6 +26,7 @@ export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private userService: UserService;
 
   $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
@@ -130,11 +132,16 @@ export default class Studio extends Vue {
     this.customizationService.setSettings({ performanceMode: false });
   }
 
+  get isLoggedIn() {
+    return this.userService.isLoggedIn();
+  }
+
   get eventsHeight() {
-    return this.customizationService.state.eventsSize;
+    return this.isLoggedIn ? this.customizationService.state.eventsSize : 0;
   }
 
   set eventsHeight(value) {
+    if (value === 0) return;
     this.customizationService.setSettings({ eventsSize: value });
     this.reconcileHeightsWithinContraints();
   }

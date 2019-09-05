@@ -13,10 +13,11 @@ import { AppService } from 'services/app';
 @Component({ components: { Spinner } })
 export default class BrowserView extends TsxComponent<{
   src: string;
-  hidden: boolean;
-  options: Electron.BrowserViewConstructorOptions;
-  setLocale: boolean;
-  enableGuestApi: boolean;
+  hidden?: boolean;
+  options?: Electron.BrowserViewConstructorOptions;
+  setLocale?: boolean;
+  enableGuestApi?: boolean;
+  onReady?: (view: Electron.BrowserView) => void;
 }> {
   @Prop() src: string;
   @Prop({ default: false }) hidden: boolean;

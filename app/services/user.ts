@@ -249,14 +249,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   dashboardUrl(subPage: string, hidenav: boolean = false) {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const hideNav = hidenav ? 'true' : 'false';
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
@@ -273,9 +274,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/library?mode=${uiTheme}&slobs`;
+    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
       url += `&oauth_token=${this.apiToken}`;

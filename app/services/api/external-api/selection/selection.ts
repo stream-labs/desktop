@@ -13,7 +13,11 @@ export class SelectionService extends Selection {
   @Inject('SelectionService')
   private internalSelectionService: InternalSelectionService;
 
-  get selection() {
+  get sceneId() {
+    return this.internalSelectionService.sceneId;
+  }
+
+  protected get selection() {
     return this.internalSelectionService;
   }
 }

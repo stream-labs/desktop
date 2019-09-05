@@ -5,6 +5,7 @@
   height: 150px;
   overflow: none;
   flex-shrink: 0;
+  position: relative;
 }
 
 .container:global(.perf-mode) {
@@ -56,6 +57,10 @@
   background: var(--background);
 }
 
+.cell-read {
+  opacity: 0.5;
+}
+
 .donation {
   color: var(--teal);
 }
@@ -90,6 +95,10 @@
 
 :global(.action-icon).red {
   color: var(--warning);
+
+  &:hover {
+    color: var(--warning);
+  }
 }
 
 .empty {
