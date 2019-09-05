@@ -209,7 +209,10 @@ class EventCell extends TsxComponent<{
         )}
         <i
           class="icon-repeat action-icon"
-          onClick={() => this.repeatAlert(this.event)}
+          onClick={(event: any) => {
+            event.stopPropagation();
+            this.repeatAlert(this.event);
+          }}
           v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
         />
       </div>
