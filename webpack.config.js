@@ -2,7 +2,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 const plugins = [
   new VueLoaderPlugin()
@@ -138,7 +138,7 @@ module.exports = {
   },
 
   optimization: {
-    minimizer: [new UglifyJsPlugin({ sourceMap: true, uglifyOptions: { mangle: false } })]
+    minimizer: [new TerserPlugin({ sourceMap: true })]
   },
 
   plugins,
