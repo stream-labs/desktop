@@ -139,10 +139,6 @@ const SUPPORTED_EVENTS = [
   'donordrivedonation',
   'justgivingdonation',
   'treat',
-  'facebook_like',
-  'facebook_share',
-  'facebook_stars',
-  'facebook_support',
 ];
 
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
