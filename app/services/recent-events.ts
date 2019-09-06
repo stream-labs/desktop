@@ -277,7 +277,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async readAlert(event: IRecentEvent) {
-    this.TOGGLE_RECENT_EVENT_READ(event.hash);
+    this.TOGGLE_RECENT_EVENT_READ(event);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
@@ -422,12 +422,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  private TOGGLE_RECENT_EVENT_READ(eventHash: string) {
-    this.state.recentEvents.forEach((event, index) => {
-      if (event.hash === eventHash) {
-        event.read = !event.read;
-      }
-    });
+  private TOGGLE_RECENT_EVENT_READ(event: IRecentEvent) {
+    event.read = !event.read;
   }
 
   @mutation()
