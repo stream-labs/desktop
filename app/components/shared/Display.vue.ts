@@ -1,12 +1,19 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { VideoService, Display as OBSDisplay } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 
+interface DisplayProps {
+  sourceId: string;
+  paddingSize?: number;
+  drawUI?: false;
+  onOutputResize: (region: IRectangle) => void;
+}
+
 @Component({})
-export default class Display extends Vue {
+export default class Display extends TsxComponent<DisplayProps> {
   @Inject() videoService: VideoService;
   @Inject() windowsService: WindowsService;
   @Inject() customizationService: CustomizationService;

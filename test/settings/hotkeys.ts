@@ -14,7 +14,7 @@ test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
 
@@ -73,7 +73,7 @@ test('Binds a hotkey', async t => {
 const openHotkeySettings = async (t: TExecutionContext) => {
   const { app } = t.context;
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
 

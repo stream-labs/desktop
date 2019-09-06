@@ -5,6 +5,8 @@
       <bool-input v-if="isMixer" :title="$t('Follows')" v-model="wData.settings.mixer_account.show_follows" />
       <bool-input v-if="isMixer" :title="$t('Hosts')" v-model="wData.settings.mixer_account.show_hosts" />
       <bool-input v-if="isMixer" :title="$t('Subscriptions')" v-model="wData.settings.mixer_account.show_subscriptions" />
+      <bool-input v-if="isMixer" :title="$t('Stickers')" v-model="wData.settings.mixer_account.show_stickers" />
+      <bool-input v-if="isMixer" :title="$t('Effects')" v-model="wData.settings.mixer_account.show_effects" />
       <bool-input
         v-for="event in eventsForPlatform"
         :key="event.key"
@@ -12,6 +14,8 @@
         v-model="wData.settings[event.key]"
       />
     </v-form-group>
+    <v-form-group v-if="isMixer" :title="$('Min. Sparks')" type="number" v-model="wData.settings.mixer_account.sparks_min" />
+    <v-form-group v-if="isMixer" :title="$('Min. Embers')" type="number" v-model="wData.settings.mixer_account.embers_min" />
     <v-form-group v-if="isTwitch" :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
     <v-form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
   </validated-form>

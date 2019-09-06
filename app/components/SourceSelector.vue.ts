@@ -160,7 +160,19 @@ export default class SourceSelector extends Vue {
     this.selectionService.remove();
   }
 
+  isScene() {
+    return this.activeItems[0].type === 'scene';
+  }
+
+  makeSceneActive() {
+    this.scenesService.makeSceneActive(this.activeItems[0].source.sourceId);
+  }
+
   sourceProperties() {
+    if (this.isScene()) {
+      this.makeSceneActive();
+      return;
+    }
     if (!this.canShowProperties()) return;
     this.sourcesService.showSourceProperties(this.activeItems[0].sourceId);
   }

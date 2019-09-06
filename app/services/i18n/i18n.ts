@@ -153,7 +153,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   setLocale(locale: string) {
     this.SET_LOCALE(locale);
-    electron.remote.app.relaunch();
+    electron.remote.app.relaunch({ args: [] });
     electron.remote.app.quit();
   }
 

@@ -16,11 +16,6 @@ interface IStreamInfoServiceState {
   channelInfo: IChannelInfo;
 }
 
-interface IStreamInfo {
-  viewerCount: number;
-  channelInfo: IChannelInfo;
-}
-
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
 /**
@@ -44,7 +39,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   init() {
     this.RESET();
-    this.refreshStreamInfo().catch(e => null);
+    this.userService.userLogin.subscribe(_ => this.refreshStreamInfo().catch(e => null));
     this.userService.userLogout.subscribe(_ => this.RESET());
 
     this.viewerCountInterval = window.setInterval(() => {
@@ -72,9 +67,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
     const platform = getPlatformService(this.userService.platform.type);
     try {
-      await platform.prepopulateInfo();
-      const info = await platform.fetchChannelInfo();
-      this.SET_CHANNEL_INFO(info);
+      const info = await platform.prepopulateInfo();
+      if (info) this.SET_CHANNEL_INFO(info);
 
       if (this.userService.platform.type === 'twitch') {
         this.SET_HAS_UPDATE_TAGS_PERM(await this.twitchService.hasScope('user:edit:broadcast'));
@@ -86,7 +80,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
       this.streamInfoChanged.next();
     } catch (e) {
-      console.warn('Unable to refresh stream info', e);
+      console.error('Unable to refresh stream info', e);
       this.SET_ERROR(true);
     }
     this.SET_FETCHING(false);
@@ -104,7 +98,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       await this.refreshStreamInfo();
       return true;
     } catch (e) {
-      console.warn('Unable to set stream info: ', e);
+      console.error('Unable to set stream info: ', e);
     }
     return false;
   }

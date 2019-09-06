@@ -28,33 +28,32 @@
 
   &.top {
     height: 10px;
+    border-top: 1px solid var(--border);
     cursor: row-resize;
 
     .resize-line {
-      height: 1px;
-      width: 100%;
+      height: 4px;
+      width: 25px;
     }
   }
 
   &.right {
     width: 10px;
-    margin-right: -5px;
     cursor: col-resize;
 
     .resize-line {
-      height: 100%;
-      width: 1px;
+      height: 25px;
+      width: 4px;
     }
   }
 
   &.left {
     width: 10px;
-    margin-left: -5px;
     cursor: col-resize;
 
     .resize-line {
-      height: 100%;
-      width: 1px;
+      height: 25px;
+      width: 4px;
     }
   }
 
@@ -65,12 +64,15 @@
 
   &:hover {
     .resize-line {
-      background-color: var(--midtone);
+      background-color: var(--title);
     }
   }
 }
 
 .resize-line {
-  background-color: var(--border);
+  .center();
+  .radius(0.5);
+
+  background-color: var(--paragraph);
 }
 </style>

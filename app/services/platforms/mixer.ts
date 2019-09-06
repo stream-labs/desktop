@@ -1,12 +1,12 @@
 import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
-  IPlatformAuth,
   IChannelInfo,
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
   EPlatformCallResult,
+  IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -14,7 +14,7 @@ import { Inject } from '../core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
-import { handlePlatformResponse, requiresToken } from './utils';
+import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 
 interface IMixerServiceState {
   typeIdMap: object;
@@ -65,14 +65,11 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.userService.channelId;
   }
 
-  getHeaders(authorized = false): Headers {
-    const headers = new Headers();
-
-    headers.append('Content-Type', 'application/json');
-
-    if (authorized) headers.append('Authorization', `Bearer ${this.oauthToken}`);
-
-    return headers;
+  getHeaders(req: IPlatformRequest, authorized = false) {
+    return {
+      'Content-Type': 'application/json',
+      ...(authorized ? { Authorization: `Bearer ${this.oauthToken}` } : {}),
+    };
   }
 
   setupStreamSettings() {
@@ -116,19 +113,13 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       });
   }
 
-  @requiresToken()
   fetchRawChannelInfo() {
-    const headers = this.getHeaders(true);
-    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}/details`, {
-      headers,
-    });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => {
+    return platformAuthorizedRequest(`${this.apiBase}channels/${this.mixerUsername}/details`).then(
+      json => {
         this.userService.updatePlatformChannelId(json.id);
         return json;
-      });
+      },
+    );
   }
 
   fetchStreamKey(): Promise<string> {
@@ -154,50 +145,35 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.fetchChannelInfo();
   }
 
-  @requiresToken()
   fetchViewerCount(): Promise<number> {
-    const headers = this.getHeaders();
-    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}`, { headers });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => json.viewersCurrent);
+    return platformRequest(`${this.apiBase}channels/${this.mixerUsername}`).then(
+      json => json.viewersCurrent,
+    );
   }
 
-  @requiresToken()
   putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
-    const headers = this.getHeaders(true);
     const data = { name: title };
 
     if (this.state.typeIdMap[game]) {
       data['typeId'] = this.state.typeIdMap[game];
     }
 
-    const request = new Request(`${this.apiBase}channels/${this.channelId}`, {
-      headers,
+    return platformAuthorizedRequest({
+      url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
     });
-
-    return fetch(request).then(handlePlatformResponse);
   }
 
-  @requiresToken()
   searchGames(searchString: string): Promise<IGame[]> {
-    const headers = this.getHeaders();
-    const request = new Request(
+    return platformRequest(
       `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
-      { headers },
-    );
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(response => {
-        response.forEach((game: any) => {
-          this.ADD_GAME_MAPPING(game.name, game.id);
-        });
-        return response;
+    ).then(response => {
+      response.forEach((game: any) => {
+        this.ADD_GAME_MAPPING(game.name, game.id);
       });
+      return response;
+    });
   }
 
   getChatUrl(mode: string): Promise<string> {

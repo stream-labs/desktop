@@ -25,10 +25,10 @@ import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
-import FacemaskSettings from 'components/windows/FacemaskSettings.vue';
 import EditTransform from 'components/windows/EditTransform';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
+import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -52,6 +52,8 @@ import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare.vue';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
+
+import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -83,10 +85,11 @@ export function getComponents() {
     RecentEvents,
     MediaGallery,
     PlatformAppPopOut,
-    FacemaskSettings,
     EditTransform,
     OverlayWindow,
     OverlayPlaceholder,
+    PerformanceMetrics,
+    BrowserSourceInteraction,
 
     BitGoal,
     DonationGoal,
@@ -282,16 +285,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
-      width: (options.size && options.size.width) || 400,
-      height: (options.size && options.size.height) || 400,
-      minWidth: options.size && options.size.minWidth,
-      minHeight: options.size && options.size.minHeight,
-      title: options.title || 'New Window',
+      width: 400,
+      height: 400,
+      title: 'New Window',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true, webviewTag: true },
+      ...options,
+      ...options.size,
     }));
 
-    newWindow.setMenu(null);
+    newWindow.removeMenu();
     newWindow.on('closed', () => {
       this.windowDestroyed.next(windowId);
       delete this.windows[windowId];
@@ -301,9 +304,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor(windowId);
     newWindow.on('move', () => this.updateScaleFactor(windowId));
 
-    if (Util.isDevMode()) {
-      newWindow.webContents.openDevTools({ mode: 'detach' });
-    }
+    if (Util.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);

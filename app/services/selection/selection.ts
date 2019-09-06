@@ -127,11 +127,8 @@ export class Selection {
    * true if selections has only one folder
    */
   isSceneFolder(): boolean {
-    const folders = this.getFolders();
-    if (folders.length !== 1) return false;
-    const folder = folders[0];
-    const isNotFolderChild = this.getItems().find(item => item.parentId !== folder.id);
-    return !isNotFolderChild;
+    const rootNodes = this.getRootNodes();
+    return rootNodes.length === 1 && rootNodes[0].sceneNodeType === 'folder';
   }
 
   getVisualItems(): SceneItem[] {

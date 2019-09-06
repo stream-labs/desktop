@@ -22,27 +22,23 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import * as obs from '../../../obs-api';
-import { EVideoCodes } from 'obs-studio-node/module';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
-import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { GameOverlayService } from 'services/game-overlay';
-import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
-import { CustomizationService } from 'services/customization';
-import path from 'path';
+import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
-
-const crashHandler = window['require']('crash-handler');
+import { Subject } from 'rxjs';
 
 interface IAppState {
   loading: boolean;
   argv: string[];
   errorAlert: boolean;
+  onboarded: boolean;
 }
 
 /**
@@ -67,6 +63,7 @@ export class AppService extends StatefulService<IAppState> {
     loading: true,
     argv: electron.remote.process.argv,
     errorAlert: false,
+    onboarded: false,
   };
 
   readonly appDataDirectory = electron.remote.app.getPath('userData');
@@ -83,12 +80,11 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
-  @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
-  @Inject() private customizationService: CustomizationService;
+  @Inject() private recentEventsService: RecentEventsService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
-  private pid = require('process').pid;
+  readonly pid = require('process').pid;
 
   @track('app_start')
   @RunInLoadingMode()
@@ -97,43 +93,6 @@ export class AppService extends StatefulService<IAppState> {
       electron.ipcRenderer.on('showErrorAlert', () => {
         this.SET_ERROR_ALERT(true);
       });
-    }
-
-    // This is used for debugging
-    window['obs'] = obs;
-
-    // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
-    obs.NodeObs.SetWorkingDirectory(
-      path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-        'node_modules',
-        'obs-studio-node',
-      ),
-    );
-
-    crashHandler.registerProcess(this.pid, false);
-
-    await this.obsUserPluginsService.initialize();
-
-    // Initialize OBS API
-    const apiResult = obs.NodeObs.OBS_API_initAPI(
-      'en-US',
-      this.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
-    );
-
-    if (apiResult !== EVideoCodes.Success) {
-      const message = apiInitErrorResultToMessage(apiResult);
-      showDialog(message);
-
-      crashHandler.unregisterProcess(this.pid);
-
-      obs.NodeObs.StopCrashHandler();
-      obs.IPC.disconnect();
-
-      electron.ipcRenderer.send('shutdownComplete');
-      return;
     }
 
     // We want to start this as early as possible so that any
@@ -152,7 +111,7 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.sceneCollectionsService.initialize();
 
-    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
@@ -176,7 +135,7 @@ export class AppService extends StatefulService<IAppState> {
     this.ipcServerService.listen();
     this.tcpServerService.listen();
 
-    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
     this.announcementsService.updateBanner();
 
     const _outageService = this.outageNotificationsService;
@@ -186,24 +145,28 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
 
     await this.gameOverlayService.initialize();
+    await this.recentEventsService.initialize();
   }
+
+  shutdownStarted = new Subject();
 
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
     obs.NodeObs.StopCrashHandler();
-
     this.crashReporterService.beginShutdown();
 
-    this.ipcServerService.stopListening();
-    this.tcpServerService.stopListening();
-
     window.setTimeout(async () => {
+      this.shutdownStarted.next();
+      this.platformAppsService.unloadAllApps();
+      this.windowsService.closeChildWindow();
+      await this.windowsService.closeAllOneOffs();
+      this.ipcServerService.stopListening();
+      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
       this.transitionsService.shutdown();
-      this.windowsService.closeAllOneOffs();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
@@ -297,22 +260,9 @@ export class AppService extends StatefulService<IAppState> {
   private SET_ARGV(argv: string[]) {
     this.state.argv = argv;
   }
-}
 
-export const apiInitErrorResultToMessage = (resultCode: EVideoCodes) => {
-  switch (resultCode) {
-    case EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
-    }
-    case EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
-    }
-    default: {
-      return $t('OBSInit.UnknownError');
-    }
+  @mutation()
+  private SET_ONBOARDED(onboarded: boolean) {
+    this.state.onboarded = onboarded;
   }
-};
-
-const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
-};
+}

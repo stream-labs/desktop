@@ -45,6 +45,11 @@ export interface IAlertBoxVariation {
   id: string;
   deleteable?: boolean;
   settings: {
+    useSkillImage?: boolean;
+    embersEnabled?: boolean;
+    minEmbersTrigger?: number;
+    sparksEnabled?: boolean;
+    minSparksTrigger?: number;
     customCss: string;
     customHtml: string;
     customHtmlEnabled: boolean;

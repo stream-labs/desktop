@@ -1,15 +1,17 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { focusChild, focusMain, skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { fillForm } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
+import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 
 useSpectron({ appArgs: '--nosync' });
 useScreentest();
 
 // test streaming for each platform
-const platforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'mixer'];
+// TODO: Re-enable Mixer streaming
+const platforms: TPlatform[] = ['twitch', 'facebook', 'youtube'];
 platforms.forEach(platform => {
   test(`Streaming to ${platform}`, async t => {
     // login into the account
@@ -108,4 +110,25 @@ schedulingPlatforms.forEach(platform => {
     await makeScreenshots(t, 'before schedule');
     t.pass();
   });
+});
+
+test('Go live error', async t => {
+  // login into the account
+  if (!(await logIn(t, 'twitch'))) return;
+  const app = t.context.app;
+
+  // simulate issues with the twitch api
+  await fetchMock(t, /api\.twitch\.tv/, 404);
+  skipCheckingErrorsInLog();
+
+  // open EditStreamInfo window
+  await app.client.click('button=Go Live');
+  await focusChild(t);
+
+  // check that the error text is shown
+  await app.client.waitForVisible('a=just go live.');
+  await makeScreenshots(t, 'network error');
+
+  await resetFetchMock(t);
+  t.pass();
 });

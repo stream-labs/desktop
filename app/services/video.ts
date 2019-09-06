@@ -71,6 +71,13 @@ export class Display {
 
     this.displayDestroyed = false;
 
+    // grid lines are enabled by default
+    // switch them off multiple items are selected
+    if (this.selectionService.getSize() > 1) {
+      this.switchGridlines(false);
+    }
+
+    // also sync girdlines when selection changes
     this.selectionSubscription = this.selectionService.updated.subscribe(state => {
       this.switchGridlines(state.selectedIds.length <= 1);
     });

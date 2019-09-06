@@ -37,7 +37,8 @@ export type TSourceFilterType =
   | 'face_mask_filter'
   | 'invert_polarity_filter'
   | 'limiter_filter'
-  | 'expander_filter';
+  | 'expander_filter'
+  | 'shader_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -94,6 +95,7 @@ export class SourceFiltersService extends Service {
       { description: $t('Invert Polarity'), value: 'invert_polarity_filter' },
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
+      { description: $t('Shader'), value: 'shader_filter' },
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));

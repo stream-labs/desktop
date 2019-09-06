@@ -7,7 +7,9 @@
     class="main-contents"
     :class="{
       'main-contents--right': renderDock && leftDock && hasLiveDock,
-      'main-contents--left': renderDock && !leftDock && hasLiveDock }">
+      'main-contents--left': renderDock && !leftDock && hasLiveDock,
+      'main-contents--onboarding': page === 'Onboarding' }">
+    <side-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading" />
     <div class="live-dock-wrapper" v-if="renderDock && leftDock">
       <live-dock :onLeft="true" />
       <resize-bar
@@ -20,11 +22,7 @@
     </div>
 
     <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
-      <resize-observer @notify="handleResize"></resize-observer>
-
-      <top-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading"></top-nav>
-      <apps-nav v-if="platformApps.length > 0 && (page !== 'Onboarding')"></apps-nav>
-
+      <resize-observer @notify="handleResize" />
       <component
         class="main-page-container"
         v-if="!showLoadingSpinner"
@@ -76,16 +74,20 @@
 
 .main-contents {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: auto 1fr;
   flex-grow: 1;
 }
 
 .main-contents--right {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto 1fr;
 }
 
 .main-contents--left {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
+}
+
+.main-contents--onboarding {
+  grid-template-columns: 1fr;
 }
 
 .main-middle {
@@ -147,11 +149,11 @@
 
 .live-dock-resize-bar {
   position: absolute;
-  height: 100%;
+  height: calc(100% - 20px);
+  bottom: 0;
 }
 
 .live-dock-resize-bar--left {
-  top: 0;
   right: 0;
 }
 

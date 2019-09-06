@@ -40,14 +40,8 @@
 @import '../styles/index';
 
 .performance-metrics {
-  .performance-metric-wrapper {
-    &:first-child {
-      &::before {
-        content: '';
-        padding-right: 0;
-      }
-    }
-  }
+  background: var(--background);
+  height: 48px;
 }
 
 .performance-metric-wrapper {
@@ -65,9 +59,12 @@
     opacity: 0.5;
   }
 
-  // @media (max-width: 1300px) {
-  //   font-size: 12px;
-  // }
+  &:first-child {
+    &::before {
+      content: '';
+      padding-right: 0;
+    }
+  }
 }
 
 .performance-metric {

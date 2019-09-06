@@ -30,12 +30,15 @@ export class Selection implements ISceneItemActions {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
 
-  constructor(public sceneId?: string, itemsList: string[] = []) {
-    if (!this.sceneId) return;
+  constructor(sceneId: string, itemsList: string[] = []) {
     this.internalSelection = new InternalSelection(sceneId, itemsList);
   }
 
-  get selection(): InternalSelection | InternalSelectionService {
+  get sceneId() {
+    return this.internalSelection.sceneId;
+  }
+
+  protected get selection(): InternalSelection | InternalSelectionService {
     return this.internalSelection;
   }
 

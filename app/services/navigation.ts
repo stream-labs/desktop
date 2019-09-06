@@ -3,16 +3,13 @@ import { Subject } from 'rxjs';
 
 export type TAppPage =
   | 'Studio'
-  | 'Dashboard'
-  | 'Live'
   | 'Onboarding'
   | 'BrowseOverlays'
   | 'PatchNotes'
   | 'Chatbot'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
-  | 'Help'
-  | 'CreatorSites';
+  | 'Help';
 
 interface INavigationState {
   currentPage: TAppPage;

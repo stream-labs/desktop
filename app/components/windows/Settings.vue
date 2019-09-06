@@ -6,33 +6,64 @@
 
   <div slot="content" class="settings">
     <NavMenu v-model="categoryName">
+
+      <form-input
+        v-model="searchStr"
+        :metadata="{
+          type: 'text',
+          placeholder: 'Search',
+          icon: 'search'
+        }"
+        class='search'
+       />
+      <button
+        class="button button--default clear-search-button"
+        v-if="searchStr"
+        @click="searchStr = ''"
+      >
+        <i class="fa fa-times"></i>
+      </button>
       <NavItem
         v-for="category in categoryNames"
         :key="category"
         :to="category"
         :ico="icons[category]"
+        :class="{disabled: searchStr && !searchResultPages.includes(category)}"
       >
         {{ $t(category) }}
       </NavItem>
     </NavMenu>
-    <div class="settings-container" ref="settingsContainer">
-      <extra-settings v-if="categoryName === 'General'" />
-      <language-settings v-if="categoryName === 'General'" />
-      <hotkeys v-if="categoryName === 'Hotkeys'" />
-      <developer-settings v-if="categoryName === 'Developer'" />
-      <installed-apps v-if="categoryName === 'Installed Apps'" />
-      <overlay-settings v-if="categoryName === 'Scene Collections'" />
-      <notifications-settings v-if="categoryName === 'Notifications'" />
-      <appearance-settings v-if="categoryName === 'Appearance'" />
-      <experimental-settings v-if="categoryName === 'Experimental'" />
-      <remote-control-settings v-if="categoryName === 'Remote Control'" />
-      <game-overlay-settings v-if="categoryName === 'Game Overlay'" />
+
+    <searchable-pages
+      class="settings-container"
+      ref="settingsContainer"
+      :page="categoryName"
+      :pages="categoryNames"
+      :searchStr="searchStr"
+      @searchCompleted="onSearchCompletedHandler"
+      @beforePageScan="page => settingsData = getSettingsData(page)"
+      @scanCompleted="settingsData = getSettingsData(categoryName)"
+      v-slot:default="{ page }"
+    >
+      <extra-settings v-if="page === 'General'" />
+      <language-settings v-if="page === 'General'" />
+      <hotkeys v-if="page === 'Hotkeys'" />
+      <developer-settings v-if="page === 'Developer'" />
+      <installed-apps v-if="page === 'Installed Apps'" />
+      <overlay-settings v-if="page === 'Scene Collections'" />
+      <notifications-settings v-if="page === 'Notifications'" />
+      <appearance-settings v-if="page === 'Appearance'" />
+      <experimental-settings v-if="page === 'Experimental'" />
+      <remote-control-settings v-if="page === 'Remote Control'" />
+      <game-overlay-settings v-if="page === 'Game Overlay'" />
+      <facemask-settings v-if="page === 'Facemasks'" />
       <GenericFormGroups
-        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
-        :categoryName="categoryName"
+        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(page)"
+        :key="page"
+        :categoryName="page"
         v-model="settingsData"
         @input="save" />
-    </div>
+    </searchable-pages>
   </div>
 </modal-layout>
 </template>
@@ -45,11 +76,34 @@
 .settings {
   .transition();
 
+  & /deep/ h2 {
+    // reset 'capitalize' transform that works weird when text has a highlight caused by the search
+    text-transform: none;
+  }
+
   display: flex;
   align-content: stretch;
   align-items: stretch;
   flex: 1;
   margin: -16px;
+
+  .search {
+    .margin-left(2);
+    .margin-bottom(2);
+  }
+
+  .clear-search-button {
+    position: absolute;
+    left: 188px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    i { margin-right: 0; }
+  }
+
+  .disabled {
+    opacity: 0.2;
+  }
 }
 
 .settings-container {

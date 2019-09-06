@@ -18,10 +18,14 @@ import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import RemoteControlSettings from 'components/RemoteControlSettings.vue';
 import LanguageSettings from 'components/LanguageSettings.vue';
 import GameOverlaySettings from 'components/GameOverlaySettings';
+import FacemaskSettings from 'components/FacemaskSettings.vue';
+import SearchablePages from 'components/shared/SearchablePages';
+import FormInput from 'components/shared/inputs/FormInput.vue';
 
 @Component({
   components: {
     ModalLayout,
+    SearchablePages,
     GenericFormGroups,
     NavMenu,
     NavItem,
@@ -36,6 +40,8 @@ import GameOverlaySettings from 'components/GameOverlaySettings';
     LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
+    FacemaskSettings,
+    FormInput,
   },
 })
 export default class Settings extends Vue {
@@ -44,6 +50,8 @@ export default class Settings extends Vue {
 
   $refs: { settingsContainer: HTMLElement };
 
+  searchStr = '';
+  searchResultPages: string[] = [];
   categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
   icons: Dictionary<string> = {
@@ -59,6 +67,7 @@ export default class Settings extends Vue {
     'Scene Collections': 'icon-themes',
     Notifications: 'icon-notifications',
     Appearance: 'icon-settings-3-1',
+    Facemasks: 'icon-face-masks-3',
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
@@ -91,7 +100,19 @@ export default class Settings extends Vue {
 
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
-    this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+    this.settingsData = this.getSettingsData(categoryName);
     this.$refs.settingsContainer.scrollTop = 0;
+  }
+
+  getSettingsData(categoryName: string) {
+    return this.settingsService.getSettingsFormData(categoryName);
+  }
+
+  onSearchCompletedHandler(foundPages: string[]) {
+    this.searchResultPages = foundPages;
+    // if there are not search results for the current page than switch to the first found page
+    if (foundPages.length && !foundPages.includes(this.categoryName)) {
+      this.categoryName = foundPages[0];
+    }
   }
 }

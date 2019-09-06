@@ -157,13 +157,15 @@ export class EditMenu extends Menu {
         this.append({
           label: $t('Export Widget'),
           click: () => {
-            const chosenPath = electron.remote.dialog.showSaveDialog({
-              filters: [{ name: 'Widget File', extensions: ['widget'] }],
-            });
+            electron.remote.dialog
+              .showSaveDialog({
+                filters: [{ name: 'Widget File', extensions: ['widget'] }],
+              })
+              .then(({ filePath }) => {
+                if (!filePath) return;
 
-            if (!chosenPath) return;
-
-            this.widgetsService.saveWidgetFile(chosenPath, selectedItem.sceneItemId);
+                this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
+              });
           },
         });
       }
@@ -204,25 +206,30 @@ export class EditMenu extends Menu {
               );
             } else {
               // remove a global source
-              electron.remote.dialog.showMessageBox(
-                electron.remote.getCurrentWindow(),
-                {
+              electron.remote.dialog
+                .showMessageBox(electron.remote.getCurrentWindow(), {
                   message: $t('This source will be removed from all of your scenes'),
                   type: 'warning',
                   buttons: [$t('Cancel'), $t('OK')],
-                },
-                ok => {
-                  if (!ok) return;
+                })
+                .then(({ response }) => {
+                  if (!response) return;
                   this.editorCommandsService.executeCommand(
                     'RemoveSourceCommand',
                     this.source.sourceId,
                   );
-                },
-              );
+                });
             }
           }
         },
       });
+
+      if (this.source.type === 'browser_source') {
+        this.append({
+          label: $t('Interact'),
+          click: () => this.sourcesService.showInteractWindow(this.source.sourceId),
+        });
+      }
     }
 
     if (this.source && !isMultipleSelection) {
@@ -244,12 +251,12 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Copy Filters'),
-        click: () => this.clipboardService.copyFilters(),
+        click: () => this.clipboardService.copyFilters(this.source.sourceId),
       });
 
       this.append({
         label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(),
+        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters(),
       });
 

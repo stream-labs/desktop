@@ -3,6 +3,20 @@
 .text-input {
   position: relative;
   display: flex;
+
+  :global(.fa) {
+    .absolute();
+    .margin-left(1);
+    .margin-top(1.1);
+
+    & + input {
+      .padding-left(4);
+    }
+  }
+
+  ::placeholder {
+    opacity: 0.5;
+  }
 }
 
 .text-input.full-width {

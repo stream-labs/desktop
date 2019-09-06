@@ -1,13 +1,13 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.16.0',
-  title: 'Game Overlay & More',
+  version: '0.17.0',
+  title: 'Streamlabs OBS Gets a New Look',
   showChest: false,
   notes: [
-    'Added a new game overlay feature that lets you overlay your chat and recent events on top of your game.',
-    'Added support for binding mouse buttons as hotkeys',
-    'Added support for controlling image slide show sources with hotkeys',
+    'Added a new and improved design. Navigation that was previously on the top of the window has been made slimmer and moved to the side. Stay tuned for more aesthetic changes coming soon!',
+    'Added a new flow for first time streamers that helps you get set up even faster.',
+    'Added the "Interact" feature to the browser source, which allows you to click, scroll, and type inside a browser source.',
     'Lots of bug and crash fixes',
   ],
 };

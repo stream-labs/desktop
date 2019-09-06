@@ -52,10 +52,10 @@ export class AudioSource implements ISerializable {
   }
 
   setDeflection(deflection: number) {
-    return this.audioSource.setDeflection(deflection);
+    this.audioSource.setDeflection(deflection);
   }
 
   setMuted(muted: boolean) {
-    return this.audioSource.setMuted(muted);
+    this.audioSource.setMuted(muted);
   }
 }

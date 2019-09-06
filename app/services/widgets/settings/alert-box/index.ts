@@ -18,6 +18,7 @@ import {
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
+import { settings } from 'cluster';
 
 export interface IAlertBoxData extends IWidgetData {
   settings: IAlertBoxSettings;
@@ -114,6 +115,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: metadata.number({ title: $t('Variation Amount') }),
       minTriggerAmount: metadata.number({ title: $t('Min. Amount to Trigger Alert') }),
       minRecentEvents: metadata.number({ title: $t('Min. Amount to Show in Recent Events') }),
+      sparksEnabled: metadata.toggle({ title: $t('Sparks Enabled') }),
+      minSparksTrigger: metadata.number({ title: $t('Min. Sparks for Alert') }),
+      embersEnabled: metadata.toggle({ title: $t('Embers Enabled') }),
+      minEmbersTrigger: metadata.number({ title: $t('Min. Embers for Alert') }),
       ttsMinAmount: metadata.number({ title: $t('Min. Amount to Read') }),
       showAnimation: metadata.animation({ title: $t('Show Animation'), filter: 'in' }),
       hideAnimation: metadata.animation({ title: $t('Hide Animation'), filter: 'out' }),
@@ -129,6 +134,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       unlimitedMediaMod: metadata.toggle({
         title: $t('Unlimited Media Sharing Alert Moderation Delay'),
       }),
+      skillImage: metadata.toggle({ title: $t('Use Skill Image') }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),
       template: metadata.textArea({ title: $t('Message Template') }),
@@ -176,9 +182,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     Object.keys(settings).forEach(key => {
       let testSuccess = false;
       REGEX_TESTERS.forEach(test => {
-        const newKey = /show/.test(key)
-          ? key.replace(test.tester, 'show_')
-          : key.replace(test.tester, '');
+        const newKey =
+          /show/.test(key) && !/show_animation/.test(key)
+            ? key.replace(test.tester, 'show_')
+            : key.replace(test.tester, '');
         if (test.tester.test(key)) {
           testSuccess = true;
           if (!newSettings[test.name]) {
@@ -241,6 +248,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         duration: constrainedDuration,
         hideAnimation: setting.hide_animation,
         image: { href: imgHref },
+        useSkillImage: setting.skill_image,
+        embersEnabled: setting.embers_enabled,
+        minEmbersTrigger: setting.embers_min,
+        sparksEnabled: setting.sparks_enabled,
+        minSparksTrigger: setting.sparks_min,
         layout: setting.layout,
         showAnimation: setting.show_animation,
         sound: { href: setting.sound_href, volume: setting.sound_volume },
@@ -332,6 +344,12 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_gif_library_enabled`]: settings.gif.libraryEnabled,
       [`${prefix}_gifs_min_amount_to_share`]: settings.gif.minAmount,
       [`${prefix}_max_gif_duration`]: settings.gif.duration,
+      // Mixer stuff
+      [`${prefix}_skill_image`]: settings.useSkillImage,
+      [`${prefix}_embers_enabled`]: settings.embersEnabled,
+      [`${prefix}_embers_min`]: settings.minEmbersTrigger,
+      [`${prefix}_sparks_enabled`]: settings.sparksEnabled,
+      [`${prefix}_sparks_min`]: settings.minSparksTrigger,
     };
   }
 

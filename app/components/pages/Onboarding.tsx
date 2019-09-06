@@ -11,9 +11,7 @@ import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
-import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
-import { throws } from 'assert';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -122,9 +120,19 @@ export default class OnboardingPage extends TsxComponent<{}> {
       <div>
         <div class={styles.container}>
           <Connect continue={this.complete.bind(this)} />
-          <span class={styles.skipButton} onClick={this.complete.bind(this)}>
-            {$t('Skip')}
-          </span>
+        </div>
+      </div>
+    );
+  }
+
+  optimizePage(h: Function) {
+    return (
+      <div>
+        <div class={styles.container}>
+          <Optimize
+            continue={this.complete.bind(this)}
+            setProcessing={this.setProcessing.bind(this)}
+          />
         </div>
       </div>
     );
@@ -135,6 +143,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
     if (this.onboardingService.options.isLogin) {
       return this.loginPage(h);
+    }
+    if (this.onboardingService.options.isOptimize) {
+      return this.optimizePage(h);
     }
 
     return (
@@ -151,7 +162,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
             skipHandler={this.proceed.bind(this)}
             prevHandler={() => {}}
             hideBack={true}
-            hideSkip={this.currentStep === 2}
+            hideSkip={
+              [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
+            }
             hideButton={
               [1, 2, 4].includes(this.currentStep) ||
               (this.currentStep === 3 && !this.importedFromObs)

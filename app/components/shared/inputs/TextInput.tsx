@@ -43,6 +43,14 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     );
   }
 
+  handleInput(value: string) {
+    if (!this.metadata.emitOnChange) this.emitInput(value);
+  }
+
+  handleChange(value: string) {
+    if (this.metadata.emitOnChange) this.emitInput(value);
+  }
+
   render(h: Function) {
     return (
       <span
@@ -54,11 +62,13 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
         data-type="text"
         data-name={this.options.name}
       >
+        {this.options.icon && <i class={`fa fa-${this.options.icon}`} />}
         <input
           type={this.textVisible ? 'text' : 'password'}
           placeholder={this.options.placeholder}
           value={this.value}
-          onInput={(e: { target: { value: string } }) => this.emitInput(e.target.value)}
+          onInput={(e: { target: { value: string } }) => this.handleInput(e.target.value)}
+          onChange={(e: { target: { value: string } }) => this.handleChange(e.target.value)}
           name={this.options.uuid}
           v-validate={this.validate}
           disabled={this.options.disabled}

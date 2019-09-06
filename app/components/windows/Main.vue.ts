@@ -1,20 +1,18 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
-import AppsNav from '../AppsNav.vue';
+import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio.vue';
-import Dashboard from '../pages/Dashboard.vue';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding';
 import TitleBar from '../TitleBar.vue';
 import { Inject } from '../../services/core/injector';
@@ -31,17 +29,14 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import CreatorSites from 'components/pages/CreatorSites';
+import FacebookMerge from 'components/pages/FacebookMerge';
 
 @Component({
   components: {
     TitleBar,
-    TopNav,
-    AppsNav,
+    SideNav,
     Studio,
-    Dashboard,
     BrowseOverlays,
-    Live,
     Onboarding,
     LiveDock,
     StudioFooter,
@@ -53,7 +48,7 @@ import CreatorSites from 'components/pages/CreatorSites';
     PlatformAppStore,
     Help,
     ResizeBar,
-    CreatorSites,
+    FacebookMerge,
   },
 })
 export default class Main extends Vue {
@@ -64,6 +59,7 @@ export default class Main extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() editorCommandsService: EditorCommandsService;
 
   mounted() {
     const dockWidth = this.customizationService.state.livedockSize;
@@ -131,13 +127,17 @@ export default class Main extends Vue {
   }
 
   onDropHandler(event: DragEvent) {
-    const files = event.dataTransfer.files;
+    const fileList = event.dataTransfer.files;
+    const files: string[] = [];
 
-    let fi = files.length;
-    while (fi--) {
-      const file = files.item(fi);
-      this.scenesService.activeScene.addFile(file.path);
-    }
+    let fi = fileList.length;
+    while (fi--) files.push(fileList.item(fi).path);
+
+    this.editorCommandsService.executeCommand(
+      'AddFilesCommand',
+      this.scenesService.activeSceneId,
+      files,
+    );
   }
 
   $refs: {
@@ -178,7 +178,7 @@ export default class Main extends Vue {
 
     clearTimeout(this.windowResizeTimeout);
 
-    this.hasLiveDock = this.windowWidth >= 1100;
+    this.hasLiveDock = this.windowWidth >= 1070;
     this.windowResizeTimeout = window.setTimeout(
       () => this.windowsService.updateStyleBlockers('main', false),
       200,

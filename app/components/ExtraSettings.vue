@@ -5,7 +5,7 @@
         <p>
           {{
             $t(
-              'If you are experiencing weird behavior, you can try deleting your cache directory. This will result in you losing your scene configuration and settings, but can fix some stability issues.',
+              'Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member.',
             )
           }}
         </p>
@@ -34,11 +34,6 @@
           v-model="streamInfoUpdate"
           name="stream_info_udpate"
           :metadata="{ title: $t('Confirm stream title and game before going live') }"
-        />
-        <bool-input
-          v-model="navigateToLive"
-          name="navigate_to_live"
-          :metadata="{ title: $t('Navigate to Live tab when going live') }"
         />
         <bool-input
           v-model="disableHardwareAcceleration"

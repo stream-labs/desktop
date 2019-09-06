@@ -12,7 +12,7 @@ test('Populates video settings', async t => {
   const { app } = t.context;
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Video');

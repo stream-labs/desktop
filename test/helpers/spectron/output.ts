@@ -13,7 +13,7 @@ export async function setTemporaryRecordingPath(t: TExecutionContext): Promise<s
   const { app } = t.context;
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Output');
@@ -29,7 +29,7 @@ export async function setOutputResolution(t: TExecutionContext, resolution: stri
   const { app } = t.context;
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Video');

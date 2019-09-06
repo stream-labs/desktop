@@ -12,6 +12,7 @@ import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import electron from 'electron';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -64,6 +65,8 @@ export default class AddSource extends Vue {
   mounted() {
     if (this.sourceAddOptions.propertiesManager === 'replay') {
       this.name = $t('Instant Replay');
+    } else if (this.sourceAddOptions.propertiesManager === 'streamlabels') {
+      this.name = $t('Stream Label');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
@@ -95,7 +98,9 @@ export default class AddSource extends Vue {
     const scene = this.scenesService.activeScene;
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
-      alert(
+
+      electron.remote.dialog.showErrorBox(
+        $t('Error'),
         $t(
           'Unable to add a source: the scene you are trying to add already contains your current scene',
         ),

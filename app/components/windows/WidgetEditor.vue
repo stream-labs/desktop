@@ -60,7 +60,7 @@
               </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
-              <generic-form v-model="sourceProperties" @input="onPropsInputHandler"/>
+              <generic-form :value="sourceProperties" @input="onPropsInputHandler"/>
             </div>
           </div>
         </div>
@@ -305,6 +305,7 @@
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
+    overflow-y: auto;
 
     &:last-of-type {
       flex-shrink: 1;

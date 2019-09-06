@@ -11,7 +11,12 @@
       </div>
     </div>
   </div>
-  <div v-else class="no-preview" :style="{ height: `calc(100% - ${height + 18}px)` }">
+  <div
+    v-else
+    class="no-preview"
+    :class="{ 'perf-mode': performanceMode }"
+    :style="{ height: performanceMode ? '100px' : `calc(100% - ${eventsHeight + controlsHeight + 18}px` }"
+  >
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
@@ -21,16 +26,28 @@
     </div>
   </div>
   <resize-bar
-    class="studio-resizer"
+    v-if="!performanceMode && isLoggedIn"
     position="top"
-    v-model="height"
+    v-model="eventsHeight"
     @onresizestop="onResizeStopHandler()"
     @onresizestart="onResizeStartHandler()"
-    :max="maxHeight"
-    :min="minHeight"
+    :max="maxHeight - controlsHeight"
+    :min="minEventsHeight"
     :reverse="true"
   />
-  <studio-controls v-if="!appLoading" :style="{height: height + 'px'}" />
+  <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
+    <recent-events v-if="isLoggedIn" :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
+    <resize-bar
+      position="top"
+      v-model="controlsHeight"
+      @onresizestop="onResizeStopHandler()"
+      @onresizestart="onResizeStartHandler()"
+      :max="maxHeight - minControlsHeight"
+      :min="minControlsHeight"
+      :reverse="true"
+    />
+    <studio-controls :style="{ height: `${controlsHeight}px` }" />
+  </div>
 </div>
 </template>
 
@@ -40,13 +57,8 @@
 @import "../../styles/index";
 
 .studio-page {
-  height: 100%;
   flex-direction: column;
   .padding-bottom(2);
-}
-
-.studio-resizer {
-  margin: 4px 0;
 }
 
 .studio-mode-container {
@@ -120,5 +132,18 @@
       display: block;
     }
   }
+}
+
+.no-preview.perf-mode {
+  flex-grow: 0;
+}
+
+.bottom-half {
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-half.perf-mode {
+  flex-grow: 1;
 }
 </style>

@@ -42,7 +42,7 @@ export default class Hotkeys extends Vue {
   }
 
   destroyed() {
-    this.hotkeysService.applyHotkeySet(this.hotkeySet);
+    if (this.hotkeySet) this.hotkeysService.applyHotkeySet(this.hotkeySet);
   }
 
   get sources() {

@@ -7,17 +7,15 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
+import { IRecentEvent } from 'services/recent-events';
 
 export type TSocketEvent =
   | IStreamlabelsSocketEvent
-  | IDonationSocketEvent
-  | IFacemaskDonationSocketEvent
-  | IFollowSocketEvent
-  | ISubscriptionSocketEvent
   | IAlertPlayingSocketEvent
   | IAlertProfileChanged
-  | IBitsSocketEvent
-  | IFmExtEnabledSocketEvent;
+  | IEventSocketEvent
+  | IFmExtEnabledSocketEvent
+  | IEventPanelSettingsChangedSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -26,46 +24,30 @@ interface IStreamlabelsSocketEvent {
   };
 }
 
-interface IDonationSocketEvent {
-  type: 'donation';
-  message: {
-    name: string;
-    amount: string;
-    formattedAmount: string;
-    facemask: string;
-    message: string;
-  }[];
-}
-
-interface IFacemaskDonationSocketEvent {
-  type: 'facemaskdonation';
-  message: {
-    facemask: string;
-    _id: string;
-  }[];
-}
-
-interface IFollowSocketEvent {
-  type: 'follow';
-  message: {
-    name: string;
-    _id: string;
-  }[];
-}
-
-interface ISubscriptionSocketEvent {
-  type: 'subscription';
-  message: {
-    name: string;
-    _id: string;
-  }[];
-}
-
-interface IBitsSocketEvent {
-  type: 'bits';
-  message: {
-    name: string;
-  }[];
+export interface IEventSocketEvent {
+  type:
+    | 'merch'
+    | 'donation'
+    | 'facemaskdonation'
+    | 'follow'
+    | 'subscription'
+    | 'bits'
+    | 'host'
+    | 'raid'
+    | 'sticker'
+    | 'effect'
+    | 'like'
+    | 'stars'
+    | 'support'
+    | 'share'
+    | 'superchat'
+    | 'pledge'
+    | 'eldonation'
+    | 'tiltifydonation'
+    | 'donordrivedonation'
+    | 'justgivingdonation'
+    | 'treat';
+  message: IRecentEvent[];
 }
 
 interface IFmExtEnabledSocketEvent {
@@ -83,6 +65,13 @@ export interface IAlertPlayingSocketEvent {
 
 interface IAlertProfileChanged {
   type: 'alertProfileChanged';
+}
+
+interface IEventPanelSettingsChangedSocketEvent {
+  type: 'eventsPanelSettingsUpdate';
+  message: {
+    muted?: boolean;
+  };
 }
 
 export class WebsocketService extends Service {

@@ -9,14 +9,25 @@
         <button class="button alert-button" @click="confirmYoutubeEnabled">{{ $t('I\'m set up') }}</button>
       </div>
     </div>
-    <performance-metrics />
+    <i
+      class="icon-leaderboard-4 metrics-icon"
+      @mouseover="metricsShown = true"
+      @mouseleave="metricsShown = false"
+      @click="openMetricsWindow"
+    />
     <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
+    <transition name="slide">
+      <performance-metrics v-if="metricsShown" class="performance-metrics" />
+    </transition>
   </div>
 
   <div class="nav-right">
     <div class="nav-item">
       <test-widgets v-if="loggedIn" />
+    </div>
+    <div v-if="streamingService.isRecording" class="nav-item record-time">
+      {{ recordingTime }}
     </div>
     <div class="nav-item">
       <button
@@ -106,6 +117,14 @@
   }
 }
 
+.metrics-icon {
+  padding-right: 12px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .record-button {
   .transition();
   .weight(@bold);
@@ -144,6 +163,10 @@
   }
 }
 
+.record-time {
+  color: var(--warning);
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 2px 0 rgba(252, 62, 63, 0.6);
@@ -179,5 +202,25 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
+}
+
+.performance-metrics {
+  position: absolute;
+  background: var(--section) !important;
+  left: 50px;
+  z-index: 100;
+}
+
+// performance metrics transition
+
+.slide-enter,
+.slide-leave-to {
+  transform: translateX(50px);
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.5s ease;
 }
 </style>

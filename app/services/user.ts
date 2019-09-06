@@ -127,7 +127,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   // Makes sure the user's login is still good
   validateLogin() {
     if (!this.isLoggedIn()) return;
-    console.log('makes sure the login');
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -239,20 +238,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+      const isMediaShare =
+        this.windowsService.state.RecentEvents &&
+        this.windowsService.state.RecentEvents.queryParams.isMediaShare
+          ? '&view=media-share'
+          : '';
 
-      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
+      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
     }
   }
 
   dashboardUrl(subPage: string, hidenav: boolean = false) {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const token = this.apiToken;
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const hideNav = hidenav ? 'true' : 'false';
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
 
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
@@ -269,9 +274,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/library?mode=${uiTheme}&slobs`;
+    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
       url += `&oauth_token=${this.apiToken}`;
@@ -291,6 +295,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const request = new Request(url, { headers });
 
     return fetch(request).then(handleResponse);
+  }
+
+  getPlatformService(): IPlatformService {
+    return getPlatformService(this.platform.type);
   }
 
   async showLogin() {
@@ -346,9 +354,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     onWindowShow: () => void,
     onAuthStart: () => void,
     onAuthFinish: (result: EPlatformCallResult) => void,
+    merge = false,
   ) {
     const service = getPlatformService(platform);
     const partition = `persist:${uuid()}`;
+    const authUrl =
+      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+
+    if (merge && !this.isLoggedIn()) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
@@ -363,9 +378,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
-      const parsed = this.parseAuthFromUrl(url);
+      const parsed = this.parseAuthFromUrl(url, merge);
 
       if (parsed) {
+        // This is a hack to work around the fact that the merge endpoint
+        // returns the wrong token.
+        if (merge) parsed.apiToken = this.apiToken;
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
@@ -379,8 +397,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       defer(onWindowShow);
     });
 
-    authWindow.setMenu(null);
-    authWindow.loadURL(service.authUrl);
+    authWindow.removeMenu();
+    authWindow.loadURL(authUrl);
   }
 
   updatePlatformToken(token: string) {
@@ -394,19 +412,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   /**
    * Parses tokens out of the auth URL
    */
-  private parseAuthFromUrl(url: string) {
+  private parseAuthFromUrl(url: string, merge: boolean) {
     const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
+    const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
 
-    if (
-      query.token &&
-      query.platform_username &&
-      query.platform_token &&
-      query.platform_id &&
-      query.oauth_token
-    ) {
+    if (!merge) requiredFields.push('token', 'oauth_token');
+
+    if (requiredFields.every(field => !!query[field])) {
       return {
-        widgetToken: query.token,
-        apiToken: query.oauth_token,
+        widgetToken: merge ? this.widgetToken : query.token,
+        apiToken: merge ? this.apiToken : query.oauth_token,
         platform: {
           type: query.platform,
           username: query.platform_username,
@@ -438,20 +453,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       username: this.username,
       platform: this.platform.type,
     };
-  }
-
-  popoutRecentEvents() {
-    this.windowsService.createOneOffWindow(
-      {
-        componentName: 'RecentEvents',
-        title: $t('Recent Events'),
-        size: {
-          width: 800,
-          height: 600,
-        },
-      },
-      'RecentEvents',
-    );
   }
 
   /**
@@ -502,22 +503,4 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
     } as LoginLifecycle;
   }
-}
-
-/**
- * You can use this decorator to ensure the user is logged in
- * before proceeding
- */
-export function requiresLogin() {
-  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
-    const original = descriptor.value;
-
-    return {
-      ...descriptor,
-      value(...args: any[]) {
-        // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
-      },
-    };
-  };
 }

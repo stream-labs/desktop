@@ -52,7 +52,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     hideViewerCount: false,
     livedockCollapsed: true,
     livedockSize: 0,
-    bottomdockSize: 240,
+    eventsSize: 156,
+    controlsSize: 240,
     performanceMode: false,
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
@@ -61,6 +62,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
     selectiveRecordingEnabled: false,
+    legacyEvents: false,
     experimental: {
       // put experimental features here
     },

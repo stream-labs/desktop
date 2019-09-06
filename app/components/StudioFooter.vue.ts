@@ -15,6 +15,7 @@ import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
+import * as moment from 'moment';
 
 @Component({
   components: {
@@ -34,8 +35,22 @@ export default class StudioFooterComponent extends Vue {
 
   @Prop() locked: boolean;
 
+  metricsShown = false;
+  recordingTime = '';
+  private recordingTimeIntervalId: number;
+
   mounted() {
     this.confirmYoutubeEnabled();
+
+    // update recording time
+    this.recordingTimeIntervalId = window.setInterval(() => {
+      if (!this.streamingService.isRecording) return;
+      this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
+    }, 1000);
+  }
+
+  destroyed() {
+    clearInterval(this.recordingTimeIntervalId);
   }
 
   toggleRecording() {
@@ -89,9 +104,26 @@ export default class StudioFooterComponent extends Vue {
       const platform = this.userService.platform.type;
       const service = getPlatformService(platform);
       if (service instanceof YoutubeService) {
-        service.verifyAbleToStream();
+        service.prepopulateInfo();
       }
     }
+  }
+
+  openMetricsWindow() {
+    const mousePos = electron.remote.screen.getCursorScreenPoint();
+
+    this.windowsService.createOneOffWindow(
+      {
+        componentName: 'PerformanceMetrics',
+        title: $t('Performance Metrics'),
+        size: { width: 450, height: 75 },
+        x: mousePos.x,
+        y: mousePos.y,
+        resizable: false,
+        maximizable: false,
+      },
+      'performance-metrics',
+    );
   }
 
   get replayBufferEnabled() {

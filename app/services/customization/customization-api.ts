@@ -13,7 +13,8 @@ export interface ICustomizationServiceState {
   folderSelection: boolean;
   livedockCollapsed: boolean;
   livedockSize: number;
-  bottomdockSize: number;
+  eventsSize: number;
+  controlsSize: number;
   performanceMode: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
@@ -22,6 +23,7 @@ export interface ICustomizationServiceState {
   navigateToLiveOnStreamStart: boolean;
   selectiveRecordingEnabled: boolean;
   experimental: any;
+  legacyEvents: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

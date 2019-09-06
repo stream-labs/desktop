@@ -1,12 +1,12 @@
 import { Service } from 'services/core/service';
 import {
   IPlatformService,
-  IPlatformAuth,
   IChannelInfo,
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
   EPlatformCallResult,
+  IPlatformRequest,
 } from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
@@ -16,12 +16,12 @@ import { UserService } from 'services/user';
 import { StreamInfoService } from 'services/stream-info';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { handlePlatformResponse, requiresToken } from './utils';
+import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 
 /**
  * Request headers that need to be sent to Twitch
  */
-export interface ITwitchRequestHeaders {
+export interface ITwitchRequestHeaders extends Dictionary<string> {
   Accept: 'application/vnd.twitchtv.v5+json';
   Authorization?: string;
   'Client-Id': string;
@@ -122,19 +122,15 @@ export class TwitchService extends Service implements IPlatformService {
       .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
-  @requiresToken()
   fetchRawChannelInfo() {
-    const headers = this.getHeaders(true);
-    const request = new Request('https://api.twitch.tv/kraken/channel', { headers });
-
-    return fetch(request).then(handlePlatformResponse);
+    return platformAuthorizedRequest('https://api.twitch.tv/kraken/channel');
   }
 
   fetchStreamKey(): Promise<string> {
     return this.fetchRawChannelInfo().then(json => json.stream_key);
   }
 
-  fetchChannelInfo(): Promise<IChannelInfo> {
+  prepopulateInfo(): Promise<IChannelInfo> {
     return Promise.all([
       this.fetchRawChannelInfo().then(json => ({
         title: json.status,
@@ -152,54 +148,33 @@ export class TwitchService extends Service implements IPlatformService {
     }));
   }
 
-  @requiresToken()
   fetchUserInfo() {
-    const headers = this.getHeaders(true, true);
-    const request = new Request(`https://api.twitch.tv/helix/users?id=${this.twitchId}`, {
-      headers,
-    });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => (json[0] && json[0].login ? { username: json[0].login as string } : {}));
+    return platformAuthorizedRequest(`https://api.twitch.tv/helix/users?id=${this.twitchId}`).then(
+      json => (json[0] && json[0].login ? { username: json[0].login as string } : {}),
+    );
   }
 
   fetchViewerCount(): Promise<number> {
-    const headers = this.getHeaders();
-    const request = new Request(`https://api.twitch.tv/kraken/streams/${this.twitchId}`, {
-      headers,
-    });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => (json.stream ? json.stream.viewers : 0));
+    return platformRequest(`https://api.twitch.tv/kraken/streams/${this.twitchId}`).then(json =>
+      json.stream ? json.stream.viewers : 0,
+    );
   }
 
-  @requiresToken()
   putChannelInfo({ title, game, tags = [] }: IChannelInfo): Promise<boolean> {
-    const headers = this.getHeaders(true);
-    const data = { channel: { game, status: title } };
-    const request = new Request(`https://api.twitch.tv/kraken/channels/${this.twitchId}`, {
-      headers,
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-
     return Promise.all([
-      fetch(request).then(handlePlatformResponse),
+      platformAuthorizedRequest({
+        url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
+        method: 'PUT',
+        body: JSON.stringify({ channel: { game, status: title } }),
+      }),
       this.setStreamTags(tags),
     ]).then(_ => true);
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
-    const headers = this.getHeaders();
-    const request = new Request(`https://api.twitch.tv/kraken/search/games?query=${searchString}`, {
-      headers,
-    });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => json.games);
+    return platformRequest(`https://api.twitch.tv/kraken/search/games?query=${searchString}`).then(
+      json => json.games,
+    );
   }
 
   getChatUrl(mode: string) {
@@ -209,24 +184,14 @@ export class TwitchService extends Service implements IPlatformService {
     );
   }
 
-  @requiresToken()
   getAllTags(): Promise<TTwitchTag[]> {
-    return getAllTags(this.getRawHeaders(true, true));
+    return getAllTags();
   }
 
-  prepopulateInfo() {
-    return this.fetchRawChannelInfo().then(json => ({
-      title: json.status,
-      game: json.game,
-    }));
-  }
-
-  @requiresToken()
   getStreamTags(): Promise<TTwitchTag[]> {
-    return getStreamTags(this.twitchId, this.getRawHeaders(true, true));
+    return getStreamTags(this.twitchId);
   }
 
-  @requiresToken()
   async setStreamTags(tags: TTwitchTag[]) {
     const hasPermission = await this.hasScope('user:edit:broadcast');
 
@@ -234,12 +199,10 @@ export class TwitchService extends Service implements IPlatformService {
       return false;
     }
 
-    return updateTags(this.getRawHeaders(true, true))(tags)(this.twitchId);
+    return updateTags()(tags)(this.twitchId);
   }
 
   searchCommunities(searchString: string) {
-    const headers = this.getHeaders();
-
     const data = {
       requests: [
         {
@@ -253,48 +216,29 @@ export class TwitchService extends Service implements IPlatformService {
       'https://xluo134hor-dsn.algolia.net/1/indexes/*/queries' +
       '?x-algolia-application-id=XLUO134HOR&x-algolia-api-key=d157112f6fc2cab93ce4b01227c80a6d';
 
-    const request = new Request(communitySearchUrl, {
-      headers,
+    return platformRequest({
+      url: communitySearchUrl,
       method: 'POST',
       body: JSON.stringify(data),
-    });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => json.results[0].hits);
+    }).then(json => json.results[0].hits);
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
-    return fetch('https://id.twitch.tv/oauth2/validate', {
-      headers: this.getHeaders(true),
-    })
-      .then(handlePlatformResponse)
-      .then((response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope));
+    return platformAuthorizedRequest('https://id.twitch.tv/oauth2/validate').then(
+      (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
+    );
   }
 
-  private getRawHeaders(authorized = false, isNewApi = false) {
-    const map: ITwitchRequestHeaders = {
+  getHeaders(req: IPlatformRequest, authorized = false): ITwitchRequestHeaders {
+    const isNewApi = req.url.indexOf('https://api.twitch.tv/helix/') === 0;
+    return {
       'Client-Id': this.clientId,
       Accept: 'application/vnd.twitchtv.v5+json',
       'Content-Type': 'application/json',
+      ...(authorized
+        ? { Authorization: `${isNewApi ? 'Bearer' : 'OAuth'} ${this.oauthToken}` }
+        : {}),
     };
-
-    return authorized
-      ? {
-          ...map,
-          Authorization: `${isNewApi ? 'Bearer' : 'OAuth'} ${this.oauthToken}`,
-        }
-      : map;
-  }
-
-  private getHeaders(authorized = false, isNewApi = false): Headers {
-    const headers = new Headers();
-
-    Object.entries(this.getRawHeaders(authorized, isNewApi)).forEach(([key, value]) => {
-      headers.append(key, value);
-    });
-
-    return headers;
   }
 
   supports<T extends TPlatformCapability>(

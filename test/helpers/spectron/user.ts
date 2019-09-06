@@ -23,7 +23,7 @@ interface ITestUser {
 
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
-  await t.context.app.client.click('.icon-logout');
+  await t.context.app.client.click('.fa-sign-out-alt');
   await dialogDismiss(t, 'Yes');
   await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
@@ -60,7 +60,7 @@ export async function logIn(
 
   app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   if (!waitForUI) return true;
-  await t.context.app.client.waitForVisible('.icon-logout'); // wait for the log-out button
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt'); // wait for the log-out button
   return true;
 }
 

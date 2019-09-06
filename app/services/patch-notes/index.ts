@@ -9,6 +9,7 @@ import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
+  updateTimestamp: string;
 }
 
 export interface IPatchNotes {
@@ -25,6 +26,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
 
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
+    updateTimestamp: null,
   };
 
   init() {
@@ -63,7 +65,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     // The user has already seen the current patch notes
     if (lastMinorVersionSeen && lastMinorVersionSeen[1] === currentMinorVersion[1]) return;
 
-    this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION);
+    this.SET_LAST_VERSION_SEEN(electron.remote.process.env.SLOBS_VERSION, new Date().toISOString());
 
     // Only show the actual patch notes if they weren't onboarded
     if (!onboarded) {
@@ -87,7 +89,8 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   }
 
   @mutation()
-  private SET_LAST_VERSION_SEEN(version: string) {
+  private SET_LAST_VERSION_SEEN(version: string, timestamp: string) {
     this.state.lastVersionSeen = version;
+    this.state.updateTimestamp = timestamp;
   }
 }
