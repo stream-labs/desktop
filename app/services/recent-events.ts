@@ -43,6 +43,7 @@ export interface IRecentEvent {
   hash: string;
   isTest?: boolean;
   repeat?: boolean;
+  // uuid is local and will NOT persist across app restarts/ fetches
   uuid: string;
 }
 
