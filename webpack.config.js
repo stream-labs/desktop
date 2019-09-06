@@ -138,7 +138,7 @@ module.exports = {
   },
 
   optimization: {
-    minimizer: [new TerserPlugin({ sourceMap: true })]
+    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })]
   },
 
   plugins,
