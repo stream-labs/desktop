@@ -285,7 +285,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
     const body = JSON.stringify({
       eventHash: event.hash,
-      read: !event.read,
+      read: event.read,
     });
     const request = new Request(url, { headers, body, method: 'POST' });
     return await fetch(request).then(handleResponse);
