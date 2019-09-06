@@ -6,6 +6,7 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import pick from 'lodash/pick';
+import uuid from 'uuid/v4';
 
 export interface IRecentEvent {
   name?: string;
@@ -42,6 +43,7 @@ export interface IRecentEvent {
   hash: string;
   isTest?: boolean;
   repeat?: boolean;
+  uuid: string;
 }
 
 interface IRecentEventsState {
@@ -193,6 +195,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
+        event.uuid = uuid();
         return event;
       });
 
@@ -227,6 +230,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'title',
           'read',
           'hash',
+          'uuid',
         ]);
       });
 
@@ -277,7 +281,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async readAlert(event: IRecentEvent) {
-    this.TOGGLE_RECENT_EVENT_READ(event);
+    this.TOGGLE_RECENT_EVENT_READ(event.uuid);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
@@ -354,6 +358,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     messages.forEach(msg => {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
+      msg.uuid = uuid();
       msg.read = false;
       msg.iso8601Created = new Date().toISOString();
     });
@@ -422,8 +427,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  private TOGGLE_RECENT_EVENT_READ(event: IRecentEvent) {
-    event.read = !event.read;
+  private TOGGLE_RECENT_EVENT_READ(uuid: string) {
+    this.state.recentEvents.forEach(event => {
+      if (event.uuid === uuid) {
+        event.read = !event.read;
+      }
+    });
   }
 
   @mutation()

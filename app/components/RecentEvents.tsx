@@ -139,7 +139,7 @@ export default class RecentEvents extends TsxComponent<{}> {
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
-              key={event.hash}
+              key={event.uuid}
               event={event}
               repeatAlert={this.repeatAlert.bind(this)}
               eventString={this.eventString.bind(this)}
