@@ -20,5 +20,6 @@ module.exports = {
   upload: {
     githubToken: process.env.NAIR_GITHUB_TOKEN,
     s3BucketName: process.env.RELEASE_S3_BUCKET_NAME,
+    s3KeyPrefix: 'download/windows',
   }
 };

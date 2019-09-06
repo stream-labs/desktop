@@ -50,6 +50,7 @@ const {
  * @param {object} param0.upload
  * @param {string} param0.upload.githubToken
  * @param {string} param0.upload.s3BucketName
+ * @param {string} param0.upload.s3KeyPrefix
  * @param {object} param0.patchNote
  * @param {string} param0.patchNote.version
  * @param {string} param0.patchNote.notes
@@ -97,6 +98,7 @@ async function runScript({
   log('   githubHost:', colors.cyan(target.host));
   log('  githubToken:', colors.cyan(upload.githubToken));
   log(' s3BucketName:', colors.cyan(upload.s3BucketName));
+  log('  s3KeyPrefix:', colors.cyan(upload.s3KeyPrefix));
   log('---- ---- ---- ----');
   info('repeat again');
   log('version:', colors.cyan(patchNote.version));
@@ -207,19 +209,19 @@ async function runScript({
       name: path.basename(binaryFilePath),
       bucketName: upload.s3BucketName,
       filePath: binaryFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
     await uploadS3File({
       name: path.basename(blockmapFilePath),
       bucketName: upload.s3BucketName,
       filePath: blockmapFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
     await uploadS3File({
       name: path.basename(latestYmlFilePath),
       bucketName: upload.s3BucketName,
       filePath: latestYmlFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
   } else {
     info('uploading artifacts to s3: SKIP');
