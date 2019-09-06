@@ -44,7 +44,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
 
   updated = new Subject<ISelectionState>();
 
-  private get sceneId() {
+  get sceneId() {
     return this.scenesService.activeSceneId;
   }
 

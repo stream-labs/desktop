@@ -60,7 +60,7 @@
               </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
-              <generic-form v-model="sourceProperties" @input="onPropsInputHandler"/>
+              <generic-form :value="sourceProperties" @input="onPropsInputHandler"/>
             </div>
           </div>
         </div>

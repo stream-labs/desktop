@@ -8,9 +8,8 @@ import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/webs
 import pick from 'lodash/pick';
 
 export interface IRecentEvent {
-  id: number;
-  name: string;
-  from: string;
+  name?: string;
+  from?: string;
   type: string;
   platform: string;
   created_at: string;
@@ -34,6 +33,13 @@ export interface IRecentEvent {
   displayString?: string;
   comment?: string;
   title?: string;
+  iso8601Created?: string;
+  createdAt?: string;
+  streamer?: string;
+  giftType?: string;
+  _id?: string;
+  read: boolean;
+  hash: string;
   isTest?: boolean;
   repeat?: boolean;
 }
@@ -51,6 +57,65 @@ const subscriptionMap = (subPlan: string) => {
     Prime: $t('Prime'),
   }[subPlan];
 };
+
+/**
+ * This function duplicates per-event logic from streamlabs.com for
+ * creating cache keys used in fetching read status of events and
+ * serves as the best proxy for a unique identifier for each
+ * event. Should be refactored when backend is rewritten for consistency
+ */
+function getHashForRecentEvent(event: IRecentEvent) {
+  switch (event.type) {
+    case 'donation':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'bits':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'donordrivedonation':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'eldonation':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'follow':
+      return [event.type, event.name, event.message].join(':');
+    case 'host':
+      return [event.type, event.name, event.host_type].join(':');
+    case 'justgivingdonation':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'loyalty_store_redemption':
+      return [event.type, event.from, event.message].join(':');
+    case 'pledge':
+      return [event.type, event.name, parseInt(event.amount, 10), event.from].join(':');
+    case 'prime_sub_gift':
+      return [event.type, event.name, event.streamer, event.giftType].join(':');
+    case 'raid':
+      return [event.type, event.name, event.from].join(':');
+    case 'redemption':
+      return [event.type, event.name, event.message].join(':');
+    case 'sticker':
+      return [event.name, event.type, event.currency].join(':');
+    case 'subscription':
+      return [event.type, event.name, event.message].join(':');
+    case 'superchat':
+      return [event.type, event.name, event.message].join(':');
+    case 'superheart':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'tiltifydonation':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'treat':
+      return [event.type, event.name, event.title, event.message, event.createdAt].join(':');
+    case 'facebook_like':
+      return [event.type, event.name, event._id].join(':');
+    case 'facebook_share':
+      return [event.type, event.name, event._id].join(':');
+    case 'facebook_stars':
+      return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
+    case 'facebook_support':
+      return [event.type, event.name, event._id].join(':');
+    case 'merch':
+      return [event.type, event.message, event.createdAt].join(':');
+    default:
+      return [event.type, event._id].join(':');
+  }
+}
 
 const SUPPORTED_EVENTS = [
   'merch',
@@ -74,6 +139,10 @@ const SUPPORTED_EVENTS = [
   'donordrivedonation',
   'justgivingdonation',
   'treat',
+  'facebook_like',
+  'facebook_share',
+  'facebook_stars',
+  'facebook_support',
 ];
 
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
@@ -126,11 +195,15 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
     Object.keys(events.data).forEach(key => {
+      const fortifiedEvents = events.data[key].map(event => {
+        event.hash = getHashForRecentEvent(event);
+        return event;
+      });
+
       // This server response returns a ton of stuff. We remove the noise
       // before adding it to the store.
-      const culledEvents: IRecentEvent[] = events.data[key].map(event => {
+      const culledEvents = fortifiedEvents.map(event => {
         return pick(event, [
-          'id',
           'name',
           'from',
           'type',
@@ -156,10 +229,21 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'displayString',
           'comment',
           'title',
+          'read',
+          'hash',
         ]);
       });
 
       eventArray = eventArray.concat(culledEvents);
+    });
+
+    // Format string of keys to look for in server event cache
+    const hashValues = eventArray.map(event => event.hash).join('|##|');
+
+    // Get read status for all events
+    const readReceipts = await this.fetchReadReceipts(hashValues);
+    eventArray.forEach(event => {
+      event.read = readReceipts[event.hash] ? readReceipts[event.hash] : false;
     });
 
     eventArray.sort((a: IRecentEvent, b: IRecentEvent) => {
@@ -167,6 +251,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     });
 
     this.SET_RECENT_EVENTS(eventArray);
+  }
+
+  async fetchReadReceipts(hashValues: string): Promise<{ data: Dictionary<boolean> }> {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/readreceipts`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const request = new Request(url, { headers });
+    const body = JSON.stringify({
+      hashValues,
+    });
+    return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
 
   async repeatAlert(event: IRecentEvent) {
@@ -181,6 +278,21 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       token: this.userService.widgetToken,
     });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
+  }
+
+  async readAlert(event: IRecentEvent) {
+    this.TOGGLE_RECENT_EVENT_READ(event.hash);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const body = JSON.stringify({
+      eventHash: event.hash,
+      read: !event.read,
+    });
+    const request = new Request(url, { headers, body, method: 'POST' });
+    return await fetch(request).then(handleResponse);
   }
 
   async skipAlert() {
@@ -224,6 +336,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onSocketEvent(e: TSocketEvent) {
+    if (e.type === 'eventsPanelSettingsUpdate') {
+      if (e.message.muted != null) {
+        this.SET_MUTED(e.message.muted);
+      }
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
@@ -231,7 +349,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   onEventSocket(e: IEventSocketEvent) {
     const messages = e.message.filter(msg => !msg.isTest && !msg.repeat);
-    messages.forEach(msg => (msg.type = e.type));
+    messages.forEach(msg => {
+      msg.type = e.type;
+      msg.hash = getHashForRecentEvent(msg);
+      msg.read = false;
+      msg.iso8601Created = new Date().toISOString();
+    });
     this.ADD_RECENT_EVENT(messages);
   }
 
@@ -276,9 +399,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
-    return await fetch(new Request(url, { headers, body, method: 'POST' }))
-      .then(handleResponse)
-      .then(() => this.SET_MUTED(!this.state.muted));
+    return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
 
   openRecentEventsWindow(isMediaShare?: boolean) {
@@ -296,6 +417,15 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private ADD_RECENT_EVENT(events: IRecentEvent[]) {
     this.state.recentEvents = events.concat(this.state.recentEvents);
+  }
+
+  @mutation()
+  private TOGGLE_RECENT_EVENT_READ(eventHash: string) {
+    this.state.recentEvents.forEach((event, index) => {
+      if (event.hash === eventHash) {
+        event.read = !event.read;
+      }
+    });
   }
 
   @mutation()

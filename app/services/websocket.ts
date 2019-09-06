@@ -14,7 +14,8 @@ export type TSocketEvent =
   | IAlertPlayingSocketEvent
   | IAlertProfileChanged
   | IEventSocketEvent
-  | IFmExtEnabledSocketEvent;
+  | IFmExtEnabledSocketEvent
+  | IEventPanelSettingsChangedSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -64,6 +65,13 @@ export interface IAlertPlayingSocketEvent {
 
 interface IAlertProfileChanged {
   type: 'alertProfileChanged';
+}
+
+interface IEventPanelSettingsChangedSocketEvent {
+  type: 'eventsPanelSettingsUpdate';
+  message: {
+    muted?: boolean;
+  };
 }
 
 export class WebsocketService extends Service {

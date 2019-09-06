@@ -1,11 +1,11 @@
-import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import moment from 'moment';
-import { RecentEventsService, IRecentEvent } from 'services/recent-events';
-import TsxComponent from './tsx-component';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
+import { IRecentEvent, RecentEventsService } from 'services/recent-events';
+import { Component, Prop } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
+import TsxComponent from './tsx-component';
 import BrowserView from 'components/shared/BrowserView';
 import { UserService } from 'services/user';
 import electron from 'electron';
@@ -76,6 +76,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.skipAlert();
   }
 
+  readAlert(event: IRecentEvent) {
+    return this.recentEventsService.readAlert(event);
+  }
+
   async toggleQueue() {
     try {
       this.queuePaused
@@ -135,9 +139,11 @@ export default class RecentEvents extends TsxComponent<{}> {
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
+              key={event.hash}
               event={event}
               repeatAlert={this.repeatAlert.bind(this)}
               eventString={this.eventString.bind(this)}
+              readAlert={this.readAlert.bind(this)}
             />
           ))}
         {this.recentEvents.length === 0 && (
@@ -225,10 +231,6 @@ class Toolbar extends TsxComponent<IToolbarProps> {
             {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
           </span>
         </span>
-        {/* <span class="action-icon" onClick={this.popoutRecentEvents}>
-          <i class="icon-pop-out-2" />
-          <span style={{ marginLeft: '8px' }}>Pop Out Full Events View</span>
-        </span> */}
         {this.native && (
           <i
             class="icon-music action-icon"
@@ -252,7 +254,12 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         )}
         {this.native && (
           <i
-            class={cx('icon-mute action-icon', { [styles.red]: this.muted })}
+            class={cx('action-icon', {
+              [styles.red]: this.muted,
+              fa: !this.muted,
+              'fa-volume-up': !this.muted,
+              'icon-mute': this.muted,
+            })}
             onClick={this.muteEvents}
             v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
           />
@@ -283,15 +290,47 @@ class EventCell extends TsxComponent<{
   event: IRecentEvent;
   eventString: (event: IRecentEvent) => string;
   repeatAlert: (event: IRecentEvent) => void;
+  readAlert: (event: IRecentEvent) => void;
 }> {
   @Prop() event: IRecentEvent;
   @Prop() eventString: (event: IRecentEvent) => string;
   @Prop() repeatAlert: (event: IRecentEvent) => void;
+  @Prop() readAlert: (event: IRecentEvent) => void;
+
+  timestamp = '';
+  timestampInterval: number;
+
+  mounted() {
+    this.updateTimestamp();
+
+    this.timestampInterval = window.setInterval(() => {
+      this.updateTimestamp();
+    }, 60 * 1000);
+  }
+
+  destroyed() {
+    if (this.timestampInterval) clearInterval(this.timestampInterval);
+  }
+
+  updateTimestamp() {
+    this.timestamp = moment.utc(this.createdAt).fromNow(true);
+  }
+
+  get createdAt(): moment.Moment {
+    if (this.event.iso8601Created) {
+      return moment(this.event.iso8601Created);
+    }
+
+    return moment.utc(this.event.created_at);
+  }
 
   render(h: Function) {
     return (
-      <div class={styles.cell}>
-        <span class={styles.timestamp}>{moment(this.event.created_at).fromNow(true)}</span>
+      <div
+        class={cx(styles.cell, this.event.read ? styles.cellRead : '')}
+        onClick={() => this.readAlert(this.event)}
+      >
+        <span class={styles.timestamp}>{this.timestamp}</span>
         <span class={styles.name}>{getName(this.event)}</span>
         <span>{this.eventString(this.event)}</span>
         {this.event.gifter && (
@@ -307,7 +346,10 @@ class EventCell extends TsxComponent<{
         )}
         <i
           class="icon-repeat action-icon"
-          onClick={() => this.repeatAlert(this.event)}
+          onClick={(event: any) => {
+            event.stopPropagation();
+            this.repeatAlert(this.event);
+          }}
           v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
         />
       </div>
