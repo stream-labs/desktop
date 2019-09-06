@@ -6,6 +6,7 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import pick from 'lodash/pick';
+import uuid from 'uuid/v4';
 
 export interface IRecentEvent {
   name?: string;
@@ -42,6 +43,8 @@ export interface IRecentEvent {
   hash: string;
   isTest?: boolean;
   repeat?: boolean;
+  // uuid is local and will NOT persist across app restarts/ fetches
+  uuid: string;
 }
 
 interface IRecentEventsState {
@@ -102,13 +105,13 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
     case 'treat':
       return [event.type, event.name, event.title, event.message, event.createdAt].join(':');
-    case 'facebook_like':
+    case 'like':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_share':
+    case 'share':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_stars':
+    case 'stars':
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
-    case 'facebook_support':
+    case 'support':
       return [event.type, event.name, event._id].join(':');
     case 'merch':
       return [event.type, event.message, event.createdAt].join(':');
@@ -139,10 +142,6 @@ const SUPPORTED_EVENTS = [
   'donordrivedonation',
   'justgivingdonation',
   'treat',
-  'facebook_like',
-  'facebook_share',
-  'facebook_stars',
-  'facebook_support',
 ];
 
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
@@ -197,6 +196,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
+        event.uuid = uuid();
         return event;
       });
 
@@ -231,6 +231,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'title',
           'read',
           'hash',
+          'uuid',
         ]);
       });
 
@@ -281,7 +282,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async readAlert(event: IRecentEvent) {
-    this.TOGGLE_RECENT_EVENT_READ(event.hash);
+    this.TOGGLE_RECENT_EVENT_READ(event.uuid);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
@@ -289,7 +290,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
     const body = JSON.stringify({
       eventHash: event.hash,
-      read: !event.read,
+      read: event.read,
     });
     const request = new Request(url, { headers, body, method: 'POST' });
     return await fetch(request).then(handleResponse);
@@ -322,10 +323,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         tier: subscriptionMap(event.sub_plan),
       });
     }
-    if (event.months > 1) {
+    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
       return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
         tier: subscriptionMap(event.sub_plan),
         streak: event.streak_months,
+        months: event.months,
+      });
+    }
+    if (event.months > 1) {
+      return $t('has resubscribed (%{tier}) for %{months} months', {
+        tier: subscriptionMap(event.sub_plan),
         months: event.months,
       });
     }
@@ -352,6 +359,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     messages.forEach(msg => {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
+      msg.uuid = uuid();
       msg.read = false;
       msg.iso8601Created = new Date().toISOString();
     });
@@ -420,9 +428,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  private TOGGLE_RECENT_EVENT_READ(eventHash: string) {
-    this.state.recentEvents.forEach((event, index) => {
-      if (event.hash === eventHash) {
+  private TOGGLE_RECENT_EVENT_READ(uuid: string) {
+    this.state.recentEvents.forEach(event => {
+      if (event.uuid === uuid) {
         event.read = !event.read;
       }
     });
