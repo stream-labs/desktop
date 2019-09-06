@@ -272,6 +272,11 @@ export default class EditStreamInfo extends Vue {
   }
 
   async handleSubmit() {
+    if (this.infoError || this.updateError) {
+      await this.goLive();
+      return;
+    }
+
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isSchedule) return this.scheduleStream();
     if (this.twitterIsEnabled && this.shouldPostTweet) {
@@ -368,6 +373,7 @@ export default class EditStreamInfo extends Vue {
     if (this.isSchedule) return $t('Schedule');
     if (this.twitterIsEnabled && this.shouldPostTweet) return $t('Tweet & Go Live');
 
+    if (this.infoError || this.updateError) return $t('Go Live');
     return $t('Confirm & Go Live');
   }
 

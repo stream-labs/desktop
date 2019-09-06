@@ -60,14 +60,10 @@ export class ProtocolLinksService extends Service {
     }
   }
 
-  @protocolHandler('dashboard')
-  private navigateDashboard(info: IProtocolLinkInfo) {
-    const subPage = info.path.replace('/', '');
-    this.navigationService.navigate('Dashboard', { subPage });
-  }
-
   @protocolHandler('library')
   private navigateLibrary(info: IProtocolLinkInfo) {
+    if (!this.userService.isLoggedIn()) return;
+
     const parts = info.path.match(/^\/(.+)\/(.+)$/);
     if (parts) {
       this.navigationService.navigate('BrowseOverlays', {
@@ -79,11 +75,15 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
+    if (!this.userService.isLoggedIn()) return;
+
     this.platformAppStoreService.paypalAuthSuccess();
   }
 
   @protocolHandler('app')
   private navigateApp(info: IProtocolLinkInfo) {
+    if (!this.userService.isLoggedIn()) return;
+
     const appId = info.path.replace('/', '');
 
     if (this.platformAppsService.getApp(appId)) {
@@ -96,6 +96,7 @@ export class ProtocolLinksService extends Service {
   @protocolHandler('facemasks')
   private openFacemaskSettings() {
     if (!this.userService.isLoggedIn()) return;
+
     this.facemasksService.showSettings();
   }
 }

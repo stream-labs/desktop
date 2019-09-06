@@ -284,3 +284,27 @@ test('Scale', async t => {
   });
 
 });
+
+test('isSceneFolder', async t => {
+  sceneBuilder.build(`
+    Folder1
+    Folder2
+      Folder3
+        Item3:
+  `);
+
+  selectionService.selectAll();
+  t.false(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Folder1')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Folder2')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Folder3')]);
+  t.true(selectionService.isSceneFolder());
+
+  selectionService.select([getNodeId('Item3')]);
+  t.false(selectionService.isSceneFolder());
+});

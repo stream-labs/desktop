@@ -34,7 +34,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   @Inject() private userService: UserService;
   @Inject() i18nService: I18nService;
 
-  apiToken = this.userService.state.auth.apiToken;
   authWindowOpen = false;
 
   static defaultState: ITwitterServiceState = {
@@ -45,6 +44,10 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     screenName: '',
     tweetWhenGoingLive: true,
   };
+
+  init() {
+    this.userService.userLogout.subscribe(() => this.RESET_TWITTER_STATUS());
+  }
 
   @mutation()
   SET_TWITTER_STATUS(status: ITwitterStatusResponse) {
@@ -60,16 +63,27 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     this.state.tweetWhenGoingLive = preference;
   }
 
+  @mutation()
+  RESET_TWITTER_STATUS() {
+    this.state.linked = false;
+    this.state.prime = false;
+    this.state.creatorSiteOnboardingComplete = false;
+    this.state.creatorSiteUrl = '';
+    this.state.screenName = '';
+    this.state.tweetWhenGoingLive = true;
+  }
+
   setTweetPreference(preference: boolean) {
     this.SET_TWEET_PREFERENCE(preference);
   }
 
   private linkTwitterUrl() {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
-    const token = this.apiToken;
+    const token = this.userService.apiToken;
     const locale = this.i18nService.state.locale;
 
-    return `https://${host}/slobs/twitter/link?oauth_token=${token}&l=${locale}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/twitter/link?oauth_token=${token}&l=${locale}`;
   }
 
   async getTwitterStatus() {
@@ -80,7 +94,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   async unlinkTwitter() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/unlink`;
-    const headers = authorizedHeaders(this.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
@@ -90,7 +104,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   async fetchTwitterStatus() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/status`;
-    const headers = authorizedHeaders(this.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
@@ -100,7 +114,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   async postTweet(tweet: string) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/tweet`;
-    const headers = authorizedHeaders(this.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const request = new Request(url, {
       headers,
