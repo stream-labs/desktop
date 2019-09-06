@@ -102,13 +102,13 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
     case 'treat':
       return [event.type, event.name, event.title, event.message, event.createdAt].join(':');
-    case 'facebook_like':
+    case 'like':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_share':
+    case 'share':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_stars':
+    case 'stars':
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
-    case 'facebook_support':
+    case 'support':
       return [event.type, event.name, event._id].join(':');
     case 'merch':
       return [event.type, event.message, event.createdAt].join(':');
