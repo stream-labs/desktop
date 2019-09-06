@@ -1,5 +1,5 @@
 <template>
-<div class="titlebar">
+<div class="titlebar" :class="{isUnstable}">
   <div class="titlebar-title">
     {{ title }}
   </div>
@@ -26,16 +26,18 @@
   z-index: 1;
 
   // 実験版用
-  &:not(.modal-layout-titlebar) {
-    background-color: #e2c84d;
+  &.isUnstable {
+    &:not(.modal-layout-titlebar) {
+      background-color: #e2c84d;
 
-    .titlebar-title {
-      color: @black;
-      font-weight: bold;
-    }
+      .titlebar-title {
+        color: @black;
+        font-weight: bold;
+      }
 
-    .link {
-      color: @black;
+      .link {
+        color: @black;
+      }
     }
   }
 }
