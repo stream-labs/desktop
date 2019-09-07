@@ -38,6 +38,11 @@
         <span>REC</span>
       </button>
     </div>
+    <div v-if="loggedIn" class="top-nav-item" :class="{ 'top-nav-item--active': selectiveRecordingEnabled }">
+      <a @click="toggleSelectiveRecording" class="link">
+        <i class="icon-smart-record" v-tooltip.right="$t('Toggle Selective Recording')" />
+      </a>
+    </div>
     <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
       <button class="button button--default replay-button" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
     </div>

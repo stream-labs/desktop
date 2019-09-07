@@ -86,6 +86,10 @@ export default class StudioFooterComponent extends Vue {
     return true;
   }
 
+  get selectiveRecordingEnabled() {
+    return this.customizationService.state.selectiveRecordingEnabled;
+  }
+
   openYoutubeEnable() {
     electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
@@ -124,6 +128,10 @@ export default class StudioFooterComponent extends Vue {
       },
       'performance-metrics',
     );
+  }
+
+  toggleSelectiveRecording() {
+    this.customizationService.toggleSelectiveRecording();
   }
 
   get replayBufferEnabled() {
