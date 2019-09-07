@@ -14,6 +14,7 @@ import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ERenderingMode } from '../../obs-api';
 
 interface IResizeRegion {
   name: string;
@@ -531,6 +532,10 @@ export default class StudioEditor extends Vue {
     });
 
     return regions;
+  }
+
+  get renderingMode() {
+    return ERenderingMode.OBS_MAIN_RENDERING;
   }
 
   generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
