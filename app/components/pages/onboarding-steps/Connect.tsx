@@ -30,8 +30,8 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
           this.continue();
         } else if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
-          electron.remote.dialog.showMessageBox(
-            {
+          electron.remote.dialog
+            .showMessageBox({
               type: 'error',
               message: $t(
                 'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
@@ -39,13 +39,12 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
               ),
               title: $t('Twitch Authentication Error'),
               buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
-            },
-            buttonIndex => {
-              if (buttonIndex === 0) {
+            })
+            .then(({ response }) => {
+              if (response === 0) {
                 electron.remote.shell.openExternal('https://twitch.tv/settings/security');
               }
-            },
-          );
+            });
         }
       },
     );
@@ -83,13 +82,14 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
 
   render(h: Function) {
     return (
-      <OnboardingStep>
-        <div slot="title">{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</div>
-        <div slot="desc">
+      <div class={styles.container}>
+        <div class={styles.progressCover} />
+        <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
+        <p>
           {this.isSecurityUpgrade
             ? this.securityUpgradeLink(h)
             : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
-        </div>
+        </p>
         <div class={styles.signupButtons}>
           {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
             <button
@@ -102,7 +102,10 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
             </button>
           ))}
         </div>
-      </OnboardingStep>
+        <span class={styles.skipButton} onClick={this.continue}>
+          {$t('Skip')}
+        </span>
+      </div>
     );
   }
 }

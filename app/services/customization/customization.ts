@@ -135,10 +135,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
-  setNavigateToLive(enabled: boolean) {
-    this.setSettings({ navigateToLiveOnStreamStart: enabled });
-  }
-
   toggleSelectiveRecording() {
     this.setSettings({ selectiveRecordingEnabled: !Global.multipleRendering });
     Global.multipleRendering = !Global.multipleRendering;
