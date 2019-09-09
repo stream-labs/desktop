@@ -8,7 +8,7 @@
       <div>
         <i
           v-if="loggedIn"
-          :class="[{ 'icon--active': selectiveRecordingEnabled }, 'icon-smart-record']"
+          :class="[{ 'icon--active': selectiveRecordingEnabled }, 'icon-smart-record icon-button icon-button--lg']"
           @click="toggleSelectiveRecording"
           v-tooltip.bottom="$t('Toggle Selective Recording')" />
         <i
