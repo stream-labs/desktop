@@ -358,13 +358,4 @@ export class ScenesService extends StatefulService<IScenesState> {
       },
     });
   }
-
-  migrateSelectiveRecording() {
-    this.scenes.forEach(scene => {
-      scene.getItems().forEach(sceneItem => {
-        if (sceneItem.streamVisible == null) sceneItem.setStreamVisible(true);
-        if (sceneItem.recordingVisible == null) sceneItem.setRecordingVisible(true);
-      });
-    });
-  }
 }
