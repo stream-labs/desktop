@@ -6,18 +6,20 @@
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component
-    v-for="(component, index) in components"
-    :key="`${component.name}-${index}`"
-    v-if="component.name"
-    v-show="component.isShown"
-    :is="component.name"/>
+  <div class="child-window-content">
+    <component
+      v-for="(component, index) in components"
+      :key="`${component.name}-${index}`"
+      v-if="component.name"
+      v-show="component.isShown"
+      :is="component.name"/>
+  </div>
 </div>
 </template>
 
 <script lang="ts" src="./ChildWindow.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../../styles/index";
 
 .blank-slate {
@@ -25,7 +27,7 @@
   flex-direction: column;
 
   position: absolute;
-  height: 100%;
+  height: calc(~"100% - 26px"); // TitleBarぶんの高さを引く
   width: 100%;
   z-index: -1;
 
@@ -36,6 +38,10 @@
 
 .child-window-titlebar {
   flex-shrink: 0;
+}
+
+.child-window-content {
+  height: calc(~"100% - 26px"); // TitleBarぶんの高さを引く
 }
 
 .spinner-spacer {

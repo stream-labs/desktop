@@ -38,7 +38,7 @@
 @import "../styles/index";
 
 .modal-layout {
-  height: calc(~"100% - 30px"); // Compensate for titlebar living in ChildWindow
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 2px 2px;
