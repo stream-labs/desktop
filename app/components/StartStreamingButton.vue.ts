@@ -54,11 +54,10 @@ export default class StartStreamingButton extends Vue {
               $t(
                 "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
               ) +
+              ' ' +
               $t('Are you sure you want to do this?') +
               '\n\n' +
-              $t(
-                'You can add sources by clicking the + icon under the Sources box in the main window at any time',
-              ),
+              $t('You can add sources by clicking the + icon near the Sources box at any time'),
             buttons: [$t('Cancel'), $t('Go Live Anyway')],
           })
           .then(({ response }) => !!response);
