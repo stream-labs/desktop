@@ -8,6 +8,8 @@ import HotkeyGroup from './HotkeyGroup';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import Fuse from 'fuse.js';
 import mapValues from 'lodash/mapValues';
+import { Debounce } from 'lodash-decorators';
+import set = Reflect.set;
 
 interface IAugmentedHotkey extends IHotkey {
   // Will be scene or source name
@@ -46,13 +48,17 @@ export default class Hotkeys extends Vue {
     this.highlightSearch(val);
   }
 
-  mounted() {
+  async mounted() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
     this.hotkeysService.unregisterAll();
 
     // Render a blank page before doing synchronous IPC
-    setTimeout(() => (this.hotkeySet = this.hotkeysService.getHotkeysSet()), 100);
+    await new Promise(r => setTimeout(r, 100));
+
+    this.hotkeySet = this.hotkeysService.getHotkeysSet();
+    await this.$nextTick();
+    this.highlightSearch(this.globalSearchStr);
   }
 
   destroyed() {
