@@ -288,11 +288,12 @@ export default class SourceSelector extends Vue {
   cycleSelectiveRecording(sceneNodeId: string) {
     if (this.streamingService.isStreaming || this.streamingService.isRecording) return;
     const selection = this.scene.getSelection(sceneNodeId);
+    console.log(selection.isRecordingVisible(), selection.isStreamVisible());
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      selection.setStreamVisible(false);
-    } else if (selection.isRecordingVisible()) {
-      selection.setStreamVisible(true);
       selection.setRecordingVisible(false);
+    } else if (selection.isStreamVisible()) {
+      selection.setStreamVisible(false);
+      selection.setRecordingVisible(true);
     } else {
       selection.setStreamVisible(true);
       selection.setRecordingVisible(true);
