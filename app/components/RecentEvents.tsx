@@ -45,6 +45,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.state.muted;
   }
 
+  get mediaShareEnabled() {
+    return this.recentEventsService.state.mediaShareEnabled;
+  }
+
   formatMoney(amount: string, type: string) {
     const prefix = type === 'donation' ? '$' : '';
     const numAmount = Number.parseFloat(amount);
@@ -175,6 +179,7 @@ export default class RecentEvents extends TsxComponent<{}> {
           toggleQueue={() => this.toggleQueue()}
           queuePaused={this.queuePaused}
           muted={this.muted}
+          mediaShareEnabled={this.mediaShareEnabled}
           native={this.native}
           onNativeswitch={val => this.setNative(val)}
         />
@@ -204,6 +209,7 @@ interface IToolbarProps {
   toggleQueue: Function;
   queuePaused: boolean;
   muted: boolean;
+  mediaShareEnabled: boolean;
   native: boolean;
   onNativeswitch: (native: boolean) => void;
 }
@@ -218,6 +224,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() toggleQueue: () => void;
   @Prop() queuePaused: boolean;
   @Prop() muted: boolean;
+  @Prop() mediaShareEnabled: boolean;
   @Prop() native: boolean;
 
   render(h: Function) {
@@ -231,7 +238,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
             {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
           </span>
         </span>
-        {this.native && (
+        {this.native && this.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
             onClick={this.popoutMediaShare}
