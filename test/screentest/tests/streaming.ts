@@ -6,7 +6,7 @@ import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
 import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 useScreentest();
 
 // test streaming for each platform

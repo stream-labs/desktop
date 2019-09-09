@@ -4,7 +4,7 @@ import { makeScreenshots, useScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 
-useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
+useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 testGoal('Donation Goal', EWidgetType.DonationGoal);

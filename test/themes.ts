@@ -4,7 +4,7 @@ import { sleep } from './helpers/sleep';
 import { FormMonkey } from './helpers/form-monkey';
 import { sceneExisting } from './helpers/spectron/scenes';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 const OVERLAY_NAME = 'Talon Stream Package by VBI';
 const OVERLAY_SCENES = ['Starting Soon', 'Be Right Back', 'Stream Ending', 'Intermission', 'Main'];

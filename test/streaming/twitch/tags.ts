@@ -2,7 +2,7 @@ import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron
 import { logIn } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 test('Twitch Tags', async t => {
   const app = t.context.app;
