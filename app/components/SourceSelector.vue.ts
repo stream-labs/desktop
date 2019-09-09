@@ -12,7 +12,6 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
-import { UserService } from '../services/user';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -67,7 +66,6 @@ export default class SourceSelector extends Vue {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamingService: StreamingService;
-  @Inject() private userService: UserService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -275,10 +273,6 @@ export default class SourceSelector extends Vue {
 
   get selectiveRecordingEnabled() {
     return this.customizationService.state.selectiveRecordingEnabled;
-  }
-
-  get loggedIn() {
-    return this.userService.isLoggedIn();
   }
 
   toggleSelectiveRecording() {
