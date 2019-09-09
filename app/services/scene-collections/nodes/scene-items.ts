@@ -117,6 +117,13 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   load(context: IContext): Promise<void> {
     this.sanitizeIds();
 
+    this.data.items.forEach(item => {
+      if (item.sceneNodeType === 'item') {
+        if (item.streamVisible == null) item.streamVisible = true;
+        if (item.recordingVisible == null) item.recordingVisible = true;
+      }
+    });
+
     context.scene.addSources(this.data.items);
 
     const promises: Promise<void>[] = [];
