@@ -60,7 +60,7 @@ export default class MixerVolmeter extends Vue {
   canvasHeight: number;
 
   mounted() {
-    this.subscribeVolmeter();
+    // this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
     this.setChannelCount(1);
@@ -79,7 +79,7 @@ export default class MixerVolmeter extends Vue {
 
   destroyed() {
     clearInterval(this.canvasWidthInterval);
-    this.unsubscribeVolmeter();
+    // this.unsubscribeVolmeter();
   }
 
   private initWebglRendering() {
