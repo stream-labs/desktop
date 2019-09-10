@@ -7,7 +7,7 @@
       </h2>
       <div>
         <i
-          :class="[{ 'icon--active': selectiveRecordingEnabled }, 'icon-smart-record icon-button icon-button--lg']"
+          :class="[{ 'icon--active': selectiveRecordingEnabled }, { disabled: selectiveRecordingLocked }, 'icon-smart-record icon-button icon-button--lg']"
           @click="toggleSelectiveRecording"
           v-tooltip.bottom="$t('Toggle Selective Recording')" />
         <i
