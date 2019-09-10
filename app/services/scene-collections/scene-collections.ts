@@ -160,7 +160,7 @@ export class SceneCollectionsService extends Service
       console.warn(
         `Unsuccessful recovery of scene collection ${id} attempted`
       );
-      alert('Failed to load scene collection.  A new one will be created instead.');
+      alert($t('scenes.failedToLoadSceneCollection'));
       await this.create();
     }
 
