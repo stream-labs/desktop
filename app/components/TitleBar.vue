@@ -1,5 +1,5 @@
 <template>
-<div class="titlebar">
+<div class="titlebar" :class="{isUnstable}">
   <div class="titlebar-title">
     {{ title }}
   </div>
@@ -24,6 +24,22 @@
   box-shadow: 0 1px 0 rgba(0,0,0,0.1);
   vertical-align: top;
   z-index: 1;
+
+  // 実験版用
+  &.isUnstable {
+    &:not(.modal-layout-titlebar) {
+      background-color: #e2c84d;
+
+      .titlebar-title {
+        color: @black;
+        font-weight: bold;
+      }
+
+      .link {
+        color: @black;
+      }
+    }
+  }
 }
 
 .titlebar-icon {
