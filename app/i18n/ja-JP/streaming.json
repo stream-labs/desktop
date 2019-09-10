@@ -24,7 +24,7 @@
   "enableThePreviewStream": "配信プレビューを有効にする",
   "recordTooltip": "設定 > 出力で録画パスを指定できます",
   "notBroadcasting": "番組が作成されていません",
-  "notBroadcastingMessage": "番組が作成されていないため、配信ができません。ニコニコ生放送にて番組を作成してください。",
+  "notBroadcastingMessage": "N Airでログインしているアカウントでは番組が作成されていないため、配信ができません。ニコニコ生放送にて番組を作成してください。",
   "broadcastStatusFetchingError": {
     "default": "配信に必要な情報を取得できませんでした。インターネットの接続状態を確認してください。",
     "httpError": "配信に必要な情報を取得できませんでした。（%{statusText}）"
