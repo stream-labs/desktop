@@ -7,7 +7,6 @@ import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
-import { InternalApiClient } from '../services/api/internal-api-client';
 
 Vue.use(Vuex);
 
@@ -30,14 +29,14 @@ const plugins: any[] = [];
 
 let mutationId = 1;
 let makeStoreReady: Function;
-let storeCanReceiveMutations = Util.isMainWindow();
+const isWorkerWindow = Util.isWorkerWindow();
+let storeCanReceiveMutations = isWorkerWindow;
 
 const storeReady = new Promise<Store<any>>(resolve => {
   makeStoreReady = resolve;
 });
 
-// This plugin will keep all vuex stores in sync via
-// IPC with the main process.
+// This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     const internalApiService: InternalApiService = InternalApiService.instance;
@@ -52,20 +51,20 @@ plugins.push((store: Store<any>) => {
     }
   });
 
-  // Only the main window should ever receive this
+  // Only the worker window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
     win.webContents.send('vuex-loadState', JSON.stringify(store.state));
   });
 
-  // Only child windows should ever receive this
+  // Only renderer windows should ever receive this
   ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
       state: JSON.parse(state),
       __vuexSyncIgnore: true,
     });
 
-    // child window can't receive mutations until BULK_LOAD_STATE event
+    // renderer windows can't receive mutations until after the BULK_LOAD_STATE event
     storeCanReceiveMutations = true;
 
     makeStoreReady(store);
@@ -77,13 +76,13 @@ plugins.push((store: Store<any>) => {
 
     const mutation = JSON.parse(mutationString);
 
-    // for main window commit mutation directly
-    if (Util.isMainWindow()) {
+    // for worker window commit mutation directly
+    if (isWorkerWindow) {
       commitMutation(mutation);
       return;
     }
 
-    // for child and one-offs windows commit mutations via api-client
+    // for renderer windows commit mutations via api-client
     const servicesManager: ServicesManager = ServicesManager.instance;
     servicesManager.internalApiClient.handleMutation(mutation);
   });
@@ -113,7 +112,8 @@ export function createStore(): Promise<Store<any>> {
 
   StatefulService.setupVuexStore(store);
 
-  if (Util.isMainWindow()) makeStoreReady(store);
+  // The worker window is immediately ready
+  if (isWorkerWindow) makeStoreReady(store);
 
   return storeReady;
 }

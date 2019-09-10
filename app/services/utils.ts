@@ -31,6 +31,10 @@ export default class Utils {
     return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
+  static isWorkerWindow(): boolean {
+    return this.getWindowId() === 'worker';
+  }
+
   static isMainWindow(): boolean {
     return this.getWindowId() === 'main';
   }

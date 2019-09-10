@@ -59,8 +59,8 @@ enum EResponseResultProcessing {
     [requestId: string]: IRequest;
   } = {};
 
-  const mainWindowContents = electron.remote.webContents.fromId(
-    electron.ipcRenderer.sendSync('getMainWindowWebContentsId'),
+  const workerWindowContents = electron.remote.webContents.fromId(
+    electron.ipcRenderer.sendSync('getWorkerWindowId'),
   );
   const webContentsId = electron.remote.getCurrentWebContents().id;
 
@@ -71,7 +71,7 @@ enum EResponseResultProcessing {
   const readyPromise = new Promise<boolean>(resolve => {
     readyFunc = () => {
       requestBuffer.forEach(req => {
-        mainWindowContents.send('guestApiRequest', req);
+        workerWindowContents.send('guestApiRequest', req);
       });
       ready = true;
       resolve();
@@ -162,7 +162,7 @@ enum EResponseResultProcessing {
         };
 
         if (ready) {
-          mainWindowContents.send('guestApiRequest', apiRequest);
+          workerWindowContents.send('guestApiRequest', apiRequest);
         } else {
           requestBuffer.push(apiRequest);
         }

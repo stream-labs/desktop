@@ -28,6 +28,7 @@ import { getResource } from 'services';
 import * as obs from '../obs-api';
 import path from 'path';
 import uuid from 'uuid/v4';
+import Blank from 'components/windows/Blank.vue';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -147,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
   createStore().then(async store => {
     const windowsService: WindowsService = WindowsService.instance;
 
-    if (Utils.isMainWindow()) {
+    if (Utils.isWorkerWindow()) {
       // Services
       const appService: AppService = AppService.instance;
       const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
@@ -224,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       store,
       el: '#app',
       render: h => {
+        if (windowId === 'worker') return h(Blank);
         if (windowId === 'child') return h(ChildWindow);
         if (windowId === 'main') {
           const componentName = windowsService.state[windowId].componentName;

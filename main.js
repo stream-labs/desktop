@@ -110,10 +110,11 @@ if (!gotTheLock) {
   }
 
   // Windows
+  let workerWindow;
   let mainWindow;
   let childWindow;
 
-  // Somewhat annoyingly, this is needed so that the child window
+  // Somewhat annoyingly, this is needed so that the main window
   // can differentiate between a user closing it vs the app
   // closing the windows before exit.
   let allowMainWindowClose = false;
@@ -165,6 +166,23 @@ if (!gotTheLock) {
       });
     }
 
+    workerWindow = new BrowserWindow({
+      show: false,
+      webPreferences: { nodeIntegration: true }
+    });
+
+    workerWindow.openDevTools({ mode: 'detach' });
+
+    workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
+
+    // All renderers should use ipcRenderer.sendTo to send to communicate with
+    // the worker.  This still gets proxied via the main process, but eventually
+    // we will refactor this to not use electron IPC, which will make it much
+    // more efficient.
+    ipcMain.on('getWorkerWindowId', event => {
+      event.returnValue = workerWindow.webContents.id;
+    });
+
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
       defaultHeight: 1000
@@ -188,24 +206,17 @@ if (!gotTheLock) {
 
     mainWindow.removeMenu();
 
-    // wait until devtools will be opened and load app into window
-    // it allows to start application with clean cache
-    // and handle breakpoints on startup
-    const LOAD_DELAY = 2000;
-    setTimeout(() => {
-      mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-    }, isDevMode ? LOAD_DELAY : 0);
-
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
         shutdownStarted = true;
-        mainWindow.send('shutdown');
+        workerWindow.send('shutdown');
 
-        // We give the main window 10 seconds to acknowledge a request
+        // We give the worker window 10 seconds to acknowledge a request
         // to shut down.  Otherwise, we just close it.
         appShutdownTimeout = setTimeout(() => {
           allowMainWindowClose = true;
           if (!mainWindow.isDestroyed()) mainWindow.close();
+          if (!workerWindow.isDestroyed()) workerWindow.close();
         }, 10 * 1000);
       }
 
@@ -219,6 +230,7 @@ if (!gotTheLock) {
     ipcMain.on('shutdownComplete', () => {
       allowMainWindowClose = true;
       mainWindow.close();
+      workerWindow.close();
     });
 
     // Initialize the keylistener
@@ -254,12 +266,12 @@ if (!gotTheLock) {
     if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
     // simple messaging system for services between windows
-    // WARNING! the child window use synchronous requests and will be frozen
-    // until main window asynchronous response
+    // WARNING! renderer windows use synchronous requests and will be frozen
+    // until the worker window's asynchronous response
     const requests = { };
 
     function sendRequest(request, event = null) {
-      mainWindow.webContents.send('services-request', request);
+      workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event });
     }
@@ -277,7 +289,10 @@ if (!gotTheLock) {
     }
 
     ipcMain.on('services-ready', () => {
-      if (!childWindow.isDestroyed()) {
+      if (!mainWindow.isDestroyed() && !childWindow.isDestroyed()) {
+        // TODO: Load these earlier but make them gracefully handle the
+        // state when services aren't ready.
+        mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
         childWindow.loadURL(`${global.indexUrl}?windowId=child`);
       }
     });
@@ -295,7 +310,7 @@ if (!gotTheLock) {
     ipcMain.on('services-message', (event, payload) => {
       const windows = BrowserWindow.getAllWindows();
       windows.forEach(window => {
-        if (window.id === mainWindow.id || window.isDestroyed()) return;
+        if (window.id === workerWindow.id || window.isDestroyed()) return;
         window.webContents.send('services-message', payload);
       });
     });
@@ -437,11 +452,11 @@ if (!gotTheLock) {
       });
     }
 
-    if (windowId !== mainWindow.id) {
-      // Tell the mainWindow to send its current store state
+    if (windowId !== workerWindow.id) {
+      // Tell the worker window to send its current store state
       // to the newly registered window
 
-      mainWindow.webContents.send('vuex-sendState', windowId);
+      workerWindow.webContents.send('vuex-sendState', windowId);
     }
   });
 

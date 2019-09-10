@@ -41,15 +41,15 @@ export class ServicesManager extends Service {
       window['sm'] = this;
     }
 
-    // Setup a different behavior for services if we're not in the MainWindow now
-    if (!Utils.isMainWindow()) {
+    // Renderer windows access services in the worker window via proxy API
+    if (!Utils.isWorkerWindow()) {
       this.internalApiClient = new InternalApiClient();
       // redirect all services methods calls to the main window's services
       Service.setupProxy(service => this.internalApiClient.applyIpcProxy(service));
       // don't call the init method for all services
       Service.setupInitFunction(service => null);
     } else {
-      // if it's a main window, subscribe to serviceAfterInit event
+      // if it's the worker window, subscribe to serviceAfterInit event
       // to initialize services with `InitAfter()` decorator
       Service.serviceAfterInit.subscribe(service => this.initObservers(service));
     }
