@@ -146,6 +146,16 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.gameOverlayService.initialize();
     await this.recentEventsService.initialize();
+
+    await new Promise(r => setTimeout(r, 2000));
+    this.windowsService.showWindow({
+      componentName: 'Test',
+      title: 'Test',
+      size: {
+        width: 830,
+        height: 800,
+      },
+    });
   }
 
   shutdownStarted = new Subject();

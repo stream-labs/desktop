@@ -54,6 +54,7 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
+import Test from 'components/windows/Test';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -108,6 +109,8 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
+
+    Test,
   };
 }
 

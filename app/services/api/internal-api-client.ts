@@ -5,6 +5,7 @@ import * as traverse from 'traverse';
 import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
+import { get } from 'lodash';
 const { ipcRenderer } = electron;
 
 /**
@@ -87,12 +88,20 @@ export class InternalApiClient {
 
           const result = response.result;
           const mutations = response.mutations;
+          const accessors = response.accessors;
 
           // commit all mutations caused by the api-request now
           mutations.forEach(mutation => commitMutation(mutation));
           // we'll still receive already committed mutations from async IPC event
           // mark them as ignored
           this.skippedMutations.push(...mutations.map(m => m.id));
+
+          // apply store reading operations to make Vuex reactivity working
+          accessors.forEach(accessor => {
+            const [serviceName, ...storePath] = accessor;
+            const serviceState = this.getResource(serviceName).state;
+            get(serviceState, storePath.join('.'));
+          });
 
           if (result && result._type === 'SUBSCRIPTION') {
             if (result.emitter === 'PROMISE') {

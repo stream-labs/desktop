@@ -31,6 +31,7 @@ export interface IJsonRpcResponse<TResponse> {
     message?: string;
   };
   mutations?: IMutation[];
+  accessors?: TAccessor[];
 }
 
 declare type TResourceType = 'HELPER' | 'SUBSCRIPTION' | 'EVENT';
@@ -48,6 +49,8 @@ export interface IMutation {
   type: string;
   payload: any;
 }
+
+export type TAccessor = string[];
 
 export interface IJsonrpcServiceApi {
   createRequest(resourceId: string, method: string, ...args: any[]): IJsonRpcRequest;

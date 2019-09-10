@@ -106,9 +106,14 @@ export function inheritMutations(target: any) {
  */
 export abstract class StatefulService<TState extends object> extends Service {
   private static store: Store<any>;
+  private static accessorWatcher: (accessor: string[]) => any;
 
   static setupVuexStore(store: Store<any>) {
     this.store = store;
+  }
+
+  static setupAccessorWatcher(accessorWatcher: (accessor: string[]) => any) {
+    this.accessorWatcher = accessorWatcher;
   }
 
   static getStore() {
@@ -121,7 +126,15 @@ export abstract class StatefulService<TState extends object> extends Service {
   }
 
   get state(): TState {
-    return this.store.state[this.serviceName];
+    const localState = this.store.state[this.serviceName];
+    return new Proxy(localState, {
+      get: (target, prop: string) => {
+        if (StatefulService.accessorWatcher) {
+          StatefulService.accessorWatcher([this.serviceName, prop]);
+        }
+        return localState[prop];
+      },
+    }) as TState;
   }
 
   set state(newState: TState) {

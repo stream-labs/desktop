@@ -9,6 +9,7 @@ import {
   IJsonRpcRequest,
   IJsonRpcResponse,
   IMutation,
+  TAccessor,
   JsonrpcService,
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
@@ -31,6 +32,7 @@ export abstract class RpcApi extends Service {
   protected servicesManager: ServicesManager = ServicesManager.instance;
   private mutationsBufferingEnabled = false;
   private bufferedMutations: IMutation[] = [];
+  private bufferedAccessors: TAccessor[] = [];
 
   /**
    * contains additional information about errors
@@ -132,7 +134,11 @@ export abstract class RpcApi extends Service {
         ? resource[methodName].apply(resource, args)
         : resource[methodName];
     const response = this.serializePayload(resource, payload, request);
-    if (fetchMutations) response.mutations = this.stopBufferingMutations();
+    if (fetchMutations) {
+      const [mutations, accessors] = this.stopBufferingMutations();
+      response.mutations = mutations;
+      response.accessors = accessors;
+    }
     return response;
   }
 
@@ -281,15 +287,21 @@ export abstract class RpcApi extends Service {
   /**
    * stop buffering and clear buffer
    */
-  private stopBufferingMutations(): IMutation[] {
+  private stopBufferingMutations(): [IMutation[], TAccessor[]] {
     this.mutationsBufferingEnabled = false;
     const mutations = this.bufferedMutations;
+    const accessors = this.bufferedAccessors;
     this.bufferedMutations = [];
-    return mutations;
+    this.bufferedAccessors = [];
+    return [mutations, accessors];
   }
 
   handleMutation(mutation: IMutation) {
     if (this.mutationsBufferingEnabled) this.bufferedMutations.push(mutation);
+  }
+
+  handleAccessor(accessor: string[]) {
+    if (this.mutationsBufferingEnabled) this.bufferedAccessors.push(accessor);
   }
 
   /**

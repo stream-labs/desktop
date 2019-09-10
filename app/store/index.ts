@@ -113,7 +113,13 @@ export function createStore(): Promise<Store<any>> {
 
   StatefulService.setupVuexStore(store);
 
-  if (Util.isMainWindow()) makeStoreReady(store);
+  if (Util.isMainWindow()) {
+    const internalApiService: InternalApiService = InternalApiService.instance;
+    StatefulService.setupAccessorWatcher((accessor: string[]) =>
+      internalApiService.handleAccessor(accessor),
+    );
+    makeStoreReady(store);
+  }
 
   return storeReady;
 }
