@@ -16,7 +16,6 @@ function registerMutation(
   options = { unsafe: false },
 ) {
   const serviceName = target.constructor.name;
-  // const mutationName = `${serviceName}.${methodName}`;
 
   target.originalMethods = target.originalMethods || {};
   target.originalMethods[methodName] = target[methodName];
