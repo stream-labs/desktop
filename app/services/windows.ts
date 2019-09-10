@@ -275,7 +275,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
-    const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
+    const newOptions: IWindowOptions = {
+      ...DEFAULT_WINDOW_OPTIONS,
+      ...optionsPatch,
+      scaleFactor: this.state.child.scaleFactor,
+    };
     if (newOptions.preservePrevWindow) {
       const currentOptions = cloneDeep(this.state.child);
 
