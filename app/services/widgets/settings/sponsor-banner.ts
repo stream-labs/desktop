@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 
@@ -35,7 +35,7 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
   getApiSettings() {
     return {
       type: WidgetType.SponsorBanner,
-      url: `https://${this.getHost()}/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.SponsorBanner].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,

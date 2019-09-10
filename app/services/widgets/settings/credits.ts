@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { authorizedHeaders } from 'util/requests';
@@ -53,7 +53,7 @@ export class CreditsService extends WidgetSettingsService<ICreditsData> {
   getApiSettings() {
     return {
       type: WidgetType.Credits,
-      url: `https://${this.getHost()}/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.Credits].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/endcredits`,

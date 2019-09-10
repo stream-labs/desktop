@@ -1,5 +1,10 @@
 import uuid from 'uuid/v4';
-import { IWidgetData, WidgetSettingsService, WidgetType } from 'services/widgets';
+import {
+  IWidgetData,
+  WidgetDefinitions,
+  WidgetSettingsService,
+  WidgetType,
+} from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import {
@@ -18,7 +23,6 @@ import {
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
-import { settings } from 'cluster';
 
 export interface IAlertBoxData extends IWidgetData {
   settings: IAlertBoxSettings;
@@ -37,7 +41,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   getApiSettings() {
     return {
       type: WidgetType.AlertBox,
-      url: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.AlertBox].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox`,

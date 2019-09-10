@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
@@ -58,7 +58,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
   getApiSettings() {
     return {
       type: WidgetType.EventList,
-      url: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.EventList].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/eventlist`,

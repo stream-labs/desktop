@@ -94,11 +94,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
       suggestedName,
       'browser_source',
       {
-        url: widget.url(
-          this.hostsService.streamlabs,
-          this.userService.widgetToken,
-          this.userService.platform.type,
-        ),
+        url: widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
         width: widget.width,
         height: widget.height,
       },
@@ -127,11 +123,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
 
   getWidgetUrl(type: WidgetType) {
     if (!this.userService.isLoggedIn()) return;
-    return WidgetDefinitions[type].url(
-      this.hostsService.streamlabs,
-      this.userService.widgetToken,
-      this.userService.platform.type,
-    );
+    return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
   getWidgetComponent(type: WidgetType): string {
@@ -212,6 +204,17 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         }
       });
     });
+  }
+
+  getWidgetTypeByUrl(url: string): WidgetType {
+    return Number(
+      Object.keys(WidgetDefinitions).find(WidgetType => {
+        const regExp = new RegExp(
+          WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '.+'),
+        );
+        return regExp.test(url);
+      }),
+    );
   }
 
   private register(sourceId: string) {

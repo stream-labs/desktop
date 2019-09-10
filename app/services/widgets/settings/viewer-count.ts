@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 
@@ -24,7 +24,7 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
   getApiSettings() {
     return {
       type: WidgetType.ViewerCount,
-      url: `https://${this.getHost()}/widgets/viewer-count?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.ViewerCount].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/viewer-count?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/viewercount`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/viewercount`,

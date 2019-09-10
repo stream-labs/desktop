@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
@@ -42,7 +42,7 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
   getApiSettings() {
     return {
       type: WidgetType.SpinWheel,
-      url: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.SpinWheel].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,

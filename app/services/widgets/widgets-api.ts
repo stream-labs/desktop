@@ -3,6 +3,7 @@ import { AnchorPoint } from 'util/ScalableRectangle';
 import { WidgetType } from './widgets-data';
 import { ISourceApi } from 'services/sources';
 import { IAlertBoxVariation } from './settings/alert-box/alert-box-api';
+import { key } from 'aws-sdk/clients/signer';
 
 export interface ISerializableWidget {
   name: string;
@@ -14,7 +15,7 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
+type TUrlGenerator = (host: string, token: string) => string;
 
 export interface IWidgetTester {
   name: string;
