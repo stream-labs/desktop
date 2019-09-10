@@ -1,5 +1,5 @@
 <template>
-<modal-layout :title="$t('informations.title')" :showControls="false">
+<modal-layout :showControls="false">
 
   <div class="informations" slot="content" data-test="Informations">
     <ul class="information-list" v-if="!fetching && !hasError">
