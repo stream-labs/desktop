@@ -4,11 +4,15 @@
 // Set Up Environment Variables
 ////////////////////////////////////////////////////////////////////////////////
 const pjson = require('./package.json');
+
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
 if (pjson.name === 'n-air-app-unstable') {
   process.env.NAIR_UNSTABLE = true;
+}
+if (process.env.NODE_ENV !== 'production' && process.env.NAIR_UNSTABLE) {
+  pjson.name = 'n-air-app-unstable';
 }
 if (pjson.name === 'n-air-app-preview') {
   process.env.NAIR_PREVIEW = true;
@@ -47,6 +51,12 @@ function log(...args) {
     console.log(...args);
   }
 }
+
+// We use a special cache directory for running tests
+if (process.env.NAIR_CACHE_DIR) {
+  app.setPath('appData', process.env.NAIR_CACHE_DIR);
+}
+app.setPath('userData', path.join(app.getPath('appData'), pjson.name));
 
 if (process.argv.includes('--clearCacheDir')) {
   // __installer.exe は electron-updater 差分アップデートの比較元になるので消してはいけない
@@ -304,12 +314,6 @@ function startApp() {
               '/node_modules/obs-studio-node'));
 
   getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
-}
-
-// We use a special cache directory for running tests
-if (process.env.NAIR_CACHE_DIR) {
-  app.setPath('appData', process.env.NAIR_CACHE_DIR);
-  app.setPath('userData', path.join(app.getPath('appData'), pjson.name));
 }
 
 app.setAsDefaultProtocolClient('nair');

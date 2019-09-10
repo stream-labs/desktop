@@ -50,6 +50,7 @@ const {
  * @param {object} param0.upload
  * @param {string} param0.upload.githubToken
  * @param {string} param0.upload.s3BucketName
+ * @param {string} param0.upload.s3KeyPrefix
  * @param {object} param0.patchNote
  * @param {string} param0.patchNote.version
  * @param {string} param0.patchNote.notes
@@ -97,6 +98,7 @@ async function runScript({
   log('   githubHost:', colors.cyan(target.host));
   log('  githubToken:', colors.cyan(upload.githubToken));
   log(' s3BucketName:', colors.cyan(upload.s3BucketName));
+  log('  s3KeyPrefix:', colors.cyan(upload.s3KeyPrefix));
   log('---- ---- ---- ----');
   info('repeat again');
   log('version:', colors.cyan(patchNote.version));
@@ -107,6 +109,10 @@ async function runScript({
   info('checking current branch...');
   const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();
   if (currentBranch !== target.branch) {
+    if (releaseEnvironment === 'public') {
+      throw new Error(`branch mismatch: '${currentBranch}' is not '${target.branch}'`);
+    }
+
     if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
       sh.exit(1);
     }
@@ -159,8 +165,7 @@ async function runScript({
     executeCmd('yarn compile:production');
 
     info('Making the package...');
-    const envPrefix = releaseEnvironment === 'public' ? '' : `${releaseEnvironment}-`;
-    executeCmd(`yarn package:${envPrefix}${releaseChannel}`);
+    executeCmd(`yarn package:${releaseEnvironment}-${releaseChannel}`);
   }
 
   info('Pushing to the repository...');
@@ -204,19 +209,19 @@ async function runScript({
       name: path.basename(binaryFilePath),
       bucketName: upload.s3BucketName,
       filePath: binaryFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
     await uploadS3File({
       name: path.basename(blockmapFilePath),
       bucketName: upload.s3BucketName,
       filePath: blockmapFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
     await uploadS3File({
       name: path.basename(latestYmlFilePath),
       bucketName: upload.s3BucketName,
       filePath: latestYmlFilePath,
-      isUnstable: releaseChannel !== 'stable',
+      keyPrefix: upload.s3KeyPrefix,
     });
   } else {
     info('uploading artifacts to s3: SKIP');
@@ -320,12 +325,21 @@ async function releaseRoutine() {
 
   const newVersionContext = getVersionContext(versionTag);
   if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
-    throw new Error(`previous version ${previousTag} and releasing version ${versionTag} have different context.`);
+    const msg = `previous version ${previousTag} and releasing version ${versionTag} have different context.`;
+    if (process.env.NAIR_IGNORE_VERSION_CONTEXT_CHECK) {
+      await confirm(`${msg} Are you sure?`, false);
+    } else {
+      error(msg);
+      log('if you wish to release the first release of a new channel or environment, set "NAIR_IGNORE_VERSION_CONTEXT_CHECK".');
+      throw new Error(msg);
+    }
   }
 
   const { channel, environment } = newVersionContext;
 
-  const config = environment === 'public' ? require('./public.config') : require('./internal.config');
+  /** @type {import('./configs/type').ReleaseConfig} */
+  // eslint-disable-next-line import/no-dynamic-require
+  const config = require(`./configs/${environment}-${channel}`);
 
   await runScript({
     patchNote,

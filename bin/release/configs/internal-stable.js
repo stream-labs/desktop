@@ -1,6 +1,6 @@
 // @ts-check
 
-const { checkEnv } = require('./scripts/util');
+const { checkEnv } = require('../scripts/util');
 
 checkEnv('INTERNAL_GITHUB_API_SERVER');
 checkEnv('INTERNAL_GITHUB_ORGANIZATION');
@@ -28,5 +28,6 @@ module.exports = {
   upload: {
     githubToken: process.env.NAIR_GITHUB_TOKEN_INTERNAL,
     s3BucketName: process.env.RELEASE_DWANGO_S3_BUCKET_NAME,
+    s3KeyPrefix: 'download/windows',
   }
 };

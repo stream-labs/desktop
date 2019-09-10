@@ -58,7 +58,9 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
   log('environment', (environment === 'public' ? colors.red : colors.cyan)(environment));
   log('channel', (channel === 'stable' ? colors.red : colors.cyan)(channel));
 
-  const config = environment === 'public' ? require('./public.config') : require('./internal.config');
+  /** @type {import('./configs/type').ReleaseConfig} */
+  // eslint-disable-next-line import/no-dynamic-require
+  const config = require(`./configs/${environment}-${channel}`);
 
   info('checking current branch...');
   const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim();

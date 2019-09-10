@@ -8,7 +8,7 @@ const ProgressBar = require('progress');
 const { info, executeCmd, error } = require('./prompt');
 
 async function uploadS3File({
-  name, bucketName, filePath, isUnstable
+  name, bucketName, filePath, keyPrefix
 }) {
   info(`Starting upload of ${name}...`);
 
@@ -16,7 +16,7 @@ async function uploadS3File({
   const upload = new AWS.S3.ManagedUpload({
     params: {
       Bucket: bucketName,
-      Key: `download/windows${isUnstable ? '-unstable' : ''}/${name}`,
+      Key: `${keyPrefix}/${name}`,
       Body: stream,
     },
     queueSize: 1,
