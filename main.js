@@ -52,6 +52,12 @@ function log(...args) {
   }
 }
 
+// We use a special cache directory for running tests
+if (process.env.NAIR_CACHE_DIR) {
+  app.setPath('appData', process.env.NAIR_CACHE_DIR);
+}
+app.setPath('userData', path.join(app.getPath('appData'), pjson.name));
+
 if (process.argv.includes('--clearCacheDir')) {
   // __installer.exe は electron-updater 差分アップデートの比較元になるので消してはいけない
   const rmPath = path.join(app.getPath('userData'), '!(__installer.exe)');
@@ -309,12 +315,6 @@ function startApp() {
 
   getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
 }
-
-// We use a special cache directory for running tests
-if (process.env.NAIR_CACHE_DIR) {
-  app.setPath('appData', process.env.NAIR_CACHE_DIR);
-}
-app.setPath('userData', path.join(app.getPath('appData'), pjson.name));
 
 app.setAsDefaultProtocolClient('nair');
 
