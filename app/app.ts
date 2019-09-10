@@ -217,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     I18nService.setVuei18nInstance(i18n);
 
+    console.log(store);
+
     // create a root Vue component
     const windowId = Utils.getCurrentUrlParams().windowId;
     const vm = new Vue({

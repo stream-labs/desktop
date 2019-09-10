@@ -16,14 +16,14 @@ function registerMutation(
   options = { unsafe: false },
 ) {
   const serviceName = target.constructor.name;
-  const mutationName = `${serviceName}.${methodName}`;
+  // const mutationName = `${serviceName}.${methodName}`;
 
   target.originalMethods = target.originalMethods || {};
   target.originalMethods[methodName] = target[methodName];
   target.mutationOptions = target.mutationOptions || {};
   target.mutationOptions[methodName] = options;
   target.mutations = target.mutations || {};
-  target.mutations[mutationName] = function(
+  target.mutations[methodName] = function(
     localState: any,
     payload: { args: any; constructorArgs: any },
   ) {
@@ -40,7 +40,7 @@ function registerMutation(
 
     if (Utils.isDevMode() && !options.unsafe) {
       const errorMsg = (key: string) =>
-        `Mutation ${mutationName} attempted to access this.${key}. ` +
+        `Mutation ${methodName} attempted to access this.${key}. ` +
         'To ensure mutations can safely execute in any context, mutations are restricted ' +
         'to only accessing this.state and their arguments.';
 
@@ -75,7 +75,7 @@ function registerMutation(
     value(...args: any[]) {
       const constructorArgs = this['_constructorArgs'];
       const store = StatefulService.getStore();
-      store.commit(mutationName, {
+      store.commit(`${serviceName}/${methodName}`, {
         args,
         constructorArgs,
       });
@@ -107,6 +107,8 @@ export function inheritMutations(target: any) {
 export abstract class StatefulService<TState extends object> extends Service {
   private static store: Store<any>;
 
+  static initialState = {};
+
   static setupVuexStore(store: Store<any>) {
     this.store = store;
   }
@@ -132,19 +134,12 @@ export abstract class StatefulService<TState extends object> extends Service {
 /**
  * Returns an injectable Vuex module
  */
-export function getModule(ModuleContainer: any): Module<any, any> {
+export function getModule(ModuleContainer: typeof StatefulService): Module<any, any> {
   const prototypeMutations = (<any>ModuleContainer.prototype).mutations;
-  const mutations = {};
-
-  // filter inherited mutations
-  for (const mutationName in prototypeMutations) {
-    const serviceName = mutationName.split('.')[0];
-    if (serviceName !== ModuleContainer.name) continue;
-    mutations[mutationName] = prototypeMutations[mutationName];
-  }
 
   return {
-    mutations,
+    mutations: Object.assign({}, prototypeMutations),
+    namespaced: true,
     state: ModuleContainer.initialState
       ? JSON.parse(JSON.stringify(ModuleContainer.initialState))
       : {},
