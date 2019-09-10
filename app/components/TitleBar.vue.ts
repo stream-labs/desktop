@@ -21,7 +21,7 @@ export default class TitleBar extends Vue {
   }
 
   get isUnstable() {
-    return Utils.isUnstable();
+    return Utils.isMainWindow() && Utils.isUnstable();
   }
 
   minimize() {
