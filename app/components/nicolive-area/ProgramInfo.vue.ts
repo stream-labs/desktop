@@ -4,11 +4,13 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
 import { $t } from 'services/i18n';
+import { StreamingService } from 'services/streaming';
 
 @Component({})
 export default class ProgramInfo extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+  @Inject() streamingService: StreamingService;
 
   // TODO: 後でまとめる
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
@@ -52,7 +54,28 @@ export default class ProgramInfo extends Vue {
     if (this.isStarting) throw new Error('startProgram is running');
     try {
       this.isStarting = true;
-      return await this.nicoliveProgramService.startProgram();
+      await this.nicoliveProgramService.startProgram();
+
+      // もし配信開始してなかったら確認する
+      if (!this.streamingService.isStreaming) {
+        const startStreaming = await new Promise(resolve => {
+          // TODO: 翻訳
+          remote.dialog.showMessageBox(
+            remote.getCurrentWindow(),
+            {
+              type: 'warning',
+              message: $t('program-info.start-streaming-confirmation'),
+              buttons: [$t('streaming.goLive'), $t('program-info.later')],
+              noLink: true,
+            },
+            idx => resolve(idx === 0)
+          );
+        });
+        if (startStreaming) {
+          // 開始
+          await this.streamingService.toggleStreamingAsync();
+        }
+      }
     } catch (caught) {
       if (caught instanceof NicoliveProgramServiceFailure) {
         await NicoliveProgramService.openErrorDialogFromFailure(caught);

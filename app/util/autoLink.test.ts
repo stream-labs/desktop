@@ -46,6 +46,10 @@ test('myvideo/1', () => {
   expect(apply('myvideo/1')).toMatchInlineSnapshot(`"<a href=\\"https://www.nicovideo.jp/myvideo/1\\">myvideo/1</a>"`);
 });
 
+test('series/1', () => {
+  expect(apply('series/1')).toMatchInlineSnapshot(`"<a href=\\"https://www.nicovideo.jp/series/1\\">series/1</a>"`);
+});
+
 test('lv1', () => {
   expect(apply('lv1')).toMatchInlineSnapshot(`"<a href=\\"https://live2.nicovideo.jp/watch/lv1\\">lv1</a>"`);
 });

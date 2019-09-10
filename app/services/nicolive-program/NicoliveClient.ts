@@ -72,10 +72,8 @@ export class NicoliveClient {
   }
 
   static isAllowedURL(url: string): boolean {
-    // メンテ中は作成画面に http://blog.nicovideo.jp/niconews/category/nicolivemainte/ へのリンクが表示されるので表示を許す
     return (
-      /^https?:\/\/live2?.nicovideo.jp\//.test(url) ||
-      /^https?:\/\/blog\.nicovideo\.jp\/niconews\//.test(url)
+      /^https?:\/\/live2?.nicovideo.jp\//.test(url)
     );
   }
 
@@ -342,6 +340,7 @@ export class NicoliveClient {
           win.close();
         } else if (!NicoliveClient.isAllowedURL(url)) {
           resolve(CreateResult.OTHER);
+          remote.shell.openExternal(url);
           win.close();
         }
       });
@@ -370,6 +369,7 @@ export class NicoliveClient {
           win.close();
         } else if (!NicoliveClient.isAllowedURL(url)) {
           resolve(EditResult.OTHER);
+          remote.shell.openExternal(url);
           win.close();
         }
       });

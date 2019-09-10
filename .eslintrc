@@ -14,6 +14,10 @@
     "arrow-parens": "off",
     "comma-dangle": "off",
     "prefer-rest-params": "off",
+    "no-await-in-loop": "off",
+    "no-restricted-syntax": "off",
+    "no-continue": "off",
+    "max-len": ["error", { "code": 120 }],
     "import/no-extraneous-dependencies": [
       "error",
       {
@@ -21,5 +25,13 @@
       }
     ],
     "spaced-comment": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["bin/**/*.js"],
+      "rules": {
+        "global-require": "off"
+      }
+    }
+  ]
 }

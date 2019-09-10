@@ -210,14 +210,20 @@ function setupMock() {
     }
   }
 
+  const openExternal = jest.fn();
   let wrapper: {
     browserWindow: BrowserWindow;
+    openExternal: jest.Mock;
   } = {
     browserWindow: null,
+    openExternal,
   };
   jest.doMock('electron', () => ({
     remote: {
       BrowserWindow,
+      shell: {
+        openExternal
+      }
     },
     ipcRenderer: {
       send() {},
@@ -260,7 +266,8 @@ describe('webviews', () => {
     expect(mock.browserWindow.close).toHaveBeenCalled();
   });
 
-  test('createProgramでニコ生外に出ると画面を閉じる', async () => {
+  test('createProgramでニコ生外に出ると既定のブラウザで開いてwebviewは閉じる', async () => {
+    const openExternal = jest.fn();
     const mock = setupMock();
 
     const { NicoliveClient } = require('./NicoliveClient');
@@ -272,6 +279,7 @@ describe('webviews', () => {
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
+    expect(mock.openExternal).toHaveBeenCalledWith('https://example.com');
   });
 
   test('createProgramで何もせず画面を閉じても結果が返る', async () => {
@@ -316,7 +324,7 @@ describe('webviews', () => {
     expect(mock.browserWindow.close).toHaveBeenCalled();
   });
 
-  test('editProgramでニコ生外に出ると画面を閉じる', async () => {
+  test('editProgramでニコ生外に出ると既定のブラウザで開いてwebviewは閉じる', async () => {
     const mock = setupMock();
 
     const { NicoliveClient } = require('./NicoliveClient');
@@ -328,6 +336,7 @@ describe('webviews', () => {
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
+    expect(mock.openExternal).toHaveBeenCalledWith('https://example.com');
   });
 
   test('editProgramで何もせず画面を閉じても結果が返る', async () => {

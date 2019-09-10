@@ -6,7 +6,7 @@
   "//": {
     "version": "0.9.3-preview.3"
   },
-  "version": "1.0.20190627-1",
+  "version": "1.0.20190905-1",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -14,14 +14,20 @@
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
+    "start:unstable": "cross-env NAIR_UNSTABLE=1 electron .",
     "clear-plugins": "shx rm -rf plugins",
-    "package": "shx rm -rf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.getlicensenair_key=%NAIR_LICENSE_API_KEY%",
-    "package:preview": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-preview\" --config.productName=\"N Air Preview\" --config.appId=\"jp.nicovideo.n-air-app.preview\"",
-    "package:ipc": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-ipc\" --config.productName=\"N Air IPC\" --config.appId=\"jp.nicovideo.n-air-app.ipc\"",
-    "release": "yarn install --cwd bin && node bin/mini-release.js",
+    "package": "yarn package:public-stable",
+    "package:public-stable": "shx rm -rf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/stable.config.js",
+    "package:public-unstable": "shx rm -rf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/unstable.config.js",
+    "package:internal-stable": "shx rm -rf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/internal-stable.config.js",
+    "package:internal-unstable": "shx rm -rf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/internal-unstable.config.js",
+    "release": "yarn install --cwd bin && node bin/release/mini-release.js",
+    "patch-note": "node bin/release/generatePatchNote.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
-    "test:unit": "jest --silent",
+    "test:unit": "yarn test:unit:app && yarn test:unit:bin",
+    "test:unit:app": "jest --silent --config ./jest.config.js",
+    "test:unit:bin": "jest --silent --config ./jest.bin-config.js",
     "lint": "tslint -p . -c tslint.json",
     "clear": "shx rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
@@ -30,47 +36,6 @@
     "version": "git add app/services/patch-notes/notes.ts"
   },
   "buildProductName": "N Air",
-  "build": {
-    "appId": "jp.nicovideo.nair",
-    "productName": "N Air",
-    "icon": "media/images/icon.ico",
-    "files": [
-      "bundles",
-      "node_modules",
-      "vendor",
-      "app/i18n",
-      "updater/index.html",
-      "updater/Updater.js",
-      "index.html",
-      "main.js",
-      "obs-api"
-    ],
-    "extraFiles": [
-      "LICENSE",
-      "AGREEMENT.sjis"
-    ],
-    "detectUpdateChannel": false,
-    "publish": {
-      "provider": "generic",
-      "useMultipleRangeRequest": false,
-      "channel": "latest",
-      "url": "https://n-air-app.nicovideo.jp/download/windows"
-    },
-    "nsis": {
-      "license": "AGREEMENT.sjis",
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "artifactName": "n-air-app-setup.${version}.${ext}",
-      "include": "installer.nsh"
-    },
-    "win": {
-      "publisherName": [
-        "DWANGO Co.,Ltd."
-      ],
-      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
-    }
-  },
   "ava": {
     "files": [
       "test-dist/test/e2e/*.js",

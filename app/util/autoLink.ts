@@ -28,6 +28,7 @@ const autoLinkPatterns = [
   },
   { matcher: /\bwatch\/\d+\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },
   { matcher: /\bmyvideo\/\d+\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },
+  { matcher: /\bseries\/\d+\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },
   // negative lookbehindが使えないので user/\d+ より先にニコニコモンズユーザーページを判定させる
   { matcher: /\bniconicommons\.jp\/user\/\d+\b/, replace: '<a href="https://www.$&">$&</a>' },
   { matcher: /\buser\/\d+\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },

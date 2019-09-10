@@ -1,5 +1,5 @@
 <template>
-<div class="titlebar">
+<div class="titlebar" :class="{isUnstable}">
   <div class="titlebar-title">
     {{ title }}
   </div>
@@ -25,6 +25,20 @@
   vertical-align: top;
   z-index: 1;
   background-color: @bg-primary;
+
+  // 実験版用
+  &.isUnstable {
+    background-color: #e2c84d;
+
+    .titlebar-title {
+      color: @black;
+      font-weight: bold;
+    }
+
+    .link {
+      color: @black;
+    }
+  }
 }
 
 .titlebar-icon {
