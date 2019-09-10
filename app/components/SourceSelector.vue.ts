@@ -275,8 +275,16 @@ export default class SourceSelector extends Vue {
     return this.customizationService.state.selectiveRecordingEnabled;
   }
 
+  get streamingServiceIdle() {
+    return this.streamingService.isIdle;
+  }
+
+  get replayBufferActive() {
+    return this.streamingService.isReplayBufferActive;
+  }
+
   get selectiveRecordingLocked() {
-    return this.streamingService.isStreaming || this.streamingService.isRecording;
+    return this.replayBufferActive || !this.streamingServiceIdle;
   }
 
   toggleSelectiveRecording() {
@@ -285,8 +293,8 @@ export default class SourceSelector extends Vue {
   }
 
   cycleSelectiveRecording(sceneNodeId: string) {
-    if (this.selectiveRecordingLocked) return;
     const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setRecordingVisible(false);
     } else if (selection.isStreamVisible()) {
