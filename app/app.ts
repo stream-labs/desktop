@@ -29,6 +29,8 @@ import * as obs from '../obs-api';
 import path from 'path';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
+import Main from 'components/windows/Main.vue';
+import CustomLoader from 'components/CustomLoader';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -144,97 +146,128 @@ const showDialog = (message: string): void => {
   electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  createStore().then(async store => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const store = createStore();
+
+  // The worker window can safely access services immediately
+  if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
 
-    if (Utils.isWorkerWindow()) {
-      // Services
-      const appService: AppService = AppService.instance;
-      const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
+    // Services
+    const appService: AppService = AppService.instance;
+    const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
-      // This is used for debugging
-      window['obs'] = obs;
+    // This is used for debugging
+    window['obs'] = obs;
 
-      // Host a new OBS server instance
-      obs.IPC.host(`slobs-${uuid()}`);
-      obs.NodeObs.SetWorkingDirectory(
-        path.join(
-          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-          'node_modules',
-          'obs-studio-node',
-        ),
-      );
+    // Host a new OBS server instance
+    obs.IPC.host(`slobs-${uuid()}`);
+    obs.NodeObs.SetWorkingDirectory(
+      path.join(
+        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        'node_modules',
+        'obs-studio-node',
+      ),
+    );
 
-      crashHandler.registerProcess(appService.pid, false);
+    crashHandler.registerProcess(appService.pid, false);
 
-      await obsUserPluginsService.initialize();
+    await obsUserPluginsService.initialize();
 
-      // Initialize OBS API
-      const apiResult = obs.NodeObs.OBS_API_initAPI(
-        'en-US',
-        appService.appDataDirectory,
-        electron.remote.process.env.SLOBS_VERSION,
-      );
+    // Initialize OBS API
+    const apiResult = obs.NodeObs.OBS_API_initAPI(
+      'en-US',
+      appService.appDataDirectory,
+      electron.remote.process.env.SLOBS_VERSION,
+    );
 
-      if (apiResult !== obs.EVideoCodes.Success) {
-        const message = apiInitErrorResultToMessage(apiResult);
-        showDialog(message);
+    if (apiResult !== obs.EVideoCodes.Success) {
+      const message = apiInitErrorResultToMessage(apiResult);
+      showDialog(message);
 
-        crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(appService.pid);
 
-        obs.NodeObs.StopCrashHandler();
-        obs.IPC.disconnect();
+      obs.NodeObs.StopCrashHandler();
+      obs.IPC.disconnect();
 
-        electron.ipcRenderer.send('shutdownComplete');
-        return;
+      electron.ipcRenderer.send('shutdownComplete');
+      return;
+    }
+
+    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+    AppService.instance.load();
+  }
+
+  // setup VueI18n plugin
+  Vue.use(VueI18n);
+
+  // This won't be fully initialized until services are ready
+  const i18n = new VueI18n({
+    locale: 'en',
+    fallbackLocale: 'en',
+    messages: {},
+  });
+
+  // create a root Vue component
+  const windowId = Utils.getCurrentUrlParams().windowId;
+  const vm = new Vue({
+    i18n,
+    store,
+    el: '#app',
+    render: h => {
+      if (windowId === 'worker') return h(Blank);
+      if (windowId === 'child') {
+        if (store.state.bulkLoadFinished) {
+          return h(ChildWindow);
+        }
+
+        return h(CustomLoader);
       }
+      if (windowId === 'main') {
+        if (store.state.bulkLoadFinished) {
+          return h(Main);
+        }
 
-      ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-      AppService.instance.load();
-    } else {
-      if (Utils.isChildWindow()) {
-        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+        return h(CustomLoader);
       }
+      return h(OneOffWindow);
+    },
+  });
+
+  // This means services are ready in renderer windows
+  store.watch(
+    state => state.bulkLoadFinished,
+    async () => {
+      const i18nService: I18nService = I18nService.instance;
+      await i18nService.load(); // load translations from a disk
+
+      // TODO: Something isn't working here
+      const dictionaries = i18nService.getLoadedDictionaries();
+
+      Object.keys(dictionaries).forEach(locale => {
+        console.log(locale, dictionaries[locale]);
+        i18n.setLocaleMessage(locale, dictionaries[locale]);
+      });
+
+      i18n.locale = i18nService.state.locale;
+      i18n.fallbackLocale = i18nService.getFallbackLocale();
+      I18nService.setVuei18nInstance(i18n);
 
       if (usingSentry) {
         const userService = getResource<UserService>('UserService');
-
         const ctx = userService.getSentryContext();
         if (ctx) setSentryContext(ctx);
         userService.sentryContext.subscribe(setSentryContext);
       }
-    }
 
-    // setup VueI18n plugin
-    Vue.use(VueI18n);
-    const i18nService: I18nService = I18nService.instance;
-    await i18nService.load(); // load translations from a disk
-    const i18n = new VueI18n({
-      locale: i18nService.state.locale,
-      fallbackLocale: i18nService.getFallbackLocale(),
-      messages: i18nService.getLoadedDictionaries(),
-      silentTranslationWarn: true,
-    });
-    I18nService.setVuei18nInstance(i18n);
+      const windowsService: WindowsService = WindowsService.instance;
+      if (Utils.isChildWindow()) {
+        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
 
-    // create a root Vue component
-    const windowId = Utils.getCurrentUrlParams().windowId;
-    const vm = new Vue({
-      i18n,
-      store,
-      el: '#app',
-      render: h => {
-        if (windowId === 'worker') return h(Blank);
-        if (windowId === 'child') return h(ChildWindow);
-        if (windowId === 'main') {
-          const componentName = windowsService.state[windowId].componentName;
-          return h(windowsService.components[componentName]);
-        }
-        return h(OneOffWindow);
-      },
-    });
-  });
+      vm.$forceUpdate();
+    },
+  );
 });
 
 if (Utils.isDevMode()) {

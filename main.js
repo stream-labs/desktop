@@ -128,6 +128,11 @@ if (!gotTheLock) {
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
+  // TODO: Clean this up
+  // These windows are waiting for services to be ready
+  let waitingVuexStores = [];
+  let servicesReady = false;
+
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
@@ -202,6 +207,12 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
+    mainWindow.openDevTools({ mode: 'detach' });
+
+    setTimeout(() => {
+      mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
+    }, 5 * 1000)
+
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
@@ -252,6 +263,8 @@ if (!gotTheLock) {
 
     childWindow.removeMenu();
 
+    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+
     // The child window is never closed, it just hides in the
     // background until it is needed.
     childWindow.on('close', e => {
@@ -289,12 +302,11 @@ if (!gotTheLock) {
     }
 
     ipcMain.on('services-ready', () => {
-      if (!mainWindow.isDestroyed() && !childWindow.isDestroyed()) {
-        // TODO: Load these earlier but make them gracefully handle the
-        // state when services aren't ready.
-        mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-        childWindow.loadURL(`${global.indexUrl}?windowId=child`);
-      }
+      servicesReady = true;
+
+      waitingVuexStores.forEach(windowId => {
+        workerWindow.webContents.send('vuex-sendState', windowId);
+      });
     });
 
     ipcMain.on('services-request', (event, payload) => {
@@ -456,7 +468,11 @@ if (!gotTheLock) {
       // Tell the worker window to send its current store state
       // to the newly registered window
 
-      workerWindow.webContents.send('vuex-sendState', windowId);
+      if (servicesReady) {
+        workerWindow.webContents.send('vuex-sendState', windowId);
+      } else {
+        waitingVuexStores.push(windowId);
+      }
     }
   });
 

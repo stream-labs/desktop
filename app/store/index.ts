@@ -19,6 +19,7 @@ const mutations = {
   BULK_LOAD_STATE(state: any, data: any) {
     each(data.state, (value, key) => {
       state[key] = value;
+      state.bulkLoadFinished = true;
     });
   },
 };
@@ -28,13 +29,8 @@ const actions = {};
 const plugins: any[] = [];
 
 let mutationId = 1;
-let makeStoreReady: Function;
 const isWorkerWindow = Util.isWorkerWindow();
 let storeCanReceiveMutations = isWorkerWindow;
-
-const storeReady = new Promise<Store<any>>(resolve => {
-  makeStoreReady = resolve;
-});
 
 // This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
@@ -66,8 +62,6 @@ plugins.push((store: Store<any>) => {
 
     // renderer windows can't receive mutations until after the BULK_LOAD_STATE event
     storeCanReceiveMutations = true;
-
-    makeStoreReady(store);
   });
 
   // All windows can receive this
@@ -92,7 +86,7 @@ plugins.push((store: Store<any>) => {
 
 let store: Store<any> = null;
 
-export function createStore(): Promise<Store<any>> {
+export function createStore(): Store<any> {
   const statefulServiceModules = {};
   const servicesManager: ServicesManager = ServicesManager.instance;
   const statefulServices = servicesManager.getStatefulServicesAndMutators();
@@ -108,14 +102,14 @@ export function createStore(): Promise<Store<any>> {
       ...statefulServiceModules,
     },
     strict: debug,
+    state: {
+      bulkLoadFinished: Util.isWorkerWindow() ? true : false,
+    },
   });
 
   StatefulService.setupVuexStore(store);
 
-  // The worker window is immediately ready
-  if (isWorkerWindow) makeStoreReady(store);
-
-  return storeReady;
+  return store;
 }
 
 export function commitMutation(mutation: IMutation) {
