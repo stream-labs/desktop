@@ -113,7 +113,7 @@ export class DragHandler {
       .getItems()
       .filter(item => item.isVisualSource);
 
-    const rect = this.draggedSource.getRectangle();
+    const rect = new ScalableRectangle(this.draggedSource.rectangle);
     rect.normalize();
 
     const pos = this.mousePositionInCanvasSpace(startEvent);
@@ -127,7 +127,7 @@ export class DragHandler {
 
   // Should be called when the mouse moves
   move(event: MouseEvent) {
-    const rect = this.draggedSource.getRectangle();
+    const rect = new ScalableRectangle(this.draggedSource.rectangle);
     const denormalize = rect.normalize();
 
     const mousePos = this.mousePositionInCanvasSpace(event);
@@ -276,7 +276,7 @@ export class DragHandler {
     // Source edge snapping:
     if (this.sourceSnapping) {
       this.otherSources.forEach(source => {
-        const edges = this.generateSourceEdges(source.getRectangle());
+        const edges = this.generateSourceEdges(new ScalableRectangle(source.rectangle));
 
         // The dragged source snaps to the adjacent edge
         // of other sources.  So the right edge snaps to

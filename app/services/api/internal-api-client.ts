@@ -71,6 +71,20 @@ export class InternalApiClient {
             }
           });
 
+          if (target[property]._isServiceAction) {
+            ipcRenderer.send(
+              'services-request',
+              this.jsonrpc.createRequestWithOptions(
+                isHelper ? target['_resourceId'] : serviceName,
+                methodName as string,
+                { compactMode: true, fetchMutations: false },
+                ...args,
+              ),
+            );
+            // We don't care about the response
+            return;
+          }
+
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(

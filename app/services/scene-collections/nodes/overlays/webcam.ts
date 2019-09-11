@@ -32,7 +32,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
   sourcesService: SourcesService = SourcesService.instance;
 
   async save(context: IContext) {
-    const rect = new ScalableRectangle(context.sceneItem.getRectangle());
+    const rect = new ScalableRectangle(context.sceneItem.rectangle);
 
     this.data = {
       width: rect.scaledWidth / this.videoService.baseWidth,

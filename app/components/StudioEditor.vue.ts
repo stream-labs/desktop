@@ -277,7 +277,7 @@ export default class StudioEditor extends Vue {
 
   crop(x: number, y: number, options: IResizeOptions) {
     const source = this.resizeRegion.item;
-    const rect = new ScalableRectangle(source.getRectangle());
+    const rect = new ScalableRectangle(source.rectangle);
 
     rect.normalized(() => {
       rect.withAnchor(options.anchor, () => {
@@ -445,7 +445,7 @@ export default class StudioEditor extends Vue {
    * given source
    */
   isOverSource(event: MouseEvent, source: SceneItem) {
-    const rect = new ScalableRectangle(source.getRectangle());
+    const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
 
     return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
@@ -540,7 +540,7 @@ export default class StudioEditor extends Vue {
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 
-    const rect = new ScalableRectangle(item.getRectangle());
+    const rect = new ScalableRectangle(item.rectangle);
     rect.normalize();
 
     return [

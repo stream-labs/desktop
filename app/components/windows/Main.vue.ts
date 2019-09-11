@@ -61,15 +61,21 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
-  mounted() {
-    const dockWidth = this.customizationService.state.livedockSize;
-    if (dockWidth < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
 
-    electron.remote.getCurrentWindow().show();
-    this.handleResize();
+  mounted() {
+    // const dockWidth = this.customizationService.state.livedockSize;
+    // if (dockWidth < 1) {
+    //   // migrate from old percentage value to the pixel value
+    //   this.resetWidth();
+    // }
+    // this.handleResize();
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
   }
 
   get title() {
@@ -85,7 +91,11 @@ export default class Main extends Vue {
   }
 
   get theme() {
-    return this.customizationService.currentTheme;
+    if (this.$store.state.bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    } else {
+      return 'night-theme';
+    }
   }
 
   get applicationLoading() {
@@ -154,14 +164,6 @@ export default class Main extends Vue {
     }
 
     return classes.join(' ');
-  }
-
-  created() {
-    window.addEventListener('resize', this.windowSizeHandler);
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.windowSizeHandler);
   }
 
   windowWidth: number;

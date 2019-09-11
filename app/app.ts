@@ -224,9 +224,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return h(CustomLoader);
       }
       if (windowId === 'main') {
-        if (store.state.bulkLoadFinished) {
+        // if (store.state.bulkLoadFinished) {
           return h(Main);
-        }
+        // }
 
         return h(CustomLoader);
       }
@@ -234,40 +234,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   });
 
+  if (Utils.isMainWindow()) {
+    electron.remote.getCurrentWindow().show();
+  }
+
   // This means services are ready in renderer windows
-  store.watch(
-    state => state.bulkLoadFinished,
-    async () => {
-      const i18nService: I18nService = I18nService.instance;
-      await i18nService.load(); // load translations from a disk
+  // store.watch(
+  //   state => state.bulkLoadFinished,
+  //   async () => {
+  //     const i18nService: I18nService = I18nService.instance;
+  //     await i18nService.load(); // load translations from a disk
 
-      // TODO: Something isn't working here
-      const dictionaries = i18nService.getLoadedDictionaries();
+  //     // TODO: Something isn't working here
+  //     const dictionaries = i18nService.getLoadedDictionaries();
 
-      Object.keys(dictionaries).forEach(locale => {
-        console.log(locale, dictionaries[locale]);
-        i18n.setLocaleMessage(locale, dictionaries[locale]);
-      });
+  //     Object.keys(dictionaries).forEach(locale => {
+  //       console.log(locale, dictionaries[locale]);
+  //       i18n.setLocaleMessage(locale, dictionaries[locale]);
+  //     });
 
-      i18n.locale = i18nService.state.locale;
-      i18n.fallbackLocale = i18nService.getFallbackLocale();
-      I18nService.setVuei18nInstance(i18n);
+  //     i18n.locale = i18nService.state.locale;
+  //     i18n.fallbackLocale = i18nService.getFallbackLocale();
+  //     I18nService.setVuei18nInstance(i18n);
 
-      if (usingSentry) {
-        const userService = getResource<UserService>('UserService');
-        const ctx = userService.getSentryContext();
-        if (ctx) setSentryContext(ctx);
-        userService.sentryContext.subscribe(setSentryContext);
-      }
+  //     if (usingSentry) {
+  //       const userService = getResource<UserService>('UserService');
+  //       const ctx = userService.getSentryContext();
+  //       if (ctx) setSentryContext(ctx);
+  //       userService.sentryContext.subscribe(setSentryContext);
+  //     }
 
-      const windowsService: WindowsService = WindowsService.instance;
-      if (Utils.isChildWindow()) {
-        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
-      }
+  //     const windowsService: WindowsService = WindowsService.instance;
+  //     if (Utils.isChildWindow()) {
+  //       ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+  //     }
 
-      vm.$forceUpdate();
-    },
-  );
+  //     vm.$forceUpdate();
+  //   },
+  // );
 });
 
 if (Utils.isDevMode()) {

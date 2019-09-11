@@ -131,7 +131,7 @@ if (!gotTheLock) {
   // TODO: Clean this up
   // These windows are waiting for services to be ready
   let waitingVuexStores = [];
-  let servicesReady = false;
+  let workerInitFinished = false;
 
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
@@ -178,7 +178,9 @@ if (!gotTheLock) {
 
     workerWindow.openDevTools({ mode: 'detach' });
 
-    workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
+    // setTimeout(() => {
+      workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
+    // }, 10 * 1000);
 
     // All renderers should use ipcRenderer.sendTo to send to communicate with
     // the worker.  This still gets proxied via the main process, but eventually
@@ -301,8 +303,8 @@ if (!gotTheLock) {
       });
     }
 
-    ipcMain.on('services-ready', () => {
-      servicesReady = true;
+    ipcMain.on('AppInitFinished', () => {
+      workerInitFinished = true;
 
       waitingVuexStores.forEach(windowId => {
         workerWindow.webContents.send('vuex-sendState', windowId);
@@ -326,7 +328,6 @@ if (!gotTheLock) {
         window.webContents.send('services-message', payload);
       });
     });
-
 
     if (isDevMode) {
       require('devtron').install();
@@ -468,7 +469,7 @@ if (!gotTheLock) {
       // Tell the worker window to send its current store state
       // to the newly registered window
 
-      if (servicesReady) {
+      if (workerInitFinished) {
         workerWindow.webContents.send('vuex-sendState', windowId);
       } else {
         waitingVuexStores.push(windowId);

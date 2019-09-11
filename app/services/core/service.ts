@@ -8,6 +8,13 @@ const singleton = Symbol();
 const singletonEnforcer = Symbol();
 const instances: Service[] = [];
 
+export function action() {
+  return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
+    target[methodName]._isServiceAction = true;
+    return descriptor;
+  };
+}
+
 export abstract class Service {
   static isSingleton = true;
 

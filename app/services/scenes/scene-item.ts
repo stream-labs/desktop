@@ -245,7 +245,7 @@ export class SceneItem extends SceneItemNode {
    * set scale and adjust the item position according to the origin parameter
    */
   setScale(newScaleModel: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
-    const rect = new ScalableRectangle(this.getRectangle());
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalized(() => {
       rect.withOrigin(origin, () => {
         rect.scaleX = newScaleModel.x;
@@ -269,7 +269,7 @@ export class SceneItem extends SceneItemNode {
    * set a new scale relative to the current scale
    */
   scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     let currentScale: Vec2;
     rect.normalized(() => {
       currentScale = v2(rect.scaleX, rect.scaleY);
@@ -289,7 +289,7 @@ export class SceneItem extends SceneItemNode {
 
   flipY() {
     this.preservePosition(() => {
-      const rect = this.getRectangle();
+      const rect = new ScalableRectangle(this.rectangle);
       rect.flipY();
       this.setRect(rect);
     });
@@ -297,32 +297,32 @@ export class SceneItem extends SceneItemNode {
 
   flipX() {
     this.preservePosition(() => {
-      const rect = this.getRectangle();
+      const rect = new ScalableRectangle(this.rectangle);
       rect.flipX();
       this.setRect(rect);
     });
   }
 
   stretchToScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.stretchAcross(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   fitToScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.fitTo(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   centerOnScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.centerOn(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   centerOnAxis(axis: CenteringAxis) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.centerOn(this.videoService.getScreenRectangle(), axis);
     this.setRect(rect);
   }
@@ -379,8 +379,8 @@ export class SceneItem extends SceneItemNode {
   /**
    * A rectangle representing this sceneItem
    */
-  getRectangle(): ScalableRectangle {
-    return new ScalableRectangle({
+  get rectangle(): IScalableRectangle {
+    return {
       x: this.transform.position.x,
       y: this.transform.position.y,
       scaleX: this.transform.scale.x,
@@ -389,14 +389,14 @@ export class SceneItem extends SceneItemNode {
       height: this.height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
-    });
+    };
   }
 
   /**
    * returns a simple bounding rectangle
    */
   getBoundingRect(): Rect {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalize();
     return new Rect({
       x: rect.x,
@@ -413,14 +413,14 @@ export class SceneItem extends SceneItemNode {
    *   that position after the operation has been performed.
    */
   private preservePosition(fun: Function) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalize();
     const x = rect.x;
     const y = rect.y;
 
     fun();
 
-    const newRect = this.getRectangle();
+    const newRect = new ScalableRectangle(this.rectangle);
     newRect.normalized(() => {
       newRect.x = x;
       newRect.y = y;

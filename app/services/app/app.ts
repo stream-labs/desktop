@@ -5,7 +5,7 @@ import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
 import { Inject } from 'services/core/injector';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -146,6 +146,10 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.gameOverlayService.initialize();
     await this.recentEventsService.initialize();
+
+    setTimeout(() => {
+      ipcRenderer.send('AppInitFinished');
+    }, 1000);
   }
 
   shutdownStarted = new Subject();
