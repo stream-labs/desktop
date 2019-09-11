@@ -18,11 +18,11 @@ export default class ModalLayout extends Vue {
 
   // Whether the "cancel" and "done" controls should be
   // shown at the bottom of the modal.
-  @Prop({ default: true }) showControls: boolean;
+  @Prop({ default: true, type: Boolean }) showControls: boolean;
 
   // If controls are shown, whether or not to show the
   // cancel button.
-  @Prop({ default: true }) showCancel: boolean;
+  @Prop({ default: true, type: Boolean }) showCancel: boolean;
 
   // Will be called when "done" is clicked if controls
   // are enabled
@@ -39,11 +39,11 @@ export default class ModalLayout extends Vue {
    * Set to true when using custom controls.
    * Custom controls go in the "controls" slot.
    */
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   customControls: boolean;
 
   /** Contentにpaddingを持たせない場合 */
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   bareContent: boolean;
 
   created() {

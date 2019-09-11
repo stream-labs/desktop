@@ -15,16 +15,16 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   value: IObsListInput<TObsValue>;
   testingAnchor = `Form/List/${this.value.name}`;
 
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   allowEmpty: boolean;
 
-  @Prop({ default: true })
+  @Prop({ default: true, type: Boolean })
   internalSearch: boolean;
 
   @Prop()
   placeholder: string;
 
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   loading: boolean;
 
   onInputHandler(option: IObsListOption<string>) {

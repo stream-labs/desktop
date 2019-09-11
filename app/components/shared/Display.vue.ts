@@ -14,7 +14,7 @@ export default class Display extends Vue {
 
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
-  @Prop({ default: false }) drawUI: boolean;
+  @Prop({ default: false, type: Boolean }) drawUI: boolean;
   @Prop() clickHandler: boolean;
 
   $refs: {

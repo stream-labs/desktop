@@ -7,7 +7,7 @@ export default class AddSourceInfo extends Vue {
   @Prop()
   sourceType: string;
 
-  @Prop({ default: true })
+  @Prop({ default: true, type: Boolean })
   showAttention: boolean;
 
 }

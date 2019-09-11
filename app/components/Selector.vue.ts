@@ -20,7 +20,7 @@ export default class Selector extends Vue {
   @Prop()
   activeItems: string[];
 
-  @Prop({ default: true })
+  @Prop({ default: true, type: Boolean })
   draggable: boolean;
 
   draggableSelector: string = this.draggable ? '.selector-item' : 'none';
