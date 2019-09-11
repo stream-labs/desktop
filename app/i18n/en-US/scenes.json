@@ -7,6 +7,7 @@
   "activeSceneCollection": "Active",
   "sceneCollectionDefaultName": "Scenes",
   "sceneCollectionModified": "Updated %{when}",
+  "failedToLoadSceneCollection": "Failed to load scene collection.  A new one will be created instead.",
   "projectorPrefix": "Projector",
   "defaultTitle": "Output",
   "manageAll": "Manage All",
