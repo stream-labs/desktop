@@ -38,7 +38,7 @@ export class Scene {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
 
-  private readonly state: IScene;
+  readonly state: IScene;
 
   constructor(sceneId: string) {
     this.state = this.scenesService.state.scenes[sceneId];

@@ -2,6 +2,7 @@
 <div
   class="studio-editor-display-container noselect"
   ref="display"
+  :style="{ cursor: cursor }"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
   @mousemove="handleMouseMove"

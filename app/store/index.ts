@@ -101,7 +101,7 @@ export function createStore(): Store<any> {
     modules: {
       ...statefulServiceModules,
     },
-    strict: debug,
+    strict: false,
     state: {
       bulkLoadFinished: Util.isWorkerWindow() ? true : false,
     },

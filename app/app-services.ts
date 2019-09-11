@@ -46,6 +46,7 @@ export { ObsUserPluginsService } from 'services/obs-user-plugins';
 export { HardwareService } from 'services/hardware';
 export { Prefab, PrefabsService } from 'services/prefabs';
 export { EditorCommandsService } from 'services/editor-commands';
+export { EditorService } from 'services/editor';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';

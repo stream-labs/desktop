@@ -2,7 +2,13 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
-import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
+import {
+  ScenesService,
+  ISceneItemNode,
+  TSceneNode,
+  ISceneItemFolder,
+  ISceneItem,
+} from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
@@ -80,23 +86,46 @@ export default class SourceSelector extends Vue {
 
   get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneNodeData>[] => {
+    const getSlVueTreeNodes = (
+      sceneNodes: (ISceneItem | ISceneItemFolder)[],
+    ): ISlTreeNodeModel<ISceneNodeData>[] => {
       return sceneNodes.map(sceneNode => {
         return {
-          title: sceneNode.name,
-          isSelected: sceneNode.isSelected(),
-          isLeaf: sceneNode.isItem(),
+          title: this.getNameForNode(sceneNode),
+          isSelected: this.isSelected(sceneNode),
+          isLeaf: sceneNode.sceneNodeType === 'item',
           isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
           data: {
             id: sceneNode.id,
-            sourceId: sceneNode.isItem() ? sceneNode.sourceId : null,
+            sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
           },
-          children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null,
+          children:
+            sceneNode.sceneNodeType === 'folder'
+              ? getSlVueTreeNodes(this.getChildren(sceneNode))
+              : null,
         };
       });
     };
 
-    return getSlVueTreeNodes(this.scene.getRootNodes());
+    const nodes = this.scene.state.nodes.filter(n => !n.parentId);
+    return getSlVueTreeNodes(nodes);
+  }
+
+  // TODO: Clean this up.  These only access state, no helpers
+  getNameForNode(node: ISceneItem | ISceneItemFolder) {
+    if (node.sceneNodeType === 'item') {
+      return this.sourcesService.state.sources[node.sourceId].name;
+    }
+
+    return node.name;
+  }
+
+  isSelected(node: ISceneItem | ISceneItemFolder) {
+    return this.selectionService.state.selectedIds.includes(node.id);
+  }
+
+  getChildren(node: ISceneItemFolder) {
+    return this.scene.state.nodes.filter(n => n.parentId === node.id);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {

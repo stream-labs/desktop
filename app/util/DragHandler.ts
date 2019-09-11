@@ -6,6 +6,7 @@ import { WindowsService } from 'services/windows';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
+import { IMouseEvent } from 'services/editor';
 
 /*
  * An edge looks like:
@@ -88,7 +89,7 @@ export class DragHandler {
    * @param startEvent the mouse event for this drag
    * @param options drag handler options
    */
-  constructor(startEvent: MouseEvent, options: IDragHandlerOptions) {
+  constructor(startEvent: IMouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
@@ -126,7 +127,7 @@ export class DragHandler {
   }
 
   // Should be called when the mouse moves
-  move(event: MouseEvent) {
+  move(event: IMouseEvent) {
     const rect = new ScalableRectangle(this.draggedSource.rectangle);
     const denormalize = rect.normalize();
 
@@ -182,7 +183,7 @@ export class DragHandler {
     );
   }
 
-  private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {
+  private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
     return this.pageSpaceToCanvasSpace({
       x: event.pageX - this.displayOffset.x,
       y: event.pageY - this.displayOffset.y,
