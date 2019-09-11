@@ -18,6 +18,8 @@ import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
+import uuid from 'uuid/v4';
+import { SceneSourceNode } from './nodes/overlays/scene';
 
 const NODE_TYPES = {
   RootNode,
@@ -27,7 +29,8 @@ const NODE_TYPES = {
   TextNode,
   WebcamNode,
   VideoNode,
-  TransitionNode
+  TransitionNode,
+  SceneSourceNode,
 };
 
 export interface IDownloadProgress {
@@ -47,9 +50,7 @@ export class OverlaysPersistenceService extends Service {
     url: string,
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
-    const overlayFilename = `${electron.ipcRenderer.sendSync(
-      'getUniqueId'
-    )}.overlay`;
+    const overlayFilename = `${uuid()}.overlay`;
     const overlayPath = path.join(os.tmpdir(), overlayFilename);
     const fileStream = fs.createWriteStream(overlayPath);
 

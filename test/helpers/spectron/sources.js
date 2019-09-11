@@ -1,6 +1,7 @@
 // Source helper functions
 import { focusMain, focusChild } from '.';
 import { contextMenuClick } from './context-menu';
+import { dialogDismiss } from './dialog';
 
 async function clickSourceAction(t, selector) {
   await t.context.app.client
@@ -14,6 +15,7 @@ export async function clickAddSource(t) {
 
 export async function clickRemoveSource(t) {
   await clickSourceAction(t, '[data-test="Remove"]');
+  await dialogDismiss(t, 'OK');
 }
 
 export async function clickSourceProperties(t) {
@@ -28,6 +30,10 @@ export async function selectSource(t, name) {
     el.dispatchEvent(new MouseEvent('up', { button: 0 }));
   }, sel);
   await t.context.app.client.click(sel);
+}
+
+export async function selectTestSource(t) {
+  await t.context.app.client.click('.item-title*=__')
 }
 
 export async function rightClickSource(t, name) {
@@ -59,6 +65,8 @@ export async function addSource(t, type, name, closeProps = true) {
   // Close source properties too
   if (closeProps) {
     await app.client.click('[data-test="Done"]');
+  } else {
+    await focusChild(t);
   }
 }
 
@@ -88,4 +96,8 @@ export async function sourceIsExisting(t, sourceName) {
   return app.client
     .$('[data-test="SourceSelector"]')
     .isExisting(`[data-test="${sourceName}"]`);
+}
+
+export async function testSourceExists(t) {
+  return t.context.app.client.isExisting('.item-title*=__')
 }

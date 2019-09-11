@@ -5,15 +5,14 @@
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
-  <span class="nav-item__name"><slot></slot></span>
+  <div class="nav-item__name"><slot></slot></div>
 </li>
 </template>
 
 <script lang="ts" src="./NavItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .nav-item {
   cursor: pointer;
@@ -32,7 +31,7 @@
     .semibold;
 
     i {
-       color: @text-primary;
+      color: @text-primary;
     }
   }
 
@@ -47,15 +46,17 @@
 
   i {
     position: relative;
-    margin-right: -15px;
-    left: -25px;
+    margin-right: -16px;
+    left: -24px;
     width: 16px;
   }
 }
 
 .nav-item__name {
   overflow: hidden;
-  max-width: calc(~"100% - 20px");
+  // max-width: calc(~"100% - 20px");
+  width: 100%;
+  max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

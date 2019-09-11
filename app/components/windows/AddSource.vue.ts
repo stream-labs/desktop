@@ -2,17 +2,16 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { IScenesServiceApi } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
+import { log } from 'lodash-decorators/utils';
 
 @Component({
-  components: { ModalLayout, Selector, Display },
-  mixins: [windowMixin]
+  components: { ModalLayout, Selector, Display }
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
@@ -35,7 +34,7 @@ export default class AddSource extends Vue {
     return { name: source.name, value: source.sourceId };
   });
 
-  selectedSourceId = this.sources[0].sourceId;
+  selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
     const sourceType =
@@ -79,8 +78,11 @@ export default class AddSource extends Vue {
 
       this.scenesService.activeScene.addSource(source.sourceId);
 
-      this.close();
-      if (source.hasProps()) this.sourcesService.showSourceProperties(source.sourceId);
+      if (source.hasProps()) {
+        this.sourcesService.showSourceProperties(source.sourceId);
+      } else {
+        this.close();
+      }
     }
   }
 

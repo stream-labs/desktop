@@ -1,22 +1,28 @@
 <template>
 <modal-layout
-  :showControls="false"
-  :title="$t('audio.advancedAudioSettings')">
+  :show-controls="false"
+>
 
   <div slot="content">
     <table>
-      <tr>
-        <th class="device">{{ $t('common.name') }}</th>
-        <th class="volume">{{ $t('audio.volumeInPercent') }}</th>
-        <th class="downmix">{{ $t('audio.downmixToMono') }}</th>
-        <th class="syncOffset">{{ $t('audio.syncOffsetInMs') }}</th>
-        <th class="audioMonitor">{{ $t('audio.audioMonitoring') }}</th>
-        <th class="track">{{ $t('audio.tracks') }}</th>
-      </tr>
+      <thead>
+        <tr>
+          <th class="device">{{ $t('common.name') }}</th>
+          <th class="volume">{{ $t('audio.volumeInPercent') }}</th>
+          <th class="downmix">{{ $t('audio.downmixToMono') }}</th>
+          <th class="syncOffset">{{ $t('audio.syncOffsetInMs') }}</th>
+          <th class="audioMonitor">{{ $t('audio.audioMonitoring') }}</th>
+          <th class="track">{{ $t('audio.tracks') }}</th>
+        </tr>
+      </thead>
 
       <tr v-for="audioSource in audioSources" :key="audioSource.sourceId">
         <td>{{ audioSource.name }}</td>
-        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name" :key="formInput.name">
+        <td
+          v-for="formInput in audioSource.getSettingsForm()"
+          :key="`${audioSource.name}${formInput.name}`"
+          :class="'column-' + formInput.name"
+        >
           <component
               v-if="propertyComponentForType(formInput.type)"
               :is="propertyComponentForType(formInput.type)"
@@ -36,7 +42,7 @@
 <script lang="ts" src="./AdvancedAudio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 table {
   min-width: 1060px;

@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('scenes.manageSceneCollections')"
   :show-cancel="false"
   :done-handler="close">
   <div slot="content">
@@ -25,8 +24,7 @@
 <script lang="ts" src="./ManageSceneCollections.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .manage-scene-collections__header {
   margin-bottom: 20px;

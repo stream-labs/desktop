@@ -3,7 +3,6 @@ import { Component, Watch } from 'vue-property-decorator';
 import SlVueTree, { ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { SourceFiltersService } from 'services/source-filters';
 import { ISourcesServiceApi } from 'services/sources';
 
@@ -11,7 +10,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 
 interface IFilterNodeData {
   visible: boolean;
@@ -26,7 +25,6 @@ interface IFilterNodeData {
     Display,
     SlVueTree
   },
-  mixins: [windowMixin]
 })
 export default class SourceFilters extends Vue {
   @Inject() sourceFiltersService: SourceFiltersService;

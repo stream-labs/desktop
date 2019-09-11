@@ -2,6 +2,7 @@
   margin-bottom: 12px;
   position: relative;
   display: flex;
+  align-items: flex-start;
 
   &.input-container--no-label {
     width: 100%;
@@ -34,6 +35,12 @@
       margin-right: 0;
     }
   }
+
+  .button {
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 }
 
 .input-wrapper--search {
@@ -52,7 +59,8 @@
 }
 
 input[type=text],
-input[type="password"],
+input[type=number],
+input[type=password],
 textarea {
   border: 1px solid @grey;
   background: #2B2F3B;
@@ -133,7 +141,7 @@ textarea {
     bottom: 0;
     left: 0;
   }
-  
+
   &:before {
     width: 30px;
     height: 8px;;
@@ -153,7 +161,7 @@ textarea {
     &:before {
         background-color: @text-secondary;
     }
-    
+
     &:after {
       left: 14px;
       background-color: @text-active;
@@ -191,7 +199,7 @@ textarea {
   border: none;
   height: 0;
   min-height: 0;
-  .radius;
+  .radius();
 
   input[type="text"] {
     cursor: pointer;
@@ -292,6 +300,7 @@ textarea {
 
 input[type="text"],
 input[type="password"],
+input[type="number"],
 textarea {
   background: @bg-secondary;
   color: @white;

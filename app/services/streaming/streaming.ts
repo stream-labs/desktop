@@ -18,6 +18,7 @@ import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
+import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -48,6 +49,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() customizationService: CustomizationService;
+  @Inject() notificationsService: NotificationsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -349,6 +351,26 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return moment(this.state.streamingStatusTime);
   }
 
+  private sendReconnectingNotification() {
+    const msg = $t('Stream has disconnected, attempting to reconnect.');
+    const existingReconnectNotif = this.notificationsService.getUnread()
+      .filter((notice: INotification) => notice.message === msg);
+    if (existingReconnectNotif.length !== 0) return;
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      showTime: true,
+      message: $t('Stream has disconnected, attempting to reconnect.')
+    });
+  }
+
+  private clearReconnectingNotification() {
+    const notice = this.notificationsService.getAll()
+      .find((notice: INotification) => notice.message === $t('Stream has disconnected, attempting to reconnect.'));
+    if (!notice) return;
+    this.notificationsService.markAsRead(notice.id);
+  }
+
   private formattedDurationSince(timestamp: moment.Moment) {
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = duration.seconds().toString().padStart(2, '0');
@@ -398,9 +420,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
+        this.sendReconnectingNotification();
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
         this.SET_STREAMING_STATUS(EStreamingState.Live);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
       const time = new Date().toISOString();

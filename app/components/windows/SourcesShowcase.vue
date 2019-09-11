@@ -2,7 +2,7 @@
 <modal-layout
   bare-content
   :show-controls="false"
-  :title="$t('sources.addSourceTitle')">
+>
 
   <div slot="content"
     class="add-source"
@@ -180,7 +180,7 @@
 <script lang="ts" src="./SourcesShowcase.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .source-info {
   padding: 0 20px;
@@ -209,8 +209,7 @@
 </style>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .modal-layout-controls {
   border-top: 1px solid @bg-secondary;

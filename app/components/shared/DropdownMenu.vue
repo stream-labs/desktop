@@ -1,12 +1,14 @@
 <template>
-  <popper trigger="click" :options="{ placement: 'bottom-start' }">
-
+  <popper
+    trigger="click"
+    :options="{ placement: (placement || 'bottom-start') }"
+  >
     <div class="popper dropdown-menu">
       <slot></slot>
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      <span class="scene-name">{{ title }}</span><i class="icon-down-arrow"/>
+      <span class="scene-name">{{ title }}</span><i :class="icon || 'icon-down-arrow'"/>
     </button>
 
   </popper>
@@ -15,8 +17,7 @@
 <script lang="ts" src="./DropdownMenu.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .dropdown-menu {
   width: 124%;
@@ -30,7 +31,7 @@
   padding: 8px;
   max-height: 152px;
   overflow-y: auto;
-  transform: none!important;
+  z-index: 200000;
 }
 
 .dropdown-menu__toggle {
@@ -66,6 +67,9 @@
 
 .dropdown-menu__item {
   white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: @text-secondary;
 
@@ -83,3 +87,5 @@
 }
 
 </style>
+
+

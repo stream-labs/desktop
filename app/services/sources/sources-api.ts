@@ -1,5 +1,5 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
-import { IListOption, TFormData } from '../../components/shared/forms/Input';
+import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Observable } from 'rxjs/Observable';
 import * as obs from '../../../obs-api';
 
@@ -36,13 +36,14 @@ export interface ISourceApi extends ISource {
   getPropertiesManagerType(): TPropertiesManager;
   getPropertiesManagerSettings(): Dictionary<any>;
   getPropertiesManagerUI(): string;
-  getPropertiesFormData(): TFormData;
-  setPropertiesFormData(properties: TFormData): void;
+  getPropertiesFormData(): TObsFormData;
+  setPropertiesFormData(properties: TObsFormData): void;
   setPropertiesManagerSettings(settings: Dictionary<any>): void;
   hasProps(): boolean;
   setName(newName: string): void;
   setDeinterlaceMode(newMode: obs.EDeinterlaceMode): void;
   setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder): void;
+  refresh(): void;
 }
 
 
@@ -53,8 +54,9 @@ export interface ISourcesServiceApi {
     settings?: Dictionary<any>,
     options?: ISourceCreateOptions
   ): ISourceApi;
+  removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[];
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];
@@ -68,7 +70,6 @@ export interface ISourcesServiceApi {
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;
   showAddSource(sourceType: TSourceType): void;
-  showNameSource(sourceType: TSourceType): void;
   sourceAdded: Observable<ISource>;
   sourceUpdated: Observable<ISource>;
   sourceRemoved: Observable<ISource>;

@@ -1,12 +1,13 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
+import { cloneDeep } from 'lodash';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import NameSource from 'components/windows/NameSource.vue';
+import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -26,59 +27,22 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
+import { Subject } from 'rxjs/Subject';
+import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
 
-export interface IWindowOptions {
-  componentName: string;
-  queryParams?: Dictionary<any>;
-  size?: {
-    x?: number;
-    y?: number;
-    width: number;
-    height: number;
-  };
-  scaleFactor: number;
-  title?: string;
-  center?: boolean;
-  transparent?: boolean;
-  resizable?: boolean;
-  alwaysOnTop?: boolean;
-}
-
-interface IWindowsState {
-  [windowId: string]: IWindowOptions;
-}
-
-export class WindowsService extends StatefulService<IWindowsState> {
-
-  /**
-   * 'main' and 'child' are special window ids that always exist
-   * and have special purposes.  All other windows ids are considered
-   * 'one-off' windows and can be freely created and destroyed.
-   */
-  static initialState: IWindowsState = {
-    main: {
-      componentName: 'Main',
-      scaleFactor: 1,
-      title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`
-    },
-    child: {
-      componentName: 'Blank',
-      scaleFactor: 1,
-    }
-  };
-
-  // This is a list of components that are registered to be
-  // top level components in new child windows.
-  components = {
+// This is a list of components that are registered to be
+// top level components in new child windows.
+export function getComponents() {
+  return {
     Main,
     Settings,
     SceneTransitions,
     SourcesShowcase,
-    NameSource,
+    RenameSource,
     AddSource,
     NameScene,
     NameFolder,
@@ -96,7 +60,66 @@ export class WindowsService extends StatefulService<IWindowsState> {
     NicoliveProgramSelector,
     Informations,
   };
+}
 
+
+export interface IWindowOptions {
+  componentName: string;
+  queryParams?: Dictionary<any>;
+  size?: {
+    x?: number;
+    y?: number;
+    width: number;
+    height: number;
+  };
+  scaleFactor: number;
+  isShown: boolean;
+  title?: string;
+  center?: boolean;
+  transparent?: boolean;
+  resizable?: boolean;
+  alwaysOnTop?: boolean;
+  isPreserved?: boolean;
+  preservePrevWindow?: boolean;
+  prevWindowOptions? : IWindowOptions;
+}
+
+interface IWindowsState {
+  [windowId: string]: IWindowOptions;
+}
+
+const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
+  componentName: '',
+  scaleFactor: 1,
+  isShown: true
+};
+
+export class WindowsService extends StatefulService<IWindowsState> {
+
+  /**
+   * 'main' and 'child' are special window ids that always exist
+   * and have special purposes.  All other windows ids are considered
+   * 'one-off' windows and can be freely created and destroyed.
+   */
+  static initialState: IWindowsState = {
+    main: {
+      componentName: 'Main',
+      scaleFactor: 1,
+      title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`,
+      isShown: true
+    },
+    child: {
+      componentName: '',
+      scaleFactor: 1,
+      isShown: false
+    }
+  };
+
+  // This is a list of components that are registered to be
+  // top level components in new child windows.
+  components = getComponents();
+
+  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -125,17 +148,32 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (options.componentName !== this.state.child.componentName) options.center = true;
 
     ipcRenderer.send('window-showChildWindow', options);
+    this.updateChildWindowOptions(options);
   }
 
   closeChildWindow() {
-    ipcRenderer.send('window-closeChildWindow');
+    const windowOptions = this.state.child;
+
+    // show previous window if `preservePrevWindow` flag is true
+    if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
+      const options = {
+        ...windowOptions.prevWindowOptions,
+        isPreserved: true
+      };
+
+      ipcRenderer.send('window-showChildWindow', options);
+      this.updateChildWindowOptions(options);
+      return;
+    }
+
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
-    this.updateChildWindowOptions({ componentName: 'Blank' });
+    this.updateChildWindowOptions({ componentName: '', isShown: false });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
+    ipcRenderer.send('window-closeChildWindow');
   }
 
   closeMainWindow() {
@@ -217,14 +255,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
+  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<string> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
+  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }
@@ -233,8 +274,27 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.windows[windowId];
   }
 
-  updateChildWindowOptions(options: Partial<IWindowOptions>) {
-    this.UPDATE_CHILD_WINDOW_OPTIONS(options);
+  updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
+    const newOptions: IWindowOptions = {
+      ...DEFAULT_WINDOW_OPTIONS,
+      ...optionsPatch,
+      scaleFactor: this.state.child.scaleFactor,
+    };
+    if (newOptions.preservePrevWindow) {
+      const currentOptions = cloneDeep(this.state.child);
+
+      if (currentOptions.preservePrevWindow) {
+        throw new Error('You can\'t use preservePrevWindow option for more that 1 window in the row');
+      }
+
+      newOptions.prevWindowOptions = currentOptions;
+
+      // restrict saving history only for 1 window before
+      delete newOptions.prevWindowOptions.prevWindowOptions;
+    }
+
+    this.SET_CHILD_WINDOW_OPTIONS(newOptions);
+    this.windowUpdated.next({ windowId: 'child', options: newOptions });
   }
 
   updateMainWindowOptions(options: Partial<IWindowOptions>) {
@@ -242,8 +302,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   @mutation()
-  private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
-    this.state.child = { ...this.state.child, ...options };
+  private SET_CHILD_WINDOW_OPTIONS(options: IWindowOptions) {
+    options.queryParams = options.queryParams || {};
+    this.state.child = options;
   }
 
   @mutation()

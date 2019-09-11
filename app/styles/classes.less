@@ -7,6 +7,10 @@
   justify-content: center;
 }
 
+.flex--wrap {
+  flex-wrap: wrap;
+}
+
 .flex--space-between {
   justify-content: space-between;
 }
@@ -32,11 +36,6 @@
   flex-flow: column;
   height: 100%;
   width: 100%;
-}
-
-// Margins
-.margin-bot--20 {
-  margin-bottom: 20px;
 }
 
 .margin-right--20 {
@@ -65,7 +64,7 @@
 
 .section-content--dropdown {
   margin-top: 16px;
-  
+
   > div {
     div {
       &:last-child {
@@ -77,10 +76,14 @@
   }
 }
 
-.text--sm {
-  font-size: 11px;
+.section-title__icon {
+  .radius();
+  .margin-right();
+  font-size: 10px;
+  padding: 4px;
+  vertical-align: text-bottom;
 }
 
-.noselect {
-  user-select: none;
+.section-content {
+  margin-bottom: -24px;
 }

@@ -1,9 +1,5 @@
 <template>
-<modal-layout
-    :title="$t('troubleshooter.pageTitle')"
-    :showControls="false"
-    :customControls="true"
->
+<modal-layout :showControls="false" :customControls="true">
   <div slot="controls">
     <button
         class="button button--action"
@@ -103,7 +99,7 @@
 <script lang="ts" src="./Troubleshooter.vue.ts"></script>
 
 <style lang="less" scoped>
-  @import "../../styles/_colors";
+  @import "../../styles/index";
 
   .icon-warning {
     color: @red;

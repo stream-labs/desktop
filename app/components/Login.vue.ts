@@ -9,7 +9,6 @@ import electron from 'electron';
 @Component({})
 export default class Login extends Vue {
   @Inject() userService: UserService;
-  @Inject() onboardingService: OnboardingService;
 
   get loggedIn() {
     return this.userService.isLoggedIn();
@@ -35,7 +34,7 @@ export default class Login extends Vue {
   }
 
   login() {
-    this.onboardingService.start({ isLogin: true });
+    this.userService.showLogin();
   }
 
   openUserpage() {

@@ -4,7 +4,7 @@ import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
-import { IScenesServiceApi } from "../../../app/services/scenes/scenes-api";
+import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 
 
 useSpectron({ restartAppAfterEachTest: false });

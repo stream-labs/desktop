@@ -1,7 +1,7 @@
 <template>
 <div class="top-nav">
   <div class="tabs">
-    <div class="top-nav-item studio-button" :class="{ 'top-nav-item--active': studioModeEnabled }">
+    <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
         @click="studioMode"
         class="link">
@@ -58,8 +58,7 @@
 <script lang="ts" src="./TopNav.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
-
+@import "../styles/index";
 .top-nav {
   display: flex;
   flex-direction: row;

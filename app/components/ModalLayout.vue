@@ -1,6 +1,5 @@
 <template>
-<div class="modal-layout" data-test="ModalLayout">
-  <title-bar :title="title" class="modal-layout-titlebar" />
+<div id="mainWrapper" class="modal-layout" data-test="ModalLayout">
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -8,7 +7,9 @@
   </div>
   <div class="modal-layout-content" :class="{ bareContent }">
     <slot name="content" v-if="!loading"/>
-    <i class="icon-spinner icon-spin modal-layout-spinner" v-else/>
+    <div class="spinner-container" v-else>
+      <i class="icon-spinner icon-spin modal-layout-spinner"/>
+    </div>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button
@@ -20,7 +21,7 @@
     </button>
     <button
       class="button button--action"
-      @click="doneHandler"
+      @click="done"
       data-test="Done">
       {{ $t('common.done') }}
     </button>
@@ -34,7 +35,7 @@
 <script lang="ts" src="./ModalLayout.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .modal-layout {
   height: 100%;
@@ -45,12 +46,9 @@
   background-color: @bg-primary;
 }
 
-.modal-layout-titlebar {
-  flex-shrink: 0;
-}
-
 .ModalLayout-fixed {
   flex-shrink: 0;
+  z-index: 1;
 }
 
 .modal-layout-content {
@@ -66,12 +64,18 @@
   }
 }
 
+.spinner-container {
+  position: absolute;
+  width: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .modal-layout-spinner {
   font-size: 36px;
   display: inline-block;
-  width: 100%;
-  text-align: center;
-  margin: 100px 0;
+  height: 36px;
 }
 
 .modal-layout-controls {
@@ -83,7 +87,7 @@
   z-index: 10;
 
   .button {
-    margin-left: 8px;
+    .margin-left();
   }
 }
 

@@ -3,8 +3,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { nodeObs } from 'services/obs-api';
-import electron from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { Inject } from 'util/injector';
 
 interface IPerformanceState {
@@ -14,6 +13,8 @@ interface IPerformanceState {
   bandwidth: number;
   frameRate: number;
 }
+
+const STATS_UPDATE_INTERVAL = 2 * 1000;
 
 // TODO: merge this service with PerformanceMonitorService
 
@@ -41,9 +42,17 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    this.intervalId = setInterval(() => {
-      this.updateStatistics();
-    }, 2 * 1000) as any;
+    ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
+      this.processPerformanceStats(stats);
+    });
+
+    this.intervalId = window.setInterval(() => {
+      if (this.customizationService.pollingPerformanceStatistics) {
+        ipcRenderer.send('requestPerformanceStatistics');
+      } else {
+        this.processPerformanceStats({ CPU: 0 } as any);
+      }
+    }, STATS_UPDATE_INTERVAL);
   }
 
   stop() {
@@ -51,22 +60,12 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
 
-  private getStatistics(): Partial<IPerformanceState> {
-    if (this.customizationService.pollingPerformanceStatistics) {
-      return nodeObs.OBS_API_getPerformanceStatistics();
-    }
-
-    return {};
-  }
-
-  private updateStatistics(): void {
-    const stats = this.getStatistics();
-
+  processPerformanceStats(stats: IPerformanceState) {
     if (stats.percentageDroppedFrames) {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
     }
 
-    stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
+    stats.CPU += remote.app.getAppMetrics().map(proc => {
       return proc.cpu.percentCPUUsage;
     }).reduce((sum, usage) => sum + usage);
 

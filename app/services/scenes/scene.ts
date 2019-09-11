@@ -1,6 +1,6 @@
-import { ServiceHelper, mutation } from '../stateful-service';
+import { ServiceHelper, mutation } from 'services/stateful-service';
 import { ScenesService } from './scenes';
-import { Source, SourcesService, TSourceType } from '../sources';
+import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
   ISceneItem,
   SceneItem,
@@ -12,15 +12,14 @@ import {
   SceneItemFolder,
   ISceneItemNode
 } from './index';
-import Utils from '../utils';
-import * as obs from '../obs-api';
-import electron from 'electron';
-import { Inject } from '../../util/injector';
+import Utils from 'services/utils';
+import * as obs from 'services/obs-api';
+import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import { uniqBy } from 'lodash';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
-const { ipcRenderer } = electron;
+import uuid from 'uuid/v4';
 
 
 export type TSceneNode = SceneItem | SceneItemFolder;
@@ -152,7 +151,7 @@ export class Scene implements ISceneApi {
     if (!this.canAddSource(sourceId)) return null;
 
 
-    const sceneItemId = options.id || ipcRenderer.sendSync('getUniqueId');
+    const sceneItemId = options.id || uuid();
 
     let obsSceneItem: obs.ISceneItem;
     obsSceneItem = this.getObsScene().add(source.getObsInput());
@@ -195,7 +194,7 @@ export class Scene implements ISceneApi {
 
   createFolder(name: string, options: ISceneNodeAddOptions = {}) {
 
-    const id = options.id || ipcRenderer.sendSync('getUniqueId');
+    const id = options.id || uuid();
 
     this.ADD_FOLDER_TO_SCENE({
       id,
@@ -242,7 +241,6 @@ export class Scene implements ISceneApi {
   }
 
 
-  // TODO write tests for this method
   placeAfter(sourceNodeId: string, destNodeId?: string) {
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
@@ -545,6 +543,4 @@ export class Scene implements ISceneApi {
       });
     });
   }
-
-
 }

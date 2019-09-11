@@ -11,7 +11,7 @@ export default class NavItem extends Vue {
   @Prop()
   ico: string;
 
-  @Prop({ default: true })
+  @Prop({ default: true, type: Boolean })
   enabled: boolean;
 
   navMenu = this.$parent as any as { value: string; setValue: (value: string) => void };

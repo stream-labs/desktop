@@ -68,7 +68,6 @@ if (process.argv.includes('--clearCacheDir')) {
 // Windows
 let mainWindow;
 let childWindow;
-let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -215,7 +214,9 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
+    getObs().OBS_service_removeCallback();
     getObs().OBS_API_destroyOBS_API();
+    getObs().IPC.disconnect();
     app.quit();
   });
 
@@ -269,10 +270,6 @@ function startApp() {
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 
-  ipcMain.on('window-childWindowIsReadyToShow', () => {
-    childWindowIsReadyToShow = true;
-  });
-
   ipcMain.on('services-request', (event, payload) => {
     sendRequest(payload, event);
   });
@@ -308,6 +305,7 @@ function startApp() {
 
   }
 
+  getObs().IPC.host("slobs" + uuid());
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
     path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
@@ -401,6 +399,7 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const width = Math.min(windowOptions.size.width, targetWorkArea.width);
       const height = Math.min(windowOptions.size.height, targetWorkArea.height);
 
+      childWindow.show();
       childWindow.restore();
       childWindow.setMinimumSize(width, height);
 
@@ -437,19 +436,6 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
 
     childWindow.focus();
   }
-
-
-  // show the child window when it will be ready
-  new Promise(resolve => {
-    if (childWindowIsReadyToShow) {
-      resolve();
-      return;
-    }
-    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
-  }).then(() => {
-    // The child window will show itself when rendered
-    childWindow.send('window-setContents', windowOptions);
-  });
 
 });
 
@@ -627,11 +613,6 @@ ipcMain.on('obs-apiCall', (event, data) => {
   event.returnValue = retVal;
 });
 
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
-});
-
 ipcMain.on('restartApp', () => {
   // prevent unexpected cache clear
   const args = process.argv.slice(1).filter(x => x !== '--clearCacheDir');
@@ -645,4 +626,10 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   const sizes = require('obs-studio-node').getSourcesSize(names);
 
   e.sender.send('notifySourceAttributes', sizes);
+});
+
+ipcMain.on('requestPerformanceStatistics', (e) => {
+  const stats = getObs().OBS_API_getPerformanceStatistics();
+
+  e.sender.send('notifyPerformanceStatistics', stats);
 });

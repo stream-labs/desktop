@@ -1,7 +1,6 @@
 <template>
 <modal-layout
   bare-content
-  :title="$t('common.settings')"
   :show-cancel="false"
   :done-handler="done">
 
@@ -17,7 +16,7 @@
         {{ $t(`settings.${category}.name`, { fallback: category }) }}
       </NavItem>
     </NavMenu>
-    <div class="settings-container">
+    <div class="settings-container" ref="settingsContainer">
       <aside class="notice-section" v-if="isStreaming">
         <p class="notice-message">
           <i class="icon-warning"/>{{ $t('settings.noticeWhileStreaming')}}
@@ -51,7 +50,7 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .settings {
   display: flex;
@@ -74,7 +73,7 @@
 </style>
 
 <style lang="less">
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 /*
 配信中に設定ダイアログへ表示するメッセージのstyle
@@ -100,7 +99,8 @@
   .input-container {
     flex-direction: column;
 
-    .input-label, .input-wrapper {
+    .input-label,
+    .input-wrapper {
       width: 100%;
     }
 

@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import windowMixin from '../mixins/window';
 import { WindowsService } from '../../services/windows';
 import { LiveProgramInfo } from 'services/platforms/niconico';
 import { StreamingService } from 'services/streaming';
@@ -11,7 +10,6 @@ import { StreamingService } from 'services/streaming';
   components: {
     ModalLayout
   },
-  mixins: [windowMixin]
 })
 export default class NicoliveProgramSelector extends Vue {
   @Inject() windowsService: WindowsService;

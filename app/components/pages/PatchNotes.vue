@@ -32,7 +32,7 @@
 <script lang="ts" src="./PatchNotes.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .patch-notes-page {
   flex-direction: column;

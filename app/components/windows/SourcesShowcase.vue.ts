@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -52,7 +51,6 @@ interface ISelectSourceOptions {
     NdiSourceIcon,
     BlackmagicSourceIcon
   },
-  mixins: [windowMixin],
 })
 export default class SourcesShowcase extends Vue {
   @Inject() sourcesService: SourcesService;
@@ -62,21 +60,7 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-
-    const sameTypeCount = this.sourcesService.getSources()
-      .filter((source) => {
-        return source.isSameType({
-          type: sourceType,
-          propertiesManager: managerType,
-        });
-      })
-      .length;
-
-    if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType, managerType);
-    } else {
-      this.sourcesService.showNameSource(sourceType, managerType);
-    }
+    this.sourcesService.showAddSource(sourceType, managerType);
   }
 
   inspectedSource: TInspectableSource = null;
@@ -90,6 +74,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   get platform() {
+    if (!this.loggedIn) return null;
     return this.userService.platform.type;
   }
 

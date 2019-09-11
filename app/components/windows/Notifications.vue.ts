@@ -3,12 +3,10 @@ import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import windowMixin from '../mixins/window';
 import { INotification, INotificationsServiceApi } from 'services/notifications';
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class Notifications extends Vue {
 

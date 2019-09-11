@@ -4,7 +4,7 @@ import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
 import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
-import { TransitionNode } from './nodes/transition';
+import { TransitionsNode } from './nodes/transitions';
 import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
@@ -30,6 +30,7 @@ import {
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
 import { $t } from 'services/i18n';
+import { TransitionsService, ETransitionType } from 'services/transitions';
 
 const uuid = window['require']('uuid/v4');
 
@@ -38,7 +39,8 @@ export const NODE_TYPES = {
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
-  TransitionNode,
+  TransitionNode: TransitionsNode, // Alias old name to new node
+  TransitionsNode,
   HotkeysNode,
   SceneFiltersNode
 };
@@ -71,6 +73,7 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
+  @Inject() transitionsService: TransitionsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -99,7 +102,17 @@ export class SceneCollectionsService extends Service
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
-      await this.load(this.collections[0].id);
+      let latestId = this.collections[0].id;
+      let latestModified = this.collections[0].modified;
+
+      this.collections.forEach(collection => {
+        if (collection.modified > latestModified) {
+          latestModified = collection.modified;
+          latestId = collection.id;
+        }
+      });
+
+      await this.load(latestId);
     } else {
       await this.create();
     }
@@ -314,11 +327,33 @@ export class SceneCollectionsService extends Service
   }
 
   /**
+   * Show the window to name a new scene collection
+   * @param options options
+   */
+  showNameConfig(
+    options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
+  ) {
+    this.windowsService.showWindow({
+      componentName: 'NameSceneCollection',
+      title: $t('scenes.nameSceneCollection'),
+      queryParams: {
+        sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
+        rename: options.rename ? 'true' : ''
+      },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+  /**
    * Show the window to manage scene collections
    */
   showManageWindow() {
     this.windowsService.showWindow({
       componentName: 'ManageSceneCollections',
+      title: $t('scenes.manageSceneCollections'),
       size: {
         width: 700,
         height: 800
@@ -484,6 +519,9 @@ export class SceneCollectionsService extends Service
       this.sourcesService.sources.forEach(source => {
         if (source.type !== 'scene') source.remove();
       });
+
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.deleteAllConnections();
     } catch (e) {
       console.error('Error deloading application state');
     }
@@ -516,6 +554,7 @@ export class SceneCollectionsService extends Service
   private setupEmptyCollection() {
     this.scenesService.createScene('Scene', { makeActive: true });
     this.setupDefaultAudio();
+    this.transitionsService.ensureTransition();
   }
 
   /**
@@ -584,21 +623,6 @@ export class SceneCollectionsService extends Service
 
   private get legacyDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
-  }
-
-  /**
-   * Performs a sync step, catches any errors, and returns
-   * true/false depending on whether the step succeeded
-   */
-  private async performSyncStep(name: string, stepRunner: () => Promise<void>): Promise<boolean> {
-    try {
-      await stepRunner();
-      console.debug(`Sync step succeeded: ${name}`);
-      return true;
-    } catch (e) {
-      console.error(`Sync step failed: ${name}`, e);
-      return false;
-    }
   }
 
   /**

@@ -40,7 +40,7 @@
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .performance-metrics {
   flex-wrap: wrap;

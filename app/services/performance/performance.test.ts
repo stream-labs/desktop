@@ -1,4 +1,5 @@
 import { createSetupFunction } from 'util/test-setup';
+import { ipcRenderer } from 'electron';
 const setup = createSetupFunction();
 
 jest.mock('services/stateful-service');
@@ -11,34 +12,49 @@ beforeEach(() => {
 });
 
 test('get instance', () => {
-  jest.doMock('services/obs-api', () => ({}));
+  jest.doMock('electron', () => ({
+    ipcRenderer: {
+      send() {},
+      on() {},
+    },
+  }));
   setup();
   const { PerformanceService } = require('./performance');
   expect(PerformanceService.instance).toBeInstanceOf(PerformanceService);
 });
 
-test('getStatisticsでpollingPerformanceStatisticsがtrueの場合', () => {
-  jest.doMock('services/obs-api', () => ({
-    nodeObs: { OBS_API_getPerformanceStatistics: jest.fn().mockReturnValue('obs result') },
-  }));
-  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: true } } });
-
-  const { PerformanceService } = require('./performance');
-  const { instance } = PerformanceService;
-  expect(instance.getStatistics()).toBe('obs result');
-});
-
-test('getStatisticsでpollingPerformanceStatisticsがfalseの場合', () => {
-  const OBS_API_getPerformanceStatistics = jest.fn();
-  jest.doMock('services/obs-api', () => ({
-    nodeObs: {
-      OBS_API_getPerformanceStatistics,
+test('processPerformanceStats', () => {
+  jest.doMock('electron', () => ({
+    remote: {
+      app: {
+        getAppMetrics() {
+          return [
+            {
+              cpu: {
+                percentCPUUsage: 1,
+              }
+            },
+            {
+              cpu: {
+                percentCPUUsage: 2,
+              }
+            }
+          ];
+        }
+      },
+    },
+    ipcRenderer: {
+      send() {},
+      on() {},
     },
   }));
-  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: false } } });
+  setup();
 
   const { PerformanceService } = require('./performance');
   const { instance } = PerformanceService;
-  expect(instance.getStatistics()).toEqual({});
-  expect(OBS_API_getPerformanceStatistics).not.toHaveBeenCalled();
+  instance.SET_PERFORMANCE_STATS = jest.fn();
+  instance.processPerformanceStats({ dummy: 'obs result', CPU: 0 });
+  expect(instance.SET_PERFORMANCE_STATS).toHaveBeenNthCalledWith(1, {
+    dummy: 'obs result', CPU: 3
+  });
 });

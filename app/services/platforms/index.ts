@@ -19,8 +19,6 @@ export interface IPlatformService {
 
   fetchViewerCount: () => Promise<number>;
 
-  getChatUrl: (mode: string) => Promise<string>;
-
   isLoggedIn?: () => Promise<boolean>;
   logout?: () => Promise<void>;
 

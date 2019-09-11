@@ -41,7 +41,7 @@
 <script lang="ts" src="./NicoliveProgramSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 .caption {
   letter-spacing: .1em;
   font-size: 18px;

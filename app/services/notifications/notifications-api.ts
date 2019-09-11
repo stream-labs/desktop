@@ -1,7 +1,7 @@
 import { TIssueCode } from 'services/troubleshooter';
 import { IJsonRpcRequest } from 'services/jsonrpc';
 import { Observable } from 'rxjs/Observable';
-import { TFormData } from '../../components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export enum ENotificationType {
   INFO = 'INFO',
@@ -50,7 +50,7 @@ export interface INotificationsServiceApi {
   getUnread(type?: ENotificationType): INotification[];
   getRead(type?: ENotificationType): INotification[];
   getSettings(): INotificationsSettings;
-  getSettingsFormData(): TFormData;
+  getSettingsFormData(): TObsFormData;
   setSettings(patch: Partial<INotificationsSettings>): void;
   restoreDefaultSettings(): void;
   markAsRead(id: number): void;

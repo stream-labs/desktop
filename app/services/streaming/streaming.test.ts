@@ -14,6 +14,7 @@ jest.mock('services/i18n', () => ({
 }));
 jest.mock('services/customization', () => ({}));
 jest.mock('services/user', () => ({}));
+jest.mock('services/notifications', () => ({}));
 
 function noop() {}
 

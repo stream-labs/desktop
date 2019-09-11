@@ -19,9 +19,14 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import moment from 'moment';
 import { setupGlobalContextMenuForEditableElement } from 'util/menus/GlobalMenu';
+import VModal from 'vue-js-modal';
+import VeeValidate from 'vee-validate';
+import ChildWindow from 'components/windows/ChildWindow.vue';
+import OneOffWindow from 'components/windows/OneOffWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 
@@ -84,6 +89,10 @@ require('./app.less');
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
+Vue.use(Toasted);
+Vue.use(VeeValidate); // form validations
+Vue.use(VModal);
+
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
@@ -150,32 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
       i18n,
       store,
       render: h => {
-        const componentName = windowsService.state[windowId].componentName;
-
-        return h(windowsService.components[componentName]);
+        if (windowId === 'child') return h(ChildWindow);
+        if (windowId === 'main') {
+          const componentName = windowsService.state[windowId].componentName;
+          return h(windowsService.components[componentName]);
+        }
+        return h(OneOffWindow);
       }
     });
 
     setupGlobalContextMenuForEditableElement();
   });
-
-  // Used for replacing the contents of this window with
-  // a new top level component
-  ipcRenderer.on(
-    'window-setContents',
-    (event: Electron.Event, options: IWindowOptions) => {
-      windowsService.updateChildWindowOptions(options);
-
-      // This is purely for developer convencience.  Changing the URL
-      // to match the current contents, as well as pulling the options
-      // from the URL, allows child windows to be refreshed without
-      // losing their contents.
-      const newOptions: any = Object.assign({ windowId: 'child' }, options);
-      const newURL: string = URI(window.location.href)
-        .query(newOptions)
-        .toString();
-
-      window.history.replaceState({}, '', newURL);
-    }
-  );
 });

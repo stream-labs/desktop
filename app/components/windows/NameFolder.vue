@@ -1,7 +1,5 @@
 <template>
-<modal-layout
-  :title="options.renameId ? $t('sources.renameFolder') : $t('sources.nameFolder')"
-  :done-handler="submit">
+<modal-layout :done-handler="submit">
   <form
     slot="content"
     @submit.prevent="submit">

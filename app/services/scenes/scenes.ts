@@ -15,11 +15,11 @@ import {
 import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
-import { Inject } from '../../util/injector';
-import * as obs from '../obs-api';
-import namingHelpers from '../../util/NamingHelpers';
+import { Inject } from 'util/injector';
+import * as obs from 'services/obs-api';
 import { $t } from 'services/i18n';
-const { ipcRenderer } = electron;
+import namingHelpers from 'util/NamingHelpers';
+import uuid from 'uuid/v4';
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
@@ -49,7 +49,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       nodes: []
     });
     this.state.displayOrder.push(id);
-    this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.activeSceneId = this.state.activeSceneId;
   }
 
   @mutation()
@@ -72,13 +72,13 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
-    const id = options.sceneId || ('scene_' + ipcRenderer.sendSync('getUniqueId'));
+    const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
     const obsScene = obs.SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, name);
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
-      const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
+      const oldScene = this.getScene(options.duplicateSourcesFromScene);
       const newScene = this.getScene(id);
 
       oldScene.getItems().slice().reverse().forEach(item => {
@@ -89,7 +89,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
-    return this.getSceneByName(name);
+    return this.getScene(id);
   }
 
 
@@ -144,9 +144,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const scene = this.getScene(id);
     if (!scene) return false;
 
-    const obsScene = scene.getObsScene();
+    const activeScene = this.activeScene;
 
-    this.transitionsService.transitionTo(obsScene);
+    this.transitionsService.transition(activeScene && activeScene.id, scene.id);
+
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
     return true;
@@ -159,20 +160,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
 
   // Utility functions / getters
-
-  getSceneByName(name: string): Scene {
-    let foundScene: IScene;
-
-    Object.keys(this.state.scenes).forEach(id => {
-      const scene = this.state.scenes[id];
-
-      if (scene.name === name) {
-        foundScene = scene;
-      }
-    });
-
-    return foundScene ? this.getScene(foundScene.id) : null;
-  }
 
 
   getModel(): IScenesState  {
@@ -231,6 +218,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showNameScene(options: {rename?: string, itemsToGroup?: string[] } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
+      title: options.rename ? $t('scenes.renameScene') : $t('scenes.nameScene'),
       queryParams: options,
       size: {
         width: 400,
@@ -243,6 +231,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showNameFolder(options: { renameId?: string, itemsToGroup?: string[], parentId?: string } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
+      title: options.renameId ? $t('sources.renameFolder') : $t('sources.nameFolder'),
       queryParams: options,
       size: {
         width: 400,
@@ -255,6 +244,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showDuplicateScene(sceneName: string) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
+      title: $t('scenes.nameScene'),
       queryParams: { sceneToDuplicate: sceneName },
       size: {
         width: 400,

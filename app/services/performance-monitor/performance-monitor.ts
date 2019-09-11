@@ -61,6 +61,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
 
 
   stop() {
+    this.performanceService.stop();
     clearInterval(this.intervalId);
     this.intervalId = null;
     if (this.droppedFramesSubscr) this.droppedFramesSubscr.unsubscribe();

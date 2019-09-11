@@ -7,7 +7,7 @@
 <script lang="ts" src="./NavMenu.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .nav-menu {
   margin: 0;

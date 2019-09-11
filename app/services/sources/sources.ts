@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
-import { IListOption, setupSourceDefaults, TObsValue } from 'components/shared/forms/Input';
+import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -16,7 +16,8 @@ import {
   Source,
   TPropertiesManager
 } from './index';
-import { $t } from '../i18n';
+import { $t } from 'services/i18n';
+import uuid from 'uuid/v4';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -42,11 +43,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private windowsService: WindowsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
 
   /**
    * Maps a source id to a property manager
@@ -132,9 +130,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string =
-      options.sourceId ||
-      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
+    const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
@@ -171,7 +167,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type: managerType
     };
 
-    if (source.hasProps()) setupSourceDefaults(obsInput);
+    if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
   }
 
@@ -188,11 +184,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (!source) throw  new Error(`Source ${id} not found`);
 
-    source.getObsInput().release();
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
     this.sourceRemoved.next(source.sourceState);
+    source.getObsInput().release();
   }
 
   addFile(path: string): Source {
@@ -247,7 +243,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
     const whitelistedTypes: TSourceType[] = [
       'image_source',
@@ -378,9 +374,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   showSourceProperties(sourceId: string) {
-    this.windowsService.closeChildWindow();
+    const source = this.getSource(sourceId);
+
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
+      title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
       queryParams: { sourceId },
       size: {
         width: 600,
@@ -389,10 +387,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-
   showShowcase() {
     this.windowsService.showWindow({
       componentName: 'SourcesShowcase',
+      title: $t('sources.addSourceTitle'),
       size: {
         width: 680,
         height: 600
@@ -404,6 +402,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
+      title: $t('sources.addSourceTitle'),
       queryParams: { sourceType, propertiesManager },
       size: {
         width: 640,
@@ -412,23 +411,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-
-  showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
-    this.windowsService.showWindow({
-      componentName: 'NameSource',
-      queryParams: { sourceType, propertiesManager },
-      size: {
-        width: 400,
-        height: 250
-      }
-    });
-  }
-
-
   showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
-      componentName: 'NameSource',
-      queryParams: { renameId: sourceId },
+      componentName: 'RenameSource',
+      title: $t('sources.renameSource'),
+      queryParams: { sourceId },
       size: {
         width: 400,
         height: 250
@@ -436,4 +423,3 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 }
-

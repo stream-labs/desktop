@@ -1,15 +1,18 @@
 <template>
 <div class="section">
-  <div class="section-title--dropdown">
-    <h4
-      v-if="title"
-      @click="collapsed = !collapsed">
+  <div
+    class="section-title section-title--dropdown"
+    v-if="title"
+    :class="{ 'section-title--opened': !collapsed }"
+    @click="collapsed = !collapsed"
+  >
+    <h4>
       <i
         v-if="collapsed === true"
-        class="icon-plus"/>
+        class="icon-plus section-title__icon"/>
       <i
         v-if="collapsed === false"
-        class="icon-minus"/>
+        class="icon-minus section-title__icon"/>
       {{ title }}
     </h4>
   </div>
@@ -17,7 +20,9 @@
       v-show="!collapsed"
       class="section-content section-content--dropdown"
   >
-    <hotkey v-for="(hotkey, index) in hotkeys" :hotkey="hotkey" :key="index" />
+    <div v-for="hotkey in hotkeys" :key="hotkey.resourceId">
+      <hotkey :hotkey="hotkey" />
+    </div>
   </div>
 </div>
 </template>

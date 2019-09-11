@@ -24,10 +24,9 @@
 <script lang="ts" src="./Studio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .studio-page {
-  display: flex;
   flex-direction: column;
 }
 
@@ -66,7 +65,6 @@
   flex-grow: 1;
   background-color: @bg-tertiary;
   display: flex;
-  align-items: center;
   justify-content: center;
 
   .message {
