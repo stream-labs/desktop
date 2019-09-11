@@ -1,9 +1,9 @@
 <template>
 <div class="top-nav">
   <div class="tabs">
-    <div class="top-nav-item" :class="{ 'top-nav-item--active': page === 'Studio' }">
+    <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
-        @click="navigateStudio"
+        @click="studioMode"
         class="link">
         <i class="icon-studio-mode" /><span>{{ $t('common.studioMode') }}</span>
       </a>
