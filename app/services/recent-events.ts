@@ -47,9 +47,15 @@ export interface IRecentEvent {
   uuid: string;
 }
 
+interface IRecentEventsConfig {
+  eventsPanelMuted: boolean;
+  settings: Dictionary<any>;
+}
+
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
+  filterConfig: Dictionary<any>;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -150,7 +156,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
 
-  static initialState: IRecentEventsState = { recentEvents: [], muted: false };
+  static initialState: IRecentEventsState = { recentEvents: [], muted: false, filterConfig: {} };
 
   lifecycle: LoginLifecycle;
 
@@ -162,16 +168,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     });
   }
 
-  syncEventsState() {
+  async syncEventsState() {
+    const config = await this.fetchConfig();
+    this.applyConfig(config);
     this.formEventsArray();
     this.websocketService.socketEvent.subscribe(this.onSocketEvent.bind(this));
-    return this.fetchMutedState();
+    return;
   }
 
   fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
+    const typeString = this.getEventTypesString();
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
       this.userService.widgetToken
-    }`;
+    }?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return fetch(request)
@@ -179,18 +188,18 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .catch(() => null);
   }
 
-  fetchMutedState() {
+  async fetchConfig() {
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return fetch(new Request(url, { headers }))
       .then(handleResponse)
-      .then(resp => this.SET_MUTED(resp.eventsPanelMuted));
+      .catch(() => null);
   }
 
   private async formEventsArray() {
-    const events = await this.fetchRecentEvents();
+    const events = await this.fetchRecentEvents(); 
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
     Object.keys(events.data).forEach(key => {
@@ -315,6 +324,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers, method: 'POST' });
     return fetch(request).then(handleResponse);
+  }
+
+  getEventTypesString() {
+    return Object.keys(this.state.filterConfig)
+      .filter((type: any) => this.state.filterConfig[type] === true)
+      .join(',');
+  }
+
+  applyConfig(config: IRecentEventsConfig) {
+    this.SET_MUTED(config.eventsPanelMuted);
+    this.SET_FILTER_CONFIG(config.settings);
   }
 
   getSubString(event: IRecentEvent) {
@@ -444,5 +464,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_MUTED(muted: boolean) {
     this.state.muted = muted;
+  }
+
+  @mutation()
+  private SET_FILTER_CONFIG(settings: any) {
+    this.state.filterConfig = settings;
   }
 }
