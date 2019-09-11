@@ -4,15 +4,15 @@
     <div class="input-label">
       <label>{{ $t('settings.optimizationForNiconicoLiveService')}}</label>
     </div>
-    <BoolInput
+    <ObsBoolInput
       :value="optimizeForNiconicoModel"
       @input="setOptimizeForNiconico" />
-    <BoolInput
+    <ObsBoolInput
       :value="showOptimizationDialogForNiconicoModel"
       v-show="optimizeForNiconicoModel.value"
       @input="setShowOptimizationDialogForNiconico"
       class="optional-item" />
-    <BoolInput
+    <ObsBoolInput
       :value="optimizeWithHardwareEncoderModel"
       v-show="optimizeForNiconicoModel.value"
       @input="setOptimizeWithHardwareEncoder"
