@@ -11,7 +11,7 @@
   "Appearance": "Aparência",
   "Remote Control": "Controle remoto",
   "Night mode": "Modo noturno",
-  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "Se você está experimentando um comportamento estranho, você pode tentar excluir o diretório de cache. Isso resultará na perda de configurações de cena e ajustes, mas poderá corrigir alguns problemas de estabilidade.",
+  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "Se você está experimentando um comportamento estranho, você pode tentar excluir sua paste de cache. Isso resultará na perda de configurações de cena e ajustes, mas poderá corrigir alguns problemas de estabilidade.",
   "Show Cache Directory": "Mostrar o diretório de Cache",
   "Delete Cache and Restart": "Excluir Cache e Reiniciar",
   "Upload Cache to Developers": "Enviar o Cache para os desenvolvedores",
