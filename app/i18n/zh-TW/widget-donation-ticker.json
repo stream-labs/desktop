@@ -1,0 +1,17 @@
+{
+  "Message Format": "訊息格式",
+  "Max Donations": "最大贊助",
+  "Text Scroll Speed": "文字滾動速度",
+  "Background Color": "背景顏色",
+  "Font": "字體",
+  "Font Size": "字型大小",
+  "Font Weight": "字體粗細",
+  "Text Color": "文字顏色",
+  "Name Text Color": "名稱文字顏色",
+  "Amount Text Color": "總額的文字顏色",
+  "The name of the donator,": "贊助者名字",
+  "The amount that was donated": "贊助金額",
+  "Manage List": "管理列表",
+  "Font Settings": "字型設定",
+  "A hex color for the text of the": "採取十六進制的文字顏色。"
+}
