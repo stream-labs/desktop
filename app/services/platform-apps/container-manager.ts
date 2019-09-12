@@ -333,7 +333,7 @@ export class PlatformContainerManager {
           }
 
           // Let through all chrome dev tools requests
-          if (parsed.protocol === 'chrome-devtools:') {
+          if (parsed.protocol === 'devtools:') {
             cb({});
             return;
           }
