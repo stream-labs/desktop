@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Otomatik Optimizeri Çalıştır",
   "Confirm stream title and game before going live": "Yayın Başlığını ve Oyunu yayına başlamadan önce onayla",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "UYARI! Bütün sahneleri, kaynakları ve ayarları kaybedeceksin. Bu işlem geri alınamaz!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Önbellek dizini başarıyla yüklendi. %{file} isimli dosya panonuza kopyalandı. Lütfen Discord'a bunu yapıştır ve bir geliştiriciyi tagle.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels oturumu başarılı bir şekilde tekrar başlatıldı!",
   "This action will restart the application. Continue?": "Bu işlem programı yeniden başlatacak. Devam edilsin mi?",
   "Show confirmation dialog when starting streams": "Yayın başlatma sırasında onay iletişim kutusunu göster",
@@ -69,5 +69,14 @@
   "Default": "Varsayılan",
   "Custom Encoder Settings": "Özel Kodlayıcı Ayarları",
   "Audio Bitrate": "Ses Bitrate",
-  "Video Bitrate": "Video Bitrate"
+  "Video Bitrate": "Video Bitrate",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
