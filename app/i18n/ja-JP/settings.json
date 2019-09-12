@@ -111,8 +111,8 @@
       "StreamEncoder": {
         "name": "エンコーダ",
         "obs_x264": "ソフトウェア（x264）",
-        "obs_qsv11": "ハードウェア（QSV）",
-        "ffmpeg_nvenc": "ハードウェア (NVENC)"
+        "qsv": "ハードウェア（QSV）",
+        "nvenc": "ハードウェア (NVENC)"
       },
       "ABitrate": {
         "name": "音声ビットレート（kbps）"
@@ -162,8 +162,8 @@
       "Encoder": {
         "name": "@:settings.Output.Streaming.StreamEncoder.name",
         "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
-        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11",
-        "ffmpeg_nvenc": "@:settings.Output.Streaming.StreamEncoder.ffmpeg_nvenc"
+        "qsv": "@:settings.Output.Streaming.StreamEncoder.qsv",
+        "nvenc": "@:settings.Output.Streaming.StreamEncoder.nvenc"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
@@ -279,7 +279,7 @@
       "RecEncoder": {
         "name": "@:settings.Output.Streaming.Encoder.name",
         "obs_x264": "@:settings.Output.Streaming.Encoder.obs_x264",
-        "obs_qsv11": "@:settings.Output.Streaming.Encoder.obs_qsv11"
+        "qsv": "@:settings.Output.Streaming.Encoder.qsv"
       },
       "RecRescale": {
         "name": "@:settings.Output.Streaming.Rescale.name"

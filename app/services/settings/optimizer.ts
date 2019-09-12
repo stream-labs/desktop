@@ -3,9 +3,9 @@ import { ISettingsSubCategory } from './settings-api';
 
 export enum EncoderType {
   x264 = 'obs_x264',
-  nvenc = 'ffmpeg_nvenc',
+  nvenc = 'nvenc',
   amd = 'amd_amf_h264',
-  qsv = 'obs_qsv11'
+  qsv = 'qsv'
 }
 
 export enum OptimizationKey {
@@ -139,7 +139,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.targetUsage,
@@ -191,7 +191,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     // 'Rescale' // bool
                                     //    'RescaleRes' // '1920x1200' ... '640x400' (10個)
@@ -316,7 +316,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -341,7 +341,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
