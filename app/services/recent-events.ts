@@ -343,6 +343,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return await fetch(request).then(handleResponse);
   }
 
+  async postUpdateFilterPreferences() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const body = JSON.stringify(this.state.filterConfig);
+    const request = new Request(url, { headers, body, method: 'POST' });
+    return await fetch(request).then(handleResponse);
+  }
+
   async skipAlert() {
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/alerts/skip`;
     const headers = authorizedHeaders(this.userService.apiToken);
