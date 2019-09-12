@@ -271,6 +271,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (this.customizationService.showOptimizationDialogForNiconico || mustShowDialog) {
         this.windowsService.showWindow({
           componentName: 'OptimizeForNiconico',
+          title: $t('streaming.optimizationForNiconico.title'),
           queryParams: settings,
           size: {
             width: 500,
