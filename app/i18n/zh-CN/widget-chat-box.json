@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "视觉设定",
+  "Font Settings": "字体设置",
+  "Chatter": "聊天室的人数",
+  "Always Show Messages": "永远显示消息",
+  "Show Moderator Badges": "显示管理员徽章",
+  "Show Subscriber Badges": "显示订阅者徽章",
+  "Show Turbo Badges": "显示 Turbo 徽章",
+  "Show Twitch Prime Badges": "显示 Twitch Prime 徽章",
+  "Show Bits Badges": "显示小奇点徽章",
+  "Show Top Coin Holder Badges": "显示最高硬币持有人徽章",
+  "Enable BetterTTV Emotes": "启用 BetterTTV 表情",
+  "Enable FrankerFaceZ Emotes": "启用 FrankerFaceZ 表情",
+  "Text Color": "文本颜色",
+  "Font Size": "字体大小",
+  "Muted Chatters": "被静音的观众",
+  "Hide Commands": "隐藏聊天指令",
+  "Background Color": "背景颜色"
+}
