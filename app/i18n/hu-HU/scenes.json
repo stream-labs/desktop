@@ -17,6 +17,7 @@
   "Create Output Projector": "Jelenet Kivetítő Létrehozása",
   "Studio Mode": "Stúdió mód",
   "Are you sure you want to remove %{sceneName}?": "Biztosan eltávolítod a %{sceneName} jelenetet?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Teljesítmény Mód Kikapcsolása",
   "Scene Collections": "Jelenet Gyűjtemények",
   "The building blocks of your scene. Also contains widgets.": "A jeleneted építőkövei. Többek között a Widgeteket is tartalmazza.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "A média fájljaid jelenleg szinkronizáció alatt vannak a felhővel. ",
   "It is recommended that you wait until this finishes before going live.": "Az adás indítása előtt ajánlott megvárni, míg ez a művelet befejeződik.",
   "Go Live Anyway": "Adás Indítása Mindenképpen",
-  "Wait": "Várj"
+  "Wait": "Várj",
+  "Add a new Scene.": "Add a new Scene.",
+  "Remove Scene.": "Remove Scene.",
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }
