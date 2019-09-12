@@ -11,7 +11,7 @@
   "Appearance": "Megjelenés",
   "Remote Control": "Távirányítás",
   "Night mode": "Éjszakai mód",
-  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "Nem megfelelő működés esetén, próbáld meg törölni a cache könyvtárat. Így elveszik minden jelenet és egyéb beállítás, de javíthat néhány stabilitással kapcsolat problémát.",
+  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "Furcsa működés esetén próbáld meg törölni a cache könyvtárat. Így elveszik minden jelenet és egyéb beállítás, de javíthat néhány stabilitással kapcsolat problémát.",
   "Show Cache Directory": "Cache Könyvtár Megjelenítése",
   "Delete Cache and Restart": "Cache Törlése és Újraindítás",
   "Upload Cache to Developers": "Cache Feltöltése a Fejlesztőknek",
