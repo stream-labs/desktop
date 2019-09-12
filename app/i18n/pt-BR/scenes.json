@@ -17,6 +17,7 @@
   "Create Output Projector": "Criar Projetor de Saída",
   "Studio Mode": "Modo Estúdio",
   "Are you sure you want to remove %{sceneName}?": "Tem certeza que deseja remover %{sceneName}?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Desativar o modo de desempenho",
   "Scene Collections": "Coleções de cena",
   "The building blocks of your scene. Also contains widgets.": "Os blocos de construção de sua cena. Também contém widgets.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "Seus arquivos de mídia estão atualmente sendo sincronizados com a nuvem. ",
   "It is recommended that you wait until this finishes before going live.": "É recomendado que aguarde até que este termine para entrar ao vivo.",
   "Go Live Anyway": "Iniciar transmissão de qualquer modo",
-  "Wait": "Espere"
+  "Wait": "Espere",
+  "Add a new Scene.": "Add a new Scene.",
+  "Remove Scene.": "Remove Scene.",
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }
