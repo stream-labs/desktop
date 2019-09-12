@@ -6,11 +6,15 @@
   "Switch to scene": "Passer à la scène",
   "Show %{sourcename}": "Afficher",
   "Hide %{sourcename}": "Masquer",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Désactivé le son",
   "Unmute": "Activé le son",
   "Push to Mute": "Appuyer pour désactiver le son",
   "Push to Talk": "Appuyer pour Parler",
   "Enable Studio Mode": "Activer le Mode Studio",
   "Disable Studio Mode": "Désactivé le Mode Studio",
-  "Transition (Studio Mode)": "Transition (Mode Studio)"
+  "Transition (Studio Mode)": "Transition (Mode Studio)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
