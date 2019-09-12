@@ -52,6 +52,62 @@ interface IRecentEventsConfig {
   settings: Dictionary<any>;
 }
 
+interface ICommonRecentEventConfig {
+  donation: boolean;
+  redemption: boolean;
+  merch: boolean;
+}
+
+interface ITwitchRecentEventsConfig {
+  follow: boolean;
+  subscription: boolean;
+  subscription_tier_1: boolean;
+  subscription_tier_2: boolean;
+  subscription_tier_3: boolean;
+  filter_subscription_3_months: boolean;
+  filter_subscription_6_months: boolean;
+  filter_subscription_9_months: boolean;
+  filter_subscription_12_months: boolean;
+  filter_subscription_minimum_enabled: boolean;
+  filter_subscription_minimum_months: number;
+  primesub: boolean;
+  resub: boolean;
+  resub_tier_1: boolean;
+  resub_tier_2: boolean;
+  resub_tier_3: boolean;
+  resub_prime: boolean;
+  gifted_sub: boolean;
+  gifted_sub_tier_1: boolean;
+  gifted_sub_tier_2: boolean;
+  gifted_sub_tier_3: boolean;
+  host: boolean;
+  bits: boolean;
+  raid: boolean;
+}
+
+interface IYouTubeRecentEventsConfig {
+  subscriber: boolean;
+  sponsor: boolean;
+  superchat: boolean;
+}
+
+interface IMixerRecentEventsConfig {
+  follow: boolean;
+  subscription: boolean;
+  resub: boolean;
+  host: boolean;
+  sticker: boolean;
+  effect: boolean;
+}
+
+interface IFacebookRecentEventsConfig {
+  follow: boolean;
+  facebook_support: boolean;
+  facebook_like: boolean;
+  facebook_share: boolean;
+  facebook_stars: boolean;
+}
+
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
@@ -375,6 +431,88 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(request).then(handleResponse);
   }
 
+  get platformFilters() {
+    const platform = this.userService.platform.type;
+    const mainFilters = pick(this.state.filterConfig, [
+      'donation',
+      'merch',
+      'follow',
+      'host',
+      'bits',
+      'raid',
+      'subscriber',
+      'sponsor',
+      'superchat',
+      'sticker',
+      'effect',
+      'facebook_support',
+      'facebook_like',
+      'facebook_share',
+      'facebook_stars',
+    ]);
+
+    const subFilters = pick(this.state.filterConfig, [
+      'subscription',
+      'subscription_tier_1',
+      'subscription_tier_2',
+      'subscription_tier_3',
+      'primesub',
+      'gifted_sub',
+    ]);
+
+    const resubFilters = pick(this.state.filterConfig, [
+      'resub',
+      'resub_tier_1',
+      'resub_tier_2',
+      'resub_tier_3',
+      'resub_prime',
+      'filter_subscription_3_months',
+      'filter_subscription_6_months',
+      'filter_subscription_9_months',
+      'filter_subscription_12_months',
+      'filter_subscription_minimum_enabled',
+      'filter_subscription_minimum_months',
+    ]);
+
+    const main = {};
+    const sub = {};
+    const resub = {};
+
+    Object.keys(mainFilters).forEach(filter => {
+      main[filter] = {
+        value: mainFilters[filter],
+        name: filterName(filter),
+      };
+    });
+
+    Object.keys(subFilters).forEach(filter => {
+      sub[filter] = {
+        value: subFilters[filter],
+        name: filterName(filter),
+      };
+    });
+
+    Object.keys(resubFilters).forEach(filter => {
+      resub[filter] = {
+        value: resubFilters[filter],
+        name: filterName(filter),
+      };
+    });
+
+    return {
+      main,
+      sub,
+      resub,
+    };
+  }
+
+  updateFilterPreference(key: string, value: any) {
+    this.SET_SINGLE_FILTER_CONFIG(key, value);
+    this.postUpdateFilterPreferences().then(() => {
+      this.formEventsArray();
+    });
+  }
+
   getEventTypesString() {
     return Object.keys(this.state.filterConfig)
       .filter((type: any) => this.state.filterConfig[type] === true)
@@ -536,5 +674,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_FILTER_CONFIG(settings: any) {
     this.state.filterConfig = settings;
+  }
+
+  @mutation()
+  private SET_SINGLE_FILTER_CONFIG(key: string, value: any) {
+    this.state.filterConfig[key] = value;
   }
 }
