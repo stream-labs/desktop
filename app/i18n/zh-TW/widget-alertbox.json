@@ -1,17 +1,17 @@
 {
-  "Layout": "布局",
+  "Layout": "編排",
   "Add Alert": "新增通知",
   "Add ": "新增",
   "Global Settings": "全局設定",
   "Text to Speech": "文字轉為語音",
   "Charity Streaming Donations": "慈善實況贊助",
   "Patreon Pledges": "Patreon Pledges",
-  "Extra Life Donations": "Extra Life贊助",
+  "Extra Life Donations": "Extra Life的贊助",
   "JustGiving Donations": "JustGiving贊助",
   "Merch": "周邊商品",
   "Resubs": "續訂",
-  "Gamewisp Subscriptions": "Gamewisp訂閱",
-  "Tiltify Donations": "Tiltify贊助",
+  "Gamewisp Subscriptions": "Gamewisp的訂閱",
+  "Tiltify Donations": "Tiltify的贊助",
   "TreatStream": "TreatStream",
   "Raids": "揪團",
   "Super Hearts": "超級愛心",
@@ -70,5 +70,5 @@
   "Image/Video File": "圖片/影像檔案",
   "Sound File": "音效檔案",
   "Variation Frequency": "變化頻率",
-  "Message Template": "訊息樣板"
+  "Message Template": "消息樣板"
 }
