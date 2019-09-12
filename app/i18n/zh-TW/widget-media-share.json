@@ -1,0 +1,11 @@
+{
+  "Banned Media": "禁止的媒體",
+  "Check Banned Media": "檢閱被禁止的媒體",
+  "Price Per Second": "每秒價格",
+  "Min. Amount to Share": "能分享媒體的最小金額",
+  "Max Duration": "最長持續時間",
+  "Buffer Time": "緩衝時間",
+  "Spam Security": "洗頻防護",
+  "The time between videos the next video has to buffer.": "換下一個影片的緩衝時間",
+  "Manage Media Settings": "管理媒體設定"
+}
