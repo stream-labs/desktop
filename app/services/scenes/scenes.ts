@@ -12,6 +12,7 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
+import { action } from 'services/core';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -244,19 +245,21 @@ export class ScenesService extends StatefulService<IScenesState> {
     return count;
   }
 
+  @action()
   makeSceneActive(id: string): boolean {
     const scene = this.getScene(id);
     if (!scene) return false;
 
+    this.MAKE_SCENE_ACTIVE(id);
+
     const activeScene = this.activeScene;
 
     this.transitionsService.transition(activeScene && activeScene.id, scene.id);
-
-    this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
     return true;
   }
 
+  @action()
   setSceneOrder(order: string[]) {
     this.SET_SCENE_ORDER(order);
   }

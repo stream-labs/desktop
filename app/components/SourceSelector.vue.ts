@@ -132,15 +132,24 @@ export default class SourceSelector extends Vue {
     if (!isLeaf) {
       return 'fa fa-folder';
     }
-    const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
-    if (sourceDetails.isStreamlabel) {
+
+    const source = this.sourcesService.state.sources[sourceId];
+
+    if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
     }
-    // We want simple equality here to also check for undefined
-    if (sourceDetails.widgetType != null) {
-      return widgetIconMap[sourceDetails.widgetType];
+
+    if (source.propertiesManagerType === 'widget') {
+      // IPC is unavoidable here, that's ok. Let's eventually put this in
+      // the store as it's something that the UI cares about. Also typing
+      // is weak for properties managers settings.
+      const widgetType = this.sourcesService.getSource(sourceId).getPropertiesManagerSettings()
+        .widgetType;
+
+      return widgetIconMap[widgetType];
     }
-    return sourceIconMap[sourceDetails.type] || 'fas fa-file';
+
+    return sourceIconMap[source.type] || 'fas fa-file';
   }
 
   addSource() {
@@ -204,9 +213,11 @@ export default class SourceSelector extends Vue {
 
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
-    const sceneNode = this.selectionService.getLastSelected();
+    const sceneNode = this.scene.state.nodes.find(
+      n => n.id === this.selectionService.state.lastSelectedId,
+    );
     return sceneNode && sceneNode.sceneNodeType === 'item'
-      ? sceneNode.getSource().hasProps()
+      ? this.sourcesService.getSource(sceneNode.sourceId).hasProps()
       : false;
   }
 
@@ -259,8 +270,7 @@ export default class SourceSelector extends Vue {
   }
 
   canShowActions(sceneNodeId: string) {
-    const node = this.scene.getNode(sceneNodeId);
-    return node.isItem() || node.getNestedItems().length;
+    return this.getItemsForNode(sceneNodeId).length > 0;
   }
 
   get lastSelectedId() {
@@ -283,7 +293,7 @@ export default class SourceSelector extends Vue {
   }
 
   get activeItemIds() {
-    return this.selectionService.getIds();
+    return this.selectionService.state.selectedIds;
   }
 
   get activeItems() {
@@ -296,9 +306,27 @@ export default class SourceSelector extends Vue {
     this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
   }
 
+  // TODO: Refactor into elsewhere
+  getItemsForNode(sceneNodeId: string): ISceneItem[] {
+    const node = this.scene.state.nodes.find(n => n.id === sceneNodeId);
+
+    if (node.sceneNodeType === 'item') {
+      return [node];
+    }
+
+    const children = this.scene.state.nodes.filter(n => n.parentId === sceneNodeId);
+    let childrenItems: ISceneItem[] = [];
+
+    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
+
+    return childrenItems;
+  }
+
   visibilityClassesForSource(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    const visible = selection.isVisible();
+    // TODO: Clean up - need views or similar
+    const items = this.getItemsForNode(sceneNodeId);
+    // Visible if at least 1 item is visible
+    const visible = !!items.find(i => i.visible);
 
     return {
       'icon-view': visible,
@@ -307,8 +335,10 @@ export default class SourceSelector extends Vue {
   }
 
   lockClassesForSource(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    const locked = selection.isLocked();
+    // TODO: Clean up - need views or similar
+    const items = this.getItemsForNode(sceneNodeId);
+    // Locked if all items are locked
+    const locked = !items.find(i => !i.locked);
 
     return {
       'icon-lock': locked,

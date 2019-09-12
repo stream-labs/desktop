@@ -37,6 +37,7 @@ plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     const internalApiService: InternalApiService = InternalApiService.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
+      console.log('SENDING MUTATION', mutation);
       const mutationToSend: IMutation = {
         id: mutationId++,
         type: mutation.type,
