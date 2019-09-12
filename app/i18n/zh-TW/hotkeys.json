@@ -6,11 +6,15 @@
   "Switch to scene": "切換到場景",
   "Show %{sourcename}": "顯示 %{sourcename}",
   "Hide %{sourcename}": "隱藏 %{sourcename}",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "靜音",
   "Unmute": "取消靜音",
   "Push to Mute": "按壓時靜音",
   "Push to Talk": "按壓時說話",
   "Enable Studio Mode": "啟用工作室模式",
   "Disable Studio Mode": "關閉工作室模式",
-  "Transition (Studio Mode)": "轉場 （工作室模式）"
+  "Transition (Studio Mode)": "轉場 （工作室模式）",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
