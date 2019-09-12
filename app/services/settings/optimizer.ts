@@ -3,9 +3,9 @@ import { ISettingsSubCategory } from './settings-api';
 
 export enum EncoderType {
   x264 = 'obs_x264',
-  nvenc = 'ffmpeg_nvenc',
+  nvenc = 'nvenc',
   amd = 'amd_amf_h264',
-  qsv = 'obs_qsv11'
+  qsv = 'qsv'
 }
 
 export enum OptimizationKey {
