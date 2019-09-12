@@ -1,7 +1,7 @@
 {
-  "Show the live dock (chat) on the left side": "Show the live dock (chat) on the left side",
-  "Chat Text Size": "Chat Text Size",
-  "Chat Width": "Chat Width",
-  "Enable BetterTTV emotes for Twitch": "Enable BetterTTV emotes for Twitch",
-  "Enable FrankerFaceZ emotes for Twitch": "Enable FrankerFaceZ emotes for Twitch"
+  "Show the live dock (chat) on the left side": "于左侧固定显示直播聊天室",
+  "Chat Text Size": "聊天室文字大小",
+  "Chat Width": "聊天室显示宽度",
+  "Enable BetterTTV emotes for Twitch": "在 Twitch 聊天室启用 BetterTTV 表情",
+  "Enable FrankerFaceZ emotes for Twitch": "在 Twitch 聊天室启用 FrankerFaceZ 表情"
 }
