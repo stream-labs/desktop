@@ -108,7 +108,7 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "ffmpeg_nvenc",
+                "value": "nvenc",
               },
             ],
             "key": "encoder",

@@ -191,7 +191,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     // 'Rescale' // bool
                                     //    'RescaleRes' // '1920x1200' ... '640x400' (10個)
@@ -341,7 +341,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
