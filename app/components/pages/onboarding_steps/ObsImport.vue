@@ -45,11 +45,12 @@
 <script lang="ts" src="./ObsImport.vue.ts"></script>
 
 <style lang="less">
-@import '../../../styles/index';
-// 3rd Party Component
-.multiselect__content-wrapper {
-  left: -50%;
-  border-radius: 0 0 3px 3px;
+.onboarding-step {
+  // 3rd Party Component
+  .multiselect__content-wrapper {
+    left: -50%;
+    border-radius: 0 0 3px 3px;
+  }
 }
 </style>
 
