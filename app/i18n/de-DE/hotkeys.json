@@ -6,11 +6,15 @@
   "Switch to scene": "Zu Szene wechseln",
   "Show %{sourcename}": "Zeige %{sourcename}",
   "Hide %{sourcename}": "%{sourcename} ausblenden",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Stummschalten",
   "Unmute": "Stummschalten aufheben",
   "Push to Mute": "Drücken um Stummzuschalten",
   "Push to Talk": "Drücken zum Sprechen",
   "Enable Studio Mode": "Studio-Modus aktivieren",
   "Disable Studio Mode": "Studio-Modus deaktivieren",
-  "Transition (Studio Mode)": "Übergang (Studio-Modus)"
+  "Transition (Studio Mode)": "Übergang (Studio-Modus)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
