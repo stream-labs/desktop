@@ -6,12 +6,12 @@
   "Reset Stream Boss": "ストリームボスをリセット",
   "Set Stream Boss Health": "ストリームボスヘルスをセットする",
   "Goal": "目標",
-  "Manage Battle": "バトルを管理",
+  "Manage Battle": "戦いを管理",
   "Starting Health": "最初のヘルス",
   "Fixed": "修正済み",
   "The boss will spawn with the set amount of health everytime.": "ボスは毎回設定された量のヘルスで現れます",
   "Incremental": "増加分",
-  "Overkill": "過剰な",
+  "Overkill": "過剰",
   "Fade Time (s)": "フェード時間（秒）",
   "Set to 0 to always appear on screen": "常にスクリーンに表示するため0に設定してください",
   "Damage From Boss Heals": "ボスヒールからのダメージ",
@@ -27,5 +27,5 @@
   "Health Text Color": "ヘルステキストの色",
   "Health Bar Color": "ヘルスバーの色",
   "Health Bar Background Color": "ヘルスバーの背景色",
-  "Font": "フォント\n"
+  "Font": "フォント"
 }
