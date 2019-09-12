@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Lancer l'optimisation automatique",
   "Confirm stream title and game before going live": "Confirmer le titre de la diffusion et le jeux avant de lancer la diffusion",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ATTENTION! Vous allez perdre toutes vos scènes, sources et paramètres de configuration. Cette action est irréversible!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Votre répertoire de cache a été transféré avec succès.  Le nom du fichier %{file} a été copié dans votre presse-papiers.  S’il vous plaît, collez-le dans le discord et taggez un développeur.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "La session Streamlabels a été redémarré avec succès!",
   "This action will restart the application. Continue?": "Cette action redémarrera l'application, Voulez-vous continuer?",
   "Show confirmation dialog when starting streams": "Afficher une boîte de dialogue de confirmation au démarrage de la diffusion",
@@ -69,5 +69,14 @@
   "Default": "Par défaut",
   "Custom Encoder Settings": "Paramètres de l’encodeur personnalisé",
   "Audio Bitrate": "Taux d'échantillonnage fixe de l'audio",
-  "Video Bitrate": "Taux d'échantillonnage fixe de la vidéo"
+  "Video Bitrate": "Taux d'échantillonnage fixe de la vidéo",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
