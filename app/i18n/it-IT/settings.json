@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Avvia l'Ottimizzatore Automatico",
   "Confirm stream title and game before going live": "Conferma il titolo e il gioco della Trasmissione prima di andare in onda",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ATTENZIONE! Perderai tutte le scene, le fonti e le impostazioni. Non sarà possibile tornare indietro!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "La cartella della cache è stata caricata con successo. Il file di nome %{file} è stato copiato negli appunti. Per favore incollalo su discord e tagga uno sviluppatore.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "La sessione di Streamlabels è stata riavviata con successo!",
   "This action will restart the application. Continue?": "Quest'azione riavvierà l'applicazione. Continuare?",
   "Show confirmation dialog when starting streams": "Visualizza la finestra di conferma quando avvii la trasmissione",
@@ -69,5 +69,14 @@
   "Default": "Predefinito",
   "Custom Encoder Settings": "Impostazioni Personalizzate di Codifica",
   "Audio Bitrate": "Audio Bitrate",
-  "Video Bitrate": "Video Bitrate"
+  "Video Bitrate": "Video Bitrate",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
