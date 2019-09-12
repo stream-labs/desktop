@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (windowId === 'main') {
         // if (store.state.bulkLoadFinished) {
-          return h(Main);
+        return h(Main);
         // }
 
         return h(CustomLoader);

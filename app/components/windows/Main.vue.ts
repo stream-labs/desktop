@@ -93,9 +93,9 @@ export default class Main extends Vue {
   get theme() {
     if (this.$store.state.bulkLoadFinished) {
       return this.customizationService.currentTheme;
-    } else {
-      return 'night-theme';
     }
+
+    return 'night-theme';
   }
 
   get applicationLoading() {
