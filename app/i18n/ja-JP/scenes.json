@@ -17,6 +17,7 @@
   "Create Output Projector": "出力プロジェクターを作成します。",
   "Studio Mode": "スタジオ モード",
   "Are you sure you want to remove %{sceneName}?": "本当に%{sceneName} を排除してもよろしいですか？",
+  "Are you sure you want to remove these %{count} items?": "本当に%{count}を削除してもよろしいですか？",
   "Disable Performance Mode": "パフォーマンス モードを無効にします。",
   "Scene Collections": "シーンコレクション",
   "The building blocks of your scene. Also contains widgets.": "シーンを作るための物です。ウィジェットも含まれています。",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "メディアファイルが現在クラウドと同期されています。 ",
   "It is recommended that you wait until this finishes before going live.": "これが終了するまで待ってからライブをすることをお勧めします。",
   "Go Live Anyway": "とにかくライブになる",
-  "Wait": "待機する"
+  "Wait": "待機する",
+  "Add a new Scene.": "新しいシーンを追加する",
+  "Remove Scene.": "シーンを削除する",
+  "Edit Scene Transitions.": "シーンの切り替えを編集する",
+  "Rename Scene": "シーン名を変更する",
+  "Name Scene": "シーンに名前を付ける\n",
+  "Rename Folder": "フォルダ名を変更する",
+  "Name Folder": "フォルダーに名前を付ける"
 }
