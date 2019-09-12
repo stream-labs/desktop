@@ -3,9 +3,9 @@
   "Check Banned Media": "Kontrollera Bannlyst Media",
   "Price Per Second": "Pris Per Sekund",
   "Min. Amount to Share": "Min. Belopp för att Dela",
-  "Max Duration": "Max Duration",
+  "Max Duration": "Max Varaktighet",
   "Buffer Time": "Bufferttid",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Spamsäkerhet",
   "The time between videos the next video has to buffer.": "Tiden mellan videos för att nästa video ska hinna buffra.",
   "Manage Media Settings": "Hantera Mediainställningar"
 }
