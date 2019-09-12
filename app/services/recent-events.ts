@@ -431,8 +431,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(request).then(handleResponse);
   }
 
-  get platformFilters() {
-    const platform = this.userService.platform.type;
+  get filters() {
     const mainFilters = pick(this.state.filterConfig, [
       'donation',
       'merch',

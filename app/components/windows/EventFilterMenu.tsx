@@ -17,15 +17,15 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   }
 
   get mainFilters() {
-    return this.recentEventsService.platformFilters.main;
+    return this.recentEventsService.filters.main;
   }
 
   get subFilters() {
-    return this.recentEventsService.platformFilters.sub;
+    return this.recentEventsService.filters.sub;
   }
 
   get resubFilters() {
-    return this.recentEventsService.platformFilters.resub;
+    return this.recentEventsService.filters.resub;
   }
 
   get subsEnabled() {
