@@ -19,7 +19,7 @@
   "Are you sure you want to remove %{sceneName}?": "Вы уверены что хотите удалить %{sceneName}?",
   "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Отключить режим повышенной производительности",
-  "Scene Collections": "Коллекции Сцен",
+  "Scene Collections": "Коллекции Сцен.",
   "The building blocks of your scene. Also contains widgets.": "Строительные блоки для вашей Сцены. Также содержит виджеты.",
   "Add a new Source to your Scene. Includes widgets.": "Добавьте новый Источник в вашу Сцену. Включает в себя виджеты.",
   "Remove Sources from your Scene.": "Удалить Источники из вашей Сцены.",
@@ -35,6 +35,6 @@
   "Edit Scene Transitions.": "Edit Scene Transitions.",
   "Rename Scene": "Rename Scene",
   "Name Scene": "Name Scene",
-  "Rename Folder": "Rename Folder",
-  "Name Folder": "Name Folder"
+  "Rename Folder": "Переименовать папку",
+  "Name Folder": "Назвать папку"
 }
