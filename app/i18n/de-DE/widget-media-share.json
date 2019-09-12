@@ -3,9 +3,9 @@
   "Check Banned Media": "Verbotenen Datenträger prüfen",
   "Price Per Second": "Preis pro Sekunde",
   "Min. Amount to Share": "Mindestbetrag zum Teilen",
-  "Max Duration": "Max Duration",
+  "Max Duration": "Max. Dauer",
   "Buffer Time": "Puffer-Zeit",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Spam-Sicherheit",
   "The time between videos the next video has to buffer.": "Zeit zwischen den Videos die das nächste Video zum Puffern hat.",
   "Manage Media Settings": "Datenträger-Einstellungen verwalten"
 }
