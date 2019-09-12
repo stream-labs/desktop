@@ -24,6 +24,8 @@ import {
 } from './audio-api';
 import { EDeviceType, HardwareService, IDevice } from 'services/hardware';
 import { $t } from 'services/i18n';
+import { ipcRenderer } from 'electron';
+import without from 'lodash/without';
 
 export enum E_AUDIO_CHANNELS {
   OUTPUT_1 = 1,
@@ -56,6 +58,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @Inject() private hardwareService: HardwareService;
 
   protected init() {
+    this.initVolmeterRelay();
+
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
       const source = this.sourcesService.getSource(sourceModel.sourceId);
       if (!source.audio) return;
@@ -88,6 +92,27 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       sec: Math.floor(ms / 1000),
       nsec: Math.floor(ms % 1000) * 1000000,
     };
+  }
+
+  volmeterSubscriptions: Dictionary<number[]> = {};
+
+  /**
+   * Special IPC channel for volmeter updates
+   */
+  initVolmeterRelay() {
+    ipcRenderer.on('volmeterSubscribe', (e, sourceId: string) => {
+      console.log(`Window ${e.senderId} subscribing to volmeter for source ${sourceId}`);
+      this.volmeterSubscriptions[sourceId] = this.volmeterSubscriptions[sourceId] || [];
+      this.volmeterSubscriptions[sourceId].push(e.senderId);
+    });
+
+    ipcRenderer.on('volmeterUnsubscribe', (e, sourceId: string) => {
+      console.log(`Window ${e.senderId} unsubscribing from volmeter for source ${sourceId}`);
+      this.volmeterSubscriptions[sourceId] = without(
+        this.volmeterSubscriptions[sourceId],
+        e.senderId,
+      );
+    });
   }
 
   getSource(sourceId: string): AudioSource {
@@ -227,7 +252,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 
   private initVolmeterStream(sourceId: string) {
-    const volmeterStream = new Subject<IVolmeter>();
+    // const volmeterStream = new Subject<IVolmeter>();
 
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
@@ -236,7 +261,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       (magnitude: number[], peak: number[], inputPeak: number[]) => {
         const volmeter: IVolmeter = { magnitude, peak, inputPeak };
 
-        volmeterStream.next(volmeter);
+        // volmeterStream.next(volmeter);
+        this.sendVolmeterData(sourceId, volmeter);
         lastVolmeterValue = volmeter;
         gotEvent = true;
       },
@@ -245,9 +271,15 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     /* This is useful for media sources since the volmeter will abruptly stop
      * sending events in the case of hiding the source. It might be better
      * to eventually just hide the mixer item as well though */
-    function volmeterCheck() {
+    const volmeterCheck = () => {
       if (!gotEvent) {
-        volmeterStream.next({
+        // volmeterStream.next({
+        //   ...lastVolmeterValue,
+        //   magnitude: [-Infinity],
+        //   peak: [-Infinity],
+        //   inputPeak: [-Infinity],
+        // });
+        this.sendVolmeterData(sourceId, {
           ...lastVolmeterValue,
           magnitude: [-Infinity],
           peak: [-Infinity],
@@ -257,11 +289,19 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
       gotEvent = false;
       volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, 100);
-    }
+    };
 
     volmeterCheck();
 
-    this.sourceData[sourceId].stream = volmeterStream;
+    // this.sourceData[sourceId].stream = volmeterStream;
+  }
+
+  private sendVolmeterData(sourceId: string, data: IVolmeter) {
+    const subscribers = this.volmeterSubscriptions[sourceId] || [];
+
+    subscribers.forEach(id => {
+      ipcRenderer.sendTo(id, `volmeter-${sourceId}`, data);
+    });
   }
 
   private removeAudioSource(sourceId: string) {

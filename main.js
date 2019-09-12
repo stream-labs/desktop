@@ -209,11 +209,11 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
-    mainWindow.openDevTools({ mode: 'detach' });
+    // mainWindow.openDevTools({ mode: 'detach' });
 
-    setTimeout(() => {
+    // setTimeout(() => {
       mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-    }, 5 * 1000)
+    // }, 5 * 1000)
 
     mainWindowState.manage(mainWindow);
 
@@ -249,7 +249,7 @@ if (!gotTheLock) {
     // Initialize the keylistener
     require('node-libuiohook').startHook();
 
-    mainWindow.on('closed', () => {
+    workerWindow.on('closed', () => {
       require('node-libuiohook').stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
@@ -336,8 +336,8 @@ if (!gotTheLock) {
       // interference with certain NodeJS APIs, expecially asynchronous
       // IO from the renderer process.  Enable at your own risk.
 
-      const devtoolsInstaller = require('electron-devtools-installer');
-      devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+      // const devtoolsInstaller = require('electron-devtools-installer');
+      // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
       // setTimeout(() => {
       //   openDevTools();
@@ -370,7 +370,7 @@ if (!gotTheLock) {
 
   app.on('ready', () => {
     if (
-      !process.argv.includes('--skip-update') &&
+      !process.argv.includes('--skip-update') && false &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       const updateInfo = {
         baseUrl: 'https://slobs-cdn.streamlabs.com',

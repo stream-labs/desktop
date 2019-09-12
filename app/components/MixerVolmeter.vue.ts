@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
-import { AudioSource } from 'services/audio';
+import { AudioSource, AudioService, IVolmeter } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import electron from 'electron';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -26,6 +27,7 @@ export default class MixerVolmeter extends Vue {
   @Prop() audioSource: AudioSource;
 
   @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   volmeterSubscription: Subscription;
 
@@ -60,7 +62,7 @@ export default class MixerVolmeter extends Vue {
   canvasHeight: number;
 
   mounted() {
-    // this.subscribeVolmeter();
+    this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
     this.setChannelCount(1);
@@ -79,7 +81,7 @@ export default class MixerVolmeter extends Vue {
 
   destroyed() {
     clearInterval(this.canvasWidthInterval);
-    // this.unsubscribeVolmeter();
+    this.unsubscribeVolmeter();
   }
 
   private initWebglRendering() {
@@ -283,8 +285,10 @@ export default class MixerVolmeter extends Vue {
     this.peakHoldCounters[channel] -= 1;
   }
 
+  workerId: number;
+
   subscribeVolmeter() {
-    this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
+    electron.ipcRenderer.on(`volmeter-${this.audioSource.sourceId}`, (e, volmeter: IVolmeter) => {
       this.setChannelCount(volmeter.peak.length);
 
       if (this.gl) {
@@ -293,9 +297,14 @@ export default class MixerVolmeter extends Vue {
         this.drawVolmeterC2d(volmeter.peak);
       }
     });
+
+    // TODO: Remove sync
+    this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
+
+    electron.ipcRenderer.sendTo(this.workerId, 'volmeterSubscribe', this.audioSource.sourceId);
   }
 
   unsubscribeVolmeter() {
-    this.volmeterSubscription && this.volmeterSubscription.unsubscribe();
+    electron.ipcRenderer.sendTo(this.workerId, 'volmeterUnsubscribe', this.audioSource.sourceId);
   }
 }

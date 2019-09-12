@@ -198,6 +198,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     AppService.instance.load();
   }
 
+  if (Utils.isChildWindow()) {
+    ipcRenderer.on('closeWindow', () => {
+      const windowsService: WindowsService = WindowsService.instance;
+      windowsService.closeChildWindow();
+    });
+  }
+
   // setup VueI18n plugin
   Vue.use(VueI18n);
 
