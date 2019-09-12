@@ -1,7 +1,7 @@
 {
   "Ad Layout": "Ad Layout",
   "Placement": "Placement",
-  "Image Layout": "Image Layout",
+  "Image Layout": "Kép elrendezése",
   "Image Duration": "Kép időtartama",
   "Seconds": "Másodperc",
   "Add Image": "Kép hozzáadása",
@@ -10,7 +10,7 @@
   "Banner Width": "Banner szélesség",
   "Banner Height": "Banner magasság",
   "Image Animation": "Kép animáció",
-  "Background Color": "Background Color",
+  "Background Color": "Háttérszín",
   "Transparent": "Áttetsző",
   "Single": "Szimpla",
   "Double": "Dupla",
