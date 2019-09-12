@@ -159,25 +159,30 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async initialize() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
-      destroy: () => Promise.resolve(this.SET_RECENT_EVENTS([])),
+      destroy: () => Promise.resolve(this.onLogout()),
       context: this,
     });
   }
 
   syncEventsState() {
     this.formEventsArray();
-    this.makeSocketConnection();
+    this.subscribeToSocketConnection();
     return this.fetchMutedState();
   }
 
-  makeSocketConnection() {
-    if (this.socketConnection) {
-      this.socketConnection.unsubscribe();
-    }
-
+  subscribeToSocketConnection() {
     this.socketConnection = this.websocketService.socketEvent.subscribe(
       this.onSocketEvent.bind(this),
     );
+  }
+
+  unsubscribeFromSocketConnection() {
+    this.socketConnection.unsubscribe();
+  }
+
+  onLogout() {
+    this.SET_RECENT_EVENTS([]);
+    this.unsubscribeFromSocketConnection();
   }
 
   fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
