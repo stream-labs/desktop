@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Uruchom Auto Optimizer",
   "Confirm stream title and game before going live": "Potwierdź tytuł transmisji i grę przed wejściem na żywo",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "OSTRZEŻENIE! Stracisz wszystkie sceny, źródła i ustawienia. Tej akcji nie można cofnąć!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Katalog pamięci podręcznej został pomyślnie przesłany.  Nazwa pliku %{file} został skopiowany do Schowka. Proszę wklej go na Discorda i powiadom developera.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Sesja Streamlabels została pomyślnie zrestartowana!",
   "This action will restart the application. Continue?": "Ta akcja spowoduje ponowne uruchomienie aplikacji. Kontynuować?",
   "Show confirmation dialog when starting streams": "Pokaż okno dialogowe potwierdzenia przy uruchamianiu transmisji",
@@ -69,5 +69,14 @@
   "Default": "Domyślne",
   "Custom Encoder Settings": "Niestandardowe ustawienia kodera",
   "Audio Bitrate": "Bitrate Audio",
-  "Video Bitrate": "Bitrate Wideo"
+  "Video Bitrate": "Bitrate Wideo",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }
