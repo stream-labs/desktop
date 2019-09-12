@@ -6,11 +6,15 @@
   "Switch to scene": "Sahne Değiştir",
   "Show %{sourcename}": "Göster %{sourcename}",
   "Hide %{sourcename}": "Gizle %{sourcename}",
+  "Push to Show %{sourcename}": "Push to Show %{sourcename}",
+  "Push to Hide %{sourcename}": "Push to Hide %{sourcename}",
   "Mute": "Sustur",
   "Unmute": "Ses Aç",
   "Push to Mute": "Bas Sustur",
   "Push to Talk": "Bas Konuş",
   "Enable Studio Mode": "Stüdyo Modunu Etkinleştir",
   "Disable Studio Mode": "Stüdyo Modunu Devre dışı bırak",
-  "Transition (Studio Mode)": "Geçiş (Stüdyo Modu)"
+  "Transition (Studio Mode)": "Geçiş (Stüdyo Modu)",
+  "Capture Foreground Window": "Capture Foreground Window",
+  "Deactivate Capture": "Deactivate Capture"
 }
