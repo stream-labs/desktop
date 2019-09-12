@@ -448,6 +448,18 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
   }
 
+  showFilterMenu() {
+    this.windowsService.showWindow({
+      componentName: 'EventFilterMenu',
+      title: $t('Filter Events'),
+      queryParams: {},
+      size: {
+        width: 850,
+        height: 800,
+      },
+    });
+  }
+
   @mutation()
   private ADD_RECENT_EVENT(events: IRecentEvent[]) {
     this.state.recentEvents = events.concat(this.state.recentEvents);
