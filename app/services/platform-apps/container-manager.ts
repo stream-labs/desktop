@@ -339,6 +339,9 @@ export class PlatformContainerManager {
           }
 
           // Cancel all other script requests.
+          console.warn(
+            `Canceling request to ${details.url} by app ${app.id}: ${app.manifest.name}`,
+          );
           cb({ cancel: true });
           return;
         }
