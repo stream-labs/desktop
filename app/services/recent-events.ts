@@ -171,8 +171,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   subscribeToSocketConnection() {
-    this.socketConnection = this.websocketService.socketEvent.subscribe(
-      this.onSocketEvent.bind(this),
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
     );
   }
 
