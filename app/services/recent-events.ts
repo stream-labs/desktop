@@ -199,7 +199,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   private async formEventsArray() {
-    const events = await this.fetchRecentEvents(); 
+    const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
     if (!events.data) return;
     Object.keys(events.data).forEach(key => {
@@ -374,8 +374,14 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }
   }
 
+  isAllowed(type: string) {
+    return this.state.filterConfig[type];
+  }
+
   onEventSocket(e: IEventSocketEvent) {
-    const messages = e.message.filter(msg => !msg.isTest && !msg.repeat);
+    const messages = e.message
+      .filter(msg => !msg.isTest && !msg.repeat)
+      .filter(msg => this.isAllowed(msg.type));
     messages.forEach(msg => {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
