@@ -13,7 +13,7 @@
   "Hide Timeout": "タイムアウトを非表示",
   "Rotation Speed": "回転スピード",
   "Slowdown Rate": "減速率",
-  "Font": "フォント\n",
+  "Font": "フォント",
   "Font Size": "フォントサイズ",
   "Font Color": "フォントの色",
   "Font Weight": "フォントの太さ",
@@ -28,6 +28,6 @@
   "Center Image Enabled": "センター画像が有効になりました",
   "Center Image Size": "センター画像のサイズ",
   "Center Image Border Enabled": "センター画像のボーダーが有効になりました",
-  "Center Image Border Color": "センター画像のボーダーの色が有効になりました",
-  "Center Image Border Width": "センター画像のボーダーの横幅が有効になりました"
+  "Center Image Border Color": "センター画像のボーダーの色",
+  "Center Image Border Width": "センター画像のボーダー横幅"
 }
