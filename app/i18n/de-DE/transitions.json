@@ -1,5 +1,5 @@
 {
-  "Scene transition": "Szenenübergang",
+  "Scene Transitions": "Szenenübergänge",
   "Cut": "Schnitt",
   "Fade": "Kreuzblende",
   "Swipe": "Verschieben",
@@ -8,5 +8,20 @@
   "Luma Wipe": "Luma Wipe",
   "Stinger": "Stinger",
   "Transition": "Übergang",
-  "Duration": "Dauer"
+  "Duration": "Dauer",
+  "Add Transition": "Übergang hinzufügen",
+  "You need at least 1 transition.": "Sie benötigen wenigstens 1 Übergang.",
+  "Add Connection": "Verbindung hinzufügen",
+  "Beginning Scene": "Anfangszene",
+  "Ending Scene": "Abschlussszene",
+  "Scene Transition": "Szenenübergang",
+  "Type": "Art",
+  "Transition Type": "Übergangsart",
+  "Name": "Name",
+  "Transition Name": "Übergangsname",
+  "Default": "Standardgerät",
+  "Deleted": "Gelöscht",
+  "This connection is redundant because another connection already connects these scenes.": "Diese Verbindung überflüssig, da eine andere Verbindung die Szenen bereits verbindet.",
+  "You need at least 2 scenes to edit transitions.": "Sie benötigen wenigstens 2 Szenen um Übergänge zu bearbeiten.",
+  "This scene transition is managed by an App and cannot be edited.": "Dieser Szenenübergang ist durch eine App verwaltet und kann nicht bearbeitet werden."
 }
