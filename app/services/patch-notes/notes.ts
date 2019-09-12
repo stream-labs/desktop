@@ -1,9 +1,14 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '1.0.20190912-unstable.1',
-  title: '1.0.20190912-unstable.1',
+  version: '1.0.20190912-unstable.2',
+  title: '1.0.20190912-unstable.2',
   notes: [
+    '修正: (unstable) ニコ生最適化: QSVとNVENCについてobs-studio-nodeの識別子変更に追従 (#355)',
+    '修正: リスト選択コンポーネントの外観を修正 (#353)',
+    '修正: 子ウィンドウのタイトルが一部出ていなかった不具合を修正 (#356)',
+    '',
+    '以下は1.0.20190912-unstable.1の内容です:',
     'シーン間のトランジションが柔軟に設定できるようになります。',
     '配信周りの内部実装が置き替わります。',
     'おかしな点がありましたら、フィードバックにてお知らせください。',
