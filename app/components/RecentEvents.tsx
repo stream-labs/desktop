@@ -240,7 +240,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         </span>
         {this.native && (
           <i
-            class="icon-music action-icon"
+            class="icon-filter action-icon"
             onClick={this.popoutFilterMenu}
             v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
           />
