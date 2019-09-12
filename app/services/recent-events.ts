@@ -67,6 +67,44 @@ const subscriptionMap = (subPlan: string) => {
   }[subPlan];
 };
 
+const filterName = (key: string) => {
+  return {
+    donation: $t('Donations'),
+    redemption: $t('Redemptions'),
+    merch: $t('Merch'),
+    follow: $t('Follows'),
+    subscription: $t('Subs'),
+    subscription_tier_1: $t('Tier 1'),
+    subscription_tier_2: $t('Tier 2'),
+    subscription_tier_3: $t('Tier 3'),
+    filter_subscription_3_months: $t('3 Months'),
+    filter_subscription_6_months: $t('6 Months'),
+    filter_subscription_9_months: $t('9 Months'),
+    filter_subscription_12_months: $t('12 Months'),
+    filter_subscription_minimum_enabled: $t('Minimum'),
+    filter_subscription_minimum_months: $t('months'),
+    primesub: $t('Prime'),
+    resub: $t('Resubs'),
+    resub_tier_1: $t('Tier 1'),
+    resub_tier_2: $t('Tier 2'),
+    resub_tier_3: $t('Tier 3'),
+    resub_prime: $t('Prime'),
+    gifted_sub: $t('Gifted'),
+    host: $t('Hosts'),
+    bits: $t('Bits'),
+    raid: $t('Raids'),
+    subscriber: $t('Subscribers'),
+    sponsor: $t('Members'),
+    superchat: $t('Super Chats'),
+    sticker: $t('Stickers'),
+    effect: $t('Effects'),
+    facebook_support: $t('Supports'),
+    facebook_like: $t('Likes'),
+    facebook_share: $t('Shares'),
+    facebook_stars: $t('Stars'),
+  }[key];
+};
+
 /**
  * This function duplicates per-event logic from streamlabs.com for
  * creating cache keys used in fetching read status of events and
