@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "我們正在改進我們的後端系統。作為遷移過程的一部分, 我們將需要您再次登錄。如果您有任何問題, 您可以",
   "contact support.": "聯繫支援。",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "登錄與您的 Twitch 或 Youtube 帳戶開始使用 Streamlabs",
+  "Sign in with your streaming account to get started with Streamlabs": "Sign in with your streaming account to get started with Streamlabs",
   "Select an OBS profile to import": "選擇要導入的 OBS 設定檔",
   "Import from OBS": "從OBS導入",
   "Start Fresh": "重新開始",
@@ -35,5 +35,10 @@
   "Next": "下個",
   "Scene Collections Import": "場景集合導入",
   "The following scene collections have been imported from your Streamlabs account": "以下的場景集合已從Streamlabs帳號中導入",
-  "Continue": "繼續"
+  "Continue": "繼續",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
