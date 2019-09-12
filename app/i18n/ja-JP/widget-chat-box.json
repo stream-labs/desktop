@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "ビジュアル設定",
+  "Font Settings": "フォント設定",
+  "Chatter": "チャット",
+  "Always Show Messages": "メッセージを常に表示する",
+  "Show Moderator Badges": "モデレーターバッジを表示する",
+  "Show Subscriber Badges": "サブスクライバーのバッジを表示する",
+  "Show Turbo Badges": "ターボバッジを表示する",
+  "Show Twitch Prime Badges": "Twitchプライムバッジを表示する",
+  "Show Bits Badges": "ビッツバッジを表示する",
+  "Show Top Coin Holder Badges": "トップのコインホルダーバッジを表示する",
+  "Enable BetterTTV Emotes": "BetterTTV Emotesを有効にする",
+  "Enable FrankerFaceZ Emotes": "FrankerFaceZ Emotesを有効にする",
+  "Text Color": "テキストの色",
+  "Font Size": "フォントサイズ",
+  "Muted Chatters": "チャットの非表示",
+  "Hide Commands": "コマンドの非表示",
+  "Background Color": "背景色"
+}
