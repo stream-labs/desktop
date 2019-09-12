@@ -15,17 +15,17 @@
   "Fade Time (s)": "Fade Time (s)",
   "Set to 0 to always appear on screen": "Set to 0 to always appear on screen",
   "Damage From Boss Heals": "Damage From Boss Heals",
-  "Theme": "Theme",
+  "Theme": "Thema",
   "Kill Animation": "Kill Animation",
   "Transparent Background": "Transparent Background",
   "Damage Per Follower": "Damage Per Follower",
   "Damage Per Bit": "Damage Per Bit",
   "Damage Per Subscriber": "Damage Per Subscriber",
   "Damage Per Dollar Donation": "Damage Per Dollar Donation",
-  "Background Color": "Background Color",
-  "Text Color": "Text Color",
+  "Background Color": "Achtergrondkleur",
+  "Text Color": "Tekstkleur",
   "Health Text Color": "Health Text Color",
   "Health Bar Color": "Health Bar Color",
   "Health Bar Background Color": "Health Bar Background Color",
-  "Font": "Font"
+  "Font": "Lettertype"
 }
