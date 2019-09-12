@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "Arka sistemimizi geliştirmekteyiz. İlerlemek için tekrar giriş yapmanız gerekmektedir. Eğer herhangi bir sorunuz olursa sormaktan çekinmeyin",
   "contact support.": "yardım ile iletişime geç.",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "Streamlabs'a Twitch ya da Youtube hesabınız ile giriş yapabilirsiniz",
+  "Sign in with your streaming account to get started with Streamlabs": "Sign in with your streaming account to get started with Streamlabs",
   "Select an OBS profile to import": "Aktarım için bir OBS profili seçin",
   "Import from OBS": "OBS'den Aktar",
   "Start Fresh": "Taze Başlangıç",
@@ -35,5 +35,10 @@
   "Next": "Sonraki",
   "Scene Collections Import": "Sahne Koleksiyonu Ekle",
   "The following scene collections have been imported from your Streamlabs account": "Streamlabs hesabınızda bulunan devamındaki sahne koleksiyonları içeri aktarıldı",
-  "Continue": "Devam Et"
+  "Continue": "Devam Et",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
