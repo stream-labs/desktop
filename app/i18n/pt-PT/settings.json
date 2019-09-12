@@ -17,7 +17,7 @@
   "Upload Cache to Developers": "Enviar a cache para os desenvolvedores",
   "Restart Streamlabels Session": "Reiniciar a sessão do Streamlabels",
   "Run Auto Optimizer": "Executar o Optimizador automático",
-  "Confirm stream title and game before going live": "Confirme o titulo da transmissão e o jogo antes de iniciar a mesma",
+  "Confirm stream title and game before going live": "Confirme o titulo da stream e o jogo antes de iniciar a sua stream",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "AVISO! Irá perder todas as cenas, fontes e configurações. Isto não poderá ser desfeito!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "O seu diretório de cache foi carregado com êxito. O nome de ficheiro %{file} foi copiado para a sua área de transferência.",
   "Streamlabels session has been succesfully restarted!": "A sessão do Streamlabs foi reiniciada com sucesso!",
