@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "Auto-Optimierung starten",
   "Confirm stream title and game before going live": "Vor dem Live-Gehen den Stream-Titel und das Spiel bestätigen",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNUNG! Sie verlieren alle Szenen, Quellen und Einstellungen. Dieser Vorgang kann nicht rückgängig gemacht werden!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "Ihr Cache-Verzeichnis wurde erfolgreich hochgeladen. Die Datei Name %{file} wurde in die Zwischenablage kopiert. Bitte fügen Sie sie in Discord ein und markieren Sie einen Entwickler.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Ihr Cache-Verzeichnis wurde erfolgreich hochgeladen. Die Datei Name %{file} wurde in die Zwischenablage kopiert.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels Sitzung wurde erfolgreich neu gestartet!",
   "This action will restart the application. Continue?": "Diese Aktion wird die Anwendung neu starten. Möchten Sie fortfahren?",
   "Show confirmation dialog when starting streams": "Bestätigungsdialog anzeigen, wenn der Stream gestartet wird",
@@ -36,7 +36,7 @@
   "Enforce streaming service bitrate limits": "Bitrate-Limit des Streaming-Services erzwingen",
   "Encoder Preset (Higher = Less CPU)": "Encoder-Voreinstellung (höher = weniger CPU-Last)",
   "Generate File Name without Space": "Dateinamen ohne Leerzeichen generieren",
-  "Recording": "Recording",
+  "Recording": "Aufnahme",
   "Recording Quality": "Aufnahmequalität",
   "Recording Format": "Aufnahmeformat",
   "Custom Muxer Settings": "Benutzerdefinierte Muxer-Einstellungen",
@@ -69,5 +69,14 @@
   "Default": "Standardgerät",
   "Custom Encoder Settings": "Benutzerdefinierte Encoder-Einstellungen",
   "Audio Bitrate": "Audio-Bitrate",
-  "Video Bitrate": "Video-Bitrate"
+  "Video Bitrate": "Video-Bitrate",
+  "Scene item selection mode": "Szenenartikel Auswahlmodus",
+  "Single click selects group. Double click selects item": "Einfacher Klick wählt die Gruppe aus. Doppel-Klick wählt den Artikel aus",
+  "Double click selects group. Single click selects item": "Doppel-Klick wählt die Gruppe aus. Einfacher Klick wählt den Artikel aus",
+  "Open FrankerFaceZ Settings": "FrankerFaceZ-Einstellungen öffnen",
+  "FrankerFaceZ Settings": "FrankerFaceZ-Einstellungen",
+  "API Token": "API-Token",
+  "Face Mask Settings": "Face Mask Einstellungen",
+  "Navigate to Live tab when going live": "Zum Live-Tab navigieren wenn auf Live geschaltet wird",
+  "Save Replay": "Wiederholung speichern"
 }
