@@ -3,9 +3,9 @@
   "Check Banned Media": "Check Banned Media",
   "Price Per Second": "Másodpercenkénti ár",
   "Min. Amount to Share": "Min. összeg a megosztáshoz",
-  "Max Duration": "Max Duration",
+  "Max Duration": "Maximális időtartam",
   "Buffer Time": "Buffer Time",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Spam szűrő",
   "The time between videos the next video has to buffer.": "The time between videos the next video has to buffer.",
   "Manage Media Settings": "Manage Media Settings"
 }
