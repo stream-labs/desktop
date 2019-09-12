@@ -111,8 +111,8 @@
       "StreamEncoder": {
         "name": "エンコーダ",
         "obs_x264": "ソフトウェア（x264）",
-        "obs_qsv11": "ハードウェア（QSV）",
-        "ffmpeg_nvenc": "ハードウェア (NVENC)"
+        "qsv11": "ハードウェア（QSV）",
+        "nvenc": "ハードウェア (NVENC)"
       },
       "ABitrate": {
         "name": "音声ビットレート（kbps）"
