@@ -9,6 +9,7 @@ import { UserService } from 'services/user';
 import { Builder, parseString } from 'xml2js';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { WindowsService } from 'services/windows';
+import { $t } from 'services/i18n';
 
 export type INiconicoProgramSelection = {
   info: LiveProgramInfo
@@ -245,6 +246,7 @@ export class NiconicoService extends Service implements IPlatformService {
       // show dialog and select
       this.windowsService.showWindow({
         componentName: 'NicoliveProgramSelector',
+        title: $t('streaming.nicoliveProgramSelector.title'),
         queryParams: info,
         size: {
           width: 700,

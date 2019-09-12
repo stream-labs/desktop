@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('streaming.optimizationForNiconico.title')"
   :show-controls="false"
   :customControls="true">
   <div slot="content">

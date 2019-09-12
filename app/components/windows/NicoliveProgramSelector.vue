@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('streaming.nicoliveProgramSelector.title')"
   :show-controls="false"
   :custom-controls="true">
   <div slot="content">
