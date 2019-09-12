@@ -139,7 +139,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.targetUsage,
@@ -316,7 +316,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
