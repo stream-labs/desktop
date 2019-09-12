@@ -1,10 +1,10 @@
 {
   "Enable Events": "Activer les événements",
-  "Min. Bits": "Bits minimum",
+  "Min. Bits": "Bits de min",
   "Max Events": "Événements maximum",
   "Text Color": "Couleur du texte",
   "Font": "Police",
-  "Font Size": "Taille de la police",
+  "Font Size": "Taille du texte",
   "Theme": "Thème",
   "Theme Color": "Couleur du thème",
   "Background Color": "Couleur d’arrière-plan",
@@ -21,5 +21,5 @@
   "Show Sub Tiers": "Montrer les sous niveaux",
   "Raids": "Raids",
   "Members": "Membres",
-  "Super Chats": "Super Chats"
+  "Super Chats": "Super chats"
 }
