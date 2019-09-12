@@ -18,7 +18,7 @@
   "Restart Streamlabels Session": "Streamlabels Oturumunu Tekrar Başlat",
   "Run Auto Optimizer": "Otomatik Optimizeri Çalıştır",
   "Confirm stream title and game before going live": "Yayın Başlığını ve Oyunu yayına başlamadan önce onayla",
-  "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "UYARI! Bütün sahneleri, kaynakları ve ayarları kaybedeceksin. Bu işlem geri alınamaz!",
+  "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "DİKKAT! Bütün sahneleri, kaynakları ve ayarları kaybedeceksin. Bu işlem geri alınamaz!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Önbellek dizini başarıyla yüklendi. %{file} isimli dosya panonuza kopyalandı.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels oturumu başarılı bir şekilde tekrar başlatıldı!",
   "This action will restart the application. Continue?": "Bu işlem programı yeniden başlatacak. Devam edilsin mi?",
