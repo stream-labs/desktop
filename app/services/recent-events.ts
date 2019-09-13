@@ -560,14 +560,99 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }
   }
 
-  isAllowed(type: string) {
-    return this.state.filterConfig[type];
+  shouldFilterSubscription(event: IRecentEvent) {
+    if (!this.state.filterConfig.subscription) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_1 && event.sub_plan.toString() === '1000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_2 && event.sub_plan.toString() === '2000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_3 && event.sub_plan.toString() === '3000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.primesub && event.sub_plan.toString() === 'prime') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.gifted_sub && event.gifter) {
+      return false;
+    }
+
+    return true;
+  }
+
+  shouldFilterResub(event: IRecentEvent) {
+    if (!this.state.filterConfig.resub) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_1 && event.sub_plan.toString() === '1000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_2 && event.sub_plan.toString() === '2000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_3 && event.sub_plan.toString() === '3000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'prime') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.gifted_sub && event.gifter) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_3_months && event.months < 3) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_6_months && event.months < 6) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_9_months && event.months < 9) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_12_months && event.months < 12) {
+      return false;
+    }
+
+    if (
+      this.state.filterConfig.filter_subscription_minimum_enabled &&
+      event.months < this.state.filterConfig.filter_subscription_minimum_months
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  isAllowed(event: IRecentEvent) {
+    if (event.type === 'subscription') {
+      if (event.months > 1) {
+        return this.shouldFilterResub(event);
+      }
+      return this.shouldFilterSubscription(event);
+    }
+    return this.state.filterConfig[event.type];
   }
 
   onEventSocket(e: IEventSocketEvent) {
     const messages = e.message
       .filter(msg => !msg.isTest && !msg.repeat)
-      .filter(msg => this.isAllowed(msg.type));
+      .filter(msg => this.isAllowed(msg));
     messages.forEach(msg => {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
