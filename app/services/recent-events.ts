@@ -577,7 +577,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.primesub && event.sub_plan.toString() === 'prime') {
+    if (!this.state.filterConfig.primesub && event.sub_plan.toString() === 'Prime') {
       return false;
     }
 
@@ -605,7 +605,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'prime') {
+    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Prime') {
       return false;
     }
 
@@ -650,8 +650,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onEventSocket(e: IEventSocketEvent) {
+    console.log(e);
     const messages = e.message
-      .filter(msg => !msg.isTest && !msg.repeat)
+      // .filter(msg => !msg.isTest && !msg.repeat)
       .filter(msg => this.isAllowed(msg));
     messages.forEach(msg => {
       msg.type = e.type;
