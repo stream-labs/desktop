@@ -60,12 +60,13 @@ interface IRecentEventsState {
 }
 
 const subscriptionMap = (subPlan: string) => {
+  const plan = subPlan.toString();
   return {
     '1000': $t('Tier 1'),
     '2000': $t('Tier 2'),
     '3000': $t('Tier 3'),
     Prime: $t('Prime'),
-  }[subPlan];
+  }[plan];
 };
 
 const filterName = (key: string) => {
@@ -489,19 +490,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
-        tier: subscriptionMap(event.sub_plan),
+        tier: subscriptionMap(event.sub_plan) || '',
       });
     }
     if (event.months > 1 && event.streak_months && event.streak_months > 1) {
       return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
-        tier: subscriptionMap(event.sub_plan),
+        tier: subscriptionMap(event.sub_plan) || '',
         streak: event.streak_months,
         months: event.months,
       });
     }
     if (event.months > 1) {
       return $t('has resubscribed (%{tier}) for %{months} months', {
-        tier: subscriptionMap(event.sub_plan),
+        tier: subscriptionMap(event.sub_plan) || '',
         months: event.months,
       });
     }
