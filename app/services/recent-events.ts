@@ -524,6 +524,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   getSubString(event: IRecentEvent) {
+    if (event.platform === 'youtube') {
+      return $t('has sponsored since %{date}', { date: event.since });
+    }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
         tier: subscriptionMap(event.sub_plan),
@@ -541,9 +544,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         tier: subscriptionMap(event.sub_plan),
         months: event.months,
       });
-    }
-    if (event.platform === 'youtube') {
-      return $t('has sponsored since %{date}', { date: event.since });
     }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
   }
