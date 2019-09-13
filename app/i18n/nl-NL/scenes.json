@@ -17,6 +17,7 @@
   "Create Output Projector": "Create Output Projector",
   "Studio Mode": "Studio Mode",
   "Are you sure you want to remove %{sceneName}?": "Are you sure you want to remove %{sceneName}?",
+  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
   "Disable Performance Mode": "Disable Performance Mode",
   "Scene Collections": "Scene Collections",
   "The building blocks of your scene. Also contains widgets.": "The building blocks of your scene. Also contains widgets.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "Your media files are currently being synced with the cloud. ",
   "It is recommended that you wait until this finishes before going live.": "It is recommended that you wait until this finishes before going live.",
   "Go Live Anyway": "Go Live Anyway",
-  "Wait": "Wait"
+  "Wait": "Wait",
+  "Add a new Scene.": "Add a new Scene.",
+  "Remove Scene.": "Remove Scene.",
+  "Edit Scene Transitions.": "Edit Scene Transitions.",
+  "Rename Scene": "Rename Scene",
+  "Name Scene": "Name Scene",
+  "Rename Folder": "Rename Folder",
+  "Name Folder": "Name Folder"
 }

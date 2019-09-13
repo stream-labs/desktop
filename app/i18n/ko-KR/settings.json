@@ -19,7 +19,7 @@
   "Run Auto Optimizer": "자동 최적화 실행",
   "Confirm stream title and game before going live": "방송하기 전에 방송 제목과 게임 확인하기",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "경고! 모든 장면, 소스, 그리고 설정을 잃게됩니다. 되돌릴 수 없습니다!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "성공적으로 캐시 저장소를 전송했습니다.  파일 이름 %{file}이(가) 클립보드에 복사되었습니다.  Discord에 붙여넣고 개발자를 태그해주세요.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels 세션이 성공적으로 재시작되었습니다!",
   "This action will restart the application. Continue?": "이 행동은 애플리케이션을 재시작합니다. 계속하시겠습니까?",
   "Show confirmation dialog when starting streams": "방송을 시작할 때 확인 팝업 표시하기",
@@ -69,5 +69,14 @@
   "Default": "기본값",
   "Custom Encoder Settings": "사용자 지정 인코더 설정",
   "Audio Bitrate": "소리 비트레이트",
-  "Video Bitrate": "영상 비트레이트"
+  "Video Bitrate": "영상 비트레이트",
+  "Scene item selection mode": "Scene item selection mode",
+  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
+  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item",
+  "Open FrankerFaceZ Settings": "Open FrankerFaceZ Settings",
+  "FrankerFaceZ Settings": "FrankerFaceZ Settings",
+  "API Token": "API Token",
+  "Face Mask Settings": "Face Mask Settings",
+  "Navigate to Live tab when going live": "Navigate to Live tab when going live",
+  "Save Replay": "Save Replay"
 }

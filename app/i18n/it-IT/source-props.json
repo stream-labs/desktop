@@ -1,7 +1,7 @@
 {
     "Image": "Immagine",
-    "Color Source": "Fonte con Colore",
-    "Browser Source": "Fonte con Browser",
+    "Color Source": "Fonte di colore",
+    "Browser Source": "Fonte del Browser",
     "Media Source": "Fonte Multimediale",
     "Image Slide Show": "Presentazione di immagini",
     "Text (GDI+)": "Testo (GDI+)",
@@ -9,9 +9,9 @@
     "Display Capture": "Cattura Schermo",
     "Window Capture": "Cattura Finestra",
     "Game Capture": "Cattura Gioco",
-    "Video Capture Device": "Dispositivo di Cattura Video",
-    "Audio Input Capture": "Cattura Audio in Entrata",
-    "Audio Output Capture": "Cattura Audio in Uscita",
+    "Video Capture Device": "Dispositivo di acquisizione video",
+    "Audio Input Capture": "Acquisizione di audio in entrata",
+    "Audio Output Capture": "Acquisizione di audio in uscita",
     "Blackmagic Device": "Dispositivo Blackmagic",
     "NDI Source": "Fonte NDI"
 }
