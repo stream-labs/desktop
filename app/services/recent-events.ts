@@ -650,9 +650,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   onEventSocket(e: IEventSocketEvent) {
-    console.log(e);
     const messages = e.message
-      // .filter(msg => !msg.isTest && !msg.repeat)
+      .filter(msg => !msg.isTest && !msg.repeat)
       .filter(msg => this.isAllowed(msg));
     messages.forEach(msg => {
       msg.type = e.type;
