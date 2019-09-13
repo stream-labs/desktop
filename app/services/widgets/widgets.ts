@@ -117,6 +117,10 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     return item;
   }
 
+  getWidgetSources(): WidgetSource[] {
+    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  }
+
   getWidgetSource(sourceId: string): WidgetSource {
     return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
@@ -206,15 +210,22 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     });
   }
 
+  /**
+   * Detects widget type by URL
+   * Used for converting browser_source to streamlabs widgets when importing OBS scene collection
+   * returns -1 if it's no type detected
+   */
   getWidgetTypeByUrl(url: string): WidgetType {
-    return Number(
+    const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
-        const regExp = new RegExp(
-          WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '.+'),
-        );
-        return regExp.test(url);
+        const regExpStr = WidgetDefinitions[WidgetType].url(
+          this.hostsService.streamlabs,
+          '.+',
+        ).replace('?', '\\?');
+        return new RegExp(regExpStr).test(url);
       }),
     );
+    return isNaN(type) ? -1 : type;
   }
 
   private register(sourceId: string) {
