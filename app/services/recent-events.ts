@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
+import { Subscription } from 'rxjs';
 
 export interface IRecentEvent {
   name?: string;
@@ -253,11 +254,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   static initialState: IRecentEventsState = { recentEvents: [], muted: false, filterConfig: {} };
 
   lifecycle: LoginLifecycle;
+  socketConnection: Subscription = null;
 
   async initialize() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
-      destroy: () => Promise.resolve(this.SET_RECENT_EVENTS([])),
+      destroy: () => Promise.resolve(this.onLogout()),
       context: this,
     });
   }
@@ -266,8 +268,22 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const config = await this.fetchConfig();
     this.applyConfig(config);
     this.formEventsArray();
-    this.websocketService.socketEvent.subscribe(this.onSocketEvent.bind(this));
-    return;
+    this.subscribeToSocketConnection();
+  }
+
+  subscribeToSocketConnection() {
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
+    );
+  }
+
+  unsubscribeFromSocketConnection() {
+    this.socketConnection.unsubscribe();
+  }
+
+  onLogout() {
+    this.SET_RECENT_EVENTS([]);
+    this.unsubscribeFromSocketConnection();
   }
 
   fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {

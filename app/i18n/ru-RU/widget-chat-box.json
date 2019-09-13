@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "Visual Settings",
+  "Font Settings": "Настройки шрифта",
+  "Chatter": "Chatter",
+  "Always Show Messages": "Всегда показывать сообщения",
+  "Show Moderator Badges": "Показывать значки модераторов",
+  "Show Subscriber Badges": "Показывать значки подписчиков",
+  "Show Turbo Badges": "Показывать значки Turbo",
+  "Show Twitch Prime Badges": "Показывать значки Twitch Prime",
+  "Show Bits Badges": "Показать значки Bits",
+  "Show Top Coin Holder Badges": "Показать значок держателя наибольшего количества монет",
+  "Enable BetterTTV Emotes": "Включить эмоции BetterTTV",
+  "Enable FrankerFaceZ Emotes": "Включить эмоции FrankerFaceZ",
+  "Text Color": "Цвет текста",
+  "Font Size": "Размер шрифта",
+  "Muted Chatters": "Отключенные пользователи чата",
+  "Hide Commands": "Hide Commands",
+  "Background Color": "Цвет фона"
+}
