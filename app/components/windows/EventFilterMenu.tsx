@@ -47,7 +47,7 @@ export default class EventFilterMenu extends TsxComponent<{}> {
         <div slot="content" class={styles.flexColumn}>
           <div class={styles.flexRow}>
             <div class={styles.halfWidth}>
-              <h2>General</h2>
+              <h2>{$t('General')}</h2>
               {Object.keys(this.mainFilters).map(filter => (
                 <div>
                   <BoolInput
