@@ -501,7 +501,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }
     if (event.months > 1) {
       return $t('has resubscribed (%{tier}) for %{months} months', {
-        tier: subscriptionMap(event.sub_plan)',
+        tier: subscriptionMap(event.sub_plan),
         months: event.months,
       });
     }
