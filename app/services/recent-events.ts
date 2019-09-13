@@ -53,62 +53,6 @@ interface IRecentEventsConfig {
   settings: Dictionary<any>;
 }
 
-interface ICommonRecentEventConfig {
-  donation: boolean;
-  redemption: boolean;
-  merch: boolean;
-}
-
-interface ITwitchRecentEventsConfig {
-  follow: boolean;
-  subscription: boolean;
-  subscription_tier_1: boolean;
-  subscription_tier_2: boolean;
-  subscription_tier_3: boolean;
-  filter_subscription_3_months: boolean;
-  filter_subscription_6_months: boolean;
-  filter_subscription_9_months: boolean;
-  filter_subscription_12_months: boolean;
-  filter_subscription_minimum_enabled: boolean;
-  filter_subscription_minimum_months: number;
-  primesub: boolean;
-  resub: boolean;
-  resub_tier_1: boolean;
-  resub_tier_2: boolean;
-  resub_tier_3: boolean;
-  resub_prime: boolean;
-  gifted_sub: boolean;
-  gifted_sub_tier_1: boolean;
-  gifted_sub_tier_2: boolean;
-  gifted_sub_tier_3: boolean;
-  host: boolean;
-  bits: boolean;
-  raid: boolean;
-}
-
-interface IYouTubeRecentEventsConfig {
-  subscriber: boolean;
-  sponsor: boolean;
-  superchat: boolean;
-}
-
-interface IMixerRecentEventsConfig {
-  follow: boolean;
-  subscription: boolean;
-  resub: boolean;
-  host: boolean;
-  sticker: boolean;
-  effect: boolean;
-}
-
-interface IFacebookRecentEventsConfig {
-  follow: boolean;
-  facebook_support: boolean;
-  facebook_like: boolean;
-  facebook_share: boolean;
-  facebook_stars: boolean;
-}
-
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
