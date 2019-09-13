@@ -722,11 +722,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   showFilterMenu() {
     this.windowsService.showWindow({
       componentName: 'EventFilterMenu',
-      title: $t('Filter Events'),
+      title: $t('Event Filters'),
       queryParams: {},
       size: {
-        width: 850,
-        height: 800,
+        width: 450,
+        height: 600,
       },
     });
   }
