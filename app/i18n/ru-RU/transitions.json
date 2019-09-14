@@ -23,5 +23,5 @@
   "Deleted": "Удалено",
   "This connection is redundant because another connection already connects these scenes.": "Это соединение избыточно потому, что другое соединение уже соединяет эти сцены.",
   "You need at least 2 scenes to edit transitions.": "Требуется хотябы 2 сцены для редактирования переходов.",
-  "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited."
+  "This scene transition is managed by an App and cannot be edited.": "Этот переход сцены управляется приложением и не может быть отредактирован."
 }
