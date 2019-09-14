@@ -3,7 +3,7 @@
   "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.": "Недействительный URL-адрес пути или соединения. Проверьте свои настройки, чтобы подтвердить, что они действительны.",
   "Failed to connect to the streaming server.  Please check your internet connection.": "Не удалось подключиться к потоковому серверу. Пожалуйста, проверьте подключение к интернету.",
   "Disconnected from the streaming server.  Please check your internet connection.": "Произошло отключение от потокового сервера. Пожалуйста, проверьте подключение к интернету.",
-  "Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.": "Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.",
+  "Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.": "Не удалось получить доступ к указанному каналу или ключу трансляции. Пожалуйста, выйдите и войдите, чтобы обновить свои учетные данные. Если проблема не устранена, возможно, проблема связана с подключением к серверу.",
   "There is not sufficient disk space to continue recording.": "Недостаточно места на диске для продолжения записи.",
   "The output format is either unsupported or does not support more than one audio track.  ": "Формат вывода либо не поддерживается, либо не поддерживает более одной звуковой дорожки.  ",
   "Please check your settings and try again.": "Пожалуйста проверьте свои настройки и попробуйте снова.",
@@ -30,7 +30,7 @@
   "YouTube account not enabled for live streaming": "Учетная запись YouTube не настроена для прямых трансляций",
   "Fix": "Исправить",
   "I'm set up": "Я настроен",
-  "End Stream": "End Stream",
+  "End Stream": "Закончить трансляцию",
   "Starting": "Starting",
   "Ending": "Ending",
   "Reconnecting": "Reconnecting",
@@ -76,5 +76,5 @@
   "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch требует, чтобы на вашем аккаунте была включена двухфакторная аутентификация для стрима на Twitch. Пожалуйста, включите двухфакторную аутентификацию и попробуйте снова.",
   "Twitch Authentication Error": "Ошибка аутентификации Twitch",
   "Enable Two Factor Authentication": "Включите двухфакторную аутентификацию",
-  "Dismiss": "Dismiss"
+  "Dismiss": "Отклонить"
 }
