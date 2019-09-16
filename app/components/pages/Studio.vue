@@ -14,8 +14,7 @@
   <div
     v-else
     class="no-preview"
-    :class="{ 'perf-mode': performanceMode }"
-    :style="{ height: performanceMode ? '100px' : `calc(100% - ${eventsHeight + controlsHeight + 18}px` }"
+    :style="`calc(100% - ${eventsHeight + controlsHeight + 18}px`"
   >
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
@@ -26,7 +25,7 @@
     </div>
   </div>
   <resize-bar
-    v-if="!performanceMode && isLoggedIn"
+    v-if="isLoggedIn"
     position="top"
     v-model="eventsHeight"
     @onresizestop="onResizeStopHandler()"
@@ -35,8 +34,8 @@
     :min="minEventsHeight"
     :reverse="true"
   />
-  <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half" :class="{ 'perf-mode': performanceMode }">
-    <recent-events v-if="isLoggedIn" :class="{ 'perf-mode': performanceMode }" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
+  <div :style="{ height: `${eventsHeight + controlsHeight}px` }" class="bottom-half">
+    <recent-events v-if="isLoggedIn" :style="{ height: `${eventsHeight}px` }" @popout="eventsHeight = minEventsHeight" />
     <resize-bar
       position="top"
       v-model="controlsHeight"
@@ -134,16 +133,8 @@
   }
 }
 
-.no-preview.perf-mode {
-  flex-grow: 0;
-}
-
 .bottom-half {
   display: flex;
   flex-direction: column;
-}
-
-.bottom-half.perf-mode {
-  flex-grow: 1;
 }
 </style>
