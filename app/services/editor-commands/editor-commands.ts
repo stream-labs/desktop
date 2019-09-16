@@ -8,7 +8,6 @@ import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
 import { SceneCollectionsService } from 'services/scene-collections';
 import electron from 'electron';
-import { action } from 'services/core';
 
 const COMMANDS = { ...commands };
 

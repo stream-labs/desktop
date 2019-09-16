@@ -209,7 +209,7 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
-    // mainWindow.openDevTools({ mode: 'detach' });
+    mainWindow.openDevTools({ mode: 'detach' });
 
     // setTimeout(() => {
       mainWindow.loadURL(`${global.indexUrl}?windowId=main`);

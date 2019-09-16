@@ -7,6 +7,7 @@ import { SliderInput } from 'components/shared/inputs/inputs';
 import MixerVolmeter from './MixerVolmeter.vue';
 import { Inject } from '../services/core/injector';
 import { EditorCommandsService } from 'services/editor-commands';
+import { SourcesService } from 'services/sources';
 
 @Component({
   components: { SliderInput, MixerVolmeter },
@@ -16,6 +17,7 @@ export default class MixerItem extends Vue {
 
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private sourcesService: SourcesService;
 
   get performanceMode() {
     return this.customizationService.state.performanceMode;
@@ -29,6 +31,10 @@ export default class MixerItem extends Vue {
       displayValue: 'false',
       simpleTheme: true,
     };
+  }
+
+  get sourceName() {
+    return this.sourcesService.state.sources[this.audioSource.sourceId].name;
   }
 
   setMuted(muted: boolean) {

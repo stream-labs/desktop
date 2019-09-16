@@ -2,7 +2,7 @@ import Vue from 'vue';
 import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem } from './index';
@@ -13,6 +13,7 @@ import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { action } from 'services/core';
+import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -122,7 +123,37 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
-export class ScenesService extends StatefulService<IScenesState> {
+type VueApi<T extends { views: any }> = Pick<T, 'views'>;
+
+class ScenesViews extends ViewHandler<IScenesState> {
+  get sourcesService() {
+    return this.getServiceViews(SourcesService);
+  }
+
+  /**
+   * Returns a scene item with included source info
+   */
+  getSceneSource(sceneId: string, sceneItemId: string): ISceneItem & ISource {
+    const node = this.getSceneNode(sceneId, sceneItemId);
+
+    if (node.sceneNodeType === 'folder') return null;
+
+    return {
+      ...node,
+      ...this.sourcesService.getSource(node.sourceId),
+    };
+  }
+
+  getSceneNode(sceneId: string, nodeId: string) {
+    return this.getScene(sceneId).nodes.find(n => n.id === nodeId);
+  }
+
+  getScene(sceneId: string) {
+    return this.state.scenes[sceneId];
+  }
+}
+
+export class ScenesService extends StatefulService<IScenesState, ScenesViews> {
   static initialState: IScenesState = {
     activeSceneId: '',
     displayOrder: [],
@@ -139,6 +170,8 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+
+  viewHandler = ScenesViews;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {

@@ -6,6 +6,7 @@ import MixerItem from './MixerItem.vue';
 import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ScenesService } from 'services/scenes';
 
 @Component({
   components: { MixerItem },
@@ -13,6 +14,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 export default class Mixer extends Vue {
   @Inject() audioService: AudioService;
   @Inject() editorCommandsService: EditorCommandsService;
+  @Inject() scenesService: ScenesService;
 
   advancedSettingsTooltip = $t('Open advanced audio settings');
   mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
@@ -31,6 +33,10 @@ export default class Mixer extends Vue {
   }
 
   get audioSources() {
+    // TODO: Reactivity hack
+    this.scenesService.activeSceneId;
+    this.scenesService.activeScene.nodes;
+
     return this.audioService.getSourcesForCurrentScene().filter(source => {
       return !source.mixerHidden;
     });

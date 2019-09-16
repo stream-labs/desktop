@@ -208,7 +208,12 @@ export default class SourceSelector extends Vue {
       return;
     }
     if (!this.canShowProperties()) return;
-    this.sourcesService.showSourceProperties(this.activeItems[0].sourceId);
+
+    const node = this.scene.state.nodes.find(n => n.id === this.selectionService.state.lastSelectedId);
+
+    if (node.sceneNodeType === 'item') {
+      this.sourcesService.showSourceProperties(node.sourceId);
+    }
   }
 
   canShowProperties(): boolean {

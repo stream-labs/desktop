@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
+import ExecuteInCurrentWindow from 'util/execute-in-current-window';
 
 export interface IRecentEvent {
   name?: string;
@@ -51,15 +52,6 @@ interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
 }
-
-const subscriptionMap = (subPlan: string) => {
-  return {
-    '1000': $t('Tier 1'),
-    '2000': $t('Tier 2'),
-    '3000': $t('Tier 3'),
-    Prime: $t('Prime'),
-  }[subPlan];
-};
 
 /**
  * This function duplicates per-event logic from streamlabs.com for
@@ -317,31 +309,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(request).then(handleResponse);
   }
 
-  getSubString(event: IRecentEvent) {
-    if (event.gifter) {
-      return $t('has gifted a sub (%{tier}) to', {
-        tier: subscriptionMap(event.sub_plan),
-      });
-    }
-    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
-      return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
-        tier: subscriptionMap(event.sub_plan),
-        streak: event.streak_months,
-        months: event.months,
-      });
-    }
-    if (event.months > 1) {
-      return $t('has resubscribed (%{tier}) for %{months} months', {
-        tier: subscriptionMap(event.sub_plan),
-        months: event.months,
-      });
-    }
-    if (event.platform === 'youtube') {
-      return $t('has sponsored since %{date}', { date: event.since });
-    }
-    return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
-  }
-
   onSocketEvent(e: TSocketEvent) {
     if (e.type === 'eventsPanelSettingsUpdate') {
       if (e.message.muted != null) {
@@ -364,38 +331,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       msg.iso8601Created = new Date().toISOString();
     });
     this.ADD_RECENT_EVENT(messages);
-  }
-
-  getEventString(event: IRecentEvent) {
-    return {
-      donation:
-        $t('has donated') +
-        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
-      merch: $t('has purchased %{product} from the store', { product: event.product }),
-      follow: $t('has followed'),
-      subscription: this.getSubString(event),
-      // Twitch
-      bits: $t('has used'),
-      host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
-      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
-      // Mixer
-      sticker: $t('has used %{skill} for', { skill: event.skill }),
-      effect: $t('has used %{skill} for', { skill: event.skill }),
-      // Facebook
-      like: $t('has liked'),
-      stars: $t('has used'),
-      support: $t('has supported for %{mounths} months', { months: event.months }),
-      share: $t('has shared'),
-      // Youtube
-      superchat: $t('has superchatted'),
-      // Integrations
-      pledge: $t('has pledged on Patreon'),
-      eldonation: $t('has donated to ExtraLife'),
-      tiltifydonation: $t('has donated to Tiltify'),
-      donordrivedonation: $t('has donated to Donor Drive'),
-      justgivingdonation: $t('has donated to Just Giving'),
-      treat: $t('has given a treat %{title}', { title: event.title }),
-    }[event.type];
   }
 
   async toggleMuteEvents() {

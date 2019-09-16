@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
 import Utils from 'services/utils';
+import { ServicesManager } from 'services-manager';
 
 export function mutation(options = { unsafe: false }) {
   return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -104,7 +105,10 @@ export function inheritMutations(target: any) {
 /**
  * helps to integrate services with Vuex store
  */
-export abstract class StatefulService<TState extends object> extends Service {
+export abstract class StatefulService<
+  TState extends object,
+  TViewHandler extends ViewHandler<TState> = null
+> extends Service {
   private static store: Store<any>;
 
   static setupVuexStore(store: Store<any>) {
@@ -126,6 +130,14 @@ export abstract class StatefulService<TState extends object> extends Service {
 
   set state(newState: TState) {
     Vue.set(this.store.state, this.serviceName, newState);
+  }
+
+  viewHandler: new (state: TState) => TViewHandler;
+
+  private _views: TViewHandler;
+  get views(): TViewHandler {
+    if (!this._views) this._views = new this.viewHandler(this.state);
+    return this._views;
   }
 }
 
@@ -156,4 +168,21 @@ export function InheritMutations(): ClassDecorator {
   return function(target: any) {
     inheritMutations(target);
   };
+}
+
+/**
+ * A class that exposes the state views of a service. Views are
+ * different ways of looking at the internal state of a service.
+ * Views may combine information from other services by accessing
+ * the views of other services. However, they may not directly access
+ * the state of other services.
+ */
+export abstract class ViewHandler<TState extends object> {
+  constructor(protected readonly state: TState) {}
+
+  protected getServiceViews<TService extends new (...args: any[]) => StatefulService<any, any>>(
+    service: TService,
+  ): InstanceType<TService>['views'] {
+    return ServicesManager.instance.getService(service).instance.views;
+  }
 }
