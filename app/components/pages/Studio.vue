@@ -12,7 +12,7 @@
     </div>
   </div>
   <div
-    v-show="!displayEnabled"
+    v-else
     class="no-preview"
     :class="{ 'perf-mode': performanceMode }"
     :style="{ height: performanceMode ? '100px' : `calc(100% - ${eventsHeight + controlsHeight + 18}px` }"
