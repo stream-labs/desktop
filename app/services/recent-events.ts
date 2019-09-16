@@ -612,14 +612,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   onEventSocket(e: IEventSocketEvent) {
     const messages = e.message
       .filter(msg => !msg.isTest && !msg.repeat)
+      .map(msg => {
+        msg.type = e.type;
+        msg.hash = getHashForRecentEvent(msg);
+        msg.uuid = uuid();
+        msg.read = false;
+        msg.iso8601Created = new Date().toISOString();
+        return msg;
+      })
       .filter(msg => this.isAllowed(msg));
-    messages.forEach(msg => {
-      msg.type = e.type;
-      msg.hash = getHashForRecentEvent(msg);
-      msg.uuid = uuid();
-      msg.read = false;
-      msg.iso8601Created = new Date().toISOString();
-    });
+
     this.ADD_RECENT_EVENT(messages);
   }
 
