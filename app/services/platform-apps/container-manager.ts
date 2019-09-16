@@ -333,12 +333,15 @@ export class PlatformContainerManager {
           }
 
           // Let through all chrome dev tools requests
-          if (parsed.protocol === 'chrome-devtools:') {
+          if (parsed.protocol === 'devtools:') {
             cb({});
             return;
           }
 
           // Cancel all other script requests.
+          console.warn(
+            `Canceling request to ${details.url} by app ${app.id}: ${app.manifest.name}`,
+          );
           cb({ cancel: true });
           return;
         }

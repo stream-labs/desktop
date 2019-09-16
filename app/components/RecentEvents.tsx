@@ -72,6 +72,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.openRecentEventsWindow(true);
   }
 
+  popoutFilterMenu() {
+    return this.recentEventsService.showFilterMenu();
+  }
+
   muteEvents() {
     return this.recentEventsService.toggleMuteEvents();
   }
@@ -173,6 +177,7 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <Toolbar
           popoutMediaShare={() => this.popoutMediaShare()}
+          popoutFilterMenu={() => this.popoutFilterMenu()}
           popoutRecentEvents={() => this.popoutRecentEvents()}
           muteEvents={() => this.muteEvents()}
           skipAlert={() => this.skipAlert()}
@@ -203,6 +208,7 @@ export default class RecentEvents extends TsxComponent<{}> {
 
 interface IToolbarProps {
   popoutMediaShare: Function;
+  popoutFilterMenu: Function;
   popoutRecentEvents: Function;
   muteEvents: Function;
   skipAlert: Function;
@@ -218,6 +224,7 @@ interface IToolbarProps {
 @Component({})
 class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() popoutMediaShare: () => void;
+  @Prop() popoutFilterMenu: () => void;
   @Prop() popoutRecentEvents: () => void;
   @Prop() muteEvents: () => void;
   @Prop() skipAlert: () => void;
@@ -239,6 +246,13 @@ class Toolbar extends TsxComponent<IToolbarProps> {
           </span>
         </span>
         {this.native && this.mediaShareEnabled && (
+          <i
+            class="icon-filter action-icon"
+            onClick={this.popoutFilterMenu}
+            v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
+          />
+        )}
+        {this.native && (
           <i
             class="icon-music action-icon"
             onClick={this.popoutMediaShare}

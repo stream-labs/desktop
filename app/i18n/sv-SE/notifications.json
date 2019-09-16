@@ -1,0 +1,20 @@
+{
+  "You don't have any notifications": "Du har inte några aviseringar",
+  "Enable notifications": "Aktivera aviseringar",
+  "Enable sound": "Aktivera ljud",
+  "Skipped frames detected:": "Överhoppade bildrutor:",
+  "Detect skipped frames": "Avisera överhoppade bildrutor",
+  "Skipped frames threshold": "Tröskelvärde för överhoppade bildrutor",
+  "Detect lagged frames": "Avisera eftersläpande bildrutor",
+  "Lagged frames threshold": "Tröskelvärde för eftersläpande bildrutor",
+  "Detect dropped frames": "Avisera tappade bildrutor",
+  "Dropped frames threshold": "Tröskelvärde för tappade bildrutor",
+  "Show Notifications": "Visa aviseringar",
+  "Restore Defaults": "Återställ standardinställningar",
+  "Troubleshooter Notifications": "Aviseringar från felsökaren",
+  "Click to open your Notifications window": "Klicka för att visa aviseringar",
+  "Click to read your unread Notifications": "Klicka för att läsa dina olästa aviseringar",
+  "New Notifications": "Nya aviseringar",
+  "Log": "Logga in",
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS har uppdaterats! Klicka här för att se vad som är nytt."
+}

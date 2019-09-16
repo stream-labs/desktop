@@ -1,0 +1,19 @@
+{
+  "Label Type": "Etikettyp",
+  "Label Template": "Etikettmall",
+  "Item Template": "Objektmall",
+  "Item Separator": "Objektavgränsare",
+  "Item Limit": "Objektgräns",
+  "Duration (seconds)": "Varaktighet (sekunder)",
+  "Show Clock": "Visa klockan",
+  "Always, show 0:00 when inactive": "Visa alltid, 0:00 vid inaktivitet",
+  "Hide when inactive": "Döljj vid inaktivitet",
+  "Show Count": "Visa antal",
+  "Always, show 0 when inactive": "Visa alltid, 0 vid inaktivitet",
+  "Show Latest": "Visa senaste",
+  "Always, show last person when inactive": "Visa alltid, sista personen vid inaktivitet",
+  "Include Resubs": "Inkludera återkommande prenumeranter",
+  "Preview": "Förhandsgranska",
+  "Note:": "Obs:",
+  "Actual label text may take up to 60 seconds to update": "Faktiska etikettexten kan ta upp till 60 sekunder att uppdatera"
+}

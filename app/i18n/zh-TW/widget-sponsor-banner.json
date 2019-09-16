@@ -1,0 +1,23 @@
+{
+  "Ad Layout": "廣告排版",
+  "Placement": "位置",
+  "Image Layout": "圖片排版",
+  "Image Duration": "圖片持續時間",
+  "Seconds": "秒",
+  "Add Image": "新增圖片",
+  "Widget Hide Duration": "插件隱藏時間長度",
+  "Widget Show Duration": "插件顯示時間長度",
+  "Banner Width": "橫幅寬度",
+  "Banner Height": "橫幅高度",
+  "Image Animation": "動態圖片",
+  "Background Color": "背景顏色",
+  "Transparent": "透明度",
+  "Single": "單個",
+  "Double": "雙個",
+  "Set to zero to show the widget permanently.": "設定 0 則永遠顯示該插件。",
+  "The amount of time the widget will appear.": "插件顯示的時間長度。",
+  "These are the animations that are used to show your banner.": "這些是用來顯示橫幅的特色動畫。",
+  "Visual Settings": "視覺設定",
+  "Image Set ": "圖片設置 ",
+  "No Image": "沒有圖片"
+}
