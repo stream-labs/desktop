@@ -2,7 +2,7 @@ import Vue from 'vue';
 import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
-import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem } from './index';
@@ -123,37 +123,7 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
-type VueApi<T extends { views: any }> = Pick<T, 'views'>;
-
-class ScenesViews extends ViewHandler<IScenesState> {
-  get sourcesService() {
-    return this.getServiceViews(SourcesService);
-  }
-
-  /**
-   * Returns a scene item with included source info
-   */
-  getSceneSource(sceneId: string, sceneItemId: string): ISceneItem & ISource {
-    const node = this.getSceneNode(sceneId, sceneItemId);
-
-    if (node.sceneNodeType === 'folder') return null;
-
-    return {
-      ...node,
-      ...this.sourcesService.getSource(node.sourceId),
-    };
-  }
-
-  getSceneNode(sceneId: string, nodeId: string) {
-    return this.getScene(sceneId).nodes.find(n => n.id === nodeId);
-  }
-
-  getScene(sceneId: string) {
-    return this.state.scenes[sceneId];
-  }
-}
-
-export class ScenesService extends StatefulService<IScenesState, ScenesViews> {
+export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
     displayOrder: [],
@@ -170,8 +140,6 @@ export class ScenesService extends StatefulService<IScenesState, ScenesViews> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
-
-  viewHandler = ScenesViews;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {

@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
@@ -54,15 +54,7 @@ interface IObsSourceCallbackInfo {
   flags: number;
 }
 
-
-class SourcesViews extends ViewHandler<ISourcesState> {
-  getSource(sourceId: string) {
-    return this.state.sources[sourceId];
-  }
-}
-
-
-export class SourcesService extends StatefulService<ISourcesState, SourcesViews> implements ISourcesServiceApi {
+export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},
     temporarySources: {}, // don't save temporarySources in the config file
@@ -71,8 +63,6 @@ export class SourcesService extends StatefulService<ISourcesState, SourcesViews>
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
-
-  viewHandler = SourcesViews;
 
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
