@@ -484,7 +484,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   getSubString(event: IRecentEvent) {
-    if (event.platform === 'youtube') {
+    if (event.platform === 'youtube_account') {
       return $t('has sponsored since %{date}', { date: event.since });
     }
     if (event.gifter) {
@@ -629,7 +629,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         $t('has donated') +
         (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
-      follow: $t('has followed'),
+      follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
       subscription: this.getSubString(event),
       // Twitch
       bits: $t('has used'),
