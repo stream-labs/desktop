@@ -56,6 +56,7 @@ interface IRecentEventsConfig {
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
+  mediaShareEnabled: boolean;
   filterConfig: Dictionary<any>;
 }
 
@@ -195,7 +196,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
 
-  static initialState: IRecentEventsState = { recentEvents: [], muted: false, filterConfig: {} };
+  static initialState: IRecentEventsState = {
+    recentEvents: [],
+    muted: false,
+    mediaShareEnabled: false,
+    filterConfig: {},
+  };
 
   lifecycle: LoginLifecycle;
   socketConnection: Subscription = null;
@@ -212,6 +218,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const config = await this.fetchConfig();
     this.applyConfig(config);
     this.formEventsArray();
+    this.fetchMediaShareState();
     this.subscribeToSocketConnection();
   }
 
@@ -250,6 +257,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(new Request(url, { headers }))
       .then(handleResponse)
       .catch(() => null);
+  }
+
+  fetchMediaShareState() {
+    const url = `https://${
+      this.hostsService.streamlabs
+    }/api/v5/slobs/widget/config?widget=media-sharing`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return fetch(new Request(url, { headers }))
+      .then(handleResponse)
+      .then(resp => this.SET_MEDIA_SHARE(resp.settings.advanced_settings.enabled));
   }
 
   private async formEventsArray() {
@@ -515,6 +532,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'mediaSharingSettingsUpdate') {
+      if (e.message.advanced_settings.enabled != null) {
+        this.SET_MEDIA_SHARE(e.message.advanced_settings.enabled);
+      }
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
@@ -715,6 +738,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_MUTED(muted: boolean) {
     this.state.muted = muted;
+  }
+
+  @mutation()
+  private SET_MEDIA_SHARE(enabled: boolean) {
+    this.state.mediaShareEnabled = enabled;
   }
 
   @mutation()
