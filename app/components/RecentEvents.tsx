@@ -245,14 +245,14 @@ class Toolbar extends TsxComponent<IToolbarProps> {
             {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
           </span>
         </span>
-        {this.native && this.mediaShareEnabled && (
+        {this.native && (
           <i
             class="icon-filter action-icon"
             onClick={this.popoutFilterMenu}
             v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
           />
         )}
-        {this.native && (
+        {this.native && this.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
             onClick={this.popoutMediaShare}
