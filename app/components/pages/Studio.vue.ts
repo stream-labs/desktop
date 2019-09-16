@@ -73,10 +73,10 @@ export default class Studio extends Vue {
    */
   @Watch('performanceMode')
   reconcileHeightsWithinContraints(isControlsResize = false) {
-    // This is the maximum height we can use
-    this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
+    const containerHeight = this.$root.$el.getBoundingClientRect().height;
 
-    if (this.performanceMode) this.maxHeight = this.$root.$el.getBoundingClientRect().height - 200;
+    // This is the maximum height we can use
+    this.maxHeight = containerHeight - (this.performanceMode ? 200 : 400);
 
     // Roughly 3 lines of events
     const reasonableMinimumEventsHeight = 156;
