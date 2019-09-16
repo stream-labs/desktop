@@ -21,7 +21,7 @@
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
     </div>
     <div ref="placeholder" class="placeholder" v-else>
-      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" />
+      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" @dragstart.prevent />
     </div>
   </div>
   <resize-bar
@@ -95,9 +95,10 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   img {
-    position: relative;
+    position: absolute;
     top: 5px;
     height: calc(100% - 10px);
     width: auto;
