@@ -532,6 +532,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'mediaSharingSettingsUpdate') {
+      if (e.message.advanced_settings.enabled != null) {
+        this.SET_MEDIA_SHARE(e.message.advanced_settings.enabled);
+      }
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
