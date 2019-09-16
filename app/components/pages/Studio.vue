@@ -12,7 +12,7 @@
     </div>
   </div>
   <div
-    v-else
+    v-show="!displayEnabled"
     class="no-preview"
     :class="{ 'perf-mode': performanceMode }"
     :style="{ height: performanceMode ? '100px' : `calc(100% - ${eventsHeight + controlsHeight + 18}px` }"
@@ -22,7 +22,7 @@
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
     </div>
     <div ref="placeholder" class="placeholder" v-else>
-      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" />
+      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" @dragstart.prevent="() => {}" />
     </div>
   </div>
   <resize-bar
