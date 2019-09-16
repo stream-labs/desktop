@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';
 import StudioEditor from 'components/StudioEditor.vue';
 import StudioControls from 'components/StudioControls.vue';
@@ -71,9 +71,12 @@ export default class Studio extends Vue {
    * max height, then the events view will be reduced in size until a reasonable
    * minimum, at which point the controls will start being reduced in size.
    */
+  @Watch('performanceMode')
   reconcileHeightsWithinContraints(isControlsResize = false) {
+    const containerHeight = this.$root.$el.getBoundingClientRect().height;
+
     // This is the maximum height we can use
-    this.maxHeight = this.$root.$el.getBoundingClientRect().height - 400;
+    this.maxHeight = containerHeight - (this.performanceMode ? 200 : 400);
 
     // Roughly 3 lines of events
     const reasonableMinimumEventsHeight = 156;
