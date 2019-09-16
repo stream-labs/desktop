@@ -737,6 +737,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.state.mediaShareEnabled = enabled;
   }
 
+  @mutation()
   private SET_FILTER_CONFIG(settings: any) {
     this.state.filterConfig = settings;
   }
