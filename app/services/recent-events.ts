@@ -599,20 +599,20 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return true;
   }
 
-  isAllowed(event: IRecentEvent) {
-    if (event.type === 'subscription') {
+  isAllowed(event: IRecentEvent, type: string) {
+    if (type === 'subscription') {
       if (event.months > 1) {
         return this.shouldFilterResub(event);
       }
       return this.shouldFilterSubscription(event);
     }
-    return this.state.filterConfig[event.type];
+    return this.state.filterConfig[type];
   }
 
   onEventSocket(e: IEventSocketEvent) {
     const messages = e.message
       .filter(msg => !msg.isTest && !msg.repeat)
-      .filter(msg => this.isAllowed(msg));
+      .filter(msg => this.isAllowed(msg, e.type));
     messages.forEach(msg => {
       msg.type = e.type;
       msg.hash = getHashForRecentEvent(msg);
