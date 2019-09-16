@@ -192,6 +192,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     const dictionary: Dictionary<string> = {};
     for (const fileName of dictionaryFiles) {
+      console.log('READING', `${i18nPath}/${locale}/${fileName}`);
       Object.assign(
         dictionary,
         JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)),

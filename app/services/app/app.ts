@@ -33,6 +33,7 @@ import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
+import { I18nService } from 'services/i18n';
 
 interface IAppState {
   loading: boolean;
@@ -82,6 +83,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
+  @Inject() private i18nService: I18nService;
+
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   readonly pid = require('process').pid;
@@ -94,6 +97,8 @@ export class AppService extends StatefulService<IAppState> {
         this.SET_ERROR_ALERT(true);
       });
     }
+
+    await this.i18nService.load();
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -147,9 +152,7 @@ export class AppService extends StatefulService<IAppState> {
     await this.gameOverlayService.initialize();
     await this.recentEventsService.initialize();
 
-    setTimeout(() => {
-      ipcRenderer.send('AppInitFinished');
-    }, 1000);
+    ipcRenderer.send('AppInitFinished');
   }
 
   shutdownStarted = new Subject();

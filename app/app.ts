@@ -210,8 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // This won't be fully initialized until services are ready
   const i18n = new VueI18n({
-    locale: 'en',
-    fallbackLocale: 'en',
+    locale: 'en-US',
+    fallbackLocale: 'en-US',
     messages: {},
   });
 
@@ -230,13 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         return h(CustomLoader);
       }
-      if (windowId === 'main') {
-        // if (store.state.bulkLoadFinished) {
-        return h(Main);
-        // }
-
-        return h(CustomLoader);
-      }
+      if (windowId === 'main') return h(Main);
       return h(OneOffWindow);
     },
   });
@@ -245,40 +239,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     electron.remote.getCurrentWindow().show();
   }
 
-  // This means services are ready in renderer windows
-  // store.watch(
-  //   state => state.bulkLoadFinished,
-  //   async () => {
-  //     const i18nService: I18nService = I18nService.instance;
-  //     await i18nService.load(); // load translations from a disk
+  // Perform some final initialization now that services are ready
+  ipcRenderer.on('initFinished', () => {
+    const i18nService: I18nService = I18nService.instance;
 
-  //     // TODO: Something isn't working here
-  //     const dictionaries = i18nService.getLoadedDictionaries();
+    // TODO: Something isn't working here
+    const dictionaries = i18nService.getLoadedDictionaries();
 
-  //     Object.keys(dictionaries).forEach(locale => {
-  //       console.log(locale, dictionaries[locale]);
-  //       i18n.setLocaleMessage(locale, dictionaries[locale]);
-  //     });
+    Object.keys(dictionaries).forEach(locale => {
+      console.log(locale, dictionaries[locale]);
+      i18n.setLocaleMessage(locale, dictionaries[locale]);
+    });
 
-  //     i18n.locale = i18nService.state.locale;
-  //     i18n.fallbackLocale = i18nService.getFallbackLocale();
-  //     I18nService.setVuei18nInstance(i18n);
+    i18n.locale = i18nService.state.locale;
+    i18n.fallbackLocale = i18nService.getFallbackLocale();
+    I18nService.setVuei18nInstance(i18n);
 
-  //     if (usingSentry) {
-  //       const userService = getResource<UserService>('UserService');
-  //       const ctx = userService.getSentryContext();
-  //       if (ctx) setSentryContext(ctx);
-  //       userService.sentryContext.subscribe(setSentryContext);
-  //     }
-
-  //     const windowsService: WindowsService = WindowsService.instance;
-  //     if (Utils.isChildWindow()) {
-  //       ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
-  //     }
-
-  //     vm.$forceUpdate();
-  //   },
-  // );
+    if (usingSentry) {
+      const userService = getResource<UserService>('UserService');
+      const ctx = userService.getSentryContext();
+      if (ctx) setSentryContext(ctx);
+      userService.sentryContext.subscribe(setSentryContext);
+    }
+  });
 });
 
 if (Utils.isDevMode()) {

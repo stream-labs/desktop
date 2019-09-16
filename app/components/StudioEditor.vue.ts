@@ -1,19 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import clamp from 'lodash/clamp';
-import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'services/core/injector';
-import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
-import { VideoService } from 'services/video';
-import { EditMenu } from 'util/menus/EditMenu';
-import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
-import { WindowsService } from 'services/windows';
-import { SelectionService, Selection } from 'services/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
-import { CustomizationService } from 'services/customization';
-import { v2 } from '../util/vec2';
-import { EditorCommandsService } from 'services/editor-commands';
 import { EditorService, IMouseEvent } from 'services/editor';
 import { throttle } from 'lodash-decorators';
 

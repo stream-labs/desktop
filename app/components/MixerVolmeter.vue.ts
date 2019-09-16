@@ -139,6 +139,9 @@ export default class MixerVolmeter extends Vue {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
       this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+
+      if (!this.$refs.canvas) return;
+
       this.$refs.canvas.height = this.canvasHeight;
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
       this.$refs.spacer.style.height = `${this.canvasHeight}px`;
