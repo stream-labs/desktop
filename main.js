@@ -130,7 +130,7 @@ if (!gotTheLock) {
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
     let crashHandlerLogPath = "";
-    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW ) {
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
