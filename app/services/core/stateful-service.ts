@@ -105,10 +105,7 @@ export function inheritMutations(target: any) {
 /**
  * helps to integrate services with Vuex store
  */
-export abstract class StatefulService<
-  TState extends object,
-  // TViewHandler extends ViewHandler<TState> = null
-> extends Service {
+export abstract class StatefulService<TState extends object> extends Service {
   private static store: Store<any>;
 
   static setupVuexStore(store: Store<any>) {
@@ -132,14 +129,7 @@ export abstract class StatefulService<
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-  // viewHandler: new (state: TState) => TViewHandler;
-
-  // private _views: TViewHandler;
-  // get views(): TViewHandler {
-  //   if (!this.viewHandler) return null;
-  //   if (!this._views) this._views = new this.viewHandler(this.state);
-  //   return this._views;
-  // }
+  views: ViewHandler<TState>;
 }
 
 /**
@@ -178,12 +168,12 @@ export function InheritMutations(): ClassDecorator {
  * the views of other services. However, they may not directly access
  * the state of other services.
  */
-// export abstract class ViewHandler<TState extends object> {
-//   constructor(protected readonly state: TState) {}
+export abstract class ViewHandler<TState extends object> {
+  constructor(protected readonly state: TState) {}
 
-//   protected getServiceViews<TService extends new (...args: any[]) => StatefulService<any, any>>(
-//     service: TService,
-//   ): InstanceType<TService>['views'] {
-//     return ServicesManager.instance.getService(service).instance.views;
-//   }
-// }
+  protected getServiceViews<TService extends new (...args: any[]) => StatefulService<any>>(
+    service: TService,
+  ): InstanceType<TService>['views'] {
+    return ServicesManager.instance.getService(service).instance.views;
+  }
+}

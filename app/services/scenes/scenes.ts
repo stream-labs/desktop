@@ -12,7 +12,7 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { action } from 'services/core';
+import { action, ViewHandler, ActionHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
@@ -123,12 +123,34 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
+class ScenesViews extends ViewHandler<IScenesState> {
+  getFoo() {
+    const bar = this.getServiceViews(SourcesService);
+
+    return this.state.displayOrder;
+  }
+}
+
+class ScenesActions extends ActionHandler<ScenesService> {
+  makeActive(sceneId: string) {
+    return true;
+  }
+}
+
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
     displayOrder: [],
     scenes: {},
   };
+
+  get views() {
+    return new ScenesViews(this.state);
+  }
+
+  get actions() {
+    return new ScenesActions(this);
+  }
 
   sceneAdded = new Subject<IScene>();
   sceneRemoved = new Subject<IScene>();
