@@ -342,7 +342,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.LOGOUT();
     this.userLogout.next();
-    this.platformAppsService.unloadAllApps();
   }
 
   /**

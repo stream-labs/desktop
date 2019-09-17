@@ -171,6 +171,11 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
 
+    this.userService.userLogout.subscribe(() => {
+      this.unloadAllApps();
+      localStorage.removeItem(this.disabledLocalStorageKey);
+    });
+
     if (!this.userService.isLoggedIn()) return;
 
     this.SET_DEV_MODE(await this.getIsDevMode());
