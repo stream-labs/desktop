@@ -4,7 +4,7 @@
   width: 100%;
   min-height: 0;
   max-height: 0;
-  background-color: var(--teal);
+  background-color: var(--background);
   color: var(--white);
   display: flex;
   position: relative;
@@ -14,86 +14,85 @@
 }
 
 .banner.show {
-  min-height: 92px;
+  height: 92px;
   max-height: 140px;
   transition: none;
-  .padding(2);
 }
 
-.bg-image {
+.left-block,
+.right-block {
+  background: var(--teal);
+  width: 500px;
+  height: 500px;
   position: absolute;
-  opacity: 0.1;
-  height: 400%;
-  top: -100%;
-  left: -100px;
-  filter: blur(6px);
+  transform: rotate(50deg);
 }
 
-.image-container {
-  position: relative;
-  margin-left: 50px;
-  width: 80px;
-
-  img {
-    top: 50%;
-    transform: translate(0, -50%);
-  }
+.left-block {
+  top: -300px;
+  left: -200px;
 }
 
-.shadow-image__left,
-.shadow-image__right {
-  opacity: 0.8;
-  width: 80%;
-  position: absolute;
-  top: 10%;
-}
-
-.shadow-image__right {
-  right: -30%;
-}
-
-.shadow-image__left {
-  left: -30%;
+.right-block {
+  top: -100px;
+  right: -200px;
 }
 
 .main-image {
   position: relative;
-  width: auto;
-  z-index: 1;
+  top: 0;
+  object-fit: contain;
+  margin-left: 10%;
+  max-width: 140px;
 }
 
 .title-container {
-  z-index: 1;
-  margin-left: 50px;
+  position: relative;
+  margin-left: 5%;
+  padding-top: 20px;
 }
 
 .title {
-  display: inline-block;
+  display: block;
+  text-align: center;
   font-size: 20px;
+  width: 100%;
 }
 
 .subheading {
   display: block;
   max-width: 900px;
+  text-align: center;
   color: var(--white);
+  width: 100%;
 }
 
 .cta-container {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  z-index: 1;
 }
 
-.learn-more {
+:global(.button).learn-more {
   background-color: var(--white);
   color: var(--black);
   font-size: 14px;
   font-weight: 500;
-  display: inline-block;
+  height: 40px;
+  width: 180px;
   padding: 0 12px;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .dismiss-button {
   display: block;
-  text-decoration: underline;
-  margin-top: 8px;
   width: 100%;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
