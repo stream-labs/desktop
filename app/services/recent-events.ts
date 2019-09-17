@@ -49,18 +49,58 @@ export interface IRecentEvent {
   uuid: string;
 }
 
-type TFilterConfig = Dictionary<boolean | number>;
-
 interface IRecentEventsConfig {
   eventsPanelMuted: boolean;
-  settings: TFilterConfig;
+  settings: IRecentEventFilterConfig;
+}
+
+interface IRecentEventFilterConfig {
+  donation: boolean;
+  merch: boolean;
+  // Twitch
+  follow?: boolean;
+  subscription?: boolean;
+  subscription_tier_1?: boolean;
+  subscription_tier_2?: boolean;
+  subscription_tier_3?: boolean;
+  filter_subscription_3_months?: boolean;
+  filter_subscription_6_months?: boolean;
+  filter_subscription_9_months?: boolean;
+  filter_subscription_12_months?: boolean;
+  filter_subscription_minimum_enabled?: boolean;
+  filter_subscription_minimum_months?: number;
+  primesub?: boolean;
+  resub?: boolean;
+  resub_tier_1?: boolean;
+  resub_tier_2?: boolean;
+  resub_tier_3?: boolean;
+  resub_prime?: boolean;
+  gifted_sub?: boolean;
+  gifted_sub_tier_1?: boolean;
+  gifted_sub_tier_2?: boolean;
+  gifted_sub_tier_3?: boolean;
+  host?: boolean;
+  bits?: boolean;
+  raid?: boolean;
+  // YouTube
+  subscriber?: boolean;
+  sponsor?: boolean;
+  superchat?: boolean;
+  // Mixer
+  sticker?: boolean;
+  effect?: boolean;
+  // Facebook Live
+  facebook_support?: boolean;
+  facebook_like?: boolean;
+  facebook_share?: boolean;
+  facebook_stars?: boolean;
 }
 
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
   mediaShareEnabled: boolean;
-  filterConfig: TFilterConfig;
+  filterConfig: IRecentEventFilterConfig;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -203,7 +243,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     recentEvents: [],
     muted: false,
     mediaShareEnabled: false,
-    filterConfig: {},
+    filterConfig: {
+      donation: false,
+      merch: false,
+    },
   };
 
   lifecycle: LoginLifecycle;
@@ -450,8 +493,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       'filter_subscription_9_months',
       'filter_subscription_12_months',
       'filter_subscription_minimum_enabled',
-      'filter_subscription_minimum_months',
     ]);
+
+    const minimumMonths = pick(this.state.filterConfig, ['filter_subscription_minimum_months']);
 
     const main = mapValues(mainFilters, (value, key) => {
       return {
@@ -474,14 +518,22 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       };
     });
 
+    const minMonths = mapValues(minimumMonths, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
     return {
       main,
       sub,
       resub,
+      minMonths,
     };
   }
 
-  updateFilterPreference(key: string, value: any) {
+  updateFilterPreference(key: string, value: boolean | number) {
     this.SET_SINGLE_FILTER_CONFIG(key, value);
     this.postUpdateFilterPreferences().then(() => {
       this.formEventsArray();
@@ -490,7 +542,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   getEventTypesString() {
     return Object.keys(this.state.filterConfig)
-      .filter((type: any) => this.state.filterConfig[type] === true)
+      .filter((type: string) => this.state.filterConfig[type] === true)
       .join(',');
   }
 
@@ -745,12 +797,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  private SET_FILTER_CONFIG(settings: any) {
+  private SET_FILTER_CONFIG(settings: IRecentEventFilterConfig) {
     this.state.filterConfig = settings;
   }
 
   @mutation()
-  private SET_SINGLE_FILTER_CONFIG(key: string, value: any) {
+  private SET_SINGLE_FILTER_CONFIG(key: string, value: boolean | number) {
     this.state.filterConfig[key] = value;
   }
 }

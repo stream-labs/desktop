@@ -29,6 +29,10 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     return this.recentEventsService.filters.resub;
   }
 
+  get minMonthsFilter() {
+    return this.recentEventsService.filters.minMonths;
+  }
+
   get subsEnabled() {
     return this.subFilters.hasOwnProperty('subscription') && this.subFilters['subscription'].value;
   }
@@ -133,18 +137,18 @@ export default class EventFilterMenu extends TsxComponent<{}> {
                       </div>
                     ),
                 )}
-                {Object.keys(this.resubFilters).map(
+                {Object.keys(this.minMonthsFilter).map(
                   filter =>
                     filter === 'filter_subscription_minimum_months' &&
                     this.resubsEnabled && (
                       <div class={styles.monthsInputContainer}>
                         <NumberInput
-                          value={this.resubFilters[filter].value}
+                          value={this.minMonthsFilter[filter].value}
                           metadata={{ min: 1, max: 120, isInteger: true }}
                           onInput={(value: number) => this.updateFilter(filter, value)}
                           class={styles.monthsInput}
                         />
-                        <p class={styles.monthsLabel}>{this.resubFilters[filter].name}</p>
+                        <p class={styles.monthsLabel}>{this.minMonthsFilter[filter].name}</p>
                       </div>
                     ),
                 )}
