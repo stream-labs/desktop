@@ -1,3 +1,6 @@
+@import '../styles/mixins';
+@import '../styles/badges';
+
 .container {
   position: relative;
   display: flex;
@@ -63,6 +66,16 @@
   i {
     color: var(--teal);
   }
+}
+
+.new-badge {
+  background: var(--teal);
+  color: var(--white);
+  font-size: 9px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  padding: 0 2px;
 }
 
 .bottom-tools {
