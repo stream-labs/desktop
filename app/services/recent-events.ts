@@ -8,6 +8,7 @@ import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/webs
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
+import mapValues from 'lodash/mapValues';
 
 export interface IRecentEvent {
   name?: string;
@@ -48,16 +49,18 @@ export interface IRecentEvent {
   uuid: string;
 }
 
+type TFilterConfig = Dictionary<boolean | number>;
+
 interface IRecentEventsConfig {
   eventsPanelMuted: boolean;
-  settings: Dictionary<any>;
+  settings: TFilterConfig;
 }
 
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
   mediaShareEnabled: boolean;
-  filterConfig: Dictionary<any>;
+  filterConfig: TFilterConfig;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -69,7 +72,7 @@ const subscriptionMap = (subPlan: string) => {
   }[subPlan];
 };
 
-const filterName = (key: string) => {
+const filterName = (key: string): string => {
   return {
     donation: $t('Donations'),
     redemption: $t('Redemptions'),
@@ -249,7 +252,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .catch(() => null);
   }
 
-  async fetchConfig() {
+  async fetchConfig(): Promise<IRecentEventsConfig> {
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
@@ -450,28 +453,24 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       'filter_subscription_minimum_months',
     ]);
 
-    const main = {};
-    const sub = {};
-    const resub = {};
-
-    Object.keys(mainFilters).forEach(filter => {
-      main[filter] = {
-        value: mainFilters[filter],
-        name: filterName(filter),
+    const main = mapValues(mainFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
-    Object.keys(subFilters).forEach(filter => {
-      sub[filter] = {
-        value: subFilters[filter],
-        name: filterName(filter),
+    const sub = mapValues(subFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
-    Object.keys(resubFilters).forEach(filter => {
-      resub[filter] = {
-        value: resubFilters[filter],
-        name: filterName(filter),
+    const resub = mapValues(resubFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
