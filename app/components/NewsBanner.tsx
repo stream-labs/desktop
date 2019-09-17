@@ -20,22 +20,10 @@ export default class NewsBanner extends Vue {
   processingClose = false;
 
   get currentBanner() {
-    return {
-      header: 'Connect to a new community of gamers on Facebook Gaming with Streamlabs OBS',
-      subHeader:
-        "Our new Twitch extension helps you monetize with Augmented Reality Face Masks based on some of Twitch's most popular emotes",
-      link: '',
-      thumbnail: 'https://uploads.twitchalerts.com/000/248/881/249/moinkas-lHY.png',
-      params: {},
-      linkTarget: '',
-      closeOnLink: false,
-      linkTitle: 'Learn More',
-    };
     return this.announcementsService.state;
   }
 
   get bannerExists() {
-    return true;
     return this.announcementsService.bannerExists;
   }
 
