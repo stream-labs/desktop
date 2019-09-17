@@ -20,10 +20,22 @@ export default class NewsBanner extends Vue {
   processingClose = false;
 
   get currentBanner() {
+    return {
+      header: 'Connect to a new community of gamers on Facebook Gaming with Streamlabs OBS',
+      subHeader:
+        "Our new Twitch extension helps you monetize with Augmented Reality Face Masks based on some of Twitch's most popular emotes",
+      link: '',
+      thumbnail: 'https://uploads.twitchalerts.com/000/248/881/249/moinkas-lHY.png',
+      params: {},
+      linkTarget: '',
+      closeOnLink: false,
+      linkTitle: 'Learn More',
+    };
     return this.announcementsService.state;
   }
 
   get bannerExists() {
+    return true;
     return this.announcementsService.bannerExists;
   }
 
@@ -68,12 +80,9 @@ export default class NewsBanner extends Vue {
           class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })}
           onClick={this.followLink}
         >
-          <img class={styles.bgImage} src={this.currentBanner.thumbnail} />
-          <div class={styles.imageContainer}>
-            <img class={styles.shadowImageLeft} src={this.currentBanner.thumbnail} />
-            <img class={styles.shadowImageRight} src={this.currentBanner.thumbnail} />
-            <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
-          </div>
+          <div class={styles.leftBlock} />
+          <div class={styles.rightBlock} />
+          <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
           <div class={styles.titleContainer}>
             <h3 class={styles.title}>{this.headerText}</h3>
             <span class={styles.subheading}>{this.currentBanner.subHeader}</span>

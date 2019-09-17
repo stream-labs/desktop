@@ -23,6 +23,7 @@
   align-items: center;
   height: 30px;
   flex: 0 0 30px;
+  background: var(--titlebar);
   border-bottom: 1px solid var(--border);
 }
 
@@ -35,6 +36,7 @@
   flex-grow: 1;
   padding-left: 10px;
   -webkit-app-region: drag;
+  color: var(--icon);
 }
 
 .titlebar-actions {
