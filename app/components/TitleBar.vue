@@ -24,7 +24,6 @@
   height: 30px;
   flex: 0 0 30px;
   background: var(--titlebar);
-  border-bottom: 1px solid var(--border);
 }
 
 .titlebar-icon {
