@@ -8,6 +8,7 @@ import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/webs
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
+import mapValues from 'lodash/mapValues';
 
 export interface IRecentEvent {
   name?: string;
@@ -50,14 +51,56 @@ export interface IRecentEvent {
 
 interface IRecentEventsConfig {
   eventsPanelMuted: boolean;
-  settings: Dictionary<any>;
+  settings: IRecentEventFilterConfig;
+}
+
+interface IRecentEventFilterConfig {
+  donation: boolean;
+  merch: boolean;
+  // Twitch
+  follow?: boolean;
+  subscription?: boolean;
+  subscription_tier_1?: boolean;
+  subscription_tier_2?: boolean;
+  subscription_tier_3?: boolean;
+  filter_subscription_3_months?: boolean;
+  filter_subscription_6_months?: boolean;
+  filter_subscription_9_months?: boolean;
+  filter_subscription_12_months?: boolean;
+  filter_subscription_minimum_enabled?: boolean;
+  filter_subscription_minimum_months?: number;
+  primesub?: boolean;
+  resub?: boolean;
+  resub_tier_1?: boolean;
+  resub_tier_2?: boolean;
+  resub_tier_3?: boolean;
+  resub_prime?: boolean;
+  gifted_sub?: boolean;
+  gifted_sub_tier_1?: boolean;
+  gifted_sub_tier_2?: boolean;
+  gifted_sub_tier_3?: boolean;
+  host?: boolean;
+  bits?: boolean;
+  raid?: boolean;
+  // YouTube
+  subscriber?: boolean;
+  sponsor?: boolean;
+  superchat?: boolean;
+  // Mixer
+  sticker?: boolean;
+  effect?: boolean;
+  // Facebook Live
+  facebook_support?: boolean;
+  facebook_like?: boolean;
+  facebook_share?: boolean;
+  facebook_stars?: boolean;
 }
 
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
   mediaShareEnabled: boolean;
-  filterConfig: Dictionary<any>;
+  filterConfig: IRecentEventFilterConfig;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -69,7 +112,7 @@ const subscriptionMap = (subPlan: string) => {
   }[subPlan];
 };
 
-const filterName = (key: string) => {
+const filterName = (key: string): string => {
   return {
     donation: $t('Donations'),
     redemption: $t('Redemptions'),
@@ -200,7 +243,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     recentEvents: [],
     muted: false,
     mediaShareEnabled: false,
-    filterConfig: {},
+    filterConfig: {
+      donation: false,
+      merch: false,
+    },
   };
 
   lifecycle: LoginLifecycle;
@@ -249,7 +295,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .catch(() => null);
   }
 
-  async fetchConfig() {
+  async fetchConfig(): Promise<IRecentEventsConfig> {
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
@@ -447,31 +493,35 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       'filter_subscription_9_months',
       'filter_subscription_12_months',
       'filter_subscription_minimum_enabled',
-      'filter_subscription_minimum_months',
     ]);
 
-    const main = {};
-    const sub = {};
-    const resub = {};
+    const minimumMonths = pick(this.state.filterConfig, ['filter_subscription_minimum_months']);
 
-    Object.keys(mainFilters).forEach(filter => {
-      main[filter] = {
-        value: mainFilters[filter],
-        name: filterName(filter),
+    const main = mapValues(mainFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
-    Object.keys(subFilters).forEach(filter => {
-      sub[filter] = {
-        value: subFilters[filter],
-        name: filterName(filter),
+    const sub = mapValues(subFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
-    Object.keys(resubFilters).forEach(filter => {
-      resub[filter] = {
-        value: resubFilters[filter],
-        name: filterName(filter),
+    const resub = mapValues(resubFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
+    const minMonths = mapValues(minimumMonths, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
       };
     });
 
@@ -479,10 +529,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       main,
       sub,
       resub,
+      minMonths,
     };
   }
 
-  updateFilterPreference(key: string, value: any) {
+  updateFilterPreference(key: string, value: boolean | number) {
     this.SET_SINGLE_FILTER_CONFIG(key, value);
     this.postUpdateFilterPreferences().then(() => {
       this.formEventsArray();
@@ -491,7 +542,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   getEventTypesString() {
     return Object.keys(this.state.filterConfig)
-      .filter((type: any) => this.state.filterConfig[type] === true)
+      .filter((type: string) => this.state.filterConfig[type] === true)
       .join(',');
   }
 
@@ -746,12 +797,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   @mutation()
-  private SET_FILTER_CONFIG(settings: any) {
+  private SET_FILTER_CONFIG(settings: IRecentEventFilterConfig) {
     this.state.filterConfig = settings;
   }
 
   @mutation()
-  private SET_SINGLE_FILTER_CONFIG(key: string, value: any) {
+  private SET_SINGLE_FILTER_CONFIG(key: string, value: boolean | number) {
     this.state.filterConfig[key] = value;
   }
 }
