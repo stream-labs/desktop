@@ -10,8 +10,12 @@ interface IKeyedBinding {
   key: string;
 }
 
+interface IProps {
+  hotkey: IHotkey;
+}
+
 @Component({})
-export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
+export default class HotkeyComponent extends TsxComponent<IProps> implements IProps {
   @Prop() hotkey: IHotkey;
 
   description = this.hotkey.description;
