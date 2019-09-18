@@ -112,30 +112,36 @@ export default class EventFilterMenu extends TsxComponent<{}> {
               ),
           )}
         </div>
-        <div class={styles.minimum}>
-          {Object.keys(this.resubFilters).map(
-            filter =>
-              filter === 'filter_subscription_minimum_enabled' &&
-              this.resubsEnabled && (
-                <div>{this.renderBooleanInput(h, filter, this.resubFilters[filter])}</div>
-              ),
-          )}
-          {Object.keys(this.minMonthsFilter).map(
-            filter =>
-              filter === 'filter_subscription_minimum_months' &&
-              this.resubsEnabled && (
-                <div class={styles.monthsInputContainer}>
-                  <NumberInput
-                    value={this.minMonthsFilter[filter].value}
-                    metadata={{ min: 1, max: 120, isInteger: true }}
-                    onInput={(value: number) => this.updateFilter(filter, value)}
-                    class={styles.monthsInput}
-                  />
-                  <p class={styles.monthsLabel}>{this.minMonthsFilter[filter].name}</p>
-                </div>
-              ),
-          )}
-        </div>
+        {this.renderResubMonthsFilter(h)}
+      </div>
+    );
+  }
+
+  renderResubMonthsFilter(h: Function) {
+    return (
+      <div class={styles.minimum}>
+        {Object.keys(this.resubFilters).map(
+          filter =>
+            filter === 'filter_subscription_minimum_enabled' &&
+            this.resubsEnabled && (
+              <div>{this.renderBooleanInput(h, filter, this.resubFilters[filter])}</div>
+            ),
+        )}
+        {Object.keys(this.minMonthsFilter).map(
+          filter =>
+            filter === 'filter_subscription_minimum_months' &&
+            this.resubsEnabled && (
+              <div class={styles.monthsInputContainer}>
+                <NumberInput
+                  value={this.minMonthsFilter[filter].value}
+                  metadata={{ min: 1, max: 120, isInteger: true }}
+                  onInput={(value: number) => this.updateFilter(filter, value)}
+                  class={styles.monthsInput}
+                />
+                <p class={styles.monthsLabel}>{this.minMonthsFilter[filter].name}</p>
+              </div>
+            ),
+        )}
       </div>
     );
   }
