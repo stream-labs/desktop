@@ -12,7 +12,7 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { action, ViewHandler, ActionHandler } from 'services/core';
+import { action, ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
@@ -131,12 +131,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 }
 
-class ScenesActions extends ActionHandler<ScenesService> {
-  makeActive(sceneId: string) {
-    return true;
-  }
-}
-
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -146,10 +140,6 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   get views() {
     return new ScenesViews(this.state);
-  }
-
-  get actions() {
-    return new ScenesActions(this);
   }
 
   sceneAdded = new Subject<IScene>();

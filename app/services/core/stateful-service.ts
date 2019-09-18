@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
 import Utils from 'services/utils';
-import { ServicesManager } from 'services-manager';
 
 export function mutation(options = { unsafe: false }) {
   return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -174,6 +173,7 @@ export abstract class ViewHandler<TState extends object> {
   protected getServiceViews<TService extends new (...args: any[]) => StatefulService<any>>(
     service: TService,
   ): InstanceType<TService>['views'] {
-    return ServicesManager.instance.getService(service).instance.views;
+    // TODO: Working around circular reference
+    return window['sm'].instance.getService(service).instance.views;
   }
 }

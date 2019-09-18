@@ -4,6 +4,7 @@ import { Inject } from 'services/core/injector';
 import { VideoService, Display as OBSDisplay } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
+import uuid from 'uuid/v4';
 
 interface DisplayProps {
   sourceId: string;
@@ -41,7 +42,7 @@ export default class Display extends TsxComponent<DisplayProps> {
   }
 
   createDisplay() {
-    const displayId = this.videoService.getRandomDisplayId();
+    const displayId = uuid();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
       paddingSize: this.paddingSize,

@@ -1,4 +1,4 @@
-import { Service } from './core/service';
+import { Service, action } from './core/service';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import electron from 'electron';
@@ -198,19 +198,6 @@ export class VideoService extends Service {
     this.settingsService.loadSettingsIntoStore();
   }
 
-  // Generates a random string:
-  // https://gist.github.com/6174/6062387
-  getRandomDisplayId() {
-    return (
-      Math.random()
-        .toString(36)
-        .substring(2, 15) +
-      Math.random()
-        .toString(36)
-        .substring(2, 15)
-    );
-  }
-
   getScreenRectangle() {
     return new ScalableRectangle({
       x: 0,
@@ -250,6 +237,7 @@ export class VideoService extends Service {
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
    */
+  @action()
   createOBSDisplay(electronWindowId: number, name: string, sourceId?: string) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
@@ -264,22 +252,27 @@ export class VideoService extends Service {
     }
   }
 
+  @action()
   setOBSDisplayPaddingColor(name: string, r: number, g: number, b: number) {
     obs.NodeObs.OBS_content_setPaddingColor(name, r, g, b);
   }
 
+  @action()
   setOBSDisplayPaddingSize(name: string, size: number) {
     obs.NodeObs.OBS_content_setPaddingSize(name, size);
   }
 
+  @action()
   moveOBSDisplay(name: string, x: number, y: number) {
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
   }
 
+  @action()
   resizeOBSDisplay(name: string, width: number, height: number) {
     obs.NodeObs.OBS_content_resizeDisplay(name, width, height);
   }
 
+  @action()
   destroyOBSDisplay(name: string) {
     obs.NodeObs.OBS_content_destroyDisplay(name);
   }
@@ -292,10 +285,12 @@ export class VideoService extends Service {
     return obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
   }
 
+  @action()
   setOBSDisplayShouldDrawUI(name: string, drawUI: boolean) {
     obs.NodeObs.OBS_content_setShouldDrawUI(name, drawUI);
   }
 
+  @action()
   setOBSDisplayDrawGuideLines(name: string, drawGuideLines: boolean) {
     obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
   }

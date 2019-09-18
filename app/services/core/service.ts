@@ -105,18 +105,4 @@ export abstract class Service {
    * all observers are ready to listen service's events
    */
   protected afterInit() {}
-
-  actions: ActionHandler<any>;
-}
-
-/**
- * A class that exposes actions that are safe to call from
- * Vue components.  Actions cannot have a return value.  If they
- * do return a value, it will be discarded when called from a
- * renderer window.  Action handlers have the following restrictions:
- * - Arguments must be serializable
- * - They cannot return a value
- */
-export abstract class ActionHandler<TService extends Service> {
-  constructor(protected service: TService) {}
 }

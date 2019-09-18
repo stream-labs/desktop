@@ -213,6 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     locale: 'en-US',
     fallbackLocale: 'en-US',
     messages: {},
+    // TODO: Make this not silent
+    silentTranslationWarn: true,
   });
 
   // create a root Vue component
@@ -242,12 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Perform some final initialization now that services are ready
   ipcRenderer.on('initFinished', () => {
     const i18nService: I18nService = I18nService.instance;
-
-    // TODO: Something isn't working here
     const dictionaries = i18nService.getLoadedDictionaries();
 
     Object.keys(dictionaries).forEach(locale => {
-      console.log(locale, dictionaries[locale]);
       i18n.setLocaleMessage(locale, dictionaries[locale]);
     });
 

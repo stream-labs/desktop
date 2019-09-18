@@ -85,6 +85,12 @@ export class InternalApiClient {
             return;
           }
 
+          console.warn(
+            `Calling non-action synchronous method from renderer process: ${
+              isHelper ? target['_resourceId'] : serviceName
+            }.${methodName.toString()}`,
+          );
+
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(
