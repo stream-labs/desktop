@@ -1,7 +1,6 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" v-if="$store.state.bulkLoadFinished" />
-  <div v-if="$store.state.bulkLoadFinished" class="main-spacer" :class="{ 'main-spacer--error': errorAlert }"></div>
   <news-banner v-if="$store.state.bulkLoadFinished"/>
   <div
     class="main-contents"

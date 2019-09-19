@@ -21,15 +21,6 @@ const getName = (event: IRecentEvent) => {
   return event.name;
 };
 
-const subscriptionMap = (subPlan: string) => {
-  return {
-    '1000': $t('Tier 1'),
-    '2000': $t('Tier 2'),
-    '3000': $t('Tier 3'),
-    Prime: $t('Prime'),
-  }[subPlan];
-};
-
 @Component({})
 export default class RecentEvents extends TsxComponent<{}> {
   @Inject() recentEventsService: RecentEventsService;
@@ -54,6 +45,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.state.muted;
   }
 
+  get mediaShareEnabled() {
+    return this.recentEventsService.state.mediaShareEnabled;
+  }
+
   formatMoney(amount: string, type: string) {
     const prefix = type === 'donation' ? '$' : '';
     const numAmount = Number.parseFloat(amount);
@@ -61,7 +56,7 @@ export default class RecentEvents extends TsxComponent<{}> {
   }
 
   eventString(event: IRecentEvent) {
-    return this.getEventString(event);
+    return this.recentEventsService.getEventString(event);
   }
 
   repeatAlert(event: IRecentEvent) {
@@ -75,6 +70,10 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   popoutMediaShare() {
     return this.recentEventsService.openRecentEventsWindow(true);
+  }
+
+  popoutFilterMenu() {
+    return this.recentEventsService.showFilterMenu();
   }
 
   muteEvents() {
@@ -142,63 +141,6 @@ export default class RecentEvents extends TsxComponent<{}> {
     });
   }
 
-  getEventString(event: IRecentEvent) {
-    return {
-      donation:
-        $t('has donated') +
-        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
-      merch: $t('has purchased %{product} from the store', { product: event.product }),
-      follow: $t('has followed'),
-      subscription: this.getSubString(event),
-      // Twitch
-      bits: $t('has used'),
-      host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
-      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
-      // Mixer
-      sticker: $t('has used %{skill} for', { skill: event.skill }),
-      effect: $t('has used %{skill} for', { skill: event.skill }),
-      // Facebook
-      like: $t('has liked'),
-      stars: $t('has used'),
-      support: $t('has supported for %{mounths} months', { months: event.months }),
-      share: $t('has shared'),
-      // Youtube
-      superchat: $t('has superchatted'),
-      // Integrations
-      pledge: $t('has pledged on Patreon'),
-      eldonation: $t('has donated to ExtraLife'),
-      tiltifydonation: $t('has donated to Tiltify'),
-      donordrivedonation: $t('has donated to Donor Drive'),
-      justgivingdonation: $t('has donated to Just Giving'),
-      treat: $t('has given a treat %{title}', { title: event.title }),
-    }[event.type];
-  }
-
-  getSubString(event: IRecentEvent) {
-    if (event.gifter) {
-      return $t('has gifted a sub (%{tier}) to', {
-        tier: subscriptionMap(event.sub_plan),
-      });
-    }
-    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
-      return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
-        tier: subscriptionMap(event.sub_plan),
-        streak: event.streak_months,
-        months: event.months,
-      });
-    }
-    if (event.months > 1) {
-      return $t('has resubscribed (%{tier}) for %{months} months', {
-        tier: subscriptionMap(event.sub_plan),
-        months: event.months,
-      });
-    }
-    if (event.platform === 'youtube') {
-      return $t('has sponsored since %{date}', { date: event.since });
-    }
-    return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
-  }
-
   renderNativeEvents(h: Function) {
     return (
       <div class={styles.eventContainer}>
@@ -235,12 +177,14 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <Toolbar
           popoutMediaShare={() => this.popoutMediaShare()}
+          popoutFilterMenu={() => this.popoutFilterMenu()}
           popoutRecentEvents={() => this.popoutRecentEvents()}
           muteEvents={() => this.muteEvents()}
           skipAlert={() => this.skipAlert()}
           toggleQueue={() => this.toggleQueue()}
           queuePaused={this.queuePaused}
           muted={this.muted}
+          mediaShareEnabled={this.mediaShareEnabled}
           native={this.native}
           onNativeswitch={val => this.setNative(val)}
         />
@@ -264,12 +208,14 @@ export default class RecentEvents extends TsxComponent<{}> {
 
 interface IToolbarProps {
   popoutMediaShare: Function;
+  popoutFilterMenu: Function;
   popoutRecentEvents: Function;
   muteEvents: Function;
   skipAlert: Function;
   toggleQueue: Function;
   queuePaused: boolean;
   muted: boolean;
+  mediaShareEnabled: boolean;
   native: boolean;
   onNativeswitch: (native: boolean) => void;
 }
@@ -278,12 +224,14 @@ interface IToolbarProps {
 @Component({})
 class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() popoutMediaShare: () => void;
+  @Prop() popoutFilterMenu: () => void;
   @Prop() popoutRecentEvents: () => void;
   @Prop() muteEvents: () => void;
   @Prop() skipAlert: () => void;
   @Prop() toggleQueue: () => void;
   @Prop() queuePaused: boolean;
   @Prop() muted: boolean;
+  @Prop() mediaShareEnabled: boolean;
   @Prop() native: boolean;
 
   render(h: Function) {
@@ -298,6 +246,13 @@ class Toolbar extends TsxComponent<IToolbarProps> {
           </span>
         </span>
         {this.native && (
+          <i
+            class="icon-filter action-icon"
+            onClick={this.popoutFilterMenu}
+            v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
+          />
+        )}
+        {this.native && this.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
             onClick={this.popoutMediaShare}

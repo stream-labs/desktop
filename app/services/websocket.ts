@@ -15,7 +15,8 @@ export type TSocketEvent =
   | IAlertProfileChanged
   | IEventSocketEvent
   | IFmExtEnabledSocketEvent
-  | IEventPanelSettingsChangedSocketEvent;
+  | IEventPanelSettingsChangedSocketEvent
+  | IMediaSharingSettingsUpdateSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -71,6 +72,15 @@ interface IEventPanelSettingsChangedSocketEvent {
   type: 'eventsPanelSettingsUpdate';
   message: {
     muted?: boolean;
+  };
+}
+
+interface IMediaSharingSettingsUpdateSocketEvent {
+  type: 'mediaSharingSettingsUpdate';
+  message: {
+    advanced_settings: {
+      enabled?: boolean;
+    };
   };
 }
 

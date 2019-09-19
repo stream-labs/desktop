@@ -1,7 +1,7 @@
 {
   "Troubleshooter": "故障檢測",
-  "Open Settings": "開啟設置",
-  " Streamlabs OBS has detected dropped frames": " Streamlabs OBS 檢測到網路丟失影格",
+  "Open Settings": "開啟設定",
+  " Streamlabs OBS has detected dropped frames": " Streamlabs OBS 檢測到網路掉禎",
   "What does this mean?": "這是什麼意思？",
   " Some frames have not been uploaded. This problem is usually related to a poor network connection.": " 某些影格尚未成功上傳。請嘗試檢視網路速度是否穩定且正常。",
   "What can I do?": "我能做什麼？",
@@ -15,7 +15,7 @@
   "Ensure that you don't have any other applications open that are heavy on your CPU": "請確保沒有其他應用程式正在加重您處理器的負擔",
   "Enable performance mode in the Editor context menu": "請嘗試在編輯器的選單中啟用效能模式",
   "Streamlabs OBS has detected lagged frames": "Streamlabs OBS 檢測到延遲影格",
-  "Some frames took too long to get rendered.": "有些影格經長時間並未繪製完成。",
+  "Some frames took too long to get rendered.": "有些影格經過過長時間繪製。",
   "Usually the problem is related to your game using up too many GPU resources.": "通常這問題和您的遊戲使用太多顯示卡 ( GPU ) 資源有關係",
   "When this happens, Streamlabs OBS does not have any resources left over to render frames.": "當偵測到延遲影格，表示Streamlabs OBS 當前已無任何多餘電腦資源可以繪製影格。",
   "Cap your in-game framerate": "請嘗試擷取您的遊戲內幀率 ( FPS )",

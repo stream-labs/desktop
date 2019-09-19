@@ -1,0 +1,68 @@
+@import "../../styles/index.less";
+
+.container {
+  padding: 0 16px;
+  height: 150px;
+  overflow: none;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.category-header {
+  :global(.checkbox label) {
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    text-transform: capitalize;
+    margin-bottom: 24px;
+  }
+}
+
+.resub-options {
+  height: 104px;
+  flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
+
+  div {
+    height: 26px;
+  }
+}
+
+.minimum {
+  display: flex;
+  justify-content: space-between;
+}
+
+.months-input-container {
+  display: flex;
+  width: 55%;
+}
+
+.months-input {
+  width: 100px;
+}
+
+.months-label {
+  margin-left: 10px;
+}
+
+.half-width {
+  width: 50%;
+  .padding(2);
+}
+
+.full-width {
+  width: 100%;
+  .padding(2);
+}
