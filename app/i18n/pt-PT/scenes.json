@@ -4,7 +4,7 @@
   "Please enter the name of the scene": "Por favor, escreva o nome da cena",
   "Manage Scene Collections": "Gerir colecções de cena",
   "There needs to be at least one scene.": "É preciso haver pelo menos uma cena.",
-  "Projector:": "Projector:",
+  "Projector:": "Projetor:",
   "Projector: Output": "Projector: Saída",
   "Manage All": "Gerir todos",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Aqui é onde pode encontrar as suas Colecções de Cena. Clicar no título abrirá um menu onde poderá visualizá-las e geri-las.",
@@ -17,6 +17,7 @@
   "Create Output Projector": "Criar Projector de Saída",
   "Studio Mode": "Modo Estúdio",
   "Are you sure you want to remove %{sceneName}?": "Tem a certeza que deseja remover %{sceneName}?",
+  "Are you sure you want to remove these %{count} items?": "Pretende realmente remover este(s) %{count} item(ns)?",
   "Disable Performance Mode": "Desactivar o modo de desempenho",
   "Scene Collections": "Colecções de cena",
   "The building blocks of your scene. Also contains widgets.": "Os blocos de construção da sua cena. Também contém widgets.",
@@ -28,5 +29,12 @@
   "Your media files are currently being synced with the cloud. ": "Os seus ficheiros estão a ser sincronizados com a nuvem. ",
   "It is recommended that you wait until this finishes before going live.": "É recomendado que espere até que este processo termine antes de iniciar a sua transmissão.",
   "Go Live Anyway": "Iniciar transmissão de qualquer modo",
-  "Wait": "Espere"
+  "Wait": "Espere",
+  "Add a new Scene.": "Adicionar uma nova Cena.",
+  "Remove Scene.": "Remover Cena.",
+  "Edit Scene Transitions.": "Editar transições de cena.",
+  "Rename Scene": "Renomear Cena",
+  "Name Scene": "Nomear Cena",
+  "Rename Folder": "Renomear pasta",
+  "Name Folder": "Nomear pasta"
 }

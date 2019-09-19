@@ -6,6 +6,9 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import pick from 'lodash/pick';
+import uuid from 'uuid/v4';
+import { Subscription } from 'rxjs';
+import mapValues from 'lodash/mapValues';
 
 export interface IRecentEvent {
   name?: string;
@@ -42,11 +45,62 @@ export interface IRecentEvent {
   hash: string;
   isTest?: boolean;
   repeat?: boolean;
+  // uuid is local and will NOT persist across app restarts/ fetches
+  uuid: string;
+}
+
+interface IRecentEventsConfig {
+  eventsPanelMuted: boolean;
+  settings: IRecentEventFilterConfig;
+}
+
+interface IRecentEventFilterConfig {
+  donation: boolean;
+  merch: boolean;
+  // Twitch
+  follow?: boolean;
+  subscription?: boolean;
+  subscription_tier_1?: boolean;
+  subscription_tier_2?: boolean;
+  subscription_tier_3?: boolean;
+  filter_subscription_3_months?: boolean;
+  filter_subscription_6_months?: boolean;
+  filter_subscription_9_months?: boolean;
+  filter_subscription_12_months?: boolean;
+  filter_subscription_minimum_enabled?: boolean;
+  filter_subscription_minimum_months?: number;
+  primesub?: boolean;
+  resub?: boolean;
+  resub_tier_1?: boolean;
+  resub_tier_2?: boolean;
+  resub_tier_3?: boolean;
+  resub_prime?: boolean;
+  gifted_sub?: boolean;
+  gifted_sub_tier_1?: boolean;
+  gifted_sub_tier_2?: boolean;
+  gifted_sub_tier_3?: boolean;
+  host?: boolean;
+  bits?: boolean;
+  raid?: boolean;
+  // YouTube
+  subscriber?: boolean;
+  sponsor?: boolean;
+  superchat?: boolean;
+  // Mixer
+  sticker?: boolean;
+  effect?: boolean;
+  // Facebook Live
+  facebook_support?: boolean;
+  facebook_like?: boolean;
+  facebook_share?: boolean;
+  facebook_stars?: boolean;
 }
 
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
+  mediaShareEnabled: boolean;
+  filterConfig: IRecentEventFilterConfig;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -56,6 +110,44 @@ const subscriptionMap = (subPlan: string) => {
     '3000': $t('Tier 3'),
     Prime: $t('Prime'),
   }[subPlan];
+};
+
+const filterName = (key: string): string => {
+  return {
+    donation: $t('Donations'),
+    redemption: $t('Redemptions'),
+    merch: $t('Merch'),
+    follow: $t('Follows'),
+    subscription: $t('Subs'),
+    subscription_tier_1: $t('Tier 1'),
+    subscription_tier_2: $t('Tier 2'),
+    subscription_tier_3: $t('Tier 3'),
+    filter_subscription_3_months: $t('3 Months'),
+    filter_subscription_6_months: $t('6 Months'),
+    filter_subscription_9_months: $t('9 Months'),
+    filter_subscription_12_months: $t('12 Months'),
+    filter_subscription_minimum_enabled: $t('Minimum'),
+    filter_subscription_minimum_months: $t('months'),
+    primesub: $t('Prime'),
+    resub: $t('Resubs'),
+    resub_tier_1: $t('Tier 1'),
+    resub_tier_2: $t('Tier 2'),
+    resub_tier_3: $t('Tier 3'),
+    resub_prime: $t('Prime'),
+    gifted_sub: $t('Gifted'),
+    host: $t('Hosts'),
+    bits: $t('Bits'),
+    raid: $t('Raids'),
+    subscriber: $t('Subscribers'),
+    sponsor: $t('Members'),
+    superchat: $t('Super Chats'),
+    sticker: $t('Stickers'),
+    effect: $t('Effects'),
+    facebook_support: $t('Supports'),
+    facebook_like: $t('Likes'),
+    facebook_share: $t('Shares'),
+    facebook_stars: $t('Stars'),
+  }[key];
 };
 
 /**
@@ -102,13 +194,13 @@ function getHashForRecentEvent(event: IRecentEvent) {
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
     case 'treat':
       return [event.type, event.name, event.title, event.message, event.createdAt].join(':');
-    case 'facebook_like':
+    case 'like':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_share':
+    case 'share':
       return [event.type, event.name, event._id].join(':');
-    case 'facebook_stars':
+    case 'stars':
       return [event.type, event.name, event.message, parseInt(event.amount, 10)].join(':');
-    case 'facebook_support':
+    case 'support':
       return [event.type, event.name, event._id].join(':');
     case 'merch':
       return [event.type, event.message, event.createdAt].join(':');
@@ -139,10 +231,6 @@ const SUPPORTED_EVENTS = [
   'donordrivedonation',
   'justgivingdonation',
   'treat',
-  'facebook_like',
-  'facebook_share',
-  'facebook_stars',
-  'facebook_support',
 ];
 
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
@@ -151,28 +239,55 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private websocketService: WebsocketService;
 
-  static initialState: IRecentEventsState = { recentEvents: [], muted: false };
+  static initialState: IRecentEventsState = {
+    recentEvents: [],
+    muted: false,
+    mediaShareEnabled: false,
+    filterConfig: {
+      donation: false,
+      merch: false,
+    },
+  };
 
   lifecycle: LoginLifecycle;
+  socketConnection: Subscription = null;
 
   async initialize() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
-      destroy: () => Promise.resolve(this.SET_RECENT_EVENTS([])),
+      destroy: () => Promise.resolve(this.onLogout()),
       context: this,
     });
   }
 
-  syncEventsState() {
+  async syncEventsState() {
+    const config = await this.fetchConfig();
+    this.applyConfig(config);
     this.formEventsArray();
-    this.websocketService.socketEvent.subscribe(this.onSocketEvent.bind(this));
-    return this.fetchMutedState();
+    this.fetchMediaShareState();
+    this.subscribeToSocketConnection();
+  }
+
+  subscribeToSocketConnection() {
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
+    );
+  }
+
+  unsubscribeFromSocketConnection() {
+    this.socketConnection.unsubscribe();
+  }
+
+  onLogout() {
+    this.SET_RECENT_EVENTS([]);
+    this.unsubscribeFromSocketConnection();
   }
 
   fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
+    const typeString = this.getEventTypesString();
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
       this.userService.widgetToken
-    }`;
+    }?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return fetch(request)
@@ -180,14 +295,24 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .catch(() => null);
   }
 
-  fetchMutedState() {
+  async fetchConfig(): Promise<IRecentEventsConfig> {
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return fetch(new Request(url, { headers }))
       .then(handleResponse)
-      .then(resp => this.SET_MUTED(resp.eventsPanelMuted));
+      .catch(() => null);
+  }
+
+  fetchMediaShareState() {
+    const url = `https://${
+      this.hostsService.streamlabs
+    }/api/v5/slobs/widget/config?widget=media-sharing`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return fetch(new Request(url, { headers }))
+      .then(handleResponse)
+      .then(resp => this.SET_MEDIA_SHARE(resp.settings.advanced_settings.enabled));
   }
 
   private async formEventsArray() {
@@ -197,6 +322,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
+        event.uuid = uuid();
         return event;
       });
 
@@ -231,6 +357,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'title',
           'read',
           'hash',
+          'uuid',
         ]);
       });
 
@@ -281,7 +408,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async readAlert(event: IRecentEvent) {
-    this.TOGGLE_RECENT_EVENT_READ(event.hash);
+    this.TOGGLE_RECENT_EVENT_READ(event.uuid);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
@@ -289,8 +416,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
     const body = JSON.stringify({
       eventHash: event.hash,
-      read: !event.read,
+      read: event.read,
     });
+    const request = new Request(url, { headers, body, method: 'POST' });
+    return await fetch(request).then(handleResponse);
+  }
+
+  async postUpdateFilterPreferences() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const body = JSON.stringify(this.state.filterConfig);
     const request = new Request(url, { headers, body, method: 'POST' });
     return await fetch(request).then(handleResponse);
   }
@@ -316,21 +454,124 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return fetch(request).then(handleResponse);
   }
 
+  get filters() {
+    const mainFilters = pick(this.state.filterConfig, [
+      'donation',
+      'merch',
+      'follow',
+      'host',
+      'bits',
+      'raid',
+      'subscriber',
+      'sponsor',
+      'superchat',
+      'sticker',
+      'effect',
+      'facebook_support',
+      'facebook_like',
+      'facebook_share',
+      'facebook_stars',
+    ]);
+
+    const subFilters = pick(this.state.filterConfig, [
+      'subscription',
+      'subscription_tier_1',
+      'subscription_tier_2',
+      'subscription_tier_3',
+      'primesub',
+      'gifted_sub',
+    ]);
+
+    const resubFilters = pick(this.state.filterConfig, [
+      'resub',
+      'resub_tier_1',
+      'resub_tier_2',
+      'resub_tier_3',
+      'resub_prime',
+      'filter_subscription_3_months',
+      'filter_subscription_6_months',
+      'filter_subscription_9_months',
+      'filter_subscription_12_months',
+      'filter_subscription_minimum_enabled',
+    ]);
+
+    const minimumMonths = pick(this.state.filterConfig, ['filter_subscription_minimum_months']);
+
+    const main = mapValues(mainFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
+    const sub = mapValues(subFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
+    const resub = mapValues(resubFilters, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
+    const minMonths = mapValues(minimumMonths, (value, key) => {
+      return {
+        value,
+        name: filterName(key),
+      };
+    });
+
+    return {
+      main,
+      sub,
+      resub,
+      minMonths,
+    };
+  }
+
+  updateFilterPreference(key: string, value: boolean | number) {
+    this.SET_SINGLE_FILTER_CONFIG(key, value);
+    this.postUpdateFilterPreferences().then(() => {
+      this.formEventsArray();
+    });
+  }
+
+  getEventTypesString() {
+    return Object.keys(this.state.filterConfig)
+      .filter((type: string) => this.state.filterConfig[type] === true)
+      .join(',');
+  }
+
+  applyConfig(config: IRecentEventsConfig) {
+    this.SET_MUTED(config.eventsPanelMuted);
+    this.SET_FILTER_CONFIG(config.settings);
+  }
+
   getSubString(event: IRecentEvent) {
+    if (event.platform === 'youtube_account') {
+      return $t('has sponsored since %{date}', { date: event.since });
+    }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
         tier: subscriptionMap(event.sub_plan),
       });
     }
-    if (event.months > 1) {
+    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
       return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
         tier: subscriptionMap(event.sub_plan),
         streak: event.streak_months,
         months: event.months,
       });
     }
-    if (event.platform === 'youtube') {
-      return $t('has sponsored since %{date}', { date: event.since });
+    if (event.months > 1) {
+      return $t('has resubscribed (%{tier}) for %{months} months', {
+        tier: subscriptionMap(event.sub_plan),
+        months: event.months,
+      });
     }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
   }
@@ -342,19 +583,119 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'mediaSharingSettingsUpdate') {
+      if (e.message.advanced_settings.enabled != null) {
+        this.SET_MEDIA_SHARE(e.message.advanced_settings.enabled);
+      }
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
   }
 
+  shouldFilterSubscription(event: IRecentEvent) {
+    if (!this.state.filterConfig.subscription) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_1 && event.sub_plan.toString() === '1000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_2 && event.sub_plan.toString() === '2000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.subscription_tier_3 && event.sub_plan.toString() === '3000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.primesub && event.sub_plan.toString() === 'Prime') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.gifted_sub && event.gifter) {
+      return false;
+    }
+
+    return true;
+  }
+
+  shouldFilterResub(event: IRecentEvent) {
+    if (!this.state.filterConfig.resub) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_1 && event.sub_plan.toString() === '1000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_2 && event.sub_plan.toString() === '2000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_tier_3 && event.sub_plan.toString() === '3000') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Prime') {
+      return false;
+    }
+
+    if (!this.state.filterConfig.gifted_sub && event.gifter) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_3_months && event.months < 3) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_6_months && event.months < 6) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_9_months && event.months < 9) {
+      return false;
+    }
+
+    if (!this.state.filterConfig.filter_subscription_12_months && event.months < 12) {
+      return false;
+    }
+
+    if (
+      this.state.filterConfig.filter_subscription_minimum_enabled &&
+      event.months < this.state.filterConfig.filter_subscription_minimum_months
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  isAllowed(event: IRecentEvent) {
+    if (event.type === 'subscription') {
+      if (event.months > 1) {
+        return this.shouldFilterResub(event);
+      }
+      return this.shouldFilterSubscription(event);
+    }
+    return this.state.filterConfig[event.type];
+  }
+
   onEventSocket(e: IEventSocketEvent) {
-    const messages = e.message.filter(msg => !msg.isTest && !msg.repeat);
-    messages.forEach(msg => {
-      msg.type = e.type;
-      msg.hash = getHashForRecentEvent(msg);
-      msg.read = false;
-      msg.iso8601Created = new Date().toISOString();
-    });
+    const messages = e.message
+      .filter(msg => !msg.isTest && !msg.repeat)
+      .map(msg => {
+        msg.type = e.type;
+        msg.hash = getHashForRecentEvent(msg);
+        msg.uuid = uuid();
+        msg.read = false;
+        msg.iso8601Created = new Date().toISOString();
+        return msg;
+      })
+      .filter(msg => this.isAllowed(msg));
+
     this.ADD_RECENT_EVENT(messages);
   }
 
@@ -364,7 +705,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         $t('has donated') +
         (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
-      follow: $t('has followed'),
+      follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
       subscription: this.getSubString(event),
       // Twitch
       bits: $t('has used'),
@@ -414,15 +755,27 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
   }
 
+  showFilterMenu() {
+    this.windowsService.showWindow({
+      componentName: 'EventFilterMenu',
+      title: $t('Event Filters'),
+      queryParams: {},
+      size: {
+        width: 450,
+        height: 600,
+      },
+    });
+  }
+
   @mutation()
   private ADD_RECENT_EVENT(events: IRecentEvent[]) {
     this.state.recentEvents = events.concat(this.state.recentEvents);
   }
 
   @mutation()
-  private TOGGLE_RECENT_EVENT_READ(eventHash: string) {
-    this.state.recentEvents.forEach((event, index) => {
-      if (event.hash === eventHash) {
+  private TOGGLE_RECENT_EVENT_READ(uuid: string) {
+    this.state.recentEvents.forEach(event => {
+      if (event.uuid === uuid) {
         event.read = !event.read;
       }
     });
@@ -436,5 +789,20 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_MUTED(muted: boolean) {
     this.state.muted = muted;
+  }
+
+  @mutation()
+  private SET_MEDIA_SHARE(enabled: boolean) {
+    this.state.mediaShareEnabled = enabled;
+  }
+
+  @mutation()
+  private SET_FILTER_CONFIG(settings: IRecentEventFilterConfig) {
+    this.state.filterConfig = settings;
+  }
+
+  @mutation()
+  private SET_SINGLE_FILTER_CONFIG(key: string, value: boolean | number) {
+    this.state.filterConfig[key] = value;
   }
 }

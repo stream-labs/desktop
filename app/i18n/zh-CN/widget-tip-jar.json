@@ -1,0 +1,23 @@
+{
+  "Jar Image": "小费罐图像",
+  "Enabled Events": "启用事件",
+  "Minimum Bits": "最低 Bits",
+  "Minimum Tips": "最低赞助量",
+  "Background Color": "背景颜色",
+  "Text": "文本",
+  "Show Text": "显示文本",
+  "Text Color": "文本颜色",
+  "Font Size": "字体大小",
+  "Tips over": " 以上的赞助",
+  "Tips & Donations": "小费与赞助",
+  "Twitch Subs": "Twitch订阅",
+  "Mixer Subscriptions": "Mixer订阅数",
+  "Twitch Resubs": "Twitch续订",
+  "Youtube Subscriptions": "Youtube订阅",
+  "Youtube Memberships": "Youtube Memberships",
+  "Youtube Super Chats": "Youtube超级聊天",
+  "Periscope Super Hearts": "Periscope Super Hearts",
+  "Picarto Follows": "Picarto追随",
+  "Picarto Subscriptions": "Picarto 订阅",
+  "Manage Jar": "管理小费罐"
+}

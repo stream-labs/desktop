@@ -93,7 +93,11 @@ export default class EditStreamInfo extends Vue {
   }
 
   get shouldPostTweet() {
-    return this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive;
+    return (
+      this.twitterService.state.linked &&
+      this.twitterService.state.tweetWhenGoingLive &&
+      !this.midStreamMode
+    );
   }
 
   get formMetadata() {

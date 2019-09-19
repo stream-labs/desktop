@@ -5,6 +5,7 @@
   "has followed": "has followed",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)",
   "has gifted a sub (%{tier}) to": "has gifted a sub (%{tier}) to",
+  "has resubscribed (%{tier}) for %{months} months": "has resubscribed (%{tier}) for %{months} months",
   "has subscribed (%{tier})": "has subscribed (%{tier})",
   "has used": "has used",
   "has hosted you with %{viewers} viewers": "has hosted you with %{viewers} viewers",
@@ -31,5 +32,19 @@
   "Unpause Alert Queue": "Unpause Alert Queue",
   "Skip Alert": "Skip Alert",
   "Mute Event Sounds": "Mute Event Sounds",
-  "Repeat Alert": "Repeat Alert"
+  "Repeat Alert": "Repeat Alert",
+  "There are no events to display": "There are no events to display",
+  "New Events Feed": "New Events Feed",
+  "Popout Event Filtering Options": "Popout Event Filtering Options",
+  "Subs": "Subs",
+  "3 Months": "3 Months",
+  "6 Months": "6 Months",
+  "9 Months": "9 Months",
+  "12 Months": "12 Months",
+  "months": "months",
+  "Gifted": "Gifted",
+  "Stickers": "Stickers",
+  "Effects": "Effects",
+  "has purchased %{product} from the store": "has purchased %{product} from the store",
+  "Event Filters": "Event Filters"
 }

@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "Doskonalimy nasze systemy zaplecza. Jako część procesu migracji, będziemy musieli zalogować Cię ponownie. Jeśli masz jakieś pytania, możesz",
   "contact support.": "skontaktuj się z obsługą.",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "Zaloguj się przy użyciu konta Twitch lub Youtube, aby rozpocząć pracę ze Streamlabs",
+  "Sign in with your streaming account to get started with Streamlabs": "Sign in with your streaming account to get started with Streamlabs",
   "Select an OBS profile to import": "Wybierz profil OBS do zaimportowania",
   "Import from OBS": "Importuj z OBS",
   "Start Fresh": "Zacznij od początku",
@@ -35,5 +35,10 @@
   "Next": "Dalej",
   "Scene Collections Import": "Importowanie kolekcji scen",
   "The following scene collections have been imported from your Streamlabs account": "Następująca scena została zaimportowana z Twojego konta Streamlabs",
-  "Continue": "Kontynuuj"
+  "Continue": "Kontynuuj",
+  "Collecting some information about your PC...": "Collecting some information about your PC...",
+  "We found optimized settings for your PC": "We found optimized settings for your PC",
+  "Something went wrong": "Something went wrong",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
+  "Download and Apply": "Download and Apply"
 }
