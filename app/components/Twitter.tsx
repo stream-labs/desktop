@@ -29,7 +29,6 @@ export class Twitter extends TsxComponent<{
   @Prop() value: string;
 
   priorTitle: string = '';
-  shouldTweetModel: boolean = this.twitterService.state.tweetWhenGoingLive;
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
@@ -97,17 +96,12 @@ export class Twitter extends TsxComponent<{
     this.onTweetChange(tweet);
   }
 
-  updateShouldTweetModel(shouldTweet: boolean) {
-    this.shouldTweetModel = shouldTweet;
+  updateShouldTweet(shouldTweet: boolean) {
+    this.twitterService.setTweetPreference(shouldTweet);
   }
 
   onTweetChange(tweet: string) {
     this.$emit('input', tweet);
-  }
-
-  @Watch('shouldTweetModel')
-  onShouldTweetChange() {
-    this.twitterService.setTweetPreference(this.shouldTweetModel);
   }
 
   @Watch('siteUrl')
@@ -177,8 +171,8 @@ export class Twitter extends TsxComponent<{
           <div class={styles.twitterToggleBlock}>
             <span>{$t('Enable Tweet Sharing')}</span>
             <ToggleInput
-              onInput={this.updateShouldTweetModel.bind(this)}
-              value={this.shouldTweetModel}
+              onInput={(shouldTweet: boolean) => this.updateShouldTweet(shouldTweet)}
+              value={this.shouldTweet}
               class={styles.twitterTweetToggle}
               metadata={{ title: $t('Tweet when going live') }}
             />
