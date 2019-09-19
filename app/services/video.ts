@@ -163,10 +163,9 @@ export class Display {
     this.outputRegionCallbacks.push(cb);
   }
 
-  refreshOutputRegion() {
-    // TODO: Use return actions or move to store
-    const position = this.videoService.getOBSDisplayPreviewOffset(this.name);
-    const size = this.videoService.getOBSDisplayPreviewSize(this.name);
+  async refreshOutputRegion() {
+    const position = await this.videoService.actions.return.getOBSDisplayPreviewOffset(this.name);
+    const size = await this.videoService.actions.return.getOBSDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
