@@ -133,7 +133,7 @@ export default class Studio extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get eventsHeight() {

@@ -92,7 +92,7 @@ export class WebsocketService extends Service {
   }
 
   openSocketConnection() {
-    if (!this.userService.isLoggedIn()) {
+    if (!this.userService.isLoggedIn) {
       console.warn('User must be logged in to make a socket connection');
       return;
     }

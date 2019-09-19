@@ -39,7 +39,7 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (
-        this.userService.isLoggedIn() &&
+        this.userService.isLoggedIn &&
         (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
       ) {
         this.streamingService.showEditStreamInfo();
@@ -93,7 +93,7 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn && this.userService.platform.type === 'facebook';
   }
 
   get isDisabled() {

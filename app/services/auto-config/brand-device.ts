@@ -121,7 +121,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       }
 
       // user have to be logged-in for correct widgets setup from the overlay file
-      if (deviceUrls.overlay_url && this.userService.isLoggedIn()) {
+      if (deviceUrls.overlay_url && this.userService.isLoggedIn) {
         const overlayPath = `${tempDir}/slobs-brand-device.overlay`;
         await downloadFile(deviceUrls.overlay_url, overlayPath);
         await this.sceneCollectionsService.loadOverlay(overlayPath, deviceName);

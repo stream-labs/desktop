@@ -476,7 +476,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.AlertBox,
     ];
 
-    if (isWidget && this.userService.isLoggedIn()) {
+    if (isWidget && this.userService.isLoggedIn) {
       const widgetType = source.getPropertiesManagerSettings().widgetType;
       if (widgetsWhitelist.includes(widgetType)) {
         const componentName = this.widgetsService.getWidgetComponent(widgetType);

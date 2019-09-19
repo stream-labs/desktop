@@ -517,7 +517,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // Check if the server has a copy
     const collection = this.collections.find(coll => coll.id === id);
 
-    if (collection.serverId && this.userService.isLoggedIn()) {
+    if (collection.serverId && this.userService.isLoggedIn) {
       const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
 
       if (coll.scene_collection.data) {
@@ -661,7 +661,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (collection.serverId && this.userService.isLoggedIn()) {
+      if (collection.serverId && this.userService.isLoggedIn) {
         try {
           await this.serverApi.makeSceneCollectionActive(collection.serverId);
         } catch (e) {
@@ -904,6 +904,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   canSync(): boolean {
-    return this.userService.isLoggedIn() && !this.appService.state.argv.includes('--nosync');
+    return this.userService.isLoggedIn && !this.appService.state.argv.includes('--nosync');
   }
 }

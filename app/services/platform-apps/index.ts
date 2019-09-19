@@ -171,7 +171,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
 
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 

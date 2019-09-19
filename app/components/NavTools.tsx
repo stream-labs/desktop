@@ -38,7 +38,7 @@ export default class SideNav extends Vue {
   }
 
   handleAuth() {
-    if (this.userService.isLoggedIn()) {
+    if (this.userService.isLoggedIn) {
       electron.remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
@@ -92,7 +92,7 @@ export default class SideNav extends Vue {
             <i class="icon-developer" />
           </div>
         )}
-        {this.userService.isLoggedIn() && (
+        {this.userService.isLoggedIn && (
           <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
             <i class="icon-dashboard" />
           </div>
@@ -108,12 +108,12 @@ export default class SideNav extends Vue {
           class={styles.cell}
           onClick={() => this.handleAuth()}
           title={
-            this.userService.isLoggedIn()
+            this.userService.isLoggedIn
               ? $t('Logout %{username}', { username: this.userService.username })
               : $t('Login')
           }
         >
-          <i class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
+          <i class={this.userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
         </div>
         <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
           <i class="icon-question" />

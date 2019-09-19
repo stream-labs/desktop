@@ -109,7 +109,7 @@ export default class Main extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get renderDock() {

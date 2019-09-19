@@ -106,7 +106,7 @@ export class UsageStatisticsService extends Service {
       data: JSON.stringify(metadata),
     };
 
-    if (this.userService.isLoggedIn()) {
+    if (this.userService.isLoggedIn) {
       headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 

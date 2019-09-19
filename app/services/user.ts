@@ -126,7 +126,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   // Makes sure the user's login is still good
   validateLogin() {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -147,7 +147,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * to support name changes on Twitch.
    */
   async refreshUserInfo() {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     // Make a best attempt to refresh the user data
     try {
@@ -166,7 +166,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Attempts to flush the user's session to disk if it exists
    */
   flushUserSession(): Promise<void> {
-    if (this.isLoggedIn() && this.state.auth.partition) {
+    if (this.isLoggedIn && this.state.auth.partition) {
       return new Promise(resolve => {
         const session = electron.remote.session.fromPartition(this.state.auth.partition);
 
@@ -178,7 +178,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return Promise.resolve();
   }
 
-  isLoggedIn() {
+  get isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken);
   }
 
@@ -200,41 +200,41 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get apiToken() {
-    if (this.isLoggedIn()) return this.state.auth.apiToken;
+    if (this.isLoggedIn) return this.state.auth.apiToken;
   }
 
   get widgetToken() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.widgetToken;
     }
   }
 
   get platform() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.platform;
     }
   }
 
   get username() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.platform.username;
     }
   }
 
   get platformId() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.platform.id;
     }
   }
 
   get channelId() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.platform.channelId;
     }
   }
 
   recentEventsUrl() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
@@ -277,7 +277,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       url += `&oauth_token=${this.apiToken}`;
     }
 
@@ -302,7 +302,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async showLogin() {
-    if (this.isLoggedIn()) await this.logOut();
+    if (this.isLoggedIn) await this.logOut();
     this.onboardingService.start({ isLogin: true });
   }
 
@@ -361,7 +361,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const authUrl =
       merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
 
-    if (merge && !this.isLoggedIn()) {
+    if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
     }
 
@@ -439,7 +439,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * we can view more detailed information.
    */
   setSentryContext() {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     setSentryContext(this.getSentryContext());
 
@@ -447,7 +447,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   getSentryContext(): ISentryContext {
-    if (!this.isLoggedIn()) return null;
+    if (!this.isLoggedIn) return null;
 
     return {
       username: this.username,
@@ -491,7 +491,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const userLoginSubscription = this.userLogin.subscribe(() => doInit());
     const userLogoutSubscription = this.userLogout.subscribe(() => doDestroy());
 
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       await doInit();
     }
 

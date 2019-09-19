@@ -20,7 +20,7 @@ export class ChatService extends Service {
     this.userService.userLogin.subscribe(() => this.initChat());
     this.userService.userLogout.subscribe(() => this.deinitChat());
 
-    if (this.userService.isLoggedIn()) this.initChat();
+    if (this.userService.isLoggedIn) this.initChat();
   }
 
   refreshChat() {

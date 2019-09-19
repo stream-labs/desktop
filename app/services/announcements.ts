@@ -106,7 +106,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   private async fetchBanner() {
     const recentlyInstalled = await this.recentlyInstalled();
 
-    if (!this.userService.isLoggedIn() || recentlyInstalled || this.recentlyUpdatedTo017) {
+    if (!this.userService.isLoggedIn || recentlyInstalled || this.recentlyUpdatedTo017) {
       return this.state;
     }
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;

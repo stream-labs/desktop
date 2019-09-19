@@ -81,11 +81,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   get isTwitchAuthed() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'twitch';
+    return this.userService.isLoggedIn && this.userService.platform.type === 'twitch';
   }
 
   get isFacebookAuthed() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn && this.userService.platform.type === 'facebook';
   }
 
   startOnboardingIfRequired() {
@@ -99,7 +99,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   forceLoginForSecurityUpgradeIfRequired() {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     if (!this.userService.apiToken) {
       this.start({ isLogin: true, isSecurityUpgrade: true });

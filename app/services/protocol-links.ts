@@ -62,7 +62,7 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('library')
   private navigateLibrary(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const parts = info.path.match(/^\/(.+)\/(.+)$/);
     if (parts) {
@@ -75,14 +75,14 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     this.platformAppStoreService.paypalAuthSuccess();
   }
 
   @protocolHandler('app')
   private navigateApp(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const appId = info.path.replace('/', '');
 
@@ -95,7 +95,7 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('facemasks')
   private openFacemaskSettings() {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     this.facemasksService.showSettings();
   }

@@ -69,7 +69,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   createWidget(type: WidgetType, name?: string): SceneItem {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
@@ -126,7 +126,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   getWidgetUrl(type: WidgetType) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
     return WidgetDefinitions[type].url(
       this.hostsService.streamlabs,
       this.userService.widgetToken,
@@ -145,7 +145,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   getTesters(): { name: string; url: string }[] {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
     return WidgetTesters.filter(tester => {
       return tester.platforms.includes(this.userService.platform.type);
     }).map(tester => {

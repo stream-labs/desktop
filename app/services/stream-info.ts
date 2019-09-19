@@ -43,7 +43,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
     this.userService.userLogout.subscribe(_ => this.RESET());
 
     this.viewerCountInterval = window.setInterval(() => {
-      if (!this.userService.isLoggedIn()) return;
+      if (!this.userService.isLoggedIn) return;
 
       if (this.streamingService.isStreaming) {
         const platform = getPlatformService(this.userService.platform.type);
@@ -60,7 +60,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
     this.SET_ERROR(false);
     this.SET_FETCHING(true);
 
-    if (!this.userService.isLoggedIn()) {
+    if (!this.userService.isLoggedIn) {
       this.SET_FETCHING(false);
       return;
     }

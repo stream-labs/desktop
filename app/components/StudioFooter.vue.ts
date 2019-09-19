@@ -66,7 +66,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get loggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get canSchedule() {
