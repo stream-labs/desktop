@@ -114,13 +114,13 @@ export default class StudioFooterComponent extends Vue {
 
     this.windowsService.createOneOffWindow(
       {
-        componentName: 'PerformanceMetrics',
+        componentName: 'AdvancedStatistics',
         title: $t('Performance Metrics'),
-        size: { width: 450, height: 75 },
-        x: mousePos.x,
-        y: mousePos.y,
-        resizable: false,
-        maximizable: false,
+        size: { width: 600, height: 550 },
+        // x: mousePos.x,
+        // y: mousePos.y,
+        resizable: true,
+        maximizable: true,
       },
       'performance-metrics',
     );
