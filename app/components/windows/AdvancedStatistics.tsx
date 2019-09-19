@@ -14,6 +14,16 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
   @Inject() windowsService: WindowsService;
   @Inject() notificationsService: NotificationsService;
 
+  mounted() {
+    this.notificationsService.notificationPushed.subscribe(notify => {
+      this.onNotificationHandler(notify);
+    });
+  }
+
+  onNotificationHandler(notification: INotification) {
+    console.log(notification);
+  }
+
   render(h: Function) {
     return (
       <ModalLayout showControls={false}>
