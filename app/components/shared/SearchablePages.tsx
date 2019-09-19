@@ -1,7 +1,7 @@
-import TsxComponent from 'components/tsx-component';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Mark from 'mark.js';
 import styles from './SearchablePages.m.less';
+import { createProps, TsxComponent } from '../tsx-component-with-props';
 
 interface IPageInfo {
   /**
@@ -14,20 +14,24 @@ interface IPageInfo {
   inputs: string[];
 }
 
+class SearchablePagesProps {
+  page: string = '';
+  pages: string[] = [];
+  searchStr: string = '';
+}
+
 /**
  * A component for the client-side text search
  */
-@Component({})
-export default class SearchablePages extends TsxComponent<{
-  page: string;
-  pages: string[];
-}> {
-  @Prop() page: string;
-  @Prop() pages: string[];
-  @Prop() searchStr: string;
-  currentPage: string = this.page || '';
+@Component({ props: createProps(SearchablePagesProps) })
+export default class SearchablePages extends TsxComponent<SearchablePagesProps> {
+  currentPage: string;
   pagesInfo: Dictionary<IPageInfo> = null;
   searchResultPages: string[];
+
+  created() {
+    this.currentPage = this.props.page || '';
+  }
 
   $refs: {
     pageSlot: HTMLDivElement;
@@ -60,7 +64,7 @@ export default class SearchablePages extends TsxComponent<{
     this.currentPage = page;
 
     // if search is active then highlight the current page
-    if (this.searchStr && this.pagesInfo) {
+    if (this.props.searchStr && this.pagesInfo) {
       await this.$nextTick();
       await this.highlightPage();
     }
@@ -73,7 +77,7 @@ export default class SearchablePages extends TsxComponent<{
     this.pagesInfo = {};
 
     // switch and render each page
-    for (const page of this.pages) {
+    for (const page of this.props.pages) {
       this.$emit('beforePageScan', page);
       // render the page
       this.currentPage = page;
@@ -99,7 +103,7 @@ export default class SearchablePages extends TsxComponent<{
     }
 
     // don't forget to switch back to the original page from the `page` property
-    this.currentPage = this.page;
+    this.currentPage = this.props.page;
     await this.$nextTick();
 
     this.$emit('scanCompleted');
@@ -114,16 +118,16 @@ export default class SearchablePages extends TsxComponent<{
     // highlight the page text via Mark.js
     const mark = new Mark(this.$refs.pageSlot);
     mark.unmark();
-    if (this.searchStr) {
-      mark.mark(this.searchStr);
+    if (this.props.searchStr) {
+      mark.mark(this.props.searchStr);
     }
 
     // highlight inputs
-    const pageInfo = this.pagesInfo[this.page];
+    const pageInfo = this.pagesInfo[this.props.page];
     this.getPageInputs().forEach(($input, ind) => {
       $input.classList.remove('search-highlight');
       const needHighlight =
-        this.searchStr && pageInfo.inputs[ind].match(new RegExp(this.searchStr, 'i'));
+        this.props.searchStr && pageInfo.inputs[ind].match(new RegExp(this.props.searchStr, 'i'));
       if (needHighlight) $input.classList.add('search-highlight');
     });
 

@@ -2,6 +2,7 @@
   <div class="hotkey" :data-test-id="description.replace(/\s+/, '_')">
     <div class="Hotkey-description">{{ description }}</div>
     <div class="Hotkey-bindings">
+      Action: {{ props.hotkey.actionName }}
       <transition-group name="bindings" tag="div">
         <div
           v-for="(binding, index) in bindings"
