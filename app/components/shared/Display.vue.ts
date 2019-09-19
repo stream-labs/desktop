@@ -21,7 +21,6 @@ export default class Display extends TsxComponent<DisplayProps> {
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
   @Prop({ default: false }) drawUI: boolean;
-  @Prop() clickHandler: boolean;
   @Prop() renderingMode: number;
 
   $refs: {
