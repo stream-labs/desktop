@@ -10,6 +10,6 @@ export abstract class TsxComponent<TProps> extends Vue {
     Readonly<TProps>;
 
   get props(): TProps {
-    return this.$props as TProps;
+    return this.$props as Readonly<TProps>;
   }
 }
