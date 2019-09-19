@@ -17,7 +17,7 @@ export default class Chat extends Vue {
   @Inject() chatService: ChatService;
 
   mounted() {
-    this.chatService.mountChat(electron.remote.getCurrentWindow().id);
+    this.chatService.actions.mountChat(electron.remote.getCurrentWindow().id);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -25,7 +25,7 @@ export default class Chat extends Vue {
   }
 
   destroyed() {
-    this.chatService.unmountChat(electron.remote.getCurrentWindow().id);
+    this.chatService.actions.unmountChat(electron.remote.getCurrentWindow().id);
     clearInterval(this.resizeInterval);
   }
 
@@ -38,7 +38,7 @@ export default class Chat extends Vue {
       this.currentPosition = { x: rect.left, y: rect.top };
       this.currentSize = { x: rect.width, y: rect.height };
 
-      this.chatService.setChatBounds(this.currentPosition, this.currentSize);
+      this.chatService.actions.setChatBounds(this.currentPosition, this.currentSize);
     }
   }
 

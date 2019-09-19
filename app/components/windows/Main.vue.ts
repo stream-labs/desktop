@@ -182,7 +182,7 @@ export default class Main extends Vue {
 
     this.hasLiveDock = this.windowWidth >= 1070;
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('main', false),
+      () => this.windowsService.actions.updateStyleBlockers('main', false),
       200,
     );
   }
@@ -192,18 +192,18 @@ export default class Main extends Vue {
   }
 
   onResizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     offset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {
-    this.customizationService.setSettings({
+    this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
     });
   }
