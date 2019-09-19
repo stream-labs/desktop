@@ -8,12 +8,11 @@ import { EditMenu } from 'util/menus/EditMenu';
 import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService, Selection } from 'services/selection';
-import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
-import { action, mutation } from './core';
+import { mutation } from './core';
 
 interface IResizeRegion {
   name: string;
@@ -73,7 +72,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isCropping: boolean;
   canDrag = true;
 
-  @action()
   handleOutputResize(region: IRectangle) {
     this.renderedWidth = region.width;
     this.renderedHeight = region.height;
@@ -85,7 +83,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * Mouse Handling *
    *****************/
 
-  @action()
   handleMouseDown(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       const overResize = this.isOverResize(event);
@@ -102,7 +99,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.updateCursor(event);
   }
 
-  @action()
   handleMouseDblClick(event: IMouseEvent) {
     const overSources = this.getOverSources(event);
 
@@ -141,7 +137,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     if (event.altKey) this.isCropping = true;
   }
 
-  @action()
   handleMouseUp(event: IMouseEvent) {
     this.canDrag = true;
 
@@ -213,7 +208,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.updateCursor(event);
   }
 
-  @action()
   handleMouseEnter(event: IMouseEvent) {
     if (event.buttons !== 1) {
       this.dragHandler = null;
@@ -221,7 +215,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     }
   }
 
-  @action()
   handleMouseMove(event: IMouseEvent) {
     // console.log('HANDLING MOUSE MOVE', event);
 

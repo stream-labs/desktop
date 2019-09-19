@@ -285,10 +285,10 @@ if (!gotTheLock) {
     // until the worker window's asynchronous response
     const requests = { };
 
-    function sendRequest(request, event = null) {
+    function sendRequest(request, event = null, async = false) {
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
-      requests[request.id] = Object.assign({}, request, { event });
+      requests[request.id] = Object.assign({}, request, { event, async });
     }
 
     // use this function to call some service method from the main process
@@ -317,9 +317,18 @@ if (!gotTheLock) {
       sendRequest(payload, event);
     });
 
+    ipcMain.on('services-request-async', (event, payload) => {
+      sendRequest(payload, event, true);
+    });
+
     ipcMain.on('services-response', (event, response) => {
       if (!requests[response.id]) return;
-      requests[response.id].event.returnValue = response;
+
+      if (requests[response.id].async) {
+        requests[response.id].event.reply('services-response-async', response);
+      } else {
+        requests[response.id].event.returnValue = response;
+      }
       delete requests[response.id];
     });
 

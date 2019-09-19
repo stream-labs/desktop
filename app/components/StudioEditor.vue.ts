@@ -27,23 +27,23 @@ export default class StudioEditor extends Vue {
   }
 
   onOutputResize(region: IRectangle) {
-    this.editorService.handleOutputResize(region);
+    this.editorService.actions.handleOutputResize(region);
   }
 
   handleMouseDown(event: MouseEvent) {
-    this.editorService.handleMouseDown(this.getMouseEvent(event));
+    this.editorService.actions.handleMouseDown(this.getMouseEvent(event));
   }
 
   handleMouseDblClick(event: MouseEvent) {
-    this.editorService.handleMouseDblClick(this.getMouseEvent(event));
+    this.editorService.actions.handleMouseDblClick(this.getMouseEvent(event));
   }
 
   handleMouseUp(event: MouseEvent) {
-    this.editorService.handleMouseUp(this.getMouseEvent(event));
+    this.editorService.actions.handleMouseUp(this.getMouseEvent(event));
   }
 
   handleMouseEnter(event: MouseEvent) {
-    this.editorService.handleMouseEnter(this.getMouseEvent(event));
+    this.editorService.actions.handleMouseEnter(this.getMouseEvent(event));
   }
 
   handleMouseMove(event: MouseEvent) {
@@ -52,7 +52,7 @@ export default class StudioEditor extends Vue {
 
   @throttle(20)
   throttledHandleMouseMove(event: MouseEvent) {
-    this.editorService.handleMouseMove(this.getMouseEvent(event));
+    this.editorService.actions.handleMouseMove(this.getMouseEvent(event));
   }
 
   getMouseEvent(event: MouseEvent): IMouseEvent {

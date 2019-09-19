@@ -20,6 +20,13 @@ export class InternalApiClient {
    * the promise in the main window will be resolved or rejected
    */
   private promises: Dictionary<Function[]> = {};
+
+  /**
+   * Similar to promises, but holds promises specifically waiting for
+   * async action responses.
+   */
+  private actionResponses: Dictionary<Function[]> = {};
+
   /**
    * almost the same as `promises` but for keeping subscriptions
    */
@@ -35,12 +42,20 @@ export class InternalApiClient {
    * All services methods calls will be sent to the main window
    * TODO: add more comments and try to refactor
    */
-  applyIpcProxy(service: Service): Service {
+  applyIpcProxy(service: Service, isAction = false, shouldReturn = false): Service {
     const availableServices = Object.keys(this.servicesManager.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
     return new Proxy(service, {
       get: (target, property, receiver) => {
+        if (property === 'actions') {
+          return this.applyIpcProxy(target, true);
+        }
+
+        if (isAction && property === 'return') {
+          return this.applyIpcProxy(target, true, true);
+        }
+
         if (!target[property]) return target[property];
 
         if (target[property]._isHelper) {
@@ -71,24 +86,31 @@ export class InternalApiClient {
             }
           });
 
-          if (target[property]._isServiceAction) {
-            ipcRenderer.send(
-              'services-request',
-              this.jsonrpc.createRequestWithOptions(
-                isHelper ? target['_resourceId'] : serviceName,
-                methodName as string,
-                { compactMode: true, fetchMutations: false },
-                ...args,
-              ),
+          if (isAction) {
+            const request = this.jsonrpc.createRequestWithOptions(
+              isHelper ? target['_resourceId'] : serviceName,
+              methodName as string,
+              { compactMode: true, fetchMutations: false, noReturn: !shouldReturn },
+              ...args,
             );
+
+            ipcRenderer.send('services-request-async', request);
+
+            if (shouldReturn) {
+              // Return a promise that will be fulfilled later with the response
+              return new Promise((resolve, reject) => {
+                this.actionResponses[request.id] = [resolve, reject];
+              });
+            }
+
             // We don't care about the response
             return;
           }
 
           console.warn(
-            `Calling non-action synchronous method from renderer process: ${
+            `Calling synchronous service method from renderer process: ${
               isHelper ? target['_resourceId'] : serviceName
-            }.${methodName.toString()}`,
+            }.${methodName.toString()} - Consider calling as an action instead`,
           );
 
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
@@ -114,40 +136,50 @@ export class InternalApiClient {
           // mark them as ignored
           this.skippedMutations.push(...mutations.map(m => m.id));
 
-          if (result && result._type === 'SUBSCRIPTION') {
-            if (result.emitter === 'PROMISE') {
-              return new Promise((resolve, reject) => {
-                const promiseId = result.resourceId;
-                this.promises[promiseId] = [resolve, reject];
-              });
-            }
-
-            if (result.emitter === 'STREAM') {
-              return (this.subscriptions[result.resourceId] =
-                this.subscriptions[result.resourceId] || new Subject());
-            }
-          }
-
-          if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
-            const helper = this.getResource(result.resourceId);
-            return this.applyIpcProxy(helper);
-          }
-
-          // payload can contain helpers-objects
-          // we have to wrap them in IpcProxy too
-          traverse(result).forEach((item: any) => {
-            if (item && item._type === 'HELPER') {
-              const helper = this.getResource(item.resourceId);
-              return this.applyIpcProxy(helper);
-            }
-          });
-          return result;
+          return this.handleResult(result);
         };
 
         if (typeof target[property] === 'function') return handler;
         if (target[property] instanceof Observable) return handler();
       },
     });
+  }
+
+  /**
+   * Handles a services response result and processes special cases
+   * such as promises, event subscriptions, helpers, and services.
+   * @param result The processed result
+   */
+  handleResult(result: any) {
+    if (result && result._type === 'SUBSCRIPTION') {
+      if (result.emitter === 'PROMISE') {
+        return new Promise((resolve, reject) => {
+          const promiseId = result.resourceId;
+          this.promises[promiseId] = [resolve, reject];
+        });
+      }
+
+      if (result.emitter === 'STREAM') {
+        return (this.subscriptions[result.resourceId] =
+          this.subscriptions[result.resourceId] || new Subject());
+      }
+    }
+
+    if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
+      const helper = this.getResource(result.resourceId);
+      return this.applyIpcProxy(helper);
+    }
+
+    // payload can contain helpers-objects
+    // we have to wrap them in IpcProxy too
+    traverse(result).forEach((item: any) => {
+      if (item && item._type === 'HELPER') {
+        const helper = this.getResource(item.resourceId);
+        return this.applyIpcProxy(helper);
+      }
+    });
+
+    return result;
   }
 
   getResource(resourceId: string) {
@@ -178,6 +210,24 @@ export class InternalApiClient {
    */
   private listenMainWindowMessages() {
     const promises = this.promises;
+
+    ipcRenderer.on('services-response-async', (e, response: IJsonRpcResponse<any>) => {
+      if (response.error) {
+        this.actionResponses[response.id][1](response.error);
+        return;
+      }
+
+      const result = this.handleResult(response.result);
+
+      if (result instanceof Promise) {
+        // Roll this promise into the original response promise
+        result
+          .then(r => this.actionResponses[response.id][0](r))
+          .catch(r => this.actionResponses[response.id][1](r));
+      } else {
+        this.actionResponses[response.id][0](result);
+      }
+    });
 
     ipcRenderer.on(
       'services-message',

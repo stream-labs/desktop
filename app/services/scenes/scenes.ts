@@ -12,7 +12,7 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { action, ViewHandler } from 'services/core';
+import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
@@ -258,7 +258,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     return count;
   }
 
-  @action()
   makeSceneActive(id: string): boolean {
     const scene = this.getScene(id);
     if (!scene) return false;
@@ -272,7 +271,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     return true;
   }
 
-  @action()
   setSceneOrder(order: string[]) {
     this.SET_SCENE_ORDER(order);
   }
