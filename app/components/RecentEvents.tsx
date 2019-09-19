@@ -45,6 +45,10 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.state.muted;
   }
 
+  get mediaShareEnabled() {
+    return this.recentEventsService.state.mediaShareEnabled;
+  }
+
   formatMoney(amount: string, type: string) {
     const prefix = type === 'donation' ? '$' : '';
     const numAmount = Number.parseFloat(amount);
@@ -66,6 +70,10 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   popoutMediaShare() {
     return this.recentEventsService.openRecentEventsWindow(true);
+  }
+
+  popoutFilterMenu() {
+    return this.recentEventsService.showFilterMenu();
   }
 
   muteEvents() {
@@ -169,12 +177,14 @@ export default class RecentEvents extends TsxComponent<{}> {
       <div class={styles.container}>
         <Toolbar
           popoutMediaShare={() => this.popoutMediaShare()}
+          popoutFilterMenu={() => this.popoutFilterMenu()}
           popoutRecentEvents={() => this.popoutRecentEvents()}
           muteEvents={() => this.muteEvents()}
           skipAlert={() => this.skipAlert()}
           toggleQueue={() => this.toggleQueue()}
           queuePaused={this.queuePaused}
           muted={this.muted}
+          mediaShareEnabled={this.mediaShareEnabled}
           native={this.native}
           onNativeswitch={val => this.setNative(val)}
         />
@@ -198,12 +208,14 @@ export default class RecentEvents extends TsxComponent<{}> {
 
 interface IToolbarProps {
   popoutMediaShare: Function;
+  popoutFilterMenu: Function;
   popoutRecentEvents: Function;
   muteEvents: Function;
   skipAlert: Function;
   toggleQueue: Function;
   queuePaused: boolean;
   muted: boolean;
+  mediaShareEnabled: boolean;
   native: boolean;
   onNativeswitch: (native: boolean) => void;
 }
@@ -212,12 +224,14 @@ interface IToolbarProps {
 @Component({})
 class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() popoutMediaShare: () => void;
+  @Prop() popoutFilterMenu: () => void;
   @Prop() popoutRecentEvents: () => void;
   @Prop() muteEvents: () => void;
   @Prop() skipAlert: () => void;
   @Prop() toggleQueue: () => void;
   @Prop() queuePaused: boolean;
   @Prop() muted: boolean;
+  @Prop() mediaShareEnabled: boolean;
   @Prop() native: boolean;
 
   render(h: Function) {
@@ -232,6 +246,13 @@ class Toolbar extends TsxComponent<IToolbarProps> {
           </span>
         </span>
         {this.native && (
+          <i
+            class="icon-filter action-icon"
+            onClick={this.popoutFilterMenu}
+            v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
+          />
+        )}
+        {this.native && this.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
             onClick={this.popoutMediaShare}

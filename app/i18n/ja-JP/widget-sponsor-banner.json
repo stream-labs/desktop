@@ -1,0 +1,23 @@
+{
+  "Ad Layout": "広告レイアウト",
+  "Placement": "配置",
+  "Image Layout": "画像のレイアウト",
+  "Image Duration": "画像の時間",
+  "Seconds": "秒",
+  "Add Image": "画像を追加",
+  "Widget Hide Duration": "ウィジェットの非表示時間",
+  "Widget Show Duration": "ウィジェットの表示時間",
+  "Banner Width": "バナーの横幅",
+  "Banner Height": "バナーの高さ",
+  "Image Animation": "画像のアニメーション",
+  "Background Color": "背景色",
+  "Transparent": "透明",
+  "Single": "シングル",
+  "Double": "ダブル",
+  "Set to zero to show the widget permanently.": "ウィジェットを永久に表示するためにはゼロに設定します",
+  "The amount of time the widget will appear.": "ウィジェットが表示される時間",
+  "These are the animations that are used to show your banner.": "あなたのバナーを表示するためのアニメーション",
+  "Visual Settings": "ビジュアル設定",
+  "Image Set ": "画像をセットする",
+  "No Image": "画像がありません"
+}

@@ -1,0 +1,11 @@
+{
+  "Banned Media": "アカウント停止されたメディア",
+  "Check Banned Media": "アカウント停止されたメディアを確認する",
+  "Price Per Second": "毎秒の価格",
+  "Min. Amount to Share": "共有分の量",
+  "Max Duration": "最長時間",
+  "Buffer Time": "バッファ時間",
+  "Spam Security": "スパムセキュリティ",
+  "The time between videos the next video has to buffer.": "次のビデオをバッファするためにかかる時間",
+  "Manage Media Settings": "メディア設定の管理"
+}
