@@ -33,7 +33,7 @@ export default class PlatformAppProperties extends Vue {
   }
 
   get app() {
-    return this.platformAppsService.getApp(this.appId);
+    return this.platformAppsService.views.getApp(this.appId);
   }
 
   get appName() {

@@ -141,6 +141,8 @@ export abstract class Service {
     // This getter is here for the type system only.
     // Attempting to call actions from the worker window will result
     // in a poor experience.
+
+    // TODO: Make a dummy synchronous aciton handler here
     return null;
   }
 }

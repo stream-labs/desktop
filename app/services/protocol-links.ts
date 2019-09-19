@@ -86,7 +86,7 @@ export class ProtocolLinksService extends Service {
 
     const appId = info.path.replace('/', '');
 
-    if (this.platformAppsService.getApp(appId)) {
+    if (this.platformAppsService.views.getApp(appId)) {
       this.navigationService.navigate('PlatformAppMainPage', { appId });
     } else {
       this.navigationService.navigate('PlatformAppStore', { appId });

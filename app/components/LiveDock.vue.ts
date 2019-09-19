@@ -234,7 +234,7 @@ export default class LiveDock extends Vue {
   get isPopOutAllowed() {
     if (this.showDefaultPlatformChat) return false;
 
-    const chatPage = this.platformAppsService
+    const chatPage = this.platformAppsService.views
       .getApp(this.selectedChat)
       .manifest.pages.find(page => page.slot === EAppPageSlot.Chat);
     if (!chatPage) return false;

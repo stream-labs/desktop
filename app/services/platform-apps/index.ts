@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
@@ -15,8 +15,7 @@ import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
 import trim from 'lodash/trim';
 import without from 'lodash/without';
-import { PlatformContainerManager } from './container-manager';
-import ExecuteInCurrentWindow from 'util/execute-in-current-window';
+import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-manager';
 import { NavigationService } from 'services/navigation';
 
 const DEV_PORT = 8081;
@@ -130,6 +129,24 @@ interface IPlatformAppServiceState {
   storeVisible: boolean;
 }
 
+class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
+  getApp(appId: string): ILoadedApp {
+    // edge case for when there are 2 apps with same id
+    // when one is unpacked and one is prod
+    // generally we want to do actions with enabled one first
+    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled);
+    if (enabledApp) return enabledApp;
+    return this.state.loadedApps.find(app => app.id === appId);
+  }
+
+  getAssetUrl(appId: string, asset: string) {
+    const app = this.getApp(appId);
+    if (!app) return null;
+
+    return getAssetUrl(app, asset);
+  }
+}
+
 export class PlatformAppsService extends StatefulService<IPlatformAppServiceState> {
   @Inject() windowsService: WindowsService;
   @Inject() guestApiService: GuestApiService;
@@ -137,6 +154,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
+
+  get views() {
+    return new PlatformAppsViews(this.state);
+  }
 
   static initialState: IPlatformAppServiceState = {
     devMode: false,
@@ -323,7 +344,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     }
 
     if (app.enabled) this.containerManager.registerApp(app);
-    this.appLoad.next(this.getApp(id));
+    this.appLoad.next(this.views.getApp(id));
   }
 
   async validateManifest(manifest: IAppManifest, appPath: string) {
@@ -447,7 +468,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    * @param appId The id of the app to refresh
    */
   async refreshApp(appId: string) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
 
     // For unpacked apps, we need to fully reload them,
     // since they may contain manifest.json changes.
@@ -504,12 +525,12 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   getPageUrlForSource(appId: string, appSourceId: string, settings = '') {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
 
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
-    let url = this.containerManager.getPageUrl(app, source.file);
+    let url = getPageUrl(app, source.file);
 
     if (settings) {
       url = `${url}&settings=${encodeURIComponent(settings)}`;
@@ -520,20 +541,13 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return url;
   }
 
-  getAssetUrl(appId: string, asset: string) {
-    const app = this.getApp(appId);
-    if (!app) return null;
-
-    return this.containerManager.getAssetUrl(app, asset);
-  }
-
   mountContainer(
     appId: string,
     slot: EAppPageSlot,
     electronWindowId: number,
     slobsWindowId: string,
   ) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
     if (!app) return null;
 
     return this.containerManager.mountContainer(app, slot, electronWindowId, slobsWindowId);
@@ -548,7 +562,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   getAppSourceSize(appId: string, sourceId: string) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
     const source = app.manifest.sources.find(source => source.id === sourceId);
 
     if (source.initialSize) {
@@ -571,7 +585,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   getPagePopOutSize(appId: string, slot: EAppPageSlot) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
     const page = app.manifest.pages.find(page => page.slot === slot);
     const popOutSize = page.popOutSize || {};
     return {
@@ -586,18 +600,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  @ExecuteInCurrentWindow()
-  getApp(appId: string): ILoadedApp {
-    // edge case for when there are 2 apps with same id
-    // when one is unpacked and one is prod
-    // generally we want to do actions with enabled one first
-    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled);
-    if (enabledApp) return enabledApp;
-    return this.state.loadedApps.find(app => app.id === appId);
-  }
-
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
     if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
@@ -628,7 +632,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
   }
 
   setEnabled(appId: string, enabling: boolean) {
-    const app = this.getApp(appId);
+    const app = this.views.getApp(appId);
     if (app.enabled === enabling) return;
 
     if (enabling) {

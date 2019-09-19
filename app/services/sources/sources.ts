@@ -498,7 +498,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     // Figure out if we should redirect to settings
     if (propertiesManagerType === 'platformApp') {
       const settings = source.getPropertiesManagerSettings();
-      const app = this.platformAppsService.getApp(settings.appId);
+      const app = this.platformAppsService.views.getApp(settings.appId);
 
       if (app) {
         const page = app.manifest.sources.find(appSource => {

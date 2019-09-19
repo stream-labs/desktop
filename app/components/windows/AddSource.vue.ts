@@ -70,7 +70,7 @@ export default class AddSource extends Vue {
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
-      const app = this.platformAppsService.getApp(
+      const app = this.platformAppsService.views.getApp(
         this.sourceAddOptions.propertiesManagerSettings.appId,
       );
       const sourceName = app.manifest.sources.find(

@@ -16,7 +16,7 @@ export default class PlatformAppMainPage extends Vue {
   }
 
   get poppedOut() {
-    const app = this.platformAppsService.getApp(this.params.appId);
+    const app = this.platformAppsService.views.getApp(this.params.appId);
 
     return !!(app && app.poppedOutSlots.find(slot => slot === this.pageSlot));
   }

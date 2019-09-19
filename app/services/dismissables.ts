@@ -1,5 +1,5 @@
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { mutation } from './core/stateful-service';
+import { mutation, ViewHandler } from './core/stateful-service';
 import Vue from 'vue';
 import { Inject } from 'services/core';
 import { AppService } from 'services/app';
@@ -13,6 +13,12 @@ interface IDismissablesServiceState {
   [key: string]: boolean;
 }
 
+class DismissiblesViews extends ViewHandler<IDismissablesServiceState> {
+  shouldShow(key: EDismissable) {
+    return !this.state[key];
+  }
+}
+
 /**
  * A dismissable is anything that can be dismissed and should
  * never show up again, like a help tip.
@@ -20,17 +26,22 @@ interface IDismissablesServiceState {
 export class DismissablesService extends PersistentStatefulService<IDismissablesServiceState> {
   @Inject() appService: AppService;
 
-  shouldShow(key: EDismissable): boolean {
-    // Some keys have extra show criteria
-    if (key === EDismissable.RecentEventsHelpTip && !this.state[key]) {
-      // If this is a fresh cache, never show the tip
-      if (this.appService.state.onboarded) {
-        this.dismiss(key);
-        return false;
-      }
-    }
+  init() {
+    console.log('INIT DISMISSIBLES');
 
-    return !this.state[key];
+    Object.values(EDismissable).forEach(key => {
+      // Some keys have extra show criteria
+      if (key === EDismissable.RecentEventsHelpTip && !this.state[key]) {
+        // If this is a fresh cache, never show the tip
+        if (this.appService.state.onboarded) {
+          this.dismiss(key);
+        }
+      }
+    });
+  }
+
+  get views() {
+    return new DismissiblesViews(this.state);
   }
 
   dismiss(key: EDismissable) {

@@ -22,9 +22,7 @@ export default class HelpTip extends TsxComponent<IHelpTipProps> {
   @Prop({ default: 'left' }) tipPosition: 'left' | 'right';
 
   get shouldShow() {
-    // TODO: This is a hack to access the store and preserve reactivity
-    this.dismissablesService.state[this.dismissableKey];
-    return this.dismissablesService.shouldShow(this.dismissableKey);
+    return this.dismissablesService.views.shouldShow(this.dismissableKey);
   }
 
   closeHelpTip() {

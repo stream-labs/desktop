@@ -22,6 +22,38 @@ interface IContainerInfo {
 }
 
 /**
+ * Page URLs are just asset URLs that additionally
+ * have an `app_token` in the query params that can
+ * be parsed by our SDK.
+ * @param app The app
+ * @param page The page filename
+ */
+export function getPageUrl(app: ILoadedApp, page: string) {
+  const url = getAssetUrl(app, page);
+  return `${url}?app_token=${app.appToken}`;
+}
+
+/**
+ * Return the URL to an asset inside an app
+ * @param app The app
+ * @param asset The asset
+ */
+export function getAssetUrl(app: ILoadedApp, asset: string) {
+  let url: string;
+
+  const trimmedAsset = trimStart(asset, '/');
+
+  if (app.unpacked) {
+    const trimmed = trim(app.manifest.buildPath, '/ ');
+    url = compact([`http://localhost:${app.devPort}`, trimmed, trimmedAsset]).join('/');
+  } else {
+    url = compact([app.appUrl, trimmedAsset]).join('/');
+  }
+
+  return url;
+}
+
+/**
  * Manages the life cycle of application containers.  Application
  * containers are restricted/sandboxed pages that can be mounted
  * into any window.  These are implemented with electron BrowserViews.
@@ -222,39 +254,7 @@ export class PlatformContainerManager {
     const page = app.manifest.pages.find(page => page.slot === slot);
     if (!page) return null;
 
-    return this.getPageUrl(app, page.file);
-  }
-
-  /**
-   * Page URLs are just asset URLs that additionally
-   * have an `app_token` in the query params that can
-   * be parsed by our SDK.
-   * @param app The app
-   * @param page The page filename
-   */
-  getPageUrl(app: ILoadedApp, page: string) {
-    const url = this.getAssetUrl(app, page);
-    return `${url}?app_token=${app.appToken}`;
-  }
-
-  /**
-   * Return the URL to an asset inside an app
-   * @param app The app
-   * @param asset The asset
-   */
-  getAssetUrl(app: ILoadedApp, asset: string) {
-    let url: string;
-
-    const trimmedAsset = trimStart(asset, '/');
-
-    if (app.unpacked) {
-      const trimmed = trim(app.manifest.buildPath, '/ ');
-      url = compact([`http://localhost:${app.devPort}`, trimmed, trimmedAsset]).join('/');
-    } else {
-      url = compact([app.appUrl, trimmedAsset]).join('/');
-    }
-
-    return url;
+    return getPageUrl(app, page.file);
   }
 
   sessionsInitialized: Dictionary<boolean> = {};

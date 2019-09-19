@@ -207,6 +207,6 @@ export default class SourcesShowcase extends Vue {
   }
 
   getAppAssetUrl(appId: string, asset: string) {
-    return this.platformAppsService.getAssetUrl(appId, asset);
+    return this.platformAppsService.views.getAssetUrl(appId, asset);
   }
 }
