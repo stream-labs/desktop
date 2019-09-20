@@ -54,7 +54,7 @@ export default class SearchablePages extends TsxComponent<{
   private async onSearchHandler(searchStr: string) {
     if (this.loading) return;
 
-    // build the pages cache if it's empty
+    // build the pages cache if it's Can
     if (!this.pagesInfo) await this.scanPages();
 
     // find pages matches to the search string in the cache
@@ -144,12 +144,14 @@ export default class SearchablePages extends TsxComponent<{
     if (searchStr) mark.mark(searchStr);
 
     // highlight inputs
-    const pageInfo = this.pagesInfo[this.page];
-    this.getPageInputs().forEach(($input, ind) => {
-      $input.classList.remove('search-highlight');
-      const needHighlight = searchStr && pageInfo.inputs[ind].match(new RegExp(searchStr, 'i'));
-      if (needHighlight) $input.classList.add('search-highlight');
-    });
+    const pageInfo = this.pagesInfo && this.pagesInfo[this.page];
+    if (pageInfo) {
+      this.getPageInputs().forEach(($input, ind) => {
+        $input.classList.remove('search-highlight');
+        const needHighlight = searchStr && pageInfo.inputs[ind].match(new RegExp(searchStr, 'i'));
+        if (needHighlight) $input.classList.add('search-highlight');
+      });
+    }
 
     // highlight buttons
     this.$refs.pageSlot.querySelectorAll('button').forEach($btn => {
