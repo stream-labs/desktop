@@ -27,13 +27,13 @@ export default class Notifications extends Vue {
 
   get notificationGroups(): { unread: INotification[]; read: INotification[] } {
     return {
-      unread: this.notificationsService.getUnread(),
-      read: this.notificationsService.getRead(),
+      unread: this.notificationsService.views.getUnread(),
+      read: this.notificationsService.views.getRead(),
     };
   }
 
   get notificationsCount() {
-    return this.notificationsService.getAll().length;
+    return this.notificationsService.views.getAll().length;
   }
 
   onNotificationClickHandler(id: number) {

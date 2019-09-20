@@ -13,7 +13,7 @@ interface IDismissablesServiceState {
   [key: string]: boolean;
 }
 
-class DismissiblesViews extends ViewHandler<IDismissablesServiceState> {
+class DismissablesViews extends ViewHandler<IDismissablesServiceState> {
   shouldShow(key: EDismissable) {
     return !this.state[key];
   }
@@ -27,7 +27,7 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   @Inject() appService: AppService;
 
   init() {
-    console.log('INIT DISMISSIBLES');
+    super.init();
 
     Object.values(EDismissable).forEach(key => {
       // Some keys have extra show criteria
@@ -41,7 +41,7 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   }
 
   get views() {
-    return new DismissiblesViews(this.state);
+    return new DismissablesViews(this.state);
   }
 
   dismiss(key: EDismissable) {

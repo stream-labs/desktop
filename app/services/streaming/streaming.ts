@@ -297,7 +297,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
     if (formattedTime === '07:50:00' && this.userService.platform.type === 'facebook') {
       const msg = $t('You are 10 minutes away from the 8 hour stream limit');
-      const existingTimeupNotif = this.notificationsService
+      const existingTimeupNotif = this.notificationsService.views
         .getUnread()
         .filter((notice: INotification) => notice.message === msg);
       if (existingTimeupNotif.length !== 0) return formattedTime;
@@ -321,7 +321,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private sendReconnectingNotification() {
     const msg = $t('Stream has disconnected, attempting to reconnect.');
-    const existingReconnectNotif = this.notificationsService
+    const existingReconnectNotif = this.notificationsService.views
       .getUnread()
       .filter((notice: INotification) => notice.message === msg);
     if (existingReconnectNotif.length !== 0) return;
@@ -334,7 +334,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private clearReconnectingNotification() {
-    const notice = this.notificationsService
+    const notice = this.notificationsService.views
       .getAll()
       .find(
         (notice: INotification) =>

@@ -50,7 +50,7 @@ export class NotificationsService {
   }
 
   getNotification(id: number): INotificationModel {
-    return this.notificationsService.getNotification(id);
+    return this.notificationsService.views.getNotification(id);
   }
 
   applyAction(notificationId: number) {
@@ -58,15 +58,15 @@ export class NotificationsService {
   }
 
   getAll(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getAll(type);
+    return this.notificationsService.views.getAll(type);
   }
 
   getUnread(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getUnread(type);
+    return this.notificationsService.views.getUnread(type);
   }
 
   getRead(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getRead(type);
+    return this.notificationsService.views.getRead(type);
   }
 
   markAsRead(id: number): void {
@@ -78,7 +78,7 @@ export class NotificationsService {
   }
 
   getSettings(): INotificationsSettings {
-    return this.notificationsService.getSettings();
+    return this.notificationsService.views.getSettings();
   }
 
   setSettings(patch: Partial<INotificationsSettings>): void {

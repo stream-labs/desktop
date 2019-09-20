@@ -62,7 +62,7 @@ export default class NotificationsArea extends Vue {
   }
 
   get unreadCount() {
-    return this.notificationsService.getUnread(ENotificationType.WARNING).length;
+    return this.notificationsService.views.getUnread(ENotificationType.WARNING).length;
   }
 
   get settings() {
@@ -139,7 +139,7 @@ export default class NotificationsArea extends Vue {
 
   private hideOutdated() {
     this.notifications.forEach(uiNotify => {
-      const notify = this.notificationsService.getNotification(uiNotify.id);
+      const notify = this.notificationsService.views.getNotification(uiNotify.id);
       const now = Date.now();
       if (!notify.unread || (notify.lifeTime !== -1 && now - notify.date > notify.lifeTime)) {
         uiNotify.outdated = true;

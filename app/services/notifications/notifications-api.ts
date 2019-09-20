@@ -43,12 +43,16 @@ export interface INotificationsServiceApi {
   notificationPushed: Observable<INotification>;
   notificationRead: Observable<number[]>;
   push(notifyInfo: INotificationOptions): INotification;
-  getNotification(id: number): INotification;
-  getAll(type?: ENotificationType): INotification[];
-  getUnread(type?: ENotificationType): INotification[];
-  getRead(type?: ENotificationType): INotification[];
-  getSettings(): INotificationsSettings;
-  getSettingsFormData(): TObsFormData;
+
+  views: {
+    getNotification(id: number): INotification;
+    getAll(type?: ENotificationType): INotification[];
+    getUnread(type?: ENotificationType): INotification[];
+    getRead(type?: ENotificationType): INotification[];
+    getSettings(): INotificationsSettings;
+    getSettingsFormData(): TObsFormData;
+  };
+
   setSettings(patch: Partial<INotificationsSettings>): void;
   restoreDefaultSettings(): void;
   markAsRead(id: number): void;

@@ -34,6 +34,7 @@ import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { I18nService } from 'services/i18n';
+import { DismissablesService } from 'services/dismissables';
 
 interface IAppState {
   loading: boolean;
@@ -84,6 +85,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private i18nService: I18nService;
+  @Inject() private dismissablesService: DismissablesService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -133,6 +135,9 @@ export class AppService extends StatefulService<IAppState> {
 
       // Pre-fetch stream info
       this.streamInfoService,
+
+      // Determine which tips should be shown
+      this.dismissablesService,
     ];
 
     this.performanceMonitorService.start();

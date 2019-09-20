@@ -26,6 +26,6 @@ export default class HelpTip extends TsxComponent<IHelpTipProps> {
   }
 
   closeHelpTip() {
-    this.dismissablesService.dismiss(this.dismissableKey);
+    this.dismissablesService.actions.dismiss(this.dismissableKey);
   }
 }

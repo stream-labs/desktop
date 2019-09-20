@@ -41,7 +41,7 @@ export default class Troubleshooter extends Vue {
   }
 
   get issue(): INotification {
-    return this.notificationsService.getAll().find(notify => notify.code === this.issueCode);
+    return this.notificationsService.views.getAll().find(notify => notify.code === this.issueCode);
   }
 
   getSettings() {

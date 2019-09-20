@@ -1,5 +1,5 @@
 import { Inject } from '../core/injector';
-import { mutation } from '../core/stateful-service';
+import { mutation, ViewHandler } from '../core/stateful-service';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
@@ -19,54 +19,9 @@ interface INotificationsState {
   notifications: INotification[];
 }
 
-export class NotificationsService extends PersistentStatefulService<INotificationsState>
-  implements INotificationsServiceApi {
-  static defaultState: INotificationsState = {
-    notifications: [],
-    settings: {
-      enabled: true,
-      playSound: false,
-    },
-  };
-
-  @Inject() private windowsService: WindowsService;
-  @Inject() private internalApiService: InternalApiService;
-
-  notificationPushed = new Subject<INotification>();
-  notificationRead = new Subject<number[]>();
-
-  private nextId = 1;
-
-  init() {
-    super.init();
-    this.CLEAR();
-  }
-
-  push(notifyInfo: INotificationOptions): INotification {
-    const notify = {
-      id: this.nextId++,
-      unread: true,
-      date: Date.now(),
-      type: ENotificationType.INFO,
-      playSound: true,
-      lifeTime: 8000,
-      showTime: false,
-      ...notifyInfo,
-    };
-    this.PUSH(notify);
-    this.notificationPushed.next(notify);
-    return notify;
-  }
-
+class NotificationsViews extends ViewHandler<INotificationsState> {
   getNotification(id: number): INotification {
     return this.state.notifications.find(notify => notify.id === id);
-  }
-
-  applyAction(notificationId: number) {
-    const notify = this.getNotification(notificationId);
-    if (!notify || !notify.action) return;
-
-    this.internalApiService.executeServiceRequest(notify.action);
   }
 
   getAll(type?: ENotificationType): INotification[] {
@@ -81,20 +36,6 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
 
   getRead(type?: ENotificationType): INotification[] {
     return this.getAll(type).filter(notify => !notify.unread);
-  }
-
-  markAsRead(id: number) {
-    const notify = this.getNotification(id);
-    if (!notify) return;
-    this.MARK_AS_READ(id);
-    this.notificationRead.next([id]);
-  }
-
-  markAllAsRead() {
-    const unreadNotifies = this.getUnread();
-    if (!unreadNotifies.length) return;
-    this.MARK_ALL_AS_READ();
-    this.notificationRead.next(unreadNotifies.map(notify => notify.id));
   }
 
   getSettings(): INotificationsSettings {
@@ -122,6 +63,71 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
         enabled: settings.enabled,
       },
     ];
+  }
+}
+
+export class NotificationsService extends PersistentStatefulService<INotificationsState>
+  implements INotificationsServiceApi {
+  static defaultState: INotificationsState = {
+    notifications: [],
+    settings: {
+      enabled: true,
+      playSound: false,
+    },
+  };
+
+  @Inject() private windowsService: WindowsService;
+  @Inject() private internalApiService: InternalApiService;
+
+  notificationPushed = new Subject<INotification>();
+  notificationRead = new Subject<number[]>();
+
+  private nextId = 1;
+
+  init() {
+    super.init();
+    this.CLEAR();
+  }
+
+  get views() {
+    return new NotificationsViews(this.state);
+  }
+
+  push(notifyInfo: INotificationOptions): INotification {
+    const notify = {
+      id: this.nextId++,
+      unread: true,
+      date: Date.now(),
+      type: ENotificationType.INFO,
+      playSound: true,
+      lifeTime: 8000,
+      showTime: false,
+      ...notifyInfo,
+    };
+    this.PUSH(notify);
+    this.notificationPushed.next(notify);
+    return notify;
+  }
+
+  applyAction(notificationId: number) {
+    const notify = this.views.getNotification(notificationId);
+    if (!notify || !notify.action) return;
+
+    this.internalApiService.executeServiceRequest(notify.action);
+  }
+
+  markAsRead(id: number) {
+    const notify = this.views.getNotification(id);
+    if (!notify) return;
+    this.MARK_AS_READ(id);
+    this.notificationRead.next([id]);
+  }
+
+  markAllAsRead() {
+    const unreadNotifies = this.views.getUnread();
+    if (!unreadNotifies.length) return;
+    this.MARK_ALL_AS_READ();
+    this.notificationRead.next(unreadNotifies.map(notify => notify.id));
   }
 
   setSettings(patch: Partial<INotificationsSettings>) {
