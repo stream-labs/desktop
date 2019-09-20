@@ -63,7 +63,11 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   moveSection(key: string, idxMod: number) {
     const sections = this.wData.settings.sections;
     const idx = sections.findIndex(sect => sect.key === key);
-    [sections[idx], sections[idx + idxMod]] = [sections[idx + idxMod], sections[idx]];
+    if (idxMod > 0) {
+      sections.splice(idx, 2, sections[idx + idxMod], sections[idx]);
+    } else {
+      sections.splice(idx + idxMod, 2, sections[idx], sections[idx + idxMod]);
+    }
     this.save();
   }
 }

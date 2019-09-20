@@ -97,8 +97,6 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
 
   protected patchBeforeSend(settings: ISpinWheelSettings): any {
     const newSettings: any = { ...settings };
-    newSettings.categories = JSON.stringify(settings.categories);
-    newSettings.sections = JSON.stringify(settings.sections);
     return newSettings;
   }
 }
