@@ -156,5 +156,8 @@
   "VLC Source": "VLC来源",
   "Add playlists of videos to your scene.": "新增影像播放清单至场景",
   "Settings for ": "设定于 ",
+  "Visible on both Stream and Recording": "Visible on both Stream and Recording",
+  "Only visible on Stream": "Only visible on Stream",
+  "Only visible on Recording": "Only visible on Recording",
   "Interact: %{sourceName}": "Interact: %{sourceName}"
 }
