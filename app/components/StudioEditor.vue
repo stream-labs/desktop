@@ -13,6 +13,7 @@
     :drawUI="true"
     :paddingSize="10"
     :sourceId="studioMode ? getStudioTransitionName() : void 0"
+    :renderingMode="renderingMode"
     @outputResize="onOutputResize"/>
 </div>
 </template>

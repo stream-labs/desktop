@@ -14,6 +14,7 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
+import { Global } from '../../../obs-api';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -59,6 +60,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
     folderSelection: false,
+    navigateToLiveOnStreamStart: true,
+    selectiveRecordingEnabled: false,
     legacyEvents: false,
     experimental: {
       // put experimental features here
@@ -71,6 +74,13 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+    if (this.state.selectiveRecordingEnabled) {
+      this.initializeMultiRendering();
+    }
+  }
+
+  initializeMultiRendering() {
+    Global.multipleRendering = this.state.selectiveRecordingEnabled;
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -126,6 +136,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setMediaBackupOptOut(optOut: boolean) {
     this.setSettings({ mediaBackupOptOut: optOut });
+  }
+
+  toggleSelectiveRecording() {
+    this.setSettings({ selectiveRecordingEnabled: !Global.multipleRendering });
+    Global.multipleRendering = !Global.multipleRendering;
   }
 
   getSettingsFormData(): TObsFormData {

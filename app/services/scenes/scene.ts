@@ -345,6 +345,8 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
+        streamVisible: sceneNode.streamVisible,
+        recordingVisible: sceneNode.recordingVisible,
       });
       return true;
     });
@@ -494,6 +496,8 @@ export class Scene {
 
       visible: true,
       locked: false,
+      streamVisible: true,
+      recordingVisible: true,
     });
   }
 

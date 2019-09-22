@@ -10,6 +10,8 @@ import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
+import { CustomizationService } from 'services/customization';
+import { StreamingService } from 'services/streaming';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -62,6 +64,8 @@ export default class SourceSelector extends Vue {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private customizationService: CustomizationService;
+  @Inject() private streamingService: StreamingService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -265,6 +269,59 @@ export default class SourceSelector extends Vue {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  get selectiveRecordingEnabled() {
+    return this.customizationService.state.selectiveRecordingEnabled;
+  }
+
+  get streamingServiceIdle() {
+    return this.streamingService.isIdle;
+  }
+
+  get replayBufferActive() {
+    return this.streamingService.isReplayBufferActive;
+  }
+
+  get selectiveRecordingLocked() {
+    return this.replayBufferActive || !this.streamingServiceIdle;
+  }
+
+  toggleSelectiveRecording() {
+    if (this.selectiveRecordingLocked) return;
+    this.customizationService.toggleSelectiveRecording();
+  }
+
+  cycleSelectiveRecording(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isLocked()) return;
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      selection.setRecordingVisible(false);
+    } else if (selection.isStreamVisible()) {
+      selection.setStreamVisible(false);
+      selection.setRecordingVisible(true);
+    } else {
+      selection.setStreamVisible(true);
+      selection.setRecordingVisible(true);
+    }
+  }
+
+  selectiveRecordingClassesForSource(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      return 'icon-smart-record';
+    }
+    return selection.isStreamVisible() ? 'icon-platforms' : 'icon-studio';
+  }
+
+  selectiveRecordingTooltip(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      return $t('Visible on both Stream and Recording');
+    }
+    return selection.isStreamVisible()
+      ? $t('Only visible on Stream')
+      : $t('Only visible on Recording');
   }
 
   visibilityClassesForSource(sceneNodeId: string) {
