@@ -221,7 +221,8 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         const regExpStr = WidgetDefinitions[WidgetType].url(
           this.hostsService.streamlabs,
           '',
-        ).replace('?', '(\\?token=[a-z0-9]+)?$'); // allow only 'token' get param
+          // allow only 'token' get param
+        ).replace('?', '(\\?token=[a-z0-9]+)?$');
         return new RegExp(regExpStr).test(url);
       }),
     );
