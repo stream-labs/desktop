@@ -61,7 +61,7 @@ export default class NewsBanner extends Vue {
     }
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <div

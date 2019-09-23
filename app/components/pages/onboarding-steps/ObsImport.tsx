@@ -63,7 +63,7 @@ export default class ObsImport extends TsxComponent<{
         description: $t(
           'We import all of your settings, including scenes, output, configurations, and much more',
         ),
-        image: ObsSvg,
+        image: <ObsSvg />,
         onClick: () => this.startImport(),
       },
       {
@@ -73,7 +73,7 @@ export default class ObsImport extends TsxComponent<{
         description: $t(
           'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',
         ),
-        image: KevinSvg,
+        image: <KevinSvg />,
         onClick: () => this.continue(false),
       },
     ];
@@ -98,7 +98,7 @@ export default class ObsImport extends TsxComponent<{
                 </span>
                 <h2>{data.title}</h2>
                 <span>{data.description}</span>
-                {data.image(h)}
+                {data.image}
               </div>
             ))}
           </div>

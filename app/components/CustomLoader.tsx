@@ -16,7 +16,7 @@ export default class CustomLoader extends Vue {
     'Constructing additional widgets...',
   ];
 
-  render(h: Function) {
+  render() {
     return <Loading loadingStrs={this.loadingStrings} isRandom />;
   }
 }
