@@ -61,7 +61,7 @@
           v-if="selectiveRecordingEnabled"
           class="source-selector-action"
           v-tooltip="selectiveRecordingTooltip(node.data.id)"
-          :class="[selectiveRecordingClassesForSource(node.data.id), streamingService.isStreaming || streamingService.isRecording ? 'disabled' : '']"
+          :class="selectiveRecordingClassesForSource(node.data.id)"
           @click.stop="cycleSelectiveRecording(node.data.id)"
           @dblclick.stop="() => {}" />
         <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
