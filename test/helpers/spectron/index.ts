@@ -128,7 +128,6 @@ export function skipCheckingErrorsInLog() {
 }
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
-  console.log('useSpectron begin');
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
@@ -138,39 +137,34 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  let isFirstRun = true;
-  let cacheDir: string;
+  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
-    if (isFirstRun) {
-      cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
-      isFirstRun = false;
-    }
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
-      path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: [
-        '--require',
-        path.join(__dirname, 'context-menu-injected.js'),
-        '--require',
-        path.join(__dirname, 'dialog-injected.js'),
-        ...appArgs,
-        '.',
-      ],
-      env: {
-        NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir,
-      },
-      webdriverOptions: {
-        // most of deprecation warning encourage us to use WebdriverIO actions API
-        // however the documentation for this API looks very poor, it provides only one example:
-        // http://webdriver.io/api/protocol/actions.html
-        // disable deprecation warning and waiting for better docs now
-        deprecationWarnings: false,
-      },
-    });
+                                            path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+                                            args: [
+                                              '--require',
+                                              path.join(__dirname, 'context-menu-injected.js'),
+                                              '--require',
+                                              path.join(__dirname, 'dialog-injected.js'),
+                                              ...appArgs,
+                                              '.',
+                                            ],
+                                            env: {
+                                              NODE_ENV: 'test',
+                                              SLOBS_CACHE_DIR: t.context.cacheDir,
+                                            },
+                                            webdriverOptions: {
+                                              // most of deprecation warning encourage us to use WebdriverIO actions API
+                                              // however the documentation for this API looks very poor, it provides only one example:
+                                              // http://webdriver.io/api/protocol/actions.html
+                                              // disable deprecation warning and waiting for better docs now
+                                              deprecationWarnings: false,
+                                            },
+                                          });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
@@ -325,7 +319,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (!appIsRunning) return;
     await stopAppFn();
     if (!testPassed) saveFailedTestsToFile([testName]);
-    console.log('tests stop');
   });
 
   /**
@@ -335,8 +328,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     testPassed = false;
     if (msg) failMsg = msg;
   }
-
-  console.log('useSpectron stop');
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
