@@ -350,6 +350,11 @@ export default class SourceSelector extends Vue {
     selection.setSettings({ locked });
   }
 
+  isLocked(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    return selection.isLocked();
+  }
+
   get scene() {
     return this.scenesService.activeScene;
   }
