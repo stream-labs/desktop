@@ -57,7 +57,7 @@
 
 .studio-page {
   flex-direction: column;
-  .padding-bottom(2);
+  .padding-bottom(1);
 }
 
 .studio-mode-container {

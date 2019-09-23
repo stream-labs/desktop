@@ -32,5 +32,19 @@
   "Unpause Alert Queue": "Unpause Alert Queue",
   "Skip Alert": "Spring over",
   "Mute Event Sounds": "Mute Event Sounds",
-  "Repeat Alert": "Repeat Alert"
+  "Repeat Alert": "Repeat Alert",
+  "There are no events to display": "There are no events to display",
+  "New Events Feed": "New Events Feed",
+  "Popout Event Filtering Options": "Popout Event Filtering Options",
+  "Subs": "Subs",
+  "3 Months": "3 Months",
+  "6 Months": "6 Months",
+  "9 Months": "9 Months",
+  "12 Months": "12 Months",
+  "months": "months",
+  "Gifted": "Gifted",
+  "Stickers": "Stickers",
+  "Effects": "Effects",
+  "has purchased %{product} from the store": "has purchased %{product} from the store",
+  "Event Filters": "Event Filters"
 }

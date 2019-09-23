@@ -111,6 +111,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return this.state.recordingStatus !== ERecordingState.Offline;
   }
 
+  get isReplayBufferActive() {
+    return this.state.replayBufferStatus !== EReplayBufferState.Offline;
+  }
+
   get isIdle(): boolean {
     return !this.isStreaming && !this.isRecording;
   }

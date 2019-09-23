@@ -1,6 +1,8 @@
 import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
+import { getClient } from '../../helpers/api-client';
+import { ScenesService } from 'services/api/external-api/scenes';
 
 useSpectron({ appArgs: '--nosync' });
 
@@ -13,6 +15,11 @@ test('Twitch Tags', async t => {
   }
 
   const tagsControlSelector = '.tags-container .v-selectpage';
+
+  // create a single source to prevent the no-sources message
+  (await getClient())
+    .getResource<ScenesService>('ScenesService')
+    .activeScene.createAndAddSource('MyColorSource', 'color_source');
 
   await app.client.click('button=Go Live');
   await focusChild(t);

@@ -20,7 +20,7 @@
           Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
         </button>
       </div>
-      <display v-if="!hideStyleBlockers" :source-id="sourceId" />
+      <display v-if="!hideStyleBlockers" :source-id="sourceId" :rendering-mode="renderingMode" />
     </div>
   </modal-layout>
 </div>

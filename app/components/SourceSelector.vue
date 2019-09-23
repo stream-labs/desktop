@@ -7,6 +7,10 @@
       </h2>
       <div>
         <i
+          :class="[{ 'icon--active': selectiveRecordingEnabled }, { disabled: selectiveRecordingLocked }, 'icon-smart-record icon-button icon-button--lg']"
+          @click="toggleSelectiveRecording"
+          v-tooltip.bottom="$t('Toggle Selective Recording')" />
+        <i
           class="icon-add-folder icon-button icon-button--lg"
           @click="addFolder"
           v-tooltip.bottom="addGroupTooltip" />
@@ -53,6 +57,13 @@
       </template>
 
       <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
+        <i
+          v-if="selectiveRecordingEnabled"
+          class="source-selector-action"
+          v-tooltip="selectiveRecordingTooltip(node.data.id)"
+          :class="[selectiveRecordingClassesForSource(node.data.id), isLocked(node.data.id) ? 'disabled' : '']"
+          @click.stop="cycleSelectiveRecording(node.data.id)"
+          @dblclick.stop="() => {}" />
         <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
         <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
       </template>
@@ -76,10 +87,14 @@
   color: var(--icon);
 }
 
+.icon--active {
+  color: var(--teal);
+}
+
 .fa.disabled,
 i.disabled {
   opacity: 0.26;
-  cursor: inherit;
+  cursor: not-allowed;
 
   &:hover {
     opacity: inherit;
