@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "Arka sistemimizi geliştirmekteyiz. İlerlemek için tekrar giriş yapmanız gerekmektedir. Eğer herhangi bir sorunuz olursa sormaktan çekinmeyin",
   "contact support.": "yardım ile iletişime geç.",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "Streamlabs'a Twitch ya da Youtube hesabınız ile giriş yapabilirsiniz",
+  "Sign in with your streaming account to get started with Streamlabs": "Streamlabs’a başlamak için yayın hesabınızla giriş yapın",
   "Select an OBS profile to import": "Aktarım için bir OBS profili seçin",
   "Import from OBS": "OBS'den Aktar",
   "Start Fresh": "Taze Başlangıç",
@@ -12,8 +12,8 @@
   "Import your scenes and your settings from OBS with a simple click, or start fresh.": "OBS'ten ayarlarınızı ve sahnelerinizi bir tıkta aktarabilir ya da taze bir başlangıç yapabilirsiniz.",
   "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.": "Aşağıya tıkladığınızda internet hızınızı ve bilgisayar bileşenlerinizi kontrol edip en iyi ayarları size sunarız.",
   "Start": "Başla",
-  "Rather do this manually?": "El ile yapmak ister misin?",
-  "Setup later": "Sonra Kur",
+  "Rather do this manually?": "Bunu el ile yapmak ister misin?",
+  "Setup later": "Sonra kur",
   "Detecting your location ...": "Bölgeniz tespit ediliyor ...",
   "Detected %{continent}": "Tespit Edilen Yer %{continent}",
   "Performing bandwidth test ...": "Bant genişliği testi yapılıyor ...",
@@ -35,5 +35,10 @@
   "Next": "Sonraki",
   "Scene Collections Import": "Sahne Koleksiyonu Ekle",
   "The following scene collections have been imported from your Streamlabs account": "Streamlabs hesabınızda bulunan devamındaki sahne koleksiyonları içeri aktarıldı",
-  "Continue": "Devam Et"
+  "Continue": "Devam Et",
+  "Collecting some information about your PC...": "Bilgisayarınız hakkında bazı bilgiler toplanıyor...",
+  "We found optimized settings for your PC": "Bilgisayarınız için optimize edilmiş ayarlar bulduk",
+  "Something went wrong": "Bir hata oluştu",
+  "Streamlabs OBS is ready to go": "Streamlabs OBS hazır",
+  "Download and Apply": "İndir ve Uygula"
 }

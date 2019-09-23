@@ -3291,9 +3291,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.39/iojs-v6.0.3-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.40/iojs-v6.0.3-crash-handler.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.39/iojs-v6.0.3-crash-handler.tar.gz#ffc1ebfcc00a632fb83407f9f749d0c52dbed815"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.40/iojs-v6.0.3-crash-handler.tar.gz#719429fbc10c047f8fae44d278292b7df2ed06ec"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
