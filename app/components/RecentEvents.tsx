@@ -107,6 +107,10 @@ export default class RecentEvents extends TsxComponent<{}> {
       this.dismissablesService.dismiss(EDismissable.RecentEventsHelpTip);
     }
 
+    if (native) {
+      this.recentEventsService.refresh();
+    }
+
     this.customizationService.setSettings({ legacyEvents: !native });
   }
 
@@ -261,7 +265,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         )}
         {this.native && (
           <i
-            class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
+            class={`${this.queuePaused ? 'icon-pause' : 'icon-media-share-2'} action-icon`}
             onClick={this.toggleQueue}
             v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
           />

@@ -156,5 +156,8 @@
   "VLC Source": "VLCソース",
   "Add playlists of videos to your scene.": "ビデオのプレイリストをシーンに追加する",
   "Settings for ": "設定",
+  "Visible on both Stream and Recording": "Visible on both Stream and Recording",
+  "Only visible on Stream": "Only visible on Stream",
+  "Only visible on Recording": "Only visible on Recording",
   "Interact: %{sourceName}": "Interact: %{sourceName}"
 }

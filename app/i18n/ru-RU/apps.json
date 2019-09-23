@@ -1,6 +1,6 @@
 {
   "Vers": "Vers",
-  "Reload": "Reload",
+  "Reload": "Перезагрузить",
   "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
+  "You must unload unpacked version before enabling this app.": "Вы должны выгрузить распакованную версию перед включением этого приложения."
 }

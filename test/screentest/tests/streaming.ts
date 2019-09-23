@@ -5,9 +5,18 @@ import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
 import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
+import { getClient } from '../../helpers/api-client';
+import { ScenesService } from 'services/api/external-api/scenes';
 
 useSpectron({ appArgs: '--nosync' });
 useScreentest();
+
+async function addColorSource() {
+  const api = await getClient();
+  api
+    .getResource<ScenesService>('ScenesService')
+    .activeScene.createAndAddSource('MyColorSource', 'color_source');
+}
 
 // test streaming for each platform
 // TODO: Re-enable Mixer streaming
@@ -20,6 +29,9 @@ platforms.forEach(platform => {
 
     // decrease resolution to reduce CPU usage
     await setOutputResolution(t, '100x100');
+
+    // add a single source to prevent showing the No-Sources dialog
+    await addColorSource();
 
     // open EditStreamInfo window
     await focusMain(t);
@@ -116,6 +128,9 @@ test('Go live error', async t => {
   // login into the account
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
+
+  // add a single source to prevent showing the No-Sources dialog
+  await addColorSource();
 
   // simulate issues with the twitch api
   await fetchMock(t, /api\.twitch\.tv/, 404);
