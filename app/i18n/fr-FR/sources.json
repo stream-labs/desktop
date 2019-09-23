@@ -156,5 +156,8 @@
   "VLC Source": "Source VLC",
   "Add playlists of videos to your scene.": "Ajoutez des listes de lecture vidéos à votre scène.",
   "Settings for ": "Paramètres pour ",
+  "Visible on both Stream and Recording": "Visible on both Stream and Recording",
+  "Only visible on Stream": "Only visible on Stream",
+  "Only visible on Recording": "Only visible on Recording",
   "Interact: %{sourceName}": "Interact: %{sourceName}"
 }

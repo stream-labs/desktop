@@ -76,5 +76,8 @@
   "Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. Please enable two factor authentication and try again.": "Twitch требует, чтобы на вашем аккаунте была включена двухфакторная аутентификация для стрима на Twitch. Пожалуйста, включите двухфакторную аутентификацию и попробуйте снова.",
   "Twitch Authentication Error": "Ошибка аутентификации Twitch",
   "Enable Two Factor Authentication": "Включите двухфакторную аутентификацию",
-  "Dismiss": "Отклонить"
+  "Dismiss": "Отклонить",
+  "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.": "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
+  "Are you sure you want to do this?": "Are you sure you want to do this?",
+  "You can add sources by clicking the + icon near the Sources box at any time": "You can add sources by clicking the + icon near the Sources box at any time"
 }
