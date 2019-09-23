@@ -315,6 +315,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       .then(resp => this.SET_MEDIA_SHARE(resp.settings.advanced_settings.enabled));
   }
 
+  refresh() {
+    return this.formEventsArray();
+  }
+
   private async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];

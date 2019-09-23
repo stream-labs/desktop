@@ -107,6 +107,10 @@ export default class RecentEvents extends TsxComponent<{}> {
       this.dismissablesService.dismiss(EDismissable.RecentEventsHelpTip);
     }
 
+    if (native) {
+      this.recentEventsService.refresh();
+    }
+
     this.customizationService.setSettings({ legacyEvents: !native });
   }
 
