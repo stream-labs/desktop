@@ -1,7 +1,7 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import Mark from 'mark.js';
 import styles from './SearchablePages.m.less';
-import { createProps, TsxComponent } from '../tsx-component-with-props';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
 interface IPageInfo {
   /**
