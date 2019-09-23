@@ -79,7 +79,7 @@ export default class ObsImport extends TsxComponent<{
     ];
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Welcome to Streamlabs OBS')}</template>

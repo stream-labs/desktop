@@ -71,10 +71,8 @@ export default class FacebookPageCreation extends TsxComponent<{ continue: () =>
     return this.pageCount ? () => this.openStreamerDashboard() : () => this.openPageCreation();
   }
 
-  render(h: Function) {
-    if (this.loading) {
-      return <i class="fa fa-spinner fa-pulse" />;
-    }
+  render() {
+    if (this.loading) return <i class="fa fa-spinner fa-pulse" />;
 
     return (
       <OnboardingStep>

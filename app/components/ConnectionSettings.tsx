@@ -67,7 +67,7 @@ export default class SceneTransitions extends TsxComponent<{ connectionId: strin
     }));
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <VFormGroup

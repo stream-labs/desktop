@@ -123,7 +123,7 @@ export default class BrowserView extends TsxComponent<{
     );
   }
 
-  render(h: Function) {
+  render() {
     if (this.loading) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -96,7 +96,7 @@ export default class EditTransform extends TsxComponent<{}> {
     this.windowsService.closeChildWindow();
   }
 
-  cropForm(h: Function) {
+  get cropForm() {
     return this.selection.isSceneItem() ? (
       <HFormGroup metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
@@ -113,7 +113,7 @@ export default class EditTransform extends TsxComponent<{}> {
     ) : null;
   }
 
-  coordinateForm(h: Function, type: string) {
+  coordinateForm(type: string) {
     const title = type === 'pos' ? $t('Position') : $t('Size');
     const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
     const inputHandler = type === 'pos' ? this.setPos : this.setScale;
@@ -135,12 +135,12 @@ export default class EditTransform extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <ModalLayout customControls showControls={false}>
         <ValidatedForm slot="content" name="transform" ref="validForm">
-          {this.coordinateForm(h, 'pos')}
-          {this.coordinateForm(h, 'scale')}
+          {this.coordinateForm('pos')}
+          {this.coordinateForm('scale')}
           <HFormGroup metadata={{ title: $t('Rotation') }}>
             <button class="button button--default" style="width: 172px;" onClick={this.rotate(90)}>
               {$t('Rotate 90 Degrees CW')}
@@ -150,7 +150,7 @@ export default class EditTransform extends TsxComponent<{}> {
               {$t('Rotate 90 Degrees CCW')}
             </button>
           </HFormGroup>
-          {this.cropForm(h)}
+          {this.cropForm}
         </ValidatedForm>
 
         <div slot="controls">

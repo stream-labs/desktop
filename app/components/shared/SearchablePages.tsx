@@ -143,7 +143,7 @@ export default class SearchablePages extends TsxComponent<{
     return Array.from(this.$refs.pageSlot.querySelectorAll('[data-role="input"]'));
   }
 
-  private render(h: Function) {
+  private render() {
     return (
       <div class={styles.searchablePages}>
         <div ref="pageSlot">{this.$scopedSlots.default({ page: this.currentPage })}</div>

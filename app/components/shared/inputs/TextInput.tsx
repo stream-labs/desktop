@@ -30,7 +30,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     };
   }
 
-  toggleVisibleButton(h: Function) {
+  get toggleVisibleButton() {
     return (
       this.metadata.masked && (
         <button
@@ -51,7 +51,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     if (this.metadata.emitOnChange) this.emitInput(value);
   }
 
-  render(h: Function) {
+  render() {
     return (
       <span
         class={cx(styles.textInput, {
@@ -73,7 +73,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
           v-validate={this.validate}
           disabled={this.options.disabled}
         />
-        {this.toggleVisibleButton(h)}
+        {this.toggleVisibleButton}
         {this.$slots.default}
       </span>
     );

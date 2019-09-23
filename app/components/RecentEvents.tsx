@@ -238,7 +238,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() mediaShareEnabled: boolean;
   @Prop() native: boolean;
 
-  render(h: Function) {
+  render() {
     const pauseTooltip = this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue');
     return (
       <div class={styles.topBar}>
@@ -349,7 +349,7 @@ class EventCell extends TsxComponent<{
     return moment.utc(this.event.created_at);
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div
         class={cx(styles.cell, this.event.read ? styles.cellRead : '')}

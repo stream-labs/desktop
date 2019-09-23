@@ -15,7 +15,7 @@ export default class HotkeyGroup extends TsxComponent<{ hotkeys: IHotkey[]; titl
   @Prop() title: string;
   collapsed = false;
 
-  header(h: Function) {
+  get header() {
     return this.title ? (
       <h2
         class="section-title section-title--dropdown"
@@ -28,10 +28,10 @@ export default class HotkeyGroup extends TsxComponent<{ hotkeys: IHotkey[]; titl
     ) : null;
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div class="section">
-        {this.header(h)}
+        {this.header}
         <transition name="expand">
           <div
             style={this.collapsed ? { display: 'none' } : null}

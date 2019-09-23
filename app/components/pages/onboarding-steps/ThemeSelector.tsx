@@ -67,7 +67,7 @@ export default class ObsImport extends TsxComponent<{
     this.continue();
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Add a Theme')}</template>

@@ -85,7 +85,7 @@ export default class Optimize extends TsxComponent<{
     }[progress.description];
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep>
         <template slot="title">

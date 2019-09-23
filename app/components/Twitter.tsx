@@ -118,7 +118,7 @@ export class Twitter extends TsxComponent<{
     this.priorTitle = title;
   }
 
-  primeButton(h: Function) {
+  get primeButton() {
     if (!this.isPrime) {
       return (
         <a onClick={this.openPrime} class={styles.primeLink}>
@@ -130,7 +130,7 @@ export class Twitter extends TsxComponent<{
     }
   }
 
-  tweetInput(h: Function) {
+  get tweetInput() {
     return (
       <TextArea
         name="tweetInput"
@@ -147,7 +147,7 @@ export class Twitter extends TsxComponent<{
     );
   }
 
-  unlinkedView(h: Function) {
+  get unlinkedView() {
     return (
       <div class={styles.section}>
         <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
@@ -163,7 +163,7 @@ export class Twitter extends TsxComponent<{
     );
   }
 
-  linkedView(h: Function) {
+  get linkedView() {
     return (
       <div class={cx('section', styles.section)}>
         <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
@@ -179,9 +179,9 @@ export class Twitter extends TsxComponent<{
           </div>
           <p>@{this.twitterScreenName}</p>
         </div>
-        {this.tweetInput(h)}
+        {this.tweetInput}
         <div class={styles.twitterButtons}>
-          {this.primeButton(h)}
+          {this.primeButton}
           <button
             class={cx('button', 'button--default', styles.adjustButton)}
             disabled={this.updatingInfo}
@@ -194,19 +194,14 @@ export class Twitter extends TsxComponent<{
     );
   }
 
-  twitter(h: Function) {
-    if (!this.updatingInfo && !this.hasTwitter) {
-      return this.unlinkedView(h);
-    }
-
-    if (this.hasTwitter) {
-      return this.linkedView(h);
-    }
+  get twitter() {
+    if (!this.updatingInfo && !this.hasTwitter) return this.unlinkedView;
+    if (this.hasTwitter) return this.linkedView;
   }
 
-  render(h: Function) {
+  render() {
     if (!this.midStreamMode) {
-      return <HFormGroup metadata={{}}>{this.twitter(h)}</HFormGroup>;
+      return <HFormGroup metadata={{}}>{this.twitter}</HFormGroup>;
     }
   }
 }

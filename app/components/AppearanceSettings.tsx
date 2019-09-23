@@ -45,7 +45,7 @@ export default class AppearanceSettings extends Vue {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <div class="section">

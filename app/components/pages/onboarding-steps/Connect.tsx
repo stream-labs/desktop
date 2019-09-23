@@ -65,7 +65,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
     return this.onboardingService.options.isSecurityUpgrade;
   }
 
-  securityUpgradeLink(h: Function) {
+  get securityUpgradeLink() {
     return (
       <span>
         {$t(
@@ -80,14 +80,14 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div class={styles.container}>
         <div class={styles.progressCover} />
         <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
         <p>
           {this.isSecurityUpgrade
-            ? this.securityUpgradeLink(h)
+            ? this.securityUpgradeLink
             : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
         </p>
         <div class={styles.signupButtons}>
