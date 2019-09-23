@@ -145,7 +145,7 @@ export default class RecentEvents extends TsxComponent<{}> {
     });
   }
 
-  renderNativeEvents(h: Function) {
+  get renderNativeEvents() {
     return (
       <div class={styles.eventContainer}>
         {!!this.recentEvents.length &&
@@ -165,7 +165,7 @@ export default class RecentEvents extends TsxComponent<{}> {
     );
   }
 
-  renderEmbeddedEvents(h: Function) {
+  get renderEmbeddedEvents() {
     return (
       <BrowserView
         class={styles.eventContainer}
@@ -176,7 +176,7 @@ export default class RecentEvents extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div class={styles.container}>
         <Toolbar
@@ -192,7 +192,7 @@ export default class RecentEvents extends TsxComponent<{}> {
           native={this.native}
           onNativeswitch={val => this.setNative(val)}
         />
-        {this.native ? this.renderNativeEvents(h) : this.renderEmbeddedEvents(h)}
+        {this.native ? this.renderNativeEvents : this.renderEmbeddedEvents}
         <HelpTip
           dismissableKey={EDismissable.RecentEventsHelpTip}
           position={{ top: '-8px', right: '360px' }}

@@ -32,7 +32,7 @@ module.exports = merge.smart(baseConfig, {
           'babel-loader',
           {
             loader: 'awesome-typescript-loader',
-            options: { forceIsolatedModules: true, reportedFiles: ['app/components/**/*.tsx'] }
+            options: { forceIsolatedModules: true, reportedFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' }
           }
         ],
         exclude: /node_modules/,
