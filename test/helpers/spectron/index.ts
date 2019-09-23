@@ -128,6 +128,7 @@ export function skipCheckingErrorsInLog() {
 }
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
+  console.log('useSpectron begin');
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
@@ -137,9 +138,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+  let isFirstRun = true;
+  let cacheDir: string;
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
+    if (isFirstRun) {
+      cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+      isFirstRun = false;
+    }
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
@@ -319,6 +325,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (!appIsRunning) return;
     await stopAppFn();
     if (!testPassed) saveFailedTestsToFile([testName]);
+    console.log('tests stop');
   });
 
   /**
@@ -328,6 +335,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     testPassed = false;
     if (msg) failMsg = msg;
   }
+
+  console.log('useSpectron stop');
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
