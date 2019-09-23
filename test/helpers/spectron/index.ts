@@ -144,27 +144,27 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     app = t.context.app = new Application({
-                                            path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-                                            args: [
-                                              '--require',
-                                              path.join(__dirname, 'context-menu-injected.js'),
-                                              '--require',
-                                              path.join(__dirname, 'dialog-injected.js'),
-                                              ...appArgs,
-                                              '.',
-                                            ],
-                                            env: {
-                                              NODE_ENV: 'test',
-                                              SLOBS_CACHE_DIR: t.context.cacheDir,
-                                            },
-                                            webdriverOptions: {
-                                              // most of deprecation warning encourage us to use WebdriverIO actions API
-                                              // however the documentation for this API looks very poor, it provides only one example:
-                                              // http://webdriver.io/api/protocol/actions.html
-                                              // disable deprecation warning and waiting for better docs now
-                                              deprecationWarnings: false,
-                                            },
-                                          });
+      path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+      args: [
+        '--require',
+        path.join(__dirname, 'context-menu-injected.js'),
+        '--require',
+        path.join(__dirname, 'dialog-injected.js'),
+        ...appArgs,
+        '.',
+      ],
+      env: {
+        NODE_ENV: 'test',
+        SLOBS_CACHE_DIR: t.context.cacheDir,
+      },
+      webdriverOptions: {
+        // most of deprecation warning encourage us to use WebdriverIO actions API
+        // however the documentation for this API looks very poor, it provides only one example:
+        // http://webdriver.io/api/protocol/actions.html
+        // disable deprecation warning and waiting for better docs now
+        deprecationWarnings: false,
+      },
+    });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 

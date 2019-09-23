@@ -3,7 +3,6 @@ import { AnchorPoint } from 'util/ScalableRectangle';
 import { WidgetType } from './widgets-data';
 import { ISourceApi } from 'services/sources';
 import { IAlertBoxVariation } from './settings/alert-box/alert-box-api';
-import { key } from 'aws-sdk/clients/signer';
 
 export interface ISerializableWidget {
   name: string;
