@@ -474,6 +474,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.MediaShare,
       WidgetType.SponsorBanner,
       WidgetType.AlertBox,
+      WidgetType.SpinWheel,
     ];
 
     if (isWidget && this.userService.isLoggedIn()) {

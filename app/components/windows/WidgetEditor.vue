@@ -125,7 +125,7 @@
 
   .top-settings {
     .row.alignable-input {
-      width: 80px;
+      width: 100px;
       flex-direction: column;
 
       .input-body {
@@ -134,6 +134,10 @@
 
       .input-footer {
         display: none;
+      }
+
+      .checkbox label {
+        width: 160px;
       }
     }
   }
@@ -178,7 +182,7 @@
   .top-settings {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: baseline;
 
     > div,
     form {
