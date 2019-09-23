@@ -6761,9 +6761,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.13electron6b/iojs-v6.0.3-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz":
   version "0.0.9"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.13electron6b/iojs-v6.0.3-node-libuiohook.tar.gz#7b6d95d5abf5ca1a38486534923a9e06129cdff9"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz#864182a1808ae605e55380bf1118d50ee488fe90"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
