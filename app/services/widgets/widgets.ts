@@ -218,11 +218,10 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   getWidgetTypeByUrl(url: string): WidgetType {
     const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
-        const regExpStr = WidgetDefinitions[WidgetType].url(
-          this.hostsService.streamlabs,
-          '',
-          // allow only 'token' get param
-        ).replace('?', '(\\?token=[a-z0-9]+)?$');
+        let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')
+          .split('?')[0]
+          .replace(/\//g, '\\/')
+        regExpStr = `${regExpStr}(\\?token=[A-z0-9]+)?$`; // allow only 'token' get param
         return new RegExp(regExpStr).test(url);
       }),
     );
