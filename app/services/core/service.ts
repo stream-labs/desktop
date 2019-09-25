@@ -27,14 +27,14 @@ type TPromisifyFunction<T extends (...args: any[]) => any> = T extends (
 /**
  * Makes all functions return void and sets other types to never
  */
-type TVoidFunctions<T> = {
+export type TVoidFunctions<T> = {
   [P in keyof T]: T[P] extends (...args: any[]) => any ? TVoidFunction<T[P]> : never
 };
 
 /**
  * Takes a function and makes its return type void
  */
-export type TVoidFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => void;
+type TVoidFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => void;
 
 export interface IActionsReturn<T> {
   return: TPromisifyFunctions<T>;

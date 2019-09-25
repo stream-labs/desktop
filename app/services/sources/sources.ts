@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation } from 'services/core/stateful-service';
+import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
@@ -54,6 +54,22 @@ interface IObsSourceCallbackInfo {
   flags: number;
 }
 
+class SourcesViews extends ViewHandler<ISourcesState> {
+  get sources(): Source[] {
+    return Object.values(this.state.sources).map(sourceModel =>
+      this.getSource(sourceModel.sourceId),
+    );
+  }
+
+  getSource(id: string): Source {
+    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
+  }
+
+  getSources() {
+    return this.sources;
+  }
+}
+
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},
@@ -72,6 +88,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
+
+  get views() {
+    return new SourcesViews(this.state);
+  }
 
   /**
    * Maps a source id to a property manager
@@ -195,7 +215,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     this.sourceAdded.next(source.state);
 
-    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
+    if (options.audioSettings) this.audioService.views.getSource(id).setSettings(options.audioSettings);
   }
 
   removeSource(id: string) {

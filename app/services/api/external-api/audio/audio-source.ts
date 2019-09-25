@@ -33,7 +33,7 @@ export class AudioSource extends ServiceHelper implements ISerializable {
 
   constructor(private sourceId: string) {
     super(sourceId);
-    this.audioSource = this.audioService.getSource(sourceId);
+    this.audioSource = this.audioService.views.getSource(sourceId);
   }
 
   getModel(): IAudioSourceModel {

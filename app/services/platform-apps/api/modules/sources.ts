@@ -156,11 +156,11 @@ export class SourcesModule extends Module {
     }
 
     if (patch.muted != null) {
-      this.audioService.getSource(patch.id).setMuted(patch.muted);
+      this.audioService.views.getSource(patch.id).setMuted(patch.muted);
     }
 
     if (patch.volume != null) {
-      this.audioService.getSource(patch.id).setDeflection(patch.volume);
+      this.audioService.views.getSource(patch.id).setDeflection(patch.volume);
     }
   }
 
@@ -212,7 +212,7 @@ export class SourcesModule extends Module {
     }
 
     if (source.audio) {
-      const audioSource = this.audioService.getSource(source.sourceId);
+      const audioSource = this.audioService.views.getSource(source.sourceId);
       serialized.volume = audioSource.fader.deflection;
       serialized.muted = audioSource.muted;
     }

@@ -12,17 +12,19 @@ export class MuteSourceCommand extends Command {
   constructor(private sourceId: string, private muted: boolean) {
     super();
     const action = muted ? 'Mute %{sourceName}' : 'Unmute %{sourceName}';
-    this.description = $t(action, { sourceName: this.audioService.getSource(this.sourceId).name });
+    this.description = $t(action, {
+      sourceName: this.audioService.views.getSource(this.sourceId).name,
+    });
   }
 
   execute() {
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     this.oldValue = source.muted;
     source.setMuted(this.muted);
   }
 
   rollback() {
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     source.setMuted(this.oldValue);
   }
 }

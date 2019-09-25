@@ -13,22 +13,22 @@ export class AudioService {
   protected audioService: InternalAudioService;
 
   getSource(sourceId: string): AudioSource {
-    const source = this.audioService.getSource(sourceId);
+    const source = this.audioService.views.getSource(sourceId);
     return source ? new AudioSource(sourceId) : null;
   }
 
   getSources(): AudioSource[] {
-    return this.audioService.getSources().map(source => this.getSource(source.sourceId));
+    return this.audioService.views.getSources().map(source => this.getSource(source.sourceId));
   }
 
   getSourcesForCurrentScene(): AudioSource[] {
-    return this.audioService
-      .getSourcesForCurrentScene()
-      .map(source => this.getSource(source.sourceId));
+    return this.audioService.views.sourcesForCurrentScene.map(source =>
+      this.getSource(source.sourceId),
+    );
   }
 
   getSourcesForScene(sceneId: string): AudioSource[] {
-    return this.audioService
+    return this.audioService.views
       .getSourcesForScene(sceneId)
       .map(source => this.getSource(source.sourceId));
   }

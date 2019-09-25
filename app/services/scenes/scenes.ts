@@ -124,10 +124,34 @@ export interface ISceneItemFolder extends ISceneItemNode {
 }
 
 class ScenesViews extends ViewHandler<IScenesState> {
-  getFoo() {
-    const bar = this.getServiceViews(SourcesService);
+  getScene(sceneId: string) {
+    return new Scene(sceneId);
+  }
 
-    return this.state.displayOrder;
+  get activeSceneId() {
+    return this.state.activeSceneId;
+  }
+
+  get activeScene() {
+    return this.getScene(this.activeSceneId);
+  }
+
+  get scenes(): Scene[] {
+    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
+  }
+
+  getSceneItems(): SceneItem[] {
+    const sceneItems: SceneItem[] = [];
+    this.scenes.forEach(scene => sceneItems.push(...scene.getItems()));
+    return sceneItems;
+  }
+
+  getSceneItem(sceneItemId: string): SceneItem | null {
+    for (const scene of this.scenes) {
+      const sceneItem = scene.getItem(sceneItemId);
+      if (sceneItem) return sceneItem;
+    }
+    return null;
   }
 }
 
@@ -281,6 +305,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     return this.state;
   }
 
+  // TODO: Remove all of this in favor of the new "views" methods
   getScene(id: string): Scene | null {
     return !this.state.scenes[id] ? null : new Scene(id);
   }

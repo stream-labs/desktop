@@ -113,7 +113,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     };
 
     if (sceneNode.getObsInput().audioMixers) {
-      details.mixerHidden = this.audioService.getSource(sceneNode.sourceId).mixerHidden;
+      details.mixerHidden = this.audioService.views.getSource(sceneNode.sourceId).mixerHidden;
     }
 
     const manager = sceneNode.source.getPropertiesManagerType();
@@ -263,7 +263,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     if (!existing) await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
 
     if (sceneItem.getObsInput().audioMixers) {
-      this.audioService.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);
+      this.audioService.views.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);
     }
 
     if (obj.filters) {

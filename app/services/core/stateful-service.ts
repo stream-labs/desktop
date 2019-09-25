@@ -174,6 +174,6 @@ export abstract class ViewHandler<TState extends object> {
     service: TService,
   ): InstanceType<TService>['views'] {
     // TODO: Working around circular reference
-    return window['sm'].instance.getService(service).instance.views;
+    return window['servicesManager'].getResource(service.name).views;
   }
 }

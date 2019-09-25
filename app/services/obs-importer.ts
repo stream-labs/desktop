@@ -202,9 +202,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                   ? obs.EMonitoringType.MonitoringOnly
                   : obs.EMonitoringType.None;
 
-              this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
-              this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
-              this.audioService.getSource(source.sourceId).setSettings({
+              this.audioService.views.getSource(source.sourceId).setMuted(sourceJSON.muted);
+              this.audioService.views.getSource(source.sourceId).setMul(sourceJSON.volume);
+              this.audioService.views.getSource(source.sourceId).setSettings({
                 audioMixers: defaultTo(sourceJSON.mixers, 255),
                 monitoringType: defaultTo(sourceJSON.monitoring_type, defaultMonitoring),
                 syncOffset: defaultTo(sourceJSON.sync / 1000000, 0),
@@ -318,9 +318,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
           { channel: i + 1 },
         );
 
-        this.audioService.getSource(newSource.sourceId).setMuted(audioSource.muted);
-        this.audioService.getSource(newSource.sourceId).setMul(audioSource.volume);
-        this.audioService.getSource(newSource.sourceId).setSettings({
+        this.audioService.views.getSource(newSource.sourceId).setMuted(audioSource.muted);
+        this.audioService.views.getSource(newSource.sourceId).setMul(audioSource.volume);
+        this.audioService.views.getSource(newSource.sourceId).setSettings({
           ['audioMixers']: audioSource.mixers,
           ['monitoringType']: audioSource.monitoring_type,
           ['syncOffset']: audioSource.sync / 1000000,

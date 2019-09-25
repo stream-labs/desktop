@@ -89,6 +89,10 @@ let store: Store<any> = null;
 export function createStore(): Store<any> {
   const statefulServiceModules = {};
   const servicesManager: ServicesManager = ServicesManager.instance;
+
+  // TODO: This is bad and I should feel bad
+  window['servicesManager'] = servicesManager;
+
   const statefulServices = servicesManager.getStatefulServicesAndMutators();
   Object.keys(statefulServices).forEach(serviceName => {
     statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);

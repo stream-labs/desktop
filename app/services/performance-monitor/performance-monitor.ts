@@ -1,7 +1,6 @@
 import { StatefulService, mutation, Service, Inject } from 'services';
 import * as obs from '../../../obs-api';
 import { NotificationsService, ENotificationType } from 'services/notifications';
-import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs';
 import { JsonrpcService } from '../api/jsonrpc';
@@ -36,7 +35,6 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   @Inject() private performanceService: PerformanceService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private troubleshooterService: TroubleshooterService;
-  servicesManager: ServicesManager = ServicesManager.instance;
 
   private intervalId: number = null;
   private droppedFramesRecords: number[] = [];

@@ -43,8 +43,37 @@ interface IAudioSourceData {
   stream?: Observable<IVolmeter>;
 }
 
+class AudioViews extends ViewHandler<IAudioSourcesState> {
+  get sourcesForCurrentScene(): AudioSource[] {
+    return this.getSourcesForScene(this.getServiceViews(ScenesService).activeSceneId);
+  }
+
+  getSourcesForScene(sceneId: string): AudioSource[] {
+    const scene = this.getServiceViews(ScenesService).getScene(sceneId);
+    const sceneSources = scene
+      .getNestedSources({ excludeScenes: true })
+      .filter(sceneItem => sceneItem.audio);
+
+    const globalSources = this.getServiceViews(SourcesService)
+      .getSources()
+      .filter(source => source.channel !== void 0);
+    return globalSources
+      .concat(sceneSources)
+      .map((sceneSource: ISource) => this.getSource(sceneSource.sourceId))
+      .filter(item => item);
+  }
+
+  getSource(sourceId: string): AudioSource {
+    return this.state.audioSources[sourceId] ? new AudioSource(sourceId) : void 0;
+  }
+
+  getSources(): AudioSource[] {
+    return Object.keys(this.state.audioSources).map(sourceId => this.getSource(sourceId));
+  }
+}
+
 @InitAfter('SourcesService')
-export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
+export class AudioService extends StatefulService<IAudioSourcesState> {
   static initialState: IAudioSourcesState = {
     audioSources: {},
   };
@@ -58,6 +87,10 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @Inject() private windowsService: WindowsService;
   @Inject() private hardwareService: HardwareService;
 
+  get views() {
+    return new AudioViews(this.state);
+  }
+
   protected init() {
     this.initVolmeterRelay();
 
@@ -68,7 +101,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     });
 
     this.sourcesService.sourceUpdated.subscribe(source => {
-      const audioSource = this.getSource(source.sourceId);
+      const audioSource = this.views.getSource(source.sourceId);
 
       if (!audioSource && source.audio) {
         this.createAudioSource(this.sourcesService.getSource(source.sourceId));
@@ -116,35 +149,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     });
   }
 
-  getSource(sourceId: string): AudioSource {
-    return this.state.audioSources[sourceId] ? new AudioSource(sourceId) : void 0;
-  }
-
-  getSources(): AudioSource[] {
-    return Object.keys(this.state.audioSources).map(sourceId => this.getSource(sourceId));
-  }
-
-  getSourcesForCurrentScene(): AudioSource[] {
-    return this.getSourcesForScene(this.scenesService.activeSceneId);
-  }
-
-  getSourcesForScene(sceneId: string): AudioSource[] {
-    const scene = this.scenesService.getScene(sceneId);
-    const sceneSources = scene
-      .getNestedSources({ excludeScenes: true })
-      .filter(sceneItem => sceneItem.audio);
-
-    const globalSources = this.sourcesService
-      .getSources()
-      .filter(source => source.channel !== void 0);
-    return globalSources
-      .concat(sceneSources)
-      .map((sceneSource: ISource) => this.getSource(sceneSource.sourceId))
-      .filter(item => item);
-  }
-
   unhideAllSourcesForCurrentScene() {
-    this.getSourcesForCurrentScene().forEach(source => {
+    this.views.sourcesForCurrentScene.forEach(source => {
       source.setHidden(false);
     });
   }
@@ -210,7 +216,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       if (name === 'syncOffset') {
         obsInput.syncOffset = AudioService.msToTimeSpec(value);
       } else if (name === 'forceMono') {
-        if (this.getSource(sourceId).forceMono !== value) {
+        if (this.views.getSource(sourceId).forceMono !== value) {
           value
             ? (obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono)
             : (obsInput.flags -= obs.ESourceFlags.ForceMono);
