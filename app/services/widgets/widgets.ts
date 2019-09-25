@@ -71,7 +71,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn) return;
 
-    const scene = this.scenesService.activeScene;
+    const scene = this.scenesService.views.activeScene;
     const widget = WidgetDefinitions[type];
 
     const suggestedName =
@@ -90,7 +90,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
 
     const item = this.editorCommandsService.executeCommand(
       'CreateNewItemCommand',
-      this.scenesService.activeSceneId,
+      this.scenesService.views.activeSceneId,
       suggestedName,
       'browser_source',
       {
@@ -199,7 +199,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
    * @param widgetItemId the id of the widget to save
    */
   async saveWidgetFile(path: string, widgetItemId: string) {
-    const widgetItem = this.scenesService.getSceneItem(widgetItemId);
+    const widgetItem = this.scenesService.views.getSceneItem(widgetItemId);
     const data = this.exportWidgetJSON(widgetItem);
     const json = JSON.stringify(data, null, 2);
 
@@ -265,7 +265,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
    * @param sceneId the id of the scene to load into
    */
   async loadWidgetFile(path: string, sceneId: string) {
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     const json = await new Promise<string>((resolve, reject) => {
       fs.readFile(path, (err, data) => {
         if (err) {

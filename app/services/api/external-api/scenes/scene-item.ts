@@ -64,7 +64,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
-    this.sceneItem = this.internalScenesService.getSceneItem(this.nodeId);
+    this.sceneItem = this.internalScenesService.views.getSceneItem(this.nodeId);
   }
 
   /**

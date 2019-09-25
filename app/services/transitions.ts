@@ -119,7 +119,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.studioModeChanged.next(true);
 
     if (!this.studioModeTransition) this.createStudioModeTransition();
-    const currentScene = this.scenesService.activeScene.getObsScene();
+    const currentScene = this.scenesService.views.activeScene.getObsScene();
     this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
 
     // Immediately switch to the duplicated scene
@@ -134,7 +134,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
 
-    this.getCurrentTransition().set(this.scenesService.activeScene.getObsScene());
+    this.getCurrentTransition().set(this.scenesService.views.activeScene.getObsScene());
     this.releaseStudioModeObjects();
   }
 
@@ -147,7 +147,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     this.studioModeLocked = true;
 
-    const currentScene = this.scenesService.activeScene.getObsScene();
+    const currentScene = this.scenesService.views.activeScene.getObsScene();
 
     const oldDuplicate = this.sceneDuplicate;
     this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
@@ -201,7 +201,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   transition(sceneAId: string, sceneBId: string) {
     if (this.state.studioMode) {
-      const scene = this.scenesService.getScene(sceneBId);
+      const scene = this.scenesService.views.getScene(sceneBId);
       this.studioModeTransition.set(scene.getObsScene());
       return;
     }
@@ -212,12 +212,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     // place when we try to transition.
     this.ensureTransition();
 
-    const obsScene = this.scenesService.getScene(sceneBId).getObsScene();
+    const obsScene = this.scenesService.views.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
 
     if (sceneAId) {
-      obsTransition.set(this.scenesService.getScene(sceneAId).getObsScene());
+      obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());
       obs.Global.setOutputSource(0, obsTransition);
       obsTransition.start(transition.duration, obsScene);
     } else {

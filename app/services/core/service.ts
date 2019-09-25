@@ -18,11 +18,11 @@ type TPromisifyFunctions<T> = {
 /**
  * Wraps the return type in a promise if it doesn't already return a promise
  */
-type TPromisifyFunction<T extends (...args: any[]) => any> = T extends (
-  ...args: any[]
-) => Promise<any>
-  ? T
-  : (...args: Parameters<T>) => Promise<ReturnType<T>>;
+type TPromisifyFunction<T> = T extends (...args: infer P) => infer R
+  ? T extends (...args: any) => Promise<any>
+    ? (...args: P) => R
+    : (...args: P) => Promise<R>
+  : T;
 
 /**
  * Makes all functions return void and sets other types to never
@@ -34,7 +34,7 @@ export type TVoidFunctions<T> = {
 /**
  * Takes a function and makes its return type void
  */
-type TVoidFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => void;
+type TVoidFunction<T> = T extends (...args: infer P) => any ? (...args: P) => void : T;
 
 export interface IActionsReturn<T> {
   return: TPromisifyFunctions<T>;

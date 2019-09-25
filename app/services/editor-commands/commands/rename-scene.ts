@@ -17,12 +17,12 @@ export class RenameSceneCommand extends Command {
   }
 
   execute() {
-    const scene = this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
     this.oldName = scene.name;
     scene.setName(this.name);
   }
 
   rollback() {
-    this.scenesService.getScene(this.sceneId).setName(this.oldName);
+    this.scenesService.views.getScene(this.sceneId).setName(this.oldName);
   }
 }

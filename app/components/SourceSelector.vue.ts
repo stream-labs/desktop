@@ -153,13 +153,13 @@ export default class SourceSelector extends Vue {
   }
 
   addSource() {
-    if (this.scenesService.activeScene) {
+    if (this.scenesService.views.activeScene) {
       this.sourcesService.showShowcase();
     }
   }
 
   addFolder() {
-    if (this.scenesService.activeScene) {
+    if (this.scenesService.views.activeScene) {
       let itemsToGroup: string[] = [];
       let parentId: string;
       if (this.selectionService.canGroupIntoFolder()) {
@@ -170,7 +170,7 @@ export default class SourceSelector extends Vue {
       this.scenesService.showNameFolder({
         itemsToGroup,
         parentId,
-        sceneId: this.scenesService.activeScene.id,
+        sceneId: this.scenesService.views.activeScene.id,
       });
     }
   }
@@ -288,7 +288,7 @@ export default class SourceSelector extends Vue {
       this.callCameFromInsideTheHouse = false;
       return;
     }
-    const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
+    const node = this.scenesService.views.activeScene.getNode(this.lastSelectedId);
     if (!node || this.selectionService.state.selectedIds.length > 1) return;
     this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
 
@@ -358,6 +358,6 @@ export default class SourceSelector extends Vue {
   }
 
   get scene() {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 }

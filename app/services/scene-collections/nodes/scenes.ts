@@ -21,7 +21,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
   sourcesService: SourcesService = SourcesService.instance;
 
   getItems() {
-    return this.scenesService.scenes;
+    return this.scenesService.views.scenes;
   }
 
   saveItem(scene: Scene): Promise<ISceneSchema> {
@@ -45,7 +45,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
             sceneItems,
             id: scene.id,
             name: scene.name,
-            active: this.scenesService.activeSceneId === scene.id,
+            active: this.scenesService.views.activeSceneId === scene.id,
           });
         });
     });
@@ -90,8 +90,8 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
 
   async afterLoad() {
     // Make sure we actually have an active scene (an invalid state things something get in)
-    if (!this.scenesService.activeSceneId) {
-      this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    if (!this.scenesService.views.activeSceneId) {
+      this.scenesService.makeSceneActive(this.scenesService.views.scenes[0].id);
     }
   }
 }

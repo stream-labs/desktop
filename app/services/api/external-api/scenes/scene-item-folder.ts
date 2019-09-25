@@ -18,7 +18,7 @@ export class SceneItemFolder extends SceneNode {
 
   constructor(public sceneId: string, public nodeId: string) {
     super(sceneId, nodeId);
-    this.sceneFolder = this.internalScenesService.getScene(sceneId).getFolder(this.nodeId);
+    this.sceneFolder = this.internalScenesService.views.getScene(sceneId).getFolder(this.nodeId);
   }
 
   /**

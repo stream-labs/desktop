@@ -45,7 +45,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
   updated = new Subject<ISelectionState>();
 
   get sceneId() {
-    return this.scenesService.activeSceneId;
+    return this.scenesService.views.activeSceneId;
   }
 
   @Inject() private scenesService: ScenesService;
@@ -172,7 +172,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
    * @override Selection.getScene
    */
   private getScene(): Scene {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 
   private getSelection(): Selection {

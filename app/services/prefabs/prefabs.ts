@@ -112,7 +112,7 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   addPrefabToActiveScene(prefabName: string) {
     const prefab = this.getPrefabs().find(prefab => prefab.name === prefabName);
     if (!prefab) return;
-    prefab.addToScene(this.scenesService.activeSceneId);
+    prefab.addToScene(this.scenesService.views.activeSceneId);
   }
 
   @mutation()
@@ -149,7 +149,7 @@ export class Prefab implements IPrefab {
   }
 
   addToScene(sceneId: string, options: IPrefabAddToSceneOptions = {}): TSceneNode {
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     const existingSource = this.getExistingSource();
 
     if (existingSource) return scene.addSource(existingSource.sourceId);

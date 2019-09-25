@@ -63,7 +63,7 @@ export default class Hotkeys extends Vue {
       }),
       scenes: mapValues(this.hotkeySet.scenes, (hotkeys, sceneId) => {
         return hotkeys.map((hotkey: IAugmentedHotkey) => {
-          hotkey.categoryName = this.scenesService.getScene(sceneId).name;
+          hotkey.categoryName = this.scenesService.views.getScene(sceneId).name;
           return hotkey;
         });
       }),

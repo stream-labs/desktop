@@ -167,7 +167,7 @@ export class SourcesModule extends Module {
   @apiMethod()
   removeSource(ctx: IApiContext, sourceId: string) {
     // Make sure this source doesn't exist in any scenes
-    const item = this.scenesService.getSceneItems().find(sceneItem => {
+    const item = this.scenesService.views.getSceneItems().find(sceneItem => {
       return sceneItem.sourceId === sourceId;
     });
 

@@ -43,14 +43,14 @@ export class CreateSceneCommand extends Command {
     let nodesToCopy: Selection;
 
     if (this.options.duplicateItemsFromScene) {
-      nodesToCopy = this.scenesService
+      nodesToCopy = this.scenesService.views
         .getScene(this.options.duplicateItemsFromScene)
         .getSelection()
         .selectAll();
     }
 
     if (this.options.groupFromOrigin) {
-      nodesToCopy = this.scenesService
+      nodesToCopy = this.scenesService.views
         .getScene(this.options.groupFromOrigin.originSceneId)
         .getSelection(this.options.groupFromOrigin.originItemIds);
     }
@@ -62,7 +62,9 @@ export class CreateSceneCommand extends Command {
     }
 
     if (this.options.groupFromOrigin) {
-      const originScene = this.scenesService.getScene(this.options.groupFromOrigin.originSceneId);
+      const originScene = this.scenesService.views.getScene(
+        this.options.groupFromOrigin.originSceneId,
+      );
       const originSelection = originScene.getSelection(this.options.groupFromOrigin.originItemIds);
 
       const item = originScene.addSource(this.sceneId, { id: this.sceneSourceId });

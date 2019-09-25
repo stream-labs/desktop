@@ -50,7 +50,7 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private scenesService: ScenesService;
 
   getItems() {
-    const linkedSourcesIds = this.scenesService
+    const linkedSourcesIds = this.scenesService.views
       .getSceneItems()
       .map(sceneItem => sceneItem.sourceId);
 

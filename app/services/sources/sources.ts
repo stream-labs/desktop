@@ -389,7 +389,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   refreshSourceAttributes() {
-    const activeItems = this.scenesService.activeScene.getItems();
+    const activeItems = this.scenesService.views.activeScene.getItems();
     const sourcesNames: string[] = [];
 
     activeItems.forEach(activeItem => {

@@ -20,7 +20,7 @@ export class AddFilesCommand extends Command {
   }
 
   execute() {
-    const scene = this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
 
     // initial executing
     if (!this.addNodesSubCommands) {

@@ -67,7 +67,7 @@ export class SceneItemFolder extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   /**

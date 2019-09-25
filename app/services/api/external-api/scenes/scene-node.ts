@@ -32,7 +32,7 @@ export abstract class SceneNode {
   protected scene: InternalScene;
 
   constructor(public sceneId: string, public nodeId: string) {
-    this.scene = this.internalScenesService.getScene(sceneId);
+    this.scene = this.internalScenesService.views.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
   }
 

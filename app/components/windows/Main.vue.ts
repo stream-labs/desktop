@@ -145,7 +145,7 @@ export default class Main extends Vue {
 
     this.editorCommandsService.executeCommand(
       'AddFilesCommand',
-      this.scenesService.activeSceneId,
+      this.scenesService.views.activeSceneId,
       files,
     );
   }

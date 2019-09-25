@@ -132,7 +132,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
         this.importMixerSources(configJSON);
         this.importTransitions(configJSON);
 
-        return this.scenesService.scenes.length !== 0;
+        return this.scenesService.views.scenes.length !== 0;
       },
     });
   }
@@ -245,7 +245,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
+          const scene = this.scenesService.views.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
@@ -286,7 +286,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importSceneOrder(configJSON: IOBSConfigJSON) {
     const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
-    const listScene = this.scenesService.scenes;
+    const listScene = this.scenesService.views.scenes;
 
     if (Array.isArray(sceneOrderJSON)) {
       sceneOrderJSON.forEach(obsScene => {

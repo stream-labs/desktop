@@ -505,7 +505,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   get sceneItems(): SceneItem[] {
-    const scene = this.scenesService.activeScene;
+    const scene = this.scenesService.views.activeScene;
     if (scene) {
       return scene.getItems().filter(source => {
         return source.isVisualSource;
@@ -516,7 +516,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   get scene(): Scene {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 
   get baseWidth() {

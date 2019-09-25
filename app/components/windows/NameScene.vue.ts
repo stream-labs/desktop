@@ -33,12 +33,12 @@ export default class NameScene extends Vue {
     let name = '';
 
     if (this.options.rename) {
-      name = this.scenesService.getScene(this.options.rename).name;
+      name = this.scenesService.views.getScene(this.options.rename).name;
       this.name = name;
     } else if (this.options.sceneToDuplicate) {
-      name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
+      name = this.scenesService.views.getScene(this.options.sceneToDuplicate).name;
     } else if (this.options.itemsToGroup) {
-      name = `${this.scenesService.activeScene.name} Group`;
+      name = `${this.scenesService.views.activeScene.name} Group`;
     } else {
       name = 'New Scene';
     }
@@ -65,7 +65,7 @@ export default class NameScene extends Vue {
 
       if (this.options.itemsToGroup) {
         options.groupFromOrigin = {
-          originSceneId: this.scenesService.activeSceneId,
+          originSceneId: this.scenesService.views.activeSceneId,
           originItemIds: this.options.itemsToGroup,
         };
       }
@@ -76,7 +76,7 @@ export default class NameScene extends Vue {
         options,
       );
 
-      this.scenesService.getScene(newSceneId).makeActive();
+      this.scenesService.views.getScene(newSceneId).makeActive();
 
       this.windowsService.closeChildWindow();
     }

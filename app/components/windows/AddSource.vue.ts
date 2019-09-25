@@ -51,7 +51,7 @@ export default class AddSource extends Vue {
         : comparison,
     );
 
-    return isSameType && source.sourceId !== this.scenesService.activeSceneId;
+    return isSameType && source.sourceId !== this.scenesService.views.activeSceneId;
   });
 
   existingSources = this.sources.map(source => {
@@ -95,7 +95,7 @@ export default class AddSource extends Vue {
   }
 
   addExisting() {
-    const scene = this.scenesService.activeScene;
+    const scene = this.scenesService.views.activeScene;
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
 
@@ -110,7 +110,7 @@ export default class AddSource extends Vue {
 
     this.editorCommandsService.executeCommand(
       'CreateExistingItemCommand',
-      this.scenesService.activeSceneId,
+      this.scenesService.views.activeSceneId,
       this.selectedSourceId,
     );
 
@@ -144,7 +144,7 @@ export default class AddSource extends Vue {
 
         const item = this.editorCommandsService.executeCommand(
           'CreateNewItemCommand',
-          this.scenesService.activeSceneId,
+          this.scenesService.views.activeSceneId,
           this.name,
           this.sourceType,
           settings,

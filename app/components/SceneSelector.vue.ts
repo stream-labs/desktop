@@ -36,11 +36,11 @@ export default class SceneSelector extends Vue {
   showTransitionsTooltip = $t('Edit Scene Transitions.');
 
   get scenes() {
-    return this.scenesService.scenes.map(scene => {
+    return this.scenesService.views.scenes.map(scene => {
       return {
         title: scene.name,
         isLeaf: true,
-        isSelected: scene.id === this.scenesService.activeSceneId,
+        isSelected: scene.id === this.scenesService.views.activeSceneId,
         data: { id: scene.id },
       };
     });
@@ -50,13 +50,13 @@ export default class SceneSelector extends Vue {
     const menu = new Menu();
     menu.append({
       label: $t('Duplicate'),
-      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.id),
+      click: () => this.scenesService.showDuplicateScene(this.scenesService.views.activeScene.id),
     });
     menu.append({
       label: $t('Rename'),
       click: () =>
         this.scenesService.showNameScene({
-          rename: this.scenesService.activeScene.id,
+          rename: this.scenesService.views.activeScene.id,
         }),
     });
     menu.append({
@@ -65,11 +65,11 @@ export default class SceneSelector extends Vue {
     });
     menu.append({
       label: $t('Filters'),
-      click: () => this.sourceFiltersService.showSourceFilters(this.scenesService.activeScene.id),
+      click: () => this.sourceFiltersService.showSourceFilters(this.scenesService.views.activeScene.id),
     });
     menu.append({
       label: $t('Create Scene Projector'),
-      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id),
+      click: () => this.projectorService.createProjector(this.scenesService.views.activeScene.id),
     });
     menu.popup();
   }
@@ -87,7 +87,7 @@ export default class SceneSelector extends Vue {
   }
 
   removeScene() {
-    const name = this.scenesService.activeScene.name;
+    const name = this.scenesService.views.activeScene.name;
     electron.remote.dialog
       .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
@@ -105,7 +105,7 @@ export default class SceneSelector extends Vue {
 
         this.editorCommandsService.executeCommand(
           'RemoveSceneCommand',
-          this.scenesService.activeSceneId,
+          this.scenesService.views.activeSceneId,
         );
       });
   }
@@ -138,8 +138,8 @@ export default class SceneSelector extends Vue {
   }
 
   get activeSceneId() {
-    if (this.scenesService.activeScene) {
-      return this.scenesService.activeScene.id;
+    if (this.scenesService.views.activeScene) {
+      return this.scenesService.views.activeScene.id;
     }
 
     return null;

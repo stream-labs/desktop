@@ -71,7 +71,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectPrefab(prefabId: string) {
-    this.prefabsService.getPrefab(prefabId).addToScene(this.scenesService.activeSceneId);
+    this.prefabsService.getPrefab(prefabId).addToScene(this.scenesService.views.activeSceneId);
     this.windowsService.closeChildWindow();
   }
 
@@ -154,7 +154,7 @@ export default class SourcesShowcase extends Vue {
       .getAvailableSourcesTypesList()
       .filter(type => {
         if (type.value === 'text_ft2_source') return false;
-        return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
+        return !(type.value === 'scene' && this.scenesService.views.scenes.length <= 1);
       })
       .map(listItem => {
         return {

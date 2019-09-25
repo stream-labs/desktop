@@ -37,13 +37,13 @@ export class RemoveItemCommand extends Command {
 
   get description() {
     return $t('Remove %{sourceName}', {
-      sourceName: this.scenesService.getSceneItem(this.sceneItemId).name,
+      sourceName: this.scenesService.views.getSceneItem(this.sceneItemId).name,
     });
   }
 
   async execute() {
-    const item = this.scenesService.getSceneItem(this.sceneItemId);
-    const scene = this.scenesService.getScene(item.sceneId);
+    const item = this.scenesService.views.getSceneItem(this.sceneItemId);
+    const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;
     this.sourceId = item.sourceId;
 
@@ -80,7 +80,7 @@ export class RemoveItemCommand extends Command {
       await this.sourceReviver.load({});
     }
 
-    const scene = this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
 
     scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
 

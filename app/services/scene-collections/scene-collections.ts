@@ -474,7 +474,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.loadDataIntoApplicationState(data);
       }
 
-      if (this.scenesService.scenes.length === 0) {
+      if (this.scenesService.views.scenes.length === 0) {
         throw new Error('Scene collection was loaded but there were no scenes.');
       }
 
@@ -554,13 +554,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     // we should remove inactive scenes first to avoid the switching between scenes
     try {
-      this.scenesService.scenes.forEach(scene => {
-        if (scene.id === this.scenesService.activeSceneId) return;
+      this.scenesService.views.scenes.forEach(scene => {
+        if (scene.id === this.scenesService.views.activeSceneId) return;
         scene.remove(true);
       });
 
-      if (this.scenesService.activeScene) {
-        this.scenesService.activeScene.remove(true);
+      if (this.scenesService.views.activeScene) {
+        this.scenesService.views.activeScene.remove(true);
       }
 
       this.sourcesService.views.sources.forEach(source => {

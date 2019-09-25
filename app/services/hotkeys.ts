@@ -10,7 +10,6 @@ import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
-import { Service } from './core';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -248,59 +247,59 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
   TOGGLE_SOURCE_VISIBILITY_SHOW: {
     name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
     description: sceneItemId => {
-      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      const sceneItem = getScenesService().views.getSceneItem(sceneItemId);
       return $t('Show %{sourcename}', { sourcename: sceneItem.source.name });
     },
-    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
-    isActive: sceneItemId => getScenesService().getSceneItem(sceneItemId).visible,
+    shouldApply: sceneItemId => getScenesService().views.getSceneItem(sceneItemId).video,
+    isActive: sceneItemId => getScenesService().views.getSceneItem(sceneItemId).visible,
     down: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(true),
   },
   TOGGLE_SOURCE_VISIBILITY_HIDE: {
     name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
     description: sceneItemId => {
-      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      const sceneItem = getScenesService().views.getSceneItem(sceneItemId);
       return $t('Hide %{sourcename}', { sourcename: sceneItem.source.name });
     },
-    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
-    isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+    shouldApply: sceneItemId => getScenesService().views.getSceneItem(sceneItemId).video,
+    isActive: sceneItemId => !getScenesService().views.getSceneItem(sceneItemId).visible,
     down: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(false),
   },
   PUSH_TO_SOURCE_SHOW: {
     name: 'PUSH_TO_SOURCE_SHOW',
     description: sceneItemId => {
-      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      const sceneItem = getScenesService().views.getSceneItem(sceneItemId);
       return $t('Push to Show %{sourcename}', { sourcename: sceneItem.source.name });
     },
-    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    shouldApply: sceneItemId => getScenesService().views.getSceneItem(sceneItemId).video,
     up: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(false),
     down: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(true),
   },
   PUSH_TO_SOURCE_HIDE: {
     name: 'PUSH_TO_SOURCE_HIDE',
     description: sceneItemId => {
-      const sceneItem = getScenesService().getSceneItem(sceneItemId);
+      const sceneItem = getScenesService().views.getSceneItem(sceneItemId);
       return $t('Push to Hide %{sourcename}', { sourcename: sceneItem.source.name });
     },
-    shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+    shouldApply: sceneItemId => getScenesService().views.getSceneItem(sceneItemId).video,
     up: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(true),
     down: sceneItemId =>
       getScenesService()
-        .getSceneItem(sceneItemId)
+        .views.getSceneItem(sceneItemId)
         .setVisibility(false),
   },
 };
@@ -408,7 +407,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       addedHotkeys.add(action.name);
     });
 
-    this.scenesService.scenes.forEach(scene => {
+    this.scenesService.views.scenes.forEach(scene => {
       Object.values(SCENE_ACTIONS).forEach(action => {
         hotkeys.push({
           actionName: action.name,
@@ -482,7 +481,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
 
     const scenesHotkeys: Dictionary<Hotkey[]> = {};
-    this.scenesService.scenes.forEach(scene => {
+    this.scenesService.views.scenes.forEach(scene => {
       const sceneItemsHotkeys = this.getSceneItemsHotkeys(scene.id);
       const sceneHotkeys = sceneItemsHotkeys.concat(this.getSceneHotkeys(scene.id));
       if (sceneHotkeys.length) scenesHotkeys[scene.id] = sceneHotkeys;
@@ -544,7 +543,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     const sceneItemsIds = scene.nodes.map(item => item.id);
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
@@ -744,11 +743,12 @@ const getActionFromName = (actionName: string) => ({
   ...(ACTIONS[actionName] || ACTIONS[getMigrationMapping(actionName)]),
 });
 
-const isSceneItem = (hotkey: OBSHotkey) => !!getScenesService().getSceneItem(hotkey.ObjectName);
+const isSceneItem = (hotkey: OBSHotkey) =>
+  !!getScenesService().views.getSceneItem(hotkey.ObjectName);
 
 const isSource = (hotkey: OBSHotkey) => !!getSourcesService().views.getSource(hotkey.ObjectName);
 
-const isScene = (hotkey: OBSHotkey) => !!getScenesService().getScene(hotkey.ObjectName);
+const isScene = (hotkey: OBSHotkey) => !!getScenesService().views.getScene(hotkey.ObjectName);
 
 const idPropFor = (hotkey: OBSHotkey) => {
   if (isSource(hotkey)) {

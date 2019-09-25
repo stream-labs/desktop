@@ -213,8 +213,8 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
-      const oldScene = this.getScene(options.duplicateSourcesFromScene);
-      const newScene = this.getScene(id);
+      const oldScene = this.views.getScene(options.duplicateSourcesFromScene);
+      const newScene = this.views.getScene(id);
 
       oldScene
         .getItems()
@@ -228,7 +228,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
-    return this.getScene(id);
+    return this.views.getScene(id);
   }
 
   canRemoveScene() {
@@ -240,14 +240,14 @@ export class ScenesService extends StatefulService<IScenesState> {
       return null;
     }
 
-    const scene = this.getScene(id);
+    const scene = this.views.getScene(id);
     const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
 
     // remove scene from other scenes if it has been added as a source
-    this.getSceneItems().forEach(sceneItem => {
+    this.views.getSceneItems().forEach(sceneItem => {
       if (sceneItem.sourceId !== scene.id) return;
       sceneItem.getScene().removeItem(sceneItem.sceneItemId);
     });
@@ -267,13 +267,13 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   setLockOnAllScenes(locked: boolean) {
-    this.scenes.forEach(scene => scene.setLockOnAllItems(locked));
+    this.views.scenes.forEach(scene => scene.setLockOnAllItems(locked));
   }
 
   getSourceItemCount(sourceId: string): number {
     let count = 0;
 
-    this.scenes.forEach(scene => {
+    this.views.scenes.forEach(scene => {
       scene.getItems().forEach(sceneItem => {
         if (sceneItem.sourceId === sourceId) count += 1;
       });
@@ -283,12 +283,12 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   makeSceneActive(id: string): boolean {
-    const scene = this.getScene(id);
+    const scene = this.views.getScene(id);
     if (!scene) return false;
 
     this.MAKE_SCENE_ACTIVE(id);
 
-    const activeScene = this.activeScene;
+    const activeScene = this.views.activeScene;
 
     this.transitionsService.transition(activeScene && activeScene.id, scene.id);
     this.sceneSwitched.next(scene.getModel());
@@ -306,43 +306,43 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   // TODO: Remove all of this in favor of the new "views" methods
-  getScene(id: string): Scene | null {
-    return !this.state.scenes[id] ? null : new Scene(id);
-  }
+  // getScene(id: string): Scene | null {
+  //   return !this.state.scenes[id] ? null : new Scene(id);
+  // }
 
-  getSceneItem(sceneItemId: string): SceneItem | null {
-    for (const scene of this.scenes) {
-      const sceneItem = scene.getItem(sceneItemId);
-      if (sceneItem) return sceneItem;
-    }
-    return null;
-  }
+  // getSceneItem(sceneItemId: string): SceneItem | null {
+  //   for (const scene of this.scenes) {
+  //     const sceneItem = scene.getItem(sceneItemId);
+  //     if (sceneItem) return sceneItem;
+  //   }
+  //   return null;
+  // }
 
-  getSceneItems(): SceneItem[] {
-    const sceneItems: SceneItem[] = [];
-    this.scenes.forEach(scene => sceneItems.push(...scene.getItems()));
-    return sceneItems;
-  }
+  // getSceneItems(): SceneItem[] {
+  //   const sceneItems: SceneItem[] = [];
+  //   this.scenes.forEach(scene => sceneItems.push(...scene.getItems()));
+  //   return sceneItems;
+  // }
 
-  getScenes(): Scene[] {
-    return this.scenes;
-  }
+  // getScenes(): Scene[] {
+  //   return this.scenes;
+  // }
 
-  get scenes(): Scene[] {
-    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
-  }
+  // get scenes(): Scene[] {
+  //   return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
+  // }
 
-  get activeSceneId(): string {
-    return this.state.activeSceneId;
-  }
+  // get activeSceneId(): string {
+  //   return this.state.activeSceneId;
+  // }
 
-  get activeScene(): Scene {
-    return this.getScene(this.state.activeSceneId);
-  }
+  // get activeScene(): Scene {
+  //   return this.getScene(this.state.activeSceneId);
+  // }
 
   suggestName(name: string): string {
     return namingHelpers.suggestName(name, (name: string) => {
-      const ind = this.activeScene.getNodes().findIndex(node => node.name === name);
+      const ind = this.views.activeScene.getNodes().findIndex(node => node.name === name);
       return ind !== -1;
     });
   }

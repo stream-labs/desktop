@@ -56,11 +56,11 @@ export class ScenesModule extends Module {
   constructor() {
     super();
     this.scenesService.sceneAdded.subscribe(sceneData => {
-      const scene = this.scenesService.getScene(sceneData.id);
+      const scene = this.scenesService.views.getScene(sceneData.id);
       this.sceneAdded.next(this.serializeScene(scene));
     });
     this.scenesService.sceneSwitched.subscribe(sceneData => {
-      const scene = this.scenesService.getScene(sceneData.id);
+      const scene = this.scenesService.views.getScene(sceneData.id);
       this.sceneSwitched.next(this.serializeScene(scene));
     });
     this.scenesService.sceneRemoved.subscribe(sceneData => {
@@ -81,26 +81,26 @@ export class ScenesModule extends Module {
 
   @apiMethod()
   getScenes() {
-    return this.scenesService.getScenes().map(scene => this.serializeScene(scene));
+    return this.scenesService.views.scenes.map(scene => this.serializeScene(scene));
   }
 
   @apiMethod()
   getScene(_ctx: IApiContext, id: string): IScene | null {
-    const scene = this.scenesService.getScene(id);
+    const scene = this.scenesService.views.getScene(id);
 
     return scene ? this.serializeScene(scene) : null;
   }
 
   @apiMethod()
   getSceneItem(_ctx: IApiContext, id: string): ISceneItem | ISceneItemFolder | null {
-    const sceneItem = this.scenesService.getSceneItem(id);
+    const sceneItem = this.scenesService.views.getSceneItem(id);
 
     return sceneItem ? this.serializeNode(sceneItem) : null;
   }
 
   @apiMethod()
   getActiveScene() {
-    return this.serializeScene(this.scenesService.activeScene);
+    return this.serializeScene(this.scenesService.views.activeScene);
   }
 
   @apiMethod()
@@ -112,7 +112,7 @@ export class ScenesModule extends Module {
   updateScene(ctx: IApiContext, patch: Partial<IScene>) {
     this.validatePatch(['id'], patch);
 
-    if (patch.name) this.scenesService.getScene(patch.id).setName(patch.name);
+    if (patch.name) this.scenesService.views.getScene(patch.id).setName(patch.name);
   }
 
   @apiMethod()
@@ -127,7 +127,7 @@ export class ScenesModule extends Module {
 
   @apiMethod()
   createSceneItem(ctx: IApiContext, sceneId: string, sourceId: string) {
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
 
     const sceneItem = scene.addSource(sourceId);
@@ -137,7 +137,7 @@ export class ScenesModule extends Module {
   @apiMethod()
   updateSceneItem(ctx: IApiContext, patch: Partial<ISceneItem>) {
     this.validatePatch(['id'], patch);
-    const sceneItem = this.scenesService.getSceneItem(patch.id);
+    const sceneItem = this.scenesService.views.getSceneItem(patch.id);
 
     if (patch.locked != null) sceneItem.setLocked(patch.locked);
     if (patch.visible != null) sceneItem.setVisibility(patch.visible);
@@ -146,7 +146,7 @@ export class ScenesModule extends Module {
 
   @apiMethod()
   removeSceneItem(ctx: IApiContext, sceneId: string, sceneItemId: string) {
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
 
     scene.removeItem(sceneItemId);

@@ -23,7 +23,7 @@ export class CreateExistingItemCommand extends Command {
   }
 
   execute() {
-    const item = this.scenesService
+    const item = this.scenesService.views
       .getScene(this.sceneId)
       .addSource(this.sourceId, { id: this.sceneItemId });
 
@@ -31,6 +31,6 @@ export class CreateExistingItemCommand extends Command {
   }
 
   rollback() {
-    this.scenesService.getScene(this.sceneId).removeItem(this.sceneItemId);
+    this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
   }
 }

@@ -33,7 +33,7 @@ export class CopyNodesCommand extends Command {
   }
 
   execute() {
-    const scene = this.scenesService.getScene(this.destSceneId);
+    const scene = this.scenesService.views.getScene(this.destSceneId);
     const insertedNodes: TSceneNode[] = [];
 
     const initialNodeOrder = scene.getNodesIds();
@@ -97,7 +97,7 @@ export class CopyNodesCommand extends Command {
     // Rolling back this operation is as simple as removing all created items.
     // Any duplicated sources will be automatically deleted as the last scene
     // item referencing them is removed.
-    const scene = this.scenesService.getScene(this.destSceneId);
+    const scene = this.scenesService.views.getScene(this.destSceneId);
 
     Object.values(this.nodeIdsMap).forEach(nodeId => {
       const node = scene.getNode(nodeId);

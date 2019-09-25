@@ -79,8 +79,10 @@ export default class OverlaySettings extends Vue {
 
     this.busy = true;
 
-    this.widgetsService.loadWidgetFile(chosenPath[0], this.scenesService.activeSceneId).then(() => {
-      this.busy = false;
-    });
+    this.widgetsService
+      .loadWidgetFile(chosenPath[0], this.scenesService.views.activeSceneId)
+      .then(() => {
+        this.busy = false;
+      });
   }
 }

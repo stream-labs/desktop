@@ -50,7 +50,7 @@ export default class SceneTransitions extends Vue {
   );
 
   get transitionsEnabled() {
-    return this.scenesService.scenes.length > 1;
+    return this.scenesService.views.scenes.length > 1;
   }
 
   /**
@@ -128,8 +128,8 @@ export default class SceneTransitions extends Vue {
   addConnection() {
     const connection = this.editorCommandsService.executeCommand(
       'CreateConnectionCommand',
-      this.scenesService.scenes[0].id,
-      this.scenesService.scenes[1].id,
+      this.scenesService.views.scenes[0].id,
+      this.scenesService.views.scenes[1].id,
       this.transitions[0].id,
     );
 
@@ -155,7 +155,7 @@ export default class SceneTransitions extends Vue {
   getSceneName(id: string | 'ALL') {
     if (id === 'ALL') return $t('All');
 
-    const scene = this.scenesService.getScene(id);
+    const scene = this.scenesService.views.getScene(id);
 
     if (scene) return scene.name;
     return `<${$t('Deleted')}>`;

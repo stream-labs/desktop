@@ -28,7 +28,7 @@ export class CreateNewItemCommand extends Command {
     this.options.sourceAddOptions.sourceId =
       this.options.sourceAddOptions.sourceId || this.sourceId;
 
-    const item = this.scenesService
+    const item = this.scenesService.views
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
@@ -39,6 +39,6 @@ export class CreateNewItemCommand extends Command {
   }
 
   rollback() {
-    this.scenesService.getScene(this.sceneId).removeItem(this.sceneItemId);
+    this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
   }
 }

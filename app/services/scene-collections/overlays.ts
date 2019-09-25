@@ -102,7 +102,7 @@ export class OverlaysPersistenceService extends Service {
     const root = parse(data, NODE_TYPES);
     await root.load({ assetsPath });
 
-    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    this.scenesService.makeSceneActive(this.scenesService.views.scenes[0].id);
     this.selectionService.reset();
   }
 

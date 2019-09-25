@@ -25,7 +25,7 @@ export class Scene {
   @Fallback() private scene: InternalScene;
 
   constructor(private sceneId: string) {
-    this.scene = this.internalScenesService.getScene(sceneId);
+    this.scene = this.internalScenesService.views.getScene(sceneId);
   }
 
   getModel(): ISceneModel {
