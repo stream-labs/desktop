@@ -77,7 +77,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     const suggestedName =
       name ||
       namingHelpers.suggestName(name || widget.name, (name: string) => {
-        return this.sourcesService.getSourcesByName(name).length;
+        return this.sourcesService.views.getSourcesByName(name).length;
       });
 
     // Calculate initial position
@@ -215,7 +215,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   private register(sourceId: string) {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     if (source.getPropertiesManagerType() !== 'widget') return;
     const widgetType = source.getPropertiesManagerSettings().widgetType;
 

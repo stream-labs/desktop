@@ -122,7 +122,7 @@ export class Scene {
   }
 
   setName(newName: string) {
-    const sceneSource = this.sourcesService.getSource(this.id);
+    const sceneSource = this.sourcesService.views.getSource(this.id);
     sceneSource.setName(newName);
     this.SET_NAME(newName);
   }
@@ -139,7 +139,7 @@ export class Scene {
   }
 
   addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     if (!source) throw new Error(`Source ${sourceId} not found`);
 
     if (!this.canAddSource(sourceId)) return null;
@@ -331,7 +331,7 @@ export class Scene {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     nodes = nodes.filter(sceneNode => {
       if (sceneNode.sceneNodeType === 'folder') return true;
-      const source = this.sourcesService.getSource(sceneNode.sourceId);
+      const source = this.sourcesService.views.getSource(sceneNode.sourceId);
       if (!source) return false;
       arrayItems.push({
         name: source.sourceId,
@@ -371,7 +371,7 @@ export class Scene {
   }
 
   canAddSource(sourceId: string): boolean {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     if (!source) return false;
 
     // if source is scene then traverse the scenes tree to detect possible infinity scenes loop
@@ -451,7 +451,7 @@ export class Scene {
    * returns the source linked to scene
    */
   getSource(): Source {
-    return this.sourcesService.getSource(this.id);
+    return this.sourcesService.views.getSource(this.id);
   }
 
   getResourceId() {

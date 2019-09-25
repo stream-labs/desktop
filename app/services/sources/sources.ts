@@ -68,9 +68,16 @@ class SourcesViews extends ViewHandler<ISourcesState> {
   getSources() {
     return this.sources;
   }
+
+  getSourcesByName(name: string): Source[] {
+    const sourceModels = Object.values(this.state.sources).filter(source => {
+      return source.name === name;
+    });
+    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
+  }
 }
 
-export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
+export class SourcesService extends StatefulService<ISourcesState> {
   static initialState = {
     sources: {},
     temporarySources: {}, // don't save temporarySources in the config file
@@ -184,7 +191,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     this.addSource(obsInput, name, options);
 
-    return this.getSource(id);
+    return this.views.getSource(id);
   }
 
   addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
@@ -202,7 +209,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
     });
-    const source = this.getSource(id);
+    const source = this.views.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
@@ -219,7 +226,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   removeSource(id: string) {
-    const source = this.getSource(id);
+    const source = this.views.getSource(id);
 
     if (!source) throw new Error(`Source ${id} not found`);
 
@@ -290,12 +297,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
+    return namingHelpers.suggestName(name, (name: string) => this.views.getSourcesByName(name).length);
   }
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
-    const source = this.getSource(sceneItemState.sourceId);
+    const source = this.views.getSource(sceneItemState.sourceId);
 
     if (source.type === 'scene') return;
 
@@ -407,7 +414,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   private handleSourceCallback(objs: IObsSourceCallbackInfo[]) {
     objs.forEach(info => {
-      const source = this.getSource(info.name);
+      const source = this.views.getSource(info.name);
 
       // This is probably a transition or something else we don't care about
       if (!source) return;
@@ -434,7 +441,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   setMuted(id: string, muted: boolean) {
-    const source = this.getSource(id);
+    const source = this.views.getSource(id);
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.state);
@@ -444,35 +451,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.RESET_SOURCES();
   }
 
-  // Utility functions / getters
-
-  getSourceById(id: string): Source {
-    return this.getSource(id);
-  }
-
-  getSourcesByName(name: string): Source[] {
-    const sourceModels = Object.values(this.state.sources).filter(source => {
-      return source.name === name;
-    });
-    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
-  }
-
-  get sources(): Source[] {
-    return Object.values(this.state.sources).map(sourceModel =>
-      this.getSource(sourceModel.sourceId),
-    );
-  }
-
-  getSource(id: string): Source {
-    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
-  }
-
-  getSources() {
-    return this.sources;
-  }
-
   showSourceProperties(sourceId: string) {
-    const source = this.getSource(sourceId);
+    const source = this.views.getSource(sourceId);
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
@@ -594,7 +574,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
    * This function does nothing if the source is not a browser source.
    */
   showInteractWindow(sourceId: string) {
-    const source = this.getSourceById(sourceId);
+    const source = this.views.getSource(sourceId);
 
     if (source.type !== 'browser_source') return;
 

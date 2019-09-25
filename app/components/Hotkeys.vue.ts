@@ -46,7 +46,7 @@ export default class Hotkeys extends Vue {
   }
 
   get sources() {
-    return this.sourcesService.sources;
+    return this.sourcesService.views.sources;
   }
 
   get augmentedHotkeySet(): IAugmentedHotkeySet {
@@ -57,7 +57,7 @@ export default class Hotkeys extends Vue {
           // Mutating the original object is required for bindings to work
           // TODO: We should refactor this to not rely on child components
           // mutating the original objects.
-          hotkey.categoryName = this.sourcesService.getSource(sourceId).name;
+          hotkey.categoryName = this.sourcesService.views.getSource(sourceId).name;
           return hotkey;
         });
       }),

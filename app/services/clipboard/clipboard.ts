@@ -138,7 +138,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   copyFilters(sourceId?: string) {
     const source = sourceId
-      ? this.sourcesService.getSource(sourceId)
+      ? this.sourcesService.views.getSource(sourceId)
       : this.selectionService.getLastSelected();
 
     if (!source) return;
@@ -148,7 +148,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   pasteFilters(sourceId?: string) {
     const source = sourceId
-      ? this.sourcesService.getSource(sourceId)
+      ? this.sourcesService.views.getSource(sourceId)
       : this.selectionService.getLastSelected();
     if (!source) return;
 

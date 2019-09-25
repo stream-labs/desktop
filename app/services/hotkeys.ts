@@ -33,13 +33,13 @@ function getGameOverlayService(): GameOverlayService {
 }
 
 const isAudio = (sourceId: string) => {
-  const source = getSourcesService().getSource(sourceId);
+  const source = getSourcesService().views.getSource(sourceId);
 
   return source ? source.audio : false;
 };
 
 const isSourceType = (type: TSourceType) => (sourceId: string) => {
-  const source = getSourcesService().getSource(sourceId);
+  const source = getSourcesService().views.getSource(sourceId);
 
   return source ? source.type === type : false;
 };
@@ -161,14 +161,14 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_MUTE',
     description: () => $t('Mute'),
     down: sourceId => getSourcesService().setMuted(sourceId, true),
-    isActive: sourceId => getSourcesService().getSource(sourceId).muted,
+    isActive: sourceId => getSourcesService().views.getSource(sourceId).muted,
     shouldApply: isAudio,
   },
   TOGGLE_UNMUTE: {
     name: 'TOGGLE_UNMUTE',
     description: () => $t('Unmute'),
     down: sourceId => getSourcesService().setMuted(sourceId, false),
-    isActive: sourceId => !getSourcesService().getSource(sourceId).muted,
+    isActive: sourceId => !getSourcesService().views.getSource(sourceId).muted,
     shouldApply: isAudio,
   },
   PUSH_TO_MUTE: {
@@ -476,7 +476,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getHotkeysSet(): IHotkeysSet {
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
-    this.sourcesService.getSources().forEach(source => {
+    this.sourcesService.views.getSources().forEach(source => {
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
       if (sourceHotkeys.length) sourcesHotkeys[source.sourceId] = sourceHotkeys;
     });
@@ -642,7 +642,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     }
 
     // Otherwise prefix the hotkey name with its source type
-    const source = this.sourcesService.getSource(hotkey.ObjectName);
+    const source = this.sourcesService.views.getSource(hotkey.ObjectName);
 
     if (source) {
       return ACTIONS[`${source.type.toUpperCase()}_${hotkey.HotkeyName}`];
@@ -746,7 +746,7 @@ const getActionFromName = (actionName: string) => ({
 
 const isSceneItem = (hotkey: OBSHotkey) => !!getScenesService().getSceneItem(hotkey.ObjectName);
 
-const isSource = (hotkey: OBSHotkey) => !!getSourcesService().getSource(hotkey.ObjectName);
+const isSource = (hotkey: OBSHotkey) => !!getSourcesService().views.getSource(hotkey.ObjectName);
 
 const isScene = (hotkey: OBSHotkey) => !!getScenesService().getScene(hotkey.ObjectName);
 

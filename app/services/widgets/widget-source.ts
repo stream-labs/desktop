@@ -22,7 +22,7 @@ export class WidgetSource implements IWidgetSource {
   }
 
   getSource() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   getSettingsService(): WidgetSettingsService<IWidgetData> {
@@ -64,12 +64,12 @@ export class WidgetSource implements IWidgetSource {
   }
 
   getPreviewSource() {
-    return this.sourcesService.getSource(this.previewSourceId);
+    return this.sourcesService.views.getSource(this.previewSourceId);
   }
 
   destroyPreviewSource() {
     this.widgetsService.stopSyncPreviewSource(this.previewSourceId);
-    this.sourcesService.getSource(this.previewSourceId).remove();
+    this.sourcesService.views.getSource(this.previewSourceId).remove();
     this.SET_PREVIEW_SOURCE_ID('');
   }
 

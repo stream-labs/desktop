@@ -17,12 +17,12 @@ export class RenameSourceCommand extends Command {
   }
 
   execute() {
-    const source = this.sourcesService.getSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
     this.oldName = source.name;
     source.setName(this.name);
   }
 
   rollback() {
-    this.sourcesService.getSource(this.sourceId).setName(this.oldName);
+    this.sourcesService.views.getSource(this.sourceId).setName(this.oldName);
   }
 }

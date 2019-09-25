@@ -380,7 +380,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   setupFilter() {
-    const sources = this.sourcesService.getSources();
+    const sources = this.sourcesService.views.getSources();
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';

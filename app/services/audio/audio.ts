@@ -95,7 +95,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     this.initVolmeterRelay();
 
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
-      const source = this.sourcesService.getSource(sourceModel.sourceId);
+      const source = this.sourcesService.views.getSource(sourceModel.sourceId);
       if (!source.audio) return;
       this.createAudioSource(source);
     });
@@ -104,7 +104,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       const audioSource = this.views.getSource(source.sourceId);
 
       if (!audioSource && source.audio) {
-        this.createAudioSource(this.sourcesService.getSource(source.sourceId));
+        this.createAudioSource(this.sourcesService.views.getSource(source.sourceId));
       }
 
       if (audioSource && !source.audio) {
@@ -156,7 +156,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   fetchFaderDetails(sourceId: string): IFader {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     const obsFader = this.sourceData[source.sourceId].fader;
     const deflection = Math.round(obsFader.deflection * 100) / 100.0;
 
@@ -168,7 +168,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   generateAudioSourceData(sourceId: string): IAudioSource {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     const obsSource = source.getObsInput();
 
     const fader = this.fetchFaderDetails(sourceId);
@@ -204,7 +204,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   setSettings(sourceId: string, patch: Partial<IAudioSource>) {
-    const obsInput = this.sourcesService.getSourceById(sourceId).getObsInput();
+    const obsInput = this.sourcesService.views.getSource(sourceId).getObsInput();
 
     // Fader is ignored by this method.  Use setFader instead
     const newPatch = omit(patch, 'fader');
@@ -435,7 +435,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   setSettings(patch: Partial<IAudioSource>) {

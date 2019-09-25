@@ -145,7 +145,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
         });
 
         if (isFilterAvailable) {
-          const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
+          const sourceId = this.sourcesService.views.getSourcesByName(source.name)[0].sourceId;
 
           const filter = this.filtersService.add(sourceId, filterJSON.id, filterJSON.name);
           filter.enabled = filterJSON.enabled;
@@ -252,7 +252,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
           if (Array.isArray(sceneItems)) {
             // Looking for the source to add to the scene
             sceneItems.forEach(item => {
-              const sourceToAdd = this.sourcesService.getSources().find(source => {
+              const sourceToAdd = this.sourcesService.views.getSources().find(source => {
                 return source.name === item.name;
               });
               if (sourceToAdd) {

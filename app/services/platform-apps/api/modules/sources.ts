@@ -42,11 +42,11 @@ export class SourcesModule extends Module {
   constructor() {
     super();
     this.sourcesService.sourceAdded.subscribe(sourceData => {
-      const source = this.sourcesService.getSourceById(sourceData.sourceId);
+      const source = this.sourcesService.views.getSource(sourceData.sourceId);
       this.sourceAdded.next(this.serializeSource(source));
     });
     this.sourcesService.sourceUpdated.subscribe(sourceData => {
-      const source = this.sourcesService.getSourceById(sourceData.sourceId);
+      const source = this.sourcesService.views.getSource(sourceData.sourceId);
       this.sourceUpdated.next(this.serializeSource(source));
     });
     this.sourcesService.sourceRemoved.subscribe(sourceData => {
@@ -70,12 +70,12 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   getSources() {
-    return this.sourcesService.getSources().map(source => this.serializeSource(source));
+    return this.sourcesService.views.getSources().map(source => this.serializeSource(source));
   }
 
   @apiMethod()
   getSource(_ctx: IApiContext, id: string): ISource | null {
-    const source = this.sourcesService.getSource(id);
+    const source = this.sourcesService.views.getSource(id);
 
     return source ? this.serializeSource(source) : null;
   }
@@ -104,7 +104,7 @@ export class SourcesModule extends Module {
   }
 
   private getAppSourceForApp(sourceId: string, appId: string) {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
 
     if (!source) {
       throw new Error(`The source with id ${sourceId} does not exist!`);
@@ -149,7 +149,7 @@ export class SourcesModule extends Module {
     const requiredKeys = ['id'];
     this.validatePatch(requiredKeys, patch);
 
-    const source = this.sourcesService.getSource(patch.id);
+    const source = this.sourcesService.views.getSource(patch.id);
 
     if (patch.name) {
       source.setName(patch.name);
@@ -180,12 +180,12 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   getObsSettings(ctx: IApiContext, sourceId: string) {
-    return this.sourcesService.getSource(sourceId).getSettings();
+    return this.sourcesService.views.getSource(sourceId).getSettings();
   }
 
   @apiMethod()
   setObsSettings(ctx: IApiContext, sourceId: string, settingsPatch: Dictionary<any>) {
-    return this.sourcesService.getSource(sourceId).updateSettings(settingsPatch);
+    return this.sourcesService.views.getSource(sourceId).updateSettings(settingsPatch);
   }
 
   private serializeSource(source: Source): ISource {

@@ -42,7 +42,7 @@ export class EditMenu extends Menu {
     super();
 
     if (this.options.selectedSourceId) {
-      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+      this.source = this.sourcesService.views.getSource(this.options.selectedSourceId);
     } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
       this.source = this.selectionService.getItems()[0].getSource();
     }

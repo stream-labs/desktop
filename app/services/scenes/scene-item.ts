@@ -26,7 +26,7 @@ import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
-import { InheritMutations, ServiceHelper } from 'services/core';
+import { ServiceHelper } from 'services/core';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -91,11 +91,11 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   getSource() {

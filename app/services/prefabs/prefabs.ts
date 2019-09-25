@@ -50,7 +50,7 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   @Inject() private scenesService: ScenesService;
 
   registerFromExistingSource(sourceId: string, name: string, description = ''): Prefab {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     return this.registerSourcePrefab({
       name,
       description,
@@ -185,7 +185,7 @@ export class Prefab implements IPrefab {
     const device =
       this.hardwareService.getDshowDeviceByName(deviceId) ||
       this.hardwareService.getDshowDevice(deviceId);
-    return this.sourcesService.getSources().find(source => {
+    return this.sourcesService.views.getSources().find(source => {
       return source.type === 'dshow_input' && source.getSettings().video_device_id === device.id;
     });
   }

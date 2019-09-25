@@ -42,7 +42,7 @@ export class Source implements ISourceModel, ISerializable {
   @Fallback() private source: InternalSource;
 
   constructor(public readonly sourceId: string) {
-    this.source = this.sourcesService.getSource(sourceId);
+    this.source = this.sourcesService.views.getSource(sourceId);
   }
 
   getModel(): ISourceModel {

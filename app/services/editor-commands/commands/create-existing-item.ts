@@ -18,7 +18,7 @@ export class CreateExistingItemCommand extends Command {
   constructor(private sceneId: string, private sourceId: string) {
     super();
     this.description = $t('Create %{sourceName}', {
-      sourceName: this.sourcesService.getSource(this.sourceId).name,
+      sourceName: this.sourcesService.views.getSource(this.sourceId).name,
     });
   }
 

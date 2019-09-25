@@ -15,7 +15,7 @@ export class ProjectorService extends Service {
    * @param sourceId The id of the source
    */
   createProjector(sourceId?: string) {
-    const title = sourceId ? this.sourcesService.getSource(sourceId).name : $t('Output');
+    const title = sourceId ? this.sourcesService.views.getSource(sourceId).name : $t('Output');
     this.windowsService.createOneOffWindow({
       componentName: 'Projector',
       title: $t('Projector: ') + title,

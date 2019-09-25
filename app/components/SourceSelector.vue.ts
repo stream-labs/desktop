@@ -143,7 +143,7 @@ export default class SourceSelector extends Vue {
       // IPC is unavoidable here, that's ok. Let's eventually put this in
       // the store as it's something that the UI cares about. Also typing
       // is weak for properties managers settings.
-      const widgetType = this.sourcesService.getSource(sourceId).getPropertiesManagerSettings()
+      const widgetType = this.sourcesService.views.getSource(sourceId).getPropertiesManagerSettings()
         .widgetType;
 
       return widgetIconMap[widgetType];
@@ -222,7 +222,7 @@ export default class SourceSelector extends Vue {
       n => n.id === this.selectionService.state.lastSelectedId,
     );
     return sceneNode && sceneNode.sceneNodeType === 'item'
-      ? this.sourcesService.getSource(sceneNode.sourceId).hasProps()
+      ? this.sourcesService.views.getSource(sceneNode.sourceId).hasProps()
       : false;
   }
 

@@ -40,12 +40,12 @@ export class SourcesService {
   }
 
   getSource(sourceId: string): Source {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     return source ? new Source(sourceId) : null;
   }
 
   getSources(): Source[] {
-    return this.sourcesService.getSources().map(source => this.getSource(source.sourceId));
+    return this.sourcesService.views.getSources().map(source => this.getSource(source.sourceId));
   }
 
   removeSource(id: string): void {
@@ -57,7 +57,7 @@ export class SourcesService {
   }
 
   getSourcesByName(name: string): Source[] {
-    return this.sourcesService
+    return this.sourcesService.views
       .getSourcesByName(name)
       .map(source => this.getSource(source.sourceId));
   }

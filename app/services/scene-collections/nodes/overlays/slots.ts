@@ -172,7 +172,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     if (obj.content instanceof WebcamNode) {
-      const existingWebcam = this.sourcesService.sources.find(source => {
+      const existingWebcam = this.sourcesService.views.sources.find(source => {
         return source.type === 'dshow_input';
       });
 
@@ -235,7 +235,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       // Check for already existing widgets of the same type instead
       const widgetType = obj.content.data.type;
 
-      this.sourcesService.sources.forEach(source => {
+      this.sourcesService.views.sources.forEach(source => {
         if (source.getPropertiesManagerType() === 'widget') {
           const type: WidgetType = source.getPropertiesManagerSettings().widgetType;
 

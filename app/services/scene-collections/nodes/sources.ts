@@ -54,7 +54,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       .getSceneItems()
       .map(sceneItem => sceneItem.sourceId);
 
-    return this.sourcesService.sources.filter(source => {
+    return this.sourcesService.views.sources.filter(source => {
       // we store scenes in separated config
       if (source.type === 'scene') return false;
 
