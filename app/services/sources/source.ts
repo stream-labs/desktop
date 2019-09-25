@@ -26,6 +26,7 @@ export class Source implements ISourceApi {
   muted: boolean;
   width: number;
   height: number;
+  configurable: boolean;
   doNotDuplicate: boolean;
   channel?: number;
   resourceId: string;
@@ -155,7 +156,7 @@ export class Source implements ISourceApi {
   }
 
   hasProps(): boolean {
-    return this.getObsInput().configurable;
+    return this.configurable;
   }
 
   /**

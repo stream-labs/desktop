@@ -15,6 +15,7 @@ export interface ISource extends IResource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
+  configurable: boolean;
   propertiesManagerType: TPropertiesManager;
   channel?: number;
 }

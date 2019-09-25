@@ -36,7 +36,7 @@ export class InternalApiClient {
   private skippedMutations: number[] = [];
 
   constructor() {
-    this.listenMainWindowMessages();
+    this.listenWorkerWindowMessages();
   }
 
   /**
@@ -59,10 +59,6 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        // if (target[property]._isHelper) {
-        //   return this.applyIpcProxy(target[property]);
-        // }
-
         if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
           return target[property];
         }
@@ -74,6 +70,7 @@ export class InternalApiClient {
         const methodName = property.toString();
         const isHelper = target['_isHelper'];
 
+        // TODO: Remove once you're sure this is impossible
         if (isHelper) {
           throw new Error('ATTEMPTED TO PROXY HELPER METHOD');
         }
@@ -224,10 +221,11 @@ export class InternalApiClient {
   }
 
   /**
-   *  The main window sends results of promises resolve/reject and RXJS events as JSON messages via IPC to the child window
+   *  The worker window sends results of promises resolve/reject and
+   *  RXJS events as JSON messages via IPC to the renderer windows
    *  Listen and handle these messages here
    */
-  private listenMainWindowMessages() {
+  private listenWorkerWindowMessages() {
     const promises = this.promises;
 
     ipcRenderer.on('services-response-async', (e, response: IJsonRpcResponse<any>) => {

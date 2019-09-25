@@ -262,7 +262,7 @@ export default class SourceSelector extends Vue {
   makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.callCameFromInsideTheHouse = true;
-    this.selectionService.select(ids);
+    this.selectionService.actions.select(ids);
   }
 
   toggleFolder(treeNode: ISlTreeNode<ISceneNodeData>) {
