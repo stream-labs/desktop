@@ -5,6 +5,7 @@ import * as traverse from 'traverse';
 import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
+import { ServiceHelper } from 'services/core';
 const { ipcRenderer } = electron;
 
 /**
@@ -58,7 +59,7 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        if (target[property]._isHelper) {
+        if (target[property] instanceof ServiceHelper) {
           return this.applyIpcProxy(target[property]);
         }
 
@@ -72,13 +73,13 @@ export class InternalApiClient {
 
         const serviceName = target.constructor.name;
         const methodName = property;
-        const isHelper = target['_isHelper'];
+        const isHelper = target instanceof ServiceHelper;
 
         const handler = (...args: any[]) => {
           // args may contain ServiceHelper objects
           // serialize them
           traverse(args).forEach((item: any) => {
-            if (item && item._isHelper) {
+            if (item && item instanceof ServiceHelper) {
               return {
                 _type: 'HELPER',
                 resourceId: item._resourceId,

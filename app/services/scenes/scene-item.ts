@@ -1,5 +1,5 @@
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper, Inject } from 'services';
+import { mutation, Inject } from 'services';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
@@ -26,12 +26,13 @@ import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
+import { InheritMutations } from 'services/core';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
-@ServiceHelper()
+@InheritMutations()
 export class SceneItem extends SceneItemNode {
   sourceId: string;
   name: string;
@@ -75,7 +76,7 @@ export class SceneItem extends SceneItemNode {
   @Inject() private videoService: VideoService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
-    super();
+    super(sceneId, sceneItemId, sourceId);
     const sceneItemState = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === sceneItemId;
     }) as ISceneItem;

@@ -21,18 +21,19 @@ export function isItem(node: SceneItemNode): node is SceneItem {
   return node.sceneNodeType === 'item';
 }
 
-@ServiceHelper()
-export abstract class SceneItemNode implements ISceneItemNode {
+export abstract class SceneItemNode extends ServiceHelper implements ISceneItemNode {
   id: string;
   parentId: string;
   abstract sceneNodeType: TSceneNodeType;
   resourceId: string;
   sceneId: string;
 
-  private _resourceId: string;
-
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
+
+  constructor(...args: any[]) {
+    super(...args);
+  }
 
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);

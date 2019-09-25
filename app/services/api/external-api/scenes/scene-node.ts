@@ -9,6 +9,7 @@ import { ScenesService } from './scenes';
 import { Scene } from './scene';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
+import { ServiceHelper } from 'services';
 
 export declare type TSceneNodeType = 'folder' | 'item';
 
@@ -23,13 +24,14 @@ export interface ISceneNodeModel {
 /**
  * A base API for Items and Folders
  */
-export abstract class SceneNode {
+export abstract class SceneNode extends ServiceHelper {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   @Fallback() protected sceneNode: InternalSceneNode;
   protected scene: InternalScene;
 
   constructor(public sceneId: string, public nodeId: string) {
+    super(sceneId, nodeId);
     this.scene = this.internalScenesService.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
   }

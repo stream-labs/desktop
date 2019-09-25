@@ -1,14 +1,15 @@
 import { ScenesService, Scene } from './index';
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper, Inject } from 'services';
+import { mutation, Inject } from 'services';
 import Utils from '../utils';
 import { Selection, SelectionService } from 'services/selection';
 import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'services/scenes';
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
+import { InheritMutations } from 'services/core';
 
-@ServiceHelper()
+@InheritMutations()
 export class SceneItemFolder extends SceneItemNode {
   name: string;
   sceneNodeType: TSceneNodeType = 'folder';
@@ -19,7 +20,7 @@ export class SceneItemFolder extends SceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   constructor(sceneId: string, id: string) {
-    super();
+    super(sceneId, id);
 
     this.id = id;
 

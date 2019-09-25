@@ -10,6 +10,7 @@ import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
+import { Service } from './core';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -652,8 +653,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 /**
  * Represents a single bindable hotkey
  */
-@ServiceHelper()
-export class Hotkey implements IHotkey {
+export class Hotkey extends ServiceHelper implements IHotkey {
   actionName: string;
   sceneId?: string;
   sourceId?: string;
@@ -668,6 +668,8 @@ export class Hotkey implements IHotkey {
   private readonly hotkeyModel: IHotkey;
 
   constructor(hotkeyModel: IHotkey) {
+    super(hotkeyModel);
+
     Object.assign(this, hotkeyModel);
     this.hotkeyModel = hotkeyModel;
 

@@ -26,13 +26,13 @@ export interface IAudioSourceModel {
   mixerHidden: boolean;
 }
 
-@ServiceHelper()
-export class AudioSource implements ISerializable {
+export class AudioSource extends ServiceHelper implements ISerializable {
   @Inject() private audioService: InternalAudioService;
   @Inject() private sourcesService: InternalSourcesService;
   @Fallback() private audioSource: InternalAudioSource;
 
   constructor(private sourceId: string) {
+    super(sourceId);
     this.audioSource = this.audioService.getSource(sourceId);
   }
 

@@ -26,6 +26,7 @@ import { EDeviceType, HardwareService, IDevice } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { ipcRenderer } from 'electron';
 import without from 'lodash/without';
+import { ViewHandler } from 'services/core';
 
 export enum E_AUDIO_CHANNELS {
   OUTPUT_1 = 1,
@@ -326,8 +327,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 }
 
-@ServiceHelper()
-export class AudioSource implements IAudioSourceApi {
+export class AudioSource extends ServiceHelper implements IAudioSourceApi {
   name: string;
   sourceId: string;
   fader: IFader;
@@ -348,6 +348,8 @@ export class AudioSource implements IAudioSourceApi {
   private readonly audioSourceState: IAudioSource;
 
   constructor(sourceId: string) {
+    super(sourceId);
+
     this.audioSourceState = this.audioService.state.audioSources[sourceId];
     const sourceState =
       this.sourcesService.state.sources[sourceId] ||

@@ -49,11 +49,19 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<
         }
       }
     }
+
+    await this.afterLoad(context);
   }
 
   /**
-   * Can be called before loading to do some data munging
+   * Will be called before loading to do some data munging
    * @param context the context
    */
   async beforeLoad(context: TContext): Promise<void> {}
+
+    /**
+   * Will be called after all items are loaded
+   * @param context the context
+   */
+  async afterLoad(context: TContext): Promise<void> {}
 }

@@ -126,8 +126,7 @@ export class PrefabsService extends PersistentStatefulService<IPrefabsServiceSta
   }
 }
 
-@ServiceHelper()
-export class Prefab implements IPrefab {
+export class Prefab extends ServiceHelper implements IPrefab {
   readonly id: string;
   readonly name: string;
   readonly description: string;
@@ -140,6 +139,7 @@ export class Prefab implements IPrefab {
   @Inject() private hardwareService: HardwareService;
 
   constructor(prefabId: string) {
+    super(prefabId);
     Utils.applyProxy(this, this.prefabsService.state.prefabs[prefabId]);
   }
 

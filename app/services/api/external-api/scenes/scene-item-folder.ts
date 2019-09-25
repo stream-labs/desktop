@@ -1,4 +1,3 @@
-import { ServiceHelper } from 'services/core';
 import { SceneItemFolder as InternalSceneItemFolder } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { SourcesService } from 'services/api/external-api/sources/sources';
@@ -13,7 +12,6 @@ export interface ISceneItemFolderModel extends ISceneNodeModel {
 /**
  * API for folders
  */
-@ServiceHelper()
 export class SceneItemFolder extends SceneNode {
   @Fallback() private sceneFolder: InternalSceneItemFolder;
   @InjectFromExternalApi() private sourcesService: SourcesService;

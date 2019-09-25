@@ -87,4 +87,11 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
       });
     });
   }
+
+  async afterLoad() {
+    // Make sure we actually have an active scene (an invalid state things something get in)
+    if (!this.scenesService.activeSceneId) {
+      this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    }
+  }
 }

@@ -34,9 +34,9 @@ type TVoidFunctions<T> = {
 /**
  * Takes a function and makes its return type void
  */
-type TVoidFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => void;
+export type TVoidFunction<T extends (...args: any[]) => any> = (...args: Parameters<T>) => void;
 
-interface IActionsReturn<T> {
+export interface IActionsReturn<T> {
   return: TPromisifyFunctions<T>;
 }
 

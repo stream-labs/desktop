@@ -1,4 +1,3 @@
-import { ServiceHelper } from 'services/core';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
@@ -59,7 +58,6 @@ export interface ISceneItemActions {
 /**
  * API for scene-items
  */
-@ServiceHelper()
 export class SceneItem extends SceneNode implements ISceneItemActions {
   @Fallback() private sceneItem: InternalSceneItem;
   @InjectFromExternalApi() private sourcesService: SourcesService;

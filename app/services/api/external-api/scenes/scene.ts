@@ -15,8 +15,7 @@ export interface ISceneModel {
   nodes: ISceneNodeModel[];
 }
 
-@ServiceHelper()
-export class Scene {
+export class Scene extends ServiceHelper {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @Inject('ScenesService')
@@ -25,6 +24,7 @@ export class Scene {
   @Fallback() private scene: InternalScene;
 
   constructor(private sceneId: string) {
+    super(sceneId);
     this.scene = this.internalScenesService.getScene(sceneId);
   }
 
