@@ -261,3 +261,10 @@ test('Go live error', async t => {
   await resetFetchMock(t);
   t.pass();
 });
+
+
+test('Youtube streaming is disabled', async t => {
+  skipCheckingErrorsInLog();
+  await logIn(t, 'youtube', { streamingIsDisabled: true });
+  t.true(await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'));
+});
