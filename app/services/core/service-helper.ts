@@ -8,6 +8,7 @@
  * - constructor must not have side effects
  */
 import { inheritMutations } from './stateful-service';
+import Utils from 'services/utils';
 
 export function ServiceHelper(): ClassDecorator {
   return function(target: any) {
@@ -33,5 +34,23 @@ export function ServiceHelper(): ClassDecorator {
 
     // return new constructor (will override original)
     return f;
+  };
+}
+
+export function ExecuteInWorkerProcess(): MethodDecorator {
+  return function(target: any, property: string, descriptor: PropertyDescriptor) {
+    return Object.assign({}, descriptor, {
+      value(...args: any[]) {
+        if (Utils.isWorkerWindow()) {
+          return descriptor.value.apply(this, args);
+        }
+
+        // TODO: Find something better than global var
+        return window['servicesManager'].internalApiClient.getRequestHandler(this, property, {
+          isAction: false,
+          shouldReturn: true,
+        })(...args);
+      },
+    });
   };
 }

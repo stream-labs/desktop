@@ -59,9 +59,9 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        if (target[property]._isHelper) {
-          return this.applyIpcProxy(target[property]);
-        }
+        // if (target[property]._isHelper) {
+        //   return this.applyIpcProxy(target[property]);
+        // }
 
         if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
           return target[property];
@@ -71,79 +71,96 @@ export class InternalApiClient {
           return target[property];
         }
 
-        const serviceName = target.constructor.name;
-        const methodName = property;
+        const methodName = property.toString();
         const isHelper = target['_isHelper'];
 
-        const handler = (...args: any[]) => {
-          // args may contain ServiceHelper objects
-          // serialize them
-          traverse(args).forEach((item: any) => {
-            if (item && item._isHelper) {
-              return {
-                _type: 'HELPER',
-                resourceId: item._resourceId,
-              };
-            }
-          });
+        if (isHelper) {
+          throw new Error('ATTEMPTED TO PROXY HELPER METHOD');
+        }
 
-          if (isAction) {
-            const request = this.jsonrpc.createRequestWithOptions(
-              isHelper ? target['_resourceId'] : serviceName,
-              methodName as string,
-              { compactMode: true, fetchMutations: false, noReturn: !shouldReturn },
-              ...args,
-            );
-
-            ipcRenderer.send('services-request-async', request);
-
-            if (shouldReturn) {
-              // Return a promise that will be fulfilled later with the response
-              return new Promise((resolve, reject) => {
-                this.actionResponses[request.id] = [resolve, reject];
-              });
-            }
-
-            // We don't care about the response
-            return;
-          }
-
-          console.warn(
-            `Calling synchronous service method from renderer process: ${
-              isHelper ? target['_resourceId'] : serviceName
-            }.${methodName.toString()} - Consider calling as an action instead`,
-          );
-
-          const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
-            'services-request',
-            this.jsonrpc.createRequestWithOptions(
-              isHelper ? target['_resourceId'] : serviceName,
-              methodName as string,
-              { compactMode: true, fetchMutations: true },
-              ...args,
-            ),
-          );
-
-          if (response.error) {
-            throw 'IPC request failed: check the errors in the main window';
-          }
-
-          const result = response.result;
-          const mutations = response.mutations;
-
-          // commit all mutations caused by the api-request now
-          mutations.forEach(mutation => commitMutation(mutation));
-          // we'll still receive already committed mutations from async IPC event
-          // mark them as ignored
-          this.skippedMutations.push(...mutations.map(m => m.id));
-
-          return this.handleResult(result);
-        };
+        const handler = this.getRequestHandler(target, methodName, {
+          isAction,
+          shouldReturn,
+        });
 
         if (typeof target[property] === 'function') return handler;
         if (target[property] instanceof Observable) return handler();
       },
     });
+  }
+
+  getRequestHandler(
+    target: any,
+    methodName: string,
+    options: { isAction: boolean; shouldReturn: boolean },
+  ) {
+    const serviceName = target.constructor.name;
+    const isHelper = target['_isHelper'];
+
+    return (...args: any[]) => {
+      // args may contain ServiceHelper objects
+      // serialize them
+      traverse(args).forEach((item: any) => {
+        if (item && item._isHelper) {
+          return {
+            _type: 'HELPER',
+            resourceId: item._resourceId,
+          };
+        }
+      });
+
+      if (options.isAction) {
+        const request = this.jsonrpc.createRequestWithOptions(
+          isHelper ? target['_resourceId'] : serviceName,
+          methodName as string,
+          { compactMode: true, fetchMutations: false, noReturn: !options.shouldReturn },
+          ...args,
+        );
+
+        ipcRenderer.send('services-request-async', request);
+
+        if (options.shouldReturn) {
+          // Return a promise that will be fulfilled later with the response
+          return new Promise((resolve, reject) => {
+            this.actionResponses[request.id] = [resolve, reject];
+          });
+        }
+
+        // We don't care about the response
+        return;
+      }
+
+      console.warn(
+        `Calling synchronous service method from renderer process: ${
+          isHelper ? target['_resourceId'] : serviceName
+        }.${methodName} - Consider calling as an action instead`,
+      );
+
+      const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
+        'services-request',
+        this.jsonrpc.createRequestWithOptions(
+          isHelper ? target['_resourceId'] : serviceName,
+          methodName,
+          { compactMode: true, fetchMutations: true },
+          ...args,
+        ),
+      );
+
+      if (response.error) {
+        throw 'IPC request failed: check the errors in the worker window';
+      }
+
+      const result = response.result;
+      const mutations = response.mutations;
+
+      // commit all mutations caused by the api-request now
+      mutations.forEach(mutation => commitMutation(mutation));
+      // we'll still receive already committed mutations from async IPC event
+      // mark them as ignored
+      this.skippedMutations.push(...mutations.map(m => m.id));
+
+      return this.handleResult(result);
+    };
   }
 
   /**
@@ -168,7 +185,8 @@ export class InternalApiClient {
 
     if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
       const helper = this.getResource(result.resourceId);
-      return this.applyIpcProxy(helper);
+      // return this.applyIpcProxy(helper);
+      return helper;
     }
 
     // payload can contain helpers-objects
