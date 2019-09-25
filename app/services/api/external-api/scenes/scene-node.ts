@@ -24,14 +24,14 @@ export interface ISceneNodeModel {
 /**
  * A base API for Items and Folders
  */
-export abstract class SceneNode extends ServiceHelper {
+@ServiceHelper()
+export abstract class SceneNode {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   @Fallback() protected sceneNode: InternalSceneNode;
   protected scene: InternalScene;
 
   constructor(public sceneId: string, public nodeId: string) {
-    super(sceneId, nodeId);
     this.scene = this.internalScenesService.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
   }

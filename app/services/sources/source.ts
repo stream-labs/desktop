@@ -15,7 +15,8 @@ import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import { cloneDeep } from 'lodash';
 
-export class Source extends ServiceHelper implements ISourceApi {
+@ServiceHelper()
+export class Source implements ISourceApi {
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -272,7 +273,6 @@ export class Source extends ServiceHelper implements ISourceApi {
   protected sourcesService: SourcesService;
 
   constructor(sourceId: string) {
-    super(sourceId);
     // Using a proxy will ensure that this object
     // is always up-to-date, and essentially acts
     // as a view into the store.  It also enforces

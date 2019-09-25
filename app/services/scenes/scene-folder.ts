@@ -7,9 +7,9 @@ import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'servic
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
-import { InheritMutations } from 'services/core';
+import { ServiceHelper } from 'services/core';
 
-@InheritMutations()
+@ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
   name: string;
   sceneNodeType: TSceneNodeType = 'folder';
@@ -20,7 +20,7 @@ export class SceneItemFolder extends SceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   constructor(sceneId: string, id: string) {
-    super(sceneId, id);
+    super();
 
     this.id = id;
 

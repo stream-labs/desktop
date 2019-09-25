@@ -333,7 +333,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 }
 
-export class AudioSource extends ServiceHelper implements IAudioSourceApi {
+@ServiceHelper()
+export class AudioSource implements IAudioSourceApi {
   name: string;
   sourceId: string;
   fader: IFader;
@@ -354,8 +355,6 @@ export class AudioSource extends ServiceHelper implements IAudioSourceApi {
   private readonly audioSourceState: IAudioSource;
 
   constructor(sourceId: string) {
-    super(sourceId);
-
     this.audioSourceState = this.audioService.state.audioSources[sourceId];
     const sourceState =
       this.sourcesService.state.sources[sourceId] ||

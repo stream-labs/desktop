@@ -25,11 +25,14 @@ export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
 }
 
-export class Scene extends ServiceHelper {
+@ServiceHelper()
+export class Scene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
   resourceId: string;
+
+  private _resourceId: string;
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -38,7 +41,6 @@ export class Scene extends ServiceHelper {
   readonly state: IScene;
 
   constructor(sceneId: string) {
-    super(sceneId);
     this.state = this.scenesService.state.scenes[sceneId];
     Utils.applyProxy(this, this.state);
   }

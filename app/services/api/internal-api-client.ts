@@ -59,7 +59,7 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        if (target[property] instanceof ServiceHelper) {
+        if (target[property]._isHelper) {
           return this.applyIpcProxy(target[property]);
         }
 
@@ -73,13 +73,13 @@ export class InternalApiClient {
 
         const serviceName = target.constructor.name;
         const methodName = property;
-        const isHelper = target instanceof ServiceHelper;
+        const isHelper = target['_isHelper'];
 
         const handler = (...args: any[]) => {
           // args may contain ServiceHelper objects
           // serialize them
           traverse(args).forEach((item: any) => {
-            if (item && item instanceof ServiceHelper) {
+            if (item && item._isHelper) {
               return {
                 _type: 'HELPER',
                 resourceId: item._resourceId,

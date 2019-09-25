@@ -204,7 +204,7 @@ export abstract class RpcApi extends Service {
     }
 
     // if responsePayload is a ServiceHelper then serialize it
-    if (responsePayload instanceof ServiceHelper) {
+    if (responsePayload._isHelper) {
       return this.jsonrpc.createResponse(request.id, {
         _type: 'HELPER',
         resourceId: responsePayload._resourceId,
@@ -215,7 +215,7 @@ export abstract class RpcApi extends Service {
     // payload may contain arrays or objects that may have ServiceHelper objects inside
     // so we have to try to find these ServiceHelpers and serialize them too
     traverse(responsePayload).forEach((item: any) => {
-      if (item && item instanceof ServiceHelper) {
+      if (item && item._isHelper) {
         const helper = this.getResource(item._resourceId);
         return {
           _type: 'HELPER',

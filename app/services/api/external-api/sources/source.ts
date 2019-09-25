@@ -23,7 +23,8 @@ export interface ISourceModel {
   channel?: number;
 }
 
-export class Source extends ServiceHelper implements ISourceModel, ISerializable {
+@ServiceHelper()
+export class Source implements ISourceModel, ISerializable {
   @Inject() private sourcesService: InternalSourcesService;
   readonly id: string;
   readonly name: string;
@@ -41,7 +42,6 @@ export class Source extends ServiceHelper implements ISourceModel, ISerializable
   @Fallback() private source: InternalSource;
 
   constructor(public readonly sourceId: string) {
-    super(sourceId);
     this.source = this.sourcesService.getSource(sourceId);
   }
 

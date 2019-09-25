@@ -24,13 +24,13 @@ export interface ISelectionModel {
  * @see Scene.getSelection() to fetch a new selection object
  * @see SelectionService to make items active
  */
-export class Selection extends ServiceHelper implements ISceneItemActions {
+@ServiceHelper()
+export class Selection implements ISceneItemActions {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
 
   constructor(sceneId: string, itemsList: string[] = []) {
-    super(sceneId, itemsList);
     this.internalSelection = new InternalSelection(sceneId, itemsList);
   }
 

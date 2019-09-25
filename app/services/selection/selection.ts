@@ -20,7 +20,8 @@ import { ISelectionState, TNodesList } from './index';
 /**
  * Helper for working with multiple sceneItems
  */
-export class Selection extends ServiceHelper {
+@ServiceHelper()
+export class Selection {
   @Inject() private scenesService: ScenesService;
 
   _resourceId: string;
@@ -31,7 +32,6 @@ export class Selection extends ServiceHelper {
   };
 
   constructor(public sceneId: string, itemsList: TNodesList = []) {
-    super(sceneId, itemsList);
     this.select(itemsList);
   }
 

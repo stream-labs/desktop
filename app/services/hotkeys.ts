@@ -653,7 +653,8 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 /**
  * Represents a single bindable hotkey
  */
-export class Hotkey extends ServiceHelper implements IHotkey {
+@ServiceHelper()
+export class Hotkey implements IHotkey {
   actionName: string;
   sceneId?: string;
   sourceId?: string;
@@ -668,8 +669,6 @@ export class Hotkey extends ServiceHelper implements IHotkey {
   private readonly hotkeyModel: IHotkey;
 
   constructor(hotkeyModel: IHotkey) {
-    super(hotkeyModel);
-
     Object.assign(this, hotkeyModel);
     this.hotkeyModel = hotkeyModel;
 

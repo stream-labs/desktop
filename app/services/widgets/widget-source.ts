@@ -5,7 +5,8 @@ import { IWidgetSource, WidgetType, IWidgetData } from './index';
 import { WidgetSettingsService } from 'services/widgets';
 import Utils from '../utils';
 
-export class WidgetSource extends ServiceHelper implements IWidgetSource {
+@ServiceHelper()
+export class WidgetSource implements IWidgetSource {
   @Inject() private sourcesService: SourcesService;
   @Inject() private widgetsService: WidgetsService;
 
@@ -16,7 +17,6 @@ export class WidgetSource extends ServiceHelper implements IWidgetSource {
   private readonly state: IWidgetSource;
 
   constructor(sourceId: string) {
-    super(sourceId);
     this.state = this.widgetsService.state.widgetSources[sourceId];
     Utils.applyProxy(this, this.state);
   }
