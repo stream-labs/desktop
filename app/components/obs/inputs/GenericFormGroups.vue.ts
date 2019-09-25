@@ -7,7 +7,7 @@ import { Inject } from 'services/core/injector';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
 class GenericFormGroupProps {
-  value: ISettingsSubCategory[] = [];
+  value: ISettingsSubCategory[] = null;
   categoryName?: string = '';
   onInput?: (value: any) => void = () => {};
 }
@@ -21,7 +21,11 @@ export default class GenericFormGroups extends TsxComponent<GenericFormGroupProp
 
   collapsedGroups: Dictionary<boolean> = {};
 
-  isAdvancedOutput = this.settingsService.isTabbedForm(this.props.categoryName) || false;
+  isAdvancedOutput = false;
+
+  created() {
+    this.isAdvancedOutput = this.settingsService.isTabbedForm(this.props.categoryName);
+  }
 
   toggleGroup(index: string) {
     this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);

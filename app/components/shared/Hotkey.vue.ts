@@ -16,12 +16,14 @@ class HotkeyProps {
 
 @Component({ props: createProps(HotkeyProps) })
 export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
-  description = this.props.hotkey.description;
+  description: string;
   bindings: IKeyedBinding[] = [];
 
-  hotkey = this.props.hotkey;
+  hotkey: IHotkey;
 
   created() {
+    this.hotkey = this.props.hotkey;
+    this.description = this.props.hotkey.description;
     if (this.props.hotkey.bindings.length === 0) {
       this.bindings = [this.createBindingWithKey(this.getBlankBinding())];
     } else {
