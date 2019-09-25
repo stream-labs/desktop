@@ -30,7 +30,6 @@ export default class RecentEvents extends TsxComponent<{}> {
   @Inject() dismissablesService: DismissablesService;
   @Inject() magicLinkService: MagicLinkService;
 
-  queuePaused = false;
   eventsCollapsed = false;
 
   get native() {
@@ -43,6 +42,10 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   get muted() {
     return this.recentEventsService.state.muted;
+  }
+
+  get queuePaused() {
+    return this.recentEventsService.state.queuePaused;
   }
 
   get mediaShareEnabled() {
@@ -88,13 +91,8 @@ export default class RecentEvents extends TsxComponent<{}> {
     return this.recentEventsService.readAlert(event);
   }
 
-  async toggleQueue() {
-    try {
-      this.queuePaused
-        ? await this.recentEventsService.unpauseAlertQueue()
-        : await this.recentEventsService.pauseAlertQueue();
-      this.queuePaused = !this.queuePaused;
-    } catch (e) {}
+  toggleQueue() {
+    return this.recentEventsService.toggleQueue();
   }
 
   setNative(native: boolean) {
@@ -239,7 +237,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
   @Prop() native: boolean;
 
   render(h: Function) {
-    const pauseTooltip = this.queuePaused ? $t('Pause Alert Queue') : $t('Unpause Alert Queue');
+    const pauseTooltip = this.queuePaused ? $t('Unpause Alert Queue') : $t('Pause Alert Queue');
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
@@ -265,7 +263,7 @@ class Toolbar extends TsxComponent<IToolbarProps> {
         )}
         {this.native && (
           <i
-            class={`${this.queuePaused ? 'icon-pause' : 'icon-media-share-2'} action-icon`}
+            class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
             onClick={this.toggleQueue}
             v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
           />
