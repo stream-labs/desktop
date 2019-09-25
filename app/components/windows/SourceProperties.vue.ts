@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
-import { ISourcesServiceApi } from 'services/sources';
+import { SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
@@ -28,13 +28,13 @@ import { EditorCommandsService } from 'services/editor-commands';
   },
 })
 export default class SourceProperties extends Vue {
-  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() sourcesService: SourcesService;
   @Inject() windowsService: WindowsService;
   @Inject() customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
-  source = this.sourcesService.getSource(this.sourceId);
+  source = this.sourcesService.views.getSource(this.sourceId);
   properties: TObsFormData = [];
   hasErrors = false;
 
@@ -91,7 +91,7 @@ export default class SourceProperties extends Vue {
   }
 
   get windowTitle() {
-    const source = this.sourcesService.getSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
     return source ? $t('Properties for %{sourceName}', { sourceName: source.name }) : '';
   }
 

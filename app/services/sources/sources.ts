@@ -19,7 +19,6 @@ import {
   IActivePropertyManager,
   ISource,
   ISourceAddOptions,
-  ISourcesServiceApi,
   ISourcesState,
   TSourceType,
   Source,

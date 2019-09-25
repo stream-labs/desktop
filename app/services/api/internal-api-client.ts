@@ -182,7 +182,6 @@ export class InternalApiClient {
 
     if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
       const helper = this.getResource(result.resourceId);
-      // return this.applyIpcProxy(helper);
       return helper;
     }
 
@@ -190,8 +189,7 @@ export class InternalApiClient {
     // we have to wrap them in IpcProxy too
     traverse(result).forEach((item: any) => {
       if (item && item._type === 'HELPER') {
-        const helper = this.getResource(item.resourceId);
-        return this.applyIpcProxy(helper);
+        return this.getResource(item.resourceId);
       }
     });
 

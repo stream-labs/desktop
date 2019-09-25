@@ -9,13 +9,13 @@
       v-for="(scenesHotkeys, sceneId) in filteredHotkeySet.scenes"
       v-if="scenesHotkeys.length > 0"
       :key="sceneId"
-      :title="scenesService.getScene(sceneId).name"
+      :title="scenesService.views.getScene(sceneId).name"
       :hotkeys="scenesHotkeys"/>
     <hotkey-group
       v-for="(sourceHotkeys, sourceId) in filteredHotkeySet.sources"
       v-if="sourceHotkeys.length > 0"
       :key="sourceId"
-      :title="sourcesService.getSource(sourceId).name"
+      :title="sourcesService.views.getSource(sourceId).name"
       :hotkeys="sourceHotkeys"/>
   </div>
 </div>

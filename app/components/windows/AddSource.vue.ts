@@ -2,8 +2,8 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
-import { ScenesService, SceneItem } from 'services/scenes';
-import { ISourcesServiceApi, TSourceType, ISourceApi, ISourceAddOptions } from 'services/sources';
+import { ScenesService } from 'services/scenes';
+import { TSourceType, ISourceApi, ISourceAddOptions, SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
@@ -18,7 +18,7 @@ import electron from 'electron';
   components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
-  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
   @Inject() widgetsService: WidgetsService;
@@ -36,7 +36,7 @@ export default class AddSource extends Vue {
     return this.sourceAddOptions.propertiesManagerSettings.widgetType;
   }
 
-  sources = this.sourcesService.getSources().filter(source => {
+  sources = this.sourcesService.views.getSources().filter(source => {
     const comparison = {
       type: this.sourceType,
       propertiesManager: this.sourceAddOptions.propertiesManager,
@@ -172,6 +172,6 @@ export default class AddSource extends Vue {
   }
 
   get selectedSource() {
-    return this.sourcesService.getSource(this.selectedSourceId);
+    return this.sourcesService.views.getSource(this.selectedSourceId);
   }
 }
