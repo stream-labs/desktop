@@ -182,7 +182,7 @@
   .top-settings {
     width: 100%;
     display: flex;
-    align-items: baseline;
+    align-items: center;
 
     > div,
     form {
