@@ -1,29 +1,27 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import Hotkey from './shared/Hotkey.vue';
 import { IHotkey } from 'services/hotkeys';
 import cx from 'classnames';
-import TsxComponent from './tsx-component';
+import TsxComponent, { createProps } from './tsx-component';
 
-@Component({
-  props: {
-    title: String,
-    hotkeys: Array,
-  },
-})
-export default class HotkeyGroup extends TsxComponent<{ hotkeys: IHotkey[]; title?: string }> {
-  @Prop() hotkeys: IHotkey[];
-  @Prop() title: string;
+class HotkeyGroupProps {
+  hotkeys: IHotkey[] = [];
+  title: string = null;
+}
+
+@Component({ props: createProps(HotkeyGroupProps) })
+export default class HotkeyGroup extends TsxComponent<HotkeyGroupProps> {
   collapsed = false;
 
   get header() {
-    return this.title ? (
+    return this.props.title ? (
       <h2
         class="section-title section-title--dropdown"
         onClick={() => (this.collapsed = !this.collapsed)}
       >
         {this.collapsed ? <i class="fa fa-plus section-title__icon" /> : null}
         {!this.collapsed ? <i class="fa fa-minus section-title__icon" /> : null}
-        {this.title}
+        {this.props.title}
       </h2>
     ) : null;
   }
@@ -35,9 +33,9 @@ export default class HotkeyGroup extends TsxComponent<{ hotkeys: IHotkey[]; titl
         <transition name="expand">
           <div
             style={this.collapsed ? { display: 'none' } : null}
-            class={cx({ 'section-content--opened': !!this.title }, 'section-content')}
+            class={cx({ 'section-content--opened': !!this.props.title }, 'section-content')}
           >
-            {this.hotkeys.map(hotkey => (
+            {this.props.hotkeys.map(hotkey => (
               <div key={hotkey.actionName + hotkey.sceneId + hotkey.sceneItemId + hotkey.sourceId}>
                 <Hotkey hotkey={hotkey} />
               </div>

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
-import ValidatedForm from './ValidatedForm.vue';
+import ValidatedForm from './ValidatedForm';
 import TsxComponent from 'components/tsx-component';
 
 export abstract class BaseInput<

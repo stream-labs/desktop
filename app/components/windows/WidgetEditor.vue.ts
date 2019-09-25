@@ -3,7 +3,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm';
 import { ProjectorService } from 'services/projector';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';

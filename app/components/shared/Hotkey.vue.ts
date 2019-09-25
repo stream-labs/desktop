@@ -1,6 +1,6 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
 /**
  * Represents a binding that has a unique key for CSS animations
@@ -10,18 +10,22 @@ interface IKeyedBinding {
   key: string;
 }
 
-@Component({})
-export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
-  @Prop() hotkey: IHotkey;
+class HotkeyProps {
+  hotkey: IHotkey = {} as IHotkey;
+}
 
-  description = this.hotkey.description;
+@Component({ props: createProps(HotkeyProps) })
+export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
+  description = this.props.hotkey.description;
   bindings: IKeyedBinding[] = [];
 
+  hotkey = this.props.hotkey;
+
   created() {
-    if (this.hotkey.bindings.length === 0) {
+    if (this.props.hotkey.bindings.length === 0) {
       this.bindings = [this.createBindingWithKey(this.getBlankBinding())];
     } else {
-      this.bindings = Array.from(this.hotkey.bindings).map(binding => {
+      this.bindings = Array.from(this.props.hotkey.bindings).map(binding => {
         return this.createBindingWithKey(binding);
       });
     }
@@ -126,7 +130,7 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
       if (binding.binding.key) bindings.push(binding.binding);
     });
 
-    this.hotkey.bindings = bindings;
+    this.props.hotkey.bindings = bindings;
   }
 
   /**

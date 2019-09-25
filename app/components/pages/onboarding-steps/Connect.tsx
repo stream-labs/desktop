@@ -1,20 +1,21 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
+import { Component } from 'vue-property-decorator';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform, EPlatformCallResult } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
 
-@Component({})
-export default class Connect extends TsxComponent<{ continue: () => void }> {
+class ConnectProps {
+  continue: () => void = () => {};
+}
+
+@Component({ props: createProps(ConnectProps) })
+export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
-
-  @Prop() continue: () => void;
 
   loadingState = false;
 
@@ -27,7 +28,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
       result => {
         // Currently we do not have special handling for generic errors
         if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
-          this.continue();
+          this.props.continue();
         } else if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
           electron.remote.dialog
@@ -102,7 +103,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
             </button>
           ))}
         </div>
-        <span class={styles.skipButton} onClick={this.continue}>
+        <span class={styles.skipButton} onClick={this.props.continue}>
           {$t('Skip')}
         </span>
       </div>

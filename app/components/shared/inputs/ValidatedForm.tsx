@@ -1,20 +1,22 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import Vue from 'vue';
 import uuid from 'uuid';
 import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
 import { Subject } from 'rxjs';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
+
+class ValidatedFormProps {
+  name?: string = '';
+}
 
 /**
  * VeeValidate doesn't support slots https://github.com/baianat/vee-validate/issues/325
  * this components allows to manage validation across slots
  */
-@Component({})
-export default class ValidatedForm extends TsxComponent<{ name: string }> {
-  @Prop() name: string;
-
+@Component({ props: createProps(ValidatedFormProps) })
+export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
   validated = new Subject<ErrorField[]>();
   validationScopeId = uuid();
 
@@ -52,5 +54,22 @@ export default class ValidatedForm extends TsxComponent<{ name: string }> {
 
   emitInput(data: any, event: Event) {
     this.$emit('input', data, event);
+  }
+
+  handleSubmit(event: Event) {
+    event.preventDefault();
+    this.$emit('submit');
+  }
+
+  render() {
+    return (
+      <form
+        data-vv-scope={this.validationScopeId}
+        onSubmit={this.handleSubmit}
+        name={this.props.name}
+      >
+        {this.$slots.default}
+      </form>
+    );
   }
 }

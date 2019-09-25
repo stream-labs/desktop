@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
-import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ICustomizationServiceApi, ICustomizationSettings } from 'services/customization';
