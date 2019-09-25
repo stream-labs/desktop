@@ -137,7 +137,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
         label: this.selectedAlert === 'subs' ? $t('Resub Message') : $t('Donor Message'),
       });
     }
-    if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId !== 'default') {
+    if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId.match('default')) {
       baseItems.push({ value: 'alert', label: $t('Alert Settings') });
     }
     return baseItems;
@@ -174,8 +174,8 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   selectAlertType(alertName: string) {
-    this.selectedId = 'default';
     this.selectedAlert = this.selectedAlert === alertName ? 'general' : alertName;
+    this.selectedId = `default-${this.selectedAlert}`;
   }
 
   selectVariation(id: string) {
@@ -196,7 +196,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   removeVariation(id: string) {
-    this.selectedId = 'default';
+    this.selectedId = `default-${this.selectedAlert}`;
     this.wData.settings[this.selectedAlert].variations = this.wData.settings[
       this.selectedAlert
     ].variations.filter((variation: IAlertBoxVariation) => variation.id !== id);
