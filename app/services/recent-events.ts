@@ -101,6 +101,7 @@ interface IRecentEventsState {
   muted: boolean;
   mediaShareEnabled: boolean;
   filterConfig: IRecentEventFilterConfig;
+  queuePaused: boolean;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -247,6 +248,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       donation: false,
       merch: false,
     },
+    queuePaused: false,
   };
 
   lifecycle: LoginLifecycle;
@@ -587,6 +589,14 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'pauseQueue') {
+      this.SET_PAUSED(true);
+    }
+
+    if (e.type === 'unpauseQueue') {
+      this.SET_PAUSED(false);
+    }
+
     if (e.type === 'mediaSharingSettingsUpdate') {
       if (e.message.advanced_settings.enabled != null) {
         this.SET_MEDIA_SHARE(e.message.advanced_settings.enabled);
@@ -747,6 +757,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
 
+  async toggleQueue() {
+    try {
+      this.state.queuePaused ? await this.unpauseAlertQueue() : await this.pauseAlertQueue();
+    } catch (e) {}
+  }
+
   openRecentEventsWindow(isMediaShare?: boolean) {
     this.windowsService.createOneOffWindow(
       {
@@ -808,5 +824,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_SINGLE_FILTER_CONFIG(key: string, value: boolean | number) {
     this.state.filterConfig[key] = value;
+  }
+
+  @mutation()
+  private SET_PAUSED(queuePaused: boolean) {
+    this.state.queuePaused = queuePaused;
   }
 }

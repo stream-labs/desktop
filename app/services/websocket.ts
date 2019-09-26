@@ -16,7 +16,9 @@ export type TSocketEvent =
   | IEventSocketEvent
   | IFmExtEnabledSocketEvent
   | IEventPanelSettingsChangedSocketEvent
-  | IMediaSharingSettingsUpdateSocketEvent;
+  | IMediaSharingSettingsUpdateSocketEvent
+  | IPauseEventQueueSocketEvent
+  | IUnpauseEventQueueSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -66,6 +68,14 @@ export interface IAlertPlayingSocketEvent {
 
 interface IAlertProfileChanged {
   type: 'alertProfileChanged';
+}
+
+interface IPauseEventQueueSocketEvent {
+  type: 'pauseQueue';
+}
+
+interface IUnpauseEventQueueSocketEvent {
+  type: 'unpauseQueue';
 }
 
 interface IEventPanelSettingsChangedSocketEvent {
