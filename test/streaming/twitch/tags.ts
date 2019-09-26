@@ -4,7 +4,7 @@ import { sleep } from '../../helpers/sleep';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 
-useSpectron();
+useSpectron({ appArgs: '--nosync' });
 
 test('Twitch Tags', async t => {
   const app = t.context.app;

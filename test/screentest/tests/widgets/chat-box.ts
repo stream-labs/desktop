@@ -4,7 +4,7 @@ import { fillForm } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 import { useScreentest } from '../../screenshoter';
 
-useSpectron({ restartAppAfterEachTest: false });
+useSpectron({ appArgs: '--nosync', restartAppAfterEachTest: false });
 useScreentest();
 afterAppStart(async t => {
   await logIn(t);

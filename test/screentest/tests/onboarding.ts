@@ -6,7 +6,7 @@ import { sleep } from '../../helpers/sleep';
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
-useSpectron({ skipOnboarding: false });
+useSpectron({ skipOnboarding: false, appArgs: '--nosync' });
 useScreentest();
 
 test('Onboarding steps', async t => {

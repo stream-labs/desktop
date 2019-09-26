@@ -6,7 +6,7 @@ import { logIn, logOut } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
 
 
-useSpectron({ restartAppAfterEachTest: false, pauseIfFailed: true });
+useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Settings General', async t => {
@@ -74,7 +74,8 @@ test('Settings Appearance', async t => {
   t.pass();
 });
 
-test('Settings Game Overlay', async (t: TExecutionContext) => {
+// TODO: Fix flaky test
+test.skip('Settings Game Overlay', async (t: TExecutionContext) => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
 

@@ -4,7 +4,7 @@ import { sleep } from '../helpers/sleep';
 import { logIn } from '../helpers/spectron/user';
 import { setOutputResolution } from '../helpers/spectron/output';
 
-useSpectron();
+useSpectron({ appArgs: '--nosync' });
 
 // TODO: flaky on CI
 test.skip('Shows optimized encoder for specific games', async t => {
