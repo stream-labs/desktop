@@ -4,7 +4,7 @@ import { logIn } from '../helpers/spectron/user';
 import { FormMonkey } from '../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../helpers/widget-helpers';
 
-useSpectron();
+useSpectron({ appArgs: '--nosync' });
 
 test('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
