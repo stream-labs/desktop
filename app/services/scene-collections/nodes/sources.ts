@@ -170,6 +170,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         muted: source.muted || false,
         settings: source.settings,
         volume: source.volume,
+        syncOffset: source.syncOffset,
         filters: source.filters.items.map(filter => {
           return {
             name: filter.name,

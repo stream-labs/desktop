@@ -311,7 +311,7 @@ export default class SourceSelector extends Vue {
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       return 'icon-smart-record';
     }
-    return selection.isStreamVisible() ? 'icon-platforms' : 'icon-studio';
+    return selection.isStreamVisible() ? 'icon-broadcast' : 'icon-studio';
   }
 
   selectiveRecordingTooltip(sceneNodeId: string) {
