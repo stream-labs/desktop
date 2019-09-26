@@ -41,7 +41,8 @@
 
 .performance-metrics {
   background: var(--background);
-  height: 48px;
+  height: 100%;
+  align-items: flex-start;
 }
 
 .performance-metric-wrapper {
