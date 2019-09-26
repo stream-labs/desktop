@@ -119,7 +119,7 @@ export default class StudioFooterComponent extends Vue {
         size: { width: 450, height: 75 },
         x: mousePos.x,
         y: mousePos.y,
-        resizable: true,
+        resizable: false,
         maximizable: false,
       },
       'performance-metrics',
