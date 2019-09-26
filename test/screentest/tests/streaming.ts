@@ -8,7 +8,7 @@ import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 useScreentest();
 
 async function addColorSource() {

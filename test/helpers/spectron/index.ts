@@ -75,6 +75,11 @@ interface ITestRunnerOptions {
   appArgs?: string;
 
   /**
+   * disable synchronisation of scene-collections and media-backup
+   */
+  noSync?: boolean;
+
+  /**
    * Enable this to show network logs if test failed
    */
   networkLogging?: boolean;
@@ -91,6 +96,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
 };
@@ -143,6 +149,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
+    if (options.noSync) appArgs.push('--noSync');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
