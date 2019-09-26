@@ -65,6 +65,11 @@ export default class Studio extends Vue {
     this.reconcileHeightsWithinContraints();
   }
 
+  @Watch('controlsHeight')
+  reconcileControlsResize() {
+    this.reconcileHeightsWithinContraints(true);
+  }
+
   /**
    * Makes sure both the controls and events heights are reasonable sizes that
    * fit within the window. If controls and events together are larger than the
@@ -72,6 +77,7 @@ export default class Studio extends Vue {
    * minimum, at which point the controls will start being reduced in size.
    */
   @Watch('performanceMode')
+  @Watch('eventsHeight')
   reconcileHeightsWithinContraints(isControlsResize = false) {
     const containerHeight = this.$root.$el.getBoundingClientRect().height;
 
@@ -128,11 +134,11 @@ export default class Studio extends Vue {
   }
 
   studioModeTransition() {
-    this.transitionsService.executeStudioModeTransition();
+    this.transitionsService.actions.executeStudioModeTransition();
   }
 
   enablePreview() {
-    this.customizationService.setSettings({ performanceMode: false });
+    this.customizationService.actions.setSettings({ performanceMode: false });
   }
 
   get isLoggedIn() {
@@ -145,8 +151,7 @@ export default class Studio extends Vue {
 
   set eventsHeight(value) {
     if (value === 0) return;
-    this.customizationService.setSettings({ eventsSize: value });
-    this.reconcileHeightsWithinContraints();
+    this.customizationService.actions.setSettings({ eventsSize: value });
   }
 
   get controlsHeight() {
@@ -154,8 +159,7 @@ export default class Studio extends Vue {
   }
 
   set controlsHeight(value) {
-    this.customizationService.setSettings({ controlsSize: value });
-    this.reconcileHeightsWithinContraints(true);
+    this.customizationService.actions.setSettings({ controlsSize: value });
   }
 
   get minEventsHeight() {
@@ -167,10 +171,10 @@ export default class Studio extends Vue {
   }
 
   onResizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler() {
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 }

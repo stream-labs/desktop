@@ -71,8 +71,8 @@ export default class ResizeBar extends Vue {
     this.barOffset = 0;
     this.mouseInitial = 0;
     this.updateTransform();
-    this.$emit('onresizestop', offset, event);
     this.$emit('input', offset + this.value, event);
+    this.$emit('onresizestop', offset, event);
   }
 
   onMouseMoveHandler(event: MouseEvent) {
