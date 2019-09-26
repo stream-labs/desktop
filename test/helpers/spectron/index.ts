@@ -149,7 +149,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
-    if (options.noSync) appArgs.push('--noSync');
+    if (options.noSync) appArgs.push('--nosync');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
