@@ -162,13 +162,16 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     const triagedSettings = this.triageSettings(settings);
     Object.keys(triagedSettings).forEach(key => {
       if (key === 'subs') {
-        triagedSettings['subs'] = this.varifySetting({
-          showResubMessage: triagedSettings['resubs'].show_message,
-          ...triagedSettings['subs'],
-          ...triagedSettings['resubs'],
-        });
+        triagedSettings['subs'] = this.varifySetting(
+          {
+            showResubMessage: triagedSettings['resubs'].show_message,
+            ...triagedSettings['subs'],
+            ...triagedSettings['resubs'],
+          },
+          key,
+        );
       } else if (this.apiNames().includes(key) && key !== 'resubs') {
-        triagedSettings[key] = this.varifySetting(triagedSettings[key]);
+        triagedSettings[key] = this.varifySetting(triagedSettings[key], key);
       }
     });
     // resubs are folded into the sub settings
@@ -212,10 +215,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return newSettings;
   }
 
-  private varifySetting(setting: any): IAlertBoxSetting {
+  private varifySetting(setting: any, type: string): IAlertBoxSetting {
     const { show_message, enabled, showResubMessage, ...rest } = setting;
     const variations = setting.variations || [];
-    const defaultVariation = this.reshapeVariation(rest);
+    const defaultVariation = this.reshapeVariation(rest, type);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),
       ...variation,
@@ -224,7 +227,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return { enabled, showResubMessage, showMessage: show_message, variations: idVariations };
   }
 
-  private reshapeVariation(setting: any): IAlertBoxVariation {
+  private reshapeVariation(setting: any, type: string): IAlertBoxVariation {
     const imgHref =
       setting.image_href === '/images/gallery/default.gif'
         ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
@@ -238,7 +241,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: null,
       conditions: [],
       name: 'Default',
-      id: 'default',
+      id: `default-${type}`,
       settings: {
         customCss: setting.custom_css,
         customHtml: setting.custom_html,
