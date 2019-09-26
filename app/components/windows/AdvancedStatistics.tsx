@@ -5,6 +5,7 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
+import Notifications from './notifications.vue';
 import PerformanceMetrics from './../PerformanceMetrics.vue';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { ENotificationType, NotificationsService, INotification } from 'services/notifications';
@@ -40,6 +41,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
           </div>
           <div>
             <h2>Performance Notifications</h2>
+            <Notifications />
           </div>
         </div>
       </ModalLayout>
