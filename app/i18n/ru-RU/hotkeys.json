@@ -15,6 +15,6 @@
   "Enable Studio Mode": "Включить режим Студии",
   "Disable Studio Mode": "Отключить режим Студии",
   "Transition (Studio Mode)": "Переход (режим Студии)",
-  "Capture Foreground Window": "Capture Foreground Window",
-  "Deactivate Capture": "Deactivate Capture"
+  "Capture Foreground Window": "Захватить окно на переднем плане",
+  "Deactivate Capture": "Отключить захват"
 }
