@@ -213,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
-      silentTranslationWarn: true,
     });
     I18nService.setVuei18nInstance(i18n);
 
