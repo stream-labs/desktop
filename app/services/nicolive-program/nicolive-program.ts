@@ -436,10 +436,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       const timeout = (nextState.endTime - 5 * 60) * 1000 - now;
       // 5分前をすでに過ぎていたら即延長
       if (timeout <= 0) {
-        this.extendProgram(nextState);
+        this.extendProgramForAutoExtension(nextState);
       } else {
         this.autoExtensionTimer = window.setTimeout(() => {
-          this.extendProgram();
+          this.extendProgramForAutoExtension();
         }, timeout);
         console.log(
           '自動延長タイマーが（再）設定されました ',
@@ -454,6 +454,18 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     if (prev && !next) {
       clearTimeout(this.autoExtensionTimer);
       console.log('自動延長タイマーが解除されました');
+    }
+  }
+
+  private async extendProgramForAutoExtension(state = this.state) {
+    try {
+      return await this.extendProgram(state);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     }
   }
 
