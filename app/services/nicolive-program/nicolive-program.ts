@@ -327,8 +327,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.stateService.toggleAutoExtension();
   }
 
-  async extendProgram(): Promise<void> {
-    const result = await this.client.extendProgram(this.state.programID);
+  async extendProgram(state = this.state): Promise<void> {
+    const result = await this.client.extendProgram(state.programID);
     if (!isOk(result)) {
       throw NicoliveProgramServiceFailure.fromClientError('extendProgram', result);
     }
@@ -436,7 +436,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       const timeout = (nextState.endTime - 5 * 60) * 1000 - now;
       // 5分前をすでに過ぎていたら即延長
       if (timeout <= 0) {
-        this.extendProgram();
+        this.extendProgram(nextState);
       } else {
         this.autoExtensionTimer = window.setTimeout(() => {
           this.extendProgram();
