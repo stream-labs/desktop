@@ -6,8 +6,8 @@ import { sceneExisting } from './helpers/spectron/scenes';
 
 useSpectron({ appArgs: '--nosync' });
 
-const OVERLAY_NAME = 'Talon Stream Package by VBI';
-const OVERLAY_SCENES = ['Starting Soon', 'Be Right Back', 'Stream Ending', 'Intermission', 'Main'];
+const OVERLAY_NAME = 'Portals';
+const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];
 
 test('Installing a theme', async (t: any) => {
   const { app } = t.context;
@@ -42,7 +42,7 @@ test('Installing a theme', async (t: any) => {
   }
 
   // Should've populated sources (this checks Starting Soon scene sources)
-  for (const source of ['Talon Promo (Delete Me)', 'Starting Soon']) {
+  for (const source of ['Starting']) {
     t.true(await app.client.isExisting(`span.item-title=${source}`), `Source ${source}`);
   }
 });
