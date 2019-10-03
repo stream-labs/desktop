@@ -37,21 +37,23 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
 
   shutdownSubscription: Subscription;
 
+  options: Electron.BrowserViewConstructorOptions = null;
+
   mounted() {
-    this.props.options.webPreferences = this.props.options.webPreferences || {};
+    this.options = this.props.options || { webPreferences: {} };
 
     // Enforce node integration disabled to prevent security issues
-    this.props.options.webPreferences.nodeIntegration = false;
+    this.options.webPreferences.nodeIntegration = false;
 
     if (this.props.enableGuestApi) {
-      this.props.options.webPreferences.preload = path.resolve(
+      this.options.webPreferences.preload = path.resolve(
         electron.remote.app.getAppPath(),
         'bundles',
         'guest-api',
       );
     }
 
-    this.browserView = new electron.remote.BrowserView(this.props.options);
+    this.browserView = new electron.remote.BrowserView(this.options);
     this.$emit('ready', this.browserView);
 
     if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);
