@@ -307,18 +307,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.onboardingService.start({ isLogin: true });
   }
 
-  private voidStreamKey() {
-    const settings = this.settingsService.getSettingsFormData('Stream');
-
-    settings.forEach(subCategory => {
-      subCategory.parameters.forEach(parameter => {
-        if (parameter.name === 'key') parameter.value = '';
-      });
-    });
-
-    this.settingsService.setSettings('Stream', settings);
-  }
-
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
@@ -352,7 +340,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       : electron.remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
-    this.voidStreamKey();
+    this.settingsService.setSettingValue('Stream', 'key', '');
 
     this.LOGOUT();
     this.userLogout.next();
