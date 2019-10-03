@@ -9,6 +9,7 @@ import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
+import cloneDeep from 'lodash/cloneDeep';
 
 class BrowserViewProps {
   src: string = '';
@@ -40,7 +41,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
   options: Electron.BrowserViewConstructorOptions = null;
 
   mounted() {
-    this.options = this.props.options || { webPreferences: {} };
+    this.options = cloneDeep(this.props.options) || { webPreferences: {} };
 
     // Enforce node integration disabled to prevent security issues
     this.options.webPreferences.nodeIntegration = false;
