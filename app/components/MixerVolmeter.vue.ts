@@ -56,15 +56,26 @@ export default class MixerVolmeter extends Vue {
   peakHolds: number[];
   canvasWidth: number;
   canvasWidthInterval: number;
-  channelCount: number;
+  channelCount = 0;
   canvasHeight: number;
 
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
-    this.setChannelCount(1);
+    this.setChannelCount(0);
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+  }
+
+  destroyed() {
+    clearInterval(this.canvasWidthInterval);
+    this.unsubscribeVolmeter();
+  }
+
+  renderingInitialized = false;
+
+  private initRenderingContext() {
+    if (this.renderingInitialized) return;
 
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
@@ -75,11 +86,8 @@ export default class MixerVolmeter extends Vue {
       // disabled, so we fall back to canvas 2D rendering.
       this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
-  }
 
-  destroyed() {
-    clearInterval(this.canvasWidthInterval);
-    this.unsubscribeVolmeter();
+    this.renderingInitialized = true;
   }
 
   private initWebglRendering() {
@@ -285,12 +293,15 @@ export default class MixerVolmeter extends Vue {
 
   subscribeVolmeter() {
     this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
-      this.setChannelCount(volmeter.peak.length);
+      if (volmeter.peak.length) {
+        this.initRenderingContext();
+        this.setChannelCount(volmeter.peak.length);
 
-      if (this.gl) {
-        this.drawVolmeterWebgl(volmeter.peak);
-      } else {
-        this.drawVolmeterC2d(volmeter.peak);
+        if (this.gl) {
+          this.drawVolmeterWebgl(volmeter.peak);
+        } else {
+          this.drawVolmeterC2d(volmeter.peak);
+        }
       }
     });
   }
