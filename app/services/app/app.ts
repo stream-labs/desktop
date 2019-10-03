@@ -41,6 +41,10 @@ interface IAppState {
   onboarded: boolean;
 }
 
+export interface IRunInLoadingModeOptions {
+  hideStyleBlockers?: boolean;
+}
+
 /**
  * Performs operations that happen once at startup and shutdown. This service
  * mainly calls into other services to do the heavy lifting.
@@ -183,9 +187,11 @@ export class AppService extends StatefulService<IAppState> {
    * Should be called for any scene-collections loading operations
    * @see RunInLoadingMode decorator
    */
-  async runInLoadingMode(fn: () => Promise<any> | void) {
+  async runInLoadingMode(fn: () => Promise<any> | void, options: IRunInLoadingModeOptions = {}) {
+    const opts: IRunInLoadingModeOptions = Object.assign({ hideStyleBlockers: true }, options);
+
     if (!this.state.loading) {
-      this.windowsService.updateStyleBlockers('main', true);
+      if (opts.hideStyleBlockers) this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -236,7 +242,9 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    if (opts.hideStyleBlockers) {
+      setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    }
     if (error) throw error;
     return returningValue;
   }
