@@ -726,9 +726,146 @@ describe('refreshProgramStatusTimer', () => {
   }
 });
 
-// TODO: 自動延長系は永続化してから
-test.todo('toggleAutoExtension');
-test.todo('refreshAutoExtensionTimer');
+describe('refreshAutoExtensionTimer', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const suites: {
+    name: string;
+    prev: any;
+    next: any;
+    now: number;
+    result: 'IMMEDIATE' | 'WAIT' | 'NOOP' | 'CLEAR';
+  }[] = [
+    {
+      name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前を切っていると即延長する',
+      prev: null,
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: 25 * 60,
+      result: 'IMMEDIATE',
+    },
+    {
+      name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前を切っていても何もしない',
+      prev: null,
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      now: 25 * 60,
+      result: 'NOOP',
+    },
+    {
+      name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前より前ならタイマーをセットする',
+      prev: null,
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: 24 * 60,
+      result: 'WAIT',
+    },
+    {
+      name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前より前で何もしない',
+      prev: null,
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      now: 24 * 60,
+      result: 'NOOP',
+    },
+    {
+      name: '初期値から遷移して延長が有効なとき放送中番組でないなら何もしない',
+      prev: null,
+      next: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: -30 * 60,
+      result: 'NOOP',
+    },
+    {
+      name: '初期値から遷移して延長が無効なとき放送中番組でないなら何もしない',
+      prev: null,
+      next: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      now: -30 * 60,
+      result: 'NOOP',
+    },
+    {
+      name: '延長完了したらタイマーをセットする',
+      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 60 * 60, autoExtensionEnabled: true },
+      now: 25 * 60,
+      result: 'WAIT',
+    },
+    {
+      name: '終了時刻が変わって延長上限に当たったらタイマーをクリアする',
+      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 330 * 60, autoExtensionEnabled: true },
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 360 * 60, autoExtensionEnabled: true },
+      now: 325 * 60,
+      result: 'CLEAR',
+    },
+    {
+      name: '放送開始したらタイマーをセットする',
+      prev: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: 0,
+      result: 'WAIT',
+    },
+    {
+      name: '放送終了したらタイマーをクリアする',
+      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: { status: 'end', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: 30 * 60,
+      result: 'CLEAR',
+    },
+    {
+      name: '自動延長を有効にしたらタイマーをセットする',
+      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      now: 24 * 60,
+      result: 'WAIT',
+    },
+    {
+      name: '自動延長を切ったらタイマーをクリアする',
+      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      now: 24 * 60,
+      result: 'CLEAR',
+    },
+  ];
+
+  for (const suite of suites) {
+    test(suite.name, () => {
+      setup();
+      const m = require('./nicolive-program');
+      const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
+
+      jest.spyOn(window, 'setTimeout').mockImplementation(jest.fn());
+      jest.spyOn(window, 'clearTimeout').mockImplementation(jest.fn());
+      jest.spyOn(Date, 'now').mockImplementation(jest.fn().mockReturnValue(suite.now * 1000));
+
+      instance.client.extendProgram = jest.fn();
+      const state = instance.state;
+
+      instance.refreshAutoExtensionTimer({ ...state, ...suite.prev }, { ...state, ...suite.next });
+      switch (suite.result) {
+        case 'IMMEDIATE':
+          expect(window.clearTimeout).toHaveBeenCalledTimes(1);
+          expect(window.clearTimeout).toHaveBeenCalledWith(0);
+          expect(window.setTimeout).not.toHaveBeenCalled();
+          expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
+          expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
+          break;
+        case 'WAIT':
+          expect(window.clearTimeout).toHaveBeenCalledTimes(1);
+          expect(window.clearTimeout).toHaveBeenCalledWith(0);
+          expect(window.setTimeout).toHaveBeenCalledTimes(1);
+          expect(window.setTimeout).toHaveBeenCalledWith(expect.anything(), expect.anything());
+          expect(instance.client.extendProgram).not.toHaveBeenCalled();
+          break;
+        case 'NOOP':
+          expect(window.clearTimeout).not.toHaveBeenCalled();
+          expect(window.setTimeout).not.toHaveBeenCalled();
+          expect(instance.client.extendProgram).not.toHaveBeenCalled();
+          break;
+        case 'CLEAR':
+          expect(window.clearTimeout).toHaveBeenCalledTimes(1);
+          expect(window.clearTimeout).toHaveBeenCalledWith(0);
+
+      }
+    });
+  }
+});
 
 describe('static getPanelState', () => {
   const suites = [
