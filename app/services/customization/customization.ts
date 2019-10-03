@@ -153,8 +153,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
         options: [
-          { value: 'night-theme', description: $t('Night (Classic)') },
-          { value: 'day-theme', description: $t('Day (Classic)') },
+          { value: 'night-theme', description: $t('Night') },
+          { value: 'day-theme', description: $t('Day') },
         ],
         visible: true,
         enabled: true,
