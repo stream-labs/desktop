@@ -130,7 +130,7 @@ export default class WidgetEditor extends Vue {
   }
 
   get sourceProperties() {
-    return this.properties.slice(5);
+    return this.properties.slice(4);
   }
 
   get topProperties() {

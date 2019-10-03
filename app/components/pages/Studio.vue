@@ -14,7 +14,7 @@
   <div
     v-else
     class="no-preview"
-    :style="`calc(100% - ${eventsHeight + controlsHeight + 18}px`"
+    :style="`height: calc(100% - ${eventsHeight + controlsHeight}px)`"
   >
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
