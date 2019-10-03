@@ -3,7 +3,7 @@ import electron from 'electron';
 import path from 'path';
 import { I18nService } from 'services/i18n';
 import { Spinner } from 'streamlabs-beaker';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
@@ -13,7 +13,7 @@ import { AppService } from 'services/app';
 class BrowserViewProps {
   src: string = '';
   hidden?: boolean = false;
-  options?: Electron.BrowserViewConstructorOptions = {};
+  options?: Electron.BrowserViewConstructorOptions = null;
   setLocale?: boolean = false;
   enableGuestApi?: boolean = false;
   onReady?: (view: any) => void = () => {};
@@ -118,7 +118,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     if (this.loading) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <spinner size="large" />
+          <Spinner size="large" />
         </div>
       );
     }
