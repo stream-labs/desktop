@@ -1,8 +1,14 @@
 import Vue from 'vue';
 
-export function createProps<TProps extends new () => any>(propsClass: TProps): string[] {
+export function createProps<TProps extends new () => any>(
+  propsClass: TProps,
+): Dictionary<{ default: any }> {
+  const propsObj = {};
   const props = new propsClass();
-  return Object.keys(props);
+  Object.keys(props).forEach((key: string) => {
+    propsObj[key] = { default: props[key] };
+  });
+  return propsObj;
 }
 
 export default abstract class TsxComponent<TProps> extends Vue {
