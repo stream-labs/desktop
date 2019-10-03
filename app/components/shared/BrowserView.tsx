@@ -38,7 +38,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
 
   shutdownSubscription: Subscription;
 
-  options: Electron.BrowserViewConstructorOptions = null;
+  options: Electron.BrowserViewConstructorOptions;
 
   mounted() {
     this.options = cloneDeep(this.props.options) || { webPreferences: {} };
