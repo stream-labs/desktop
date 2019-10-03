@@ -469,7 +469,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         errorText = $t('An unexpected error occurred:') + info.error;
       }
 
-      electron.remote.dialog.showErrorBox($t('Streaming error'), errorText);
+      electron.remote.dialog.showErrorBox(
+        info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
+        errorText,
+      );
     }
   }
 
