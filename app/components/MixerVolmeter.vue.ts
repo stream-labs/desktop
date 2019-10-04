@@ -54,25 +54,60 @@ export default class MixerVolmeter extends Vue {
 
   peakHoldCounters: number[];
   peakHolds: number[];
+
   canvasWidth: number;
   canvasWidthInterval: number;
-  channelCount = 0;
+  channelCount: number;
   canvasHeight: number;
+
+  // Used to force recreation of the canvas element
+  canvasId = 1;
+
+  // Used for lazy initialization of the canvas rendering
+  renderingInitialized = false;
 
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
-    this.setChannelCount(0);
-    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+
+    this.setupNewCanvas();
+  }
+
+  beforeDestroy() {
+    this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
   }
 
   destroyed() {
+    if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
   }
 
-  renderingInitialized = false;
+  private setupNewCanvas() {
+    // Make sure all state is cleared out
+    this.ctx = null;
+    this.gl = null;
+    this.program = null;
+    this.positionLocation = null;
+    this.resolutionLocation = null;
+    this.translationLocation = null;
+    this.scaleLocation = null;
+    this.volumeLocation = null;
+    this.peakHoldLocation = null;
+    this.bgMultiplierLocation = null;
+    this.canvasWidth = null;
+    this.channelCount = null;
+    this.canvasHeight = null;
+
+    this.renderingInitialized = false;
+
+    // Assume 2 channels until we know otherwise. This prevents too much
+    // visual jank as the volmeters are initializing.
+    this.setChannelCount(2);
+
+    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+  }
 
   private initRenderingContext() {
     if (this.renderingInitialized) return;
@@ -81,13 +116,40 @@ export default class MixerVolmeter extends Vue {
 
     if (this.gl) {
       this.initWebglRendering();
+
+      // Get ready to lose this conext if too many are created
+      if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
+      window['activeWebglContexts'] += 1;
+      this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
     } else {
-      // This machine does not support hardware acceleration, or it has been
-      // disabled, so we fall back to canvas 2D rendering.
+      // This machine does not support hardware acceleration, or it has been disabled
+      // Fall back to canvas 2d rendering instead.
       this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
 
     this.renderingInitialized = true;
+  }
+
+  private handleLostWebglContext() {
+    // Only do this if there are free contexts, otherwise we will churn forever
+    if (window['activeWebglContexts'] < 16) {
+      console.warn('Lost WebGL context and attempting restore.');
+
+      if (this.canvasWidthInterval) {
+        clearInterval(this.canvasWidthInterval);
+        this.canvasWidthInterval = null;
+      }
+      this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
+      window['activeWebglContexts'] -= 1;
+
+      this.canvasId += 1;
+
+      this.$nextTick(() => {
+        this.setupNewCanvas();
+      });
+    } else {
+      console.warn('Lost WebGL context and not attempting restore due to too many active contexts');
+    }
   }
 
   private initWebglRendering() {
