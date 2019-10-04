@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
-import Notifications from './notifications.vue';
+// import Notifications from './notifications.vue';
 import PerformanceMetrics from './../PerformanceMetrics.vue';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import moment from 'moment';
@@ -17,6 +17,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
   @Inject() notificationsService: NotificationsService;
 
   private updateInterval = 0;
+  private notifications: INotification[] = [];
 
   mounted() {
     this.notificationsService.notificationPushed.subscribe(notify => {
@@ -54,6 +55,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
 
   onNotificationHandler(notification: INotification) {
     console.log(notification);
+    this.notifications.push(notification);
   }
 
   render(h: Function) {
@@ -62,6 +64,8 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
         <div slot="content" class={styles.container}>
           <div>
             <h2>Status</h2>
+            <span class="fa fa-info-circle" />
+            <span class="fa fa-exclamation-triangle" />
           </div>
           <div>
             <h2>Live Stats</h2>
@@ -72,7 +76,16 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
           </div>
           <div>
             <h2>Performance Notifications</h2>
-            <Notifications />
+            {this.notifications.map(notification => (
+              <div class={styles.notification}>
+                <div class="icon">
+                  {notification.type === 'INFO' && <span class="fa fa-info-circle" />}
+                  {notification.type === 'WARNING' && <span class="fa fa-exclamation-triangle" />}
+                </div>
+                <div class="message">{notification.message}</div>
+                <div class="date">{this.moment(notification.date)}</div>
+              </div>
+            ))}
           </div>
         </div>
       </ModalLayout>
