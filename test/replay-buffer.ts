@@ -12,10 +12,10 @@ test('Replay Buffer', async t => {
   const tmpDir = await setTemporaryRecordingPath(t);
   const { client } = t.context.app;
 
-  await client.click('button=Start Replay Buffer');
-  await client.click('button=Save Replay');
-  await client.click('button=Stop');
-  await client.isVisible('button=Start Replay Buffer');
+  await client.click('button .icon-repeat');
+  await client.click('button .icon-save');
+  await client.click('button .fa.fa-stop');
+  await client.isVisible('button .icon-repeat');
 
   // Check that the replay-buffer file has been created
   await sleep(1000);
@@ -30,5 +30,5 @@ test('Replay Buffer', async t => {
 
   // check Start Replay Buffer is not visible
   await focusMain(t);
-  t.false(await client.isExisting('button=Start Replay Buffer'));
+  t.false(await client.isExisting('button .icon-repeat'));
 });
