@@ -56,14 +56,17 @@ export default class MixerVolmeter extends Vue {
   peakHolds: number[];
   canvasWidth: number;
   canvasWidthInterval: number;
-  channelCount = 0;
+  channelCount: number;
   canvasHeight: number;
 
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
-    this.setChannelCount(0);
+
+    // Assume 2 channels until we know otherwise. This prevents too much
+    // visual jank as the volmeters are initializing.
+    this.setChannelCount(2);
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
   }
 
