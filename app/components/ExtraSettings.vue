@@ -71,5 +71,7 @@
   .flex();
   .flex--space-between();
   .margin-top();
+
+  flex-wrap: wrap;
 }
 </style>
