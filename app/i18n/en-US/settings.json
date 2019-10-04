@@ -10,6 +10,9 @@
   "Notifications": "Notifications",
   "Appearance": "Appearance",
   "Remote Control": "Remote Control",
+  "Experimental": "Experimental",
+  "Developer": "Developer",
+  "Facemasks": "Facemasks",
   "Night mode": "Night mode",
   "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
   "Show Cache Directory": "Show Cache Directory",
@@ -78,5 +81,7 @@
   "API Token": "API Token",
   "Face Mask Settings": "Face Mask Settings",
   "Navigate to Live tab when going live": "Navigate to Live tab when going live",
-  "Save Replay": "Save Replay"
+  "Save Replay": "Save Replay",
+  "Disable hardware acceleration": "Disable hardware acceleration",
+  "Replay Buffer": "Replay Buffer"
 }

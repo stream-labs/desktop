@@ -155,8 +155,9 @@
     }
   }
 
-  .test-button .link {
-    color: var(--white);
+  .test-button {
+    overflow-x: visible;
+    .link { color: var(--white)}
   }
 </style>
 

@@ -88,7 +88,7 @@ export default class SideNav extends Vue {
     return (
       <div class={styles.bottomTools}>
         {this.isDevMode && (
-          <div class={styles.cell} onClick={() => this.openDevTools()} title={$t('Dev Tools')}>
+          <div class={styles.cell} onClick={() => this.openDevTools()} title={'Dev Tools'}>
             <i class="icon-developer" />
           </div>
         )}

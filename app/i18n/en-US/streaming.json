@@ -79,5 +79,7 @@
   "Dismiss": "Dismiss",
   "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.": "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
   "Are you sure you want to do this?": "Are you sure you want to do this?",
-  "You can add sources by clicking the + icon near the Sources box at any time": "You can add sources by clicking the + icon near the Sources box at any time"
+  "You can add sources by clicking the + icon near the Sources box at any time": "You can add sources by clicking the + icon near the Sources box at any time",
+  "Tweet to let your followers know you're going live": "Tweet to let your followers know you're going live",
+  "Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience": "Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience"
 }

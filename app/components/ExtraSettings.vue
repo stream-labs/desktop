@@ -69,7 +69,7 @@
 
 .actions {
   .flex();
-  .flex--space-between();
+  .flex--wrap();
   .margin-top();
 }
 </style>
