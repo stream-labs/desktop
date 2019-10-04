@@ -115,7 +115,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     return steps;
   }
 
-  loginPage() {
+  get loginPage() {
     return (
       <div>
         <div class={styles.container}>
@@ -125,7 +125,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  optimizePage() {
+  get optimizePage() {
     return (
       <div>
         <div class={styles.container}>
