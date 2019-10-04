@@ -85,13 +85,6 @@ export default class MixerVolmeter extends Vue {
   }
 
   private setupNewCanvas() {
-    if (this.canvasWidthInterval) {
-      clearInterval(this.canvasWidthInterval);
-      this.canvasWidthInterval = null;
-    }
-
-    if (this.gl) window['activeWebglContexts'] -= 1;
-
     // Make sure all state is cleared out
     this.ctx = null;
     this.gl = null;
@@ -141,6 +134,13 @@ export default class MixerVolmeter extends Vue {
     // Only do this if there are free contexts, otherwise we will churn forever
     if (window['activeWebglContexts'] < 16) {
       console.warn('Lost WebGL context and attempting restore.');
+
+      if (this.canvasWidthInterval) {
+        clearInterval(this.canvasWidthInterval);
+        this.canvasWidthInterval = null;
+      }
+      this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
+      window['activeWebglContexts'] -= 1;
 
       this.canvasId += 1;
 
