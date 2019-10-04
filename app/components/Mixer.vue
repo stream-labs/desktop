@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="studio-controls-selector mixer-panel">
-    <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="getUuid()"/>
+    <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="audioSource.sourceId"/>
   </div>
 </div>
 </template>

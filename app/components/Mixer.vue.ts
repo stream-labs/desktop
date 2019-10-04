@@ -6,7 +6,6 @@ import MixerItem from './MixerItem.vue';
 import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
-import uuid from 'uuid/v4';
 
 @Component({
   components: { MixerItem },
@@ -35,9 +34,5 @@ export default class Mixer extends Vue {
     return this.audioService.getSourcesForCurrentScene().filter(source => {
       return !source.mixerHidden;
     });
-  }
-
-  getUuid() {
-    return uuid();
   }
 }
