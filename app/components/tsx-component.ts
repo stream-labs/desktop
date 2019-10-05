@@ -11,7 +11,7 @@ export function createProps<TProps extends new () => any>(
   return propsObj;
 }
 
-export default abstract class TsxComponent<TProps> extends Vue {
+export default abstract class TsxComponent<TProps = {}> extends Vue {
   private vueTsxProps: Readonly<{ slot?: string; ref?: string; class?: string; key?: string }> &
     Readonly<TProps>;
 
