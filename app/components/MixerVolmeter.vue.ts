@@ -106,6 +106,7 @@ export default class MixerVolmeter extends Vue {
     // visual jank as the volmeters are initializing.
     this.setChannelCount(2);
 
+    this.setCanvasWidth();
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
   }
 
