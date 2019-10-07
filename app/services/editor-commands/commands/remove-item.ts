@@ -3,7 +3,6 @@ import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { SourcesNode } from 'services/scene-collections/nodes/sources';
 import { Source } from 'services/sources';
-import { ResetTransformCommand } from './reset-transform';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
