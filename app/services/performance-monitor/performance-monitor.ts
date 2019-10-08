@@ -1,6 +1,10 @@
 import { StatefulService, mutation, Service, Inject } from 'services';
 import * as obs from '../../../obs-api';
-import { NotificationsService, ENotificationType } from 'services/notifications';
+import {
+  NotificationsService,
+  ENotificationType,
+  ENotificationSubType,
+} from 'services/notifications';
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs';
@@ -119,6 +123,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       data: factor,
       lifeTime: -1,
       showTime: true,
+      subType: ENotificationSubType.SKIPPED,
       // tslint:disable-next-line:prefer-template
       message: $t('Skipped frames detected:') + Math.round(factor * 100) + '%',
       action: this.jsonrpcService.createRequest(
@@ -137,6 +142,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       data: factor,
       lifeTime: -1,
       showTime: true,
+      subType: ENotificationSubType.LAGGED,
       message: `Lagged frames detected: ${Math.round(factor * 100)}%`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
@@ -154,6 +160,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       data: factor,
       lifeTime: -1,
       showTime: true,
+      subType: ENotificationSubType.DROPPED,
       message: `Dropped frames detected: ${Math.round(factor * 100)}%`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),

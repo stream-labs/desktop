@@ -19,7 +19,12 @@ import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
-import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
+import {
+  NotificationsService,
+  ENotificationType,
+  INotification,
+  ENotificationSubType,
+} from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
 import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
@@ -331,6 +336,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (existingReconnectNotif.length !== 0) return;
     this.notificationsService.push({
       type: ENotificationType.WARNING,
+      subType: ENotificationSubType.DISCONNECTED,
       lifeTime: -1,
       showTime: true,
       message: msg,
