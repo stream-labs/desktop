@@ -116,11 +116,11 @@ export default class StudioFooterComponent extends Vue {
       {
         componentName: 'AdvancedStatistics',
         title: $t('Performance Metrics'),
-        size: { width: 600, height: 550 },
-        // x: mousePos.x,
-        // y: mousePos.y,
+        size: { width: 700, height: 550 },
         resizable: true,
         maximizable: true,
+        minWidth: 500,
+        minHeight: 400,
       },
       'performance-metrics',
     );
