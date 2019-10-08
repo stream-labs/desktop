@@ -61,7 +61,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     });
   }
 
-  windowEnableToggles(h: Function) {
+  get windowEnableToggles() {
     const windows = Object.keys(this.gameOverlayService.state.windowProperties);
     const titles = { chat: $t('Show Chat'), recentEvents: $t('Show Recent Events') };
     return (
@@ -77,7 +77,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     );
   }
 
-  extraOptions(h: Function) {
+  get extraOptions() {
     return (
       <div>
         <VFormGroup
@@ -101,7 +101,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <div class="section">
@@ -112,8 +112,8 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
                 onInput={this.setEnableGameOverlay}
                 metadata={metadata.toggle({ title: $t('Enable in-game overlay') })}
               />
-              {this.enableGameOverlay && this.windowEnableToggles(h)}
-              {this.enableGameOverlay && this.extraOptions(h)}
+              {this.enableGameOverlay && this.windowEnableToggles}
+              {this.enableGameOverlay && this.extraOptions}
               <div style="margin-bottom: 16px;">
                 {$t('Set a hotkey in Hotkey Settings to toggle the in-game overlay')}
               </div>

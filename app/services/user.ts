@@ -28,6 +28,7 @@ import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
+import { SettingsService } from './settings';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -64,7 +65,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
-  @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private settingsService: SettingsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -339,6 +340,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       : electron.remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
+    this.settingsService.setSettingValue('Stream', 'key', '');
 
     this.LOGOUT();
     this.userLogout.next();

@@ -9,7 +9,7 @@ import { inputComponents } from 'components/shared/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import ImagePickerInput from 'components/shared/inputs/ImagePickerInput.vue';
 
 const nameMap = () => ({

@@ -11,7 +11,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
-import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
 
 interface IFilterNodeData {

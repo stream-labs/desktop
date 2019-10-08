@@ -67,7 +67,7 @@ export default class DeveloperSettings extends Vue {
     return this.tcpServerService.getApiSettingsFormData();
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         {this.appDeveloperMode && (

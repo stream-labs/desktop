@@ -306,7 +306,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the overlay
    * @param progressCallback a callback that receives progress of the download
    */
-  @RunInLoadingMode()
+  @RunInLoadingMode({ hideStyleBlockers: false })
   async installOverlay(
     url: string,
     name: string,

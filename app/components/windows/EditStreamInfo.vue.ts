@@ -27,7 +27,7 @@ import { Twitter } from '../Twitter';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
 import { Spinner } from 'streamlabs-beaker';
-import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
+import ValidatedForm from '../shared/inputs/ValidatedForm';
 import Utils from 'services/utils';
 
 @Component({

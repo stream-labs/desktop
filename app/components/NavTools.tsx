@@ -84,7 +84,7 @@ export default class SideNav extends Vue {
     this.dashboardOpening = false;
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div class={styles.bottomTools}>
         {this.isDevMode && (

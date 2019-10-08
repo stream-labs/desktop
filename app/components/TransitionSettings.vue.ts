@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { EditorCommandsService } from 'services/editor-commands';
 import { debounce } from 'lodash-decorators';
