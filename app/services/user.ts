@@ -28,7 +28,7 @@ import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
-import obs from '../../obs-api';
+import * as obs from '../../obs-api';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
