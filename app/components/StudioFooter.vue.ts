@@ -118,7 +118,7 @@ export default class StudioFooterComponent extends Vue {
         title: $t('Performance Metrics'),
         size: { width: 700, height: 550 },
         resizable: true,
-        maximizable: true,
+        maximizable: false,
         minWidth: 500,
         minHeight: 400,
       },
