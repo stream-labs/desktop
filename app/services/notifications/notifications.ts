@@ -6,6 +6,7 @@ import { WindowsService } from 'services/windows';
 import { IObsInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import {
   ENotificationType,
+  ENotificationSubType,
   INotification,
   INotificationOptions,
   INotificationsServiceApi,
@@ -51,6 +52,7 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
       playSound: true,
       lifeTime: 8000,
       showTime: false,
+      subType: ENotificationSubType.DEFAULT,
       ...notifyInfo,
     };
     this.PUSH(notify);
