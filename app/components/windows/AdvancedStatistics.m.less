@@ -1,6 +1,5 @@
 @import "../../styles/index.less";
 
-
 .container {
   @media (max-width: 1200px) {
     :global(.performance-metric-icon) {
@@ -14,16 +13,72 @@
     margin-right: 2px;
     flex-grow: 1;
   }
+
   :global(.performance-metric-wrapper)::before {
     content: '' !important;
     padding: 0;
     padding-right: 1px;
   }
-  // :global(.performance-metric) {
-  //   background-color: var(--section-alt);
-  //   padding: 10px;
-  //   .radius(1);
-  // }
+}
+
+.section {
+  margin-top: 40px;
+}
+
+.description {
+  margin-top: 20px;
+}
+
+.status {
+  padding: 10px 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  .radius(1);
+
+  span {
+    margin-left: 5px;
+  }
+}
+
+.error {
+  background: rgba(251, 72, 76, 0.28);
+  color: var(--warning);
+}
+
+.warning {
+  background-color: rgba(227, 151, 62, 0.08);
+  color: #e3973e;
+}
+
+.error-text {
+  color: var(--warning);
+}
+
+.warning-text {
+  color: #e3973e;
+}
+
+.success {
+  background-color: rgba(49, 195, 162, 0.08);
+  color: #31c3a2;
+}
+
+.notification:nth-child(even) {
+  background: var(--background);
+}
+
+.notification-container {
+  overflow-y: auto;
+  max-height: 108px;
+}
+
+.notification-empty {
+  color: var(--icon);
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  text-align: center;
+  background: var(--hover);
+  .radius(1);
 }
 
 .notification {
@@ -33,7 +88,7 @@
   display: grid;
   grid-template-columns: 30px 1fr 130px;
   background: var(--hover);
-  .border();
+  .radius(1);
 
   &.has-action:hover {
     color: var(--title);
