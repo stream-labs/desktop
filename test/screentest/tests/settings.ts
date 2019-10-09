@@ -74,8 +74,7 @@ test('Settings Appearance', async t => {
   t.pass();
 });
 
-// TODO: Fix flaky test
-test.skip('Settings Game Overlay', async (t: TExecutionContext) => {
+test('Settings Game Overlay', async (t: TExecutionContext) => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
 

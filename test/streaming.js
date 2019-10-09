@@ -16,7 +16,7 @@ import { getClient } from './helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 async function addColorSource() {
   const api = await getClient();
