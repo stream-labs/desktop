@@ -22,12 +22,13 @@ import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs';
-import Util from 'services/utils';
+import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
+import * as obs from '../../obs-api';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -54,6 +55,10 @@ export function setSentryContext(ctx: ISentryContext) {
     scope.setUser({ username: ctx.username });
     scope.setExtra('platform', ctx.platform);
   });
+
+  if (Utils.isMainWindow()) {
+    obs.NodeObs.SetUsername(ctx.username);
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
