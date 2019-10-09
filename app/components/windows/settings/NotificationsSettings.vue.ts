@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/core/injector';
+import { Inject } from 'services/core/injector';
 import GenericForm from 'components/obs/inputs/GenericForm';
-import { INotificationsServiceApi, INotificationsSettings } from 'services/notifications';
+import { INotificationsServiceApi, INotificationsSettings } from 'services/notifications/index';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import { ITroubleshooterServiceApi, ITroubleshooterSettings } from 'services/troubleshooter';
+import { ITroubleshooterServiceApi, ITroubleshooterSettings } from 'services/troubleshooter/index';
 
 @Component({
   components: { GenericForm },

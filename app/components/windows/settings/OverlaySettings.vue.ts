@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { SceneCollectionsService } from 'services/scene-collections';
+import { SceneCollectionsService } from 'services/scene-collections/index';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
-import { CustomizationService } from 'services/customization';
+import { CustomizationService } from 'services/customization/index';
 import electron from 'electron';
 import path from 'path';
-import { AppService } from 'services/app';
-import { WidgetsService } from 'services/widgets';
-import { ScenesService } from 'services/scenes';
-import { $t } from 'services/i18n';
+import { AppService } from 'services/app/index';
+import { WidgetsService } from 'services/widgets/index';
+import { ScenesService } from 'services/scenes/index';
+import { $t } from 'services/i18n/index';
 import { BoolInput } from 'components/shared/inputs/inputs';
 
 @Component({ components: { BoolInput } })
