@@ -46,4 +46,8 @@
   width: 50px;
   margin-left: 16px;
 }
+
+.slider-container /deep/ .s-slider .vue-slider {
+  background-color: var(--slider-bg);
+}
 </style>
