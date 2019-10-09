@@ -25,9 +25,9 @@ class SearchablePagesProps {
  */
 @Component({ props: createProps(SearchablePagesProps) })
 export default class SearchablePages extends TsxComponent<SearchablePagesProps> {
-  currentPage: string;
+  currentPage: string = '';
   pagesInfo: Dictionary<IPageInfo> = null;
-  searchResultPages: string[];
+  searchResultPages: string[] = [];
 
   created() {
     this.currentPage = this.props.page || '';
