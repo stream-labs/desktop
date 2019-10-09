@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import Main from 'components/windows/Main.vue';
-import Settings from 'components/windows/Settings.vue';
+import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';

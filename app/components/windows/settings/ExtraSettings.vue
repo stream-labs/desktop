@@ -65,7 +65,7 @@
 <script lang="ts" src="./ExtraSettings.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../styles/mixins';
+@import '../../../styles/mixins';
 
 .actions {
   .flex();

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { $t, I18nServiceApi } from 'services/i18n';
+import { $t, I18nServiceApi } from 'services/i18n/index';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import electron from 'electron';

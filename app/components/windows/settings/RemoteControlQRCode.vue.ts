@@ -2,8 +2,8 @@ import { remote } from 'electron';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
-import { Inject } from '../services/core/injector';
-import { ITcpServerServiceApi } from 'services/api/tcp-server';
+import { Inject } from 'services/core/injector';
+import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
 import { HostsService } from 'services/hosts';
 
 interface IQRCodeData {

@@ -47,7 +47,7 @@
 <script lang="ts" src="./RemoteControlQRCode.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../../../styles/index";
 
 input {
   cursor: text;
