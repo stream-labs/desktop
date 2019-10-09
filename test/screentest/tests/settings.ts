@@ -6,7 +6,7 @@ import { logIn, logOut } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
 
 
-useSpectron({ restartAppAfterEachTest: false, pauseIfFailed: true });
+useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Settings General', async t => {
