@@ -19,6 +19,13 @@ interface ITestUser {
   apiToken: string; // Streamlabs API token
   widgetToken: string; // needs for widgets showing
   channelId?: string; // for the Mixer and Facebook only
+  features?: ITestUserFeatures; // user-specific features
+}
+
+interface ITestUserFeatures {
+  streamingIsDisabled: boolean;
+  noFacebookPages: boolean;
+  hasLinkedTwitter: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {
@@ -37,7 +44,7 @@ export async function logOut(t: TExecutionContext) {
 export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
-  email?: string, // if not set, pick a random user's account from user-pool
+  features?: ITestUserFeatures, // if not set, pick a random user's account from user-pool
   waitForUI = true,
   isOnboardingTest = false,
 ): Promise<boolean> {
@@ -47,7 +54,7 @@ export async function logIn(
   if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
+    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, features);
   } else {
     authInfo = getAuthInfoFromEnv();
     if (!authInfo) {
@@ -60,7 +67,7 @@ export async function logIn(
 
   app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   if (!waitForUI) return true;
-  await t.context.app.client.waitForVisible('.fa-sign-out-alt'); // wait for the log-out button
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;
 }
 
@@ -121,7 +128,7 @@ function getAuthInfoFromEnv(): IPlatformAuth {
 async function reserveUserFromPool(
   token: string,
   platformType: TPlatform,
-  email = '',
+  features: ITestUserFeatures = null,
 ): Promise<IPlatformAuth> {
   // try to get a user account from users-pool service
   // give it several attempts
@@ -129,8 +136,10 @@ async function reserveUserFromPool(
   while (attempts--) {
     try {
       let urlPath = 'reserve';
-      if (platformType) urlPath += `/${platformType}`; // request a specific platform
-      if (email) urlPath += `/${email}`; // request a specific account
+      // request a specific platform
+      if (platformType) urlPath += `/${platformType}`;
+      // request a user with a specific feature
+      if (features) urlPath += `?features=${JSON.stringify(features)}`;
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {

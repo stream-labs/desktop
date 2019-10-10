@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'services';
+import { Inject } from 'services/index';
 import { HotkeysService, IHotkeysSet, IHotkey } from 'services/hotkeys';
-import { ScenesService } from '../services/scenes';
-import { SourcesService } from '../services/sources';
+import { ScenesService } from 'services/scenes/index';
+import { SourcesService } from 'services/sources/index';
 import HotkeyGroup from './HotkeyGroup';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import Fuse from 'fuse.js';

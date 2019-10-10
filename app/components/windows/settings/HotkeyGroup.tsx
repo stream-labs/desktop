@@ -1,8 +1,8 @@
 import { Component } from 'vue-property-decorator';
-import Hotkey from './shared/Hotkey.vue';
+import Hotkey from 'components/shared/Hotkey.vue';
 import { IHotkey } from 'services/hotkeys';
 import cx from 'classnames';
-import TsxComponent, { createProps } from './tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
 class HotkeyGroupProps {
   hotkeys: IHotkey[] = [];

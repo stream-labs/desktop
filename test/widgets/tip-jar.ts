@@ -3,7 +3,7 @@ import { addSource } from '../helpers/spectron/sources';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 test('Set tip-jar settings', async t => {
   if (!(await logIn(t))) return;

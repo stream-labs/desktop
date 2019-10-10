@@ -569,6 +569,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.deleteAllConnections();
+
+      this.streamingService.setSelectiveRecording(false);
     } catch (e) {
       console.error('Error deloading application state', e);
     }

@@ -2,13 +2,13 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
-import { ITcpServerServiceApi, ITcpServersSettings } from 'services/api/tcp-server';
-import { ISettingsSubCategory } from 'services/settings';
+import { ITcpServerServiceApi, ITcpServersSettings } from 'services/api/tcp-server/index';
+import { ISettingsSubCategory } from 'services/settings/index';
 import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
-import { PlatformAppsService } from 'services/platform-apps';
+import { PlatformAppsService } from 'services/platform-apps/index';
 import { TextInput } from 'components/shared/inputs/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { $t } from 'services/i18n';
+import { $t } from 'services/i18n/index';
 
 @Component({
   components: {

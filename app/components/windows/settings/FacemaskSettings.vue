@@ -89,7 +89,7 @@
 
 <script lang="ts" src="./FacemaskSettings.vue.ts"></script>
 <style lang="less" scoped>
-  @import '../styles/index';
+  @import '../../../styles/index';
 
   .row {
     flex-wrap: nowrap;

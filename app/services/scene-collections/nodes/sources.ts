@@ -43,7 +43,7 @@ export interface ISourceInfo {
 }
 
 export class SourcesNode extends Node<ISchema, {}> {
-  schemaVersion = 3;
+  schemaVersion = 4;
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
@@ -247,6 +247,17 @@ export class SourcesNode extends Node<ISchema, {}> {
           // tslint:disable-next-line:prefer-template
           source.name = 'Mic/Aux' + (index > 1 ? ' ' + index : '');
           return;
+        }
+      });
+    }
+
+    // Migrate media sources to turn off HW decoding. This property previously
+    // had no effect and now it does, so to make sure nothing changes, we are
+    // reverting this flag to false for everyone.
+    if (version < 4) {
+      this.data.items.forEach(source => {
+        if (source.type === 'ffmpeg_source') {
+          source.settings.hw_decode = false;
         }
       });
     }

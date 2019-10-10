@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import ModalLayout from './ModalLayout.vue';
+import ModalLayout from 'components/ModalLayout.vue';
 import { ListInput, ToggleInput, SliderInput, NumberInput } from 'components/shared/inputs/inputs';
 import { ProgressBar, ItemGrid, VirtualItem, Accordion } from 'streamlabs-beaker';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { FacemasksService } from 'services/facemasks';
+import { FacemasksService } from 'services/facemasks/index';
 
 interface IInputDeviceSelection {
   name: string;

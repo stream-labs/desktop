@@ -2,7 +2,7 @@ import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { getFormInput } from '../helpers/spectron/forms';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 test('Populates stream settings while logged in', async t => {
   const { app } = t.context;

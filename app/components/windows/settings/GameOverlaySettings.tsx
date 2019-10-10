@@ -1,10 +1,10 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
-import { metadata } from 'components/shared/inputs';
+import { metadata } from 'components/shared/inputs/index';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { GameOverlayService } from 'services/game-overlay';
-import { Inject } from 'services/core';
-import { $t } from 'services/i18n';
+import { GameOverlayService } from 'services/game-overlay/index';
+import { Inject } from 'services/core/index';
+import { $t } from 'services/i18n/index';
 
 @Component({})
 export default class GameOverlaySettings extends TsxComponent<{}> {

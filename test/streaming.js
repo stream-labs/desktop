@@ -16,7 +16,7 @@ import { getClient } from './helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 async function addColorSource() {
   const api = await getClient();
@@ -260,4 +260,52 @@ test('Go live error', async t => {
 
   await resetFetchMock(t);
   t.pass();
+});
+
+
+test('Youtube streaming is disabled', async t => {
+  skipCheckingErrorsInLog();
+  await logIn(t, 'youtube', { streamingIsDisabled: true });
+  t.true(
+    await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
+    'The streaming-disabled message should be visible'
+  );
+});
+
+test('User does not have Facebook pages', async t => {
+  skipCheckingErrorsInLog();
+  await logIn(t, 'facebook', { noFacebookPages: true });
+  const app = t.context.app;
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
+
+  // open EditStreamInfo window
+  await app.client.click('button=Go Live');
+  await focusChild(t);
+
+  t.true(
+    await t.context.app.client.isExisting('a=Facebook Page Creation'),
+    'The link for adding new facebook changes should exist'
+  );
+});
+
+test('User has linked twitter', async t => {
+  skipCheckingErrorsInLog();
+  await logIn(t, 'twitch', { hasLinkedTwitter: true });
+  const app = t.context.app;
+
+  // add a single source to prevent showing No-Sources dialog
+  await addColorSource();
+
+  // open EditStreamInfo window
+  await app.client.click('button=Go Live');
+  await focusChild(t);
+
+  // check the "Unlink" button
+  await t.context.app.client.waitForVisible('button=Unlink Twitter')
+  t.true(
+    await t.context.app.client.isExisting('button=Unlink Twitter'),
+    'The button for unlinking Twitter should exist'
+  );
 });

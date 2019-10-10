@@ -71,7 +71,7 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../../styles/index';
+@import '../../../styles/index';
 
 .settings {
   .transition();
