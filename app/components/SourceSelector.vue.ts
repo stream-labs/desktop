@@ -169,7 +169,7 @@ export default class SourceSelector extends Vue {
   }
 
   sourceProperties() {
-    if (this.activeItemIds.length === 0) return false;
+    if (this.activeItems.length === 0) return;
 
     if (this.isScene()) {
       this.makeSceneActive();
