@@ -21,7 +21,6 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  selectiveRecordingEnabled: boolean;
   experimental: any;
   legacyEvents: boolean;
 }
