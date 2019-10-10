@@ -28,6 +28,16 @@ interface IPerformanceState {
   frameRate: number;
 }
 
+interface INextStats {
+  framesSkipped: number;
+  framesEncoded: number;
+  skippedFactor: number;
+  framesLagged: number;
+  framesRendered: number;
+  laggedFactor: number;
+  droppedFramesFactor: number;
+}
+
 export enum EStreamQuality {
   GOOD = 'GOOD',
   FAIR = 'FAIR',
@@ -96,6 +106,28 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     );
   }
 
+  nextStats(currentStats: IMonitorState): INextStats {
+    const framesSkipped = currentStats.framesSkipped - this.state.numberSkippedFrames;
+    const framesEncoded = currentStats.framesEncoded - this.state.numberEncodedFrames;
+    const skippedFactor = framesSkipped / framesEncoded;
+
+    const framesLagged = currentStats.framesLagged - this.state.numberLaggedFrames;
+    const framesRendered = currentStats.framesRendered - this.state.numberRenderedFrames;
+    const laggedFactor = framesLagged / framesRendered;
+
+    const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
+
+    return {
+      framesSkipped,
+      framesEncoded,
+      skippedFactor,
+      framesLagged,
+      framesRendered,
+      laggedFactor,
+      droppedFramesFactor,
+    };
+  }
+
   /* Monitor frame rate statistics
   /  Update values in state
   /  Dispatch notifications when thresholds are crossed */
@@ -108,54 +140,49 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       framesEncoded: obs.Video.encodedFrames,
     };
 
-    const {
-      skippedEnabled,
-      skippedThreshold,
-      laggedEnabled,
-      laggedThreshold,
-      droppedEnabled,
-      droppedThreshold,
-    } = this.troubleshooterService.getSettings();
+    const nextStats = this.nextStats(currentStats);
+    this.sendNotifications(currentStats, nextStats);
 
-    const framesSkipped = currentStats.framesSkipped - this.state.numberSkippedFrames;
-    const framesEncoded = currentStats.framesEncoded - this.state.numberEncodedFrames;
-    const skippedFactor = framesSkipped / framesEncoded;
+    this.SET_PERFORMANCE_STATS({
+      numberSkippedFrames: nextStats.framesSkipped,
+      percentageSkippedFrames: nextStats.skippedFactor * 100,
+      numberLaggedFrames: nextStats.framesLagged,
+      percentageLaggedFrames: nextStats.laggedFactor * 100,
+      numberEncodedFrames: nextStats.framesEncoded,
+      numberRenderedFrames: nextStats.framesRendered,
+    });
+  }
 
-    const framesLagged = currentStats.framesLagged - this.state.numberLaggedFrames;
-    const framesRendered = currentStats.framesRendered - this.state.numberRenderedFrames;
-    const laggedFactor = framesLagged / framesRendered;
-
-    const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
+  // Check if any notification thresholds are met and send applicable notification
+  sendNotifications(currentStats: IMonitorState, nextStats: INextStats) {
+    const troubleshooterSettings = this.troubleshooterService.getSettings();
 
     // Check if skipped frames exceed notification threshold
-    if (skippedEnabled && currentStats.framesEncoded !== 0) {
-      if (framesEncoded !== 0 && skippedFactor >= skippedThreshold) {
-        this.pushSkippedFramesNotify(skippedFactor);
+    if (troubleshooterSettings.skippedEnabled && currentStats.framesEncoded !== 0) {
+      if (
+        nextStats.framesEncoded !== 0 &&
+        nextStats.skippedFactor >= troubleshooterSettings.skippedThreshold
+      ) {
+        this.pushSkippedFramesNotify(nextStats.skippedFactor);
       }
     }
 
     // Check if lagged frames exceed notification threshold
-    if (laggedEnabled && currentStats.framesRendered !== 0) {
-      if (framesRendered !== 0 && laggedFactor >= laggedThreshold) {
-        this.pushLaggedFramesNotify(laggedFactor);
+    if (troubleshooterSettings.laggedEnabled && currentStats.framesRendered !== 0) {
+      if (
+        nextStats.framesRendered !== 0 &&
+        nextStats.laggedFactor >= troubleshooterSettings.laggedThreshold
+      ) {
+        this.pushLaggedFramesNotify(nextStats.laggedFactor);
       }
     }
 
     // Check if dropped frames exceed notification threshold
-    if (droppedEnabled && this.state.percentageDroppedFrames) {
-      if (droppedFramesFactor >= droppedThreshold) {
-        this.pushDroppedFramesNotify(droppedFramesFactor);
+    if (troubleshooterSettings.droppedEnabled && this.state.percentageDroppedFrames) {
+      if (nextStats.droppedFramesFactor >= troubleshooterSettings.droppedThreshold) {
+        this.pushDroppedFramesNotify(nextStats.droppedFramesFactor);
       }
     }
-
-    this.SET_PERFORMANCE_STATS({
-      numberSkippedFrames: framesSkipped,
-      percentageSkippedFrames: skippedFactor * 100,
-      numberLaggedFrames: framesLagged,
-      percentageLaggedFrames: laggedFactor * 100,
-      numberEncodedFrames: framesEncoded,
-      numberRenderedFrames: framesRendered,
-    });
   }
 
   @throttle(NOTIFICATION_INTERVAL)
