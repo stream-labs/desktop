@@ -10,7 +10,7 @@
       </div>
     </div>
     <i
-      class="icon-leaderboard-4 metrics-icon"
+      v-bind:class="['icon-leaderboard-4', 'metrics-icon', performanceIconClassName]"
       @mouseover="metricsShown = true"
       @mouseleave="metricsShown = false"
       @click="openMetricsWindow"
@@ -123,6 +123,18 @@
   &:hover {
     cursor: pointer;
   }
+}
+
+.warning {
+  color: var(--warning);
+}
+
+.info {
+  color: #e3973e;
+}
+
+.success {
+  color: var(--teal);
 }
 
 .record-button {

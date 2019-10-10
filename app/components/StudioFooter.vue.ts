@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
-import { StreamingService, EReplayBufferState } from '../services/streaming';
+import { StreamingService, EReplayBufferState, EStreamingState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
@@ -9,12 +9,14 @@ import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
+import { PerformanceService, EStreamQuality } from 'services/performance';
 import electron from 'electron';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
+import { Subscription } from 'rxjs';
 import * as moment from 'moment';
 
 @Component({
@@ -32,12 +34,15 @@ export default class StudioFooterComponent extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
+  @Inject() performanceService: PerformanceService;
 
   @Prop() locked: boolean;
 
   metricsShown = false;
   recordingTime = '';
   private recordingTimeIntervalId: number;
+  private streamingStatus: EStreamingState = null;
+  private streamingStatusChange: Subscription = null;
 
   mounted() {
     this.confirmYoutubeEnabled();
@@ -47,14 +52,34 @@ export default class StudioFooterComponent extends Vue {
       if (!this.streamingService.isRecording) return;
       this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
+
+    this.streamingStatusChange = this.streamingService.streamingStatusChange.subscribe(status => {
+      this.streamingStatus = status;
+    });
   }
 
   destroyed() {
     clearInterval(this.recordingTimeIntervalId);
+    this.streamingStatusChange.unsubscribe();
   }
 
   toggleRecording() {
     this.streamingService.toggleRecording();
+  }
+
+  get performanceIconClassName() {
+    if (
+      this.streamingStatus === EStreamingState.Reconnecting ||
+      this.performanceService.streamQuality === EStreamQuality.POOR
+    ) {
+      return 'warning';
+    }
+
+    if (this.performanceService.streamQuality === EStreamQuality.FAIR) {
+      return 'info';
+    }
+
+    return 'success';
   }
 
   get mediaBackupOptOut() {
