@@ -223,15 +223,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       })
       .catch(resp => {
         if (resp.status !== 403) throw new Error(resp);
-        resp.json().then((json: any) => {
-          if (
-            json.error &&
-            json.error.errors &&
-            json.error.errors[0].reason === 'liveStreamingNotEnabled'
-          ) {
-            this.SET_ENABLED_STATUS(false);
-          }
-        });
+        const json = resp.result;
+        if (
+          json.error &&
+          json.error.errors &&
+          json.error.errors[0].reason === 'liveStreamingNotEnabled'
+        ) {
+          this.SET_ENABLED_STATUS(false);
+        }
         throw new Error('liveStreamingNotEnabled');
       });
   }
