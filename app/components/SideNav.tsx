@@ -67,7 +67,7 @@ export default class SideNav extends Vue {
 
   render() {
     const pageData = [
-      { target: 'Studio', icon: 'icon-studio' },
+      { target: 'Studio', icon: 'icon-studio', title: 'Editor' },
       { target: 'BrowseOverlays', icon: 'icon-themes', title: 'Themes' },
     ];
 

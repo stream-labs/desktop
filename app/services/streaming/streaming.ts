@@ -91,6 +91,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     recordingStatusTime: new Date().toISOString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
+    selectiveRecording: false,
   };
 
   init() {
@@ -117,6 +118,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   get isIdle(): boolean {
     return !this.isStreaming && !this.isRecording;
+  }
+
+  setSelectiveRecording(enabled: boolean) {
+    this.SET_SELECTIVE_RECORDING(enabled);
+    obs.Global.multipleRendering = enabled;
   }
 
   /**
@@ -492,6 +498,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
     this.state.replayBufferStatus = status;
     if (time) this.state.replayBufferStatusTime = time;
+  }
+
+  @mutation()
+  private SET_SELECTIVE_RECORDING(enabled: boolean) {
+    this.state.selectiveRecording = enabled;
   }
 
   private runPlatformAfterGoLiveHook() {
