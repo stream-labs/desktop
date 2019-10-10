@@ -47,6 +47,7 @@
     >
       <extra-settings v-if="page === 'General'" />
       <language-settings v-if="page === 'General'" />
+      <stream-settings v-if="page === 'Facemasks'" />
       <hotkeys v-if="page === 'Hotkeys'" />
       <developer-settings v-if="page === 'Developer'" />
       <installed-apps v-if="page === 'Installed Apps'" />
@@ -58,7 +59,7 @@
       <game-overlay-settings v-if="page === 'Game Overlay'" />
       <facemask-settings v-if="page === 'Facemasks'" />
       <GenericFormGroups
-        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(page)"
+        v-if="!['Hotkeys', 'Stream', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(page)"
         :key="page"
         :categoryName="page"
         v-model="settingsData"
