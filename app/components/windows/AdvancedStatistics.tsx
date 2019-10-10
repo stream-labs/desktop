@@ -118,7 +118,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     this.notifications.push(notification);
   }
 
-  statusIcon(h: Function) {
+  get statusIcon() {
     if (this.status.type === 'error') {
       return <span class="fa fa-minus-circle" />;
     }
@@ -132,7 +132,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     }
   }
 
-  statusBar(h: Function) {
+  get statusBar() {
     return (
       <div>
         <h2>Status</h2>
@@ -144,21 +144,21 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
             this.status.type === 'success' ? styles.success : '',
           )}
         >
-          {this.statusIcon(h)}
+          {this.statusIcon}
           <span>{this.status.description}</span>
         </div>
       </div>
     );
   }
 
-  notificationsArea(h: Function) {
+  get notificationsArea() {
     return (
       <div class={styles.section}>
         <h2>Performance Notifications</h2>
         <div class={styles.notificationContainer}>
           {this.notifications.map(notification => (
             <div class={styles.notification}>
-              {this.iconForNotificationBySubType(h, notification)}
+              {this.iconForNotificationBySubType(notification)}
               <div class="message">{notification.message}</div>
               <div class="date">{this.moment(notification.date)}</div>
             </div>
@@ -178,7 +178,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     );
   }
 
-  iconForNotificationBySubType(h: Function, notification: INotification) {
+  iconForNotificationBySubType(notification: INotification) {
     return (
       <div class="icon">
         {notification.subType === ENotificationSubType.DISCONNECTED && (
@@ -197,11 +197,11 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <ModalLayout showControls={false}>
         <div slot="content" class={styles.container}>
-          {this.statusBar(h)}
+          {this.statusBar}
           <div>
             <h2>Live Stats</h2>
             <div class={styles.statsRow}>
@@ -209,7 +209,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
               <GlobalSyncStatus />
             </div>
           </div>
-          {this.notificationsArea(h)}
+          {this.notificationsArea}
         </div>
       </ModalLayout>
     );
