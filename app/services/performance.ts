@@ -28,6 +28,12 @@ interface IPerformanceState {
   frameRate: number;
 }
 
+export enum EStreamQuality {
+  GOOD = 'GOOD',
+  FAIR = 'FAIR',
+  POOR = 'POOR',
+}
+
 const STATS_UPDATE_INTERVAL = 5 * 1000;
 const NOTIFICATION_INTERVAL = 2 * 60 * 1000;
 
@@ -83,8 +89,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
             return proc.cpu.percentCPUUsage;
           })
           .reduce((sum, usage) => sum + usage);
-
-        console.log(stats);
 
         this.SET_PERFORMANCE_STATS(stats);
         this.monitorAndUpdateStats();
@@ -210,6 +214,24 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
         code,
       ),
     });
+  }
+
+  get streamQuality() {
+    if (
+      this.state.percentageDroppedFrames > 50 ||
+      this.state.percentageLaggedFrames > 50 ||
+      this.state.percentageSkippedFrames > 50
+    ) {
+      return EStreamQuality.POOR;
+    }
+    if (
+      this.state.percentageDroppedFrames > 30 ||
+      this.state.percentageLaggedFrames > 30 ||
+      this.state.percentageSkippedFrames > 30
+    ) {
+      return EStreamQuality.FAIR;
+    }
+    return EStreamQuality.GOOD;
   }
 
   stop() {
