@@ -7,7 +7,7 @@
   "There is not sufficient disk space to continue recording.": "Il n'y a plus d'espace disponible sur le disque dur pour continuer l'enregistrement.",
   "The output format is either unsupported or does not support more than one audio track.  ": "Le format de sortie n'est soit pas supportée ou ne supporte pas plus d'une piste audio.  ",
   "Please check your settings and try again.": "Veuillez vérifier vos paramètres de configuration et essayer à nouveaux.",
-  "An unexpected error occurred:": "Une erreur inateendue s'est produite:",
+  "An unexpected error occurred:": "Une erreur inattendue s'est produite:",
   "Title": "Titre",
   "Game": "Jeux",
   "Do not show this message when going live": "Ne plus afficher ce message en commençant la diffusion",
