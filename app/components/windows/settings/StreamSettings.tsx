@@ -12,27 +12,18 @@ import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 @Component({ components: { GenericFormGroups } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
-
-  created() {
-    // this.settingsFormData = this.customizationService.getSettingsFormData();
-    // this.enableFFZEmotes = this.customizationService.getSettings().enableFFZEmotes;
-  }
+  private obsSettings = this.streamSettingsService.getObsSettings();
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
-    // const settings: Partial<ICustomizationSettings> = {};
-    // formData.forEach(formInput => {
-    //   settings[formInput.name] = formInput.value;
-    // });
-    // this.customizationService.setSettings(settings);
-    // this.settingsFormData = this.customizationService.getSettingsFormData();
-    // this.enableFFZEmotes = this.customizationService.getSettings().enableFFZEmotes;
     this.streamSettingsService.setObsSettings(obsSettings);
+    this.obsSettings = this.streamSettingsService.getObsSettings();
   }
 
   render() {
     return (
       <div>
-        <GenericFormGroups value={this.streamSettingsService.getObsSettings()} onInput={this.saveObsSettings} />
+        Stream Settings
+        <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
       </div>
     );
   }

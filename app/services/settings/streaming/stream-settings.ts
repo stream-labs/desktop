@@ -16,11 +16,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   };
 
   getObsSettings(): ISettingsSubCategory[] {
-    return this.settingsService.getSettingsFormData('Streaming');
+    return this.settingsService.getSettingsFormData('Stream');
   }
 
   setObsSettings(formData: ISettingsSubCategory[]) {
-    this.settingsService.setSettings('Streaming', formData);
+    this.settingsService.setSettings('Stream', formData);
   }
 
   setProtectedMode(enabled: boolean) {

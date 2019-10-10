@@ -47,7 +47,7 @@
     >
       <extra-settings v-if="page === 'General'" />
       <language-settings v-if="page === 'General'" />
-      <stream-settings v-if="page === 'Facemasks'" />
+      <stream-settings v-if="page === 'Stream'" />
       <hotkeys v-if="page === 'Hotkeys'" />
       <developer-settings v-if="page === 'Developer'" />
       <installed-apps v-if="page === 'Installed Apps'" />
