@@ -57,13 +57,6 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     clearInterval(this.updateInterval);
   }
 
-  get notificationGroups(): { unread: INotification[]; read: INotification[] } {
-    return {
-      unread: this.notificationsService.getUnread(),
-      read: this.notificationsService.getRead(),
-    };
-  }
-
   get notificationsCount() {
     return this.notificationsService.getAll().length;
   }
@@ -72,15 +65,28 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     return this.performanceService.state.percentageDroppedFrames || 0;
   }
 
+  get percentLagged() {
+    return this.performanceService.state.percentageLaggedFrames || 0;
+  }
+
+  get percentSkipped() {
+    return this.performanceService.state.percentageSkippedFrames || 0;
+  }
+
   get status(): { type: string; description: string } {
-    if (this.streamingStatus === 'reconnecting' || this.percentDropped > 50) {
+    if (
+      this.streamingStatus === 'reconnecting' ||
+      this.percentDropped > 50 ||
+      this.percentLagged > 50 ||
+      this.percentSkipped > 50
+    ) {
       return {
         type: 'error',
         description: $t('Streamlabs OBS is experiencing difficulties broadcasting'),
       };
     }
 
-    if (this.percentDropped > 30) {
+    if (this.percentDropped > 30 || this.percentLagged > 30 || this.percentSkipped > 30) {
       return {
         type: 'warning',
         description: $t('Streamlabs OBS is experiencing minor issues.'),
