@@ -205,13 +205,34 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     );
   }
 
-  prepopulateInfo() {
+  private fetchBroadcastPromise: Promise<IYoutubeLiveBroadcast> = null;
+
+  /**
+   * returns default broadcast
+   */
+  private fetchBroadcast(): Promise<IYoutubeLiveBroadcast> {
+    // youtube API has a strict limitation for amount of API request
+    // reuse a previous fetchBroadcast request if it's still in pending state
+    if (this.fetchBroadcastPromise) return this.fetchBroadcastPromise;
+
     const query = `part=snippet,contentDetails,status&default=true&access_token=${this.oauthToken}`;
-    return platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveBroadcast>>(
-      `${this.apiBase}/liveBroadcasts?${query}`,
-    )
-      .then(broadcasts => {
-        const defaultBroadcast = broadcasts.items[0];
+    this.fetchBroadcastPromise = platformAuthorizedRequest<
+      IYoutubeCollection<IYoutubeLiveBroadcast>
+    >(`${this.apiBase}/liveBroadcasts?${query}`).then(broadcasts => {
+      this.fetchBroadcastPromise = null;
+      return broadcasts.items[0];
+    });
+
+    // reset fetchBroadcastPromise in case of error
+    this.fetchBroadcastPromise.catch(e => {
+      console.error(e);
+      this.fetchBroadcastPromise = null;
+    });
+  }
+
+  prepopulateInfo() {
+    return this.fetchBroadcast()
+      .then(defaultBroadcast => {
         this.SET_ENABLED_STATUS(true);
         this.SET_STREAM_ID(defaultBroadcast.contentDetails.boundStreamId);
         this.SET_SCHEDULED_START_TIME(defaultBroadcast.snippet.scheduledStartTime);
