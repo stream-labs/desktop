@@ -2,7 +2,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
-import { WindowsService } from 'services/windows';
 import cx from 'classnames';
 import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
@@ -11,7 +10,7 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import moment from 'moment';
 import { Subscription } from 'rxjs';
-import { PerformanceService } from 'services/performance';
+import { PerformanceService, EStreamQuality } from 'services/performance';
 import {
   ENotificationType,
   ENotificationSubType,
@@ -21,14 +20,13 @@ import {
 
 @Component({})
 export default class AdvancedStatistics extends TsxComponent<{}> {
-  @Inject() windowsService: WindowsService;
   @Inject() notificationsService: NotificationsService;
   @Inject() performanceService: PerformanceService;
   @Inject() streamingService: StreamingService;
 
   private updateInterval = 0;
   private notifications: INotification[] = [];
-  private streamingStatus = '';
+  private streamingStatus: EStreamingState = null;
   private notificationPushed: Subscription = null;
   private streamingStatusChange: Subscription = null;
 
@@ -57,36 +55,19 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     clearInterval(this.updateInterval);
   }
 
-  get notificationsCount() {
-    return this.notificationsService.getAll().length;
-  }
-
-  get percentDropped() {
-    return this.performanceService.state.percentageDroppedFrames || 0;
-  }
-
-  get percentLagged() {
-    return this.performanceService.state.percentageLaggedFrames || 0;
-  }
-
-  get percentSkipped() {
-    return this.performanceService.state.percentageSkippedFrames || 0;
+  get streamQuality() {
+    return this.performanceService.streamQuality;
   }
 
   get status(): { type: string; description: string } {
-    if (
-      this.streamingStatus === 'reconnecting' ||
-      this.percentDropped > 50 ||
-      this.percentLagged > 50 ||
-      this.percentSkipped > 50
-    ) {
+    if (this.streamingStatus === 'reconnecting' || this.streamQuality === EStreamQuality.POOR) {
       return {
         type: 'error',
         description: $t('Streamlabs OBS is experiencing difficulties broadcasting'),
       };
     }
 
-    if (this.percentDropped > 30 || this.percentLagged > 30 || this.percentSkipped > 30) {
+    if (this.streamQuality === EStreamQuality.FAIR) {
       return {
         type: 'warning',
         description: $t('Streamlabs OBS is experiencing minor issues.'),
@@ -97,10 +78,6 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       type: 'success',
       description: $t('Streamlabs OBS is running normally'),
     };
-  }
-
-  onNotificationClickHandler(id: number) {
-    this.notificationsService.applyAction(id);
   }
 
   onStreamingStatusChange(status: EStreamingState) {
