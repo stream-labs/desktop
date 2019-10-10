@@ -7,6 +7,7 @@ export const notes: IPatchNotes = {
   notes: [
     "We've combined the Editor and Live tabs into a single tab with all of the same functionality.",
     'Selective recording allows you to hide certain sources in your recordings that are present in your live stream. Enable it by clicking the icon above the sources list.',
+    'Added dynamic bitrate, an option enabled by default that will automatically adjust your bitrate based on your connection speed to prevent you dropping frames.',
     'Added a button to open up the Streamlabs dashboard in a web browser.',
     'Added a recording timer.',
     'Added search functionality to the settings window.',
