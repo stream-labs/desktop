@@ -1,6 +1,5 @@
 import { readdir } from 'fs-extra';
-import { focusChild, focusMain, test, useSpectron } from './helpers/spectron';
-import { setFormDropdown } from './helpers/spectron/forms';
+import { focusMain, test, useSpectron } from './helpers/spectron';
 import { sleep } from './helpers/sleep';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 import { addSource } from './helpers/spectron/sources';
@@ -21,7 +20,6 @@ test('Selective Recording', async t => {
   await client.click('.studio-controls-top .icon-smart-record');
 
   // Check that selective recording icon is active
-  await sleep(2000);
   t.true(await client.isExisting('.icon-smart-record.icon--active'));
 
   // Check that browser source has a selective recording toggle
@@ -29,14 +27,12 @@ test('Selective Recording', async t => {
 
   // Cycle selective recording mode on browser source
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record');
-  await sleep(2000);
 
   // Check that source is set to stream only
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast'));
 
   // Cycle selective recording mode to record only
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
-  await sleep(2000);
 
   // Check that source is set to record only
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-studio'));
@@ -46,7 +42,6 @@ test('Selective Recording', async t => {
   await sleep(2000);
 
   // Ensure recording indicator is active
-  await focusMain(t);
   t.true(await client.isExisting('.record-button.active'));
 
   // Stop recording
