@@ -9,7 +9,6 @@ import {
   IPlatformRequest,
 } from '.';
 import { HostsService } from 'services/hosts';
-import { SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
@@ -17,6 +16,7 @@ import { StreamInfoService } from 'services/stream-info';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 /**
  * Request headers that need to be sent to Twitch
@@ -41,7 +41,7 @@ interface ITwitchOAuthValidateResponse {
 
 export class TwitchService extends Service implements IPlatformService {
   @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() streamInfoService: StreamInfoService;
 
@@ -80,26 +80,27 @@ export class TwitchService extends Service implements IPlatformService {
     return this.userService.platform.id;
   }
 
-  // TODO: Some of this code could probably eventually be
-  // shared with the Youtube platform.
   setupStreamSettings() {
     return this.fetchStreamKey()
       .then(key => {
-        const settings = this.settingsService.getSettingsFormData('Stream');
+        const currentStreamSettings = this.streamSettingsService.getSettings();
 
-        settings.forEach(subCategory => {
-          subCategory.parameters.forEach(parameter => {
-            if (parameter.name === 'service') {
-              parameter.value = 'Twitch';
-            }
+        // enable protectedMode for users who manually changed their stream key
+        const needToEnableProtectedMode: boolean =
+          !currentStreamSettings.protectedModeEnabled &&
+          currentStreamSettings.platform === 'twitch' &&
+          currentStreamSettings.key !== key;
 
-            if (parameter.name === 'key') {
-              parameter.value = key;
-            }
+        if (needToEnableProtectedMode) {
+          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        } else {
+          this.streamSettingsService.setSettings({
+            key,
+            platform: 'twitch',
+            protectedModeEnabled: false,
           });
-        });
+        }
 
-        this.settingsService.setSettings('Stream', settings);
         return EPlatformCallResult.Success;
       })
       .catch((r: Response) => {

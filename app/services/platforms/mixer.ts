@@ -15,15 +15,16 @@ import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 interface IMixerServiceState {
   typeIdMap: object;
 }
 
 export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
-  @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
-  @Inject() userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
 
@@ -75,21 +76,23 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   setupStreamSettings() {
     return this.fetchStreamKey()
       .then(key => {
-        const settings = this.settingsService.getSettingsFormData('Stream');
+        const currentStreamSettings = this.streamSettingsService.getSettings();
 
-        settings.forEach(subCategory => {
-          subCategory.parameters.forEach(parameter => {
-            if (parameter.name === 'service') {
-              parameter.value = 'Mixer.com - FTL';
-            }
+        // enable protectedMode for users who manually changed their stream key
+        const needToEnableProtectedMode: boolean =
+          !currentStreamSettings.protectedModeEnabled &&
+          currentStreamSettings.platform === 'mixer' &&
+          currentStreamSettings.key !== key;
 
-            if (parameter.name === 'key') {
-              parameter.value = key;
-            }
+        if (needToEnableProtectedMode) {
+          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        } else {
+          this.streamSettingsService.setSettings({
+            key,
+            platform: 'mixer',
+            protectedModeEnabled: false,
           });
-        });
-
-        this.settingsService.setSettings('Stream', settings);
+        }
         return EPlatformCallResult.Success;
       })
       .catch(() => EPlatformCallResult.Error);

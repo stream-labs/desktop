@@ -25,6 +25,7 @@ import { NavigationService } from 'services/navigation';
 import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { StreamSettingsService } from '../settings/streaming';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -61,6 +62,7 @@ export interface StreamingContext {
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -168,6 +170,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         if (this.userService.isLoggedIn && this.userService.platform) {
           const service = getPlatformService(this.userService.platform.type);
+
+          // update stream key and stream settings for platform
+          if (!this.streamSettingsService.protectedModeEnabled) {
+            await service.setupStreamSettings();
+          }
+
           await service.beforeGoLive();
         }
         this.finishStartStreaming();
