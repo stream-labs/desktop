@@ -195,9 +195,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       .catch(e => $t('Please enable account for streaming to recieve a stream key'));
   }
 
-  fetchViewerCount(): Promise<number> {
+  async fetchViewerCount(): Promise<number> {
+    const liveBroadCast = this.state.liveBroadcast || (await this.fetchBroadcast());
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
-    const url = `${this.apiBase}/${endpoint}&id=${this.state.liveBroadcast.id}&access_token=${
+    const url = `${this.apiBase}/${endpoint}&id=${liveBroadCast.id}&access_token=${
       this.oauthToken
     }`;
     return platformAuthorizedRequest(url).then(
@@ -211,6 +212,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    * returns default broadcast
    */
   private fetchBroadcast(): Promise<IYoutubeLiveBroadcast> {
+
     // youtube API has a strict limitation for amount of API request
     // reuse a previous fetchBroadcast request if it's still in pending state
     if (this.fetchBroadcastPromise) return this.fetchBroadcastPromise;
@@ -307,10 +309,11 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return Promise.resolve(JSON.parse(''));
   }
 
-  getChatUrl(mode: string) {
+  async getChatUrl(mode: string) {
+    const liveBroadCast = this.state.liveBroadcast || (await this.fetchBroadcast());
     const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return Promise.resolve(
-      `${youtubeDomain}/live_chat?v=${this.state.liveBroadcast.id}&is_popout=1`,
+      `${youtubeDomain}/live_chat?v=${liveBroadCast.id}&is_popout=1`,
     );
   }
 
