@@ -29,6 +29,7 @@ const base = {
     provider: 'generic',
     url: 'https://slobs-cdn.streamlabs.com'
   },
+  win: {},
   extraMetadata: {
     env: 'production'
   }
