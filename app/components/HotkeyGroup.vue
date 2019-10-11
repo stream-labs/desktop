@@ -20,9 +20,7 @@
       v-show="!collapsed"
       class="section-content section-content--dropdown"
   >
-    <div class="hotkey" v-for="hotkey in hotkeys" :key="hotkey.resourceId">
-      <hotkey :hotkey="hotkey" />
-    </div>
+    <hotkey :hotkey="hotkey" class="hotkey" v-for="hotkey in hotkeys" :key="hotkey.resourceId" />
   </div>
 </div>
 </template>
