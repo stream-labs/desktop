@@ -229,6 +229,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       console.error(e);
       this.fetchBroadcastPromise = null;
     });
+
+    return this.fetchBroadcastPromise;
   }
 
   prepopulateInfo() {
