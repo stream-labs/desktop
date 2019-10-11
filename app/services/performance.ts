@@ -158,30 +158,31 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     const troubleshooterSettings = this.troubleshooterService.getSettings();
 
     // Check if skipped frames exceed notification threshold
-    if (troubleshooterSettings.skippedEnabled && currentStats.framesEncoded !== 0) {
-      if (
-        nextStats.framesEncoded !== 0 &&
-        nextStats.skippedFactor >= troubleshooterSettings.skippedThreshold
-      ) {
-        this.pushSkippedFramesNotify(nextStats.skippedFactor);
-      }
+    if (
+      troubleshooterSettings.skippedEnabled &&
+      currentStats.framesEncoded !== 0 &&
+      nextStats.framesEncoded !== 0 &&
+      nextStats.skippedFactor >= troubleshooterSettings.skippedThreshold
+    ) {
+      this.pushSkippedFramesNotify(nextStats.skippedFactor);
     }
 
     // Check if lagged frames exceed notification threshold
-    if (troubleshooterSettings.laggedEnabled && currentStats.framesRendered !== 0) {
-      if (
-        nextStats.framesRendered !== 0 &&
-        nextStats.laggedFactor >= troubleshooterSettings.laggedThreshold
-      ) {
-        this.pushLaggedFramesNotify(nextStats.laggedFactor);
-      }
+    if (
+      troubleshooterSettings.laggedEnabled &&
+      currentStats.framesRendered !== 0 &&
+      nextStats.framesRendered !== 0 &&
+      nextStats.laggedFactor >= troubleshooterSettings.laggedThreshold
+    ) {
+      this.pushLaggedFramesNotify(nextStats.laggedFactor);
     }
 
     // Check if dropped frames exceed notification threshold
-    if (troubleshooterSettings.droppedEnabled && this.state.percentageDroppedFrames) {
-      if (nextStats.droppedFramesFactor >= troubleshooterSettings.droppedThreshold) {
-        this.pushDroppedFramesNotify(nextStats.droppedFramesFactor);
-      }
+    if (
+      troubleshooterSettings.droppedEnabled &&
+      nextStats.droppedFramesFactor >= troubleshooterSettings.droppedThreshold
+    ) {
+      this.pushDroppedFramesNotify(nextStats.droppedFramesFactor);
     }
   }
 
