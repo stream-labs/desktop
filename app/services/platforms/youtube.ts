@@ -212,7 +212,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    * returns default broadcast
    */
   private fetchBroadcast(): Promise<IYoutubeLiveBroadcast> {
-
     // youtube API has a strict limitation for amount of API request
     // reuse a previous fetchBroadcast request if it's still in pending state
     if (this.fetchBroadcastPromise) return this.fetchBroadcastPromise;
@@ -312,9 +311,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async getChatUrl(mode: string) {
     const liveBroadCast = this.state.liveBroadcast || (await this.fetchBroadcast());
     const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
-    return Promise.resolve(
-      `${youtubeDomain}/live_chat?v=${liveBroadCast.id}&is_popout=1`,
-    );
+    return Promise.resolve(`${youtubeDomain}/live_chat?v=${liveBroadCast.id}&is_popout=1`);
   }
 
   beforeGoLive() {
