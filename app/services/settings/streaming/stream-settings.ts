@@ -41,6 +41,9 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
   facebook: 'Facebook Live',
 };
 
+/**
+ * This service aggregates managing all streaming setting in the app
+ */
 export class StreamSettingsService extends PersistentStatefulService<IStreamSettingsState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private userService: UserService;
