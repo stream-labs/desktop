@@ -8,9 +8,12 @@ import { TPlatform } from 'services/platforms';
 import { invert } from 'lodash';
 
 /**
- * settings that we store in the localStorage
+ * settings that we keep in the localStorage
  */
 interface IStreamSettingsState {
+  /**
+   * In protected mode we fetch and update stream key before each stream start
+   */
   protectedModeEnabled: boolean;
 }
 
@@ -21,6 +24,14 @@ interface IStreamSettings extends IStreamSettingsState {
   platform: TPlatform;
   key: string;
   streamType: 'rtmp_common' | 'rtmp_custom';
+  warnBeforeStartingStream: boolean;
+  recordWhenStreaming: boolean;
+  replayBufferWhileStreaming: boolean;
+  warnBeforeStoppingStream: boolean;
+  keepRecordingWhenStreamStops: boolean;
+  keepReplayBufferStreamStops: boolean;
+  delayEnable: boolean;
+  delaySec: number;
 }
 
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
@@ -70,35 +81,24 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   /**
    * obtain stream settings in a single object
    */
-  getSettings(): IStreamSettings {
-    // get settings from "Settings->Stream" window
-    const obsSettings: Partial<{
-      key: string;
-      platform: TPlatform;
-      streamType: IStreamSettings['streamType'];
-    }> = {};
-    const streamFormData = this.getObsStreamSettings();
-    streamFormData.forEach(subCategory => {
-      subCategory.parameters.forEach(parameter => {
-        if (parameter.name === 'service') {
-          return invert(platformToServiceNameMap)[parameter.value as string];
-        }
-
-        if (parameter.name === 'key') {
-          obsSettings.key = parameter.value as string;
-        }
-
-        if (parameter.name === 'streamType') {
-          obsSettings.streamType = parameter.value as IStreamSettings['streamType'];
-        }
-      });
-    });
+  get settings(): IStreamSettings {
+    const obsStreamSettings = this.settingsService.state.Stream;
+    const obsGeneralSettings = this.settingsService.state.General;
+    const obsAdvancedSettings = this.settingsService.state.Advanced;
 
     return {
-      platform: obsSettings.platform,
-      key: obsSettings.key,
-      streamType: obsSettings.streamType,
       protectedModeEnabled: this.state.protectedModeEnabled,
+      platform: obsStreamSettings.service as TPlatform,
+      key: obsStreamSettings.key,
+      streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
+      warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
+      recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
+      replayBufferWhileStreaming: obsGeneralSettings.RecordWhenStreaming,
+      warnBeforeStoppingStream: obsGeneralSettings.WarnBeforeStartingStream,
+      keepRecordingWhenStreamStops: obsGeneralSettings.KeepRecordingWhenStreamStops,
+      keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
+      delayEnable: obsAdvancedSettings.DelayEnable,
+      delaySec: obsAdvancedSettings.DelaySec,
     };
   }
 
@@ -114,6 +114,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     return this.userService.isLoggedIn() && this.state.protectedModeEnabled;
   }
 
+  /**
+   * reset streaming settings to defaults
+   */
   async resetStreamSettings() {
     // protected mode is enabled by default
     this.setSettings({

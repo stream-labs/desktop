@@ -78,19 +78,19 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       .then(key => {
         const currentStreamSettings = this.streamSettingsService.getSettings();
 
-        // enable protectedMode for users who manually changed their stream key
-        const needToEnableProtectedMode: boolean =
-          !currentStreamSettings.protectedModeEnabled &&
+        // disable protectedMode for users who manually changed their stream key before
+        const needToDisableProtectedMode: boolean =
           currentStreamSettings.platform === 'mixer' &&
+          currentStreamSettings.key &&
           currentStreamSettings.key !== key;
 
-        if (needToEnableProtectedMode) {
-          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        if (needToDisableProtectedMode) {
+          this.streamSettingsService.setSettings({ protectedModeEnabled: false });
         } else {
           this.streamSettingsService.setSettings({
             key,
             platform: 'mixer',
-            protectedModeEnabled: false,
+            protectedModeEnabled: true,
           });
         }
         return EPlatformCallResult.Success;

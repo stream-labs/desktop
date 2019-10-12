@@ -3,7 +3,7 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, SettingsService, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import electron from 'electron';
@@ -61,7 +61,6 @@ export interface StreamingContext {
 
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
-  @Inject() settingsService: SettingsService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
@@ -142,7 +141,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private finishStartStreaming() {
-    const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
     const confirmText = $t('Are you sure you want to start streaming?');
     if (shouldConfirm && !confirm(confirmText)) return;
 
@@ -150,13 +149,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     obs.NodeObs.OBS_service_startStreaming();
 
-    const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+    const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
     }
 
-    const replayWhenStreaming = this.settingsService.state.General.ReplayBufferWhileStreaming;
+    const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
 
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
@@ -190,7 +189,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Live ||
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
 
       if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
@@ -201,12 +200,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       obs.NodeObs.OBS_service_stopStreaming(false);
 
-      const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
+      const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
         this.toggleRecording();
       }
 
-      const keepReplaying = this.settingsService.state.General.KeepReplayBufferStreamStops;
+      const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
       if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
         this.stopReplayBuffer();
       }
@@ -286,11 +285,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   get delayEnabled() {
-    return this.settingsService.state.Advanced.DelayEnable;
+    return this.streamSettingsService.settings.delayEnable;
   }
 
   get delaySeconds() {
-    return this.settingsService.state.Advanced.DelaySec;
+    return this.streamSettingsService.settings.delaySec;
   }
 
   get delaySecondsRemaining() {

@@ -85,7 +85,7 @@ export class TwitchService extends Service implements IPlatformService {
       .then(key => {
         const currentStreamSettings = this.streamSettingsService.getSettings();
 
-        // disable protectedMode for users who manually changed their stream key
+        // disable protectedMode for users who manually changed their stream key before
         const needToDisableProtectedMode: boolean =
           currentStreamSettings.platform === 'twitch' &&
           currentStreamSettings.key &&
