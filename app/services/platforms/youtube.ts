@@ -8,7 +8,6 @@ import {
   IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
@@ -282,6 +281,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   beforeGoLive() {
     return Promise.resolve();
+  }
+
+  chatEnabled(): boolean {
+    return this.streamSettingsService.getSettings().protectedModeEnabled;
   }
 
   // TODO: dedup

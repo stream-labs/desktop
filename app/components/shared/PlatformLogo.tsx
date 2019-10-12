@@ -1,9 +1,8 @@
 import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'services/core/injector';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import styles from './HelpTip.m.less';
-import { TPlatform } from '../../services/platforms';
+import styles from './PlatformLogo.m.less';
+import { TPlatform } from 'services/platforms';
 
 class LogoProps {
   platform: TPlatform = 'twitch';
@@ -19,11 +18,11 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       mixer: 'fas fa-times',
       facebook: 'fab fa-facebook',
     }[this.props.platform];
+  }
 
   render() {
     return (
-      <i className={cx(styles['platform-icon'], this.iconForPlatform)} />
-      )
+      <i class={cx(this.iconForPlatform, styles[this.props.platform])}/>
     );
   }
 }

@@ -1,18 +1,16 @@
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import cx from 'classnames';
-import GenericForm from 'components/obs/inputs/GenericForm';
 import { $t } from 'services/i18n';
-import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import { ISettingsSubCategory, SettingsService } from 'services/settings';
+import { ISettingsSubCategory } from 'services/settings';
 import TsxComponent from 'components/tsx-component';
 import { StreamSettingsService } from '../../../services/settings/streaming';
 import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
+import PlatformLogo from 'components/shared/PlatformLogo';
 
-@Component({ components: { GenericFormGroups } })
+@Component({ components: { GenericFormGroups, PlatformLogo } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
@@ -21,6 +19,14 @@ export default class StreamSettings extends TsxComponent {
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
     this.obsSettings = this.streamSettingsService.getObsStreamSettings();
+  }
+
+  disableProtectedMode() {
+    this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+  }
+
+  restoreDefaults() {
+    this.streamSettingsService.resetStreamSettings();
   }
 
   get protectedModeEnabled(): boolean {
@@ -39,39 +45,48 @@ export default class StreamSettings extends TsxComponent {
     return this.platform.charAt(0).toUpperCase() + this.platform.slice(1);
   }
 
-  get iconForPlatform() {
-    return {
-      twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
-      mixer: 'fas fa-times',
-      facebook: 'fab fa-facebook',
-    }[this.platform];
+  get needToShowWarning() {
+    return this.userService.isLoggedIn() && !this.protectedModeEnabled;
   }
 
   render() {
     return (
       <div>
-        <div class="section flex">
-          <div class="margin-right--20">
-            <i class={cx(styles['platform-icon'], this.iconForPlatform)} />
-          </div>
+        {/* account info */}
+        {this.protectedModeEnabled && (
           <div>
-            Streaming to {this.platformName} <br/>
-            account: {this.userName}
+            <div class="section flex">
+              <div class="margin-right--20">
+                <PlatformLogo platform={this.platform} class={styles.platformLogo} />
+              </div>
+              <div>
+                Streaming to {this.platformName} <br />
+                account: {this.userName}
+              </div>
+            </div>
+            <div>
+              <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
+            </div>
           </div>
-        </div>
-        <div>
-          <a> Stream to custom ingest</a>
-        </div>
+        )}
 
-        <div class="section section--warning">
-          <b>Warning: </b>
-          Streaming to a custom injest is advanced functionality.
-          Some features at Streamlabs OBS may stop working as expected
-          <br /><br />
-          <button class="button button--warn">{ $t('Use recommended settings') }</button>
-        </div>
-        <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
+        {/* WARNING message */}
+        {this.needToShowWarning && (
+          <div class="section section--warning">
+            <b>{$t('Warning')}: </b>
+            {$t('CUSTOM_INGEST_WARN')}
+            <br />
+            <br />
+            <button class="button button--warn" onClick={this.restoreDefaults}>
+              {$t('Use recommended settings')}
+            </button>
+          </div>
+        )}
+
+        {/* OBS settings */}
+        {!this.protectedModeEnabled && (
+          <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
+        )}
       </div>
     );
   }

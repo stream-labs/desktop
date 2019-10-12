@@ -172,7 +172,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           const service = getPlatformService(this.userService.platform.type);
 
           // update stream key and stream settings for platform
-          if (!this.streamSettingsService.protectedModeEnabled) {
+          if (this.streamSettingsService.protectedModeEnabled) {
             await service.setupStreamSettings();
           }
 

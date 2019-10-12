@@ -20,6 +20,7 @@ interface IStreamSettingsState {
 interface IStreamSettings extends IStreamSettingsState {
   platform: TPlatform;
   key: string;
+  streamType: 'rtmp_common' | 'rtmp_custom';
 }
 
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
@@ -57,8 +58,13 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         if (parameter.name === 'key' && patch.key !== void 0) {
           parameter.value = patch.key;
         }
+
+        if (parameter.name === 'streamType' && patch.streamType !== void 0) {
+          parameter.value = patch.streamType;
+        }
       });
     });
+    this.settingsService.setSettings('Stream', streamFormData);
   }
 
   /**
@@ -66,7 +72,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   getSettings(): IStreamSettings {
     // get settings from "Settings->Stream" window
-    const obsSettings: Partial<{ key: string; platform: TPlatform }> = {};
+    const obsSettings: Partial<{
+      key: string;
+      platform: TPlatform;
+      streamType: IStreamSettings['streamType'];
+    }> = {};
     const streamFormData = this.getObsStreamSettings();
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -77,12 +87,17 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         if (parameter.name === 'key') {
           obsSettings.key = parameter.value as string;
         }
+
+        if (parameter.name === 'streamType') {
+          obsSettings.streamType = parameter.value as IStreamSettings['streamType'];
+        }
       });
     });
 
     return {
       platform: obsSettings.platform,
       key: obsSettings.key,
+      streamType: obsSettings.streamType,
       protectedModeEnabled: this.state.protectedModeEnabled,
     };
   }
@@ -101,7 +116,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
   async resetStreamSettings() {
     // protected mode is enabled by default
-    this.setSettings({ protectedModeEnabled: true, key: '' });
+    this.setSettings({
+      protectedModeEnabled: true,
+      key: '',
+      streamType: 'rtmp_common',
+    });
     // setup current platform-related settings
     if (this.userService.isLoggedIn()) {
       await this.userService.getPlatformService().setupStreamSettings();

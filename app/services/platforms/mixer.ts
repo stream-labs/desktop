@@ -197,4 +197,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
   }
+
+  chatEnabled(): boolean {
+    return true;
+  }
 }

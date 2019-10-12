@@ -17,11 +17,35 @@ test('Settings General', async t => {
   t.pass();
 });
 
-test('Settings Stream', async t => {
+test('Settings Stream Offline', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
   settingsService.showSettings('Stream');
   await focusChild(t);
+  t.pass();
+});
+
+test('Settings Stream Twitch', async (t: TExecutionContext) => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  await logIn(t, 'twitch');
+  settingsService.showSettings('Stream');
+  t.pass();
+});
+
+test('Settings Stream Youtube', async (t: TExecutionContext) => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  await logIn(t, 'youtube');
+  settingsService.showSettings('Stream');
+  t.pass();
+});
+
+test('Settings Stream Facebook', async (t: TExecutionContext) => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  await logIn(t, 'facebook');
+  settingsService.showSettings('Stream');
   t.pass();
 });
 

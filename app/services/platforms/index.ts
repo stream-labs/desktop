@@ -133,6 +133,8 @@ export interface IPlatformService {
   fetchNewToken: () => Promise<void>;
 
   getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
+
+  chatEnabled: () => boolean;
 }
 
 export interface IPlatformAuth {

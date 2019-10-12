@@ -85,19 +85,19 @@ export class TwitchService extends Service implements IPlatformService {
       .then(key => {
         const currentStreamSettings = this.streamSettingsService.getSettings();
 
-        // enable protectedMode for users who manually changed their stream key
-        const needToEnableProtectedMode: boolean =
-          !currentStreamSettings.protectedModeEnabled &&
+        // disable protectedMode for users who manually changed their stream key
+        const needToDisableProtectedMode: boolean =
           currentStreamSettings.platform === 'twitch' &&
+          currentStreamSettings.key &&
           currentStreamSettings.key !== key;
 
-        if (needToEnableProtectedMode) {
-          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        if (needToDisableProtectedMode) {
+          this.streamSettingsService.setSettings({ protectedModeEnabled: false });
         } else {
           this.streamSettingsService.setSettings({
             key,
             platform: 'twitch',
-            protectedModeEnabled: false,
+            protectedModeEnabled: true,
           });
         }
 
@@ -249,4 +249,8 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   async beforeGoLive() {}
+
+  chatEnabled(): boolean {
+    return true;
+  }
 }

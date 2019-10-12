@@ -298,6 +298,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return platformRequest(`${this.apiBase}/me/accounts`);
   }
 
+  chatEnabled(): boolean {
+    return true;
+  }
+
   private fetchPages(): Promise<IStreamlabsFacebookPages> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
