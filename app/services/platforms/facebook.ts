@@ -166,7 +166,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   private createLiveVideo() {
-    if (this.streamSettingsService.getSettings().platform === 'facebook') return Promise.resolve();
+    if (this.streamSettingsService.settings.platform === 'facebook') return Promise.resolve();
     const { title, description, game } = this.state.streamProperties;
     const data = {
       method: 'POST',
@@ -238,7 +238,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   async fbGoLive() {
-    if (this.state.streamUrl && this.streamSettingsService.getSettings().platform === 'facebook') {
+    if (this.state.streamUrl && this.streamSettingsService.settings.platform === 'facebook') {
       const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
       this.setSettingsWithKey(streamKey);
       this.SET_STREAM_URL(null);

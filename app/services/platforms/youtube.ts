@@ -284,7 +284,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   chatEnabled(): boolean {
-    return this.streamSettingsService.getSettings().protectedModeEnabled;
+    return this.streamSettingsService.settings.protectedModeEnabled;
   }
 
   // TODO: dedup
