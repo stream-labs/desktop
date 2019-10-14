@@ -35,7 +35,7 @@ const alertNameMap = () => ({
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
-  loyaltystore: $t('Cloudbot Redemption'),
+  loyaltystore: $t('Cloudbot Store'),
   stickers: $t('Stickers'),
   effects: $t('Effects/Rallies'),
 });
