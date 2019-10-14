@@ -37,7 +37,7 @@ export default class ObsImport extends TsxComponent {
       } as ISourceAddOptions);
     });
 
-    this.selectedVideoDevice = this.videoDevices[0].value;
+    if (this.videoDevices[0]) this.selectedVideoDevice = this.videoDevices[0].value;
   }
 
   get selectedAudioSource() {
