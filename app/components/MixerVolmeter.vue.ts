@@ -7,6 +7,7 @@ import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import TsxComponent, { createProps } from './tsx-component';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -21,10 +22,12 @@ const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
 
-@Component({})
-export default class MixerVolmeter extends Vue {
-  @Prop() audioSource: AudioSource;
+class MixerVolmeterProps {
+  audioSource: AudioSource = null;
+}
 
+@Component({ props: createProps(MixerVolmeterProps) })
+export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
 
   volmeterSubscription: Subscription;
@@ -355,7 +358,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   subscribeVolmeter() {
-    this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
+    this.volmeterSubscription = this.props.audioSource.subscribeVolmeter(volmeter => {
       if (volmeter.peak.length) {
         this.initRenderingContext();
         this.setChannelCount(volmeter.peak.length);

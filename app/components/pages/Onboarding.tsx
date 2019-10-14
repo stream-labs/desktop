@@ -9,6 +9,7 @@ import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
 import Optimize from './onboarding-steps/Optimize';
 import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
+import HardwareSetup from './onboarding-steps/HardwareSetup';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import styles from './Onboarding.m.less';
@@ -94,9 +95,10 @@ export default class OnboardingPage extends TsxComponent<{}> {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
+    steps.push(<HardwareSetup slot="3" />);
     steps.push(
       <ThemeSelector
-        slot="3"
+        slot="4"
         continue={this.continue.bind(this)}
         setProcessing={this.setProcessing.bind(this)}
       />,
@@ -104,13 +106,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(
         <Optimize
-          slot="4"
+          slot="5"
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="4" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
     }
     return steps;
   }
@@ -139,9 +141,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   render() {
-    if (this.onboardingService.options.isLogin) {
-      return this.loginPage;
-    }
+    // if (this.onboardingService.options.isLogin) {
+    //   return this.loginPage;
+    // }
     if (this.onboardingService.options.isOptimize) {
       return this.optimizePage;
     }
@@ -164,7 +166,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
               [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
             }
             hideButton={
-              [1, 2, 4].includes(this.currentStep) ||
+              [1, 2, 5].includes(this.currentStep) ||
               (this.currentStep === 3 && !this.importedFromObs)
             }
           >
