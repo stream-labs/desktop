@@ -167,7 +167,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
             }
             hideButton={
               [1, 2, 5].includes(this.currentStep) ||
-              (this.currentStep === 3 && !this.importedFromObs)
+              (this.currentStep === 4 && !this.importedFromObs)
             }
           >
             {this.steps}

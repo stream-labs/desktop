@@ -4,12 +4,13 @@ import TsxComponent from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { AudioService } from 'services/audio';
 import { $t } from 'services/i18n';
-import { ListInput } from 'components/shared/inputs/inputs';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { SourcesService, ISourceAddOptions } from 'services/api/external-api/sources';
 import MixerVolmeter from 'components/MixerVolmeter.vue';
 import Display from 'components/shared/Display.vue';
 import { ERenderingMode } from '../../../../obs-api';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/widgets/inputs';
 
 // import styles from './HardwareSetup.m.less';
 
@@ -24,17 +25,27 @@ export default class ObsImport extends TsxComponent {
 
   mounted() {
     this.audioDevices.forEach(device => {
-      this.sourcesService.createSource(device.value, 'wasapi_input_capture', {}, {
-        isTemporary: true,
-        sourceId: device.value,
-      } as ISourceAddOptions);
+      this.sourcesService.createSource(
+        device.value,
+        'wasapi_input_capture',
+        { device_id: device.value },
+        {
+          isTemporary: true,
+          sourceId: device.value,
+        } as ISourceAddOptions,
+      );
     });
 
     this.videoDevices.forEach(device => {
-      this.sourcesService.createSource(device.value, 'dshow_input', {}, {
-        isTemporary: true,
-        sourceId: device.value,
-      } as ISourceAddOptions);
+      this.sourcesService.createSource(
+        device.value,
+        'dshow_input',
+        { video_device_id: device.value },
+        {
+          isTemporary: true,
+          sourceId: device.value,
+        } as ISourceAddOptions,
+      );
     });
 
     if (this.videoDevices[0]) this.selectedVideoDevice = this.videoDevices[0].value;
@@ -75,27 +86,30 @@ export default class ObsImport extends TsxComponent {
       <OnboardingStep slot="2">
         <template slot="title">{$t('Setup Mic and Webcam')}</template>
         <template slot="desc">{$t('Configure your hardware to go live seamlessly')}</template>
-        <ListInput
-          title={$t('Select your mic')}
-          metadata={{ options: this.audioDevices }}
-          value={this.selectedAudioDevice}
-          onInput={(id: string) => (this.selectedAudioDevice = id)}
-        />
-        {this.selectedAudioSource && <MixerVolmeter audioSource={this.selectedAudioSource} />}
-        <ListInput
-          title={$t('Select your webcam')}
-          metadata={{ options: this.videoDevices }}
-          value={this.selectedVideoDevice}
-          onInput={(id: string) => (this.selectedVideoDevice = id)}
-        />
-        {this.selectedVideoDevice && (
-          <div style="height: 300px;">
-            <Display
-              sourceId={this.selectedVideoDevice}
-              renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-            />
-          </div>
-        )}
+        <div style="width: 60%;">
+          {this.selectedVideoDevice && (
+            <div style="height: 200px;">
+              <Display
+                sourceId={this.selectedVideoDevice}
+                renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+              />
+            </div>
+          )}
+          <VFormGroup
+            metadata={metadata.list({
+              options: this.videoDevices,
+              title: $t('Select your webcam'),
+            })}
+            value={this.selectedVideoDevice}
+            onInput={(id: string) => (this.selectedVideoDevice = id)}
+          />
+          {this.selectedAudioSource && <MixerVolmeter audioSource={this.selectedAudioSource} />}
+          <VFormGroup
+            metadata={metadata.list({ options: this.audioDevices, title: $t('Select your mic') })}
+            value={this.selectedAudioDevice}
+            onInput={(id: string) => (this.selectedAudioDevice = id)}
+          />
+        </div>
       </OnboardingStep>
     );
   }
