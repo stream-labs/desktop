@@ -1,7 +1,6 @@
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import { Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
-import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
 import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
@@ -10,8 +9,11 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
+import { OverlayThreadStatus } from '@streamlabs/game-overlay';
 
 const { BrowserWindow } = electron.remote;
+
+const overlay = electron.remote.require('@streamlabs/game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -126,7 +128,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       skipTaskbar: true,
       thickFrame: false,
       resizable: false,
-      webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
+      webPreferences: { nodeIntegration: false, offscreen: true },
     };
   }
 
@@ -339,18 +341,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       win.webContents.executeJavaScript(hideInteraction);
 
-      win.webContents.on('paint', (event, dirty, image) => {
-        if (
-          overlay.paintOverlay(
-            overlayId,
-            image.getSize().width,
-            image.getSize().height,
-            image.getBitmap(),
-          ) === 0
-        ) {
-          win.webContents.invalidate();
-        }
-      });
+      ipcRenderer.send('gameOverlayPaintCallback', { overlayId, contentsId: win.webContents.id });
       win.webContents.setFrameRate(1);
     });
   }
