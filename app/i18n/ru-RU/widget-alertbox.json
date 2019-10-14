@@ -1,7 +1,6 @@
 {
   "Layout": "Расположение",
-  "Add Alert": "Добавить оповещение",
-  "Add ": "Добавить ",
+  "Alert": "Alert",
   "Global Settings": "Глобальные настройки",
   "Text to Speech": "Озвучивание текста",
   "Charity Streaming Donations": "Пожертвования с Благотворительной трансляции",
@@ -23,6 +22,9 @@
   "Likes": "Лайки",
   "Shares": "Поделились",
   "Facemask Donations": "Пожертвования Масками для лица",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Наклейки",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Основные настройки",
   "Moderator Tools": "Инструменты модератора",
   "Title Message": "Заголовок сообщения",
