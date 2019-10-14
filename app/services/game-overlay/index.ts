@@ -9,7 +9,6 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { OverlayThreadStatus } from '@streamlabs/game-overlay';
 
 const { BrowserWindow } = electron.remote;
 
@@ -228,7 +227,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
-    if (overlay.getStatus() !== OverlayThreadStatus.Running || !this.state.isEnabled) {
+    // This is a typo in the module: "runing"
+    if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
       return;
     }
 
