@@ -1,7 +1,6 @@
 {
   "Layout": "레이 아웃",
-  "Add Alert": "Add Alert",
-  "Add ": "Add ",
+  "Alert": "Alert",
   "Global Settings": "Global Settings",
   "Text to Speech": "Text to Speech",
   "Charity Streaming Donations": "Charity Streaming Donations",
@@ -23,6 +22,9 @@
   "Likes": "Likes",
   "Shares": "Shares",
   "Facemask Donations": "Facemask Donations",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "일반 설정",
   "Moderator Tools": "Moderator Tools",
   "Title Message": "Title Message",

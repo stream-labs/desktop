@@ -1,7 +1,6 @@
 {
   "Layout": "編排",
-  "Add Alert": "新增通知",
-  "Add ": "新增",
+  "Alert": "Alert",
   "Global Settings": "全局設定",
   "Text to Speech": "文字轉為語音",
   "Charity Streaming Donations": "慈善實況贊助",
@@ -23,6 +22,9 @@
   "Likes": "讚",
   "Shares": "分享",
   "Facemask Donations": "Facemask贊助",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "一般設定",
   "Moderator Tools": "Mod工具",
   "Title Message": "標題訊息",

@@ -67,15 +67,15 @@ export default class SideNav extends Vue {
 
   render() {
     const pageData = [
-      { target: 'Studio', icon: 'icon-studio', title: 'Editor' },
-      { target: 'BrowseOverlays', icon: 'icon-themes', title: 'Themes' },
+      { target: 'Studio', icon: 'icon-studio', title: $t('Editor') },
+      { target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') },
     ];
 
     if (this.chatbotVisible) {
-      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: 'Cloudbot' });
+      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: $t('Cloudbot') });
     }
     if (this.appStoreVisible) {
-      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: 'Store' });
+      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: $t('App Store') });
     }
 
     return (
@@ -87,7 +87,7 @@ export default class SideNav extends Vue {
               [styles.disabled]: !this.userService.isLoggedIn(),
             })}
             onClick={() => this.navigate(page.target as TAppPage)}
-            title={$t(page.title || page.target)}
+            title={page.title}
           >
             <i class={page.icon} />
             {page.target === 'BrowseOverlays' && (

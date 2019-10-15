@@ -23,6 +23,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const electronLog = require('electron-log');
 
+const overlay = require('@streamlabs/game-overlay');
+
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
@@ -514,5 +516,24 @@ if (!gotTheLock) {
     if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
       mainWindow.send('showErrorAlert');
     }
+  });
+
+  ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
+    const contents = webContents.fromId(contentsId);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('paint', (event, dirty, image) => {
+      if (
+        overlay.paintOverlay(
+          overlayId,
+          image.getSize().width,
+          image.getSize().height,
+          image.getBitmap(),
+        ) === 0
+      ) {
+        contents.invalidate();
+      }
+    });
   });
 }

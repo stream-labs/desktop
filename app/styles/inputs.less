@@ -116,7 +116,7 @@ textarea[type=text] {
 
 .multiselect__input {
   background: var(--dropdown-bg);
-  border-color: var(--dropdown-border);
+  border-color: var(--input-border);
 }
 
 .multiselect__select {
@@ -177,6 +177,8 @@ textarea[type=text] {
 .multiselect__content {
   border-bottom-left-radius: @radius;
   border-bottom-right-radius: @radius;
+  border: 1px solid var(--input-border);
+  border-top: none;
   top: 30px;
   background: var(--dropdown-bg);
   list-style-type: none;
@@ -218,7 +220,7 @@ textarea[type=text] {
 }
 
 .multiselect__option--highlight {
-  background: var(--border);
+  background: var(--dropdown-alt-bg);
   color: var(--paragraph);
 
   &::after {
@@ -227,11 +229,11 @@ textarea[type=text] {
 }
 
 .multiselect__option--selected {
-  background: var(--button);
+  background: var(--dropdown-bg);
   color: var(--title);
 
   &.multiselect__option--highlight {
-    background: var(--button);
+    background: var(--dropdown-alt-bg);
 
     &::after {
       display: none;
@@ -284,13 +286,13 @@ textarea[type=text] {
   .colorpicker__input {
     cursor: pointer !important;
     background: var(--dropdown-bg);
-    border-color: var(--dropdown-border);
+    border-color: var(--input-border);
 
     &:focus,
     &:visited,
     &:active {
       background: var(--dropdown-bg);
-      border-color: var(--dropdown-border);
+      border-color: var(--input-border);
     }
   }
 
@@ -316,7 +318,7 @@ textarea[type=text] {
     border-bottom-right-radius: @radius;
     border-bottom-left-radius: @radius;
     background: var(--dropdown-bg);
-    border-color: var(--dropdown-border);
+    border-color: var(--input-border);
     .shadow() !important;
   }
 
