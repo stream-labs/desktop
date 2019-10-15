@@ -141,7 +141,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   render() {
-    if (this.onboardingService.options.isLogin) return this.loginPage;
+    // if (this.onboardingService.options.isLogin) return this.loginPage;
     if (this.onboardingService.options.isOptimize) return this.optimizePage;
 
     return (

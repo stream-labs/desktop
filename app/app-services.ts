@@ -43,7 +43,7 @@ export { ProtocolLinksService } from 'services/protocol-links';
 export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
-export { HardwareService } from 'services/hardware';
+export { HardwareService, DefaultHardwareService } from 'services/hardware';
 export { Prefab, PrefabsService } from 'services/prefabs';
 export { EditorCommandsService } from 'services/editor-commands';
 
