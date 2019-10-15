@@ -34,6 +34,7 @@ import { Subject } from 'rxjs';
 import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
+import { DefaultHardwareService } from 'services/hardware';
 
 const uuid = window['require']('uuid/v4');
 
@@ -79,6 +80,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() tcpServerService: TcpServerService;
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -599,11 +601,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
     );
-
+    const defaultId = this.defaultHardwareService.state.defaultAudioDevice
+      ? this.defaultHardwareService.state.defaultAudioDevice
+      : undefined;
     this.sourcesService.createSource(
       'Mic/Aux',
       'wasapi_input_capture',
-      {},
+      { device_id: defaultId },
       { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );
   }

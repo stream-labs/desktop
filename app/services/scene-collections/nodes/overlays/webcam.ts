@@ -5,6 +5,8 @@ import { SourcesService } from '../../../sources';
 import sortBy from 'lodash/sortBy';
 import { IListProperty } from '../../../../../obs-api';
 import { ScalableRectangle } from '../../../../util/ScalableRectangle';
+import { Inject } from 'services/core';
+import { DefaultHardwareService } from 'services/hardware';
 
 interface ISchema {
   width: number;
@@ -30,6 +32,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
   videoService: VideoService = VideoService.instance;
   sourcesService: SourcesService = SourcesService.instance;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   async save(context: IContext) {
     const rect = new ScalableRectangle(context.sceneItem.getRectangle());
@@ -100,7 +103,9 @@ export class WebcamNode extends Node<ISchema, IContext> {
     // Stop loading if there aren't any devices
     if ((deviceProperty as IListProperty).details.items.length === 0) return;
 
-    const device = (deviceProperty as IListProperty).details.items[0]['value'];
+    const device = this.defaultHardwareService.state.defaultVideoDevice
+      ? this.defaultHardwareService.state.defaultVideoDevice
+      : (deviceProperty as IListProperty).details.items[0]['value'];
 
     input.update({
       video_device_id: device,
