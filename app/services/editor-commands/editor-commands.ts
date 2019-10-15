@@ -230,6 +230,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     const selection = this.selectionService.getActiveSelection();
 
     if (!selection.getNodes().length) return;
+    if (selection.isLocked()) return;
 
     this.executeCommand('NudgeItemsCommand', selection, direction);
   }
