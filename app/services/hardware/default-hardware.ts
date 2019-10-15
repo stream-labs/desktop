@@ -47,6 +47,16 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
   }
 
+  clearTemporarySources() {
+    this.audioDevices.forEach(device => {
+      this.sourcesService.removeSource(device.id);
+    });
+
+    this.videoDevices.forEach(device => {
+      this.sourcesService.removeSource(device.id);
+    });
+  }
+
   get videoDevices() {
     return this.hardwareService
       .getDshowDevices()

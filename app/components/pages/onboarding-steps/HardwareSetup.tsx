@@ -19,6 +19,10 @@ export default class HardwareSetup extends TsxComponent {
     if (this.videoDevices[0]) this.selectedVideoDevice = this.videoDevices[0].value;
   }
 
+  destroyed() {
+    this.defaultHardwareService.clearTemporarySources();
+  }
+
   get audioDevices() {
     return this.defaultHardwareService.audioDevices.map(device => ({
       title: device.description,
