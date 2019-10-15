@@ -174,9 +174,13 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     record.push(current);
   }
 
+  averageFactor(record: number[]) {
+    return record.reduce((a, b) => a + b, 0) / this.numberOfSamples;
+  }
+
   checkNotification(target: number, record: number[]) {
     if (record.length < this.numberOfSamples) return false;
-    return record.reduce((a, b) => a + b, 0) / this.numberOfSamples >= target;
+    return this.averageFactor(record) >= target;
   }
 
   // Check if any notification thresholds are met and send applicable notification
@@ -190,7 +194,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       nextStats.framesEncoded !== 0 &&
       this.checkNotification(troubleshooterSettings.skippedThreshold, this.historicalSkippedFrames)
     ) {
-      this.pushSkippedFramesNotify(nextStats.skippedFactor);
+      this.pushSkippedFramesNotify(this.averageFactor(this.historicalSkippedFrames));
     }
 
     // Check if lagged frames exceed notification threshold
@@ -200,7 +204,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       nextStats.framesRendered !== 0 &&
       this.checkNotification(troubleshooterSettings.laggedThreshold, this.historicalLaggedFrames)
     ) {
-      this.pushLaggedFramesNotify(nextStats.laggedFactor);
+      this.pushLaggedFramesNotify(this.averageFactor(this.historicalLaggedFrames));
     }
 
     // Check if dropped frames exceed notification threshold
@@ -208,7 +212,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       troubleshooterSettings.droppedEnabled &&
       this.checkNotification(troubleshooterSettings.droppedThreshold, this.historicalDroppedFrames)
     ) {
-      this.pushDroppedFramesNotify(nextStats.droppedFramesFactor);
+      this.pushDroppedFramesNotify(this.averageFactor(this.historicalDroppedFrames));
     }
   }
 
@@ -223,7 +227,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       showTime: true,
       subType: ENotificationSubType.SKIPPED,
       // tslint:disable-next-line:prefer-template
-      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '%',
+      message: $t('Skipped frames detected:') + Math.round(factor * 100) + '% over last 2 minutes',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
@@ -242,7 +246,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       lifeTime: -1,
       showTime: true,
       subType: ENotificationSubType.LAGGED,
-      message: `Lagged frames detected: ${Math.round(factor * 100)}%`,
+      message: `Lagged frames detected: ${Math.round(factor * 100)}%  over last 2 minutes`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
@@ -261,7 +265,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       lifeTime: -1,
       showTime: true,
       subType: ENotificationSubType.DROPPED,
-      message: `Dropped frames detected: ${Math.round(factor * 100)}%`,
+      message: `Dropped frames detected: ${Math.round(factor * 100)}%  over last 2 minutes`,
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',
