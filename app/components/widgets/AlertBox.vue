@@ -10,7 +10,9 @@
   <!-- Left Toolbar -->
   <div slot="leftbar" v-if="wData">
     <div class="left-accordion__button alert-button">
-      <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">{{ $t('Add Alert') }}</span>
+      <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">
+        <i class="icon-add-circle" />{{ $t('Alert') }}
+      </span>
       <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
         <button
           v-for="type in alertTypes.filter(t => t !== 'facemasks')"
@@ -18,7 +20,7 @@
           :key="type"
           @click="addAlert(type)"
         >
-          {{ $t('Add ') }}{{ alertName(type) }}
+          {{ alertName(type) }}
         </button>
       </div>
     </div>
@@ -181,6 +183,7 @@
   background-color: var(--background);
   z-index: 1;
   box-shadow: 0 2px var(--shadow);
+  width: 100%;
 
   .button {
     display: block;

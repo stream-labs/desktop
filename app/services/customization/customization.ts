@@ -19,13 +19,13 @@ import { Global } from '../../../obs-api';
 // Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': { r: 9, g: 22, b: 29 },
-  'day-theme': { r: 247, g: 249, b: 249 },
+  'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 // Maps to --section
 const DISPLAY_BACKGROUNDS = {
   'night-theme': { r: 11, g: 22, b: 28 },
-  'day-theme': { r: 245, g: 248, b: 250 },
+  'day-theme': { r: 227, g: 232, b: 235 },
 };
 
 /**

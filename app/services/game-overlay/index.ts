@@ -1,7 +1,6 @@
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import { Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
-import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
 import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
@@ -12,6 +11,11 @@ import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
 
 const { BrowserWindow } = electron.remote;
+
+// We remote.require because this module needs to live in the main
+// process so we can paint to it from there. We are doing this to
+// work around an electron bug: https://github.com/electron/electron/issues/20559
+const overlay = electron.remote.require('@streamlabs/game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -126,7 +130,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       skipTaskbar: true,
       thickFrame: false,
       resizable: false,
-      webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
+      webPreferences: { nodeIntegration: false, offscreen: true },
     };
   }
 
@@ -226,7 +230,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
-    if (overlay.getStatus() !== OverlayThreadStatus.Running || !this.state.isEnabled) {
+    // This is a typo in the module: "runing"
+    if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
       return;
     }
 
@@ -339,18 +344,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       win.webContents.executeJavaScript(hideInteraction);
 
-      win.webContents.on('paint', (event, dirty, image) => {
-        if (
-          overlay.paintOverlay(
-            overlayId,
-            image.getSize().width,
-            image.getSize().height,
-            image.getBitmap(),
-          ) === 0
-        ) {
-          win.webContents.invalidate();
-        }
-      });
+      // We bind the paint callback in the main process to avoid a memory
+      // leak in electron. This can be moved back to the renderer process
+      // when the leak is fixed: https://github.com/electron/electron/issues/20559
+      ipcRenderer.send('gameOverlayPaintCallback', { overlayId, contentsId: win.webContents.id });
       win.webContents.setFrameRate(1);
     });
   }

@@ -1,7 +1,6 @@
 {
   "Layout": "Layout",
-  "Add Alert": "Adicionar alerta",
-  "Add ": "Adicionar ",
+  "Alert": "Alert",
   "Global Settings": "Configurações globais",
   "Text to Speech": "Texto para Voz",
   "Charity Streaming Donations": "Donativos de transmissões para a caridade",
@@ -23,6 +22,9 @@
   "Likes": "Curtidas",
   "Shares": "Compartilhamentos",
   "Facemask Donations": "Donativos de Máscara Facial",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Efeitos/Comícios",
   "General Settings": "Configurações gerais",
   "Moderator Tools": "Ferramentas de moderação",
   "Title Message": "Mensagem de título",
