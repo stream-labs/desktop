@@ -17,7 +17,6 @@ export class ChatService extends Service {
   private chatView: Electron.BrowserView;
 
   init() {
-    this.userService.userLogin.subscribe(() => this.initChat());
     this.userService.userLogout.subscribe(() => this.deinitChat());
   }
 
