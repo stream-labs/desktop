@@ -44,8 +44,12 @@ export enum EStreamQuality {
   POOR = 'POOR',
 }
 
+// How frequently parformance stats should be updated
 const STATS_UPDATE_INTERVAL = 5 * 1000;
-const NOTIFICATION_INTERVAL = 2 * 60 * 1000;
+// Limit on interval between unique notification types
+const NOTIFICATION_THROTTLE_INTERVAL = 2 * 60 * 1000;
+// Time window for averaging notification issues
+const SAMPLING_DURATION = 2 * 60 * 1000;
 
 interface IMonitorState {
   framesLagged: number;
@@ -73,6 +77,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     bandwidth: 0,
     frameRate: 0,
   };
+
+  private historicalDroppedFrames: number[] = [];
+  private historicalSkippedFrames: number[] = [];
+  private historicalLaggedFrames: number[] = [];
+  private numberOfSamples: number = SAMPLING_DURATION / STATS_UPDATE_INTERVAL;
 
   private intervalId: number = null;
 
@@ -109,11 +118,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   nextStats(currentStats: IMonitorState): INextStats {
     const framesSkipped = currentStats.framesSkipped - this.state.numberSkippedFrames;
     const framesEncoded = currentStats.framesEncoded - this.state.numberEncodedFrames;
-    const skippedFactor = framesSkipped / framesEncoded;
+    const skippedFactor = framesEncoded === 0 ? 0 : framesSkipped / framesEncoded;
 
     const framesLagged = currentStats.framesLagged - this.state.numberLaggedFrames;
     const framesRendered = currentStats.framesRendered - this.state.numberRenderedFrames;
-    const laggedFactor = framesLagged / framesRendered;
+    const laggedFactor = framesRendered === 0 ? 0 : framesLagged / framesRendered;
 
     const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
 
@@ -141,6 +150,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     };
 
     const nextStats = this.nextStats(currentStats);
+
+    this.addSample(this.historicalDroppedFrames, nextStats.droppedFramesFactor);
+    this.addSample(this.historicalSkippedFrames, nextStats.skippedFactor);
+    this.addSample(this.historicalLaggedFrames, nextStats.laggedFactor);
+
     this.sendNotifications(currentStats, nextStats);
 
     this.SET_PERFORMANCE_STATS({
@@ -153,6 +167,18 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     });
   }
 
+  addSample(record: number[], current: number) {
+    if (record.length >= this.numberOfSamples) {
+      record.shift();
+    }
+    record.push(current);
+  }
+
+  checkNotification(target: number, record: number[]) {
+    if (record.length < this.numberOfSamples) return false;
+    return record.reduce((a, b) => a + b, 0) / this.numberOfSamples >= target;
+  }
+
   // Check if any notification thresholds are met and send applicable notification
   sendNotifications(currentStats: IMonitorState, nextStats: INextStats) {
     const troubleshooterSettings = this.troubleshooterService.getSettings();
@@ -162,7 +188,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       troubleshooterSettings.skippedEnabled &&
       currentStats.framesEncoded !== 0 &&
       nextStats.framesEncoded !== 0 &&
-      nextStats.skippedFactor >= troubleshooterSettings.skippedThreshold
+      this.checkNotification(troubleshooterSettings.skippedThreshold, this.historicalSkippedFrames)
     ) {
       this.pushSkippedFramesNotify(nextStats.skippedFactor);
     }
@@ -172,7 +198,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       troubleshooterSettings.laggedEnabled &&
       currentStats.framesRendered !== 0 &&
       nextStats.framesRendered !== 0 &&
-      nextStats.laggedFactor >= troubleshooterSettings.laggedThreshold
+      this.checkNotification(troubleshooterSettings.laggedThreshold, this.historicalLaggedFrames)
     ) {
       this.pushLaggedFramesNotify(nextStats.laggedFactor);
     }
@@ -180,13 +206,13 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     // Check if dropped frames exceed notification threshold
     if (
       troubleshooterSettings.droppedEnabled &&
-      nextStats.droppedFramesFactor >= troubleshooterSettings.droppedThreshold
+      this.checkNotification(troubleshooterSettings.droppedThreshold, this.historicalDroppedFrames)
     ) {
       this.pushDroppedFramesNotify(nextStats.droppedFramesFactor);
     }
   }
 
-  @throttle(NOTIFICATION_INTERVAL)
+  @throttle(NOTIFICATION_THROTTLE_INTERVAL)
   private pushSkippedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_SKIPPED';
     this.notificationsService.push({
@@ -206,7 +232,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     });
   }
 
-  @throttle(NOTIFICATION_INTERVAL)
+  @throttle(NOTIFICATION_THROTTLE_INTERVAL)
   private pushLaggedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_LAGGED';
     this.notificationsService.push({
@@ -225,7 +251,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     });
   }
 
-  @throttle(NOTIFICATION_INTERVAL)
+  @throttle(NOTIFICATION_THROTTLE_INTERVAL)
   private pushDroppedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_DROPPED';
     this.notificationsService.push({
