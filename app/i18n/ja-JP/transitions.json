@@ -13,13 +13,13 @@
   "connectionFrom": "開始シーン",
   "connectionTo": "終了シーン",
   "default": "既定",
-  "transitions": "トランジション",
+  "transitions": "シーン切り替え",
   "connections": "コネクション",
-  "addTransition": "新規トランジション",
+  "addTransition": "新規シーン切り替え",
   "addConnection": "新規コネクション",
-  "mustHaveLeastTwoScenes": "トランジションを編集するには2つ以上のシーンが必要です",
-  "mustHaveLeastOneTransition": "1つ以上のトランジションが必要です",
+  "mustHaveLeastTwoScenes": "シーン切り替えを編集するには2つ以上のシーンが必要です",
+  "mustHaveLeastOneTransition": "1つ以上のシーン切り替えが必要です",
   "redundantConnectionTooltip": "このコネクションは冗長です。他のコネクションとシーンの指定が一致しています。",
-  "newTransition": "トランジション",
+  "newTransition": "シーン切り替え",
   "deleted": "削除済み"
 }
