@@ -61,7 +61,7 @@ export default class StreamSettings extends TsxComponent {
               </div>
               <div>
                 {$t('Streaming to %{platformName}', { platformName: this.platformName })} <br />
-                {$t('account: %{userName}', { userName: this.userName })} <br />
+                {this.userName} <br />
               </div>
             </div>
             <div>

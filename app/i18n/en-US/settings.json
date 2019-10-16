@@ -80,8 +80,7 @@
   "Navigate to Live tab when going live": "Navigate to Live tab when going live",
   "Save Replay": "Save Replay",
   "Streaming to %{platformName}": "Streaming to %{platformName}",
-  "account: %{userName}": "account: %{userName}",
   "Stream to custom ingest": "Stream to custom ingest",
   "Use recommended settings": "Use recommended settings",
-  "CUSTOM_INGEST_WARN": "Streaming to a custom injest is advanced functionality. Some features at Streamlabs OBS may stop working as expected"
+  "CUSTOM_INGEST_WARN": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected"
 }
