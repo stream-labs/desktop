@@ -73,6 +73,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
+      this.stepsState.push({ complete: false });
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)

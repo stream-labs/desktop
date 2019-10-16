@@ -53,20 +53,26 @@ export default class HardwareSetup extends TsxComponent {
     this.defaultHardwareService.setDefault('video', val);
   }
 
+  get displayRender() {
+    return (
+      this.selectedVideoDevice &&
+      !!this.videoDevices.length && (
+        <div style="height: 200px; margin-bottom: 8px;">
+          <Display
+            sourceId={this.selectedVideoDevice}
+            renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+          />
+        </div>
+      )
+    );
+  }
+
   render() {
-    console.log(this.selectedVideoDevice);
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Setup Mic and Webcam')}</template>
         <div style="width: 60%;">
-          {this.selectedVideoDevice && !!this.videoDevices.length && (
-            <div style="height: 200px; margin-bottom: 8px;">
-              <Display
-                sourceId={this.selectedVideoDevice}
-                renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-              />
-            </div>
-          )}
+          {this.displayRender}
           {!!this.videoDevices.length && (
             <VFormGroup
               metadata={metadata.list({
