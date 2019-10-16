@@ -516,6 +516,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
               'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
             );
           }
+        })
+        .catch(() => {
+          this.outputErrorOpen = false;
         });
     }
   }
