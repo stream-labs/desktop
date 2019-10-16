@@ -472,7 +472,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
       } else if (info.code === obs.EOutputCode.Error) {
-        errorText = $t('An unexpected error occurred:') + info.error;
+        if (info.error) {
+          errorText = info.error;
+        } else {
+          errorText = $t(
+            'There was an error starting the output. This usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+          );
+        }
       }
 
       electron.remote.dialog.showErrorBox(
