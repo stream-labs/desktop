@@ -447,6 +447,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     if (info.code) {
       let errorText = '';
+      let linkToDriverInfo = false;
 
       if (info.code === obs.EOutputCode.BadPath) {
         errorText = $t(
@@ -475,16 +476,41 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         if (info.error) {
           errorText = info.error;
         } else {
+          linkToDriverInfo = true;
           errorText = $t(
-            'There was an error starting the output. This usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+            'There was an error starting the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
           );
         }
       }
 
-      electron.remote.dialog.showErrorBox(
-        info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
-        errorText,
-      );
+      const buttons = [$t('OK')];
+      const title = {
+        [EOBSOutputType.Streaming]: $t('Streaming Error'),
+        [EOBSOutputType.Recording]: $t('Recording Error'),
+        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
+      }[info.type];
+
+      if (linkToDriverInfo) buttons.unshift($t('Learn More'));
+
+      electron.remote.dialog
+        .showMessageBox({
+          buttons,
+          title,
+          type: 'error',
+          message: errorText,
+        })
+        .then(({ response }) => {
+          if (linkToDriverInfo && response === 0) {
+            electron.remote.shell.openExternal(
+              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
+            );
+          }
+        });
+
+      // electron.remote.dialog.showErrorBox(
+      //   info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
+      //   errorText,
+      // );
     }
   }
 
