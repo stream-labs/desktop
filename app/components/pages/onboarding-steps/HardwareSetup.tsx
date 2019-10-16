@@ -54,11 +54,12 @@ export default class HardwareSetup extends TsxComponent {
   }
 
   render() {
+    console.log(this.selectedVideoDevice);
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Setup Mic and Webcam')}</template>
         <div style="width: 60%;">
-          {this.selectedVideoDevice && (
+          {this.selectedVideoDevice && !!this.videoDevices.length && (
             <div style="height: 200px; margin-bottom: 8px;">
               <Display
                 sourceId={this.selectedVideoDevice}
@@ -66,7 +67,7 @@ export default class HardwareSetup extends TsxComponent {
               />
             </div>
           )}
-          {this.videoDevices.length && (
+          {!!this.videoDevices.length && (
             <VFormGroup
               metadata={metadata.list({
                 options: this.videoDevices,

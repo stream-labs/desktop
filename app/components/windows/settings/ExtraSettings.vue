@@ -43,17 +43,28 @@
         <div class="actions">
           <div class="input-container">
             <button class="button button--default" @click="restartStreamlabelsSession">
-              {{ $t('Restart Streamlabels Session') }}
+              {{ $t('Restart Streamlabels') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-content">
+        <div class="actions">
+          <div class="input-container">
+            <button class="button button--default" @click="configureDefaults">
+              {{ $t('Configure Default Devices') }}
             </button>
           </div>
           <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming">
             <button class="button button--default" @click="runAutoOptimizer">
-              {{ $t('Run Auto Optimizer') }}
+              {{ $t('Auto Optimize') }}
             </button>
           </div>
           <div class="input-container">
-            <button class="button button--action" @click="importFromObs">
-              {{ $t('Import from OBS') }}
+            <button class="button button--default" @click="importFromObs">
+              {{ $t('OBS Import') }}
             </button>
           </div>
         </div>

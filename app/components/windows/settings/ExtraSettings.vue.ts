@@ -87,6 +87,11 @@ export default class ExtraSettings extends Vue {
     this.windowsService.closeChildWindow();
   }
 
+  configureDefaults() {
+    this.onboardingService.start({ isHardware: true });
+    this.windowsService.closeChildWindow();
+  }
+
   importFromObs() {
     this.obsImporterService.import();
   }

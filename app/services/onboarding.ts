@@ -19,6 +19,7 @@ interface IOnboardingOptions {
   isOptimize: boolean; // When re-running the optimizer after onboarding
   isSecurityUpgrade: boolean; // When logging in, display a special message
   // about our security upgrade.
+  isHardware: boolean; // When configuring capture defaults
 }
 
 interface IOnboardingServiceState {
@@ -42,6 +43,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isLogin: false,
       isOptimize: false,
       isSecurityUpgrade: false,
+      isHardware: false,
     },
   };
 
@@ -67,6 +69,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isLogin: false,
       isOptimize: false,
       isSecurityUpgrade: false,
+      isHardware: false,
       ...options,
     };
 

@@ -12,6 +12,7 @@ import ThemeSelector from './onboarding-steps/ThemeSelector';
 import HardwareSetup from './onboarding-steps/HardwareSetup';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
+import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 
 @Component({})
@@ -140,9 +141,23 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
+  get hardwarePage() {
+    return (
+      <div>
+        <div class={styles.container}>
+          <HardwareSetup />
+          <button class="button button--action" onClick={this.complete}>
+            {$t('Complete')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if (this.onboardingService.options.isLogin) return this.loginPage;
     if (this.onboardingService.options.isOptimize) return this.optimizePage;
+    if (this.onboardingService.options.isHardware) return this.hardwarePage;
 
     return (
       <div>
