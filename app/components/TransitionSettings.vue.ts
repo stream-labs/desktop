@@ -46,7 +46,7 @@ export default class SceneTransitions extends Vue {
 
   get nameModel(): IObsInput<string> {
     return {
-      description: $t('transitions.name'),
+      description: $t('transitions.transitionName'),
       name: 'name',
       value: this.transition.name
     };
