@@ -111,6 +111,8 @@
       "StreamEncoder": {
         "name": "Encoder",
         "obs_x264": "Software (x264)",
+        "obs_qsv11": "Hardware (QSV)",
+        "x264": "Software (x264)",
         "qsv": "Hardware (QSV)",
         "nvenc": "Hardware (NVENC)"
       },
@@ -162,6 +164,8 @@
       "Encoder": {
         "name": "@:settings.Output.Streaming.StreamEncoder.name",
         "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11",
+        "x264": "@:settings.Output.Streaming.StreamEncoder.x264",
         "qsv": "@:settings.Output.Streaming.StreamEncoder.qsv",
         "nvenc": "@:settings.Output.Streaming.StreamEncoder.nvenc"
       },
@@ -279,7 +283,7 @@
       "RecEncoder": {
         "name": "@:settings.Output.Streaming.Encoder.name",
         "obs_x264": "@:settings.Output.Streaming.Encoder.obs_x264",
-        "qsv": "@:settings.Output.Streaming.Encoder.qsv"
+        "obs_qsv11": "@:settings.Output.Streaming.Encoder.obs_qsv11"
       },
       "RecRescale": {
         "name": "@:settings.Output.Streaming.Rescale.name"
