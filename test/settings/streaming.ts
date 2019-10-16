@@ -13,6 +13,7 @@ test('Populates stream settings while logged in', async t => {
 
   await focusChild(t);
   await app.client.click('li=Stream');
+  await app.client.click('a=Stream to custom ingest');
 
   t.is('Streaming Services', await getFormInput(t, 'Stream Type'));
   t.is('Twitch', await getFormInput(t, 'Service'));
@@ -28,6 +29,7 @@ test('Populates stream key when logged in', async t => {
 
   await focusChild(t);
   await app.client.click('li=Stream');
+  await app.client.click('a=Stream to custom ingest');
 
   // Test that we can toggle show stream key, also helps us fetch the value
   await app.client.click('button=Show');

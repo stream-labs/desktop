@@ -103,7 +103,12 @@ export default class Main extends Vue {
   }
 
   get renderDock() {
-    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
+    return (
+      this.isLoggedIn &&
+      !this.isOnboarding &&
+      this.hasLiveDock &&
+      this.userService.getPlatformService().liveDockEnabled()
+    );
   }
 
   get isDockCollapsed() {

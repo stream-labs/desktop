@@ -8,12 +8,12 @@ import {
   IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
-import { Inject } from '../core/injector';
+import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { $t } from 'services/i18n';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest } from './utils';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -89,9 +89,9 @@ interface IYoutubeLiveStream {
 
 export class YoutubeService extends StatefulService<IYoutubeServiceState>
   implements IPlatformService {
-  @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
-  @Inject() userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private userService: UserService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
@@ -147,21 +147,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   setupStreamSettings() {
     return this.fetchStreamKey()
-      .then(streamKey => {
-        const settings = this.settingsService.getSettingsFormData('Stream');
-
-        settings.forEach(subCategory => {
-          subCategory.parameters.forEach(parameter => {
-            if (parameter.name === 'service') {
-              parameter.value = 'YouTube / YouTube Gaming';
-            }
-            if (parameter.name === 'key') {
-              parameter.value = streamKey;
-            }
-          });
-        });
-
-        this.settingsService.setSettings('Stream', settings);
+      .then(key => {
+        this.streamSettingsService.setSettings({ key, platform: 'youtube' });
         return EPlatformCallResult.Success;
       })
       .catch(() => EPlatformCallResult.Error);
@@ -317,6 +304,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   beforeGoLive() {
     return Promise.resolve();
+  }
+
+  liveDockEnabled(): boolean {
+    return this.streamSettingsService.settings.protectedModeEnabled;
   }
 
   // TODO: dedup

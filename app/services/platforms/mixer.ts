@@ -15,15 +15,16 @@ import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 interface IMixerServiceState {
   typeIdMap: object;
 }
 
 export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
-  @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
-  @Inject() userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
 
@@ -75,21 +76,23 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   setupStreamSettings() {
     return this.fetchStreamKey()
       .then(key => {
-        const settings = this.settingsService.getSettingsFormData('Stream');
+        const currentStreamSettings = this.streamSettingsService.settings;
 
-        settings.forEach(subCategory => {
-          subCategory.parameters.forEach(parameter => {
-            if (parameter.name === 'service') {
-              parameter.value = 'Mixer.com - FTL';
-            }
+        // disable protectedMode for users who manually changed their stream key before
+        const needToDisableProtectedMode: boolean =
+          currentStreamSettings.platform === 'mixer' &&
+          currentStreamSettings.key &&
+          currentStreamSettings.key !== key;
 
-            if (parameter.name === 'key') {
-              parameter.value = key;
-            }
+        if (needToDisableProtectedMode) {
+          this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+        } else {
+          this.streamSettingsService.setSettings({
+            key,
+            platform: 'mixer',
+            protectedModeEnabled: true,
           });
-        });
-
-        this.settingsService.setSettings('Stream', settings);
+        }
         return EPlatformCallResult.Success;
       })
       .catch(() => EPlatformCallResult.Error);
@@ -193,5 +196,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
+  }
+
+  liveDockEnabled(): boolean {
+    return true;
   }
 }

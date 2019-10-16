@@ -133,6 +133,8 @@ export interface IPlatformService {
   fetchNewToken: () => Promise<void>;
 
   getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
+
+  liveDockEnabled: () => boolean;
 }
 
 export interface IPlatformAuth {

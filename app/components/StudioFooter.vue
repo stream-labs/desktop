@@ -92,7 +92,7 @@
 }
 
 .platform-error {
-  background: rgba(251, 72, 76, 0.28);
+  background: var(--warning-bg);
   padding: 5px;
   .radius();
 
