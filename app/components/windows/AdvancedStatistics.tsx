@@ -128,7 +128,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     );
   }
 
-  get notificationsArea() {
+  notificationsArea() {
     return (
       <div class={styles.section}>
         <h2>Performance Notifications</h2>
@@ -186,7 +186,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
               <GlobalSyncStatus />
             </div>
           </div>
-          {this.notificationsArea}
+          {this.notificationsArea()}
         </div>
       </ModalLayout>
     );
