@@ -17,10 +17,7 @@ export class ChatService extends Service {
   private chatView: Electron.BrowserView;
 
   init() {
-    this.userService.userLogin.subscribe(() => this.initChat());
     this.userService.userLogout.subscribe(() => this.deinitChat());
-
-    if (this.userService.isLoggedIn()) this.initChat();
   }
 
   refreshChat() {
@@ -28,7 +25,9 @@ export class ChatService extends Service {
   }
 
   mountChat(electronWindowId: number) {
-    if (!this.chatView) return;
+    if (!this.chatView) {
+      this.initChat();
+    }
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
