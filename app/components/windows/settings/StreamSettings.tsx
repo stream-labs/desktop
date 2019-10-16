@@ -74,7 +74,9 @@ export default class StreamSettings extends TsxComponent {
         {this.needToShowWarning && (
           <div class="section section--warning">
             <b>{$t('Warning')}: </b>
-            {$t('CUSTOM_INGEST_WARN')}
+            {$t(
+              'Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected',
+            )}
             <br />
             <br />
             <button class="button button--warn" onClick={this.restoreDefaults}>

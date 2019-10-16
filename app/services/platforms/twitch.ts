@@ -250,7 +250,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   async beforeGoLive() {}
 
-  chatEnabled(): boolean {
+  liveDockEnabled(): boolean {
     return true;
   }
 }

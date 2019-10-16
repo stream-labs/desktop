@@ -283,7 +283,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return Promise.resolve();
   }
 
-  chatEnabled(): boolean {
+  liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
   }
 

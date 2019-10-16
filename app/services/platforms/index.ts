@@ -134,7 +134,7 @@ export interface IPlatformService {
 
   getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
 
-  chatEnabled: () => boolean;
+  liveDockEnabled: () => boolean;
 }
 
 export interface IPlatformAuth {

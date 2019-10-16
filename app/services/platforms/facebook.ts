@@ -298,7 +298,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return platformRequest(`${this.apiBase}/me/accounts`);
   }
 
-  chatEnabled(): boolean {
+  liveDockEnabled(): boolean {
     return true;
   }
 

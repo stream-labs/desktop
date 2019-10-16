@@ -198,7 +198,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.capabilities.has(capability);
   }
 
-  chatEnabled(): boolean {
+  liveDockEnabled(): boolean {
     return true;
   }
 }
