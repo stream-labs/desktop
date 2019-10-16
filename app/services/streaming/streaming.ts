@@ -364,6 +364,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  private outputErrorOpen = false;
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -446,6 +448,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     if (info.code) {
+      if (this.outputErrorOpen) {
+        console.warn('Not showing error message because existing window is open.', info);
+        return;
+      }
+
       let errorText = '';
       let linkToDriverInfo = false;
 
@@ -490,7 +497,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
       }[info.type];
 
-      if (linkToDriverInfo) buttons.unshift($t('Learn More'));
+      if (linkToDriverInfo) buttons.push($t('Learn More'));
+
+      this.outputErrorOpen = true;
 
       electron.remote.dialog
         .showMessageBox({
@@ -500,7 +509,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           message: errorText,
         })
         .then(({ response }) => {
-          if (linkToDriverInfo && response === 0) {
+          this.outputErrorOpen = false;
+
+          if (linkToDriverInfo && response === 1) {
             electron.remote.shell.openExternal(
               'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
             );
