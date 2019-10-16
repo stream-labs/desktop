@@ -364,6 +364,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  private outputErrorOpen = false;
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -446,7 +448,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     if (info.code) {
+      if (this.outputErrorOpen) {
+        console.warn('Not showing error message because existing window is open.', info);
+        return;
+      }
+
       let errorText = '';
+      let linkToDriverInfo = false;
 
       if (info.code === obs.EOutputCode.BadPath) {
         errorText = $t(
@@ -472,13 +480,46 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
       } else if (info.code === obs.EOutputCode.Error) {
-        errorText = $t('An unexpected error occurred:') + info.error;
+        if (info.error) {
+          errorText = info.error;
+        } else {
+          linkToDriverInfo = true;
+          errorText = $t(
+            'There was an error starting the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+          );
+        }
       }
 
-      electron.remote.dialog.showErrorBox(
-        info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
-        errorText,
-      );
+      const buttons = [$t('OK')];
+      const title = {
+        [EOBSOutputType.Streaming]: $t('Streaming Error'),
+        [EOBSOutputType.Recording]: $t('Recording Error'),
+        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
+      }[info.type];
+
+      if (linkToDriverInfo) buttons.push($t('Learn More'));
+
+      this.outputErrorOpen = true;
+
+      electron.remote.dialog
+        .showMessageBox({
+          buttons,
+          title,
+          type: 'error',
+          message: errorText,
+        })
+        .then(({ response }) => {
+          this.outputErrorOpen = false;
+
+          if (linkToDriverInfo && response === 1) {
+            electron.remote.shell.openExternal(
+              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
+            );
+          }
+        })
+        .catch(() => {
+          this.outputErrorOpen = false;
+        });
     }
   }
 
