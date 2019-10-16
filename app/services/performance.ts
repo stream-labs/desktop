@@ -115,28 +115,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     );
   }
 
-  nextStats(currentStats: IMonitorState): INextStats {
-    const framesSkipped = currentStats.framesSkipped - this.state.numberSkippedFrames;
-    const framesEncoded = currentStats.framesEncoded - this.state.numberEncodedFrames;
-    const skippedFactor = framesEncoded === 0 ? 0 : framesSkipped / framesEncoded;
-
-    const framesLagged = currentStats.framesLagged - this.state.numberLaggedFrames;
-    const framesRendered = currentStats.framesRendered - this.state.numberRenderedFrames;
-    const laggedFactor = framesRendered === 0 ? 0 : framesLagged / framesRendered;
-
-    const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
-
-    return {
-      framesSkipped,
-      framesEncoded,
-      skippedFactor,
-      framesLagged,
-      framesRendered,
-      laggedFactor,
-      droppedFramesFactor,
-    };
-  }
-
   /* Monitor frame rate statistics
   /  Update values in state
   /  Dispatch notifications when thresholds are crossed */
@@ -158,13 +136,35 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     this.sendNotifications(currentStats, nextStats);
 
     this.SET_PERFORMANCE_STATS({
-      numberSkippedFrames: nextStats.framesSkipped,
+      numberSkippedFrames: currentStats.framesSkipped,
       percentageSkippedFrames: nextStats.skippedFactor * 100,
-      numberLaggedFrames: nextStats.framesLagged,
+      numberLaggedFrames: currentStats.framesLagged,
       percentageLaggedFrames: nextStats.laggedFactor * 100,
-      numberEncodedFrames: nextStats.framesEncoded,
-      numberRenderedFrames: nextStats.framesRendered,
+      numberEncodedFrames: currentStats.framesEncoded,
+      numberRenderedFrames: currentStats.framesRendered,
     });
+  }
+
+  nextStats(currentStats: IMonitorState): INextStats {
+    const framesSkipped = currentStats.framesSkipped - this.state.numberSkippedFrames;
+    const framesEncoded = currentStats.framesEncoded - this.state.numberEncodedFrames;
+    const skippedFactor = framesEncoded === 0 ? 0 : framesSkipped / framesEncoded;
+
+    const framesLagged = currentStats.framesLagged - this.state.numberLaggedFrames;
+    const framesRendered = currentStats.framesRendered - this.state.numberRenderedFrames;
+    const laggedFactor = framesRendered === 0 ? 0 : framesLagged / framesRendered;
+
+    const droppedFramesFactor = this.state.percentageDroppedFrames / 100;
+
+    return {
+      framesSkipped,
+      framesEncoded,
+      skippedFactor,
+      framesLagged,
+      framesRendered,
+      laggedFactor,
+      droppedFramesFactor,
+    };
   }
 
   addSample(record: number[], current: number) {
