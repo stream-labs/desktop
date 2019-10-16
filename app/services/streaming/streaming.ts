@@ -122,6 +122,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   setSelectiveRecording(enabled: boolean) {
+    // Selective recording cannot be toggled while live
+    if (this.state.streamingStatus !== EStreamingState.Offline) return;
+
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
   }
