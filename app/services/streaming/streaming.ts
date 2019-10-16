@@ -506,11 +506,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             );
           }
         });
-
-      // electron.remote.dialog.showErrorBox(
-      //   info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
-      //   errorText,
-      // );
     }
   }
 
