@@ -315,17 +315,16 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
     }
 
-    if (type === 'text_gdiplus') {
-      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    if (type === 'text_gdiplus' && resolvedSettings.text === void 0) {
+      resolvedSettings.text = name;
     }
 
-    if (type === 'dshow_input') {
-      if (
-        resolvedSettings.video_device_id === void 0 &&
-        this.defaultHardwareService.state.defaultVideoDevice
-      ) {
-        resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
-      }
+    if (
+      type === 'dshow_input' &&
+      resolvedSettings.video_device_id === void 0 &&
+      this.defaultHardwareService.state.defaultVideoDevice
+    ) {
+      resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
     }
 
     return resolvedSettings;
