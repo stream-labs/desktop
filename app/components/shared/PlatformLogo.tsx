@@ -10,7 +10,6 @@ class LogoProps {
 
 @Component({ props: createProps(LogoProps) })
 export default class PlatformLogo extends TsxComponent<LogoProps> {
-
   get iconForPlatform() {
     return {
       twitch: 'fab fa-twitch',
@@ -21,8 +20,6 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
   }
 
   render() {
-    return (
-      <i class={cx(this.iconForPlatform, styles[this.props.platform])}/>
-    );
+    return <i class={cx(this.iconForPlatform, styles[this.props.platform])} />;
   }
 }
