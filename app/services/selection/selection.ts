@@ -295,6 +295,14 @@ export class Selection {
     return this.getItems().every(item => item.locked);
   }
 
+  /**
+   * Helper method to check if any items in the selection
+   * are locked.
+   */
+  isAnyLocked(): boolean {
+    return this.getItems().some(item => item.locked);
+  }
+
   isStreamVisible(): boolean {
     return this.getItems().every(item => item.streamVisible);
   }
