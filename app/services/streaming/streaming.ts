@@ -487,7 +487,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         } else {
           linkToDriverInfo = true;
           errorText = $t(
-            'There was an error starting the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
           );
         }
       }
