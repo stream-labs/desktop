@@ -78,5 +78,9 @@
   "API Token": "APIトークン",
   "Face Mask Settings": "フェイスマスク設定",
   "Navigate to Live tab when going live": "ライブの際にはライブタブに移動します",
-  "Save Replay": "リプレイを保存する"
+  "Save Replay": "リプレイを保存する",
+  "Streaming to %{platformName}": "Streaming to %{platformName}",
+  "Stream to custom ingest": "Stream to custom ingest",
+  "Use recommended settings": "Use recommended settings",
+  "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected"
 }
