@@ -20,11 +20,17 @@
       v-show="!collapsed"
       class="section-content section-content--dropdown"
   >
-    <div v-for="hotkey in hotkeys" :key="hotkey.resourceId">
-      <hotkey :hotkey="hotkey" />
-    </div>
+    <hotkey :hotkey="hotkey" class="hotkey" v-for="hotkey in hotkeys" :key="hotkey.resourceId" />
   </div>
 </div>
 </template>
+
+<style lang="less" scoped>
+.hotkey {
+  & + & {
+    margin-top: 20px;
+  }
+}
+</style>
 
 <script lang="ts" src="./HotkeyGroup.vue.ts"></script>
