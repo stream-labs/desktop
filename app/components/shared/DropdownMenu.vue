@@ -19,11 +19,10 @@
 <style lang="less">
 @import "../../styles/index";
 
-.dropdown-menu {
+// 詳細度でライブラリ側の指定を上書きする
+.popper.dropdown-menu {
   width: 124%;
   position: absolute;
-  top: 22px!important;
-  left: 2px!important;
   background-color: @bg-secondary;
   border-color: @bg-primary;
   .border;
@@ -66,6 +65,7 @@
 }
 
 .dropdown-menu__item {
+  text-align: left;
   white-space: nowrap;
   max-width: 300px;
   overflow: hidden;
@@ -79,9 +79,6 @@
     background-color: @bg-primary;
     &:before {
       content:"\003e";
-      position: relative;
-      top: 0;
-      left: -10px;
     }
   }
 }

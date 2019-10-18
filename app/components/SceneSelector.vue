@@ -83,6 +83,10 @@
       border:1px solid @text-primary;
     }
   }
+
+  &::after {
+    color: @text-primary;
+  }
 }
 
 .settings-link {
