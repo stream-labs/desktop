@@ -65,6 +65,7 @@ export abstract class Service {
     const mustInit = this.initFn ? !this.initFn(instance) : true;
 
     if (mustInit) instance.init();
+
     instance.mounted();
     Service.serviceAfterInit.next(instance);
     if (mustInit) instance.afterInit();
