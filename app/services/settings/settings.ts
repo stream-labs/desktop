@@ -118,11 +118,8 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   @Inject() private sourcesService: SourcesService;
-
   @Inject() private audioService: AudioService;
-
   @Inject() private windowsService: WindowsService;
-
   @Inject() private appService: AppService;
 
   @Inject() private userService: UserService;

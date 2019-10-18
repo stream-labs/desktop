@@ -16,7 +16,7 @@ import electron from 'electron';
   components: {
     ModalLayout,
     Display,
-    GenericForm
+    GenericForm,
   },
 })
 export default class SourceProperties extends Vue {

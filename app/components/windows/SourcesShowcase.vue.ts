@@ -60,7 +60,11 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-    this.sourcesService.showAddSource(sourceType, managerType);
+
+    this.sourcesService.showAddSource(sourceType, {
+      propertiesManager: managerType,
+      propertiesManagerSettings: {}
+    });
   }
 
   inspectedSource: TInspectableSource = null;
@@ -91,5 +95,4 @@ export default class SourcesShowcase extends Vue {
       return true;
     });
   }
-
 }

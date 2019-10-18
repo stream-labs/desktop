@@ -81,6 +81,7 @@ export interface ISourceCreateOptions {
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
+  isTemporary?: boolean;
 }
 
 export type TSourceType =
@@ -101,18 +102,24 @@ export type TSourceType =
   'scene' |
   'ndi_source' |
   'openvr_capture' |
-  'liv_capture'
+  'liv_capture' |
+  'ovrstream_dc_source'
   ;
 
 // Register new properties manager here
 export type TPropertiesManager = 'default';
 
-
 export interface ISourcesState {
   sources: Dictionary<ISource>;
+  temporarySources: Dictionary<ISource>;
 }
 
 export interface IActivePropertyManager {
   manager: IPropertyManager;
   type: TPropertiesManager;
+}
+
+export interface ISourceAddOptions {
+  propertiesManager: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 }

@@ -16,7 +16,6 @@ export default class ChildWindow extends Vue {
 
 
   components: { name: string; isShown: boolean; title: string; }[] = [];
-
   private refreshingTimeout = 0;
 
   mounted() {

@@ -30,7 +30,7 @@ if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents, shell } = require('electron');
 const electron = require('electron');
 const fs = require('fs');
 const { Updater } = require('./updater/Updater.js');
@@ -493,7 +493,7 @@ ipcMain.on('window-preventLogout', (event, id) => {
  **/
 function preventNewWindow(e, url) {
   e.preventDefault();
-  electron.shell.openExternal(url);
+  shell.openExternal(url);
 }
 
 ipcMain.on('window-preventNewWindow', (_event, id) => {
@@ -630,4 +630,10 @@ ipcMain.on('requestPerformanceStatistics', (e) => {
   const stats = getObs().OBS_API_getPerformanceStatistics();
 
   e.sender.send('notifyPerformanceStatistics', stats);
+});
+
+ipcMain.on('webContents-preventNavigation', (e, id) => {
+  webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
+  });
 });
