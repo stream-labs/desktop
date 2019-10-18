@@ -1,6 +1,6 @@
 <template>
 <div style="height: 100%">
-  <title-bar :title="options.title" class="child-window-titlebar" v-if="!isFullScreen" />
+  <title-bar :title="options.title" class="child-window-titlebar" v-if="!options.isFullScreen" />
   <div class="blank-slate">
     <div class="spinner-spacer" />
     <i class="icon-spinner icon-spin modal-layout-spinner"/>

@@ -78,7 +78,6 @@ let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
 
-
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -94,7 +93,6 @@ function getObs() {
 
   return _obs;
 }
-
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');

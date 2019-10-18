@@ -15,19 +15,11 @@ import TitleBar from '../TitleBar.vue';
 export default class OneOffWindow extends Vue {
   @Inject() private windowsService: WindowsService;
 
-  mounted() {
-    console.log(this.options);
-  }
-
   get options() {
     return this.windowsService.state[this.windowId];
   }
 
   get windowId() {
     return Util.getCurrentUrlParams().windowId;
-  }
-
-  get isFullScreen() {
-    return electron.remote.getCurrentWindow().isFullScreen();
   }
 }
