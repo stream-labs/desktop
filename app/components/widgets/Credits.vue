@@ -3,7 +3,7 @@
   <validated-form slot="manage-credits-properties" @input="save()" v-if="loaded">
     <!-- <button class="button button--action" @click="rollCredits">{{ $t('Roll Credits') }}</button> -->
     <v-form-group v-model="wData.settings.credit_title" :metadata="metadata.title" />
-    <v-form-group  v-model="wData.settings.credit_title" :metadata="metadata.subtitle" />
+    <v-form-group  v-model="wData.settings.credit_subtitle" :metadata="metadata.subtitle" />
     <v-form-group :title="$t('Includes')">
       <bool-input :title="$t('Show Followers')" v-model="wData.settings.followers"/>
       <bool-input :title="$t('Show Subscribers')" v-model="wData.settings.subscribers"/>
