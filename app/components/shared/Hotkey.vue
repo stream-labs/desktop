@@ -31,10 +31,6 @@
 .hotkey {
   display: flex;
   flex-direction: row;
-
-  & + & {
-    margin-top: 20px;
-  }
 }
 
 .Hotkey-description {
