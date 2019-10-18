@@ -21,7 +21,9 @@
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
     </div>
     <div ref="placeholder" class="placeholder" v-else>
-      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder }" @dragstart.prevent />
+      <div v-if="studioMode" class="placeholder-controls" :class="{ stacked }" />
+      <img src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder, studioMode, stacked }" @dragstart.prevent />
+      <img v-if="studioMode" src="../../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder, studioMode, stacked, right: true }" @dragstart.prevent />
     </div>
   </div>
   <resize-bar
@@ -112,6 +114,46 @@
     top: 50%;
     left: 5px;
     transform: translate(0, -50%);
+  }
+
+  img.studioMode {
+    height: auto;
+    top: 50%;
+    width: calc(50% - 20px);
+    left: 10px;
+    transform: translate(0, calc(-50% + 30px));
+  }
+
+  img.studioMode.right {
+    left: auto;
+    right: 10px;
+  }
+
+  img.studioMode.stacked {
+    height: calc(50% - 10px);
+    width: auto;
+    top: 5px;
+    left: 50%;
+    transform: translate(calc(-50% + 60px), 0);
+  }
+
+  img.studioMode.stacked.right {
+    bottom: 5px;
+    top: auto;
+  }
+}
+
+.placeholder-controls {
+  height: 60px;
+  color: var(--paragraph);
+  background-color: var(--background);
+
+  &.stacked {
+    position: absolute;
+    height: 100%;
+    width: 125px;
+    left: 0;
+    top: 0;
   }
 }
 
