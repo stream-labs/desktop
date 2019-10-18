@@ -16,7 +16,7 @@ import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from 'util/injector';
-import * as obs from 'services/obs-api';
+import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
