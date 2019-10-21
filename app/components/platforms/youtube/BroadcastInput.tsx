@@ -12,6 +12,9 @@ interface IBroadcastInputMetadata extends IInputMetadata {
   broadcasts: IYoutubeLiveBroadcast[];
 }
 
+/**
+ * Youtube broadcast-selector input
+ */
 @Component({ components: { ListInput } })
 export default class BroadcastInput extends BaseInput<string, IBroadcastInputMetadata> {
   @Prop() readonly value: string;
@@ -19,6 +22,7 @@ export default class BroadcastInput extends BaseInput<string, IBroadcastInputMet
   @Prop() readonly title: string;
 
   get listInputMetadata() {
+    // prepare data for the nested list-input
     const newBroadCastOption = {
       title: $t('Create New Event'),
       value: '',
@@ -37,17 +41,22 @@ export default class BroadcastInput extends BaseInput<string, IBroadcastInputMet
     };
   }
 
+  /**
+   * format the isoDate to the locale-dependent format
+   */
   formatDate(isoDate: string): string {
     return moment(new Date(isoDate)).format(moment.localeData().longDateFormat('ll'));
   }
 
   render() {
+    // define custom slot for the list-item
     const scopedSlots = {
       item: (props: { option: IListOption<string> }) => {
         const broadcast = this.options.broadcasts.find(
           broadcast => broadcast.id === props.option.value,
         );
 
+        // "Create New" option
         if (!broadcast) {
           return (
             <div class={cx(styles['new-broadcast'], styles.broadcast)}>
@@ -63,6 +72,7 @@ export default class BroadcastInput extends BaseInput<string, IBroadcastInputMet
           );
         }
 
+        // Regular options
         return (
           <div class={styles.broadcast}>
             <div class={styles['col-image']}>
@@ -80,6 +90,7 @@ export default class BroadcastInput extends BaseInput<string, IBroadcastInputMet
       },
     };
 
+    // render customized ListInput
     return (
       <ListInput
         class={styles['broadcast-input']}

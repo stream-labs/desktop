@@ -40,7 +40,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
   }
 
   onSelectBroadcastHandler() {
-    // get title and description from selected broadcast
+    // set title and description fields from selected broadcast
     const selectedBroadcast = this.broadcasts.find(
       broadcast => broadcast.id === this.channelInfo.broadcastId,
     );

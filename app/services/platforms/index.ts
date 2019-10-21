@@ -118,7 +118,7 @@ export interface IPlatformService {
   authUrl: string;
 
   /**
-   * Check the user's ability to stream to the platform
+   * Check the user's ability to stream for the current platform
    */
   validatePlatform: () => Promise<EPlatformCallResult>;
 

@@ -28,6 +28,7 @@
   .col-image {
     flex: 0 0 76px;
 
+    // 'img' is the preview image and 'div' is add-new rectangular icon
     > img,
     > div {
       .radius(0.5);
@@ -61,7 +62,7 @@
     }
   }
 
-  // Create new text
+  // 'Create new' text
   &.new-broadcast .col-description {
     font-weight: bold;
     line-height: 44px;
@@ -73,20 +74,5 @@
     margin-left: auto;
     color: var(--link-active);
     font-size: smaller;
-  }
-}
-
-.new-broadcast {
-  .flex();
-
-  line-height: 67px;
-
-  .box {
-    font-size: 32px;
-    width: 60px;
-    border: 1px solid white;
-    text-align: center;
-    height: 45px;
-    vertical-align: middle;
   }
 }

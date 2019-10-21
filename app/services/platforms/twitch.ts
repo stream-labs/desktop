@@ -87,8 +87,8 @@ export class TwitchService extends Service implements IPlatformService {
       if (this.userService.platform.type === 'twitch') this.prepopulateInfo();
     });
 
+    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
     this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      // trigger `channelInfoChanged` event to with new chat url based on the changed theme
       if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
@@ -199,6 +199,9 @@ export class TwitchService extends Service implements IPlatformService {
     return this.activeChannel;
   }
 
+  /**
+   * update the local info for current channel and emit the "channelInfoChanged" event
+   */
   private updateActiveChannel(patch: Partial<ITwitchChannelInfo>) {
     if (!this.activeChannel) this.activeChannel = {} as ITwitchChannelInfo;
     this.activeChannel = {

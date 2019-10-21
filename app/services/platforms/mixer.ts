@@ -86,8 +86,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       if (this.userService.platform.type === 'mixer') this.prepopulateInfo();
     });
 
+    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
     this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      // trigger `channelInfoChanged` event to with new chat url based on the changed theme
       if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
@@ -134,6 +134,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
   }
 
+  /**
+   * obtain channel info for the GoLive window
+   */
   async prepopulateInfo() {
     const json = await this.fetchRawChannelInfo();
     let gameTitle = '';
@@ -151,6 +154,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.activeChannel;
   }
 
+  /**
+   * update the local info for current channel and emit the "channelInfoChanged" event
+   */
   private updateActiveChannel(patch: Partial<IMixerChannelInfo>) {
     if (!this.activeChannel) this.activeChannel = {} as IMixerChannelInfo;
     const channelId = patch.channelId || this.activeChannel.channelId;

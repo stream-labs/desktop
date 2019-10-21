@@ -26,10 +26,7 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
     children = children || this.$children;
     const inputs: BaseInput<any, IInputMetadata>[] = [];
     children.forEach(child => {
-      if (child instanceof BaseInput) {
-        inputs.push(child);
-        // return;
-      }
+      if (child instanceof BaseInput) inputs.push(child);
       if (child.$children.length) inputs.push(...this.getInputs(child.$children));
     });
     return inputs;
@@ -56,13 +53,17 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
    * validate and show validation messages
    */
   async validate() {
+    // validate the root-level form
     const inputs = this.getInputs();
     for (let i = 0; i < inputs.length; i++) {
       await inputs[i].$validator.validateAll(inputs[i].form.validationScopeId);
     }
+
+    // validate nested forms
     const nestedForms = this.getForms();
     nestedForms.forEach(form => form.validate());
 
+    // emit errors from root and nested forms
     this.validated.next(
       this.$validator.errors.items.concat(...nestedForms.map(form => form.$validator.errors.items)),
     );

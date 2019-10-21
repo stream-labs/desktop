@@ -167,6 +167,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      // in the "force" mode just try to start streaming without updating channel info
       if (force) {
         this.finishStartStreaming();
         return Promise.resolve();

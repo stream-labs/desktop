@@ -82,11 +82,16 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     this.RESET();
   }
 
+  /**
+   * handle the StreamInfoChanged event form the current platform
+   */
   private onStreamInfoChangedHandler(streamInfoPatch: Partial<TStreamInfoServiceState>) {
     const newStreamInfo = {
       ...this.state,
       ...streamInfoPatch,
     };
+
+    // emit the "streamInfoChanged" only with updated values
     const changedProps = reduce(
       this.state,
       (result, value, key) => {
@@ -97,61 +102,6 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     const changedData = pick(newStreamInfo, changedProps);
     this.UPDATE_STREAM_INFO(changedData);
     this.streamInfoChanged.next(changedData);
-  }
-
-  async refreshStreamInfo(): Promise<void> {
-    // this.SET_ERROR(false);
-    // this.SET_FETCHING(true);
-    //
-    // if (!this.userService.isLoggedIn()) {o
-    //   this.SET_FETCHING(false);
-    //   return;
-    // }
-    //
-    // const platform = getPlatformService(this.userService.platform.type);
-    // try {
-    //   const info = await platform.prepopulateInfo();
-    //   if (info) this.SET_CHANNEL_INFO(info);
-    //
-    //   if (this.userService.platform.type === 'twitch') {
-    //     this.SET_HAS_UPDATE_TAGS_PERM(await this.twitchService.hasScope('user:edit:broadcast'));
-    //   }
-    //
-    //   if (this.userService.platform.type === 'facebook') {
-    //     this.SET_FACEBOOK_PAGE(this.facebookService.state.facebookPages.page_id);
-    //   }
-    //
-    //   this.streamInfoChanged.next();
-    // } catch (e) {
-    //   console.error('Unable to refresh stream info', e);
-    //   this.SET_ERROR(true);
-    // }
-    // this.SET_FETCHING(false);
-  }
-
-  /**
-   * set channel info that will be used when stream starts
-   * if the stream is currently active that sync this changes immediately
-   * @param info
-   */
-  async setChannelInfo(info: TCombinedChannelInfo): Promise<boolean> {
-    const platform = getPlatformService(this.userService.platform.type);
-    if (this.userService.platform.type === 'facebook' && info.game === '') {
-      return Promise.reject('You must select a game.');
-    }
-
-    this.SET_CHANNEL_INFO(info);
-
-    try {
-      if (this.streamingService.isStreaming) {
-        await platform.putChannelInfo(info);
-      }
-      this.createGameAssociation(info.game);
-      return true;
-    } catch (e) {
-      console.error('Unable to set stream info: ', e);
-    }
-    return false;
   }
 
   /**
@@ -179,36 +129,8 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   }
 
   @mutation()
-  SET_FETCHING(fetching: boolean) {
-    this.state.fetching = fetching;
-  }
-
-  @mutation()
-  SET_ERROR(error: boolean) {
-    this.state.error = error;
-  }
-
-  @mutation()
-  SET_CHANNEL_INFO(info: TChannelInfo) {
-    this.state = {
-      ...this.state,
-      ...info,
-    };
-  }
-
-  @mutation()
-  SET_HAS_UPDATE_TAGS_PERM(perm: boolean) {
-    this.state.hasUpdateTagsPermission = perm;
-  }
-
-  @mutation()
   SET_VIEWER_COUNT(viewers: number) {
     this.state.viewerCount = viewers;
-  }
-
-  @mutation()
-  SET_FACEBOOK_PAGE(pageId: string) {
-    this.state.facebookPageId = pageId;
   }
 
   @mutation()

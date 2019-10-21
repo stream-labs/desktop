@@ -163,8 +163,29 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     this.state.activeBroadcast = broadcast;
   }
 
+  async beforeGoLive({ title, description, broadcastId }: IYoutubeStartStreamOptions) {
+    // update selected LiveBroadcast with new title and description
+    // or create a new LiveBroadcast if there are no broadcasts selected
+    let broadcast = broadcastId
+      ? await this.updateBroadcast(broadcastId, { title, description })
+      : await this.createBroadcast({ title, description });
+
+    // create a LiveStream object and bind it with current LiveBroadcast
+    const stream = await this.createLiveStream(title);
+    broadcast = await this.bindStreamToBroadcast(broadcast.id, stream.id);
+
+    // setup key and platform type in the OBS settings
+    const streamKey = stream.cdn.ingestionInfo.streamName;
+    this.streamSettingsService.setSettings({ platform: 'youtube', key: streamKey });
+
+    // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
+    this.setActiveBroadcast(broadcast);
+  }
+
+  /**
+   * check that user has enabled live-streaming on their account
+   */
   async validatePlatform(): Promise<EPlatformCallResult> {
-    // check that user has enabled live-streaming on their account
     try {
       await this.fetchBroadcasts();
     } catch (resp) {
@@ -184,11 +205,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     }
   }
 
-  setupStreamSettings() {
-    this.streamSettingsService.setSettings({ platform: 'youtube' });
-    return Promise.resolve(EPlatformCallResult.Success);
-  }
-
   getHeaders(req: IPlatformRequest, authorized = false) {
     return {
       'Content-Type': 'application/json',
@@ -196,7 +212,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     };
   }
 
-  fetchDescription(): Promise<string> {
+  fetchDefaultDescription(): Promise<string> {
     return this.userService
       .getDonationSettings()
       .then(json =>
@@ -222,16 +238,16 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    * returns perilled data for the EditStreamInfo window
    */
   async prepopulateInfo(): Promise<IYoutubeStartStreamOptions> {
-    // return activeBroadcast description and title if exists
+    // if streaming then return activeBroadcast description and title if exists
     if (this.streamingService.isStreaming) {
       return this.activeChannel;
     }
 
-    // return last saved description and title for new the streaming session
+    // otherwise return the last saved description and title for new the streaming session
     const settings = this.streamSettingsService.settings;
     return {
       title: settings.title,
-      description: settings.description || (await this.fetchDescription()),
+      description: settings.description || (await this.fetchDefaultDescription()),
     };
   }
 
@@ -279,22 +295,34 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     });
   }
 
+  /**
+   * update the local info for current channel and emit the "channelInfoChanged" event
+   */
   private updateActiveChannel(info: Partial<IYoutubeChannelInfo>) {
     this.activeChannel = this.activeChannel || ({} as IYoutubeChannelInfo);
     const broadCastId = info.broadcastId || this.activeChannel.broadcastId;
+
+    // update settings and calculate new chatUrl and streamUrl
     this.activeChannel = {
       ...this.activeChannel,
       ...info,
       chatUrl: this.getChatUrl(broadCastId),
       streamUrl: this.getSteamUrl(broadCastId),
     };
+
+    // save title and description to use them as pre-filled data for the next stream
     this.streamSettingsService.setSettings({
       title: this.activeChannel.title,
       description: this.activeChannel.description,
     });
+
+    // emit the updated channelInfo
     this.channelInfoChanged.next(this.activeChannel);
   }
 
+  /**
+   * create a new broadcast via API
+   */
   private async createBroadcast(params: {
     title: string;
     description: string;
@@ -317,6 +345,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     });
   }
 
+  /**
+   * update the broadcast via API
+   */
   private async updateBroadcast(
     id: string,
     params: {
@@ -346,6 +377,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     });
   }
 
+  /**
+   * The liveStream must be bounded to the Youtube LiveBroadcast before going live
+   */
   private bindStreamToBroadcast(
     broadcastId: string,
     streamId: string,
@@ -359,6 +393,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     });
   }
 
+  /**
+   * create new LiveStream via API
+   * this LiveStream must be bounded to the Youtube LiveBroadcast before going live
+   */
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=cdn,snippet,contentDetails`;
     return platformAuthorizedRequest<IYoutubeLiveStream>({
@@ -380,20 +418,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return Promise.resolve(JSON.parse(''));
   }
 
-  async beforeGoLive(options: IYoutubeStartStreamOptions) {
-    const { title, description, broadcastId } = options;
-
-    let broadcast = broadcastId
-      ? await this.updateBroadcast(broadcastId, { title, description })
-      : await this.createBroadcast({ title, description });
-
-    const stream = await this.createLiveStream(title);
-    broadcast = await this.bindStreamToBroadcast(broadcast.id, stream.id);
-    const streamKey = stream.cdn.ingestionInfo.streamName;
-    this.streamSettingsService.setSettings({ platform: 'youtube', key: streamKey });
-    this.setActiveBroadcast(broadcast);
-  }
-
   liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
   }
@@ -405,6 +429,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return this.capabilities.has(capability);
   }
 
+  /**
+   * Fetch the list of active and upcoming broadcasts
+   */
   async fetchBroadcasts(ids?: string[]): Promise<IYoutubeLiveBroadcast[]> {
     const idsFilter = ids ? `&id=${ids.join(',')}` : '';
     const query = `part=snippet,contentDetails,status&mine=true&status=upcoming,active&maxResults=50${idsFilter}&access_token=${
@@ -413,7 +440,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const broadcastsCollection = await platformAuthorizedRequest<
       IYoutubeCollection<IYoutubeLiveBroadcast>
     >(`${this.apiBase}/liveBroadcasts?${query}`);
-    console.log('fetched broadcasts ', broadcastsCollection);
     return broadcastsCollection.items;
   }
 
