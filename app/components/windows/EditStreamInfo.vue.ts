@@ -99,6 +99,7 @@ export default class EditStreamInfo extends Vue {
     return (
       this.twitterService.state.linked &&
       this.twitterService.state.tweetWhenGoingLive &&
+      !this.isSchedule &&
       !this.midStreamMode
     );
   }

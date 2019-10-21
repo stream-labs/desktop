@@ -105,7 +105,7 @@ schedulingPlatforms.forEach(platform => {
 
     // open EditStreamInfo window
     await focusMain(t);
-    await app.client.click('button=Schedule Stream');
+    await app.client.click('button .icon-date');
     await focusChild(t);
 
     const formMonkey = new FormMonkey(t, 'form[name=editStreamForm]');

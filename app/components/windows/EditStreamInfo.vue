@@ -97,7 +97,7 @@
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"
           :updatingInfo="updatingInfo"
-          v-if="twitterIsEnabled"
+          v-if="twitterIsEnabled && !isSchedule"
           v-model="tweetModel"
         />
         <div class="update-warning" v-if="updateError">
