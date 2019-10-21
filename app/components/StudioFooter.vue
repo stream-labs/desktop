@@ -39,11 +39,11 @@
       </button>
     </div>
     <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
-      <button class="circle-button" @click="toggleReplayBuffer" v-tooltip="$t('Start Replay Buffer')"><i class="icon-replay-buffer" /></button>
+      <button class="circle-button" @click="toggleReplayBuffer" v-tooltip.left="$t('Start Replay Buffer')"><i class="icon-replay-buffer" /></button>
     </div>
     <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
-      <button class="circle-button left-replay button--soft-warning" @click="toggleReplayBuffer" v-tooltip="$t('Stop')"><i class="fa fa-stop" /></button>
-      <button class="circle-button right-replay" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping" v-tooltip="$t('Save Replay')">
+      <button class="circle-button left-replay button--soft-warning" @click="toggleReplayBuffer" v-tooltip.left="$t('Stop')"><i class="fa fa-stop" /></button>
+      <button class="circle-button right-replay" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping" v-tooltip.left="$t('Save Replay')">
         <i class="icon-save" />
       </button>
     </div>
