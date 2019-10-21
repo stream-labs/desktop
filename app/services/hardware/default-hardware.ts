@@ -40,6 +40,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
 
     this.videoDevices.forEach(device => {
+      const existingSource = this.sourcesService.sources.find(
+        source => source.getSettings().video_device_id === device.id,
+      );
+      if (existingSource) return;
       this.sourcesService.createSource(device.id, 'dshow_input', { video_device_id: device.id }, {
         isTemporary: true,
         sourceId: device.id,
@@ -74,6 +78,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
 
   get selectedVideoSource() {
     if (!this.state.defaultVideoDevice) return;
+    const existingSource = this.sourcesService.sources.find(
+      source => source.getSettings().video_device_id === this.state.defaultVideoDevice,
+    );
+    if (existingSource) return existingSource;
     return this.sourcesService.getSource(this.state.defaultVideoDevice);
   }
 
