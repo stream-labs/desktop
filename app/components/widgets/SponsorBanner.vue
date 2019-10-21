@@ -63,15 +63,14 @@
 
 .media-container {
   position: relative;
-  width: 90%;
   margin-bottom: 20px;
 }
 
 .close-button {
   position: absolute;
   color: var(--warning);
-  top: 0;
-  right: -20px;
+  top: 2px;
+  right: 2px;
   font-size: 13px;
 }
 
