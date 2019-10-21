@@ -57,6 +57,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
 
     this.videoDevices.forEach(device => {
+      const existingSource = this.sourcesService.sources.find(
+        source => source.getSettings().video_device_id === device.id,
+      );
+      if (existingSource) return;
       this.sourcesService.removeSource(device.id);
     });
   }
