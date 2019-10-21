@@ -10,7 +10,7 @@ import { FormMonkey } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
-import { goLive, prepeareToGoLive } from './helpers/spectron/streaming';
+import { goLive, prepareToGoLive } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 
 useSpectron();
@@ -34,7 +34,7 @@ test('Streaming to Twitch without auth', async t => {
   await setFormInput(t, 'Stream key', process.env.SLOBS_TEST_STREAM_KEY);
   await app.client.click('button=Done');
 
-  await prepeareToGoLive(t);
+  await prepareToGoLive(t);
   await focusMain(t);
   await app.client.click('button=Go Live');
 
@@ -150,7 +150,7 @@ test('Go live error', async t => {
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
 
-  await prepeareToGoLive(t);
+  await prepareToGoLive(t);
 
   // simulate issues with the twitch api
   await fetchMock(t, /api\.twitch\.tv/, 404);
@@ -181,7 +181,7 @@ test('User does not have Facebook pages', async t => {
   await logIn(t, 'facebook', { noFacebookPages: true });
   const app = t.context.app;
 
-  await prepeareToGoLive(t);
+  await prepareToGoLive(t);
 
   // open EditStreamInfo window
   await app.client.click('button=Go Live');
@@ -198,7 +198,7 @@ test('User has linked twitter', async t => {
   await logIn(t, 'twitch', { hasLinkedTwitter: true });
   const app = t.context.app;
 
-  await prepeareToGoLive(t);
+  await prepareToGoLive(t);
 
   // open EditStreamInfo window
   await app.client.click('button=Go Live');

@@ -187,7 +187,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
     try {
-      await this.fetchBroadcasts();
+      await this.fetchBroadcasts(1);
     } catch (resp) {
       if (resp.status !== 403) {
         console.error(resp);
@@ -432,9 +432,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   /**
    * Fetch the list of active and upcoming broadcasts
    */
-  async fetchBroadcasts(ids?: string[]): Promise<IYoutubeLiveBroadcast[]> {
+  async fetchBroadcasts(maxResults = 50, ids?: string[]): Promise<IYoutubeLiveBroadcast[]> {
     const idsFilter = ids ? `&id=${ids.join(',')}` : '';
-    const query = `part=snippet,contentDetails,status&mine=true&status=upcoming,active&maxResults=50${idsFilter}&access_token=${
+    const query = `part=snippet,contentDetails,status&mine=true&status=upcoming,active&maxResults=${maxResults}${idsFilter}&access_token=${
       this.oauthToken
     }`;
     const broadcastsCollection = await platformAuthorizedRequest<

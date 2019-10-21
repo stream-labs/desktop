@@ -57,7 +57,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
         fullWidth: true,
         required: true,
       }),
-      description1: metadata.textArea({
+      description: metadata.textArea({
         title: $t('Description'),
         fullWidth: true,
       }),
@@ -88,7 +88,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
           <HFormGroup vModel={this.channelInfo.title} metadata={this.formMetadata.title} />
           <HFormGroup
             vModel={this.channelInfo.description}
-            metadata={this.formMetadata.description1}
+            metadata={this.formMetadata.description}
           />
         </ValidatedForm>
       )
