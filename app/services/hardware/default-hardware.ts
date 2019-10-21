@@ -41,8 +41,8 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
 
     this.videoDevices.forEach(device => {
-      const existingSource = this.sourcesService.sources.find(
-        source => source.getSettings().video_device_id === device.id,
+      const existingSource = this.existingVideoDeviceSources.find(
+        source => source.deviceId === device.id,
       );
       if (existingSource) return;
       this.sourcesService.createSource(device.id, 'dshow_input', { video_device_id: device.id }, {
@@ -52,14 +52,24 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
   }
 
+  get existingVideoDeviceSources() {
+    return this.sourcesService.sources
+      .filter(
+        source =>
+          this.videoDevices.find(device => device.id === source.getSettings().video_device_id) &&
+          source.type === 'dshow_input',
+      )
+      .map(source => ({ source, deviceId: source.getSettings().video_device_id }));
+  }
+
   clearTemporarySources() {
     this.audioDevices.forEach(device => {
       this.sourcesService.removeSource(device.id);
     });
 
     this.videoDevices.forEach(device => {
-      const existingSource = this.sourcesService.sources.find(
-        source => source.getSettings().video_device_id === device.id,
+      const existingSource = this.existingVideoDeviceSources.find(
+        source => source.deviceId === device.id,
       );
       if (existingSource) return;
       this.sourcesService.removeSource(device.id);
@@ -83,16 +93,14 @@ export class DefaultHardwareService extends PersistentStatefulService<
 
   get selectedVideoSource() {
     if (!this.state.defaultVideoDevice) return;
-    const existingSource = this.sourcesService.sources.find(
-      source =>
-        source.getSettings().video_device_id === this.state.defaultVideoDevice &&
-        source.type === 'dshow_input',
-    );
+    const existingSource = this.existingVideoDeviceSources.find(
+      source => source.deviceId === this.state.defaultVideoDevice,
+    ).source;
     if (existingSource) return existingSource;
     return this.sourcesService.getSource(this.state.defaultVideoDevice);
   }
 
-  setDefault(type: string, id: string) {
+  setDefault(type: 'audio' | 'video', id: string) {
     this.SET_DEVICE(type, id);
   }
 
