@@ -60,7 +60,10 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
   }
 
   get status(): { type: string; description: string } {
-    if (this.streamingStatus === 'reconnecting' || this.streamQuality === EStreamQuality.POOR) {
+    if (
+      this.streamingStatus === EStreamingState.Reconnecting ||
+      this.streamQuality === EStreamQuality.POOR
+    ) {
       return {
         type: 'error',
         description: $t('Streamlabs OBS is experiencing difficulties broadcasting'),
@@ -92,7 +95,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     if (notification.subType === ENotificationSubType.DEFAULT) {
       return;
     }
-    this.notifications.push(notification);
+    this.notifications.unshift(notification);
   }
 
   get statusIcon() {
