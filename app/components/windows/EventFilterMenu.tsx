@@ -71,7 +71,7 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     );
   }
 
-  renderSubFilters() {
+  get renderSubFilters() {
     return (
       <div class={styles.halfWidth}>
         {Object.keys(this.subFilters).map(
@@ -91,7 +91,7 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     );
   }
 
-  renderResubFilters() {
+  get renderResubFilters() {
     return (
       <div class={styles.fullWidth}>
         {Object.keys(this.resubFilters).map(
@@ -116,7 +116,7 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     );
   }
 
-  renderResubMonthsFilter() {
+  get renderResubMonthsFilter() {
     return (
       <div class={styles.minimum}>
         {Object.keys(this.resubFilters).map(
