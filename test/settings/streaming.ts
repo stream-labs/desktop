@@ -1,13 +1,15 @@
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { getFormInput } from '../helpers/spectron/forms';
+import { goLive } from '../helpers/spectron/streaming';
 
 useSpectron();
 
-test('Populates stream settings while logged in', async t => {
+test('Populates stream settings after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
+  await goLive(t);
   await app.client.waitForExist('.side-nav.loading', 5000, true);
   await app.client.click('.side-nav .icon-settings');
 
@@ -20,10 +22,11 @@ test('Populates stream settings while logged in', async t => {
   t.is('Auto (Recommended)', await getFormInput(t, 'Server'));
 });
 
-test('Populates stream key when logged in', async t => {
+test('Populates stream key after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
+  await goLive(t);
   await app.client.waitForExist('.side-nav.loading', 5000, true);
   await app.client.click('.side-nav .icon-settings');
 

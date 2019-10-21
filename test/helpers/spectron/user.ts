@@ -23,9 +23,9 @@ interface ITestUser {
 }
 
 interface ITestUserFeatures {
-  streamingIsDisabled: boolean;
-  noFacebookPages: boolean;
-  hasLinkedTwitter: boolean;
+  streamingIsDisabled?: boolean;
+  noFacebookPages?: boolean;
+  hasLinkedTwitter?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {

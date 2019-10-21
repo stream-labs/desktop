@@ -6,22 +6,15 @@ import {
   skipCheckingErrorsInLog
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
-import { fillForm, FormMonkey } from './helpers/form-monkey';
+import { FormMonkey } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
-import { setOutputResolution } from './helpers/spectron/output';
 const moment = require('moment');
-import { sleep } from './helpers/sleep';
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
-import { getClient } from './helpers/api-client';
-import { ScenesService } from 'services/api/external-api/scenes';
+import { goLive, prepeareToGoLive } from './helpers/spectron/streaming';
 
 
 useSpectron();
 
-async function addColorSource() {
-  const api = await getClient();
-  api.getResource('ScenesService').activeScene.createAndAddSource('MyColorSource', 'color_source');
-}
 
 
 test('Streaming to Twitch without auth', async t => {
@@ -47,11 +40,7 @@ test('Streaming to Twitch without auth', async t => {
   );
   await app.client.click('button=Done');
 
-  await setOutputResolution(t, '100x100');
-
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
-
+  await prepeareToGoLive(t);
   await focusMain(t);
   await app.client.click('button=Go Live');
 
@@ -59,33 +48,15 @@ test('Streaming to Twitch without auth', async t => {
   t.pass();
 });
 
-
 test('Streaming to Twitch', async t => {
-
   // login into the account
   if (!(await logIn(t, 'twitch'))) return;
-  const app = t.context.app;
 
-  await setOutputResolution(t, '100x100');
-
-  // add a single source to prevent showing the No-Sources dialog
-  await addColorSource();
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info, and start stream
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
+  await goLive(t, {
     title: 'SLOBS Test Stream',
     game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
   });
-  await app.client.click('button=Confirm & Go Live');
 
-  // check we're streaming
-  await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -93,31 +64,14 @@ test('Streaming to Facebook', async t => {
 
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;
-  const app = t.context.app;
-
-  // decrease resolution to reduce CPU usage
-  await setOutputResolution(t, '100x100');
-
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
 
   // set stream info, and start stream
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
+  await goLive(t, {
     title: 'SLOBS Test Stream',
     game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
-    description: 'SLOBS Test Stream Description'
+    description: 'SLOBS Test Stream Description',
   });
 
-  await app.client.click('button=Confirm & Go Live');
-
-  // check we're streaming
-  await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -126,30 +80,12 @@ test.skip('Streaming to Mixer', async t => {
 
   // login into the account
   if (!(await logIn(t, 'mixer'))) return;
-  const app = t.context.app;
-
-  // decrease resolution to reduce CPU usage
-  await setOutputResolution(t, '100x100');
-
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
 
   // set stream info, and start stream
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
+  await goLive(t, {
     title: 'SLOBS Test Stream',
     game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
   });
-
-  await app.client.click('button=Confirm & Go Live');
-
-  // check we're streaming
-  await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -157,29 +93,13 @@ test('Streaming to Youtube', async t => {
 
   // login into the account
   if (!(await logIn(t, 'youtube'))) return;
-  const app = t.context.app;
-
-  // decrease resolution to reduce CPU usage
-  await setOutputResolution(t, '100x100');
-
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
 
   // set stream info, and start stream
-  await focusChild(t);
-  await fillForm(t, 'form[name=editStreamForm]', {
+  await goLive(t, {
     title: 'SLOBS Test Stream',
     description: 'SLOBS Test Stream Description'
   });
-  await app.client.click('button=Confirm & Go Live');
 
-  // check we're streaming
-  await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
   t.pass();
 });
 
@@ -210,7 +130,7 @@ schedulingPlatforms.forEach(platform => {
         break;
 
       case 'youtube':
-        await formMonkey.fill( {
+        await formMonkey.fill({
           title: 'SLOBS Test Stream',
           description: 'SLOBS Test Stream Description',
         });
@@ -227,12 +147,11 @@ schedulingPlatforms.forEach(platform => {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
     await formMonkey.fill({
-      date: moment(tomorrow).format('MM/DD/YYYY')
+      date: moment(tomorrow).format('MM/DD/YYYY'),
     });
 
     await app.client.click('button=Schedule');
     await app.client.waitForVisible('.toast-success', 20000);
-
   });
 });
 
@@ -244,8 +163,7 @@ test('Go live error', async t => {
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
 
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
+  await prepeareToGoLive(t);
 
   // simulate issues with the twitch api
   await fetchMock(t, /api\.twitch\.tv/, 404);
@@ -277,8 +195,7 @@ test('User does not have Facebook pages', async t => {
   await logIn(t, 'facebook', { noFacebookPages: true });
   const app = t.context.app;
 
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
+  await prepeareToGoLive(t);
 
   // open EditStreamInfo window
   await app.client.click('button=Go Live');
@@ -295,8 +212,7 @@ test('User has linked twitter', async t => {
   await logIn(t, 'twitch', { hasLinkedTwitter: true });
   const app = t.context.app;
 
-  // add a single source to prevent showing No-Sources dialog
-  await addColorSource();
+  await prepeareToGoLive(t);
 
   // open EditStreamInfo window
   await app.client.click('button=Go Live');
