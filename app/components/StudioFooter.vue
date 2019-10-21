@@ -39,16 +39,16 @@
       </button>
     </div>
     <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
-      <button class="button button--default replay-button" @click="toggleReplayBuffer">{{ $t('Start Replay Buffer') }}</button>
+      <button class="circle-button" @click="toggleReplayBuffer" v-tooltip.left="$t('Start Replay Buffer')"><i class="icon-replay-buffer" /></button>
     </div>
     <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
-      <button class="button button--soft-warning" @click="toggleReplayBuffer">{{ $t('Stop') }}</button>
-      <button class="button button--default" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping">
-        {{ $t('Save Replay') }}
+      <button class="circle-button left-replay button--soft-warning" @click="toggleReplayBuffer" v-tooltip.left="$t('Stop')"><i class="fa fa-stop" /></button>
+      <button class="circle-button right-replay" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping" v-tooltip.left="$t('Save Replay')">
+        <i class="icon-save" />
       </button>
     </div>
     <div class="nav-item" v-if="canSchedule">
-      <button class="button button--default" @click="openScheduleStream" >{{ $t('Schedule Stream')}}</button>
+      <button class="circle-button" @click="openScheduleStream" v-tooltip.left="$t('Schedule Stream')"><i class="icon-date" /></button>
     </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
@@ -181,26 +181,21 @@
   }
 }
 
-.replay-button {
-  font-size: 12px;
-}
-
 .replay-button-group {
   font-size: 0;
   white-space: nowrap;
+  display: flex;
 
   > button {
     font-size: 12px;
   }
 
-  > button:nth-child(1) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+  > .left-replay {
+    border-radius: 100% 0 0 100%;
   }
 
-  > button:nth-child(2) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+  > .right-replay {
+    border-radius: 0 100% 100% 0;
   }
 }
 
