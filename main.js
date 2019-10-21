@@ -564,3 +564,7 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
     e.preventDefault();
   });
 });
+
+ipcMain.on('getMainWindowWebContentsId', e => {
+  e.returnValue = mainWindow.webContents.id;
+});
