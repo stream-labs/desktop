@@ -3,13 +3,14 @@ import electron from 'electron';
 import path from 'path';
 import { I18nService } from 'services/i18n';
 import { Spinner } from 'streamlabs-beaker';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
 import cloneDeep from 'lodash/cloneDeep';
+import { CustomizationService } from 'services/customization';
 
 class BrowserViewProps {
   src: string = '';
@@ -24,6 +25,7 @@ class BrowserViewProps {
 export default class BrowserView extends TsxComponent<BrowserViewProps> {
   @Inject() windowsService: WindowsService;
   @Inject() appService: AppService;
+  @Inject() customizationService: CustomizationService;
 
   $refs: {
     sizeContainer: HTMLDivElement;
@@ -104,6 +106,15 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
         height: Math.round(this.currentSize.y),
       });
     }
+  }
+
+  get theme() {
+    return this.customizationService.state.theme;
+  }
+
+  @Watch('theme')
+  refreshBrowser() {
+    this.browserView.webContents.loadURL(this.props.src);
   }
 
   private rectChanged(rect: { left: number; top: number; width: number; height: number }) {
