@@ -59,7 +59,7 @@ export default class HardwareSetup extends TsxComponent {
       !!this.videoDevices.length && (
         <div style="height: 200px; margin-bottom: 8px;">
           <Display
-            sourceId={this.selectedVideoDevice}
+            sourceId={this.defaultHardwareService.selectedVideoSource.sourceId}
             renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
           />
         </div>
