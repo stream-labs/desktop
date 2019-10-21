@@ -48,7 +48,7 @@
       </button>
     </div>
     <div class="nav-item" v-if="canSchedule">
-      <button class="circle-button" @click="openScheduleStream" v-tooltip="$t('Schedule Stream')"><i class="icon-date" /></button>
+      <button class="circle-button" @click="openScheduleStream" v-tooltip.left="$t('Schedule Stream')"><i class="icon-date" /></button>
     </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
