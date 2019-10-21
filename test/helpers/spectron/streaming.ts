@@ -35,12 +35,6 @@ export async function tryToGoLive(t: TExecutionContext, channelInfo?: Dictionary
     await fillForm(t, 'form[name=editStreamForm]', channelInfo);
   }
 
-  // youtube requires some delay between API requests
-  const user = getUser();
-  if (user.type === 'youtube') {
-    await sleep(10000);
-  }
-
   await app.client.waitForEnabled('button=Confirm & Go Live', 10000);
   await app.client.click('button=Confirm & Go Live');
 }

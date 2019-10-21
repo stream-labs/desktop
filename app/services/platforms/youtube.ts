@@ -187,7 +187,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    */
   async validatePlatform(): Promise<EPlatformCallResult> {
     try {
-      await this.fetchBroadcasts(1);
+      const endpoint = 'liveStreams?part=id,snippet&mine=true';
+      const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
+      await platformAuthorizedRequest(url);
+      this.SET_ENABLED_STATUS(true);
     } catch (resp) {
       if (resp.status !== 403) {
         console.error(resp);
@@ -258,7 +261,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return this.createBroadcast({ title, description, scheduledStartTime });
   }
 
-  fetchNewToken(): Promise<void> {
+  async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/youtube/token`;
     const headers = authorizedHeaders(this.userService.apiToken);

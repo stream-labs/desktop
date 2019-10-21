@@ -67,9 +67,6 @@ export async function logIn(
 
   app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
 
-  // youtube requires to have a delay between API calls
-  if (platform === 'youtube') await sleep(5000);
-
   if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;
