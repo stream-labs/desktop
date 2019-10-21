@@ -10,7 +10,6 @@ import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
-import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
@@ -23,7 +22,6 @@ import * as moment from 'moment';
     TestWidgets,
     PerformanceMetrics,
     NotificationsArea,
-    GlobalSyncStatus,
   },
 })
 export default class StudioFooterComponent extends Vue {

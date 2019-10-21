@@ -15,7 +15,6 @@
       @mouseleave="metricsShown = false"
       @click="openMetricsWindow"
     />
-    <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
     <transition name="slide">
       <performance-metrics v-if="metricsShown" class="performance-metrics" />
