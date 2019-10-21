@@ -43,23 +43,25 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    this.intervalId = window.setInterval(() => {
-      const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
-        ? obs.NodeObs.OBS_API_getPerformanceStatistics()
-        : { CPU: 0 };
+    this.intervalId = window.setInterval(() => this.update(), STATS_UPDATE_INTERVAL);
+  }
 
-      if (stats.percentageDroppedFrames) {
-        this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
-      }
+  private update() {
+    const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
+      ? obs.NodeObs.OBS_API_getPerformanceStatistics()
+      : { CPU: 0 };
 
-      const am = electron.remote.app.getAppMetrics();
+    if (stats.percentageDroppedFrames) {
+      this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
+    }
 
-      stats.CPU += am.map(proc => {
-        return proc.cpu.percentCPUUsage;
-      }).reduce((sum, usage) => sum + usage);
+    const am = electron.remote.app.getAppMetrics();
 
-      this.SET_PERFORMANCE_STATS(stats);
-    }, STATS_UPDATE_INTERVAL);
+    stats.CPU += am.map(proc => {
+      return proc.cpu.percentCPUUsage;
+    }).reduce((sum, usage) => sum + usage);
+
+    this.SET_PERFORMANCE_STATS(stats);
   }
 
   stop() {

@@ -498,8 +498,8 @@ type OptimizeItem = {
 };
 
 /** KeyDescription を OptimizeSettings にある分岐点に沿う物だけ列挙する
- * @param values 
- * @param desc 
+ * @param values
+ * @param desc
  */
 export function* iterateKeyDescriptions(
     values: OptimizeSettings,
@@ -553,8 +553,8 @@ function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boo
 
 /**
  * source を keysNeededに存在するキーに必要なだけの内容に削減したものを返す。
- * @param source 
- * @param keysNeeded 
+ * @param source
+ * @param keysNeeded
  */
 export function filterKeyDescriptions(keysNeeded: OptimizeSettings, source: KeyDescription[]): KeyDescription[] {
     const result: KeyDescription[] = [];
@@ -714,8 +714,8 @@ export class SettingsKeyAccessor {
 
     /**
      * KeyDescriptions を再帰的に渡り歩いて f を呼び出す
-     * @param keyDescriptions 
-     * @param f 
+     * @param keyDescriptions
+     * @param f
      */
     *travarseKeyDescriptions<T>(keyDescriptions: KeyDescription[], f: (d: KeyDescription) => T): IterableIterator<T> {
         for (const item of keyDescriptions) {
@@ -789,9 +789,9 @@ export class SettingsKeyAccessor {
 
     /**
     // 指定した keyに指定した値が選択肢として現れるかを確認する
-     * @param key 
-     * @param value 
-     * @param keyDescriptions 
+     * @param key
+     * @param value
+     * @param keyDescriptions
      */
     hasSpecificValue(
         key: OptimizationKey,
