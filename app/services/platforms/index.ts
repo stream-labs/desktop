@@ -1,23 +1,13 @@
-import { TwitchService } from './twitch';
-import { YoutubeService } from './youtube';
-import { MixerService } from './mixer';
-import { FacebookService, IStreamlabsFacebookPages } from './facebook';
+import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
+import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
+import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
+import { FacebookService, IFacebookChanelInfo, IFacebookStartStreamOptions } from './facebook';
 import { StreamingContext } from '../streaming';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
+import { Observable } from 'rxjs';
 
 export type Tag = TTwitchTag;
-
-export interface IChannelInfo {
-  title: string;
-  game?: string;
-  description?: string;
-  tags?: Tag[];
-  availableTags?: Tag[];
-  hasUpdateTagsPermission?: boolean;
-  facebookPageId?: string;
-}
-
 export interface IGame {
   name: string;
 }
@@ -64,7 +54,7 @@ interface IPlatformCapabilityUserInfo {
 }
 
 interface IPlatformCapabilityScheduleStream {
-  scheduleStream: (startTime: string, info: IChannelInfo) => Promise<any>;
+  scheduleStream: (startTime: string, info: TChannelInfo) => Promise<any>;
 }
 
 interface IPlatformCapabilityScopeValidation {
@@ -94,7 +84,24 @@ export enum EPlatformCallResult {
    * The user does not have 2FA enabled on their Twitch account
    */
   TwitchTwoFactor,
+
+  /**
+   * The user does not have live-streaming enabled on their Youtube account
+   */
+  YoutubeStreamingDisabled,
 }
+
+export type TStartStreamOptions =
+  | ITwitchStartStreamOptions
+  | IYoutubeStartStreamOptions
+  | IFacebookStartStreamOptions
+  | IMixerStartStreamOptions;
+
+export type TChannelInfo =
+  | IYoutubeChannelInfo
+  | ITwitchChannelInfo
+  | IFacebookChanelInfo
+  | IMixerChannelInfo;
 
 // All platform services should implement this interface.
 export interface IPlatformService {
@@ -104,31 +111,32 @@ export interface IPlatformService {
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService;
 
+  channelInfoChanged: Observable<TChannelInfo>;
+
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
   authUrl: string;
 
-  // This function is responsible for setting up stream
-  // settings for this platform.
-  setupStreamSettings: () => Promise<EPlatformCallResult>;
+  /**
+   * Check the user's ability to stream to the platform
+   */
+  validatePlatform: () => Promise<EPlatformCallResult>;
 
   fetchViewerCount: () => Promise<number>;
 
   fetchUserInfo: () => Promise<IUserInfo>;
 
-  putChannelInfo: (channelInfo: IChannelInfo) => Promise<boolean>;
+  putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
 
   searchGames: (searchString: string) => Promise<IGame[]>;
 
-  getChatUrl: (mode: string) => Promise<string>;
-
-  beforeGoLive: () => Promise<any>;
+  beforeGoLive: (options?: TStartStreamOptions) => Promise<any>;
 
   afterGoLive?: (context?: StreamingContext) => Promise<void>;
 
-  prepopulateInfo: () => Promise<IChannelInfo>;
+  prepopulateInfo: () => Promise<TStartStreamOptions>;
 
-  scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
+  scheduleStream?: (startTime: string, info: TChannelInfo) => Promise<any>;
 
   fetchNewToken: () => Promise<void>;
 

@@ -5,7 +5,7 @@
 
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
-        <a class="description-link" @click="refreshStreamInfo">{{
+        <a class="description-link" @click="populateInfo">{{
           $t('fetching the information again')
         }}</a
         >, {{ $t('or you can') }}
@@ -30,15 +30,22 @@
             options: facebookService.state.facebookPages.options,
           }"
         />
-        <h-form-group
-          v-model="channelInfo.title"
-          :metadata="formMetadata.title"
-        />
-        <h-form-group
-          v-if="isYoutube || isFacebook"
-          v-model="channelInfo.description"
-          :metadata="formMetadata.description"
-        />
+
+        <div v-if="isYoutube">
+          <YoutubeEditStreamInfo v-model="channelInfo" :canChangeBroadcast="!midStreamMode && !isSchedule"/>
+        </div>
+        <div v-else>
+          <h-form-group
+            v-model="channelInfo.title"
+            :metadata="formMetadata.title"
+          />
+          <h-form-group
+            v-if="isFacebook"
+            v-model="channelInfo.description"
+            :metadata="formMetadata.description"
+          />
+        </div>
+
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
           :metadata="formMetadata.game"
@@ -103,7 +110,7 @@
                 'Something went wrong while updating your stream info. You can try again, or you can',
               )
             }}
-            <a @click="goLive">{{ $t('just go live') }}</a
+            <a @click="goLive(true)">{{ $t('just go live') }}</a
             >
           </div>
         </div>

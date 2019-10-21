@@ -4,11 +4,11 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from '../../services/user';
 import { Inject } from '../../services/core/injector';
-import { getPlatformService, IChannelInfo } from 'services/platforms';
+import { getPlatformService, TChannelInfo } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -29,6 +29,7 @@ import { Debounce } from 'lodash-decorators';
 import { Spinner } from 'streamlabs-beaker';
 import ValidatedForm from '../shared/inputs/ValidatedForm';
 import Utils from 'services/utils';
+import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
 
 @Component({
   components: {
@@ -40,6 +41,7 @@ import Utils from 'services/utils';
     ValidatedForm,
     Spinner,
     Twitter,
+    YoutubeEditStreamInfo,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -73,7 +75,7 @@ export default class EditStreamInfo extends Vue {
   tweetModel: string = '';
 
   searchProfilesPending = false;
-  channelInfo: IChannelInfo = null;
+  channelInfo: TCombinedChannelInfo = null;
 
   $refs: {
     form: ValidatedForm;
@@ -148,7 +150,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   async created() {
-    await this.refreshStreamInfo();
+    await this.populateInfo();
   }
 
   @Debounce(500)
@@ -204,33 +206,35 @@ export default class EditStreamInfo extends Vue {
 
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
-    this.streamInfoService
-      .setChannelInfo(this.channelInfo)
-      .then(success => {
-        if (success) {
-          if (this.midStreamMode) {
+    if (this.midStreamMode) {
+      const platform = this.userService.getPlatformService();
+      platform
+        .putChannelInfo(this.channelInfo)
+        .then(success => {
+          if (success) {
             this.windowsService.closeChildWindow();
           } else {
-            this.goLive();
+            this.updateError = true;
+            this.updatingInfo = false;
           }
-        } else {
-          this.updateError = true;
+        })
+        .catch(e => {
+          this.$toasted.show(e, {
+            position: 'bottom-center',
+            className: 'toast-alert',
+            duration: 1000,
+            singleton: true,
+          });
           this.updatingInfo = false;
-        }
-      })
-      .catch(e => {
-        this.$toasted.show(e, {
-          position: 'bottom-center',
-          className: 'toast-alert',
-          duration: 1000,
-          singleton: true,
         });
-        this.updatingInfo = false;
-      });
+      return;
+    }
 
     if (this.selectedProfile && this.useOptimizedProfile) {
       this.videoEncodingOptimizationService.applyProfile(this.selectedProfile);
     }
+
+    this.goLive();
   }
 
   async scheduleStream() {
@@ -310,9 +314,10 @@ export default class EditStreamInfo extends Vue {
     return success;
   }
 
-  async goLive() {
+  async goLive(force = false) {
     try {
-      await this.streamingService.toggleStreaming();
+      await this.streamingService.toggleStreaming(this.channelInfo, force);
+      this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
     } catch (e) {
       this.$toasted.show(e, {
@@ -321,6 +326,7 @@ export default class EditStreamInfo extends Vue {
         duration: 1000,
         singleton: true,
       });
+      this.updateError = false;
       this.updatingInfo = false;
     }
   }
@@ -329,12 +335,9 @@ export default class EditStreamInfo extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  async refreshStreamInfo() {
-    // This should have been pre-fetched, but we can force a refresh
-    await this.streamInfoService.refreshStreamInfo();
-
+  async populateInfo() {
     // set a local state of the channelInfo
-    this.channelInfo = cloneDeep(this.streamInfoService.state.channelInfo);
+    this.channelInfo = cloneDeep(await this.platform.prepopulateInfo()) as TCombinedChannelInfo;
 
     // the ListInput component requires the selected game to be in the options list
     if (this.channelInfo.game) {
@@ -343,6 +346,10 @@ export default class EditStreamInfo extends Vue {
 
     // check available profiles for the selected game
     await this.loadAvailableProfiles();
+  }
+
+  get platform() {
+    return this.userService.getPlatformService();
   }
 
   get isTwitch() {

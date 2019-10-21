@@ -17,7 +17,7 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, TStartStreamOptions } from 'services/platforms';
 import { UserService } from 'services/user';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
@@ -129,15 +129,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * @deprecated Use toggleStreaming instead
    */
-  startStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  startStreaming() {
+    this.toggleStreaming();
   }
 
   /**
    * @deprecated Use toggleStreaming instead
    */
-  stopStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  stopStreaming() {
+    this.toggleStreaming();
   }
 
   private finishStartStreaming() {
@@ -162,20 +162,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  async toggleStreaming(ctx?: StreamingContext) {
-    this.context = ctx;
-
+  async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      if (force) {
+        this.finishStartStreaming();
+        return Promise.resolve();
+      }
       try {
         if (this.userService.isLoggedIn && this.userService.platform) {
           const service = getPlatformService(this.userService.platform.type);
 
-          // update stream key and stream settings for platform
           if (this.streamSettingsService.protectedModeEnabled) {
-            await service.setupStreamSettings();
+            await service.beforeGoLive(options);
           }
-
-          await service.beforeGoLive();
         }
         this.finishStartStreaming();
         return Promise.resolve();
@@ -387,9 +386,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          if (this.streamInfoService.state.channelInfo) {
-            game = this.streamInfoService.state.channelInfo.game;
-          }
+          game = this.streamInfoService.state.game;
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }

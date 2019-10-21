@@ -1,7 +1,6 @@
 import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
-  IChannelInfo,
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
@@ -9,24 +8,39 @@ import {
   IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
-import { Inject } from '../core/injector';
+import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
+import { Subject } from 'rxjs';
+import { ITwitchChannelInfo } from './twitch';
+import { CustomizationService } from 'services/customization';
 
 interface IMixerServiceState {
   typeIdMap: object;
+}
+
+export interface IMixerStartStreamOptions {
+  title: string;
+  game: string;
+}
+
+export interface IMixerChannelInfo extends IMixerStartStreamOptions {
+  channelId: string;
+  chatUrl: string;
 }
 
 export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private customizationService: CustomizationService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
+  channelInfoChanged = new Subject<IMixerChannelInfo>();
+  private activeChannel: IMixerChannelInfo;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 800,
@@ -66,6 +80,18 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.userService.channelId;
   }
 
+  init() {
+    // prepopulate data to make chat available after app start
+    this.userService.userLogin.subscribe(_ => {
+      if (this.userService.platform.type === 'mixer') this.prepopulateInfo();
+    });
+
+    this.customizationService.settingsChanged.subscribe(updatedSettings => {
+      // trigger `channelInfoChanged` event to with new chat url based on the changed theme
+      if (updatedSettings.theme) this.updateActiveChannel({});
+    });
+  }
+
   getHeaders(req: IPlatformRequest, authorized = false) {
     return {
       'Content-Type': 'application/json',
@@ -73,29 +99,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     };
   }
 
-  setupStreamSettings() {
-    return this.fetchStreamKey()
-      .then(key => {
-        const currentStreamSettings = this.streamSettingsService.settings;
-
-        // disable protectedMode for users who manually changed their stream key before
-        const needToDisableProtectedMode: boolean =
-          currentStreamSettings.platform === 'mixer' &&
-          currentStreamSettings.key &&
-          currentStreamSettings.key !== key;
-
-        if (needToDisableProtectedMode) {
-          this.streamSettingsService.setSettings({ protectedModeEnabled: false });
-        } else {
-          this.streamSettingsService.setSettings({
-            key,
-            platform: 'mixer',
-            protectedModeEnabled: true,
-          });
-        }
-        return EPlatformCallResult.Success;
-      })
-      .catch(() => EPlatformCallResult.Error);
+  validatePlatform() {
+    // there is nothing to validate for Mixer
+    return Promise.resolve(EPlatformCallResult.Success);
   }
 
   fetchUserInfo() {
@@ -112,7 +118,6 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       .then(handlePlatformResponse)
       .then(response => {
         this.userService.updatePlatformToken(response.access_token);
-        this.setupStreamSettings();
       });
   }
 
@@ -129,23 +134,32 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
   }
 
-  fetchChannelInfo(): Promise<IChannelInfo> {
-    return this.fetchRawChannelInfo().then(json => {
-      let gameTitle = '';
+  async prepopulateInfo() {
+    const json = await this.fetchRawChannelInfo();
+    let gameTitle = '';
 
-      if (json.type && json.type.name) {
-        gameTitle = json.type.name;
-      }
+    if (json.type && json.type.name) {
+      gameTitle = json.type.name;
+    }
 
-      return {
-        title: json.name,
-        game: gameTitle,
-      };
+    this.updateActiveChannel({
+      channelId: json.id,
+      title: json.name,
+      game: gameTitle,
     });
+
+    return this.activeChannel;
   }
 
-  prepopulateInfo() {
-    return this.fetchChannelInfo();
+  private updateActiveChannel(patch: Partial<IMixerChannelInfo>) {
+    if (!this.activeChannel) this.activeChannel = {} as IMixerChannelInfo;
+    const channelId = patch.channelId || this.activeChannel.channelId;
+    this.activeChannel = {
+      ...this.activeChannel,
+      chatUrl: this.getChatUrl(channelId),
+      ...patch,
+    };
+    this.channelInfoChanged.next(this.activeChannel);
   }
 
   fetchViewerCount(): Promise<number> {
@@ -154,18 +168,20 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     );
   }
 
-  putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
+  async putChannelInfo({ title, game }: ITwitchChannelInfo): Promise<boolean> {
     const data = { name: title };
 
     if (this.state.typeIdMap[game]) {
       data['typeId'] = this.state.typeIdMap[game];
     }
 
-    return platformAuthorizedRequest({
+    await platformAuthorizedRequest({
       url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
     });
+    this.updateActiveChannel({ title, game });
+    return true;
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
@@ -179,16 +195,29 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     });
   }
 
-  getChatUrl(mode: string): Promise<string> {
-    return new Promise(resolve => {
-      this.fetchRawChannelInfo().then(json => {
-        resolve(`https://mixer.com/embed/chat/${json.id}`);
-      });
-    });
+  private getChatUrl(channelId: string): string {
+    return `https://mixer.com/embed/chat/${channelId}`;
   }
 
-  beforeGoLive() {
-    return Promise.resolve();
+  async beforeGoLive(startStreamOptions?: IMixerStartStreamOptions) {
+    const key = await this.fetchStreamKey();
+    const currentStreamSettings = this.streamSettingsService.settings;
+
+    // disable protectedMode for users who manually changed their stream key before
+    const needToDisableProtectedMode: boolean =
+      currentStreamSettings.platform === 'mixer' &&
+      currentStreamSettings.key &&
+      currentStreamSettings.key !== key;
+
+    if (needToDisableProtectedMode) {
+      this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+    } else {
+      this.streamSettingsService.setSettings({
+        key,
+        platform: 'mixer',
+        protectedModeEnabled: true,
+      });
+    }
   }
 
   // TODO: dedup

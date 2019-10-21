@@ -316,7 +316,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
 
-    const result = await service.setupStreamSettings();
+    const result = await service.validatePlatform();
 
     // Currently we treat generic errors as success
     if (result === EPlatformCallResult.TwitchTwoFactor) {
