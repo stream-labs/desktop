@@ -10,7 +10,8 @@ test('Populates stream settings after go live', async t => {
 
   await logIn(t);
   await goLive(t);
-  await app.client.waitForExist('.side-nav.loading', 5000, true);
+
+  await focusMain(t);
   await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
@@ -27,7 +28,8 @@ test('Populates stream key after go live', async t => {
 
   await logIn(t);
   await goLive(t);
-  await app.client.waitForExist('.side-nav.loading', 5000, true);
+
+  await focusMain(t);
   await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);

@@ -30,6 +30,7 @@ export async function tryToGoLive(t: TExecutionContext, channelInfo?: Dictionary
   // set stream info, and start stream
   await focusChild(t);
   if (channelInfo) await fillForm(t, 'form[name=editStreamForm]', channelInfo);
+  await app.client.waitForEnabled('button=Confirm & Go Live', 10000);
   await app.client.click('button=Confirm & Go Live');
 }
 

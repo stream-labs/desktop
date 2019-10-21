@@ -3,7 +3,7 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog
+  skipCheckingErrorsInLog,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { FormMonkey } from './helpers/form-monkey';
@@ -11,11 +11,9 @@ import { logIn } from './helpers/spectron/user';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
 import { goLive, prepeareToGoLive } from './helpers/spectron/streaming';
-
+import { TPlatform } from '../app/services/platforms';
 
 useSpectron();
-
-
 
 test('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
@@ -33,11 +31,7 @@ test('Streaming to Twitch without auth', async t => {
   await app.client.click('li=Stream');
 
   // This is the twitch.tv/slobstest stream key
-  await setFormInput(
-    t,
-    'Stream key',
-    process.env.SLOBS_TEST_STREAM_KEY
-  );
+  await setFormInput(t, 'Stream key', process.env.SLOBS_TEST_STREAM_KEY);
   await app.client.click('button=Done');
 
   await prepeareToGoLive(t);
@@ -54,21 +48,20 @@ test('Streaming to Twitch', async t => {
 
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
 
   t.pass();
 });
 
 test('Streaming to Facebook', async t => {
-
   // login into the account
   if (!(await logIn(t, 'facebook'))) return;
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
     description: 'SLOBS Test Stream Description',
   });
 
@@ -77,39 +70,36 @@ test('Streaming to Facebook', async t => {
 
 // TODO: We can't stream to Mixer anymore because they require channels to pass review
 test.skip('Streaming to Mixer', async t => {
-
   // login into the account
   if (!(await logIn(t, 'mixer'))) return;
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
   t.pass();
 });
 
 test('Streaming to Youtube', async t => {
-
   // login into the account
   if (!(await logIn(t, 'youtube'))) return;
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    description: 'SLOBS Test Stream Description'
+    description: 'SLOBS Test Stream Description',
   });
 
   t.pass();
 });
-
 
 // test scheduling for each platform
 const schedulingPlatforms = ['facebook', 'youtube'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
     // login into the account
-    if (!(await logIn(t, platform))) return;
+    if (!(await logIn(t, platform as TPlatform))) return;
     const app = t.context.app;
 
     // open EditStreamInfo window
@@ -124,7 +114,7 @@ schedulingPlatforms.forEach(platform => {
       case 'facebook':
         await formMonkey.fill({
           title: 'SLOBS Test Stream',
-          game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
           description: 'SLOBS Test Stream Description',
         });
         break;
@@ -155,10 +145,7 @@ schedulingPlatforms.forEach(platform => {
   });
 });
 
-
-
 test('Go live error', async t => {
-
   // login into the account
   if (!(await logIn(t, 'twitch'))) return;
   const app = t.context.app;
@@ -180,13 +167,12 @@ test('Go live error', async t => {
   t.pass();
 });
 
-
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
   await logIn(t, 'youtube', { streamingIsDisabled: true });
   t.true(
     await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
-    'The streaming-disabled message should be visible'
+    'The streaming-disabled message should be visible',
   );
 });
 
@@ -203,7 +189,7 @@ test('User does not have Facebook pages', async t => {
 
   t.true(
     await t.context.app.client.isExisting('a=Facebook Page Creation'),
-    'The link for adding new facebook changes should exist'
+    'The link for adding new facebook changes should exist',
   );
 });
 
@@ -219,9 +205,9 @@ test('User has linked twitter', async t => {
   await focusChild(t);
 
   // check the "Unlink" button
-  await t.context.app.client.waitForVisible('button=Unlink Twitter')
+  await t.context.app.client.waitForVisible('button=Unlink Twitter');
   t.true(
     await t.context.app.client.isExisting('button=Unlink Twitter'),
-    'The button for unlinking Twitter should exist'
+    'The button for unlinking Twitter should exist',
   );
 });
