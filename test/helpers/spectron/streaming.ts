@@ -50,6 +50,5 @@ export async function goLive(t: TExecutionContext, channelInfo?: Dictionary<stri
 
   // check we're streaming
   await focusMain(t);
-  await sleep(99999999);
   await t.context.app.client.waitForExist('button=End Stream', 20 * 1000);
 }
