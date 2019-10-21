@@ -192,7 +192,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
    */
   async prepopulateInfo() {
     await this.fetchActivePage();
-    if (!this.state.activePage || !this.state.activePage.id) return;
+    if (!this.state.activePage || !this.state.activePage.id) return {};
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
       'fields=status,stream_url,title,description';

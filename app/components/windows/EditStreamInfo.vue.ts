@@ -76,6 +76,7 @@ export default class EditStreamInfo extends Vue {
 
   searchProfilesPending = false;
   channelInfo: TCombinedChannelInfo = null;
+  infoError = false;
 
   $refs: {
     form: ValidatedForm;
@@ -281,7 +282,7 @@ export default class EditStreamInfo extends Vue {
 
   async handleSubmit() {
     if (this.infoError || this.updateError) {
-      await this.goLive();
+      await this.goLive(true);
       return;
     }
 
@@ -336,8 +337,16 @@ export default class EditStreamInfo extends Vue {
   }
 
   async populateInfo() {
-    // set a local state of the channelInfo
-    this.channelInfo = cloneDeep(await this.platform.prepopulateInfo()) as TCombinedChannelInfo;
+    // set the local state of the channelInfo
+    this.channelInfo = null;
+    this.infoError = false;
+    try {
+      this.channelInfo = cloneDeep(await this.platform.prepopulateInfo()) as TCombinedChannelInfo;
+      this.infoError = false;
+    } catch (e) {
+      this.infoError = true;
+      return;
+    }
 
     // the ListInput component requires the selected game to be in the options list
     if (this.channelInfo.game) {
@@ -397,11 +406,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get infoLoading() {
-    return !this.channelInfo || this.streamInfoService.state.fetching;
-  }
-
-  get infoError() {
-    return this.streamInfoService.state.error;
+    return !this.channelInfo && !this.infoError;
   }
 
   openFBPageCreateLink() {

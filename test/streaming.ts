@@ -12,6 +12,7 @@ const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
 import { goLive, prepareToGoLive } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
+import { sleep } from './helpers/sleep';
 
 useSpectron();
 

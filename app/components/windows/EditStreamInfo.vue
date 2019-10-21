@@ -9,7 +9,7 @@
           $t('fetching the information again')
         }}</a
         >, {{ $t('or you can') }}
-        <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
+        <a class="description-link" @click="() => goLive(true)">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
