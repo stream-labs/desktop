@@ -336,5 +336,6 @@ export async function fillForm(
   selector: string,
   formData: Dictionary<any>,
 ): Promise<any> {
-  return new FormMonkey(t, selector).fill(formData);
+  const formSelector = selector || DEFAULT_SELECTOR;
+  return new FormMonkey(t, formSelector).fill(formData);
 }
