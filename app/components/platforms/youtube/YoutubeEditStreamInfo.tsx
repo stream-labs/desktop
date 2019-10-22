@@ -28,10 +28,12 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
   @Inject() private youtubeService: YoutubeService;
   channelInfo: IYoutubeStartStreamOptions = null;
   broadcasts: IYoutubeLiveBroadcast[] = [];
+  broadcastsLoaded = false;
 
   async created() {
     this.channelInfo = cloneDeep(this.props.value);
     this.broadcasts = await this.youtubeService.fetchBroadcasts();
+    this.broadcastsLoaded = true;
   }
 
   @Watch('value')
@@ -63,6 +65,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
       }),
       event: {
         broadcasts: this.broadcasts,
+        loading: !this.broadcastsLoaded,
         disabled: !this.props.canChangeBroadcast,
       },
     });

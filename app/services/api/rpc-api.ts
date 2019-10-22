@@ -108,7 +108,7 @@ export abstract class RpcApi extends Service {
         code: E_JSON_RPC_ERROR.INVALID_PARAMS,
         message: `resource not found: ${resourceId}`,
       });
-    } else if (!resource[methodName]) {
+    } else if (resource[methodName] === void 0) {
       errorResponse = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
         message: methodName,

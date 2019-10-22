@@ -3,16 +3,39 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog,
+  skipCheckingErrorsInLog
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
-import { FormMonkey } from './helpers/form-monkey';
+import { fillForm, FormMonkey } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
+
+<<<<<<< HEAD
+:
+test / streaming.ts
+=== === =
+import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
+
+>>>>>>>
+staging:test / streaming.js;
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
+
+<<<<<<< HEAD
+:
+test / streaming.ts;
 import { goLive, prepareToGoLive } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { sleep } from './helpers/sleep';
+import { setTemporaryRecordingPath } from './helpers/spectron/output';
+
+======
+=
+import { getClient } from './helpers/api-client';
+import { ScenesService } from 'services/api/external-api/scenes';
+import { readdir } from 'fs-extra';
+
+>>>>>>>
+staging:test / streaming.js;
 
 useSpectron();
 
@@ -45,11 +68,15 @@ test('Streaming to Twitch without auth', async t => {
 
 test('Streaming to Twitch', async t => {
   // login into the account
-  if (!(await logIn(t, 'twitch'))) return;
+  if (!(
+    await logIn(t, 'twitch')
+  )) {
+    return;
+  }
 
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
   });
 
   t.pass();
@@ -57,13 +84,17 @@ test('Streaming to Twitch', async t => {
 
 test('Streaming to Facebook', async t => {
   // login into the account
-  if (!(await logIn(t, 'facebook'))) return;
+  if (!(
+    await logIn(t, 'facebook')
+  )) {
+    return;
+  }
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
-    description: 'SLOBS Test Stream Description',
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+    description: 'SLOBS Test Stream Description'
   });
 
   t.pass();
@@ -72,24 +103,32 @@ test('Streaming to Facebook', async t => {
 // TODO: We can't stream to Mixer anymore because they require channels to pass review
 test.skip('Streaming to Mixer', async t => {
   // login into the account
-  if (!(await logIn(t, 'mixer'))) return;
+  if (!(
+    await logIn(t, 'mixer')
+  )) {
+    return;
+  }
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
   });
   t.pass();
 });
 
 test('Streaming to Youtube', async t => {
   // login into the account
-  if (!(await logIn(t, 'youtube'))) return;
+  if (!(
+    await logIn(t, 'youtube')
+  )) {
+    return;
+  }
 
   // set stream info, and start stream
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    description: 'SLOBS Test Stream Description',
+    description: 'SLOBS Test Stream Description'
   });
 
   t.pass();
@@ -100,7 +139,11 @@ const schedulingPlatforms = ['facebook', 'youtube'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
     // login into the account
-    if (!(await logIn(t, platform as TPlatform))) return;
+    if (!(
+      await logIn(t, platform as TPlatform)
+    )) {
+      return;
+    }
     const app = t.context.app;
 
     // open EditStreamInfo window
@@ -114,17 +157,17 @@ schedulingPlatforms.forEach(platform => {
     switch (platform) {
       case 'facebook':
         await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
-          description: 'SLOBS Test Stream Description',
-        });
+                                title: 'SLOBS Test Stream',
+                                game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS',
+                                description: 'SLOBS Test Stream Description'
+                              });
         break;
 
       case 'youtube':
         await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          description: 'SLOBS Test Stream Description',
-        });
+                                title: 'SLOBS Test Stream',
+                                description: 'SLOBS Test Stream Description'
+                              });
         break;
     }
 
@@ -138,8 +181,8 @@ schedulingPlatforms.forEach(platform => {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
     await formMonkey.fill({
-      date: moment(tomorrow).format('MM/DD/YYYY'),
-    });
+                            date: moment(tomorrow).format('MM/DD/YYYY')
+                          });
 
     await app.client.click('button=Schedule');
     await app.client.waitForVisible('.toast-success', 20000);
@@ -148,7 +191,11 @@ schedulingPlatforms.forEach(platform => {
 
 test('Go live error', async t => {
   // login into the account
-  if (!(await logIn(t, 'twitch'))) return;
+  if (!(
+    await logIn(t, 'twitch')
+  )) {
+    return;
+  }
   const app = t.context.app;
 
   await prepareToGoLive(t);
@@ -178,7 +225,7 @@ test('Youtube streaming is disabled', async t => {
   await logIn(t, 'youtube', { streamingIsDisabled: true });
   t.true(
     await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
-    'The streaming-disabled message should be visible',
+    'The streaming-disabled message should be visible'
   );
 });
 
@@ -195,7 +242,7 @@ test('User does not have Facebook pages', async t => {
 
   t.true(
     await t.context.app.client.isExisting('a=Facebook Page Creation'),
-    'The link for adding new facebook changes should exist',
+    'The link for adding new facebook changes should exist'
   );
 });
 
@@ -214,6 +261,41 @@ test('User has linked twitter', async t => {
   await t.context.app.client.waitForVisible('button=Unlink Twitter');
   t.true(
     await t.context.app.client.isExisting('button=Unlink Twitter'),
-    'The button for unlinking Twitter should exist',
+    'The button for unlinking Twitter should exist'
   );
+});
+
+
+test('Recording when streaming', async t => {
+  await logIn(t);
+  const app = t.context.app;
+
+  // enable RecordWhenStreaming
+  await focusMain(t);
+  await app.client.click('.side-nav .icon-settings');
+  await focusChild(t);
+  await app.client.click('li=General');
+  await fillForm(t, null, { RecordWhenStreaming: true });
+
+  const tmpDir = await setTemporaryRecordingPath(t);
+
+  // open EditStreamInfo window
+  await focusMain(t);
+  await app.client.click('button=Go Live');
+
+  // set stream info, and start stream
+  await focusChild(t);
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
+  });
+  await app.client.click('button=Confirm & Go Live');
+
+  // Stop recording
+  await app.client.click('.record-button');
+  await app.client.waitForVisible('.record-button:not(.active)', 15000);
+
+  // check that recording has been created
+  const files = await readdir(tmpDir);
+  t.true(files.length === 1, 'Should be one recoded file');
 });
