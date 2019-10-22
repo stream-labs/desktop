@@ -436,15 +436,24 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   /**
    * Fetch the list of active and upcoming broadcasts
    */
-  async fetchBroadcasts(maxResults = 50, ids?: string[]): Promise<IYoutubeLiveBroadcast[]> {
+  async fetchBroadcasts(ids?: string[]): Promise<IYoutubeLiveBroadcast[]> {
     const idsFilter = ids ? `&id=${ids.join(',')}` : '';
-    const query = `part=snippet,contentDetails,status&mine=true&status=upcoming,active&maxResults=${maxResults}${idsFilter}&access_token=${
+    const query = `part=snippet,contentDetails,status&mine=true&status=upcoming,active&maxResults=50${idsFilter}&access_token=${
       this.oauthToken
     }`;
     const broadcastsCollection = await platformAuthorizedRequest<
       IYoutubeCollection<IYoutubeLiveBroadcast>
     >(`${this.apiBase}/liveBroadcasts?${query}`);
-    return broadcastsCollection.items;
+
+    // cap broadcasts list depending on the current date
+    // unfortunately YT API doesn't provide a way to filter broadcasts by date
+    return broadcastsCollection.items.filter(broadcast => {
+      const timeRange = 1000 * 60 * 60 * 24;
+      const maxDate = Date.now() + timeRange;
+      const minDate = Date.now() - timeRange;
+      const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
+      return broadcastDate > minDate && broadcastDate < maxDate;
+    });
   }
 
   private getChatUrl(broadcastId: string) {
