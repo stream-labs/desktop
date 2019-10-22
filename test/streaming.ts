@@ -164,7 +164,12 @@ test('Go live error', async t => {
   // check that the error text is shown
   await app.client.waitForVisible('a=just go live.');
 
+  // stop simulating network issues and retry fetching the channelInfo
   await resetFetchMock(t);
+  await focusChild(t);
+  await app.client.click('a=fetching the information again');
+  await app.client.waitForVisible('button=Confirm & Go Live');
+
   t.pass();
 });
 
