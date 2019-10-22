@@ -4,6 +4,7 @@
         :value="value"
         :options="editorOptions[metadata.type]"
         @input="value => emitInput(value)"
+        :viewportMargin="Infinity"
     />
   </div>
 </template>
@@ -16,6 +17,6 @@
 
   .CodeMirror {
     font-size: 10pt;
-    min-height: 425px;
+    height: auto;
   }
 </style>
