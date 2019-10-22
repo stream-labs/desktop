@@ -191,6 +191,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
       await platformAuthorizedRequest(url);
       this.SET_ENABLED_STATUS(true);
+      return EPlatformCallResult.Success;
     } catch (resp) {
       if (resp.status !== 403) {
         console.error(resp);
