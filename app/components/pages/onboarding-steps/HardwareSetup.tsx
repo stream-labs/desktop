@@ -10,6 +10,21 @@ import { ERenderingMode } from '../../../../obs-api';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';
 
+const styles = {
+  volmeter: {
+    position: 'relative',
+    background: 'var(--section)',
+    height: '16px',
+    borderRadius: '4px',
+  },
+  center: {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(0, -14%)',
+    width: '100%',
+  },
+};
+
 @Component({})
 export default class HardwareSetup extends TsxComponent {
   @Inject() defaultHardwareService: DefaultHardwareService;
@@ -84,7 +99,12 @@ export default class HardwareSetup extends TsxComponent {
             />
           )}
           {this.defaultHardwareService.selectedAudioSource && (
-            <MixerVolmeter audioSource={this.defaultHardwareService.selectedAudioSource} />
+            <div style={styles.volmeter}>
+              <MixerVolmeter
+                audioSource={this.defaultHardwareService.selectedAudioSource}
+                style={styles.center}
+              />
+            </div>
           )}
           <VFormGroup
             metadata={metadata.list({ options: this.audioDevices, title: $t('Select your mic') })}
