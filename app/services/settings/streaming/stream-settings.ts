@@ -1,11 +1,8 @@
-import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { mutation, PersistentStatefulService } from '../../core';
-import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
-import { invert } from 'lodash';
 
 /**
  * settings that we keep in the localStorage
@@ -96,8 +93,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
-      replayBufferWhileStreaming: obsGeneralSettings.RecordWhenStreaming,
-      warnBeforeStoppingStream: obsGeneralSettings.WarnBeforeStartingStream,
+      replayBufferWhileStreaming: obsGeneralSettings.ReplayBufferWhileStreaming,
+      warnBeforeStoppingStream: obsGeneralSettings.WarnBeforeStoppingStream,
       keepRecordingWhenStreamStops: obsGeneralSettings.KeepRecordingWhenStreamStops,
       keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
       delayEnable: obsAdvancedSettings.DelayEnable,
