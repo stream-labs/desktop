@@ -1,9 +1,10 @@
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { EDeviceType, HardwareService } from './hardware';
 import { Inject } from 'services/core/injector';
-import { AudioService } from 'services/audio';
+import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { SourcesService, ISourceAddOptions } from 'services/sources';
 import { mutation } from 'services/core';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;
@@ -21,6 +22,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
   @Inject() private sourcesService: SourcesService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   init() {
     super.init();
@@ -101,8 +103,28 @@ export class DefaultHardwareService extends PersistentStatefulService<
     return this.sourcesService.getSource(this.state.defaultVideoDevice);
   }
 
+  setSceneCollectionAudio(id: string) {
+    const collectionManifest = this.sceneCollectionsService.collections.find(
+      collection => collection.auto,
+    );
+
+    const audioSource = this.sourcesService.sources.find(
+      source => source.channel === E_AUDIO_CHANNELS.INPUT_1,
+    );
+    if (
+      audioSource &&
+      collectionManifest &&
+      this.sceneCollectionsService.activeCollection.id === collectionManifest.id
+    ) {
+      audioSource.updateSettings({ device_id: id });
+    }
+  }
+
   setDefault(type: 'audio' | 'video', id: string) {
     this.SET_DEVICE(type, id);
+    if (type === 'audio') {
+      this.setSceneCollectionAudio(id);
+    }
   }
 
   @mutation()
