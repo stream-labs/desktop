@@ -132,7 +132,7 @@ export class TwitchService extends Service implements IPlatformService {
       });
     }
 
-    await this.putChannelInfo(channelInfo);
+    if (channelInfo) await this.putChannelInfo(channelInfo);
   }
 
   /**
