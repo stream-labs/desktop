@@ -131,6 +131,13 @@ async function getUpdateId(info: IUpdateInfo): Promise<string> {
 async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersionInfo) {
   const updateId = await getUpdateId(info);
 
+  // Useful for debugging. This update id will always induce
+  // an update regardless of rollout or seed.
+  if (updateId === 'updateplz') {
+    log.info('Detected update id short circuit code.');
+    return true;
+  }
+
   // Combine the update id with the seed from the server and hash into 1 of 100 buckets
   const bucket = hashToInt(`${updateId}${latestVersion.seed}`) % 100;
 
