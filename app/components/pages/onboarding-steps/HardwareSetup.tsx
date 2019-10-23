@@ -31,7 +31,7 @@ export default class HardwareSetup extends TsxComponent {
 
   mounted() {
     this.defaultHardwareService.createTemporarySources();
-    if (this.videoDevices[0]) this.selectedVideoDevice = this.videoDevices[0].value;
+    if (this.videoDevices[0]) this.setVideoDevice(this.videoDevices[0].value);
   }
 
   destroyed() {
@@ -64,8 +64,17 @@ export default class HardwareSetup extends TsxComponent {
     return this.defaultHardwareService.state.defaultVideoDevice;
   }
 
-  set selectedVideoDevice(val: string) {
-    this.defaultHardwareService.setDefault('video', val);
+  setVideoDevice(val: string) {
+    try {
+      this.defaultHardwareService.setDefault('video', val);
+    } catch {
+      this.$toasted.show($t('This device is not available'), {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 3000,
+        singleton: true,
+      });
+    }
   }
 
   get displayRender() {
@@ -95,7 +104,7 @@ export default class HardwareSetup extends TsxComponent {
                 title: $t('Select your webcam'),
               })}
               value={this.selectedVideoDevice}
-              onInput={(id: string) => (this.selectedVideoDevice = id)}
+              onInput={(id: string) => this.setVideoDevice(id)}
             />
           )}
           {this.defaultHardwareService.selectedAudioSource && (
