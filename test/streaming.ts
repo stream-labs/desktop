@@ -7,14 +7,22 @@ import {
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
-import { logIn } from './helpers/spectron/user';
+import { logIn, logOut } from './helpers/spectron/user';
 import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
-import { goLive, prepareToGoLive } from './helpers/spectron/streaming';
+import {
+  goLive,
+  clickGoLive,
+  prepareToGoLive,
+  scheduleStream,
+  submit,
+  waitForStreamStart, stopStream
+} from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { sleep } from './helpers/sleep';
 import { readdir } from 'fs-extra';
+import { showSettings } from './helpers/spectron/settings';
 
 useSpectron();
 
@@ -83,6 +91,58 @@ test('Streaming to Youtube', async t => {
     description: 'SLOBS Test Stream Description',
   });
 
+  t.pass();
+});
+
+test('Streaming to the scheduled event on Youtube', async t => {
+  await logIn(t, 'youtube');
+
+  // create event via scheduling form
+  const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
+  await scheduleStream(t, tomorrow, {
+    title: `Youtube Test Stream ${tomorrow}`,
+    description: 'SLOBS Test Stream Description',
+  });
+
+  // select event and go live
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  const form = new FormMonkey(t);
+  await form.fill({
+    event: await form.getOptionByTitle('event', new RegExp(`Youtube Test Stream ${tomorrow}`)),
+  });
+  await submit(t);
+  await waitForStreamStart(t);
+  t.pass();
+});
+
+test('Stream after switching accounts', async t => {
+  // stream to youtube
+  await logIn(t, 'youtube');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
+  });
+  await stopStream(t);
+
+  // stream to twitch
+  await logOut(t);
+  await logIn(t, 'twitch');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+
+  t.pass();
+});
+
+test('Stream with disabled confirmation', async t => {
+  await logIn(t, 'twitch');
+  await showSettings(t, 'General');
+  await fillForm(t, null, { stream_info_udpate: false });
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
   t.pass();
 });
 

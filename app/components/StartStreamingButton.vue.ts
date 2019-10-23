@@ -42,11 +42,12 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      const visibleSources = this.sourcesService
-        .getSources()
-        .filter(source => source.type !== 'scene' && source.video);
+      const needToShowNoSourcesWarning =
+        this.streamSettingsService.settings.warnNoVideoSources &&
+        this.sourcesService.getSources().filter(source => source.type !== 'scene' && source.video)
+          .length === 0;
 
-      if (!visibleSources.length) {
+      if (needToShowNoSourcesWarning) {
         const goLive = await electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
             title: $t('No Sources'),

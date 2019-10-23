@@ -2,47 +2,91 @@ import { focusChild, focusMain, TExecutionContext } from './index';
 import { setOutputResolution } from './output';
 import { fillForm } from '../form-monkey';
 import { getClient } from '../api-client';
-import { ScenesService } from 'services/api/external-api/scenes';
-import { sleep } from '../sleep';
-import { getUser } from './user';
+import moment = require('moment');
+import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
-async function addColorSource() {
-  const api = await getClient();
-  api
-    .getResource<ScenesService>('ScenesService')
-    .activeScene.createAndAddSource('MyColorSource', 'color_source');
+/**
+ * Go live and wait for stream start
+ */
+export async function goLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+  await tryToGoLive(t, prefillData);
+  await waitForStreamStart(t);
 }
 
+/**
+ * setup settings for running streaming tests in CI
+ */
 export async function prepareToGoLive(t: TExecutionContext) {
   // set low resolution to prevent intensive CPU usage
   await setOutputResolution(t, '100x100');
 
-  // add a single source to prevent showing the No-Sources dialog
-  await addColorSource();
+  // disable warning when trying to start stream without video-sources
+  (await getClient())
+    .getResource<StreamSettingsService>('StreamSettingsService')
+    .setSettings({ warnNoVideoSources: false });
 }
 
-export async function tryToGoLive(t: TExecutionContext, channelInfo?: Dictionary<string>) {
-  await prepareToGoLive(t);
-
-  // open EditStreamInfo window
+/**
+ * Open the EditStreamInfo window or start stream if the conformation dialog has been disabled
+ */
+export async function clickGoLive(t: TExecutionContext) {
   const app = t.context.app;
   await focusMain(t);
   await app.client.click('button=Go Live');
-
-  // set stream info, and start stream
   await focusChild(t);
-  if (channelInfo) {
-    await fillForm(t, 'form[name=editStreamForm]', channelInfo);
-  }
+}
 
+/**
+ * Fill the form in the EditStreamInfo window and click Go Live
+ */
+export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  await focusChild(t);
+  if (prefillData) {
+    await fillForm(t, 'form[name=editStreamForm]', prefillData);
+  }
+  await submit(t);
+}
+
+/**
+ * Submit EditStreamInfo
+ */
+export async function submit(t: TExecutionContext) {
+  const app = t.context.app;
   await app.client.waitForEnabled('button=Confirm & Go Live', 10000);
   await app.client.click('button=Confirm & Go Live');
 }
 
-export async function goLive(t: TExecutionContext, channelInfo?: Dictionary<string>) {
-  await tryToGoLive(t, channelInfo);
-
+export async function waitForStreamStart(t: TExecutionContext) {
   // check we're streaming
   await focusMain(t);
   await t.context.app.client.waitForExist('button=End Stream', 20 * 1000);
+}
+
+export async function stopStream(t: TExecutionContext) {
+  await focusMain(t);
+  await t.context.app.client.click('button=End Stream');
+  await t.context.app.client.waitForExist('button=Go Live', 20 * 1000);
+}
+
+
+/**
+ * Schedule stream for platforms that supports scheduling
+ */
+export async function scheduleStream(
+  t: TExecutionContext,
+  date: number,
+  channelInfo?: Dictionary<string>,
+) {
+  const app = t.context.app;
+  await focusMain(t);
+  await app.client.click('button .icon-date');
+  await focusChild(t);
+  await fillForm(t, null, {
+    ...channelInfo,
+    date: moment(date).format('MM/DD/YYYY'),
+  });
+  await app.client.click('button=Schedule');
+  await app.client.waitForVisible('.toast-success', 20000);
 }

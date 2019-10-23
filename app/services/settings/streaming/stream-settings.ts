@@ -22,6 +22,11 @@ interface IStreamSettingsState {
    * description from last streaming session
    */
   description: string;
+
+  /**
+   * show warning if no sources exists before going live
+   */
+  warnNoVideoSources: boolean;
 }
 
 /**
@@ -59,6 +64,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     protectedModeEnabled: true,
     title: '',
     description: '',
+    warnNoVideoSources: true,
   };
 
   /**
@@ -104,6 +110,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeEnabled: this.state.protectedModeEnabled,
       title: this.state.title,
       description: this.state.description,
+      warnNoVideoSources: this.state.warnNoVideoSources,
       platform: obsStreamSettings.service as TPlatform,
       key: obsStreamSettings.key,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],

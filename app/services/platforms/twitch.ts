@@ -112,7 +112,7 @@ export class TwitchService extends Service implements IPlatformService {
     return this.userService.platform.id;
   }
 
-  async beforeGoLive(channelInfo: ITwitchChannelInfo) {
+  async beforeGoLive(channelInfo?: ITwitchChannelInfo) {
     const key = await this.fetchStreamKey();
     const currentStreamSettings = this.streamSettingsService.settings;
 
