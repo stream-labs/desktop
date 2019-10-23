@@ -64,16 +64,7 @@ export default class HardwareSetup extends TsxComponent {
   }
 
   setVideoDevice(val: string) {
-    try {
-      this.defaultHardwareService.setDefault('video', val);
-    } catch {
-      this.$toasted.show($t('This device is not available'), {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 3000,
-        singleton: true,
-      });
-    }
+    this.defaultHardwareService.setDefault('video', val);
   }
 
   get displayRender() {

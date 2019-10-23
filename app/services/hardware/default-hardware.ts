@@ -101,16 +101,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
     return this.sourcesService.getSource(this.state.defaultVideoDevice);
   }
 
-  videoSourceExists(id: string) {
-    const existingSource = this.existingVideoDeviceSources.find(source => source.deviceId === id);
-    const tempSource = this.sourcesService.getSource(id);
-    return existingSource || tempSource;
-  }
-
   setDefault(type: 'audio' | 'video', id: string) {
-    if (type === 'video' && !this.videoSourceExists(id)) {
-      throw new Error('Device Unavailable');
-    }
     this.SET_DEVICE(type, id);
   }
 
