@@ -93,26 +93,6 @@ interface ILatestVersionInfo {
   };
 }
 
-async function getPreviousRoll(cacheFile: string) {
-  return new Promise<number>(resolve => {
-    fs.readFile(cacheFile, 'utf8', (err, data) => {
-      if (err) {
-        log.info('Roll cache not found!');
-        resolve(0);
-        return;
-      }
-
-      let roll = parseInt(data.toString(), 10);
-
-      if (!roll) {
-        roll = 0;
-      }
-
-      resolve(roll);
-    });
-  });
-}
-
 /**
  * Generates a relatively small and uniform numeric hash of a string
  *
