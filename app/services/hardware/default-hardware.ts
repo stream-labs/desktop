@@ -49,6 +49,8 @@ export class DefaultHardwareService extends PersistentStatefulService<
         sourceId: device.id,
       } as ISourceAddOptions);
     });
+
+    if (this.videoDevices[0]) this.SET_DEVICE('video', this.videoDevices[0].id);
   }
 
   get existingVideoDeviceSources() {

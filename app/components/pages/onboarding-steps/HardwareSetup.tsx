@@ -31,7 +31,6 @@ export default class HardwareSetup extends TsxComponent {
 
   mounted() {
     this.defaultHardwareService.createTemporarySources();
-    if (this.videoDevices[0]) this.setVideoDevice(this.videoDevices[0].value);
   }
 
   destroyed() {
