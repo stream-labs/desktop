@@ -214,8 +214,9 @@ test('Recording when streaming', async t => {
   await focusChild(t);
   await app.client.click('li=General');
   await fillForm(t, null, { RecordWhenStreaming: true });
-
   const tmpDir = await setTemporaryRecordingPath(t);
+
+  await prepareToGoLive(t);
 
   // open EditStreamInfo window
   await focusMain(t);

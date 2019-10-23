@@ -15,7 +15,6 @@ import { integer } from 'aws-sdk/clients/cloudfront';
 import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
-import { ITwitchChannelInfo } from './twitch';
 import { CustomizationService } from 'services/customization';
 
 interface IMixerServiceState {
@@ -174,7 +173,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     );
   }
 
-  async putChannelInfo({ title, game }: ITwitchChannelInfo): Promise<boolean> {
+  async putChannelInfo({ title, game }: IMixerStartStreamOptions): Promise<boolean> {
     const data = { name: title };
 
     if (this.state.typeIdMap[game]) {
@@ -224,6 +223,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
         protectedModeEnabled: true,
       });
     }
+    if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
   }
 
   // TODO: dedup
