@@ -69,7 +69,7 @@ export default class HardwareSetup extends TsxComponent {
 
   get displayRender() {
     return (
-      this.selectedVideoDevice &&
+      this.defaultHardwareService.selectedVideoSource &&
       !!this.videoDevices.length && (
         <div style="height: 200px; margin-bottom: 8px;">
           <Display
