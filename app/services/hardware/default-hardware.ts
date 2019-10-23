@@ -4,7 +4,6 @@ import { Inject } from 'services/core/injector';
 import { AudioService } from 'services/audio';
 import { SourcesService, ISourceAddOptions } from 'services/sources';
 import { mutation } from 'services/core';
-import { ESourceType } from 'obs-studio-node';
 
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;
@@ -95,12 +94,23 @@ export class DefaultHardwareService extends PersistentStatefulService<
     if (!this.state.defaultVideoDevice) return;
     const existingSource = this.existingVideoDeviceSources.find(
       source => source.deviceId === this.state.defaultVideoDevice,
-    ).source;
-    if (existingSource) return existingSource;
+    );
+    if (existingSource) return existingSource.source;
     return this.sourcesService.getSource(this.state.defaultVideoDevice);
   }
 
+  videoSourceExists(id: string) {
+    const existingSource = this.existingVideoDeviceSources.find(
+      source => source.deviceId === this.state.defaultVideoDevice,
+    );
+    const tempSource = this.sourcesService.getSource(id);
+    return existingSource || tempSource;
+  }
+
   setDefault(type: 'audio' | 'video', id: string) {
+    if (type === 'video' && !this.videoSourceExists(id)) {
+      throw Error;
+    }
     this.SET_DEVICE(type, id);
   }
 
