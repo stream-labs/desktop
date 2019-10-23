@@ -48,7 +48,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   const fs = require('fs');
-  const bootstrap = require('./updater/bootstrap.js');
+  const bootstrap = require('./updater/build/bootstrap.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -351,7 +351,7 @@ if (!gotTheLock) {
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       const updateInfo = {
-        baseUrl: 'https://slobs-cdn.streamlabs.com',
+        baseUrl: 'https://streamlabs-obs-dev.s3-us-west-2.amazonaws.com',
         version: pjson.version,
         exec: process.argv,
         cwd: process.cwd(),
@@ -362,7 +362,6 @@ if (!gotTheLock) {
         versionFileName: `${releaseChannel}.json`
       };
 
-      log(updateInfo);
       bootstrap(updateInfo, startApp, app.exit);
     } else {
       startApp();
