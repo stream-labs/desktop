@@ -141,6 +141,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     fetch(request)
       .then(res => {
+        this.userLogin.next(this.state.auth);
         return res.text();
       })
       .then(valid => {

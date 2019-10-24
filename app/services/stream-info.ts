@@ -52,7 +52,6 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     this.RESET();
     this.userService.userLogin.subscribe(_ => this.onLoginHandler());
     this.userService.userLogout.subscribe(_ => this.onLogoutHandler());
-    if (this.userService.isLoggedIn()) this.onLoginHandler();
 
     // update viewers count
     this.viewerCountInterval = window.setInterval(() => {
