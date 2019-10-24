@@ -351,7 +351,7 @@ if (!gotTheLock) {
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       const updateInfo = {
-        baseUrl: 'https://streamlabs-obs-dev.s3-us-west-2.amazonaws.com',
+        baseUrl: 'https://slobs-cdn.streamlabs.com',
         version: pjson.version,
         exec: process.argv,
         cwd: process.cwd(),

@@ -1,17 +1,9 @@
-/* This is our updater bootstrap.
- * It has four goals in sequence:
- *  1. Check version.
- *  2. Download updater if new version is found.
- *  3. Run updater.
- *  4. Close application.
- *
- * Any complicated logic wanting to be placed in here needs
- * to be thoroughly thought about before doing so as any
- * mistakes here will require the user download a full
- * installer to have a fix put in place. In addition,
- * anything added to the updater that further complicates
- * its runtime requirements should be looked down upon. It's
- * designed to be small and mostly standalone. */
+/**
+ * Updater bootstrap:
+ * Determines if the user should receive an update, and if so,
+ * spawns the updater and shuts down the application. In most
+ * error situations, the application will start up normally.
+ */
 
 import * as util from 'util';
 import * as path from 'path';
@@ -182,14 +174,11 @@ async function isUpdaterRunning(updaterPath: string, updaterName: string) {
   return updaterRunning;
 }
 
-/* Note that latest-updater.exe never changes
- * in name regardless of what version of the
- * application we're using. The base url should
- * always have an endpoint of `/latest-updater.exe`
- * that points to the updater executable or at
- * least redirects to it. Except for a preview version
- * where preview-updater.exe name will be used */
 async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
+  /**
+   * latest-updater.exe is always the latest most stable version of the
+   * updater on our update CDN.
+   */
   let updaterName = 'latest-updater.exe';
 
   if (process.env.SLOBS_PREVIEW) {
