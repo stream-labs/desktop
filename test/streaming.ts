@@ -216,19 +216,10 @@ test('Recording when streaming', async t => {
   await fillForm(t, null, { RecordWhenStreaming: true });
   const tmpDir = await setTemporaryRecordingPath(t);
 
-  await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info, and start stream
-  await focusChild(t);
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
-  await app.client.click('button=Confirm & Go Live');
 
   // Stop recording
   await app.client.click('.record-button');
