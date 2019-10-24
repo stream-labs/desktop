@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { mutation, PersistentStatefulService } from '../../core';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
+import { invert } from 'lodash';
 
 /**
  * settings that we keep in the localStorage
@@ -111,7 +112,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       title: this.state.title,
       description: this.state.description,
       warnNoVideoSources: this.state.warnNoVideoSources,
-      platform: obsStreamSettings.service as TPlatform,
+      platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,

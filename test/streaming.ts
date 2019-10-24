@@ -23,6 +23,7 @@ import {
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
 import { showSettings } from './helpers/spectron/settings';
+import { sleep } from './helpers/sleep';
 import { getClient } from './helpers/api-client';
 import { StreamSettingsService } from '../app/services/settings/streaming';
 
@@ -151,27 +152,36 @@ test('Stream with disabled confirmation', async t => {
 test('Migrate twitch account to the custom ingest mode', async t => {
   await logIn(t, 'twitch');
 
+
+  // await showSettings(t, 'Stream');
+  // await sleep(30000, true);
+
   // change stream key before go live
-  // (await getClient())
-  //   .getResource<StreamSettingsService>('StreamSettingsService')
-  //   .setSettings({ key: 'fake key' });
+  (await getClient())
+    .getResource<StreamSettingsService>('StreamSettingsService')
+    .setSettings({ key: 'fake key' });
 
   // go live
-  // await tryToGoLive(t, {
-  //   title: 'SLOBS Test Stream',
-  //   game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
-  // });
-  //
-  // // check settings for Custom Ingest mode
-  // console.log('show settings');
-  // await showSettings(t, 'Stream');
-  // console.log('show settings end');
-  // t.true(
-  //   await t.context.app.client.isVisible('button=Use recommended settings'),
-  //   'Custom ingest mode should be enabled',
-  // );
-  // console.log('done');
 
+  await sleep(30000, true);
+
+  await tryToGoLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+
+
+  // check settings for Custom Ingest mode
+  console.log('show settings');
+  await sleep(10000, true);
+  await showSettings(t, 'Stream');
+  console.log('show settings end');
+  t.true(
+    await t.context.app.client.isVisible('button=Use recommended settings'),
+    'Custom ingest mode should be enabled',
+  );
+  // console.log('done');
+  // t.pass();
 });
 
 // test scheduling for each platform
@@ -264,14 +274,8 @@ test('Youtube streaming is disabled', async t => {
 test('User does not have Facebook pages', async t => {
   skipCheckingErrorsInLog();
   await logIn(t, 'facebook', { noFacebookPages: true });
-  const app = t.context.app;
-
-  await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await app.client.click('button=Go Live');
+  await clickGoLive(t);
   await focusChild(t);
-
   t.true(
     await t.context.app.client.isExisting('a=Facebook Page Creation'),
     'The link for adding new facebook changes should exist',
