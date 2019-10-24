@@ -3,7 +3,7 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog,
+  skipCheckingErrorsInLog, restartApp
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
@@ -18,7 +18,8 @@ import {
   scheduleStream,
   submit,
   waitForStreamStart,
-  stopStream, tryToGoLive
+  stopStream,
+  tryToGoLive,
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
@@ -36,23 +37,16 @@ test('Streaming to Twitch without auth', async t => {
     return;
   }
 
-  const app = t.context.app;
-
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Stream');
+  await showSettings(t, 'Stream');
 
   // This is the twitch.tv/slobstest stream key
   await setFormInput(t, 'Stream key', process.env.SLOBS_TEST_STREAM_KEY);
-  await app.client.click('button=Done');
+  await t.context.app.client.click('button=Done');
 
+  // go live
   await prepareToGoLive(t);
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
   t.pass();
 });
 
@@ -146,15 +140,16 @@ test('Stream with disabled confirmation', async t => {
   await prepareToGoLive(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
+
+  // try to stream after restart
+  await restartApp(t);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
   t.pass();
 });
 
 test('Migrate twitch account to the custom ingest mode', async t => {
   await logIn(t, 'twitch');
-
-
-  // await showSettings(t, 'Stream');
-  // await sleep(30000, true);
 
   // change stream key before go live
   (await getClient())
@@ -162,26 +157,18 @@ test('Migrate twitch account to the custom ingest mode', async t => {
     .setSettings({ key: 'fake key' });
 
   // go live
-
-  await sleep(30000, true);
-
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
 
-
   // check settings for Custom Ingest mode
-  console.log('show settings');
-  await sleep(10000, true);
+  await sleep(2000); // TODO: find out why can't show the settings without 'sleep' here
   await showSettings(t, 'Stream');
-  console.log('show settings end');
   t.true(
     await t.context.app.client.isVisible('button=Use recommended settings'),
     'Custom ingest mode should be enabled',
   );
-  // console.log('done');
-  // t.pass();
 });
 
 // test scheduling for each platform
