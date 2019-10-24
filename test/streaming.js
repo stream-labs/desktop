@@ -8,12 +8,13 @@ import {
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
 import { logIn } from './helpers/spectron/user';
-import { setOutputResolution } from './helpers/spectron/output';
+import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { sleep } from './helpers/sleep';
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
 import { getClient } from './helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
+import { readdir } from 'fs-extra';
 
 
 useSpectron();
@@ -194,7 +195,7 @@ schedulingPlatforms.forEach(platform => {
 
     // open EditStreamInfo window
     await focusMain(t);
-    await app.client.click('button=Schedule Stream');
+    await app.client.click('button .icon-date');
     await focusChild(t);
 
     const formMonkey = new FormMonkey(t, 'form[name=editStreamForm]');
@@ -321,4 +322,50 @@ test('User has linked twitter', async t => {
     await t.context.app.client.isExisting('button=Unlink Twitter'),
     'The button for unlinking Twitter should exist'
   );
+});
+
+
+test('Recording when streaming', async t => {
+  await logIn(t);
+  const app = t.context.app;
+
+  // enable RecordWhenStreaming
+  await focusMain(t);
+  await app.client.click('.side-nav .icon-settings');
+  await focusChild(t);
+  await app.client.click('li=General');
+  await fillForm(t, null, { RecordWhenStreaming: true });
+
+
+  await setOutputResolution(t, '100x100');
+  const tmpDir = await setTemporaryRecordingPath(t);
+
+  // add a single source to prevent showing the No-Sources dialog
+  await addColorSource();
+
+  // open EditStreamInfo window
+  await focusMain(t);
+  await app.client.click('button=Go Live');
+
+  // set stream info, and start stream
+  await focusChild(t);
+  await fillForm(t, 'form[name=editStreamForm]', {
+    title: 'SLOBS Test Stream',
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS'
+  });
+  await app.client.click('button=Confirm & Go Live');
+
+  // check we're streaming
+  await focusMain(t);
+  await app.client.waitForExist('button=End Stream', 20 * 1000);
+
+  // Stop recording
+  await app.client.click('.record-button');
+  await app.client.waitForVisible('.record-button:not(.active)', 15000);
+
+  // check that recording has been created
+  const files = await readdir(tmpDir);
+  t.true(files.length === 1, 'Should be one recoded file');
+
+  t.pass();
 });

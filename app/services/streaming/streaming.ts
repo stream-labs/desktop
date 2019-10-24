@@ -489,13 +489,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           $t(
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
-      } else if (info.code === obs.EOutputCode.Error) {
+      } else {
+        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
+        // we don't recognize should fall into this branch and show a generic error.
         if (info.error) {
           errorText = info.error;
         } else {
           linkToDriverInfo = true;
           errorText = $t(
-            'There was an error starting the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
           );
         }
       }

@@ -78,5 +78,9 @@
   "API Token": "API-Token",
   "Face Mask Settings": "Face Mask Einstellungen",
   "Navigate to Live tab when going live": "Zum Live-Tab navigieren wenn auf Live geschaltet wird",
-  "Save Replay": "Wiederholung speichern"
+  "Save Replay": "Wiederholung speichern",
+  "Streaming to %{platformName}": "Streaming to %{platformName}",
+  "Stream to custom ingest": "Stream to custom ingest",
+  "Use recommended settings": "Use recommended settings",
+  "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected"
 }

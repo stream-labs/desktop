@@ -1,5 +1,5 @@
 import { WIDGET_INITIAL_STATE } from './widget-settings';
-import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/core/stateful-service';
@@ -58,7 +58,7 @@ export abstract class StreamBossService extends BaseGoalService<
   getApiSettings() {
     return {
       type: WidgetType.StreamBoss,
-      url: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.StreamBoss].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'streambossSettingsUpdate',
       goalCreateEvent: 'newStreamboss',
