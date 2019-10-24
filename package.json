@@ -10,12 +10,12 @@
     "yarn": ">= 1.5.2"
   },
   "scripts": {
-    "compile": "yarn clear && yarn webpack-cli --progress --config dev.config.js",
-    "compile:ci": "yarn clear && yarn webpack-cli --config dev.config.js",
+    "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config dev.config.js",
+    "compile:ci": "yarn clear && yarn compile:updater && yarn webpack-cli --config dev.config.js",
     "compile:production": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config prod.config.js",
     "compile:updater": "rm -rf updater/build && tsc -p updater",
     "webpack-cli": "node --max-old-space-size=4096 node_modules/webpack-cli/bin/cli.js",
-    "watch": "yarn clear && yarn webpack-cli --watch --progress --config dev.config.js",
+    "watch": "yarn clear && yarn compile:updater && yarn webpack-cli --watch --progress --config dev.config.js",
     "watch-app": "yarn clear && yarn webpack-cli --watch --progress --config dev-app.config.js",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
