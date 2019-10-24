@@ -75,6 +75,7 @@ export default class HardwareSetup extends TsxComponent {
           <Display
             sourceId={this.defaultHardwareService.selectedVideoSource.sourceId}
             renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+            key={this.defaultHardwareService.selectedVideoSource.sourceId}
           />
         </div>
       )
