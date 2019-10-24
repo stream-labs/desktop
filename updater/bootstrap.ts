@@ -294,7 +294,7 @@ async function entry(info: IUpdateInfo) {
     '--base-url',
     `"${info.baseUrl}"`,
     '--version',
-    `"${latestVersion}"`,
+    `"${latestVersion.version}"`,
     '--exec',
     `"${info.exec}"`,
     '--cwd',
