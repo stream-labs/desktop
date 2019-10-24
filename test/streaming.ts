@@ -8,7 +8,7 @@ import {
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
 import { logIn, logOut } from './helpers/spectron/user';
-import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
+import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
 import {
@@ -17,12 +17,14 @@ import {
   prepareToGoLive,
   scheduleStream,
   submit,
-  waitForStreamStart, stopStream
+  waitForStreamStart,
+  stopStream, tryToGoLive
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
-import { sleep } from './helpers/sleep';
 import { readdir } from 'fs-extra';
 import { showSettings } from './helpers/spectron/settings';
+import { getClient } from './helpers/api-client';
+import { StreamSettingsService } from '../app/services/settings/streaming';
 
 useSpectron();
 
@@ -146,6 +148,32 @@ test('Stream with disabled confirmation', async t => {
   t.pass();
 });
 
+test('Migrate twitch account to the custom ingest mode', async t => {
+  await logIn(t, 'twitch');
+
+  // change stream key before go live
+  // (await getClient())
+  //   .getResource<StreamSettingsService>('StreamSettingsService')
+  //   .setSettings({ key: 'fake key' });
+
+  // go live
+  // await tryToGoLive(t, {
+  //   title: 'SLOBS Test Stream',
+  //   game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  // });
+  //
+  // // check settings for Custom Ingest mode
+  // console.log('show settings');
+  // await showSettings(t, 'Stream');
+  // console.log('show settings end');
+  // t.true(
+  //   await t.context.app.client.isVisible('button=Use recommended settings'),
+  //   'Custom ingest mode should be enabled',
+  // );
+  // console.log('done');
+
+});
+
 // test scheduling for each platform
 const schedulingPlatforms = ['facebook', 'youtube'];
 schedulingPlatforms.forEach(platform => {
@@ -251,15 +279,8 @@ test('User does not have Facebook pages', async t => {
 });
 
 test('User has linked twitter', async t => {
-  skipCheckingErrorsInLog();
   await logIn(t, 'twitch', { hasLinkedTwitter: true });
-  const app = t.context.app;
-
-  await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await app.client.click('button=Go Live');
-  await focusChild(t);
+  await clickGoLive(t);
 
   // check the "Unlink" button
   await t.context.app.client.waitForVisible('button=Unlink Twitter');
@@ -274,26 +295,14 @@ test('Recording when streaming', async t => {
   const app = t.context.app;
 
   // enable RecordWhenStreaming
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-  await focusChild(t);
-  await app.client.click('li=General');
+  await showSettings(t, 'General');
   await fillForm(t, null, { RecordWhenStreaming: true });
   const tmpDir = await setTemporaryRecordingPath(t);
 
-  await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  // set stream info, and start stream
-  await focusChild(t);
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
-  await app.client.click('button=Confirm & Go Live');
 
   // Stop recording
   await app.client.click('.record-button');
