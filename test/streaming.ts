@@ -145,6 +145,18 @@ test('Stream with disabled confirmation', async t => {
   await restartApp(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
+  await stopStream(t);
+  await logOut(t);
+
+  // check that stream_info_udpate can not be applied to YT
+  await logIn(t, 'youtube');
+  await clickGoLive(t);
+  await focusChild(t);
+  t.true(
+    await t.context.app.client.isVisible('button=Confirm & Go Live'),
+    'Should not be able to disable GoLive window for YT',
+  );
+
   t.pass();
 });
 
