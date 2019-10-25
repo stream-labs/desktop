@@ -45,7 +45,7 @@ export enum EStreamQuality {
 }
 
 // How frequently parformance stats should be updated
-const STATS_UPDATE_INTERVAL = 5 * 1000;
+const STATS_UPDATE_INTERVAL = 2 * 1000;
 // Limit on interval between unique notification types
 const NOTIFICATION_THROTTLE_INTERVAL = 2 * 60 * 1000;
 // Time window for averaging notification issues
