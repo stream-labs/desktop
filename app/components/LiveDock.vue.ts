@@ -88,7 +88,6 @@ export default class LiveDock extends Vue {
 
   @Watch('streamingStatus')
   onStreamingStatusChange() {
-    console.log('streaming status changed', this.streamingStatus)
     if (this.streamingStatus === EStreamingState.Starting) {
       this.setCollapsed(false);
     }
