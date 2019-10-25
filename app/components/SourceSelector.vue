@@ -7,12 +7,12 @@
       </h4>
       <div>
         <i
-          class="icon-add-folder icon-btn icon-btn--lg"
+          class="icon-folder icon-btn icon-btn--lg"
           @click="addFolder"
           v-tooltip.bottom="addGroupTooltip"
           data-test="AddFolder" />
         <i
-          class="icon-add-file icon-btn icon-btn--lg"
+          class="icon-add icon-btn icon-btn--lg"
           @click="addSource"
           v-tooltip.bottom="addSourceTooltip"
           data-test="Add" />
@@ -203,13 +203,13 @@ i.disabled {
 
 //Simple Mode
 .advanced-theme {
-  .icon-add-folder {
+  .icon-folder {
     display: inline-block;
   }
 }
 
 .beginner-theme {
-  .icon-add-folder {
+  .icon-folder {
     display: none;
   }
 }
