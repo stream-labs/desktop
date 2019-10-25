@@ -216,7 +216,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get apiToken() {
-    if (this.isLoggedIn()) return this.state.auth.apiToken;
+    if (this.state.auth) return this.state.auth.apiToken;
   }
 
   get widgetToken() {
