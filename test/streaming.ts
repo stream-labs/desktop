@@ -261,6 +261,7 @@ test('Youtube streaming is disabled', async t => {
 test('User does not have Facebook pages', async t => {
   skipCheckingErrorsInLog();
   await logIn(t, 'facebook', { noFacebookPages: true });
+  await prepareToGoLive(t);
   await clickGoLive(t);
   await focusChild(t);
   t.true(
