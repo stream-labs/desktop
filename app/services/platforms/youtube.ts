@@ -17,8 +17,7 @@ import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
 
 interface IYoutubeServiceState {
-  ableToStream: boolean;
-  activeBroadcast: IYoutubeLiveBroadcast;
+  liveStreamingEnabled: boolean;
 }
 
 export interface IYoutubeStartStreamOptions {
@@ -119,8 +118,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
   static initialState: IYoutubeServiceState = {
-    ableToStream: true,
-    activeBroadcast: null,
+    liveStreamingEnabled: true,
   };
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -149,18 +147,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return this.userService.platform.token;
   }
 
-  get youtubeId() {
-    return this.userService.platform.id;
-  }
-
   @mutation()
   private SET_ENABLED_STATUS(enabled: boolean) {
-    this.state.ableToStream = enabled;
-  }
-
-  @mutation()
-  private SET_ACTIVE_BROADCAST(broadcast: IYoutubeLiveBroadcast) {
-    this.state.activeBroadcast = broadcast;
+    this.state.liveStreamingEnabled = enabled;
   }
 
   async beforeGoLive({ title, description, broadcastId }: IYoutubeStartStreamOptions) {
@@ -280,7 +269,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     { title, description }: IYoutubeStartStreamOptions,
     scheduledStartTime?: string,
   ): Promise<boolean> {
-    const broadcast = await this.updateBroadcast(this.state.activeBroadcast.id, {
+    const broadcast = await this.updateBroadcast(this.activeChannel.broadcastId, {
       title,
       description,
     });
