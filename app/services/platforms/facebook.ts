@@ -307,7 +307,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   fetchRawPageResponse() {
-    return platformRequest(`${this.apiBase}/me/accounts`);
+    return platformRequest<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`);
   }
 
   liveDockEnabled(): boolean {

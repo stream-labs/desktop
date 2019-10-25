@@ -80,7 +80,7 @@ export default class StudioFooterComponent extends Vue {
       const platform = this.userService.platform.type;
       const service = getPlatformService(platform);
       if (service instanceof YoutubeService) {
-        return service.state.ableToStream;
+        return service.state.liveStreamingEnabled;
       }
     }
     return true;

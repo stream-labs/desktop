@@ -109,7 +109,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async initialize() {
     await this.migrate();
     await this.stateService.loadManifestFile();
-    await this.safeSync();
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {

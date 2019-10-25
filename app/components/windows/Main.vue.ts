@@ -62,6 +62,7 @@ export default class Main extends Vue {
   @Inject() editorCommandsService: EditorCommandsService;
 
   mounted() {
+    window['main'] = this;
     const dockWidth = this.customizationService.state.livedockSize;
     if (dockWidth < 1) {
       // migrate from old percentage value to the pixel value
