@@ -219,10 +219,12 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   async fetchViewerCount(): Promise<number> {
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
-    const url = `${this.apiBase}/${endpoint}&id=${this.state.activeBroadcast.id}&access_token=${
+    const url = `${this.apiBase}/${endpoint}&id=${this.activeChannel.broadcastId}&access_token=${
       this.oauthToken
     }`;
-    return platformAuthorizedRequest(url).then(
+    return platformAuthorizedRequest<{
+      items: { liveStreamingDetails: { concurrentViewers: number } }[];
+    }>(url).then(
       json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
     );
   }
@@ -358,10 +360,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       snippet.description = params.description;
     }
 
-    snippet.scheduledStartTime =
-      this.state.activeBroadcast && id === this.state.activeBroadcast.id
-        ? this.state.activeBroadcast.snippet.scheduledStartTime
-        : new Date().toISOString();
+    snippet.scheduledStartTime = new Date().toISOString();
 
     return await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
       body: JSON.stringify({ id, snippet }),
