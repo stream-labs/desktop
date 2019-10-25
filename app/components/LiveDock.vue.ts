@@ -64,7 +64,6 @@ export default class LiveDock extends Vue {
   controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
 
   mounted() {
-    console.log('MOUNTED');
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
