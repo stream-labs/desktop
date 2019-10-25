@@ -31,6 +31,12 @@ export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
   availableTags: TTwitchTag[];
 }
 
+interface ITWitchChannel {
+  status: string;
+  game: string;
+  stream_key: string;
+}
+
 /**
  * Request headers that need to be sent to Twitch
  */
@@ -163,8 +169,8 @@ export class TwitchService extends Service implements IPlatformService {
       .then(response => this.userService.updatePlatformToken(response.access_token));
   }
 
-  private fetchRawChannelInfo() {
-    return platformAuthorizedRequest('https://api.twitch.tv/kraken/channel');
+  private fetchRawChannelInfo(): Promise<ITWitchChannel> {
+    return platformAuthorizedRequest<ITWitchChannel>('https://api.twitch.tv/kraken/channel');
   }
 
   private fetchStreamKey(): Promise<string> {
@@ -213,15 +219,15 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   fetchUserInfo() {
-    return platformAuthorizedRequest(`https://api.twitch.tv/helix/users?id=${this.twitchId}`).then(
-      json => (json[0] && json[0].login ? { username: json[0].login as string } : {}),
-    );
+    return platformAuthorizedRequest<{ login: string }[]>(
+      `https://api.twitch.tv/helix/users?id=${this.twitchId}`,
+    ).then(json => (json[0] && json[0].login ? { username: json[0].login as string } : {}));
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformRequest(`https://api.twitch.tv/kraken/streams/${this.twitchId}`).then(json =>
-      json.stream ? json.stream.viewers : 0,
-    );
+    return platformRequest<{ stream?: { viewers: number } }>(
+      `https://api.twitch.tv/kraken/streams/${this.twitchId}`,
+    ).then(json => (json.stream ? json.stream.viewers : 0));
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<boolean> {
@@ -238,9 +244,9 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
-    return platformRequest(`https://api.twitch.tv/kraken/search/games?query=${searchString}`).then(
-      json => json.games,
-    );
+    return platformRequest<{ games: IGame[] }>(
+      `https://api.twitch.tv/kraken/search/games?query=${searchString}`,
+    ).then(json => json.games);
   }
 
   private getChatUrl(): string {

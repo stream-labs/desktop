@@ -21,6 +21,13 @@ interface IMixerServiceState {
   typeIdMap: object;
 }
 
+interface IMixerRawChannel {
+  id: string;
+  streamKey: string;
+  name: string;
+  type?: { name: string }; // game name
+}
+
 export interface IMixerStartStreamOptions {
   title: string;
   game: string;
@@ -121,12 +128,12 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   fetchRawChannelInfo() {
-    return platformAuthorizedRequest(`${this.apiBase}channels/${this.mixerUsername}/details`).then(
-      json => {
-        this.userService.updatePlatformChannelId(json.id);
-        return json;
-      },
-    );
+    return platformAuthorizedRequest<IMixerRawChannel>(
+      `${this.apiBase}channels/${this.mixerUsername}/details`,
+    ).then(json => {
+      this.userService.updatePlatformChannelId(json.id);
+      return json;
+    });
   }
 
   fetchStreamKey(): Promise<string> {
@@ -168,9 +175,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformRequest(`${this.apiBase}channels/${this.mixerUsername}`).then(
-      json => json.viewersCurrent,
-    );
+    return platformRequest<{ viewersCurrent: number }>(
+      `${this.apiBase}channels/${this.mixerUsername}`,
+    ).then(json => json.viewersCurrent);
   }
 
   async putChannelInfo({ title, game }: IMixerStartStreamOptions): Promise<boolean> {
@@ -190,10 +197,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   searchGames(searchString: string): Promise<IGame[]> {
-    return platformRequest(
+    return platformRequest<{ id: number; name: string }[]>(
       `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
     ).then(response => {
-      response.forEach((game: any) => {
+      response.forEach(game => {
         this.ADD_GAME_MAPPING(game.name, game.id);
       });
       return response;
