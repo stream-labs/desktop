@@ -33,6 +33,7 @@ import * as obs from '../../obs-api';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
+  loginValidated: boolean;
   auth?: IPlatformAuth;
 }
 
@@ -97,6 +98,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.state.auth.platform.channelId = name;
   }
 
+  @mutation()
+  private VALIDATE_LOGIN(validated = false) {
+    this.state.loginValidated = validated;
+  }
+
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
 
@@ -107,13 +113,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
-    this.setSentryContext();
-    this.validateLogin();
-    this.incrementalRolloutService.fetchAvailableFeatures();
+    this.VALIDATE_LOGIN(false);
   }
 
   async initialize() {
-    await this.refreshUserInfo();
+    await this.validateLogin();
   }
 
   mounted() {
@@ -132,7 +136,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   // Makes sure the user's login is still good
   validateLogin() {
-    if (!this.isLoggedIn()) return;
+    if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -141,7 +145,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     fetch(request)
       .then(res => {
-        this.userLogin.next(this.state.auth);
+        const service = getPlatformService(this.state.auth.platform.type);
+        this.login(service, this.state.auth);
+        this.refreshUserInfo();
         return res.text();
       })
       .then(valid => {
@@ -186,7 +192,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isLoggedIn() {
-    return !!(this.state.auth && this.state.auth.widgetToken);
+    return !!(this.state.loginValidated && this.state.auth && this.state.auth.widgetToken);
   }
 
   /**
@@ -327,6 +333,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.setSentryContext();
 
+    this.VALIDATE_LOGIN(true);
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
 
