@@ -322,7 +322,8 @@ export default class EditStreamInfo extends Vue {
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
     } catch (e) {
-      this.$toasted.show(e, {
+      const message = this.platform.getErrorDescription(e);
+      this.$toasted.show(message, {
         position: 'bottom-center',
         className: 'toast-alert',
         duration: 1000,

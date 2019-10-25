@@ -11,7 +11,7 @@ import { HostsService } from '../hosts';
 import { Inject } from '../core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
@@ -347,5 +347,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     } catch {
       console.error(new Error('Could not set Facebook page'));
     }
+  }
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription(error: IPlatformResponse<unknown>): string {
+    return `Can not connect to Facebook`;
   }
 }

@@ -10,7 +10,7 @@ import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
-import { platformAuthorizedRequest } from './utils';
+import { IPlatformResponse, platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
@@ -419,6 +419,13 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
+  }
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription(error: IPlatformResponse<{ message: string }>): string {
+    return `Youtube: ${error.result.message}`;
   }
 
   /**

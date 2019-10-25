@@ -2,6 +2,13 @@ import { getResource } from '../core';
 import { UserService } from '../user';
 import { IPlatformRequest } from './index';
 
+export interface IPlatformResponse<TResult = unknown> {
+  ok: boolean;
+  url: string;
+  status: number;
+  result: TResult;
+}
+
 /**
  * same as handleResponse but passes a Response object instead a response body
  * in the case of Promise rejection
@@ -12,7 +19,9 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
   const isJson = contentType && contentType.includes('application/json');
   const result = await (isJson ? response.json() : response.text());
   const serializedResponse = { ok: response.ok, url: response.url, status: response.status };
-  return response.ok ? result : Promise.reject({ result, ...serializedResponse });
+  return response.ok
+    ? result
+    : Promise.reject({ result, ...serializedResponse } as IPlatformResponse);
 }
 
 /**
