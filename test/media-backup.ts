@@ -12,7 +12,7 @@ import { sleep } from './helpers/sleep';
 
 useSpectron({ noSync: false });
 
-test('Media backup', async t => {
+test.skip('Media backup', async t => {
   // copy images to the temporary folder
   const imagesDir = path.resolve(__dirname, '..', '..', 'test', 'data', 'sources-files', 'images');
   const tmpDir = fs.mkdtempSync(os.tmpdir());
