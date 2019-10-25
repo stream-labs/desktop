@@ -6,6 +6,7 @@ import { StreamingContext } from '../streaming';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { Observable } from 'rxjs';
+import { IPlatformResponse } from './utils';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -143,6 +144,11 @@ export interface IPlatformService {
   getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
 
   liveDockEnabled: () => boolean;
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription: (error: IPlatformResponse<unknown>) => string;
 }
 
 export interface IPlatformAuth {

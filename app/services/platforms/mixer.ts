@@ -9,10 +9,10 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
-import { handlePlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
@@ -121,7 +121,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handlePlatformResponse)
+      .then(handleResponse)
       .then(response => {
         this.userService.updatePlatformToken(response.access_token);
       });
@@ -242,5 +242,12 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   liveDockEnabled(): boolean {
     return true;
+  }
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription(error: IPlatformResponse<unknown>): string {
+    return `Can not connect to Mixer`;
   }
 }
