@@ -70,7 +70,6 @@ export async function stopStream(t: TExecutionContext) {
   await t.context.app.client.waitForExist('button=Go Live', 20 * 1000);
 }
 
-
 /**
  * Schedule stream for platforms that supports scheduling
  */
@@ -89,4 +88,9 @@ export async function scheduleStream(
   });
   await app.client.click('button=Schedule');
   await app.client.waitForVisible('.toast-success', 20000);
+}
+
+export async function chatIsVisible(t: TExecutionContext) {
+  await focusMain(t);
+  return await t.context.app.client.isVisible('a=Refresh Chat');
 }

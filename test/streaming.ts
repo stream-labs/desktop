@@ -20,6 +20,7 @@ import {
   waitForStreamStart,
   stopStream,
   tryToGoLive,
+  chatIsVisible,
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
@@ -28,7 +29,7 @@ import { sleep } from './helpers/sleep';
 import { getClient } from './helpers/api-client';
 import { StreamSettingsService } from '../app/services/settings/streaming';
 
-useSpectron();
+useSpectron({ pauseIfFailed: true });
 
 test('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
@@ -56,7 +57,7 @@ test('Streaming to Twitch', async t => {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
-
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
@@ -67,7 +68,7 @@ test('Streaming to Facebook', async t => {
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
     description: 'SLOBS Test Stream Description',
   });
-
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
@@ -78,15 +79,21 @@ test.skip('Streaming to Mixer', async t => {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
 test('Streaming to Youtube', async t => {
   await logIn(t, 'youtube');
+
+  t.false(await chatIsVisible(t), 'Chat is not visible for YT before stream starts');
+
   await goLive(t, {
     title: 'SLOBS Test Stream',
     description: 'SLOBS Test Stream Description',
   });
+
+  t.true(await chatIsVisible(t), 'Chat should be visible');
 
   t.pass();
 });
