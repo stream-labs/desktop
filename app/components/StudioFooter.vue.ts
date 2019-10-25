@@ -56,6 +56,8 @@ export default class StudioFooterComponent extends Vue {
     this.streamingStatusChange = this.streamingService.streamingStatusChange.subscribe(status => {
       this.streamingStatus = status;
     });
+
+    this.streamingStatus = this.streamingService.state.streamingStatus;
   }
 
   destroyed() {
@@ -68,6 +70,10 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get performanceIconClassName() {
+    if (!this.streamingStatus || this.streamingStatus === EStreamingState.Offline) {
+      return '';
+    }
+
     if (
       this.streamingStatus === EStreamingState.Reconnecting ||
       this.performanceService.streamQuality === EStreamQuality.POOR
