@@ -322,7 +322,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-
+    this.VALIDATE_LOGIN(true);
     const result = await service.validatePlatform();
 
     // Currently we treat generic errors as success
@@ -333,7 +333,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.setSentryContext();
 
-    this.VALIDATE_LOGIN(true);
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
 
