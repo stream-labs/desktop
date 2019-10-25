@@ -99,8 +99,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
-  private VALIDATE_LOGIN(validated = false) {
-    this.state.loginValidated = validated;
+  private VALIDATE_LOGIN(validated: boolean) {
+    Vue.set(this.state, 'loginValidated', validated);
   }
 
   userLogin = new Subject<IPlatformAuth>();
@@ -192,7 +192,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isLoggedIn() {
-    return !!(this.state.loginValidated && this.state.auth && this.state.auth.widgetToken);
+    return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
   /**
