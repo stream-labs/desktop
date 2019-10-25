@@ -12,7 +12,7 @@
       <NavMenu v-model="selectedFilterName" class="side-menu">
         <div class="controls">
           <i
-            class="icon-add-file icon-btn"
+            class="icon-add icon-btn"
             @click="addFilter"
             data-test="Add"></i>
           <i

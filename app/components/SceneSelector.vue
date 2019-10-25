@@ -26,7 +26,7 @@
 
     <div>
       <i
-        class="icon-add-file icon-btn icon-btn--lg"
+        class="icon-add icon-btn icon-btn--lg"
         @click="addScene"
         data-test="Add" />
       <i
