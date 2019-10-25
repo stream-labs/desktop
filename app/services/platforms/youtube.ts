@@ -424,8 +424,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   /**
    * Get user-friendly error message
    */
-  getErrorDescription(error: IPlatformResponse<{ message: string }>): string {
-    return `Youtube: ${error.result.message}`;
+  getErrorDescription(error: IPlatformResponse<{ error: { message: string } }>): string {
+    let message;
+    try {
+      message = error.result.error.message;
+    } catch (e) {
+      message = 'Can not connect to platform';
+    }
+    return `Youtube: ${message}`;
   }
 
   /**
