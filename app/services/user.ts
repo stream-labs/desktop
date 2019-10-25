@@ -145,13 +145,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     fetch(request)
       .then(res => {
-        const service = getPlatformService(this.state.auth.platform.type);
-        this.login(service, this.state.auth);
-        this.refreshUserInfo();
         return res.text();
       })
       .then(valid => {
-        if (valid.match(/false/)) this.LOGOUT();
+        if (valid.match(/false/)) {
+          this.LOGOUT();
+          return;
+        }
+        const service = getPlatformService(this.state.auth.platform.type);
+        this.login(service, this.state.auth);
+        this.refreshUserInfo();
       });
   }
 
@@ -213,7 +216,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get apiToken() {
-    if (this.isLoggedIn()) return this.state.auth.apiToken;
+    if (this.state.auth) return this.state.auth.apiToken;
   }
 
   get widgetToken() {
