@@ -33,6 +33,7 @@ import * as obs from '../../obs-api';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
+  loginValidated: boolean;
   auth?: IPlatformAuth;
 }
 
@@ -97,14 +98,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.state.auth.platform.channelId = name;
   }
 
+  @mutation()
+  private VALIDATE_LOGIN(validated = false) {
+    this.state.loginValidated = validated;
+  }
+
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
-  private userLoginValidated = false;
 
   /**
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
+
+  init() {
+    super.init();
+    this.VALIDATE_LOGIN(false);
+  }
 
   async initialize() {
     await this.validateLogin();
@@ -182,7 +192,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isLoggedIn() {
-    return !!(this.userLoginValidated && this.state.auth && this.state.auth.widgetToken);
+    return !!(this.state.loginValidated && this.state.auth && this.state.auth.widgetToken);
   }
 
   /**
@@ -323,7 +333,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.setSentryContext();
 
-    this.userLoginValidated = true;
+    this.VALIDATE_LOGIN(true);
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
 
