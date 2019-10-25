@@ -9,7 +9,7 @@ import os = require('os');
 import { logIn } from './helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 
-useSpectron({ noSync: false, pauseIfFailed: true });
+useSpectron({ noSync: false });
 
 test('Media backup', async t => {
   // copy images to the temporary folder
