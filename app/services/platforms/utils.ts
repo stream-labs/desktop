@@ -21,7 +21,7 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
  * if the token has been outdated
  * @param useToken true|false or a token string
  */
-export async function platformRequest<T = any>(
+export async function platformRequest<T = unknown>(
   reqInfo: IPlatformRequest | string,
   useToken: boolean | string = false,
 ): Promise<T> {
@@ -50,6 +50,6 @@ export async function platformRequest<T = any>(
  * This is a shortcut for platformRequest()
  * @see platformRequest
  */
-export function platformAuthorizedRequest<T = any>(req: IPlatformRequest | string): Promise<T> {
+export function platformAuthorizedRequest<T = unknown>(req: IPlatformRequest | string): Promise<T> {
   return platformRequest(req, true);
 }

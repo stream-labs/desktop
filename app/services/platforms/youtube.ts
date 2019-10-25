@@ -132,7 +132,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   init() {
     this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      // trigger `channelInfoChanged` event to with new chat url based on the changed theme
+      // trigger `channelInfoChanged` event with a new chat url based on the changed theme
       if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
@@ -258,7 +258,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   scheduleStream(
     scheduledStartTime: string,
     { title, description }: IYoutubeChannelInfo,
-  ): Promise<any> {
+  ): Promise<IYoutubeLiveBroadcast> {
     return this.createBroadcast({ title, description, scheduledStartTime });
   }
 
