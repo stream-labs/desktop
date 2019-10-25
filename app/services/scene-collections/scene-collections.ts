@@ -232,7 +232,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const removingActiveCollection = id === this.activeCollection.id;
 
     if (removingActiveCollection) {
-      this.appService.runInLoadingMode(async () => {
+      await this.appService.runInLoadingMode(async () => {
         await this.removeCollection(id);
 
         if (this.collections.length > 0) {
@@ -266,6 +266,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Instead, it will log an error and continue.
    */
   async safeSync(retries = 2) {
+    if (!this.canSync()) return;
+
     if (this.syncPending) {
       console.error(
         'Unable to start the scenes-collection sync process while prev process is not finished',

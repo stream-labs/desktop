@@ -99,21 +99,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
+  private userLoginValidated = false;
 
   /**
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
 
-  init() {
-    super.init();
-    this.setSentryContext();
-    this.validateLogin();
-    this.incrementalRolloutService.fetchAvailableFeatures();
-  }
-
   async initialize() {
-    await this.refreshUserInfo();
+    await this.validateLogin();
   }
 
   mounted() {
@@ -132,7 +126,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   // Makes sure the user's login is still good
   validateLogin() {
-    if (!this.isLoggedIn()) return;
+    if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -141,7 +135,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     fetch(request)
       .then(res => {
-        this.userLogin.next(this.state.auth);
+        const service = getPlatformService(this.state.auth.platform.type);
+        this.login(service, this.state.auth);
+        this.refreshUserInfo();
         return res.text();
       })
       .then(valid => {
@@ -186,7 +182,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isLoggedIn() {
-    return !!(this.state.auth && this.state.auth.widgetToken);
+    return !!(this.userLoginValidated && this.state.auth && this.state.auth.widgetToken);
   }
 
   /**
@@ -327,6 +323,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.setSentryContext();
 
+    this.userLoginValidated = true;
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
 
