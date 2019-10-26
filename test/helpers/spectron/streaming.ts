@@ -1,4 +1,4 @@
-import { focusChild, focusMain, TExecutionContext } from './index';
+import { click, focusChild, focusMain, TExecutionContext, waitForEnabled, waitForExist } from './index';
 import { setOutputResolution } from './output';
 import { fillForm } from '../form-monkey';
 import { getClient } from '../api-client';
@@ -30,9 +30,8 @@ export async function prepareToGoLive(t: TExecutionContext) {
  * Open the EditStreamInfo window or start stream if the conformation dialog has been disabled
  */
 export async function clickGoLive(t: TExecutionContext) {
-  const app = t.context.app;
   await focusMain(t);
-  await app.client.click('button=Go Live');
+  await click(t, 'button=Go Live');
   await focusChild(t);
 }
 
@@ -55,7 +54,7 @@ export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary
 export async function submit(t: TExecutionContext) {
   const app = t.context.app;
   await app.client.waitForEnabled('button=Confirm & Go Live', 10000);
-  await app.client.click('button=Confirm & Go Live');
+  await click(t, 'button=Confirm & Go Live');
 }
 
 export async function waitForStreamStart(t: TExecutionContext) {
@@ -66,8 +65,29 @@ export async function waitForStreamStart(t: TExecutionContext) {
 
 export async function stopStream(t: TExecutionContext) {
   await focusMain(t);
-  await t.context.app.client.click('button=End Stream');
-  await t.context.app.client.waitForExist('button=Go Live', 20 * 1000);
+  await click(t, 'button=End Stream');
+  await waitForStreamStop(t);
+}
+
+export async function waitForStreamStop(t: TExecutionContext) {
+  if (await isReadyToStartStream(t)) {
+    try {
+      await t.context.app.client.waitForExist('button=Go Live', 10000, true);
+    } catch (e) {
+      throw new Error(`Waited for stream stop, but it didn't start`);
+    }
+  }
+  const ms = 30 * 1000;
+  try {
+    await t.context.app.client.waitForExist('button=Go Live', ms);
+  } catch (e) {
+    throw new Error(`Stream did not stop in ${ms}ms`);
+  }
+}
+
+export async function isReadyToStartStream(t: TExecutionContext) {
+  await focusMain(t);
+  return await t.context.app.client.isVisible('button=Go Live');
 }
 
 /**
@@ -80,13 +100,13 @@ export async function scheduleStream(
 ) {
   const app = t.context.app;
   await focusMain(t);
-  await app.client.click('button .icon-date');
+  await click(t, 'button .icon-date');
   await focusChild(t);
   await fillForm(t, null, {
     ...channelInfo,
     date: moment(date).format('MM/DD/YYYY'),
   });
-  await app.client.click('button=Schedule');
+  await click(t, 'button=Schedule');
   await app.client.waitForVisible('.toast-success', 20000);
 }
 

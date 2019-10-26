@@ -21,6 +21,7 @@ import {
   stopStream,
   tryToGoLive,
   chatIsVisible,
+  waitForStreamStop,
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
@@ -29,7 +30,7 @@ import { sleep } from './helpers/sleep';
 import { getClient } from './helpers/api-client';
 import { StreamSettingsService } from '../app/services/settings/streaming';
 
-useSpectron({ pauseIfFailed: true });
+useSpectron();
 
 test('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
@@ -167,26 +168,46 @@ test('Stream with disabled confirmation', async t => {
   t.pass();
 });
 
-test('Migrate twitch account to the custom ingest mode', async t => {
+test('Migrate the twitch account to the protected mode', async t => {
   await logIn(t, 'twitch');
 
   // change stream key before go live
-  (await getClient())
-    .getResource<StreamSettingsService>('StreamSettingsService')
-    .setSettings({ key: 'fake key' });
+  const streamSettings = (await getClient()).getResource<StreamSettingsService>(
+    'StreamSettingsService',
+  );
+  streamSettings.setSettings({ key: 'fake key' });
+  console.log('key is set');
 
   // go live
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
+  await waitForStreamStop(t); // can't go live with a fake key
 
-  // check settings for Custom Ingest mode
-  await sleep(2000); // TODO: find out why can't show the settings without 'sleep' here
+  // check that settings have been switched to the Custom Ingest mode
   await showSettings(t, 'Stream');
   t.true(
     await t.context.app.client.isVisible('button=Use recommended settings'),
-    'Custom ingest mode should be enabled',
+    'Protected mode should be disabled',
+  );
+
+  // use recommended settings
+  await t.context.app.client.click('button=Use recommended settings');
+  // setup custom server
+  streamSettings.setSettings({ server: 'rtmp://live-sjc.twitch.tv/app' });
+
+  await tryToGoLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+  await waitForStreamStop(t);
+
+  // check that settings have been switched to the Custom Ingest mode
+  await showSettings(t, 'Stream');
+  t.true(
+    await t.context.app.client.isVisible('button=Use recommended settings'),
+    'Protected mode should be disabled',
   );
 });
 

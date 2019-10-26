@@ -1,13 +1,11 @@
-import { focusChild, focusMain, TExecutionContext } from './index';
-import { sleep } from '../sleep';
+import { click, focusChild, focusMain, TExecutionContext } from './index';
 
 export async function showSettings(t: TExecutionContext, category: string) {
   await focusMain(t);
-  await t.context.app.client.click('.side-nav .icon-settings');
+  await click(t, '.side-nav .icon-settings');
   await focusChild(t);
 
   if (category) {
-    await t.context.app.client.click(`.nav-item__content=${category}`);
+    await click(t, `.nav-item__content=${category}`);
   }
 }
-
