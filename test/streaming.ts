@@ -176,7 +176,6 @@ test('Migrate the twitch account to the protected mode', async t => {
     'StreamSettingsService',
   );
   streamSettings.setSettings({ key: 'fake key' });
-  console.log('key is set');
 
   // go live
   await tryToGoLive(t, {
