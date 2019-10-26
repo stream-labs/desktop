@@ -39,6 +39,8 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       this.onStreamingStatusChange(status);
     });
 
+    this.onStreamingStatusChange(this.streamingService.state.streamingStatus);
+
     this.notifications = this.notificationsService
       .getAll()
       .filter(notification => notification.subType !== ENotificationSubType.DEFAULT);
@@ -60,26 +62,33 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
   }
 
   get status(): { type: string; description: string } {
+    if (this.streamingStatus === EStreamingState.Offline) {
+      return {
+        type: 'info',
+        description: $t('Your stream is currently offline'),
+      };
+    }
+
     if (
       this.streamingStatus === EStreamingState.Reconnecting ||
       this.streamQuality === EStreamQuality.POOR
     ) {
       return {
         type: 'error',
-        description: $t('Streamlabs OBS is experiencing difficulties broadcasting'),
+        description: $t('Your stream is experiencing issues'),
       };
     }
 
     if (this.streamQuality === EStreamQuality.FAIR) {
       return {
         type: 'warning',
-        description: $t('Streamlabs OBS is experiencing minor issues.'),
+        description: $t('Your stream is experiencing minor issues'),
       };
     }
 
     return {
       type: 'success',
-      description: $t('Streamlabs OBS is running normally'),
+      description: $t('Your stream quality is good'),
     };
   }
 
@@ -96,6 +105,10 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       return;
     }
     this.notifications.unshift(notification);
+  }
+
+  onNotificationClickHandler(id: number) {
+    this.notificationsService.applyAction(id);
   }
 
   get statusIcon() {
@@ -137,7 +150,12 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
         <h2>Performance Notifications</h2>
         <div class={styles.notificationContainer}>
           {this.notifications.map(notification => (
-            <div class={styles.notification}>
+            <div
+              class={cx(styles.notification, styles.hasAction)}
+              onClick={() => {
+                this.onNotificationClickHandler(notification.id);
+              }}
+            >
               {this.iconForNotificationBySubType(notification)}
               <div class="message">{notification.message}</div>
               <div class="date">{this.moment(notification.date)}</div>
