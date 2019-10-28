@@ -309,6 +309,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         alert($t('streaming.badPathError'));
         return;
       }
+
+      if (this.userService.isNiconicoLoggedIn()) {
+        const recordingSettings = this.settingsService.getRecordingSettings();
+        if (recordingSettings) {
+          // send Recording type to Sentry (どれぐらいURL出力が使われているかの比率を調査する)
+          console.error('Recording / recType:' + recordingSettings.recType);
+          console.log('Recording / path:' + JSON.stringify(recordingSettings.path));
+        }
+      }
+
       this.obsApiService.nodeObs.OBS_service_startRecording();
       return;
     }

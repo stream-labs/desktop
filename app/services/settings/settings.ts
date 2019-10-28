@@ -98,6 +98,11 @@ const niconicoAudioBitrateOptions = niconicoAudioBitrates.map(res => ({
   description: res
 }));
 
+type RecordingSettings = {
+  recType: 'Simple' | 'Advanced/Standard' | 'Advanced/Custom/URL' | 'Advanced/Custom/FilePath',
+  path: string
+};
+
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi, ISettingsAccessor {
   static initialState = {};
@@ -440,6 +445,47 @@ export class SettingsService extends StatefulService<ISettingsState>
       baseResolution,
       outputResolution
     };
+  }
+
+  getRecordingSettings(): RecordingSettings {
+    const output = this.getSettingsFormData('Output');
+    const outputMode = this.getOutputMode(output);
+    switch (outputMode) {
+      case 'Simple':
+        return {
+          recType: 'Simple',
+          path: this.findSettingValue(output, 'Recording', 'FilePath')
+        };
+
+      case 'Advanced':
+        {
+          const recType = this.findSettingValue(output, 'Recording', 'RecType');
+          console.log(`Output/Recording RecType: ${recType}`);
+          switch (recType) {
+            case 'Standard':
+              return {
+                recType: 'Advanced/Standard',
+                path: this.findSettingValue(output, 'Recording', 'RecFilePath')
+              };
+
+            case 'Custom Output (FFmpeg)':
+              const ffMpegMode = this.findSettingValue(output, 'Recording', 'FFOutputToFile')
+              switch (ffMpegMode) {
+                case 0: // Output to URL
+                  return {
+                    recType: 'Advanced/Custom/URL',
+                    path: this.findSettingValue(output, 'Recording', 'FFURL')
+                  };
+                case 1: // Output to File
+                  return {
+                    recType: 'Advanced/Custom/FilePath',
+                    path: this.findSettingValue(output, 'Recording', 'FFFilePath')
+                  };
+              }
+          }
+        }
+    }
+    return undefined;
   }
 
   diffOptimizedSettings(
