@@ -17,7 +17,7 @@ import { ScenesService } from 'services/api/external-api/scenes';
 import { readdir } from 'fs-extra';
 
 
-useSpectron();
+useSpectron({ pauseIfFailed: true });
 
 async function addColorSource() {
   const api = await getClient();
