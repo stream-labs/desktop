@@ -6,7 +6,10 @@
         <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
         <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
-      <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
+      <img :src="value || metadata.clearImage" v-if="!/\.webm/.test(value) && !showUrlUpload" >
+      <video v-if="/\.webm/.test(value) && !showUrlUpload && value" loop muted autoplay :key="value">
+        <source :src="value" type="video/webm" />
+      </video>
       <div class="footer">
         <span class="filename">{{ fileName || 'Default' }}</span>
         <div>
@@ -33,7 +36,8 @@
   height: 120px;
   background-color: var(--section);
 
-  img {
+  img,
+  video {
     max-height: 110px;
     width: auto;
     position: absolute;
