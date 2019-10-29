@@ -73,8 +73,7 @@ test('Streaming to Facebook', async t => {
   t.pass();
 });
 
-// TODO: We can't stream to Mixer anymore because they require channels to pass review
-test.skip('Streaming to Mixer', async t => {
+test('Streaming to Mixer', async t => {
   await logIn(t, 'mixer');
   await goLive(t, {
     title: 'SLOBS Test Stream',

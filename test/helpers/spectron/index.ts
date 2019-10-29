@@ -358,8 +358,8 @@ function removeFailedTestFromFile(testName: string) {
   }
 }
 
-// built-in Spectron utils don't show selector in the error message
-// override these utils to achieve this functionality
+// the built-in 'click' method doesn't show selector in the error message
+// wrap this method to achieve this functionality
 
 export async function click(t: TExecutionContext, selector: string) {
   try {
@@ -367,44 +367,6 @@ export async function click(t: TExecutionContext, selector: string) {
   } catch (e) {
     const windowId = String(activeWindow);
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
-    throw new Error(message);
-  }
-}
-
-export async function waitForExist(
-  t: TExecutionContext,
-  selector: string,
-  time?: number,
-): Promise<unknown> {
-  return waitFor(t, 'waitForExist', selector, time);
-}
-
-export async function waitForVisible(
-  t: TExecutionContext,
-  selector: string,
-  time?: number,
-): Promise<unknown> {
-  return waitFor(t, 'waitForVisible', selector, time);
-}
-
-export async function waitForEnabled(
-  t: TExecutionContext,
-  selector: string,
-  time?: number,
-): Promise<unknown> {
-  return waitFor(t, 'waitForEnabled', selector, time);
-}
-
-async function waitFor(
-  t: TExecutionContext,
-  waitType: 'waitForVisible' | 'waitForExist' | 'waitForEnabled',
-  selector: string,
-  time?: number,
-): Promise<unknown> {
-  try {
-    return await t.context.app.client[waitType](selector, time);
-  } catch (e) {
-    const message = `${waitType} ${selector}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
 }
