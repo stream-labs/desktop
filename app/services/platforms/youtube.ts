@@ -28,6 +28,7 @@ export interface IYoutubeStartStreamOptions {
 
 export interface IYoutubeChannelInfo extends IYoutubeStartStreamOptions {
   broadcastId: string;
+  streamId: string;
   chatUrl: string;
   streamUrl: string;
 }
@@ -102,6 +103,9 @@ interface IYoutubeLiveStream {
     resolution: string;
     frameRate: string;
   };
+  status: {
+    streamStatus: 'active' | 'created' | 'error' | 'inactive' | 'ready';
+  };
 }
 
 export class YoutubeService extends StatefulService<IYoutubeServiceState>
@@ -169,6 +173,47 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
     this.setActiveBroadcast(broadcast);
+
+    // await this.waitForStreamActiveAndGoLive(stream.id, broadcastId);
+  }
+
+  async afterGoLive() {
+    // console.log('wait for starting stream');
+    // try {
+    //   const { streamId, broadcastId } = this.activeChannel;
+    //
+    //   const stream = await new Promise<IYoutubeLiveStream>(async (resolve, reject) => {
+    //     const maxWaitTime = 200000;
+    //     let shouldPoll = true;
+    //     setTimeout(() => {
+    //       shouldPoll = false;
+    //       reject(`Live stream is not in active state after ${maxWaitTime} ms`);
+    //     }, maxWaitTime);
+    //
+    //     while (shouldPoll) {
+    //       const stream = await this.fetchLiveStream(streamId);
+    //       console.log('poll stream', stream);
+    //       if (stream.status.streamStatus === 'active') {
+    //         resolve(stream);
+    //         break;
+    //       } else if (stream.status.streamStatus === 'error') {
+    //         reject('streamStatus is in error state');
+    //         break;
+    //       }
+    //
+    //       // wait 2s
+    //       await new Promise(r => setTimeout(r, 2000));
+    //     }
+    //   });
+    //
+    //   const endpoint = `liveBroadcasts/transition?broadcastStatus=live&id=${broadcastId}&part=status`;
+    //   await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    //     method: 'POST',
+    //     url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    //   });
+    // } catch (e) {
+    //   console.error(e);
+    // }
   }
 
   /**
@@ -285,6 +330,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   private setActiveBroadcast(broadcast: IYoutubeLiveBroadcast) {
     this.updateActiveChannel({
       broadcastId: broadcast.id,
+      streamId: broadcast.contentDetails.boundStreamId,
       title: broadcast.snippet.title,
       description: broadcast.snippet.description,
     });
@@ -404,6 +450,18 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
         contentDetails: { isReusable: false },
       }),
     });
+  }
+
+  /**
+   * create new LiveStream via API
+   * this LiveStream must be bounded to the Youtube LiveBroadcast before going live
+   */
+  private async fetchLiveStream(id: string): Promise<IYoutubeLiveStream> {
+    const endpoint = `liveStreams?part=cdn,snippet,contentDetails,status&id=${id}`;
+    const collection = await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveStream>>(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    );
+    return collection.items[0];
   }
 
   searchGames(searchString: string) {

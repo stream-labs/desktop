@@ -146,6 +146,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
       hasUpdateTagsPermission: false,
       facebookPageId: '',
       broadcastId: '',
+      streamId: '',
       channelId: '',
       chatUrl: '',
       streamUrl: '',
