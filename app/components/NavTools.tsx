@@ -104,6 +104,9 @@ export default class SideNav extends Vue {
         >
           <i class="icon-studio-mode-3" />
         </div>
+        <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
+          <i class="icon-question" />
+        </div>
         <div
           class={styles.cell}
           onClick={() => this.handleAuth()}
@@ -114,9 +117,6 @@ export default class SideNav extends Vue {
           }
         >
           <i class={this.userService.isLoggedIn() ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
-        </div>
-        <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
-          <i class="icon-question" />
         </div>
         <div class={styles.cell} onClick={() => this.openSettingsWindow()} title={$t('Settings')}>
           <i class="icon-settings" />
