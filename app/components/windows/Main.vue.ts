@@ -103,7 +103,12 @@ export default class Main extends Vue {
   }
 
   get renderDock() {
-    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
+    return (
+      this.isLoggedIn &&
+      !this.isOnboarding &&
+      this.hasLiveDock &&
+      this.userService.getPlatformService().liveDockEnabled()
+    );
   }
 
   get isDockCollapsed() {
@@ -194,9 +199,8 @@ export default class Main extends Vue {
   }
 
   onResizeStopHandler(offset: number) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    offset = this.leftDock ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + offset);
+    const adjustedOffset = this.leftDock ? offset : -offset;
+    this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
     this.windowsService.updateStyleBlockers('main', false);
   }
 
@@ -208,14 +212,12 @@ export default class Main extends Vue {
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 860;
+    const minEditorWidth = 500;
     const minWidth = 290;
     const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    width = Math.max(minWidth, width);
-    // tslint:disable-next-line:no-parameter-reassignment
-    width = Math.min(maxWidth, width);
-    return width;
+    let constrainedWidth = Math.max(minWidth, width);
+    constrainedWidth = Math.min(maxWidth, width);
+    return constrainedWidth;
   }
 
   updateWidth() {

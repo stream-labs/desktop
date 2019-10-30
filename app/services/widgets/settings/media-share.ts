@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
 import { InheritMutations } from '../../core/stateful-service';
 
@@ -47,7 +47,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   getApiSettings() {
     return {
       type: WidgetType.MediaShare,
-      url: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.MediaShare].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'mediaSharingSettingsUpdate',
       goalCreateEvent: 'newmediaShare',

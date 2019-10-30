@@ -9,13 +9,13 @@ import {
   IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
 import { Inject } from '../core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 interface IFacebookPage {
   access_token: string;
@@ -48,7 +48,7 @@ interface IFacebookServiceState {
 export class FacebookService extends StatefulService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
 
   capabilities = new Set<TPlatformCapability>([
@@ -166,7 +166,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   private createLiveVideo() {
-    if (this.settingsService.state.Stream.service !== 'Facebook Live') return Promise.resolve();
+    if (this.streamSettingsService.settings.platform === 'facebook') return Promise.resolve();
     const { title, description, game } = this.state.streamProperties;
     const data = {
       method: 'POST',
@@ -238,7 +238,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   async fbGoLive() {
-    if (this.state.streamUrl && this.settingsService.state.Stream.service === 'Facebook Live') {
+    if (this.state.streamUrl && this.streamSettingsService.settings.platform === 'facebook') {
       const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
       this.setSettingsWithKey(streamKey);
       this.SET_STREAM_URL(null);
@@ -284,18 +284,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   private setSettingsWithKey(key: string) {
-    const settings = this.settingsService.getSettingsFormData('Stream');
-    settings.forEach(subCategory => {
-      subCategory.parameters.forEach(parameter => {
-        if (parameter.name === 'service') {
-          parameter.value = 'Facebook Live';
-        }
-        if (parameter.name === 'key') {
-          parameter.value = key;
-        }
-      });
-    });
-    this.settingsService.setSettings('Stream', settings);
+    this.streamSettingsService.setSettings({ key, platform: 'facebook' });
   }
 
   // TODO: dedup
@@ -307,6 +296,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   fetchRawPageResponse() {
     return platformRequest(`${this.apiBase}/me/accounts`);
+  }
+
+  liveDockEnabled(): boolean {
+    return true;
   }
 
   private fetchPages(): Promise<IStreamlabsFacebookPages> {

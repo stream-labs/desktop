@@ -1,5 +1,5 @@
 import { GenericGoalService } from './generic-goal';
-import { WidgetType } from 'services/widgets';
+import { WidgetDefinitions, WidgetType } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 
@@ -10,7 +10,7 @@ export class StarsGoalService extends GenericGoalService {
   getApiSettings() {
     return {
       type: WidgetType.StarsGoal,
-      url: `https://${this.getHost()}/widgets/stars-goal?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.StarsGoal].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/stars-goal?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/starsgoal/settings`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/starsgoal/settings`,

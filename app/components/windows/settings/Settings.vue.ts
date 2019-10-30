@@ -21,6 +21,7 @@ import GameOverlaySettings from './GameOverlaySettings';
 import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
+import StreamSettings from './StreamSettings';
 
 @Component({
   components: {
@@ -42,6 +43,7 @@ import FormInput from 'components/shared/inputs/FormInput.vue';
     GameOverlaySettings,
     FacemaskSettings,
     FormInput,
+    StreamSettings,
   },
 })
 export default class Settings extends Vue {
