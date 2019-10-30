@@ -7,7 +7,7 @@
     :data-name="options.name"
   >
     <slider
-      :value="localValue"
+      :value="interval >= 1 ? Math.round(localValue) : localValue"
       @input="value => updateLocalValue(value)"
       :max="max"
       :min="min"
