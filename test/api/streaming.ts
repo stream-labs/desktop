@@ -9,7 +9,8 @@ import { ISettingsServiceApi } from '../../app/services/settings';
 
 useSpectron({ restartAppAfterEachTest: true });
 
-test('Streaming to Twitch via API', async t => {
+// TODO obtain a valid streamkey in CI
+test.skip('Streaming to Twitch via API', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
     console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
     t.pass();
