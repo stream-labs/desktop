@@ -41,8 +41,6 @@ export default class StudioFooterComponent extends Vue {
   metricsShown = false;
   recordingTime = '';
   private recordingTimeIntervalId: number;
-  private streamingStatus: EStreamingState = null;
-  private streamingStatusChange: Subscription = null;
 
   mounted() {
     this.confirmYoutubeEnabled();
@@ -52,21 +50,18 @@ export default class StudioFooterComponent extends Vue {
       if (!this.streamingService.isRecording) return;
       this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
-
-    this.streamingStatusChange = this.streamingService.streamingStatusChange.subscribe(status => {
-      this.streamingStatus = status;
-    });
-
-    this.streamingStatus = this.streamingService.state.streamingStatus;
   }
 
   destroyed() {
     clearInterval(this.recordingTimeIntervalId);
-    this.streamingStatusChange.unsubscribe();
   }
 
   toggleRecording() {
     this.streamingService.toggleRecording();
+  }
+
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
   }
 
   get performanceIconClassName() {

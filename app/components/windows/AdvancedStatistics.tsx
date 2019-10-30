@@ -26,20 +26,12 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
 
   private updateInterval = 0;
   private notifications: INotification[] = [];
-  private streamingStatus: EStreamingState = null;
   private notificationPushed: Subscription = null;
-  private streamingStatusChange: Subscription = null;
 
   mounted() {
     this.notificationPushed = this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
     });
-
-    this.streamingStatusChange = this.streamingService.streamingStatusChange.subscribe(status => {
-      this.onStreamingStatusChange(status);
-    });
-
-    this.onStreamingStatusChange(this.streamingService.state.streamingStatus);
 
     this.notifications = this.notificationsService
       .getAll()
@@ -53,12 +45,15 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
   destroyed() {
     this.notificationsService.markAllAsRead();
     this.notificationPushed.unsubscribe();
-    this.streamingStatusChange.unsubscribe();
     clearInterval(this.updateInterval);
   }
 
   get streamQuality() {
     return this.performanceService.streamQuality;
+  }
+
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
   }
 
   get status(): { type: string; description: string } {
@@ -90,10 +85,6 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       type: 'success',
       description: $t('Your stream quality is good'),
     };
-  }
-
-  onStreamingStatusChange(status: EStreamingState) {
-    this.streamingStatus = status;
   }
 
   moment(time: number): string {
