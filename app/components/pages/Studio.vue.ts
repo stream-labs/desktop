@@ -85,9 +85,10 @@ export default class Studio extends Vue {
     // Roughly 1 mixer item
     const reasonableMinimumControlsHeight = 150;
 
-    const spaceForDisplay = containerHeight - (this.eventsHeight + this.controlsHeight);
+    const spaceForDisplay =
+      containerHeight - (this.eventsHeight + this.controlsHeight + this.resizeBarNudgeFactor);
 
-    if (spaceForDisplay < 25) {
+    if (spaceForDisplay < 50) {
       this.showDisplay = false;
     } else {
       this.showDisplay = true;
