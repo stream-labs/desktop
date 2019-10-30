@@ -104,7 +104,7 @@
     "@types/request": "2.48.1",
     "@types/semver": "^6.0.2",
     "@types/socket.io-client": "1.4.32",
-    "@types/uuid": "3.4.4",
+    "@types/uuid": "3.4.6",
     "@types/webdriverio": "4.13.3",
     "@vue/babel-helper-vue-jsx-merge-props": "^1.0.0",
     "@vue/babel-preset-jsx": "^1.1.0",
