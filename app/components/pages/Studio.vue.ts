@@ -74,18 +74,20 @@ export default class Studio extends Vue {
    */
   @Watch('performanceMode')
   reconcileHeightsWithinContraints(isControlsResize = false) {
-    const containerHeight = this.$root.$el.getBoundingClientRect().height;
+    const containerHeight = this.$el.getBoundingClientRect().height;
+    // console.log(containerHeight, this.$root.$el, this.$el);
 
     // This is the maximum height we can use
-    this.maxHeight = containerHeight - (this.performanceMode ? 200 : 1);
+    this.maxHeight = containerHeight - this.resizeBarNudgeFactor;
 
     // Roughly 3 lines of events
     const reasonableMinimumEventsHeight = 156;
 
     // Roughly 1 mixer item
     const reasonableMinimumControlsHeight = 150;
-
-    const spaceForDisplay = containerHeight - (this.minEventsHeight + this.controlsHeight);
+    console.log(this.eventsHeight);
+    const spaceForDisplay = containerHeight - (this.eventsHeight + this.controlsHeight);
+    console.log(spaceForDisplay, this.controlsHeight, this.maxHeight);
 
     if (spaceForDisplay < 25) {
       this.showDisplay = false;
@@ -175,6 +177,10 @@ export default class Studio extends Vue {
 
   get minControlsHeight() {
     return 50;
+  }
+
+  get resizeBarNudgeFactor() {
+    return this.isLoggedIn ? 18 : 8;
   }
 
   onResizeStartHandler() {
