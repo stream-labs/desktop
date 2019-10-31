@@ -144,7 +144,7 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal('https://www.youtube.com/live_dashboard');
+    electron.remote.shell.openExternal(this.streamInfoService.state.dashboardUrl);
   }
 
   get isTwitch() {
