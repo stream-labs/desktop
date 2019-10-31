@@ -6,9 +6,9 @@ import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
-import { UserService } from '../../services/user';
-import { Inject } from '../../services/core/injector';
-import { getPlatformService, TChannelInfo } from 'services/platforms';
+import { UserService } from 'services/user';
+import { Inject } from 'services/core/injector';
+import { getPlatformService } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -26,10 +26,11 @@ import { TwitterService } from 'services/integrations/twitter';
 import { Twitter } from '../Twitter';
 import { cloneDeep } from 'lodash';
 import { Debounce } from 'lodash-decorators';
-import { Spinner } from 'streamlabs-beaker';
-import ValidatedForm from '../shared/inputs/ValidatedForm';
+import { Spinner, ProgressBar } from 'streamlabs-beaker';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import Utils from 'services/utils';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
+import { YoutubeService } from 'services/platforms/youtube';
 
 @Component({
   components: {
@@ -115,20 +116,24 @@ export default class EditStreamInfo extends Vue {
         allowEmpty: true,
         noResult: $t('No matching game(s) found.'),
         required: true,
+        disabled: this.updatingInfo,
       }),
       title: metadata.text({
         title: $t('Title'),
         fullWidth: true,
         required: true,
+        disabled: this.updatingInfo,
       }),
       description: metadata.textArea({
         title: $t('Description'),
+        disabled: this.updatingInfo,
       }),
       date: metadata.text({
         title: $t('Scheduled Date'),
         dateFormat: 'MM/dd/yyyy',
         placeholder: 'MM/DD/YYYY',
         required: true,
+        disabled: this.updatingInfo,
         description: this.isFacebook
           ? $t(
               'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
@@ -318,9 +323,12 @@ export default class EditStreamInfo extends Vue {
 
   async goLive(force = false) {
     try {
+      this.updatingInfo = true;
       await this.streamingService.toggleStreaming(this.channelInfo, force);
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
+      // youtube needs additional actions after the stream has been started
+      if (this.isYoutube) (this.platform as YoutubeService).showStreamStatusWindow();
     } catch (e) {
       const message = this.platform.getErrorDescription(e);
       this.$toasted.show(message, {
@@ -399,9 +407,7 @@ export default class EditStreamInfo extends Vue {
     return $t('Confirm & Go Live');
   }
 
-  get midStreamMode() {
-    return this.streamingService.isStreaming;
-  }
+  midStreamMode = this.streamingService.isStreaming;
 
   get isSchedule() {
     return this.windowsService.getChildWindowQueryParams().isSchedule;

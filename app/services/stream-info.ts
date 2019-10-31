@@ -1,5 +1,5 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import { getPlatformService, Tag, TChannelInfo } from 'services/platforms';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { getPlatformService } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'services/core/injector';
 import { StreamingService } from './streaming';
@@ -9,9 +9,9 @@ import { Subject, Subscription } from 'rxjs';
 import { ITwitchChannelInfo, TwitchService } from './platforms/twitch';
 import { FacebookService, IFacebookChanelInfo } from './platforms/facebook';
 import { InitAfter } from './core';
-import { IYoutubeChannelInfo } from './platforms/youtube';
+import { IYoutubeChannelInfo, TYoutubeLifecycleStep } from './platforms/youtube';
 import { IMixerChannelInfo } from './platforms/mixer';
-import { reduce, isEqual, pick } from 'lodash';
+import { isEqual, pick, reduce } from 'lodash';
 
 export type TCombinedChannelInfo = IFacebookChanelInfo &
   ITwitchChannelInfo &
@@ -20,8 +20,9 @@ export type TCombinedChannelInfo = IFacebookChanelInfo &
 
 type TStreamInfoServiceState = {
   fetching: boolean;
-  error: boolean;
+  error: string;
   viewerCount: number;
+  lifecycleStep: TYoutubeLifecycleStep;
 } & TCombinedChannelInfo;
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
@@ -61,7 +62,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
         const platform = getPlatformService(this.userService.platform.type);
 
         platform.fetchViewerCount().then(viewers => {
-          this.onStreamInfoChangedHandler({ viewerCount: viewers });
+          this.updateInfo({ viewerCount: viewers });
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
@@ -72,7 +73,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   private onLoginHandler() {
     const platform = getPlatformService(this.userService.platform.type);
     this.channelInfoSubsc = platform.channelInfoChanged.subscribe(channelInfo =>
-      this.onStreamInfoChangedHandler(channelInfo),
+      this.updateInfo(channelInfo),
     );
   }
 
@@ -81,10 +82,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     this.RESET();
   }
 
-  /**
-   * handle the StreamInfoChanged event form the current platform
-   */
-  private onStreamInfoChangedHandler(streamInfoPatch: Partial<TStreamInfoServiceState>) {
+  private updateInfo(streamInfoPatch: Partial<TStreamInfoServiceState>) {
     const newStreamInfo = {
       ...this.state,
       ...streamInfoPatch,
@@ -136,7 +134,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   RESET() {
     this.state = {
       fetching: false,
-      error: false,
+      error: '',
       viewerCount: 0,
       title: '',
       game: '',
@@ -150,6 +148,8 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
       channelId: '',
       chatUrl: '',
       streamUrl: '',
+      dashboardUrl: '',
+      lifecycleStep: 'idle',
     };
   }
 }
