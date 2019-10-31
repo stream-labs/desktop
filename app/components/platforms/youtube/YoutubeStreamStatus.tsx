@@ -39,7 +39,6 @@ export default class YoutubeStreamStatus extends TsxComponent {
         msg: $t('Waiting for Youtube to start receiving the video...'),
         progress: 0.1,
       },
-
       transitionBroadcastToTesting: {
         msg: $t('Start testing the broadcast...'),
         progress: 0.3,
@@ -112,7 +111,9 @@ export default class YoutubeStreamStatus extends TsxComponent {
                 {$t(
                   `Your stream has been created but we can\'t publish it in your channel. Check your internet connection or go to the `,
                 )}
-                <a href="javascript:void(0)" onClick={this.goToDashboard}>{$t('stream control page')}</a>
+                <a href="javascript:void(0)" onClick={this.goToDashboard}>
+                  {$t('stream control page')}
+                </a>
                 {$t(' to publish it manually')}
               </p>
 
