@@ -50,6 +50,8 @@ const STATS_UPDATE_INTERVAL = 2 * 1000;
 const NOTIFICATION_THROTTLE_INTERVAL = 2 * 60 * 1000;
 // Time window for averaging notification issues
 const SAMPLING_DURATION = 2 * 60 * 1000;
+// How many samples we should take
+const NUMBER_OF_SAMPLES = Math.round(SAMPLING_DURATION / STATS_UPDATE_INTERVAL);
 
 interface IMonitorState {
   framesLagged: number;
@@ -81,8 +83,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   private historicalDroppedFrames: number[] = [];
   private historicalSkippedFrames: number[] = [];
   private historicalLaggedFrames: number[] = [];
-  private numberOfSamples: number = SAMPLING_DURATION / STATS_UPDATE_INTERVAL;
-
   private intervalId: number = null;
 
   @mutation()
@@ -168,18 +168,18 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   addSample(record: number[], current: number) {
-    if (record.length >= this.numberOfSamples) {
+    if (record.length >= NUMBER_OF_SAMPLES) {
       record.shift();
     }
     record.push(current);
   }
 
   averageFactor(record: number[]) {
-    return record.reduce((a, b) => a + b, 0) / this.numberOfSamples;
+    return record.reduce((a, b) => a + b, 0) / NUMBER_OF_SAMPLES;
   }
 
   checkNotification(target: number, record: number[]) {
-    if (record.length < this.numberOfSamples) return false;
+    if (record.length < NUMBER_OF_SAMPLES) return false;
     return this.averageFactor(record) >= target;
   }
 
