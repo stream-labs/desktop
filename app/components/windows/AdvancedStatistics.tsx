@@ -192,9 +192,10 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
         <div slot="content" class={styles.container}>
           {this.statusBar}
           <div>
-            <h2>Live Stats</h2>
+            <h2>{$t('Live Stats')}</h2>
+            <p>{$t('Click on a stat to add it to your footer')}</p>
             <div class={styles.statsRow}>
-              <PerformanceMetrics />
+              <PerformanceMetrics mode="full" />
               <GlobalSyncStatus />
             </div>
           </div>
