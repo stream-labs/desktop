@@ -377,6 +377,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const readReceipts = await this.fetchReadReceipts(hashValues);
     eventArray.forEach(event => {
       event.read = readReceipts[event.hash] ? readReceipts[event.hash] : false;
+
+      // Events older than 1 month are treated as read
+      if (new Date(event.created_at).getTime() < new Date().getTime() - 1000 * 60 * 60 * 24 * 30) {
+        event.read = true;
+      }
     });
 
     eventArray.sort((a: IRecentEvent, b: IRecentEvent) => {
