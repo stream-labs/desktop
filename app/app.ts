@@ -9,7 +9,6 @@ import Vue from 'vue';
 import URI from 'urijs';
 
 import { createStore } from './store';
-import { ObsApiService } from './services/obs-api';
 import { IWindowOptions, WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
@@ -32,6 +31,16 @@ const { ipcRenderer, remote } = electron;
 
 const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+
+window['obs'] = window['require']('obs-studio-node');
+
+{ // Set up things for IPC
+  // Connect to the IPC Server
+  window['obs'].IPC.connect(remote.process.env.NAIR_IPC_PATH);
+  document.addEventListener('close', (e) => {
+    window['obs'].IPC.disconnect();
+  });
+}
 
 // This is the development DSN
 let sentryDsn = 'https://1cb5cdf6a93c466dad570861b8c82b61@sentry.io/1262580';
@@ -106,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const i18nService: I18nService = I18nService.instance;
-  const obsApiService = ObsApiService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
 
   if (Utils.isMainWindow()) {
@@ -118,8 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     servicesManager.listenMessages();
   }
-
-  window['obs'] = obsApiService.nodeObs;
 
   storePromise.then(async store => {
 

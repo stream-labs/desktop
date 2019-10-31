@@ -18,6 +18,7 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
@@ -44,7 +45,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: []
+    argv: electron.remote.process.argv
   };
 
   private autosaveInterval: number;
@@ -65,6 +66,9 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   async load() {
     this.START_LOADING();
+
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.NAIR_IPC_USERDATA);
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -101,14 +105,7 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.FINISH_LOADING();
-  }
-
-  /**
-   * the main process sends argv string here
-   */
-  setArgv(argv: string[]) {
-    this.SET_ARGV(argv);
-    this.protocolLinksService.start(argv);
+    this.protocolLinksService.start(this.state.argv);
   }
 
   @track('app_close')
@@ -127,6 +124,8 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

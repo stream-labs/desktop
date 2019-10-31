@@ -3,8 +3,9 @@ import { Subject } from 'rxjs/Subject';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { ipcRenderer, remote } from 'electron';
 import { Inject } from 'util/injector';
+import electron from 'electron';
+import * as obs from '../../../obs-api';
 
 interface IPerformanceState {
   CPU: number;
@@ -42,33 +43,28 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
-      this.processPerformanceStats(stats);
-    });
-
-    this.intervalId = window.setInterval(() => {
-      if (this.customizationService.pollingPerformanceStatistics) {
-        ipcRenderer.send('requestPerformanceStatistics');
-      } else {
-        this.processPerformanceStats({ CPU: 0 } as any);
-      }
-    }, STATS_UPDATE_INTERVAL);
+    this.intervalId = window.setInterval(() => this.update(), STATS_UPDATE_INTERVAL);
   }
 
-  stop() {
-    clearInterval(this.intervalId);
-    this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
-  }
+  private update() {
+    const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
+      ? obs.NodeObs.OBS_API_getPerformanceStatistics()
+      : { CPU: 0 };
 
-  processPerformanceStats(stats: IPerformanceState) {
     if (stats.percentageDroppedFrames) {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
     }
 
-    stats.CPU += remote.app.getAppMetrics().map(proc => {
+    const am = electron.remote.app.getAppMetrics();
+
+    stats.CPU += am.map(proc => {
       return proc.cpu.percentCPUUsage;
     }).reduce((sum, usage) => sum + usage);
 
     this.SET_PERFORMANCE_STATS(stats);
+  }
+
+  stop() {
+    window.clearInterval(this.intervalId);
   }
 }

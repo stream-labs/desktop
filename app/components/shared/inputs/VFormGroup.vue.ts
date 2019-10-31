@@ -7,7 +7,6 @@ import BaseFormGroup from './BaseFormGroup';
 @Component({
   components: { FormInput }
 })
-
 export default class VFormGroup extends BaseFormGroup {
 
   @Prop()
@@ -21,9 +20,4 @@ export default class VFormGroup extends BaseFormGroup {
 
   @Prop()
   title: string;
-
-  created() {
-    // vue-class-component doesn't inherit lifecycle hooks
-    super.created();
-  }
 }

@@ -6,7 +6,7 @@ import {
   TObsFormData,
   IObsListInput
 } from 'components/obs/inputs/ObsInput';
-import { nodeObs } from '../obs-api';
+import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
@@ -118,11 +118,8 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   @Inject() private sourcesService: SourcesService;
-
   @Inject() private audioService: AudioService;
-
   @Inject() private windowsService: WindowsService;
-
   @Inject() private appService: AppService;
 
   @Inject() private userService: UserService;
@@ -176,7 +173,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    const categories: string[] = nodeObs.OBS_settings_getListCategories();
+    const categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
 
     // if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
@@ -185,7 +182,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = nodeObs.OBS_settings_getSettings(categoryName) as ISettingsSubCategory[];
+    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName) as ISettingsSubCategory[];
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -614,7 +611,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       });
     }
 
-    nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
+    obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(
       SettingsService.convertFormDataToState({ [categoryName]: settingsData })
     );

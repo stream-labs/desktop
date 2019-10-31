@@ -3,12 +3,11 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { IScenesServiceApi } from 'services/scenes';
-import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
+import { ISourcesServiceApi, TSourceType, ISourceApi, ISourceAddOptions } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
-import { log } from 'lodash-decorators/utils';
 
 @Component({
   components: { ModalLayout, Selector, Display }
@@ -21,12 +20,12 @@ export default class AddSource extends Vue {
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  propertiesManager = this.windowsService.getChildWindowQueryParams().propertiesManager as TPropertiesManager;
+  sourceAddOptions = this.windowsService.getChildWindowQueryParams().sourceAddOptions as ISourceAddOptions;
 
   sources = this.sourcesService.getSources().filter(source => {
     return source.isSameType({
       type: this.sourceType,
-      propertiesManager: this.propertiesManager,
+      propertiesManager: this.sourceAddOptions.propertiesManager,
     }) && source.sourceId !== this.scenesService.activeSceneId;
   });
 
@@ -70,9 +69,10 @@ export default class AddSource extends Vue {
       source = this.sourcesService.createSource(
         this.name,
         this.sourceType,
-        {},
+        {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
         {
-          propertiesManager: this.propertiesManager ? this.propertiesManager : void 0
+          propertiesManager: this.sourceAddOptions.propertiesManager,
+          propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
         }
       );
 

@@ -12,7 +12,6 @@ import { CustomizationService } from '../../services/customization';
 import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
 import { StreamingService } from '../../services/streaming';
 import ExtraSettings from '../ExtraSettings.vue';
-import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
@@ -28,7 +27,6 @@ import { CategoryIcons } from './CategoryIcons';
     NavItem,
     ExtraSettings,
     Hotkeys,
-    ApiSettings,
     NotificationsSettings,
     AppearanceSettings,
     ExperimentalSettings,
