@@ -5,6 +5,7 @@ import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  IPinnedStatistics,
 } from './customization-api';
 import {
   IObsInput,
@@ -62,6 +63,12 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
     legacyEvents: false,
+    pinnedStatistics: {
+      cpu: true,
+      fps: false,
+      droppedFrames: false,
+      bandwidth: false,
+    },
     experimental: {
       // put experimental features here
     },
@@ -128,6 +135,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setMediaBackupOptOut(optOut: boolean) {
     this.setSettings({ mediaBackupOptOut: optOut });
+  }
+
+  setPinnedStatistics(pinned: IPinnedStatistics) {
+    this.setSettings({ pinnedStatistics: pinned });
   }
 
   getSettingsFormData(): TObsFormData {
