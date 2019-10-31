@@ -61,7 +61,7 @@ export default class LiveDock extends Vue {
 
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
-  controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
+  controlRoomTooltip = $t('Go to Youtube Live Dashboard');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {

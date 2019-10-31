@@ -17,6 +17,7 @@ import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { pickBy } from 'lodash';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -350,13 +351,16 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   /**
    * update the chanel info based on the selected broadcast
    */
-  private setActiveBroadcast(broadcast: IYoutubeLiveBroadcast) {
-    this.updateActiveChannel({
+  private setActiveBroadcast(broadcast: Partial<IYoutubeLiveBroadcast>) {
+    const patch = {
       broadcastId: broadcast.id,
-      streamId: broadcast.contentDetails.boundStreamId,
-      title: broadcast.snippet.title,
-      description: broadcast.snippet.description,
-    });
+      streamId: broadcast.contentDetails && broadcast.contentDetails.boundStreamId,
+      title: broadcast.snippet && broadcast.snippet.title,
+      description: broadcast.snippet && broadcast.snippet.description,
+    };
+
+    // update non-empty fields
+    this.updateActiveChannel(pickBy(patch, val => val));
   }
 
   /**
@@ -395,7 +399,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     description: string;
     scheduledStartTime?: string;
   }): Promise<IYoutubeLiveBroadcast> {
-    const endpoint = 'liveBroadcasts?part=snippet,status,contentDetails';
+    const fields = ['snippet', 'contentDetails', 'status'];
+    const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const data: Dictionary<any> = {
       snippet: {
         title: params.title,
@@ -423,7 +428,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       boundStreamId?: string;
     },
   ): Promise<IYoutubeLiveBroadcast> {
-    const endpoint = `liveBroadcasts?part=snippet&id=${id}`;
+    const fields = ['snippet'];
+    const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {};
     if (params.title !== void 0) {
       snippet.title = params.title;
@@ -448,7 +454,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     broadcastId: string,
     streamId: string,
   ): Promise<IYoutubeLiveBroadcast> {
-    const endpoint = '/liveBroadcasts/bind?part=contentDetails,snippet,status';
+    const fields = ['snippet', 'contentDetails', 'status'];
+    const endpoint = `/liveBroadcasts/bind?part=${fields.join(',')}`;
     return platformAuthorizedRequest<IYoutubeLiveBroadcast>({
       method: 'POST',
       url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
