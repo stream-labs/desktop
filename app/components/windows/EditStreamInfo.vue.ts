@@ -226,7 +226,7 @@ export default class EditStreamInfo extends Vue {
           }
         })
         .catch(e => {
-          this.$toasted.show(e, {
+          this.$toasted.show(e.message, {
             position: 'bottom-center',
             className: 'toast-alert',
             duration: 5000,

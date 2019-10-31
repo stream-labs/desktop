@@ -230,6 +230,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterStopStream() {
+    const { broadcastId, lifecycleStep } = this.activeChannel;
+    if (lifecycleStep !== 'idle') this.transitionBroadcastStatus(broadcastId, 'complete');
     this.updateActiveChannel({
       lifecycleStep: 'idle',
       error: '',
@@ -607,16 +609,16 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   /**
-   * Fetch the list of active and upcoming broadcasts
+   * Fetch the list of upcoming broadcasts
+   * If ids specified than return broadcast in any state
    */
   async fetchBroadcasts(
     ids?: string[],
     maxResults = 50,
     fields = ['snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveBroadcast[]> {
-    const idsFilter = ids ? `&id=${ids.join(',')}` : '&mine=true';
-    const fieldsSelector = fields.join(',');
-    const query = `part=${fieldsSelector}&status=upcoming,active&maxResults=${maxResults}${idsFilter}&access_token=${
+    const filter = ids ? `&id=${ids.join(',')}` : `&broadcastStatus=upcoming`;
+    const query = `part=${fields.join(',')}${filter}&maxResults=${maxResults}&access_token=${
       this.oauthToken
     }`;
     const broadcastsCollection = await platformAuthorizedRequest<
