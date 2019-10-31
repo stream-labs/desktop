@@ -229,7 +229,7 @@ export default class EditStreamInfo extends Vue {
           this.$toasted.show(e, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 1000,
+            duration: 5000,
             singleton: true,
           });
           this.updatingInfo = false;

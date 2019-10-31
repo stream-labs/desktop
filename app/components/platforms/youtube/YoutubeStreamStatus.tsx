@@ -10,6 +10,7 @@ import TsxComponent from 'components/tsx-component';
 import styles from './YoutubeStreamStatus.m.less';
 import { TYoutubeLifecycleStep } from 'services/platforms/youtube';
 import { StreamingService } from 'services/streaming';
+import electron from 'electron';
 
 /**
  * This component is responsible for showing progress for YT
@@ -81,6 +82,11 @@ export default class YoutubeStreamStatus extends TsxComponent {
     });
   }
 
+  goToDashboard() {
+    electron.remote.shell.openExternal(this.streamInfo.dashboardUrl);
+    this.windowsService.closeChildWindow();
+  }
+
   render() {
     return (
       <ModalLayout showControls={false}>
@@ -106,7 +112,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
                 {$t(
                   `Your stream has been created but we can\'t publish it in your channel. Check your internet connection or go to the `,
                 )}
-                <a href={this.streamInfo.dashboardUrl}>{$t('stream control page')}</a>
+                <a href="javascript:void(0)" onClick={this.goToDashboard}>{$t('stream control page')}</a>
                 {$t(' to publish it manually')}
               </p>
 
