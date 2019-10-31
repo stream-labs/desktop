@@ -11,15 +11,14 @@
     </div>
     <i
       v-bind:class="['icon-leaderboard-4', 'metrics-icon', performanceIconClassName]"
-      @mouseover="metricsShown = true"
-      @mouseleave="metricsShown = false"
       @click="openMetricsWindow"
     />
+    <performance-metrics mode="limited" class="performance-metrics" />
     <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
-    <transition name="slide">
+    <!-- <transition name="slide">
       <performance-metrics v-if="metricsShown" class="performance-metrics" />
-    </transition>
+    </transition> -->
   </div>
 
   <div class="nav-right">
@@ -212,22 +211,8 @@
 }
 
 .performance-metrics {
-  position: absolute;
+  position: relative;
+  display: inline-flex;
   background: var(--section) !important;
-  left: 50px;
-  z-index: 100;
-}
-
-// performance metrics transition
-
-.slide-enter,
-.slide-leave-to {
-  transform: translateX(50px);
-  opacity: 0;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.5s ease;
 }
 </style>
