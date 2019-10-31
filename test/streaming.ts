@@ -18,7 +18,8 @@ import { readdir } from 'fs-extra';
 
 useSpectron();
 
-test('Streaming to Twitch without auth', async t => {
+// TODO obtain a valid streamkey in CI
+test.skip('Streaming to Twitch without auth', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
     console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
     t.pass();
