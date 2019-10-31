@@ -592,7 +592,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       message = error.result.error.message;
     } catch (e) {
-      message = 'Can not connect to platform';
+      message = `Can not connect to platform: ${error.message}`;
     }
     return `Youtube: ${message}`;
   }
