@@ -86,7 +86,7 @@
 }
 
 .performance-metric-wrapper.active {
-  background-color: var(--teal-semi);
+  background: var(--input-border);
 }
 
 .performance-metric-wrapper.clickable {

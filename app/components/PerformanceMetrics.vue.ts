@@ -5,7 +5,7 @@ import { Inject } from '../services/core/injector';
 import { Component, Prop } from 'vue-property-decorator';
 import { CustomizationService } from 'app-services';
 import TsxComponent from 'components/tsx-component';
-import cloneDeep from 'lodash/clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 import { $t } from 'services/i18n';
 
 type TPerformanceMetricsMode = 'full' | 'limited';
