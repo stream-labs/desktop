@@ -172,8 +172,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return Promise.resolve({});
   }
 
-  private createLiveVideo() {
-    if (this.streamSettingsService.settings.platform === 'facebook') return Promise.resolve();
+  private createLiveVideo(): Promise<string> {
     const { title, description, game } = this.state.streamProperties;
     const data = {
       method: 'POST',
@@ -191,6 +190,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
         this.streamSettingsService.setSettings({ key: streamKey });
+        return streamKey;
       })
       .catch(resp =>
         Promise.reject($t('Something went wrong while going live, please try again.')),
@@ -263,12 +263,23 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     await this.prepopulateInfo();
     await this.putChannelInfo(options);
     this.streamSettingsService.setSettings({ platform: 'facebook' });
+
+    // This generally happens when a stream was scheduled, or when we
+    // fetched an existing stopped or scheduled stream from the API.
     if (this.state.streamUrl) {
       const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
       this.streamSettingsService.setSettings({ key: streamKey, platform: 'facebook' });
       this.SET_STREAM_URL(null);
-    } else if (this.state.activePage) await this.createLiveVideo();
+      return streamKey;
+    }
+
+    if (this.state.activePage) {
+      return await this.createLiveVideo();
+    }
+
     this.emitChannelInfo();
+
+    return null;
   }
 
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {
