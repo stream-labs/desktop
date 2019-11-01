@@ -29,8 +29,8 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
   info(colors.magenta('| N Air Release Note Generator |'));
   info(colors.magenta('|------------------------------|'));
 
-  info('checking current tag ...');
-  const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
+  info('checking current version ...');
+  const previousVersion = executeCmd('git describe --tags --abbrev=0').stdout.trim().replace(/^v/, '');
 
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
   const patchNoteFileName = `${baseDir}patch-note.txt`;
@@ -42,19 +42,19 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
     log(`${previousPatchNote.version}\n${previousPatchNote.lines.join('\n')}`);
 
     info(`patch-note.txt for ${previousPatchNote.version} found`);
-    info(`current version: ${previousTag}`);
+    info(`current version: ${previousVersion}`);
 
     if (!await confirm('overwrite?', false)) {
       sh.exit(1);
     }
   } else {
-    info(`current version: ${previousTag}`);
+    info(`current version: ${previousVersion}`);
   }
 
-  const previousVersionContext = getVersionContext(previousTag);
+  const previousVersionContext = getVersionContext(previousVersion);
   const { channel, environment } = previousVersionContext;
 
-  log('current version', colors.cyan(previousTag));
+  log('current version', colors.cyan(previousVersion));
   log('environment', (environment === 'public' ? colors.red : colors.cyan)(environment));
   log('channel', (channel === 'stable' ? colors.red : colors.cyan)(channel));
 
@@ -71,18 +71,18 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
   }
 
   const defaultVersion = generateNewVersion({
-    previousTag,
+    previousVersion,
   });
   log('\nestimated version', colors.cyan(defaultVersion));
 
   const newVersion = await input('What should the new version number be?', defaultVersion);
 
-  const newVersionContext = getVersionContext(`v${newVersion}`);
+  const newVersionContext = getVersionContext(newVersion);
   if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
-    log('version', colors.cyan(previousTag), ' -> ', colors.cyan(`v${newVersion}`));
+    log('version', colors.cyan(previousVersion), ' -> ', colors.cyan(newVersion));
     const environmentIsMatched = previousVersionContext.environment === newVersionContext.environment;
     const channelIsMatched = previousVersionContext.channel === newVersionContext.channel;
-    const colorize = flag => flag ? colors.red : colors.cyan;
+    const colorize = flag => (flag ? colors.red : colors.cyan);
     log(
       'environment:',
       colorize(!environmentIsMatched)(environmentIsMatched ? 'matched  ' : 'unmatched'),
@@ -117,10 +117,10 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
       owner: 'n-air-app',
       repo: 'n-air-app',
     },
-    previousTag
+    previousVersion
   );
 
-  const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {
+  const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" v${previousVersion}..`, {
     silent: true,
   }).stdout;
   const directCommitsNotes = directCommits ? `\nDirect Commits:\n${directCommits}` : '';

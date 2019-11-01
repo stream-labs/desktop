@@ -1,13 +1,13 @@
-const { parseVersionTag, getVersionContext, validateVersionContext, generateNewVersion } = require('./patchNote');
+const { parseVersion, getVersionContext, validateVersionContext, generateNewVersion } = require('./patchNote');
 
 const fixtures = {
   public: {
-    stable: 'v1.0.20190826-2',
-    unstable: 'v1.0.20190826-unstable.2',
+    stable: '1.0.20190826-2',
+    unstable: '1.0.20190826-unstable.2',
   },
   internal: {
-    stable: 'v1.0.20190826-2d',
-    unstable: 'v1.0.20190826-unstable.2d',
+    stable: '1.0.20190826-2d',
+    unstable: '1.0.20190826-unstable.2d',
   },
 };
 const TODAY = new Date('2019-08-26');
@@ -46,7 +46,7 @@ for (const fixtureSet of channelEnvironmentSets()) {
 }
 
 test('バージョンがパースできる(public stable)', () => {
-  expect(parseVersionTag(fixtures.public.stable)).toMatchInlineSnapshot(`
+  expect(parseVersion(fixtures.public.stable)).toMatchInlineSnapshot(`
                 Object {
                   "channel": undefined,
                   "date": "20190826",
@@ -58,7 +58,7 @@ test('バージョンがパースできる(public stable)', () => {
         `);
 });
 test('バージョンがパースできる(public unstable)', () => {
-  expect(parseVersionTag(fixtures.public.unstable)).toMatchInlineSnapshot(`
+  expect(parseVersion(fixtures.public.unstable)).toMatchInlineSnapshot(`
                 Object {
                   "channel": "unstable",
                   "date": "20190826",
@@ -70,7 +70,7 @@ test('バージョンがパースできる(public unstable)', () => {
         `);
 });
 test('バージョンがパースできる(internal stable)', () => {
-  expect(parseVersionTag(fixtures.internal.stable)).toMatchInlineSnapshot(`
+  expect(parseVersion(fixtures.internal.stable)).toMatchInlineSnapshot(`
                 Object {
                   "channel": undefined,
                   "date": "20190826",
@@ -82,7 +82,7 @@ test('バージョンがパースできる(internal stable)', () => {
         `);
 });
 test('バージョンがパースできる(internal unstable)', () => {
-  expect(parseVersionTag(fixtures.internal.unstable)).toMatchInlineSnapshot(`
+  expect(parseVersion(fixtures.internal.unstable)).toMatchInlineSnapshot(`
                 Object {
                   "channel": "unstable",
                   "date": "20190826",
@@ -95,11 +95,11 @@ test('バージョンがパースできる(internal unstable)', () => {
 });
 
 test('stableチャンネルの場合はバージョン中のチャンネル部分があったらエラー', () => {
-  expect(() => getVersionContext('v1.0.20190826-stable.2')).toThrow();
+  expect(() => getVersionContext('1.0.20190826-stable.2')).toThrow();
 });
 
 test('知らないチャンネルを名乗っていたらエラー', () => {
-  expect(() => getVersionContext('v1.0.20190826-hogehoge.2')).toThrow();
+  expect(() => getVersionContext('1.0.20190826-hogehoge.2')).toThrow();
 });
 
 test('バージョンがパースできる(public stable)', () => {
@@ -153,43 +153,43 @@ test('ふたつのVersionContextが同じか否か判定できる', () => {
 });
 
 test('次のバージョンを生成する(当日、publicでstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.public.stable, now: TODAY })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.public.stable, now: TODAY })).toMatchInlineSnapshot(
     `"1.0.20190826-3"`
   );
 });
 test('次のバージョンを生成する(当日、publicでunstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.public.unstable, now: TODAY })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.public.unstable, now: TODAY })).toMatchInlineSnapshot(
     `"1.0.20190826-unstable.3"`
   );
 });
 test('次のバージョンを生成する(当日、internalでstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.internal.stable, now: TODAY })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.internal.stable, now: TODAY })).toMatchInlineSnapshot(
     `"1.0.20190826-3d"`
   );
 });
 test('次のバージョンを生成する(当日、internalでunstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.internal.unstable, now: TODAY })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TODAY })).toMatchInlineSnapshot(
     `"1.0.20190826-unstable.3d"`
   );
 });
 
 test('次のバージョンを生成する(別日、publicでstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.public.stable, now: TOMORROW })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.public.stable, now: TOMORROW })).toMatchInlineSnapshot(
     `"1.0.20190827-1"`
   );
 });
 test('次のバージョンを生成する(別日、publicでunstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.public.unstable, now: TOMORROW })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.public.unstable, now: TOMORROW })).toMatchInlineSnapshot(
     `"1.0.20190827-unstable.1"`
   );
 });
 test('次のバージョンを生成する(別日、internalでstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.internal.stable, now: TOMORROW })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.internal.stable, now: TOMORROW })).toMatchInlineSnapshot(
     `"1.0.20190827-1d"`
   );
 });
 test('次のバージョンを生成する(別日、internalでunstable)', () => {
-  expect(generateNewVersion({ previousTag: fixtures.internal.unstable, now: TOMORROW })).toMatchInlineSnapshot(
+  expect(generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TOMORROW })).toMatchInlineSnapshot(
     `"1.0.20190827-unstable.1d"`
   );
 });
