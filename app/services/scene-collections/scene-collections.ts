@@ -276,12 +276,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.syncPending = true;
     try {
       await this.sync();
+      this.syncPending = false;
     } catch (e) {
+      this.syncPending = false;
+
       console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
       if (retries > 0) await this.safeSync(retries - 1);
     }
-
-    this.syncPending = false;
   }
 
   /**
