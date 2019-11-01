@@ -12,7 +12,13 @@ export function createProps<TProps extends new () => any>(
 }
 
 export default abstract class TsxComponent<TProps = {}> extends Vue {
-  private vueTsxProps: Readonly<{ slot?: string; ref?: string; class?: string; key?: string }> &
+  private vueTsxProps: Readonly<{
+    slot?: string;
+    ref?: string;
+    class?: string;
+    key?: string;
+    vModel?: unknown;
+  }> &
     Readonly<TProps>;
 
   get props(): TProps {

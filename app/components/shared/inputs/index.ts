@@ -35,6 +35,7 @@ export interface IInputMetadata {
   disabled?: boolean;
   uuid?: string;
   name?: string;
+  isInteger?: boolean;
 }
 
 export interface INumberMetadata extends IInputMetadata {

@@ -24,6 +24,7 @@ export interface IMediaShareSettings extends IWidgetSettings {
   price_per_second: number;
   security: number;
   volume: number;
+  buffer_time: number;
 }
 
 export interface IMediaShareData extends IWidgetData {
@@ -55,8 +56,8 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/media`,
       testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
-      customCodeAllowed: true,
-      customFieldsAllowed: true,
+      customCodeAllowed: false,
+      customFieldsAllowed: false,
     };
   }
 

@@ -9,6 +9,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 
 class ValidatedFormProps {
   name?: string = '';
+  onInput?: () => void;
 }
 
 /**
