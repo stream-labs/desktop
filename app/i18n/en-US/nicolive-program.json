@@ -88,7 +88,7 @@
         },
         "401": {
           "title": "You do not have the authority to extend the program",
-          "message": "You can not extend the program because the account you are logged into does not have authority to extend the program. \nMake sure you are logged in with the correct account."
+          "message": "You can not extend the program because the account you are logged into does not have authority to extend the program time. Try to relogin to niconico on N Air and extend the program again."
         },
         "403": {
           "title": "Failed to extend the program",

@@ -328,7 +328,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async extendProgram(): Promise<void> {
-    const result = await this.client.extendProgram(this.state.programID);
+    return this.internalExtendProgram(this.state);
+  }
+
+  private async internalExtendProgram(state: INicoliveProgramState): Promise<void> {
+    const result = await this.client.extendProgram(state.programID);
     if (!isOk(result)) {
       throw NicoliveProgramServiceFailure.fromClientError('extendProgram', result);
     }
@@ -436,10 +440,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       const timeout = (nextState.endTime - 5 * 60) * 1000 - now;
       // 5分前をすでに過ぎていたら即延長
       if (timeout <= 0) {
-        this.extendProgram();
+        this.extendProgramForAutoExtension(nextState);
       } else {
         this.autoExtensionTimer = window.setTimeout(() => {
-          this.extendProgram();
+          this.extendProgramForAutoExtension(nextState);
         }, timeout);
         console.log(
           '自動延長タイマーが（再）設定されました ',
@@ -454,6 +458,18 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     if (prev && !next) {
       clearTimeout(this.autoExtensionTimer);
       console.log('自動延長タイマーが解除されました');
+    }
+  }
+
+  private async extendProgramForAutoExtension(state: INicoliveProgramState) {
+    try {
+      return await this.internalExtendProgram(state);
+    } catch (caught) {
+      if (caught instanceof NicoliveProgramServiceFailure) {
+        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     }
   }
 

@@ -9,7 +9,7 @@
     <div class="editable-list__bar">
       <i
         @click="menu.popup()"
-        class="icon-add-file icon-btn editable-list__control"
+        class="icon-add icon-btn editable-list__control"
         data-test="Add"/>
       <i
         @click="handleRemove"
