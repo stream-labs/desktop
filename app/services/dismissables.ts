@@ -3,7 +3,8 @@ import { mutation } from './stateful-service';
 import Vue from 'vue';
 
 export enum EDismissable {
-  SceneCollectionsHelpTip = 'scene_collections_help_tip'
+  SceneCollectionsHelpTip = 'scene_collections_help_tip',
+  ScenePresetHelpTip = 'scene_preset_help_tip'
 }
 
 interface IDismissablesServiceState {
@@ -25,6 +26,10 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
     this.DISMISS(key);
   }
 
+  reset(key: EDismissable) {
+    this.RESET(key);
+  }
+
   dismissAll() {
     Object.keys(EDismissable).forEach(key => this.dismiss(EDismissable[key]));
   }
@@ -32,6 +37,11 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   @mutation()
   DISMISS(key: EDismissable) {
     Vue.set(this.state, key, true);
+  }
+
+  @mutation()
+  RESET(key: EDismissable) {
+    Vue.set(this.state, key, false);
   }
 
 }
