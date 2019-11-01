@@ -7,6 +7,7 @@ export interface IPlatformResponse<TResult = unknown> {
   url: string;
   status: number;
   result: TResult;
+  message: string;
 }
 
 /**
@@ -21,7 +22,7 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
   const serializedResponse = { ok: response.ok, url: response.url, status: response.status };
   return response.ok
     ? result
-    : Promise.reject({ result, ...serializedResponse } as IPlatformResponse);
+    : Promise.reject({ result, message: status, ...serializedResponse } as IPlatformResponse);
 }
 
 /**

@@ -353,6 +353,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
    * Get user-friendly error message
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Facebook`;
+    return `Can not connect to Facebook: ${error.message}`;
   }
 }

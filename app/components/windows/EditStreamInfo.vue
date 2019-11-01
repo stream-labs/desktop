@@ -2,7 +2,6 @@
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
       <div v-if="infoLoading"><spinner/></div>
-
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="populateInfo">{{
@@ -100,6 +99,7 @@
           v-if="twitterIsEnabled && !isSchedule"
           v-model="tweetModel"
         />
+
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -116,7 +116,7 @@
         </div>
       </validated-form>
     </div>
-    <div slot="controls">
+    <div slot="controls" class="controls">
       <button class="button button--default" :disabled="updatingInfo" @click="cancel">
         {{ isSchedule ? $t('Close') : $t('Cancel') }}
       </button>

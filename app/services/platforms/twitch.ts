@@ -316,6 +316,6 @@ export class TwitchService extends Service implements IPlatformService {
    * Get user-friendly error message
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Twitch`;
+    return `Can not connect to Twitch: ${error.message}`;
   }
 }

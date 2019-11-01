@@ -2,7 +2,6 @@ import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './
 import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
 import { FacebookService, IFacebookChanelInfo, IFacebookStartStreamOptions } from './facebook';
-import { StreamingContext } from '../streaming';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { Observable } from 'rxjs';
@@ -133,7 +132,9 @@ export interface IPlatformService {
 
   beforeGoLive: (options?: TStartStreamOptions) => Promise<any>;
 
-  afterGoLive?: (context?: StreamingContext) => Promise<void>;
+  afterGoLive?: () => Promise<void>;
+
+  afterStopStream?: () => Promise<void>;
 
   prepopulateInfo: () => Promise<TStartStreamOptions>;
 

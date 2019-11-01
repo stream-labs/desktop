@@ -22,7 +22,6 @@ import { UserService } from 'services/user';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
-import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
@@ -51,14 +50,6 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-/**
- * Streaming context that's passed if we need to use in an after hook
- */
-export interface StreamingContext {
-  twitchTags?: TTwitchTagWithLabel[];
-  allTwitchTags?: TTwitchTag[];
-}
-
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() streamSettingsService: StreamSettingsService;
@@ -82,8 +73,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
-
-  private context: StreamingContext = null;
 
   static initialState = {
     streamingStatus: EStreamingState.Offline,
@@ -413,6 +402,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
+        this.runPlaformAfterStopStreamHook();
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -556,12 +546,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn && this.userService.platform) {
+  private async runPlatformAfterGoLiveHook() {
+    if (this.userService.isLoggedIn() && this.userService.platform) {
       const service = getPlatformService(this.userService.platform.type);
       if (typeof service.afterGoLive === 'function') {
-        service.afterGoLive(this.context);
+        await service.afterGoLive();
       }
+    }
+  }
+
+  private async runPlaformAfterStopStreamHook() {
+    if (!this.userService.isLoggedIn()) return;
+    const service = this.userService.getPlatformService();
+    if (typeof service.afterStopStream === 'function') {
+      await service.afterStopStream();
     }
   }
 }
