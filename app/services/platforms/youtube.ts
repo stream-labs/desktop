@@ -193,6 +193,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
     this.setActiveBroadcast(broadcast);
+
+    return streamKey;
   }
 
   async afterGoLive() {
