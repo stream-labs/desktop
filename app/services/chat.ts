@@ -76,7 +76,7 @@ export class ChatService extends Service {
   }
 
   unmountChat(electronWindowId: number) {
-    this.electronWindowId = 0;
+    this.electronWindowId = null;
     if (!this.chatView) return;
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);

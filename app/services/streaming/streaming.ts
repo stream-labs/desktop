@@ -547,7 +547,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private async runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn && this.userService.platform) {
+    if (this.userService.isLoggedIn() && this.userService.platform) {
       const service = getPlatformService(this.userService.platform.type);
       if (typeof service.afterGoLive === 'function') {
         await service.afterGoLive();
@@ -556,7 +556,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private async runPlaformAfterStopStreamHook() {
-    if (!this.userService.isLoggedIn) return;
+    if (!this.userService.isLoggedIn()) return;
     const service = this.userService.getPlatformService();
     if (typeof service.afterStopStream === 'function') {
       await service.afterStopStream();

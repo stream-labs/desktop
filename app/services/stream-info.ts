@@ -80,6 +80,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   private onLogoutHandler() {
     if (this.channelInfoSubsc) this.channelInfoSubsc.unsubscribe();
     this.RESET();
+    this.streamInfoChanged.next(this.state);
   }
 
   private updateInfo(streamInfoPatch: Partial<TStreamInfoServiceState>) {

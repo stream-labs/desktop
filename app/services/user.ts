@@ -150,6 +150,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .then(valid => {
         if (valid.match(/false/)) {
           this.LOGOUT();
+          electron.remote.dialog.showMessageBox({
+            message: $t('You have been logged out'),
+          });
           return;
         }
         const service = getPlatformService(this.state.auth.platform.type);
@@ -314,7 +317,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   getPlatformService(): IPlatformService {
-    return getPlatformService(this.platform.type);
+    return this.isLoggedIn() ? getPlatformService(this.platform.type) : null;
   }
 
   async showLogin() {
