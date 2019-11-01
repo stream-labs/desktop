@@ -6,7 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 const OctoKit = require('@octokit/rest');
-const inq = require('inquirer');
 const sh = require('shelljs');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
@@ -30,8 +29,9 @@ const {
 const {
   uploadS3File,
   uploadToGithub,
-  uploadToSentry
+  uploadToSentry,
 } = require('./scripts/uploadArtifacts');
+
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 /**

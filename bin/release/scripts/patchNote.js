@@ -16,7 +16,7 @@ const VERSION_REGEXP = /(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel
 function parseVersion(tag) {
   const result = VERSION_REGEXP.exec(tag);
   if (result && result.groups) return result.groups;
-  throw new Error(`cannot parse a given tag: ${tag}`)
+  throw new Error(`cannot parse a given tag: ${tag}`);
 }
 
 /** @typedef {{ channel: 'stable' | 'unstable', environment: 'public' | 'internal' }} VersionContext */

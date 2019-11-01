@@ -25,6 +25,7 @@ const {
   writePatchNoteFile,
   collectPullRequestMerges,
 } = require('./scripts/patchNote');
+
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 async function generateRoutine({ githubTokenForReadPullRequest }) {
