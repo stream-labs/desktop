@@ -81,6 +81,6 @@
   "Save Replay": "Visszajátszás Mentése",
   "Streaming to %{platformName}": "Streaming to %{platformName}",
   "Stream to custom ingest": "Stream to custom ingest",
-  "Use recommended settings": "Use recommended settings",
+  "Use recommended settings": "Használd az ajánlott beállításokat",
   "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected"
 }
