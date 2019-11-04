@@ -20,7 +20,7 @@
     v-tooltip="pinTooltip"
     v-if="showFPS"
   >
-    <img class="performance-metric-icon" src="../../media/images/icons/fps.png">
+    <i class="performance-metric-icon icon-fps"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ frameRate }}</span>
       <span class="performance-metric__label">FPS</span>
@@ -33,7 +33,7 @@
     v-tooltip="pinTooltip"
     v-if="showDroppedFrames"
   >
-    <img class="performance-metric-icon" src="../../media/images/icons/dropped-frames.png">
+    <i class="performance-metric-icon icon-dropped-frames"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span>
       <span v-if="mode === 'full'" class="performance-metric__label">{{ $t('Dropped Frames') }}</span>
@@ -46,7 +46,7 @@
     v-tooltip="pinTooltip"
     v-if="showBandwidth"
   >
-    <img class="performance-metric-icon" src="../../media/images/icons/speed.png">
+    <i class="performance-metric-icon icon-bitrate"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ bandwidth }}</span>
       <span class="performance-metric__label">kb/s</span>
@@ -72,10 +72,6 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
-
-  i {
-    color: var(--icon);
-  }
 
   &::before {
     .padding-right();
