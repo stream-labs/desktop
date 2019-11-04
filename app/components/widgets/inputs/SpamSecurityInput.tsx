@@ -4,7 +4,7 @@ import { ISpamSecurityMetadata } from 'components/widgets/inputs/index';
 import { SliderInput } from 'components/shared/inputs/inputs';
 import { $t } from 'services/i18n';
 
-@Component({ components: { SliderInput } })
+@Component({})
 export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMetadata> {
   @Prop() readonly value: number;
   @Prop() readonly metadata: ISpamSecurityMetadata;
@@ -28,5 +28,15 @@ export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMe
   updateLocalValue(value: string) {
     this.localValue = value;
     this.emitInput(this.optionData.indexOf(value) + this.idxMod);
+  }
+
+  render() {
+    return (
+      <SliderInput
+        metadata={this.spamMetadata}
+        value={this.localValue}
+        onInput={(value: string) => this.updateLocalValue(value)}
+      />
+    );
   }
 }

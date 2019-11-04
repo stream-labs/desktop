@@ -61,16 +61,14 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
     };
   }
 
-  async unbanMedia(media: IMediaShareBan) {
+  async unbanMedia(media: string) {
     const url = `${this.getApiSettings().dataFetchUrl}/unban`;
     await this.request({
       url,
       method: 'POST',
-      body: {
-        media: media.media,
-      },
+      body: { media },
     });
-    return this.fetchData();
+    return this.refreshData();
   }
 
   protected patchAfterFetch(response: IMediaShareData): any {

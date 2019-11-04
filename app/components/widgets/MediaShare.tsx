@@ -10,6 +10,7 @@ import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 
 import { $t } from 'services/i18n';
+import styles from './MedaShare.m.less';
 
 @Component({})
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
@@ -55,6 +56,31 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
     { value: 'source', label: $t('Source') },
   ];
 
+  async unbanMedia(media: string) {
+    await this.service.unbanMedia(media);
+  }
+
+  get banList() {
+    if (this.wData && !this.wData.banned_media.length) {
+      return <span class={styles.whisper}>{$t('No banned media found')}</span>;
+    }
+
+    return (
+      this.wData &&
+      this.wData.banned_media.map(media => (
+        <div
+          vTooltip={$t('Banned by %{user}', { user: media.action_by })}
+          class={styles.banlistCell}
+        >
+          <span>{media.media_title}</span>
+          <button class="button button--default" onClick={() => this.unbanMedia(media.media)}>
+            {$t('Unban')}
+          </button>
+        </div>
+      ))
+    );
+  }
+
   render() {
     return (
       this.wData && (
@@ -62,8 +88,8 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
           slots={[{ value: 'banlist', label: $t('Banned Media') }]}
           navItems={this.navItems}
         >
-          <div slot="banlist">
-            <div />
+          <div slot="banlist" class={styles.banlist}>
+            {this.banList}
           </div>
           {this.loaded && (
             <ValidatedForm slot="media-properties" onInput={() => this.save()}>

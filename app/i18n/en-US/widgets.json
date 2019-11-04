@@ -65,5 +65,8 @@
   "Sparks sent are at least <amount>": "Sparks sent are at least <amount>",
   "Sparks sent are exactly <amount>": "Sparks sent are exactly <amount>",
   "Ember amount is at least <amount>": "Ember amount is at least <amount>",
-  "Ember amount is exactly <amopunt>": "Ember amount is exactly <amopunt>"
+  "Ember amount is exactly <amopunt>": "Ember amount is exactly <amopunt>",
+  "Unban": "Unban",
+  "Banned by %{user}": "Banned by %{user}",
+  "No banned media found": "No banned media found"
 }

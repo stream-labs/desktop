@@ -10,10 +10,10 @@ import { isString } from 'util';
 @Component({
   components: { Slider },
 })
-export default class SliderInput extends BaseInput<number, ISliderMetadata> {
+export default class SliderInput extends BaseInput<number | string, ISliderMetadata> {
   @Inject() customizationService: CustomizationService;
 
-  @Prop() readonly value: number;
+  @Prop() readonly value: number | string;
   @Watch('value')
   private syncLocalValue(newVal: number) {
     this.localValue = this.usePercentages ? newVal * 100 : newVal;
@@ -34,8 +34,17 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
    * @param value The value that will be displayed on the interface.
    */
   updateLocalValue(value: number) {
+    // Return early for string value sliders
+    if (this.options.data) {
+      this.localValue = value;
+      return this.updateValue(value);
+    }
     if (this.timeout) this.timeout = window.clearTimeout(this.timeout);
 
+    this.parseNumericalValue(value);
+  }
+
+  parseNumericalValue(value: number | string) {
     const parsedValue = Number(value);
 
     // Dislay a empty string if and only if the user deletes all of the input field.
@@ -47,7 +56,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
     } else if (parsedValue > this.max) {
       this.localValue = this.max;
       this.updateValue(this.max);
-    } else if (value != null && !isNaN(value) && this.localValue !== parsedValue) {
+    } else if (value != null && !isNaN(parsedValue) && this.localValue !== parsedValue) {
       // Otherwise use the provided number value if it has changed and is properly constrained
       this.localValue = parsedValue;
       this.updateValue(parsedValue);
@@ -55,11 +64,13 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   }
 
   initializeLocalValue() {
+    if (typeof this.value === 'string') return this.value;
     if (this.value == null) return this.min || 0;
     return this.options.usePercentages ? this.value * 100 : this.value;
   }
 
   get interval() {
+    if (this.options.data) return null;
     return this.options.usePercentages
       ? this.options.interval * 100 || 1
       : this.options.interval || 1;
@@ -94,6 +105,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   }
 
   handleKeydown(event: KeyboardEvent) {
+    if (typeof this.value === 'string') return;
     if (event.code === 'ArrowUp') this.updateValue(this.value + this.interval);
     if (event.code === 'ArrowDown') this.updateValue(this.value - this.interval);
   }
