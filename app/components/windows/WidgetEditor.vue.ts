@@ -29,11 +29,11 @@ class WidgetEditorProps {
    * Declaration of additional sections in the right panel
    * @see example of usage in TipJar.vue.ts
    */
-  slots?: IWidgetNavItem[] = [];
+  slots?: IWidgetNavItem[] = null;
   /**
    * Navigation items for the right panel
    */
-  navItems: IWidgetNavItem[] = [];
+  navItems: IWidgetNavItem[] = null;
 }
 
 @Component({
