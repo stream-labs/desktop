@@ -64,7 +64,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     navigateToLiveOnStreamStart: true,
     legacyEvents: false,
     pinnedStatistics: {
-      cpu: true,
+      cpu: false,
       fps: false,
       droppedFrames: false,
       bandwidth: false,
