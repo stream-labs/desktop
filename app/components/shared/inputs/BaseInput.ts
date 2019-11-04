@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import uuid from 'uuid/v4';
-import { IInputMetadata } from './index';
+import { EInputType, IInputMetadata } from './index';
 import ValidatedForm from './ValidatedForm';
 import TsxComponent from 'components/tsx-component';
 
@@ -9,9 +9,10 @@ export abstract class BaseInput<
   TValueType,
   TMetadataType extends IInputMetadata
 > extends TsxComponent<{
-  metadata: TMetadataType;
+  metadata?: TMetadataType;
   value?: TValueType;
   title?: string;
+  type?: EInputType;
   onInput?: Function;
 }> {
   abstract readonly value: TValueType;
@@ -32,7 +33,7 @@ export abstract class BaseInput<
   /**
    * contains ValidatedForm if exist
    */
-  protected form: ValidatedForm = null;
+  form: ValidatedForm = null;
 
   /**
    * contains parent-input if exist

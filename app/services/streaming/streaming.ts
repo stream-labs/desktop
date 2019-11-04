@@ -17,7 +17,7 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, TStartStreamOptions } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
   NotificationsService,
@@ -27,7 +27,6 @@ import {
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
-import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
@@ -56,14 +55,6 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-/**
- * Streaming context that's passed if we need to use in an after hook
- */
-export interface StreamingContext {
-  twitchTags?: TTwitchTagWithLabel[];
-  allTwitchTags?: TTwitchTag[];
-}
-
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() streamSettingsService: StreamSettingsService;
@@ -87,8 +78,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
-
-  private context: StreamingContext = null;
 
   static initialState = {
     streamingStatus: EStreamingState.Offline,
@@ -137,15 +126,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * @deprecated Use toggleStreaming instead
    */
-  startStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  startStreaming() {
+    this.toggleStreaming();
   }
 
   /**
    * @deprecated Use toggleStreaming instead
    */
-  stopStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  stopStreaming() {
+    this.toggleStreaming();
   }
 
   private finishStartStreaming() {
@@ -170,20 +159,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  async toggleStreaming(ctx?: StreamingContext) {
-    this.context = ctx;
-
+  async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      // in the "force" mode just try to start streaming without updating channel info
+      if (force) {
+        this.finishStartStreaming();
+        return Promise.resolve();
+      }
       try {
         if (this.userService.isLoggedIn && this.userService.platform) {
           const service = getPlatformService(this.userService.platform.type);
 
-          // update stream key and stream settings for platform
           if (this.streamSettingsService.protectedModeEnabled) {
-            await service.setupStreamSettings();
+            await service.beforeGoLive(options);
           }
-
-          await service.beforeGoLive();
         }
         this.finishStartStreaming();
         return Promise.resolve();
@@ -398,9 +387,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          if (this.streamInfoService.state.channelInfo) {
-            game = this.streamInfoService.state.channelInfo.game;
-          }
+          game = this.streamInfoService.state.game;
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }
@@ -421,6 +408,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
+        this.runPlaformAfterStopStreamHook();
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -564,12 +552,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn && this.userService.platform) {
+  private async runPlatformAfterGoLiveHook() {
+    if (this.userService.isLoggedIn() && this.userService.platform) {
       const service = getPlatformService(this.userService.platform.type);
       if (typeof service.afterGoLive === 'function') {
-        service.afterGoLive(this.context);
+        await service.afterGoLive();
       }
+    }
+  }
+
+  private async runPlaformAfterStopStreamHook() {
+    if (!this.userService.isLoggedIn()) return;
+    const service = this.userService.getPlatformService();
+    if (typeof service.afterStopStream === 'function') {
+      await service.afterStopStream();
     }
   }
 }
