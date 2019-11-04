@@ -30,6 +30,7 @@ import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
+import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -111,6 +112,7 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
+    YoutubeStreamStatus,
   };
 }
 

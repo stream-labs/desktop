@@ -23,7 +23,6 @@ export enum EReplayBufferState {
 }
 
 export interface IStreamingServiceState {
-  protectedModeEnabled: boolean;
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
   recordingStatus: ERecordingState;

@@ -9,7 +9,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 
 class ValidatedFormProps {
   name?: string = '';
-  onInput?: () => void;
+  onInput?: () => unknown;
 }
 
 /**
@@ -33,14 +33,40 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
   }
 
   /**
+   * get nested forms
+   */
+  getForms(children?: Vue[]): ValidatedForm[] {
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    children = children || this.$children;
+    const forms: ValidatedForm[] = [];
+    children.forEach(child => {
+      if (child instanceof ValidatedForm) {
+        forms.push(child, ...child.getForms());
+        return;
+      }
+      if (child.$children.length) forms.push(...this.getForms(child.$children));
+    });
+    return forms;
+  }
+
+  /**
    * validate and show validation messages
    */
   async validate() {
+    // validate the root-level form
     const inputs = this.getInputs();
     for (let i = 0; i < inputs.length; i++) {
-      await inputs[i].$validator.validateAll(this.validationScopeId);
+      await inputs[i].$validator.validateAll(inputs[i].form.validationScopeId);
     }
-    this.validated.next(this.$validator.errors.items);
+
+    // validate nested forms
+    const nestedForms = this.getForms();
+    nestedForms.forEach(form => form.validate());
+
+    // emit errors from root and nested forms
+    this.validated.next(
+      this.$validator.errors.items.concat(...nestedForms.map(form => form.$validator.errors.items)),
+    );
   }
 
   async validateAndGetErrors(): Promise<ErrorField[]> {

@@ -11,11 +11,7 @@
       </div>
     </div>
   </div>
-  <div
-    v-else
-    class="no-preview"
-    :style="`height: calc(100% - ${eventsHeight + controlsHeight}px)`"
-  >
+  <div v-else class="no-preview">
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
       <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
@@ -43,7 +39,7 @@
       v-model="controlsHeight"
       @onresizestop="onResizeStopHandler()"
       @onresizestart="onResizeStartHandler()"
-      :max="maxHeight - minControlsHeight"
+      :max="maxHeight"
       :min="minControlsHeight"
       :reverse="true"
     />
@@ -159,15 +155,17 @@
 
 .no-preview {
   width: 100%;
-  height: 100%;
+  height: 0;
   position: relative;
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 
   .message {
     max-width: 50%;
+    position: relative;
 
     .button {
       margin-top: 20px;

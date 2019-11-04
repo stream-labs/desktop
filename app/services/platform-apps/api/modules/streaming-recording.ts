@@ -53,14 +53,10 @@ export class StreamingRecordingModule extends Module {
     return this.serializeStreamInfo();
   }
 
-  private serializeStreamInfo() {
+  private serializeStreamInfo(): IStreamInfo {
     return {
-      title: this.streamInfoService.state.channelInfo
-        ? this.streamInfoService.state.channelInfo.title
-        : null,
-      game: this.streamInfoService.state.channelInfo
-        ? this.streamInfoService.state.channelInfo.game
-        : null,
+      title: this.streamInfoService.state.title,
+      game: this.streamInfoService.state.game,
       viewerCount: this.streamInfoService.state.viewerCount,
     };
   }
