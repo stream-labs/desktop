@@ -138,11 +138,11 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
       ...this.commonWindowOptions,
       width: 600,
-      transparent: true,
+      transparent: false,
       webPreferences: { offscreen: false, nodeIntegration: true },
       isFullScreen: true,
       alwaysOnTop: true,
-      componentName: 'OverlayPlaceholder',
+      componentName: 'RecentEvents',
       title: $t('Recent Events'),
     });
 
@@ -169,7 +169,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
+    // this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
+    console.log(this.windows.recentEvents);
+    this.windows.recentEvents.show();
     this.windows.chat.loadURL(
       await getPlatformService(this.userService.platform.type).getChatUrl(
         this.customizationService.isDarkTheme ? 'night' : 'day',
