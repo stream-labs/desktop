@@ -31,10 +31,30 @@ import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 
+interface ISecondaryPlatformAuth {
+  username: string;
+  token: string;
+  id: string;
+}
+
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
   auth?: IPlatformAuth;
+  secondaryAuths?: { [platform in TPlatform]?: ISecondaryPlatformAuth };
+}
+
+interface ILinkedPlatform {
+  access_token: string;
+  platform_id: string;
+  platform_name: string;
+}
+
+interface ILinkedPlatformsResponse {
+  twitch_account?: ILinkedPlatform;
+  facebook_account?: ILinkedPlatform;
+  youtube_account?: ILinkedPlatform;
+  mixer_account?: ILinkedPlatform;
 }
 
 export type LoginLifecycleOptions = {
@@ -76,11 +96,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
+
+    if (!this.state.secondaryAuths) Vue.set(this.state, 'secondaryAuths', {});
+    Vue.set(this.state.secondaryAuths, auth.platform.type, {
+      username: auth.platform.username,
+      token: auth.platform.token,
+      id: auth.platform.id,
+    });
+  }
+
+  @mutation()
+  ADD_SECONDARY_AUTH(type: TPlatform, auth: ISecondaryPlatformAuth) {
+    if (!this.state.secondaryAuths) Vue.set(this.state, 'secondaryAuths', {});
+    Vue.set(this.state.secondaryAuths, type, auth);
   }
 
   @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
+    Vue.delete(this.state, 'secondaryAuths');
   }
 
   @mutation()
@@ -118,6 +152,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async initialize() {
     await this.validateLogin();
+    await this.updateLinkedPlatforms();
   }
 
   mounted() {
@@ -179,6 +214,55 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } catch (e) {
       console.error('Error fetching user info', e);
     }
+  }
+
+  async updateLinkedPlatforms() {
+    const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    // TODO: Could metaprogram this a bit more
+    if (linkedPlatforms.facebook_account) {
+      this.ADD_SECONDARY_AUTH('facebook', {
+        username: linkedPlatforms.facebook_account.platform_name,
+        id: linkedPlatforms.facebook_account.platform_id,
+        token: linkedPlatforms.facebook_account.access_token,
+      });
+    }
+    if (linkedPlatforms.mixer_account) {
+      this.ADD_SECONDARY_AUTH('mixer', {
+        username: linkedPlatforms.mixer_account.platform_name,
+        id: linkedPlatforms.mixer_account.platform_id,
+        token: linkedPlatforms.mixer_account.access_token,
+      });
+    }
+    if (linkedPlatforms.twitch_account) {
+      this.ADD_SECONDARY_AUTH('twitch', {
+        username: linkedPlatforms.twitch_account.platform_name,
+        id: linkedPlatforms.twitch_account.platform_id,
+        token: linkedPlatforms.twitch_account.access_token,
+      });
+    }
+    if (linkedPlatforms.youtube_account) {
+      this.ADD_SECONDARY_AUTH('youtube', {
+        username: linkedPlatforms.youtube_account.platform_name,
+        id: linkedPlatforms.youtube_account.platform_id,
+        token: linkedPlatforms.youtube_account.access_token,
+      });
+    }
+  }
+
+  fetchLinkedPlatforms(): Promise<ILinkedPlatformsResponse> {
+    if (!this.isLoggedIn()) return;
+
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.apiToken);
+    const url = `https://${host}/api/v5/restream/user/info`;
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(res => {
+        return res.json();
+      })
+      .catch(() => {});
   }
 
   /**
