@@ -46,7 +46,7 @@ export class DefaultManager extends PropertiesManager {
     }
   }
 
-  initializeMediaBackup() {
+  private initializeMediaBackup() {
     if (this.customizationService.state.mediaBackupOptOut) {
       this.settings.mediaBackup = {};
       return;
@@ -85,7 +85,7 @@ export class DefaultManager extends PropertiesManager {
     }
   }
 
-  uploadNewMediaFile() {
+  private uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
     if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
 
@@ -108,7 +108,7 @@ export class DefaultManager extends PropertiesManager {
       });
   }
 
-  ensureMediaBackupId() {
+  private ensureMediaBackupId() {
     if (this.settings.mediaBackup.localId) return;
     this.settings.mediaBackup.localId = this.mediaBackupService.getLocalFileId();
   }
@@ -117,7 +117,7 @@ export class DefaultManager extends PropertiesManager {
     return this.obsSource.id === 'ffmpeg_source';
   }
 
-  async downloadGoogleFont() {
+  private async downloadGoogleFont() {
     if (this.obsSource.id !== 'text_gdiplus') return;
 
     const settings = this.obsSource.settings;

@@ -104,8 +104,6 @@ export class WebsocketService extends Service {
   socketEvent = new Subject<TSocketEvent>();
 
   init() {
-    this.openSocketConnection();
-
     this.userService.userLogin.subscribe(() => {
       this.openSocketConnection();
     });

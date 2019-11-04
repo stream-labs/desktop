@@ -26,10 +26,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
       () => (this.loadingState = false),
       () => (this.loadingState = true),
       result => {
-        // Currently we do not have special handling for generic errors
-        if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
-          this.props.continue();
-        } else if (result === EPlatformCallResult.TwitchTwoFactor) {
+        if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
           electron.remote.dialog
             .showMessageBox({
@@ -46,6 +43,9 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 electron.remote.shell.openExternal('https://twitch.tv/settings/security');
               }
             });
+        } else {
+          // Currently we do not have special handling for generic errors
+          this.props.continue();
         }
       },
     );
