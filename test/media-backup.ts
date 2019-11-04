@@ -12,7 +12,7 @@ import { sleep } from './helpers/sleep';
 
 useSpectron({ noSync: false });
 
-test.skip('Media backup', async t => {
+test('Media backup', async t => {
   // copy images to the temporary folder
   const imagesDir = path.resolve(__dirname, '..', '..', 'test', 'data', 'sources-files', 'images');
   const tmpDir = fs.mkdtempSync(os.tmpdir());
@@ -26,7 +26,6 @@ test.skip('Media backup', async t => {
 
   // TODO: user-pool should return clean accounts without any scene-collections
   // delete all collections for this account
-  await skipCheckingErrorsInLog();
   const collections = await collectionsService.fetchSceneCollectionsSchema();
   for (const collection of collections) {
     try {

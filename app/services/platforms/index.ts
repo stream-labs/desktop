@@ -130,7 +130,11 @@ export interface IPlatformService {
 
   searchGames: (searchString: string) => Promise<IGame[]>;
 
-  beforeGoLive: (options?: TStartStreamOptions) => Promise<any>;
+  /**
+   * Sets up the stream key and live broadcast info required to go live.
+   * Returns the stream key.
+   */
+  beforeGoLive: (options?: TStartStreamOptions) => Promise<string>;
 
   afterGoLive?: () => Promise<void>;
 

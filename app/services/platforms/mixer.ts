@@ -231,6 +231,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       });
     }
     if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
+
+    return key;
   }
 
   // TODO: dedup
