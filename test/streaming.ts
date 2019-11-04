@@ -3,18 +3,32 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog,
+  skipCheckingErrorsInLog, restartApp
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
-import { logIn } from './helpers/spectron/user';
-import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
+import { logIn, logOut } from './helpers/spectron/user';
+import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
-import { goLive, prepareToGoLive } from './helpers/spectron/streaming';
+import {
+  goLive,
+  clickGoLive,
+  prepareToGoLive,
+  scheduleStream,
+  submit,
+  waitForStreamStart,
+  stopStream,
+  tryToGoLive,
+  chatIsVisible,
+  waitForStreamStop,
+} from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
-import { sleep } from './helpers/sleep';
 import { readdir } from 'fs-extra';
+import { showSettings } from './helpers/spectron/settings';
+import { sleep } from './helpers/sleep';
+import { getClient } from './helpers/api-client';
+import { StreamSettingsService } from '../app/services/settings/streaming';
 
 useSpectron();
 
@@ -26,23 +40,16 @@ test.skip('Streaming to Twitch without auth', async t => {
     return;
   }
 
-  const app = t.context.app;
-
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Stream');
+  await showSettings(t, 'Stream');
 
   // This is the twitch.tv/slobstest stream key
   await setFormInput(t, 'Stream key', process.env.SLOBS_TEST_STREAM_KEY);
-  await app.client.click('button=Done');
+  await t.context.app.client.click('button=Done');
 
+  // go live
   await prepareToGoLive(t);
-  await focusMain(t);
-  await app.client.click('button=Go Live');
-
-  await app.client.waitForExist('button=End Stream', 20 * 1000);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
   t.pass();
 });
 
@@ -52,7 +59,7 @@ test('Streaming to Twitch', async t => {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
-
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
@@ -63,28 +70,144 @@ test('Streaming to Facebook', async t => {
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
     description: 'SLOBS Test Stream Description',
   });
-
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
-// TODO: We can't stream to Mixer anymore because they require channels to pass review
-test.skip('Streaming to Mixer', async t => {
+test('Streaming to Mixer', async t => {
   await logIn(t, 'mixer');
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
+  t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
 });
 
 test('Streaming to Youtube', async t => {
   await logIn(t, 'youtube');
+
+  t.false(await chatIsVisible(t), 'Chat is not visible for YT before stream starts');
+
   await goLive(t, {
     title: 'SLOBS Test Stream',
     description: 'SLOBS Test Stream Description',
   });
 
+  t.true(await chatIsVisible(t), 'Chat should be visible');
+
   t.pass();
+});
+
+test('Streaming to the scheduled event on Youtube', async t => {
+  await logIn(t, 'youtube');
+
+  // create event via scheduling form
+  const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
+  await scheduleStream(t, tomorrow, {
+    title: `Youtube Test Stream ${tomorrow}`,
+    description: 'SLOBS Test Stream Description',
+  });
+
+  // select event and go live
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  const form = new FormMonkey(t);
+  await form.fill({
+    event: await form.getOptionByTitle('event', new RegExp(`Youtube Test Stream ${tomorrow}`)),
+  });
+  await submit(t);
+  await waitForStreamStart(t);
+  t.pass();
+});
+
+test('Stream after switching accounts', async t => {
+  // stream to youtube
+  await logIn(t, 'youtube');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
+  });
+  await stopStream(t);
+
+  // stream to twitch
+  await logOut(t);
+  await logIn(t, 'twitch');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+
+  t.pass();
+});
+
+test('Stream with disabled confirmation', async t => {
+  await logIn(t, 'twitch');
+  await showSettings(t, 'General');
+  await fillForm(t, null, { stream_info_udpate: false });
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
+
+  // try to stream after restart
+  await restartApp(t);
+  await clickGoLive(t);
+  await waitForStreamStart(t);
+  await stopStream(t);
+  await logOut(t);
+
+  // check that stream_info_udpate can not be applied to YT
+  await logIn(t, 'youtube');
+  await clickGoLive(t);
+  await focusChild(t);
+  t.true(
+    await t.context.app.client.isVisible('button=Confirm & Go Live'),
+    'Should not be able to disable GoLive window for YT',
+  );
+
+  t.pass();
+});
+
+test('Migrate the twitch account to the protected mode', async t => {
+  await logIn(t, 'twitch');
+
+  // change stream key before go live
+  const streamSettings = (await getClient()).getResource<StreamSettingsService>(
+    'StreamSettingsService',
+  );
+  streamSettings.setSettings({ key: 'fake key' });
+
+  // go live
+  await tryToGoLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+  await waitForStreamStop(t); // can't go live with a fake key
+
+  // check that settings have been switched to the Custom Ingest mode
+  await showSettings(t, 'Stream');
+  t.true(
+    await t.context.app.client.isVisible('button=Use recommended settings'),
+    'Protected mode should be disabled',
+  );
+
+  // use recommended settings
+  await t.context.app.client.click('button=Use recommended settings');
+  // setup custom server
+  streamSettings.setSettings({ server: 'rtmp://live-sjc.twitch.tv/app' });
+
+  await tryToGoLive(t, {
+    title: 'SLOBS Test Stream',
+    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  });
+  await waitForStreamStop(t);
+
+  // check that settings have been switched to the Custom Ingest mode
+  await showSettings(t, 'Stream');
+  t.true(
+    await t.context.app.client.isVisible('button=Use recommended settings'),
+    'Protected mode should be disabled',
+  );
 });
 
 // test scheduling for each platform
@@ -156,7 +279,12 @@ test('Go live error', async t => {
   // check that the error text is shown
   await app.client.waitForVisible('a=just go live.');
 
+  // stop simulating network issues and retry fetching the channelInfo
   await resetFetchMock(t);
+  await focusChild(t);
+  await app.client.click('a=fetching the information again');
+  await app.client.waitForVisible('button=Confirm & Go Live');
+
   t.pass();
 });
 
@@ -172,14 +300,9 @@ test('Youtube streaming is disabled', async t => {
 test('User does not have Facebook pages', async t => {
   skipCheckingErrorsInLog();
   await logIn(t, 'facebook', { noFacebookPages: true });
-  const app = t.context.app;
-
   await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await app.client.click('button=Go Live');
+  await clickGoLive(t);
   await focusChild(t);
-
   t.true(
     await t.context.app.client.isExisting('a=Facebook Page Creation'),
     'The link for adding new facebook changes should exist',
@@ -187,15 +310,9 @@ test('User does not have Facebook pages', async t => {
 });
 
 test('User has linked twitter', async t => {
-  skipCheckingErrorsInLog();
   await logIn(t, 'twitch', { hasLinkedTwitter: true });
-  const app = t.context.app;
-
   await prepareToGoLive(t);
-
-  // open EditStreamInfo window
-  await app.client.click('button=Go Live');
-  await focusChild(t);
+  await clickGoLive(t);
 
   // check the "Unlink" button
   await t.context.app.client.waitForVisible('button=Unlink Twitter');
@@ -210,10 +327,7 @@ test('Recording when streaming', async t => {
   const app = t.context.app;
 
   // enable RecordWhenStreaming
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-  await focusChild(t);
-  await app.client.click('li=General');
+  await showSettings(t, 'General');
   await fillForm(t, null, { RecordWhenStreaming: true });
   const tmpDir = await setTemporaryRecordingPath(t);
 

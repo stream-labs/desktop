@@ -26,6 +26,7 @@ interface ITestUserFeatures {
   streamingIsDisabled?: boolean;
   noFacebookPages?: boolean;
   hasLinkedTwitter?: boolean;
+  '2FADisabled'?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {
@@ -70,6 +71,10 @@ export async function logIn(
   if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;
+}
+
+export async function isLoggedIn(t: TExecutionContext) {
+  return t.context.app.client.isVisible('.fa-sign-out-alt');
 }
 
 /**

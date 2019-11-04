@@ -1,6 +1,6 @@
 {
   "Layout": "Elrendezés",
-  "Alert": "Értesítés",
+  "Alert": "Alert",
   "Global Settings": "Globális beállítások",
   "Text to Speech": "Szöveg felolvasása",
   "Charity Streaming Donations": "Charity Streaming Donations",
@@ -23,7 +23,7 @@
   "Shares": "Shares",
   "Facemask Donations": "Arc Maszk Támogatás",
   "Cloudbot Store": "Cloudbot Store",
-  "Stickers": "Matricák",
+  "Stickers": "Stickers",
   "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Általános beállítások",
   "Moderator Tools": "Moderátor eszközök",

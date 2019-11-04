@@ -215,11 +215,11 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const key = await this.fetchStreamKey();
     const currentStreamSettings = this.streamSettingsService.settings;
 
-    // disable protectedMode for users who manually changed their stream key before
+    // disable protectedMode for users who manually changed their stream key or server before
     const needToDisableProtectedMode: boolean =
       currentStreamSettings.platform === 'mixer' &&
-      currentStreamSettings.key &&
-      currentStreamSettings.key !== key;
+      ((currentStreamSettings.key && currentStreamSettings.key !== key) ||
+        currentStreamSettings.server !== 'auto');
 
     if (needToDisableProtectedMode) {
       this.streamSettingsService.setSettings({ protectedModeEnabled: false });
