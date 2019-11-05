@@ -222,7 +222,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // we all set
       this.setLifecycleStep('live');
     } catch (e) {
-
       if (this.userService.platformType !== 'youtube') {
         // user has logged out before the stream started
         // don't treat this as an error
@@ -594,7 +593,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
-
         // if user clicked stop streaming, cancel polling
         if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
 
