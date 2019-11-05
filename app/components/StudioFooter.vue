@@ -129,7 +129,7 @@
 }
 
 .info {
-  color: #e3973e;
+  color: var(--info-dark);
 }
 
 .success {
