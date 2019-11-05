@@ -122,9 +122,11 @@ export class ChatService extends Service {
         .catch(this.handleRedirectError);
 
       this.chatView.webContents.once('did-navigate', () => {
+        if (!this.chatUrl) return; // user has logged out
         this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
       });
     } else {
+      if (!this.chatUrl) return; // user has logged out
       this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
     }
 

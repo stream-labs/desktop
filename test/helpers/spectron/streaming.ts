@@ -4,7 +4,7 @@ import { fillForm } from '../form-monkey';
 import { getClient } from '../api-client';
 import moment = require('moment');
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
-
+import { sleep } from '../sleep';
 /**
  * Go live and wait for stream start
  */
@@ -27,7 +27,8 @@ export async function prepareToGoLive(t: TExecutionContext) {
 }
 
 /**
- * Open the EditStreamInfo window or start stream if the conformation dialog has been disabled
+ * Simply click the "Go Live" button
+ * It opens the EditStreamInfo window or start stream if the conformation dialog has been disabled
  */
 export async function clickGoLive(t: TExecutionContext) {
   await focusMain(t);
@@ -49,7 +50,7 @@ export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary
 }
 
 /**
- * Submit EditStreamInfo
+ * Submit EditStreamInfo form in the child window
  */
 export async function submit(t: TExecutionContext) {
   const app = t.context.app;
@@ -63,6 +64,9 @@ export async function waitForStreamStart(t: TExecutionContext) {
   await t.context.app.client.waitForExist('button=End Stream', 20 * 1000);
 }
 
+/**
+ * Click the "End Stream" button and wait until stream stops
+ */
 export async function stopStream(t: TExecutionContext) {
   await focusMain(t);
   await click(t, 'button=End Stream');
@@ -70,24 +74,14 @@ export async function stopStream(t: TExecutionContext) {
 }
 
 export async function waitForStreamStop(t: TExecutionContext) {
-  if (await isReadyToStartStream(t)) {
-    try {
-      await t.context.app.client.waitForExist('button=Go Live', 10000, true);
-    } catch (e) {
-      throw new Error(`Waited for stream stop, but it didn't start`);
-    }
-  }
-  const ms = 30 * 1000;
+  await sleep(2000); // the stream often starts with delay so we have the "Go Live" button visible for a second even we clicked "Start Stream"
+  const ms = 40 * 1000; // we may wait for a long time if the stream key is not valid
+  await focusMain(t);
   try {
     await t.context.app.client.waitForExist('button=Go Live', ms);
   } catch (e) {
     throw new Error(`Stream did not stop in ${ms}ms`);
   }
-}
-
-export async function isReadyToStartStream(t: TExecutionContext) {
-  await focusMain(t);
-  return await t.context.app.client.isVisible('button=Go Live');
 }
 
 /**
@@ -107,10 +101,12 @@ export async function scheduleStream(
     date: moment(date).format('MM/DD/YYYY'),
   });
   await click(t, 'button=Schedule');
+
+  // the success message should be shown
   await app.client.waitForVisible('.toast-success', 20000);
 }
 
 export async function chatIsVisible(t: TExecutionContext) {
   await focusMain(t);
-  return await t.context.app.client.isVisible('a=Refresh Chat');
+  return await t.context.app.client.isVisible('a=Refresh Chat'); // TODO: it's better to check the content of the chat browser-view
 }

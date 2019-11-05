@@ -3,7 +3,7 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog, restartApp
+  skipCheckingErrorsInLog, restartApp, closeWindow
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
@@ -74,7 +74,8 @@ test('Streaming to Facebook', async t => {
   t.pass();
 });
 
-test('Streaming to Mixer', async t => {
+// TODO: Mixer stopped returning a stream key for testing accounts
+test.skip('Streaming to Mixer', async t => {
   await logIn(t, 'mixer');
   await goLive(t, {
     title: 'SLOBS Test Stream',
@@ -96,8 +97,35 @@ test('Streaming to Youtube', async t => {
 
   t.true(await chatIsVisible(t), 'Chat should be visible');
 
+  // give youtube 2 min to publish stream
+  await focusChild(t);
+  await t.context.app.client.waitForVisible('p=Your all set', 2 * 60 * 1000);
+
   t.pass();
 });
+
+test('Youtube should show error window if afterStreamStart hook fails', async t => {
+  await logIn(t, 'youtube');
+
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
+  });
+  await focusChild(t);
+  await closeWindow(t);
+
+  // emulate API errors
+  skipCheckingErrorsInLog();
+  await fetchMock(t, /www\.googleapis\.com\/youtube/, 404);
+
+  // the error window should be shown right after request to YT API fails
+  await sleep(2000);
+  await focusChild(t);
+  await t.context.app.client.waitForVisible('h1=Something went wrong');
+
+  t.pass();
+});
+
 
 test('Streaming to the scheduled event on Youtube', async t => {
   await logIn(t, 'youtube');

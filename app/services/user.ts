@@ -234,6 +234,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  get platformType(): TPlatform {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.type;
+    }
+  }
+
   get username() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.username;
