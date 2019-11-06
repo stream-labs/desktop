@@ -8,8 +8,7 @@ const base = {
     'node_modules',
     'vendor',
     'app/i18n',
-    'updater/index.html',
-    'updater/bootstrap.js',
+    'updater/build/bootstrap.js',
     'index.html',
     'main.js',
     'obs-api'

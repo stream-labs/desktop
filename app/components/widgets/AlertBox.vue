@@ -44,7 +44,10 @@
           :class="{ active: selectedId === variation.id }"
         >
           <div class="variation-tile__image-box">
-            <img v-if="variation.settings.image.href" :src="variation.settings.image.href" />
+            <img v-if="variation.settings.image.href && !/\.webm/.test(variation.settings.image.href)" :src="variation.settings.image.href" />
+            <video v-if="variation.settings.image.href && /\.webm/.test(variation.settings.image.href)" :key="variation.settings.image.href" loop muted autoplay>
+              <source :src="variation.settings.image.href" type="video/webm" />
+            </video>
             <div class="variation-tile__name">
               <input
                 type="text"
@@ -224,7 +227,8 @@
   position: relative;
   .padding();
 
-  img {
+  img,
+  video {
     height: 60px;
     margin: 0 auto;
     display: block;

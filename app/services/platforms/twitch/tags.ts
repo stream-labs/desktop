@@ -59,9 +59,10 @@ interface IPaginatedResponse {
  */
 const requestTags = (cursor: string): Observable<IPaginatedResponse> =>
   fromPromise(
-    platformAuthorizedRequest(
-      `https://api.twitch.tv/helix/tags/streams?first=100&after=${cursor}`,
-    ).then(response => ({
+    platformAuthorizedRequest<{
+      data: TTwitchTag[];
+      pagination: { cursor: string };
+    }>(`https://api.twitch.tv/helix/tags/streams?first=100&after=${cursor}`).then(response => ({
       cursor: response.pagination.cursor,
       items: response.data,
     })),
