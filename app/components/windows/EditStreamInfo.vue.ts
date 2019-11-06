@@ -307,6 +307,10 @@ export default class EditStreamInfo extends Vue {
     }
 
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.isFacebook && !this.channelInfo.game) {
+      this.showGameError();
+      return;
+    }
     if (this.isSchedule) return this.scheduleStream();
     if (this.twitterIsEnabled && this.shouldPostTweet) {
       const tweetedSuccessfully = await this.handlePostTweet();
@@ -328,6 +332,16 @@ export default class EditStreamInfo extends Vue {
     }
 
     this.updateAndGoLive();
+  }
+
+  showGameError() {
+    this.$toasted.show($t('You must select a game'), {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 2500,
+      singleton: true,
+    });
+    this.updatingInfo = false;
   }
 
   async handlePostTweet() {
