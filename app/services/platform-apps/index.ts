@@ -178,11 +178,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     if (!this.userService.isLoggedIn()) return;
 
-    this.SET_DEV_MODE(await this.getIsDevMode());
-
-    this.loadProductionApps();
-    this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
-
     if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
       if (data.appPath && data.appToken) {

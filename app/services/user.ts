@@ -116,10 +116,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.VALIDATE_LOGIN(false);
   }
 
-  async initialize() {
-    await this.validateLogin();
-  }
-
   mounted() {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
@@ -147,7 +143,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .then(res => {
         return res.text();
       })
-      .then(valid => {
+      .then(async valid => {
         if (valid.match(/false/)) {
           this.LOGOUT();
           electron.remote.dialog.showMessageBox({
@@ -156,7 +152,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           return;
         }
         const service = getPlatformService(this.state.auth.platform.type);
-        this.login(service, this.state.auth);
+        await this.login(service, this.state.auth);
         this.refreshUserInfo();
       });
   }

@@ -102,7 +102,7 @@ export class AppService extends StatefulService<IAppState> {
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    await this.userService.initialize();
+    await this.userService.validateLogin();
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
@@ -122,34 +122,16 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    // Eager load services
-    const _ = [
-      this.facemasksService,
-
-      this.incrementalRolloutService,
-      this.shortcutsService,
-      this.streamlabelsService,
-
-      // Pre-fetch stream info
-      this.streamInfoService,
-    ];
-
     this.performanceMonitorService.start();
-
     this.ipcServerService.listen();
     this.tcpServerService.listen();
 
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
     this.announcementsService.updateBanner();
 
-    const _outageService = this.outageNotificationsService;
-
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
-
-    await this.gameOverlayService.initialize();
-    await this.recentEventsService.initialize();
   }
 
   shutdownStarted = new Subject();
