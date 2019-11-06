@@ -11,6 +11,14 @@ enum ENotificationType {
   SUCCESS = 'SUCCESS',
 }
 
+enum ENotificationSubType {
+  DEFAULT = 'DEFAULT',
+  DISCONNECTED = 'DISCONNECTED',
+  DROPPED = 'DROPPED',
+  LAGGED = 'LAGGED',
+  SKIPPED = 'SKIPPED',
+}
+
 interface INotificationOptions {
   message: string;
   code?: TIssueCode | string;
@@ -18,6 +26,7 @@ interface INotificationOptions {
   type?: ENotificationType;
   playSound?: boolean;
   data?: any;
+  subType?: ENotificationSubType;
 
   /** The notification's life time in ms. Use -1 for infinity */
   lifeTime?: number;
@@ -33,6 +42,7 @@ interface INotification extends INotificationOptions {
   playSound: boolean;
   lifeTime: number;
   showTime: boolean;
+  subType: ENotificationSubType;
 }
 
 export class NotificationsModule extends Module {
