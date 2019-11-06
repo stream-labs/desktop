@@ -111,7 +111,7 @@ export default class EditStreamInfo extends Vue {
         name: 'stream_page',
         title: $t('Facebook Page'),
         fullWidth: true,
-        options: this.facebookService.state.facebookPages.options,
+        options: this.isFacebook && this.facebookService.state.facebookPages.options,
       }),
       game: metadata.list({
         title: $t('Game'),
