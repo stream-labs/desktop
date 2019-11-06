@@ -119,13 +119,12 @@ test('Youtube should show error window if afterStreamStart hook fails', async t 
   await fetchMock(t, /www\.googleapis\.com\/youtube/, 404);
 
   // the error window should be shown right after request to YT API fails
-  await sleep(2000);
+  await sleep(2000); // TODO: wait for the child window to be shown instead sleep
   await focusChild(t);
   await t.context.app.client.waitForVisible('h1=Something went wrong');
 
   t.pass();
 });
-
 
 test('Streaming to the scheduled event on Youtube', async t => {
   await logIn(t, 'youtube');
