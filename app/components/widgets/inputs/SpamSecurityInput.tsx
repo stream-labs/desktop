@@ -15,6 +15,7 @@ export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMe
   localValue = this.optionData[this.value - this.idxMod];
 
   get optionData() {
+    if (this.metadata.data) return this.metadata.data;
     return [$t('Off'), $t('Low'), $t('Medium'), $t('High'), $t('Very High')];
   }
 
