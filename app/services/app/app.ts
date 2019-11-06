@@ -15,7 +15,7 @@ import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
-import { PerformanceMonitorService } from 'services/performance-monitor';
+import { PerformanceService } from 'services/performance';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
@@ -80,7 +80,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
-  @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private performanceService: PerformanceService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
@@ -140,7 +140,7 @@ export class AppService extends StatefulService<IAppState> {
     // We don't need to wait on this
     this.restreamService.initialize();
 
-    this.performanceMonitorService.start();
+    this.performanceService.startMonitoringPerformance();
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();
@@ -175,7 +175,7 @@ export class AppService extends StatefulService<IAppState> {
       this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceService.stop();
       this.transitionsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();

@@ -20,7 +20,6 @@ export { NotificationsService } from 'services/notifications';
 export { OnboardingService } from 'services/onboarding';
 export { NavigationService } from 'services/navigation';
 export { PerformanceService } from 'services/performance';
-export { PerformanceMonitorService } from 'services/performance-monitor';
 export { SettingsService, OutputSettingsService } from 'services/settings';
 export { VideoService } from 'services/video';
 export { WindowsService } from 'services/windows';

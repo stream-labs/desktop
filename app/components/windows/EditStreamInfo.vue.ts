@@ -113,6 +113,12 @@ export default class EditStreamInfo extends Vue {
 
   get formMetadata() {
     return formMetadata({
+      page: metadata.list({
+        name: 'stream_page',
+        title: $t('Facebook Page'),
+        fullWidth: true,
+        options: this.isFacebook && this.facebookService.state.facebookPages.options,
+      }),
       game: metadata.list({
         title: $t('Game'),
         placeholder: $t('Start typing to search'),
@@ -133,6 +139,7 @@ export default class EditStreamInfo extends Vue {
       description: metadata.textArea({
         title: $t('Description'),
         disabled: this.updatingInfo,
+        fullWidth: true,
       }),
       date: metadata.text({
         title: $t('Scheduled Date'),

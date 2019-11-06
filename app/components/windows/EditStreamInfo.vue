@@ -23,12 +23,7 @@
         <h-form-group
           v-if="isFacebook && hasPages && !midStreamMode"
           :v-model="channelInfo.facebookPageId"
-          :metadata="{
-            type: 'list',
-            name: 'stream_page',
-            title: $t('Facebook Page'),
-            options: facebookService.state.facebookPages.options,
-          }"
+          :metadata="formMetadata.page"
         />
 
         <div v-if="isYoutube">

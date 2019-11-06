@@ -43,7 +43,7 @@ export interface IStreamlabsFacebookPages {
   page_id: string;
   page_type: string;
   name: string;
-  options: IListOption<string>;
+  options: IListOption<string>[];
 }
 
 interface IFacebookServiceState {

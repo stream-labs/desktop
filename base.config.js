@@ -1,7 +1,11 @@
 const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader')
 
+<<<<<<< HEAD
 const plugins = [];
+=======
+const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
+>>>>>>> staging
 
 // uncomment and install to watch circular dependencies
 // const CircularDependencyPlugin = require('circular-dependency-plugin');
