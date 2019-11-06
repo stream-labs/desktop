@@ -15,9 +15,6 @@
     />
     <performance-metrics mode="limited" class="performance-metrics" />
     <notifications-area class="notifications-area flex--grow"/>
-    <!-- <transition name="slide">
-      <performance-metrics v-if="metricsShown" class="performance-metrics" />
-    </transition> -->
   </div>
 
   <div class="nav-right">
