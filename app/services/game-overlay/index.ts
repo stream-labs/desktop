@@ -9,7 +9,6 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { RecentEventsService } from 'app-services';
 
 const { BrowserWindow } = electron.remote;
 
@@ -54,7 +53,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
-  @Inject() recentEventsService: RecentEventsService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
