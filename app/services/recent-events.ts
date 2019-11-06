@@ -846,9 +846,4 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   private SET_PAUSED(queuePaused: boolean) {
     this.state.queuePaused = queuePaused;
   }
-
-  @mutation()
-  private SET_OVERLAY_WINDOW() {
-    console.log('yay');
-  }
 }

@@ -22,7 +22,6 @@ import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
-import MiniFeed from 'components/RecentEvents';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
@@ -95,7 +94,6 @@ export function getComponents() {
     PerformanceMetrics,
     BrowserSourceInteraction,
     EventFilterMenu,
-    MiniFeed,
     GameOverlayEventFeed,
 
     BitGoal,

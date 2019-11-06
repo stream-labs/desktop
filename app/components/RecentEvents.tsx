@@ -36,10 +36,6 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
 
   eventsCollapsed = false;
 
-  mounted() {
-    console.log(this.$props.isOverlay);
-  }
-
   get native() {
     return !this.customizationService.state.legacyEvents;
   }

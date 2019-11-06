@@ -118,7 +118,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       isFullScreen: true,
       alwaysOnTop: true,
     });
-    this.windows.recentEvents.webContents.openDevTools();
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
