@@ -793,7 +793,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   showFilterMenu() {
     this.windowsService.showWindow({
-      componentName: 'EventFilterMenu',
+      componentName: 'MiniFeed',
       title: $t('Event Filters'),
       queryParams: {},
       size: {
@@ -845,5 +845,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_PAUSED(queuePaused: boolean) {
     this.state.queuePaused = queuePaused;
+  }
+
+  @mutation()
+  private SET_OVERLAY_WINDOW() {
+    console.log('yay');
   }
 }

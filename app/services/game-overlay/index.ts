@@ -9,6 +9,7 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
+import { RecentEventsService } from 'app-services';
 
 const { BrowserWindow } = electron.remote;
 
@@ -53,6 +54,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() recentEventsService: RecentEventsService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
@@ -107,7 +109,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
     const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
-    this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
+    this.windows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      width: 600,
+      componentName: 'GameOverlayEventFeed',
+      queryParams: { gameOverlay: true },
+      webPreferences: { offscreen: true, nodeIntegration: true },
+      isFullScreen: true,
+      alwaysOnTop: true,
+    });
+    this.windows.recentEvents.webContents.openDevTools();
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
@@ -138,11 +149,11 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.previewWindows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
       ...this.commonWindowOptions,
       width: 600,
-      transparent: false,
+      transparent: true,
       webPreferences: { offscreen: false, nodeIntegration: true },
       isFullScreen: true,
       alwaysOnTop: true,
-      componentName: 'RecentEvents',
+      componentName: 'OverlayPlaceholder',
       title: $t('Recent Events'),
     });
 
@@ -169,9 +180,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    // this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
-    console.log(this.windows.recentEvents);
-    this.windows.recentEvents.show();
     this.windows.chat.loadURL(
       await getPlatformService(this.userService.platform.type).getChatUrl(
         this.customizationService.isDarkTheme ? 'night' : 'day',

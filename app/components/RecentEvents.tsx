@@ -21,7 +21,11 @@ const getName = (event: IRecentEvent) => {
   return event.name;
 };
 
-@Component({})
+class RecentEventsProps {
+  overlay: boolean = false;
+}
+
+@Component({ props: createProps(RecentEventsProps) })
 export default class RecentEvents extends TsxComponent<{}> {
   @Inject() recentEventsService: RecentEventsService;
   @Inject() userService: UserService;
@@ -30,7 +34,13 @@ export default class RecentEvents extends TsxComponent<{}> {
   @Inject() dismissablesService: DismissablesService;
   @Inject() magicLinkService: MagicLinkService;
 
+  @Prop() overlay: boolean;
+
   eventsCollapsed = false;
+
+  mounted() {
+    console.log(this.$props.overlay);
+  }
 
   get native() {
     return !this.customizationService.state.legacyEvents;
