@@ -15,17 +15,24 @@ import ImagePickerInput from 'components/shared/inputs/ImagePickerInput.vue';
 const nameMap = () => ({
   tips: $t('Tips & Donations'),
   twitch_follows: $t('Twitch Follows'),
-  mixer_follows: $t('Mixer Follows'),
   twitch_bits: $t('Twitch Bits'),
   twitch_subs: $t('Twitch Subs'),
-  mixer_subscriptions: $t('Mixer Subscriptions'),
   twitch_resubs: $t('Twitch Resubs'),
+  mixer_follows: $t('Mixer Follows'),
+  mixer_subscriptions: $t('Mixer Subscriptions'),
+  mixer_effects: $t('Mixer Effects'),
+  mixer_stickers: $t('Mixer Stickers'),
   youtube_subscribers: $t('Youtube Subscriptions'),
   youtube_sponsors: $t('Youtube Memberships'),
   youtube_superchats: $t('Youtube Super Chats'),
   periscope_superhearts: $t('Periscope Super Hearts'),
   picarto_follows: $t('Picarto Follows'),
   picarto_subscriptions: $t('Picarto Subscriptions'),
+  facebook_follows: $t('Facebook Follows'),
+  facebook_likes: $t('Facebook Likes'),
+  facebook_shares: $t('Facebook Shares'),
+  facebook_stars: $t('Facebook Stars'),
+  facebook_supports: $t('Facebook Supports'),
 });
 
 const mediaGalleryInputs = {

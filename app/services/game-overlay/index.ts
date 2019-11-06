@@ -4,11 +4,11 @@ import { delay, take } from 'rxjs/operators';
 import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
-import { getPlatformService } from '../platforms';
 import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
+import { StreamInfoService } from 'services/stream-info';
 
 const { BrowserWindow } = electron.remote;
 
@@ -53,6 +53,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() streamInfoService: StreamInfoService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
@@ -91,6 +92,15 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       init: this.initializeOverlay,
       destroy: this.destroyOverlay,
       context: this,
+    });
+
+    // sync chat url
+    this.streamInfoService.streamInfoChanged.subscribe(streamInfo => {
+      const chatWindow = this.windows.chat;
+      if (!chatWindow) return;
+      if (streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
+        chatWindow.loadURL(streamInfo.chatUrl);
+      }
     });
   }
 
@@ -177,11 +187,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    this.windows.chat.loadURL(
-      await getPlatformService(this.userService.platform.type).getChatUrl(
-        this.customizationService.isDarkTheme ? 'night' : 'day',
-      ),
-    );
+    if (this.streamInfoService.state.chatUrl) {
+      this.windows.chat.loadURL(this.streamInfoService.state.chatUrl);
+    }
   }
 
   determineStartPosition(window: string) {

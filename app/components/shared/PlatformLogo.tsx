@@ -6,6 +6,7 @@ import { TPlatform } from 'services/platforms';
 
 class LogoProps {
   platform: TPlatform = 'twitch';
+  size?: number = 0;
 }
 
 @Component({ props: createProps(LogoProps) })
@@ -20,6 +21,11 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
   }
 
   render() {
-    return <i class={cx(this.iconForPlatform, styles[this.props.platform])} />;
+    return (
+      <i
+        class={cx(this.iconForPlatform, styles[this.props.platform])}
+        style={this.props.size && `font-size: ${this.props.size}px`}
+      />
+    );
   }
 }

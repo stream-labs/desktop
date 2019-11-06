@@ -33,6 +33,7 @@ import * as obs from '../../obs-api';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
+  loginValidated: boolean;
   auth?: IPlatformAuth;
 }
 
@@ -97,6 +98,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.state.auth.platform.channelId = name;
   }
 
+  @mutation()
+  private VALIDATE_LOGIN(validated: boolean) {
+    Vue.set(this.state, 'loginValidated', validated);
+  }
+
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject();
 
@@ -107,13 +113,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
-    this.setSentryContext();
-    this.validateLogin();
-    this.incrementalRolloutService.fetchAvailableFeatures();
+    this.VALIDATE_LOGIN(false);
   }
 
   async initialize() {
-    await this.refreshUserInfo();
+    await this.validateLogin();
   }
 
   mounted() {
@@ -132,7 +136,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   // Makes sure the user's login is still good
   validateLogin() {
-    if (!this.isLoggedIn()) return;
+    if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -144,7 +148,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         return res.text();
       })
       .then(valid => {
-        if (valid.match(/false/)) this.LOGOUT();
+        if (valid.match(/false/)) {
+          this.LOGOUT();
+          electron.remote.dialog.showMessageBox({
+            message: $t('You have been logged out'),
+          });
+          return;
+        }
+        const service = getPlatformService(this.state.auth.platform.type);
+        this.login(service, this.state.auth);
+        this.refreshUserInfo();
       });
   }
 
@@ -185,7 +198,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isLoggedIn() {
-    return !!(this.state.auth && this.state.auth.widgetToken);
+    return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
   /**
@@ -206,7 +219,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get apiToken() {
-    if (this.isLoggedIn()) return this.state.auth.apiToken;
+    if (this.state.auth) return this.state.auth.apiToken;
   }
 
   get widgetToken() {
@@ -304,7 +317,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   getPlatformService(): IPlatformService {
-    return getPlatformService(this.platform.type);
+    return this.isLoggedIn() ? getPlatformService(this.platform.type) : null;
   }
 
   async showLogin() {
@@ -315,8 +328,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
-
-    const result = await service.setupStreamSettings();
+    this.VALIDATE_LOGIN(true);
+    const result = await service.validatePlatform();
 
     // Currently we treat generic errors as success
     if (result === EPlatformCallResult.TwitchTwoFactor) {
