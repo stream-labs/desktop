@@ -61,7 +61,7 @@ export default class LiveDock extends Vue {
 
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
-  controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
+  controlRoomTooltip = $t('Go to Youtube Live Dashboard');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
@@ -140,19 +140,11 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeStreamUrl() {
-    const platform = this.userService.platform.type;
-    const service = getPlatformService(platform);
-    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    const youtubeDomain =
-      nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
-    if (service instanceof YoutubeService) {
-      const url = `${youtubeDomain}/channel/${service.youtubeId}/live`;
-      electron.remote.shell.openExternal(url);
-    }
+    electron.remote.shell.openExternal(this.streamInfoService.state.streamUrl);
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal('https://www.youtube.com/live_dashboard');
+    electron.remote.shell.openExternal(this.streamInfoService.state.dashboardUrl);
   }
 
   get isTwitch() {

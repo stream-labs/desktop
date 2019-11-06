@@ -76,11 +76,11 @@
   "Open FrankerFaceZ Settings": "Nyissa meg a FrankerFaceZ Beállításokat",
   "FrankerFaceZ Settings": "FrankerFaceZ Beállítások",
   "API Token": "API tokenek",
-  "Face Mask Settings": "Face Mask Settings",
+  "Face Mask Settings": "Arcmaszk beállításai",
   "Navigate to Live tab when going live": "Nyissa meg az Élő fület, amikor élőben jelenik meg",
   "Save Replay": "Visszajátszás Mentése",
   "Streaming to %{platformName}": "Streaming to %{platformName}",
   "Stream to custom ingest": "Stream to custom ingest",
-  "Use recommended settings": "Use recommended settings",
+  "Use recommended settings": "Használd az ajánlott beállításokat",
   "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected"
 }
