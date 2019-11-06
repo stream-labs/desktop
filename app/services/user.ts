@@ -12,10 +12,11 @@ import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
-  IPlatformAuth,
+  IUserAuth,
   TPlatform,
   IPlatformService,
   EPlatformCallResult,
+  IPlatformAuth,
 } from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
@@ -40,8 +41,7 @@ interface ISecondaryPlatformAuth {
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
-  auth?: IPlatformAuth;
-  secondaryAuths?: { [platform in TPlatform]?: ISecondaryPlatformAuth };
+  auth?: IUserAuth;
 }
 
 interface ILinkedPlatform {
@@ -94,42 +94,37 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private settingsService: SettingsService;
 
   @mutation()
-  LOGIN(auth: IPlatformAuth) {
+  LOGIN(auth: IUserAuth) {
     Vue.set(this.state, 'auth', auth);
 
-    if (!this.state.secondaryAuths) Vue.set(this.state, 'secondaryAuths', {});
-    Vue.set(this.state.secondaryAuths, auth.platform.type, {
-      username: auth.platform.username,
-      token: auth.platform.token,
-      id: auth.platform.id,
-    });
+    // For now, to ensure safe rollbacks, we will set the old format
+    Vue.set(this.state.auth, 'platform', auth.platforms[auth.primaryPlatform]);
   }
 
   @mutation()
-  ADD_SECONDARY_AUTH(type: TPlatform, auth: ISecondaryPlatformAuth) {
-    if (!this.state.secondaryAuths) Vue.set(this.state, 'secondaryAuths', {});
-    Vue.set(this.state.secondaryAuths, type, auth);
+  UPDATE_PLATFORM(auth: IPlatformAuth) {
+    console.log('setting', auth);
+    Vue.set(this.state.auth.platforms, auth.type, auth);
   }
 
   @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
-    Vue.delete(this.state, 'secondaryAuths');
   }
 
   @mutation()
-  private SET_PLATFORM_TOKEN(token: string) {
-    this.state.auth.platform.token = token;
+  private SET_PLATFORM_TOKEN(platform: TPlatform, token: string) {
+    this.state.auth.platforms[platform].token = token;
   }
 
   @mutation()
-  private SET_CHANNEL_ID(id: string) {
-    this.state.auth.platform.channelId = id;
+  private SET_CHANNEL_ID(platform: TPlatform, id: string) {
+    this.state.auth.platforms[platform].channelId = id;
   }
 
   @mutation()
-  private SET_USERNAME(name: string) {
-    this.state.auth.platform.channelId = name;
+  private SET_USERNAME(platform: TPlatform, name: string) {
+    this.state.auth.platforms[platform].channelId = name;
   }
 
   @mutation()
@@ -137,7 +132,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'loginValidated', validated);
   }
 
-  userLogin = new Subject<IPlatformAuth>();
+  /**
+   * Checks for v1 auth schema and migrates if needed
+   */
+  @mutation()
+  private MIGRATE_AUTH() {
+    if (!this.state.auth) return;
+
+    if (this.state.auth.platform && !this.state.auth.platforms) {
+      Vue.set(this.state.auth, 'platforms', {
+        [this.state.auth.platform.type]: this.state.auth.platform,
+      });
+      Vue.set(this.state.auth, 'primaryPlatform', this.state.auth.platform.type);
+
+      // We are not deleting the old key for now to ensure compatibility
+      // in the case we have to roll back. Eventually we should remove it.
+    }
+  }
+
+  userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
 
   /**
@@ -147,12 +160,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
+    this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
   }
 
   async initialize() {
     await this.validateLogin();
-    await this.updateLinkedPlatforms();
   }
 
   mounted() {
@@ -161,8 +174,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      async (e: Electron.Event, auth: IPlatformAuth, isOnboardingTest: boolean) => {
-        const service = getPlatformService(auth.platform.type);
+      async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
+        const service = getPlatformService(auth.primaryPlatform);
         await this.login(service, auth);
         if (!isOnboardingTest) this.onboardingService.finish();
       },
@@ -182,7 +195,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .then(res => {
         return res.text();
       })
-      .then(valid => {
+      .then(async valid => {
         if (valid.match(/false/)) {
           this.LOGOUT();
           electron.remote.dialog.showMessageBox({
@@ -191,7 +204,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           return;
         }
         const service = getPlatformService(this.state.auth.platform.type);
-        this.login(service, this.state.auth);
+        await this.login(service, this.state.auth);
         this.refreshUserInfo();
       });
   }
@@ -209,7 +222,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const userInfo = await service.fetchUserInfo();
 
       if (userInfo.username) {
-        this.SET_USERNAME(userInfo.username);
+        this.SET_USERNAME(this.platform.type, userInfo.username);
       }
     } catch (e) {
       console.error('Error fetching user info', e);
@@ -221,28 +234,32 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
-      this.ADD_SECONDARY_AUTH('facebook', {
+      this.UPDATE_PLATFORM({
+        type: 'facebook',
         username: linkedPlatforms.facebook_account.platform_name,
         id: linkedPlatforms.facebook_account.platform_id,
         token: linkedPlatforms.facebook_account.access_token,
       });
     }
     if (linkedPlatforms.mixer_account) {
-      this.ADD_SECONDARY_AUTH('mixer', {
+      this.UPDATE_PLATFORM({
+        type: 'mixer',
         username: linkedPlatforms.mixer_account.platform_name,
         id: linkedPlatforms.mixer_account.platform_id,
         token: linkedPlatforms.mixer_account.access_token,
       });
     }
     if (linkedPlatforms.twitch_account) {
-      this.ADD_SECONDARY_AUTH('twitch', {
+      this.UPDATE_PLATFORM({
+        type: 'twitch',
         username: linkedPlatforms.twitch_account.platform_name,
         id: linkedPlatforms.twitch_account.platform_id,
         token: linkedPlatforms.twitch_account.access_token,
       });
     }
     if (linkedPlatforms.youtube_account) {
-      this.ADD_SECONDARY_AUTH('youtube', {
+      this.UPDATE_PLATFORM({
+        type: 'youtube',
         username: linkedPlatforms.youtube_account.platform_name,
         id: linkedPlatforms.youtube_account.platform_id,
         token: linkedPlatforms.youtube_account.access_token,
@@ -312,27 +329,30 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Returns the auth for the primary platform
+   */
   get platform() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform;
+      return this.state.auth.platforms[this.state.auth.primaryPlatform];
     }
   }
 
   get username() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.username;
+      return this.platform.username;
     }
   }
 
   get platformId() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.id;
+      return this.platform.id;
     }
   }
 
   get channelId() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.channelId;
+      return this.platform.channelId;
     }
   }
 
@@ -400,19 +420,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return fetch(request).then(handleResponse);
   }
 
-  getPlatformService(): IPlatformService {
-    return this.isLoggedIn() ? getPlatformService(this.platform.type) : null;
-  }
-
   async showLogin() {
     if (this.isLoggedIn()) await this.logOut();
     this.onboardingService.start({ isLogin: true });
   }
 
   @RunInLoadingMode()
-  private async login(service: IPlatformService, auth: IPlatformAuth) {
+  private async login(service: IPlatformService, auth: IUserAuth) {
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
+    await this.updateLinkedPlatforms();
     const result = await service.validatePlatform();
 
     // Currently we treat generic errors as success
@@ -504,18 +521,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     authWindow.loadURL(authUrl);
   }
 
-  updatePlatformToken(token: string) {
-    this.SET_PLATFORM_TOKEN(token);
+  updatePlatformToken(platform: TPlatform, token: string) {
+    this.SET_PLATFORM_TOKEN(platform, token);
   }
 
-  updatePlatformChannelId(id: string) {
-    this.SET_CHANNEL_ID(id);
+  updatePlatformChannelId(platform: TPlatform, id: string) {
+    this.SET_CHANNEL_ID(platform, id);
   }
 
   /**
    * Parses tokens out of the auth URL
    */
-  private parseAuthFromUrl(url: string, merge: boolean) {
+  private parseAuthFromUrl(url: string, merge: boolean): IUserAuth {
     const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
     const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
 
@@ -525,16 +542,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return {
         widgetToken: merge ? this.widgetToken : query.token,
         apiToken: merge ? this.apiToken : query.oauth_token,
-        platform: {
-          type: query.platform,
-          username: query.platform_username,
-          token: query.platform_token,
-          id: query.platform_id,
+        primaryPlatform: query.platform as TPlatform,
+        platforms: {
+          [query.platform]: {
+            type: query.platform,
+            username: query.platform_username,
+            token: query.platform_token,
+            id: query.platform_id,
+          },
         },
-      } as IPlatformAuth;
+      };
     }
-
-    return false;
   }
 
   /**

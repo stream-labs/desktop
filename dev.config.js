@@ -4,7 +4,7 @@ const path = require('path');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader')
 
-const plugins = [new HardSourceWebpackPlugin(), new CheckerPlugin()];
+const plugins = [new HardSourceWebpackPlugin()];
 
 module.exports = merge.smart(baseConfig, {
   entry: {
@@ -22,7 +22,7 @@ module.exports = merge.smart(baseConfig, {
       {
         test: /\.ts$/,
         loader: 'awesome-typescript-loader',
-        options: { useCache: true, forceIsolatedModules: true, reportedFiles: ['app/**/*.ts'] },
+        options: { useCache: true, forceIsolatedModules: true, reportFiles: ['app/**/*.ts'] },
         exclude: /node_modules|vue\/src/
       },
       {
@@ -32,7 +32,7 @@ module.exports = merge.smart(baseConfig, {
           'babel-loader',
           {
             loader: 'awesome-typescript-loader',
-            options: { forceIsolatedModules: true, reportedFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' }
+            options: { forceIsolatedModules: true, reportFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' }
           }
         ],
         exclude: /node_modules/,

@@ -9,11 +9,16 @@ import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
 import PlatformLogo from 'components/shared/PlatformLogo';
+import { RestreamService } from 'services/restream';
+import { ToggleInput } from 'components/shared/inputs/inputs';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 @Component({ components: { GenericFormGroups, PlatformLogo } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
+  @Inject() private restreamService: RestreamService;
   private obsSettings = this.streamSettingsService.getObsStreamSettings();
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
@@ -34,19 +39,38 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get userName() {
-    return this.userService.state.auth.platform.username;
+    return this.userService.platform.username;
   }
 
   get platform() {
-    return this.userService.state.auth.platform.type;
+    return this.userService.platform.type;
   }
 
   get platformName() {
-    return this.platform.charAt(0).toUpperCase() + this.platform.slice(1);
+    return this.formattedPlatformName(this.platform);
+  }
+
+  formattedPlatformName(platform: string) {
+    return platform.charAt(0).toUpperCase() + this.platform.slice(1);
   }
 
   get needToShowWarning() {
     return this.userService.isLoggedIn() && !this.protectedModeEnabled;
+  }
+
+  get restreamEnabled() {
+    console.log('FETCHING', this.restreamService.state.enabled);
+    return this.restreamService.state.enabled;
+  }
+
+  set restreamEnabled(enabled: boolean) {
+    console.log('SETTING', enabled);
+    this.restreamService.setEnabled(enabled);
+  }
+
+  get restreamEligible() {
+    // TODO: Logged into Twitch, rolled out, etc.
+    return true;
   }
 
   render() {
@@ -55,6 +79,17 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
+            <div class="section">
+              <VFormGroup
+                vModel={this.restreamEnabled}
+                metadata={metadata.toggle({
+                  title: $t('Enable Restreaming'),
+                  description: $t(
+                    'Restreaming allows you to stream to multiple platforms simultaneously.',
+                  ),
+                })}
+              />
+            </div>
             <div class="section flex">
               <div class="margin-right--20">
                 <PlatformLogo platform={this.platform} class={styles.platformLogo} />
@@ -64,6 +99,17 @@ export default class StreamSettings extends TsxComponent {
                 {this.userName} <br />
               </div>
             </div>
+            {this.restreamEnabled && this.userService.state.auth.platforms.facebook && (
+              <div class="section flex">
+                <div class="margin-right--20">
+                  <PlatformLogo platform={'facebook'} class={styles.platformLogo} />
+                </div>
+                <div>
+                  {$t('Streaming to %{platformName}', { platformName: 'facebook' })} <br />
+                  {this.userService.state.auth.platforms.facebook.username} <br />
+                </div>
+              </div>
+            )}
             <div>
               <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
             </div>

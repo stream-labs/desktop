@@ -251,7 +251,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       const endpoint = 'liveStreams?part=id,snippet&mine=true';
       const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
-      await platformAuthorizedRequest(url);
+      await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
     } catch (resp) {
@@ -297,7 +297,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     }`;
     return platformAuthorizedRequest<{
       items: { liveStreamingDetails: { concurrentViewers: number } }[];
-    }>(url).then(
+    }>('youtube', url).then(
       json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
     );
   }
@@ -334,7 +334,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     return fetch(request)
       .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => this.userService.updatePlatformToken('youtube', response.access_token));
   }
 
   /**
@@ -414,7 +414,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       status: { privacyStatus: 'public' },
     };
 
-    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       body: JSON.stringify(data),
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -444,7 +444,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     snippet.scheduledStartTime = new Date().toISOString();
 
-    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       body: JSON.stringify({ id, snippet }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -460,7 +460,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `/liveBroadcasts/bind?part=${fields.join(',')}`;
-    return platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       method: 'POST',
       url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
         this.oauthToken
@@ -474,7 +474,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    */
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=cdn,snippet,contentDetails`;
-    return platformAuthorizedRequest<IYoutubeLiveStream>({
+    return platformAuthorizedRequest<IYoutubeLiveStream>('youtube', {
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       method: 'POST',
       body: JSON.stringify({
@@ -499,6 +499,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=${fields.join(',')}&id=${id}`;
     const collection = await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveStream>>(
+      'youtube',
       `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     );
     return collection.items[0];
@@ -556,7 +557,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       // ask Youtube to change the broadcast status
       const endpoint = `liveBroadcasts/transition?broadcastStatus=${status}&id=${broadcastId}&part=status`;
-      await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+      await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
         method: 'POST',
         url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       });
@@ -625,7 +626,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     }`;
     const broadcastsCollection = await platformAuthorizedRequest<
       IYoutubeCollection<IYoutubeLiveBroadcast>
-    >(`${this.apiBase}/liveBroadcasts?${query}`);
+    >('youtube', `${this.apiBase}/liveBroadcasts?${query}`);
 
     // don't apply any filters if the ids filter specified
     if (ids) return broadcastsCollection.items;

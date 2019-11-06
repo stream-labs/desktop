@@ -30,6 +30,7 @@ import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
+import { getPlatformService } from 'services/platforms';
 
 @Component({
   components: {
@@ -107,7 +108,7 @@ export default class Main extends Vue {
       this.isLoggedIn &&
       !this.isOnboarding &&
       this.hasLiveDock &&
-      this.userService.getPlatformService().liveDockEnabled()
+      getPlatformService(this.userService.platform.type).liveDockEnabled()
     );
   }
 

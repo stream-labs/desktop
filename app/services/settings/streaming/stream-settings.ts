@@ -31,6 +31,7 @@ interface IStreamSettingsState {
 interface IStreamSettings extends IStreamSettingsState {
   platform: TPlatform;
   key: string;
+  server: string;
   streamType: 'rtmp_common' | 'rtmp_custom';
   warnBeforeStartingStream: boolean;
   recordWhenStreaming: boolean;
@@ -66,6 +67,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    * setup all stream-settings via single object
    */
   setSettings(patch: Partial<IStreamSettings>) {
+    console.log('SET SETTINGS', patch);
+
     // save settings to localStorage
     Object.keys(this.state).forEach(prop => {
       if (prop in patch) {
@@ -88,6 +91,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
         }
+
+        if (parameter.name === 'server' && patch.server !== void 0) {
+          parameter.value = patch.server;
+        }
       });
     });
     this.settingsService.setSettings('Stream', streamFormData);
@@ -107,6 +114,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       description: this.state.description,
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
+      server: obsStreamSettings.server,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,

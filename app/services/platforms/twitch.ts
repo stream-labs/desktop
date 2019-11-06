@@ -110,15 +110,23 @@ export class TwitchService extends Service implements IPlatformService {
     return `https://${host}/slobs/login?${query}`;
   }
 
+  // TODO: Refactor so this is reusable
+  get userAuth(): { token: string; id: string } {
+    return {
+      token: this.userService.state.auth.platforms.twitch.token,
+      id: this.userService.state.auth.platforms.twitch.id,
+    };
+  }
+
   get oauthToken() {
-    return this.userService.platform.token;
+    return this.userAuth.token;
   }
 
   get twitchId() {
-    return this.userService.platform.id;
+    return this.userAuth.id;
   }
 
-  async beforeGoLive(channelInfo: ITwitchChannelInfo) {
+  async beforeGoLive(channelInfo?: ITwitchStartStreamOptions) {
     const key = await this.fetchStreamKey();
     const currentStreamSettings = this.streamSettingsService.settings;
 
@@ -168,11 +176,14 @@ export class TwitchService extends Service implements IPlatformService {
 
     return fetch(request)
       .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => this.userService.updatePlatformToken('twitch', response.access_token));
   }
 
   private fetchRawChannelInfo(): Promise<ITWitchChannel> {
-    return platformAuthorizedRequest<ITWitchChannel>('https://api.twitch.tv/kraken/channel');
+    return platformAuthorizedRequest<ITWitchChannel>(
+      'twitch',
+      'https://api.twitch.tv/kraken/channel',
+    );
   }
 
   private fetchStreamKey(): Promise<string> {
@@ -222,19 +233,21 @@ export class TwitchService extends Service implements IPlatformService {
 
   fetchUserInfo() {
     return platformAuthorizedRequest<{ login: string }[]>(
+      'twitch',
       `https://api.twitch.tv/helix/users?id=${this.twitchId}`,
     ).then(json => (json[0] && json[0].login ? { username: json[0].login as string } : {}));
   }
 
   fetchViewerCount(): Promise<number> {
     return platformRequest<{ stream?: { viewers: number } }>(
+      'twitch',
       `https://api.twitch.tv/kraken/streams/${this.twitchId}`,
     ).then(json => (json.stream ? json.stream.viewers : 0));
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<boolean> {
     await Promise.all([
-      platformAuthorizedRequest({
+      platformAuthorizedRequest('twitch', {
         url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
         method: 'PUT',
         body: JSON.stringify({ channel: { game, status: title } }),
@@ -247,6 +260,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   searchGames(searchString: string): Promise<IGame[]> {
     return platformRequest<{ games: IGame[] }>(
+      'twitch',
       `https://api.twitch.tv/kraken/search/games?query=${searchString}`,
     ).then(json => json.games);
   }
@@ -279,7 +293,7 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
-    return platformAuthorizedRequest('https://id.twitch.tv/oauth2/validate').then(
+    return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );
   }
