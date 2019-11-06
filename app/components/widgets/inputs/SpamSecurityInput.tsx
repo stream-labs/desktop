@@ -1,7 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
+import { Slider } from 'streamlabs-beaker';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { ISpamSecurityMetadata } from 'components/widgets/inputs/index';
-import { SliderInput } from 'components/shared/inputs/inputs';
 import { $t } from 'services/i18n';
 
 @Component({})
@@ -18,13 +18,6 @@ export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMe
     return [$t('Off'), $t('Low'), $t('Medium'), $t('High'), $t('Very High')];
   }
 
-  get spamMetadata() {
-    return {
-      data: this.optionData,
-      ...this.metadata,
-    };
-  }
-
   updateLocalValue(value: string) {
     this.localValue = value;
     this.emitInput(this.optionData.indexOf(value) + this.idxMod);
@@ -32,10 +25,11 @@ export default class SpamSecurityInput extends BaseInput<number, ISpamSecurityMe
 
   render() {
     return (
-      <SliderInput
-        metadata={this.spamMetadata}
+      <Slider
         value={this.localValue}
         onInput={(value: string) => this.updateLocalValue(value)}
+        speed={0}
+        data={this.optionData}
       />
     );
   }

@@ -14,42 +14,9 @@ import styles from './MedaShare.m.less';
 
 @Component({})
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
-  pricePerSecTooltip = $t(
-    'In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30' +
-      ' would mean that for $10, media would play for 30 seconds. The default value is 0.10.',
-  );
-
-  minAmountTooltip = $t(
-    'The minimum amount a donor must donate in order to share media. The default value is $5.00 USD',
-  );
-
-  maxDurationTooltip = $t(
-    'The maximum duration in seconds that media can be played, regardless of amount donated.' +
-      ' The default value is 60 seconds.',
-  );
-
-  bufferTimeTooltip = $t('The time between videos the next video has to buffer.');
-
-  securityDescription = $t(
-    // tslint:disable-next-line:prefer-template
-    'This slider helps you filter shared media before it can be submitted.\n' +
-      'Off: No security\n' +
-      'Low: 65%+ rating, 5k+ views\n' +
-      'Medium: 75%+ rating, 40k+ views\n' +
-      'High: 80%+ rating, 300k+ views\n' +
-      'Very High: 85%+ rating, 900k+ views',
-  );
-
-  bufferMeta = metadata.slider({
-    tooltip: this.bufferTimeTooltip,
-    max: 30,
-    interval: 1,
-    title: $t('Buffer Time'),
-  });
-  securityMeta = metadata.spamSecurity({
-    title: $t('Spam Security'),
-    tooltip: this.securityDescription,
-  });
+  get metadata() {
+    return this.service.getMetadata();
+  }
 
   navItems = [
     { value: 'media', label: $t('Manage Media Settings') },
@@ -85,29 +52,20 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
     return (
       this.loaded && (
         <ValidatedForm slot="media-properties" onInput={() => this.save()}>
-          <VFormGroup
-            title={$t('Price Per Second')}
-            metadata={{ tooltip: this.pricePerSecTooltip }}
-          >
+          <VFormGroup metadata={this.metadata.pricePerSecond}>
             <NumberInput vModel={this.wData.settings.price_per_second} metadata={{}} />
             <span>{$t('USD')}</span>
           </VFormGroup>
-          <VFormGroup
-            title={$t('Min. Amount to Share')}
-            metadata={{ tooltip: this.minAmountTooltip }}
-          >
+          <VFormGroup metadata={this.metadata.minAmount}>
             <NumberInput vModel={this.wData.settings.min_amount_to_share} metadata={{}} />
             <span>{$t('USD')}</span>
           </VFormGroup>
-          <VFormGroup
-            title={$t('Max Duration')}
-            metadata={{ tooltip: this.maxDurationTooltip, isInteger: true }}
-          >
+          <VFormGroup metadata={this.metadata.maxDuration}>
             <NumberInput vModel={this.wData.settings.max_duration} metadata={{}} />
             <span>{$t('seconds')}</span>
           </VFormGroup>
-          <VFormGroup vModel={this.wData.settings.buffer_time} metadata={this.bufferMeta} />
-          <VFormGroup vModel={this.wData.settings.security} metadata={this.securityMeta} />
+          <VFormGroup vModel={this.wData.settings.buffer_time} metadata={this.metadata.buffer} />
+          <VFormGroup vModel={this.wData.settings.security} metadata={this.metadata.security} />
         </ValidatedForm>
       )
     );
