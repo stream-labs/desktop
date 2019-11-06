@@ -341,6 +341,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private createWindowOverlays() {
     Object.keys(this.windows).forEach((key: string) => {
       const win: electron.BrowserWindow = this.windows[key];
+      // Fix race condition in screen tests
+      if (win.isDestroyed()) return;
+
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId === -1 || overlayId == null) {
