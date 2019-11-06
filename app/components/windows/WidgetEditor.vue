@@ -65,46 +65,45 @@
           </div>
         </div>
 
-        <div class="code-editor" v-if="loaded">
-          <div v-if="customCodeIsEnabled && !loadingFailed">
-            <tabs
-              :hideConent="true"
-              className="widget-editor__top-tabs"
-              :tabs="codeTabs"
-              v-model="currentCodeTab"
-              @input="value => updateCodeTab(value)"
-            />
-          <div v-if="canShowEditor">
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
-              key="html"
-              :value="wData"
-              :metadata="{ type: 'html', selectedId, selectedAlert }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
-              key="css"
-              :value="wData"
-              :metadata="{ type: 'css', selectedId, selectedAlert }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
-              key="js"
-              :value="wData"
-              :metadata="{ type: 'js', selectedId, selectedAlert }"
-            />
-            <custom-fields-editor
-              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
-              key="customFields"
-              :value="wData"
-              :metadata="{ selectedId, selectedAlert }"
-            />
-          </div>
-          </div>
-          <div v-else-if="loadingFailed" style="padding: 8px;">
-            <div>{{ $t('Failed to load settings') }}</div>
-            <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
-          </div>
+        <div class="code-editor" v-if="loaded && customCodeIsEnabled && !loadingFailed">
+          <tabs
+            :hideConent="true"
+            :tabs="codeTabs"
+            v-model="currentCodeTab"
+            @input="value => updateCodeTab(value)"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+            key="html"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'html', selectedId, selectedAlert }"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+            key="css"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'css', selectedId, selectedAlert }"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+            key="js"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'js', selectedId, selectedAlert }"
+          />
+          <custom-fields-editor
+            v-if="canShowEditor && apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+            key="customFields"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ selectedId, selectedAlert }"
+          />
+        </div>
+        <div v-else-if="customCodeIsEnabled && loadingFailed" style="padding: 8px;">
+          <div>{{ $t('Failed to load settings') }}</div>
+          <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
         </div>
       </div>
 
@@ -223,7 +222,7 @@
   .content-container {
     display: flex;
     width: 100%;
-    height: calc(~"100% - 36px");
+    height: calc(~"100% - 48px");
     position: relative;
     background-color: var(--section);
     overflow: hidden;
@@ -384,6 +383,10 @@
     border-top: 1px solid var(--border);
     background-color: var(--background);
     .transition();
+  }
+
+  .code-tab {
+    height: calc(100% - 48px);
   }
 
   .custom-code {

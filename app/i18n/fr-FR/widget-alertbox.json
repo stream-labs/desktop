@@ -1,7 +1,6 @@
 {
   "Layout": "Format",
-  "Add Alert": "Ajouter une alerte",
-  "Add ": "Ajouter ",
+  "Alert": "Alert",
   "Global Settings": "Paramètres généraux",
   "Text to Speech": "Texte à lire à haute voix",
   "Charity Streaming Donations": "Dons d'évènement de charité en streaming",
@@ -23,6 +22,9 @@
   "Likes": "J'aimes",
   "Shares": "Partages",
   "Facemask Donations": "Donations de masques faciaux",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effets/Rallies",
   "General Settings": "Paramètres généraux",
   "Moderator Tools": "Outils du modérateur",
   "Title Message": "Message du titre",

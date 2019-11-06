@@ -15,7 +15,7 @@ import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
-import { PerformanceMonitorService } from 'services/performance-monitor';
+import { PerformanceService } from 'services/performance';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
@@ -39,6 +39,10 @@ interface IAppState {
   argv: string[];
   errorAlert: boolean;
   onboarded: boolean;
+}
+
+export interface IRunInLoadingModeOptions {
+  hideStyleBlockers?: boolean;
 }
 
 /**
@@ -75,7 +79,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
-  @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private performanceService: PerformanceService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
@@ -130,7 +134,7 @@ export class AppService extends StatefulService<IAppState> {
       this.streamInfoService,
     ];
 
-    this.performanceMonitorService.start();
+    this.performanceService.startMonitoringPerformance();
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();
@@ -165,7 +169,7 @@ export class AppService extends StatefulService<IAppState> {
       this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceService.stop();
       this.transitionsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
@@ -183,9 +187,11 @@ export class AppService extends StatefulService<IAppState> {
    * Should be called for any scene-collections loading operations
    * @see RunInLoadingMode decorator
    */
-  async runInLoadingMode(fn: () => Promise<any> | void) {
+  async runInLoadingMode(fn: () => Promise<any> | void, options: IRunInLoadingModeOptions = {}) {
+    const opts: IRunInLoadingModeOptions = Object.assign({ hideStyleBlockers: true }, options);
+
     if (!this.state.loading) {
-      this.windowsService.updateStyleBlockers('main', true);
+      if (opts.hideStyleBlockers) this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -236,7 +242,9 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    if (opts.hideStyleBlockers) {
+      setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    }
     if (error) throw error;
     return returningValue;
   }

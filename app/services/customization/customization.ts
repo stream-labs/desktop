@@ -5,6 +5,7 @@ import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  IPinnedStatistics,
 } from './customization-api';
 import {
   IObsInput,
@@ -19,13 +20,13 @@ import { Global } from '../../../obs-api';
 // Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': { r: 9, g: 22, b: 29 },
-  'day-theme': { r: 247, g: 249, b: 249 },
+  'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 // Maps to --section
 const DISPLAY_BACKGROUNDS = {
   'night-theme': { r: 11, g: 22, b: 28 },
-  'day-theme': { r: 245, g: 248, b: 250 },
+  'day-theme': { r: 227, g: 232, b: 235 },
 };
 
 /**
@@ -61,8 +62,13 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     mediaBackupOptOut: false,
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
-    selectiveRecordingEnabled: false,
     legacyEvents: false,
+    pinnedStatistics: {
+      cpu: false,
+      fps: false,
+      droppedFrames: false,
+      bandwidth: false,
+    },
     experimental: {
       // put experimental features here
     },
@@ -74,13 +80,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
-    if (this.state.selectiveRecordingEnabled) {
-      this.initializeMultiRendering();
-    }
-  }
-
-  initializeMultiRendering() {
-    Global.multipleRendering = this.state.selectiveRecordingEnabled;
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -138,9 +137,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
-  toggleSelectiveRecording() {
-    this.setSettings({ selectiveRecordingEnabled: !Global.multipleRendering });
-    Global.multipleRendering = !Global.multipleRendering;
+  setPinnedStatistics(pinned: IPinnedStatistics) {
+    this.setSettings({ pinnedStatistics: pinned });
   }
 
   getSettingsFormData(): TObsFormData {

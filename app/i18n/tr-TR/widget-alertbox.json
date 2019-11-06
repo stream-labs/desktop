@@ -1,7 +1,6 @@
 {
   "Layout": "Düzen",
-  "Add Alert": "Uyarı Ekle",
-  "Add ": "Ekle ",
+  "Alert": "Alert",
   "Global Settings": "Global Ayarlar",
   "Text to Speech": "Metin okuma",
   "Charity Streaming Donations": "Hayır Yayın Bağışları",
@@ -23,6 +22,9 @@
   "Likes": "Beğeniler",
   "Shares": "Paylaşılanlar",
   "Facemask Donations": "Yüz Maskesi Bağışları",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Genel Ayarlar",
   "Moderator Tools": "Moderatör Araçları",
   "Title Message": "Başlık Mesajı",

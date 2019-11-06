@@ -137,6 +137,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   @RunInLoadingMode()
   async setupNewUser() {
+    if (!this.initialized) return; // don't handle initial user login
     await this.initialize();
   }
 
@@ -232,7 +233,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const removingActiveCollection = id === this.activeCollection.id;
 
     if (removingActiveCollection) {
-      this.appService.runInLoadingMode(async () => {
+      await this.appService.runInLoadingMode(async () => {
         await this.removeCollection(id);
 
         if (this.collections.length > 0) {
@@ -266,6 +267,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Instead, it will log an error and continue.
    */
   async safeSync(retries = 2) {
+    if (!this.canSync()) return;
+
     if (this.syncPending) {
       console.error(
         'Unable to start the scenes-collection sync process while prev process is not finished',
@@ -276,12 +279,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.syncPending = true;
     try {
       await this.sync();
+      this.syncPending = false;
     } catch (e) {
+      this.syncPending = false;
+
       console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
       if (retries > 0) await this.safeSync(retries - 1);
     }
-
-    this.syncPending = false;
   }
 
   /**
@@ -306,7 +310,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the overlay
    * @param progressCallback a callback that receives progress of the download
    */
-  @RunInLoadingMode()
+  @RunInLoadingMode({ hideStyleBlockers: false })
   async installOverlay(
     url: string,
     name: string,
@@ -569,6 +573,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.deleteAllConnections();
+
+      this.streamingService.setSelectiveRecording(false);
     } catch (e) {
       console.error('Error deloading application state', e);
     }

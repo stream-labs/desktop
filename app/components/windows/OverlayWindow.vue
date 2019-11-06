@@ -51,8 +51,7 @@
   }
 
   .live-preview {
-    .margin-horizontal--10();
-
+    margin: 0 10px;
     width: 100%;
   }
 

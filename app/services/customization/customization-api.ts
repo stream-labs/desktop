@@ -3,6 +3,13 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { overArgs } from 'lodash-decorators';
 import Display from 'components/shared/Display.vue';
 
+export interface IPinnedStatistics {
+  cpu: boolean;
+  fps: boolean;
+  droppedFrames: boolean;
+  bandwidth: boolean;
+}
+
 export interface ICustomizationServiceState {
   nightMode?: string;
   theme: string;
@@ -21,9 +28,9 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  selectiveRecordingEnabled: boolean;
   experimental: any;
   legacyEvents: boolean;
+  pinnedStatistics: IPinnedStatistics;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

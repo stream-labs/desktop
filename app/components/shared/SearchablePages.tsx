@@ -25,9 +25,9 @@ class SearchablePagesProps {
  */
 @Component({ props: createProps(SearchablePagesProps) })
 export default class SearchablePages extends TsxComponent<SearchablePagesProps> {
-  currentPage: string;
+  currentPage: string = '';
   pagesInfo: Dictionary<IPageInfo> = null;
-  searchResultPages: string[];
+  searchResultPages: string[] = [];
 
   created() {
     this.currentPage = this.props.page || '';
@@ -147,7 +147,7 @@ export default class SearchablePages extends TsxComponent<SearchablePagesProps> 
     return Array.from(this.$refs.pageSlot.querySelectorAll('[data-role="input"]'));
   }
 
-  private render(h: Function) {
+  private render() {
     return (
       <div class={styles.searchablePages}>
         <div ref="pageSlot">{this.$scopedSlots.default({ page: this.currentPage })}</div>

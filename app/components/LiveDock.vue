@@ -54,7 +54,7 @@
           <a
             @click="openYoutubeControlRoom"
             v-if="isYoutube && isStreaming"
-            v-tooltip="controlRoomTooltip">
+            v-tooltip.top="controlRoomTooltip">
             <i class="icon-settings" />
           </a>
         </div>

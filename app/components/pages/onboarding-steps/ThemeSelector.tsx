@@ -1,20 +1,19 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
 import styles from './ThemeSelector.m.less';
 
-@Component({})
-export default class ObsImport extends TsxComponent<{
-  continue: () => void;
-  setProcessing: (bool: boolean) => void;
-}> {
-  @Inject() sceneCollectionsService: SceneCollectionsService;
+class ThemeSelectorProps {
+  continue: () => void = () => {};
+  setProcessing: (bool: boolean) => void = () => {};
+}
 
-  @Prop() continue: () => void;
-  @Prop() setProcessing: (bool: boolean) => void;
+@Component({ props: createProps(ThemeSelectorProps) })
+export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   installing = false;
   progress = 0;
@@ -56,18 +55,18 @@ export default class ObsImport extends TsxComponent<{
 
   async installTheme(url: string, name: string) {
     this.installing = true;
-    this.setProcessing(true);
+    this.props.setProcessing(true);
     await this.sceneCollectionsService.installOverlay(
       url,
       name,
       progress => (this.progress = progress.percent),
     );
     this.installing = false;
-    this.setProcessing(false);
-    this.continue();
+    this.props.setProcessing(false);
+    this.props.continue();
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Add a Theme')}</template>

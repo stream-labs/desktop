@@ -9,7 +9,7 @@
   border: 1px solid transparent;
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  height: 32px;
+  min-height: 32px;
   line-height: 30px;
   white-space: nowrap;
   overflow-x: hidden;
@@ -93,12 +93,37 @@
 }
 
 .button--warn {
-  background-color: var(--warning);
+  background-color: var(--warning-button-bg);
 
   &:hover,
   &:focus,
   &:active {
     background-color: var(--warning-hover);
+  }
+}
+
+.circle-button {
+  .transition();
+  .weight(@bold);
+
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background: var(--button);
+  color: var(--paragraph);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  box-sizing: content-box;
+  letter-spacing: 0.2px;
+
+  &:hover {
+    background-color: var(--button-hover);
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
@@ -156,10 +181,11 @@
   background: #6441a4;
 
   &:hover {
-    background: lighten(#6441a4, 4%);
+    background: lighten(#6441a4, 4%) !important;
   }
 
-  &:focus {
+  &:focus,
+  &:active {
     background: #6441a4;
   }
 }
@@ -169,7 +195,7 @@
   background: #d22222;
 
   &:hover {
-    background: lighten(#d22222, 4%);
+    background: lighten(#d22222, 4%) !important;
   }
 
   &:focus,
@@ -183,16 +209,18 @@
 .button--facebook {
   background: #3b5998;
 
-  &:hover {
-    background: lighten(#3b5998, 4%);
+  &:hover,
+  &:active {
+    background: lighten(#3b5998, 4%) !important;
   }
 }
 
 .square-button--twitter {
   background: #1da1f2;
 
-  &:hover {
-    background: lighten(#1da1f2, 4%);
+  &:hover,
+  &:active {
+    background: lighten(#1da1f2, 4%) !important;
   }
 }
 

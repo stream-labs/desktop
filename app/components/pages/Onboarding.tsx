@@ -80,7 +80,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     }
   }
 
-  steps(h: Function) {
+  get steps() {
     const steps = [
       <Connect slot="1" continue={this.continue.bind(this)} />,
       <ObsImport
@@ -115,7 +115,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     return steps;
   }
 
-  loginPage(h: Function) {
+  get loginPage() {
     return (
       <div>
         <div class={styles.container}>
@@ -125,7 +125,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  optimizePage(h: Function) {
+  get optimizePage() {
     return (
       <div>
         <div class={styles.container}>
@@ -138,15 +138,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
-    const steps = this.steps(h);
-
-    if (this.onboardingService.options.isLogin) {
-      return this.loginPage(h);
-    }
-    if (this.onboardingService.options.isOptimize) {
-      return this.optimizePage(h);
-    }
+  render() {
+    if (this.onboardingService.options.isLogin) return this.loginPage;
+    if (this.onboardingService.options.isOptimize) return this.optimizePage;
 
     return (
       <div>
@@ -170,7 +164,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
               (this.currentStep === 3 && !this.importedFromObs)
             }
           >
-            {steps}
+            {this.steps}
           </Onboarding>
         </div>
       </div>

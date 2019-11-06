@@ -79,5 +79,11 @@
   "Dismiss": "离开",
   "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.": "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
   "Are you sure you want to do this?": "Are you sure you want to do this?",
-  "You can add sources by clicking the + icon near the Sources box at any time": "You can add sources by clicking the + icon near the Sources box at any time"
+  "You can add sources by clicking the + icon near the Sources box at any time": "You can add sources by clicking the + icon near the Sources box at any time",
+  "An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.": "An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.",
+  "OK": "OK",
+  "Streaming Error": "Streaming Error",
+  "Recording Error": "Recording Error",
+  "Replay Buffer Error": "Replay Buffer Error",
+  "Learn More": "Learn More"
 }

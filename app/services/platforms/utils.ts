@@ -2,6 +2,14 @@ import { getResource } from '../core';
 import { UserService } from '../user';
 import { IPlatformRequest } from './index';
 
+export interface IPlatformResponse<TResult = unknown> {
+  ok: boolean;
+  url: string;
+  status: number;
+  result: TResult;
+  message: string;
+}
+
 /**
  * same as handleResponse but passes a Response object instead a response body
  * in the case of Promise rejection
@@ -12,7 +20,9 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
   const isJson = contentType && contentType.includes('application/json');
   const result = await (isJson ? response.json() : response.text());
   const serializedResponse = { ok: response.ok, url: response.url, status: response.status };
-  return response.ok ? result : Promise.reject({ result, ...serializedResponse });
+  return response.ok
+    ? result
+    : Promise.reject({ result, message: status, ...serializedResponse } as IPlatformResponse);
 }
 
 /**
@@ -21,7 +31,7 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
  * if the token has been outdated
  * @param useToken true|false or a token string
  */
-export async function platformRequest<T = any>(
+export async function platformRequest<T = unknown>(
   reqInfo: IPlatformRequest | string,
   useToken: boolean | string = false,
 ): Promise<T> {
@@ -50,6 +60,6 @@ export async function platformRequest<T = any>(
  * This is a shortcut for platformRequest()
  * @see platformRequest
  */
-export function platformAuthorizedRequest<T = any>(req: IPlatformRequest | string): Promise<T> {
+export function platformAuthorizedRequest<T = unknown>(req: IPlatformRequest | string): Promise<T> {
   return platformRequest(req, true);
 }

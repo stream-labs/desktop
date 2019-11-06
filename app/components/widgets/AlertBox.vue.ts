@@ -6,7 +6,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-box';
 import { $t } from 'services/i18n';
 
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 
@@ -35,7 +35,7 @@ const alertNameMap = () => ({
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
-  loyaltystore: $t('Cloudbot Redemption'),
+  loyaltystore: $t('Cloudbot Store'),
   stickers: $t('Stickers'),
   effects: $t('Effects/Rallies'),
 });
