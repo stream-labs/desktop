@@ -89,5 +89,6 @@
   "Replay Buffer Error": "Replay Buffer Error",
   "Learn More": "Learn More",
   "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again.",
-  "You must select a game": "You must select a game"
+  "You must select a game": "You must select a game",
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance."
 }
