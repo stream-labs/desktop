@@ -88,5 +88,6 @@
   "Recording Error": "Recording Error",
   "Replay Buffer Error": "Replay Buffer Error",
   "Learn More": "Learn More",
-  "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again."
+  "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again.",
+  "You must select a game": "You must select a game"
 }

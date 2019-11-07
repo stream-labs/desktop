@@ -107,7 +107,6 @@ schedulingPlatforms.forEach(platform => {
       case 'facebook':
         await formMonkey.fill({
           title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
           description: 'SLOBS Test Stream Description',
         });
         break;
@@ -134,6 +133,18 @@ schedulingPlatforms.forEach(platform => {
     });
 
     await app.client.click('button=Schedule');
+
+    // facebook requires a game
+    if (platform === 'facebook') {
+      t.true(await app.client.waitForVisible('.toast-alert', 2000));
+
+      await formMonkey.fill({
+        game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+      });
+
+      await app.client.click('button=Schedule');
+    }
+
     await app.client.waitForVisible('.toast-success', 20000);
   });
 });

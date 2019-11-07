@@ -107,6 +107,12 @@ export default class EditStreamInfo extends Vue {
 
   get formMetadata() {
     return formMetadata({
+      page: metadata.list({
+        name: 'stream_page',
+        title: $t('Facebook Page'),
+        fullWidth: true,
+        options: this.isFacebook && this.facebookService.state.facebookPages.options,
+      }),
       game: metadata.list({
         title: $t('Game'),
         placeholder: $t('Start typing to search'),
@@ -127,6 +133,7 @@ export default class EditStreamInfo extends Vue {
       description: metadata.textArea({
         title: $t('Description'),
         disabled: this.updatingInfo,
+        fullWidth: true,
       }),
       date: metadata.text({
         title: $t('Scheduled Date'),
@@ -293,12 +300,26 @@ export default class EditStreamInfo extends Vue {
     }
 
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.isFacebook && !this.channelInfo.game) {
+      this.showGameError();
+      return;
+    }
     if (this.isSchedule) return this.scheduleStream();
     if (this.twitterIsEnabled && this.shouldPostTweet) {
       const tweetedSuccessfully = await this.handlePostTweet();
       if (!tweetedSuccessfully) return;
     }
     this.updateAndGoLive();
+  }
+
+  showGameError() {
+    this.$toasted.show($t('You must select a game'), {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 2500,
+      singleton: true,
+    });
+    this.updatingInfo = false;
   }
 
   async handlePostTweet() {
