@@ -20,5 +20,9 @@
   "Filter name": "Filter name",
   "Add source filter": "Add source filter",
   "No filters applied": "No filters applied",
-  "Source filters": "Source filters"
+  "Source filters": "Source filters",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader"
 }

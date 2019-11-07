@@ -75,6 +75,7 @@
   "Please enter a valid date": "Please enter a valid date",
   "Hr": "Hr",
   "Min": "Min",
+  "min": "min",
   "Sec": "Sec",
   "USD": "USD",
   "seconds": "seconds",
@@ -94,5 +95,17 @@
   "Studio": "Studio",
   "Store": "Store",
   "Connect": "Connect",
-  "Skip": "Skip"
+  "Skip": "Skip",
+  "Chat": "Chat",
+  "Event": "Event",
+  "Error": "Error",
+  "Left": "Left",
+  "Right": "Right",
+  "Top": "Top",
+  "Bottom": "Bottom",
+  "Crop": "Crop",
+  "Rotation": "Rotation",
+  "Reset": "Reset",
+  "Retry": "Retry",
+  "Warning": "Warning"
 }

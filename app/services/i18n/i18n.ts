@@ -205,12 +205,18 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       .filter(fileName => fileName.split('.')[1] === 'json');
 
     const dictionary: Dictionary<string> = {};
+
     for (const fileName of dictionaryFiles) {
-      Object.assign(
-        dictionary,
-        JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)),
-      );
+      const filePath = `${i18nPath}/${locale}/${fileName}`;
+      let json: Dictionary<string>;
+      try {
+        json = JSON.parse(this.fileManagerService.read(filePath));
+      } catch (e) {
+        throw new Error(`Invalid JSON in ${filePath}`);
+      }
+      Object.assign(dictionary, json);
     }
+
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
   }
