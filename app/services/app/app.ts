@@ -135,10 +135,9 @@ export class AppService extends StatefulService<IAppState> {
 
       // Pre-fetch stream info
       this.streamInfoService,
-    ];
 
-    // We don't need to wait on this
-    this.restreamService.initialize();
+      this.restreamService,
+    ];
 
     this.performanceService.startMonitoringPerformance();
 
