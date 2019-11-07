@@ -90,10 +90,8 @@ export default class BrowseOverlays extends Vue {
       showTime: false,
       message: $t('Widget Theme installed & activated. Click here to manage your Widget Profiles.'),
       action: this.jsonrpcService.createRequest(
-        Service.getResourceId(this.navigationService),
-        'navigate',
-        'Dashboard',
-        { subPage: 'widgetthemes' },
+        Service.getResourceId(this.notificationsService),
+        'openWidgetThemesMagicLink',
       ),
     });
   }
