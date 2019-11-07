@@ -202,7 +202,9 @@ test('Migrate the twitch account to the protected mode', async t => {
   const streamSettings = (await getClient()).getResource<StreamSettingsService>(
     'StreamSettingsService',
   );
-  streamSettings.setSettings({ key: 'fake key' });
+  streamSettings.setSettings({ key: 'fake key', protectedModeMigrationRequired: true });
+
+  await restartApp(t); // restarting the app should call migration again
 
   // go live
   await tryToGoLive(t, {
@@ -221,8 +223,12 @@ test('Migrate the twitch account to the protected mode', async t => {
   // use recommended settings
   await t.context.app.client.click('button=Use recommended settings');
   // setup custom server
-  streamSettings.setSettings({ server: 'rtmp://live-sjc.twitch.tv/app' });
+  streamSettings.setSettings({
+    server: 'rtmp://live-sjc.twitch.tv/app',
+    protectedModeMigrationRequired: true,
+  });
 
+  await restartApp(t); // restarting the app should call migration again
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
