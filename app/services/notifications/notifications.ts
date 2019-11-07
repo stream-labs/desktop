@@ -14,8 +14,6 @@ import {
 } from './notifications-api';
 import { $t } from 'services/i18n';
 import { InternalApiService } from 'services/api/internal-api';
-import { MagicLinkService } from 'services/magic-link';
-import electron from 'electron';
 
 interface INotificationsState {
   settings: INotificationsSettings;
@@ -34,7 +32,6 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
 
   @Inject() private windowsService: WindowsService;
   @Inject() private internalApiService: InternalApiService;
-  @Inject() private magicLinkService: MagicLinkService;
 
   notificationPushed = new Subject<INotification>();
   notificationRead = new Subject<number[]>();
@@ -146,15 +143,6 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
         height: 600,
       },
     });
-  }
-
-  async openWidgetThemesMagicLink() {
-    try {
-      const link = await this.magicLinkService.getDashboardMagicLink('widgetthemes');
-      electron.remote.shell.openExternal(link);
-    } catch (e) {
-      console.error('Error generating dashboard magic link', e);
-    }
   }
 
   @mutation()
