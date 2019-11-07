@@ -59,18 +59,15 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get restreamEnabled() {
-    console.log('FETCHING', this.restreamService.state.enabled);
     return this.restreamService.state.enabled;
   }
 
   set restreamEnabled(enabled: boolean) {
-    console.log('SETTING', enabled);
     this.restreamService.setEnabled(enabled);
   }
 
   get restreamEligible() {
-    // TODO: Logged into Twitch, rolled out, etc.
-    return true;
+    return this.restreamService.restreamEligible;
   }
 
   render() {
@@ -79,17 +76,19 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            <div class="section">
-              <VFormGroup
-                vModel={this.restreamEnabled}
-                metadata={metadata.toggle({
-                  title: $t('Enable Restreaming'),
-                  description: $t(
-                    'Restreaming allows you to stream to multiple platforms simultaneously.',
-                  ),
-                })}
-              />
-            </div>
+            {this.restreamEligible && (
+              <div class="section">
+                <VFormGroup
+                  vModel={this.restreamEnabled}
+                  metadata={metadata.toggle({
+                    title: $t('Enable Restreaming'),
+                    description: $t(
+                      'Restreaming allows you to stream to multiple platforms simultaneously.',
+                    ),
+                  })}
+                />
+              </div>
+            )}
             <div class="section flex">
               <div class="margin-right--20">
                 <PlatformLogo platform={this.platform} class={styles.platformLogo} />

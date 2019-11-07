@@ -81,7 +81,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async initialize() {
     this.settings = await this.fetchUserSettings();
-    this.SET_ENABLED(this.settings.enabled);
+    this.SET_ENABLED(this.settings.enabled && this.restreamEligible);
   }
 
   get enabledPlatforms(): TPlatform[] {
@@ -103,7 +103,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   get restreamEligible() {
     // TODO: Check server side rollout flag
     // Possibly not remove it for people who had it enabled?
-    return (
+    return !!(
       this.userService.state.auth.primaryPlatform === 'twitch' &&
       this.userService.state.auth.platforms.facebook
     );
