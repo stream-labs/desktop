@@ -85,5 +85,6 @@
   "Streaming Error": "Streaming Error",
   "Recording Error": "Recording Error",
   "Replay Buffer Error": "Replay Buffer Error",
-  "Learn More": "Learn More"
+  "Learn More": "Learn More",
+  "You must select a game": "You must select a game"
 }
