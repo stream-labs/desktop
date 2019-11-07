@@ -10,15 +10,19 @@ import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
 import PlatformLogo from 'components/shared/PlatformLogo';
 import { RestreamService } from 'services/restream';
-import { ToggleInput } from 'components/shared/inputs/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
+import { NavigationService } from 'services/navigation';
+import { WindowsService } from 'services/windows';
 
 @Component({ components: { GenericFormGroups, PlatformLogo } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private windowsService: WindowsService;
+
   private obsSettings = this.streamSettingsService.getObsStreamSettings();
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
@@ -66,8 +70,9 @@ export default class StreamSettings extends TsxComponent {
     this.restreamService.setEnabled(enabled);
   }
 
-  get restreamEligible() {
-    return this.restreamService.restreamEligible;
+  facebookMerge() {
+    this.navigationService.navigate('FacebookMerge');
+    this.windowsService.closeChildWindow();
   }
 
   render() {
@@ -76,7 +81,7 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            {this.restreamEligible && (
+            {this.restreamService.canEnableRestream && (
               <div class="section">
                 <VFormGroup
                   vModel={this.restreamEnabled}
@@ -98,15 +103,23 @@ export default class StreamSettings extends TsxComponent {
                 {this.userName} <br />
               </div>
             </div>
-            {this.restreamEnabled && this.userService.state.auth.platforms.facebook && (
+            {this.restreamEnabled && (
               <div class="section flex">
                 <div class="margin-right--20">
                   <PlatformLogo platform={'facebook'} class={styles.platformLogo} />
                 </div>
-                <div>
-                  {$t('Streaming to %{platformName}', { platformName: 'facebook' })} <br />
-                  {this.userService.state.auth.platforms.facebook.username} <br />
-                </div>
+                {this.userService.state.auth.platforms.facebook ? (
+                  <div>
+                    {$t('Streaming to %{platformName}', { platformName: 'facebook' })} <br />
+                    {this.userService.state.auth.platforms.facebook.username} <br />
+                  </div>
+                ) : (
+                  <div style={{ lineHeight: '42px' }}>
+                    <button onClick={this.facebookMerge} class="button button--facebook">
+                      Connect
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             <div>

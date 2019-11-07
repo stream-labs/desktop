@@ -79,11 +79,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     Vue.set(this.state.platforms, platform, { options, streamKey });
   }
 
-  async initialize() {
-    this.settings = await this.fetchUserSettings();
-    this.SET_ENABLED(this.settings.enabled && this.restreamEligible);
-  }
-
   init() {
     if (this.userService.isLoggedIn()) {
       this.loadUserSettings();
@@ -98,13 +93,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
-    this.SET_ENABLED(this.settings.enabled && this.restreamEligible);
-  }
-
-  get enabledPlatforms(): TPlatform[] {
-    return (Object.keys(this.state.platforms) as TPlatform[]).filter(
-      p => this.state.platforms[p].enabled,
-    );
+    this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
   }
 
   get host() {
@@ -113,17 +102,35 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   /**
+   * This determines whether the user sees the restream toggle in settings
+   * Requirements:
+   * - Logged in with Twitch
+   * - Rolled out to
+   */
+  get canEnableRestream() {
+    // TODO: Check server side rollout flag
+    return !!(
+      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
+    );
+  }
+
+  /**
+   * Go live requirements for now:
+   * - Restream is enabled
+   * - Protected mode is enabled
+   * - Logged in via twitch
+   * - Facebook is linked
    * For now, restream will only work if you are logged into Twitch and
    * restreaming to Facebook. We are starting with a simple case with broad
    * appeal, but will be expanding to all platforms very soon.
    */
-  get restreamEligible() {
-    // TODO: Check server side rollout flag
-    // Possibly not remove it for people who had it enabled?
-    return !!(
+  get shouldGoLiveWithRestream() {
+    return (
       this.userService.state.auth &&
       this.userService.state.auth.primaryPlatform === 'twitch' &&
-      this.userService.state.auth.platforms.facebook
+      this.userService.state.auth.platforms.facebook &&
+      this.state.enabled &&
+      this.streamSettingsService.protectedModeEnabled
     );
   }
 

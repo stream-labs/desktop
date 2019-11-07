@@ -317,8 +317,7 @@ export default class EditStreamInfo extends Vue {
       if (!tweetedSuccessfully) return;
     }
 
-    if (this.restreamService.state.enabled) {
-      // TODO should maybe do this at the end
+    if (this.restreamService.shouldGoLiveWithRestream) {
       this.updatingInfo = true;
       await this.restreamService.stagePlatform(this.platform, this.channelInfo);
 

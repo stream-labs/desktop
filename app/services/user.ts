@@ -31,6 +31,7 @@ import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
+import { StreamSettingsService } from './settings/streaming';
 
 interface ISecondaryPlatformAuth {
   username: string;
@@ -92,6 +93,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -103,8 +105,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   UPDATE_PLATFORM(auth: IPlatformAuth) {
-    console.log('setting', auth);
     Vue.set(this.state.auth.platforms, auth.type, auth);
+  }
+
+  @mutation()
+  UNLINK_PLATFORM(platform: TPlatform) {
+    Vue.delete(this.state.auth.platforms, platform);
   }
 
   @mutation()
@@ -240,7 +246,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.facebook_account.platform_id,
         token: linkedPlatforms.facebook_account.access_token,
       });
+    } else if (this.state.auth.primaryPlatform !== 'facebook') {
+      this.UNLINK_PLATFORM('facebook');
     }
+
     if (linkedPlatforms.mixer_account) {
       this.UPDATE_PLATFORM({
         type: 'mixer',
@@ -248,7 +257,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.mixer_account.platform_id,
         token: linkedPlatforms.mixer_account.access_token,
       });
+    } else if (this.state.auth.primaryPlatform !== 'mixer') {
+      this.UNLINK_PLATFORM('mixer');
     }
+
     if (linkedPlatforms.twitch_account) {
       this.UPDATE_PLATFORM({
         type: 'twitch',
@@ -256,7 +268,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.twitch_account.platform_id,
         token: linkedPlatforms.twitch_account.access_token,
       });
+    } else if (this.state.auth.primaryPlatform !== 'twitch') {
+      this.UNLINK_PLATFORM('twitch');
     }
+
     if (linkedPlatforms.youtube_account) {
       this.UPDATE_PLATFORM({
         type: 'youtube',
@@ -264,6 +279,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         id: linkedPlatforms.youtube_account.platform_id,
         token: linkedPlatforms.youtube_account.access_token,
       });
+    } else if (this.state.auth.primaryPlatform !== 'youtube') {
+      this.UNLINK_PLATFORM('youtube');
     }
   }
 
@@ -501,13 +518,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const parsed = this.parseAuthFromUrl(url, merge);
 
       if (parsed) {
-        // This is a hack to work around the fact that the merge endpoint
-        // returns the wrong token.
-        if (merge) parsed.apiToken = this.apiToken;
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
-        const result = await this.login(service, parsed);
+
+        let result: EPlatformCallResult;
+
+        if (!merge) {
+          result = await this.login(service, parsed);
+
+          // A fresh auth should enable protected mode
+          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        } else {
+          this.UPDATE_PLATFORM(parsed.platforms[parsed.primaryPlatform]);
+          result = EPlatformCallResult.Success;
+        }
+
         defer(() => onAuthFinish(result));
       }
     });
