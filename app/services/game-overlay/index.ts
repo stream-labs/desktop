@@ -123,8 +123,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       componentName: 'GameOverlayEventFeed',
       queryParams: { gameOverlay: true },
       webPreferences: { offscreen: true, nodeIntegration: true },
-      isFullScreen: true,
-      alwaysOnTop: true,
     });
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,

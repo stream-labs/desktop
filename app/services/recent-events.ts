@@ -793,7 +793,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   showFilterMenu() {
     this.windowsService.showWindow({
-      componentName: 'MiniFeed',
+      componentName: 'EventFilterMenu',
       title: $t('Event Filters'),
       queryParams: {},
       size: {
