@@ -80,7 +80,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   init() {
     this.userService.userLogin.subscribe(async _ => {
       const protectedModeHasBeenDisabled = await this.migrateToProtectedModeIfRequired();
-      console.log('disabled', protectedModeHasBeenDisabled);
       if (!protectedModeHasBeenDisabled) this.resetStreamSettings();
     });
     this.userService.userLogout.subscribe(async _ => {
