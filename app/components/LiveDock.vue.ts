@@ -55,7 +55,10 @@ export default class LiveDock extends Vue {
 
   get selectedChat() {
     if (this.underlyingSelectedChat === 'default') return 'default';
-    if (this.underlyingSelectedChat === 'restream') return 'restream';
+    if (this.underlyingSelectedChat === 'restream') {
+      if (this.restreamService.shouldGoLiveWithRestream) return 'restream';
+      return 'default';
+    }
 
     return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
       ? this.underlyingSelectedChat
@@ -209,7 +212,7 @@ export default class LiveDock extends Vue {
   }
 
   get hasChatTabs() {
-    return this.chatTabs.length > 0;
+    return this.chatTabs.length > 1;
   }
 
   get showDefaultPlatformChat() {
