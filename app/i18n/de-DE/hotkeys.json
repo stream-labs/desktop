@@ -16,5 +16,10 @@
   "Disable Studio Mode": "Studio-Modus deaktivieren",
   "Transition (Studio Mode)": "Übergang (Studio-Modus)",
   "Capture Foreground Window": "Vordergrund-Bild aufnehmen",
-  "Deactivate Capture": "Aufnahme deaktivieren"
+  "Deactivate Capture": "Aufnahme deaktivieren",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }
