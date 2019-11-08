@@ -1,4 +1,5 @@
 {
+  "Sponsor Banner": "Sponsor Banner",
   "Ad Layout": "Layout do anúncio",
   "Placement": "Posicionamento",
   "Image Layout": "Layout de imagem",
@@ -19,5 +20,6 @@
   "These are the animations that are used to show your banner.": "Estas são as animações que são utilizadas para mostrar o seu banner.",
   "Visual Settings": "Configurações visuais",
   "Image Set ": "Conjunto de Imagens ",
-  "No Image": "Nenhuma Imagem"
+  "No Image": "Nenhuma Imagem",
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
 }

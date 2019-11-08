@@ -222,6 +222,19 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // we all set
       this.setLifecycleStep('live');
     } catch (e) {
+      if (this.userService.platformType !== 'youtube') {
+        // user has logged out before the stream started
+        // don't treat this as an error
+        return;
+      }
+
+      if (this.activeChannel.lifecycleStep === 'idle') {
+        // user stopped streaming before it started, so transitions for broadcast may not work
+        // don't treat this as an error
+        return;
+      }
+
+      // something is wrong in afterGoLive hook
       // show the window with error description
       this.updateActiveChannel({ error: e.message });
       this.showStreamStatusWindow();
@@ -233,11 +246,18 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   async afterStopStream() {
     const { broadcastId, lifecycleStep } = this.activeChannel;
-    if (lifecycleStep !== 'idle') this.transitionBroadcastStatus(broadcastId, 'complete');
     this.updateActiveChannel({
       lifecycleStep: 'idle',
       error: '',
     });
+    if (lifecycleStep !== 'idle') {
+      try {
+        await this.transitionBroadcastStatus(broadcastId, 'complete');
+      } catch (e) {
+        // most likely we tried to switch status to complete when the broadcast is in ready or testing state
+        // this happens when we stop stream before it becomes active
+      }
+    }
   }
 
   private setLifecycleStep(step: TYoutubeLifecycleStep) {
@@ -522,7 +542,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       // poll each 2s
       while (canPoll) {
-        const shouldStop = await cb();
+        let shouldStop = false;
+        try {
+          shouldStop = await cb();
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
         if (shouldStop) {
           canPoll = false;
           resolve();
@@ -540,6 +567,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   private async waitForStreamStatus(streamId: string, status: TStreamStatus) {
     try {
       await this.pollAPI(async () => {
+        // user clicked stop streaming, cancel polling
+        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
       });
@@ -564,6 +594,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
+        // if user clicked stop streaming, cancel polling
+        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
       });

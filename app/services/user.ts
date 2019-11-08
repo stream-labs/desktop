@@ -209,7 +209,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           });
           return;
         }
-        const service = getPlatformService(this.state.auth.platform.type);
+        const service = getPlatformService(this.state.auth.primaryPlatform);
         await this.login(service, this.state.auth);
         this.refreshUserInfo();
       });
@@ -352,6 +352,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get platform() {
     if (this.isLoggedIn()) {
       return this.state.auth.platforms[this.state.auth.primaryPlatform];
+    }
+  }
+
+  get platformType(): TPlatform {
+    if (this.isLoggedIn()) {
+      return this.state.auth.primaryPlatform;
     }
   }
 

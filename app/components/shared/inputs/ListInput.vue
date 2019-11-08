@@ -24,7 +24,11 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <span slot="option" slot-scope="props" :data-option-value="props.option.value">
+    <span
+      slot="option"
+      slot-scope="props"
+      :data-option-value="props.option.value"
+      :data-option-title="props.option.title">
       <slot name="item" :option="props.option">{{ props.option.title }}</slot>
     </span>
 

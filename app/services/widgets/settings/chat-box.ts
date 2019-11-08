@@ -88,11 +88,11 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       background_color: metadata.color({
         title: $t('Background Color'),
         description: $t(
-          'Note: This background color is for preview purposes only.' +
+          'This background color is for preview purposes only. ' +
             'It will not be shown in your stream.',
         ),
         tooltip: $t(
-          'A hex code for the widget background. This is for preview purposes only.' +
+          'A hex code for the widget background. This is for preview purposes only. ' +
             'It will not be shown in your stream.',
         ),
       }),

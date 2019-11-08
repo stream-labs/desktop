@@ -16,5 +16,10 @@
   "Disable Studio Mode": "Отключить режим Студии",
   "Transition (Studio Mode)": "Переход (режим Студии)",
   "Capture Foreground Window": "Захватить окно на переднем плане",
-  "Deactivate Capture": "Отключить захват"
+  "Deactivate Capture": "Отключить захват",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }

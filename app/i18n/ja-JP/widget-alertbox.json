@@ -72,5 +72,11 @@
   "Image/Video File": "イメージ、ビデオファイル",
   "Sound File": "サウンドファイル",
   "Variation Frequency": "バリエーションの頻度",
-  "Message Template": "メッセージのテンプレート"
+  "Message Template": "メッセージのテンプレート",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

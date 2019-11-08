@@ -75,8 +75,17 @@ export default class YoutubeStreamStatus extends TsxComponent {
   created() {
     this.streamInfoService.streamInfoChanged.subscribe(async info => {
       if (info.lifecycleStep === 'live') {
+        // stream successfully started
+        // show the success message for couple of seconds and close the window
         await new Promise(r => setTimeout(r, 2000));
         this.windowsService.closeChildWindow();
+        return;
+      }
+
+      if (info.lifecycleStep === 'idle') {
+        // user stopped the stream, close this window
+        this.windowsService.closeChildWindow();
+        return;
       }
     });
   }
