@@ -1,4 +1,5 @@
 {
+  "Sponsor Banner": "Sponsor Banner",
   "Ad Layout": "Lägg till arrangemang",
   "Placement": "Placering",
   "Image Layout": "Bild arrangemang",
@@ -19,5 +20,6 @@
   "These are the animations that are used to show your banner.": "Dessa är dom animationer som används för att visa din banderoll.",
   "Visual Settings": "Visual Settings",
   "Image Set ": "Bildgrupp ",
-  "No Image": "Ingen bild"
+  "No Image": "Ingen bild",
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
 }

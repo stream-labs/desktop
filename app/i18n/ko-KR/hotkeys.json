@@ -16,5 +16,10 @@
   "Disable Studio Mode": "스튜디오 모드 비활성화",
   "Transition (Studio Mode)": "전환 (스튜디오 모드)",
   "Capture Foreground Window": "Capture Foreground Window",
-  "Deactivate Capture": "Deactivate Capture"
+  "Deactivate Capture": "Deactivate Capture",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }

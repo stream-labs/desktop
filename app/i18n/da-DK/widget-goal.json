@@ -4,6 +4,7 @@
   "Days Remaining": "Resterende dage",
   "Start Goal": "Start Goal",
   "Goal": "Goal",
+  "End Goal": "End Goal",
   "Starting Amount": "Start beløb",
   "End After": "Slut efter",
   "Include resubs?": "Include resubs?",
@@ -14,5 +15,11 @@
   "Text Color": "Tekstfarve",
   "Bar Text Color": "Bjælke tekstfarve",
   "Bar Thickness": "Bjælke tykkelse",
-  "Font Family": "Font Family"
+  "Font Family": "Font Family",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }

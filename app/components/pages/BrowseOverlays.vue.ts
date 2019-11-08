@@ -10,6 +10,7 @@ import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { MagicLinkService } from 'services/magic-link';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
@@ -24,6 +25,7 @@ export default class BrowseOverlays extends Vue {
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
+  @Inject() private magicLinkService: MagicLinkService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
 
@@ -90,10 +92,8 @@ export default class BrowseOverlays extends Vue {
       showTime: false,
       message: $t('Widget Theme installed & activated. Click here to manage your Widget Profiles.'),
       action: this.jsonrpcService.createRequest(
-        Service.getResourceId(this.navigationService),
-        'navigate',
-        'Dashboard',
-        { subPage: 'widgetthemes' },
+        Service.getResourceId(this.magicLinkService),
+        'openWidgetThemesMagicLink',
       ),
     });
   }

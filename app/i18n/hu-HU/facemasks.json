@@ -21,5 +21,11 @@
   "Unable to find face mask plugin. You will not be able to use Face Masks": "Nem található az arcmaszk plugin. Az arcmaszkokat nem fogja használni",
   "Face Mask Settings": "Arcmaszk beállításai",
   "Twitch Follows": "Twitch Követések",
-  "Youtube Follows": "YouTube Követések"
+  "Youtube Follows": "YouTube Követések",
+  "Mask Duration": "Mask Duration",
+  "Donation Masks": "Donation Masks",
+  "Minimum Bits to Activate": "Minimum Bits to Activate",
+  "Test Face Masks": "Test Face Masks",
+  "Collapse": "Collapse",
+  "Expand": "Expand"
 }

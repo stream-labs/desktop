@@ -20,5 +20,10 @@
   "Filter name": "Filtre İsmi",
   "Add source filter": "Kaynak Filtresi Ekle",
   "No filters applied": "Filtre Seçimi Yok",
-  "Source filters": "Kaynak Filtresi"
+  "Source filters": "Kaynak Filtresi",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

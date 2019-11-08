@@ -36,5 +36,7 @@
   "Rename Scene": "Rename Scene",
   "Name Scene": "Name Scene",
   "Rename Folder": "폴더 이름 바꾸기",
-  "Name Folder": "폴더 이름 짓기"
+  "Name Folder": "폴더 이름 짓기",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

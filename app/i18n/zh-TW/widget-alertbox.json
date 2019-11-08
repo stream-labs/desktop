@@ -72,5 +72,11 @@
   "Image/Video File": "圖片/影像檔案",
   "Sound File": "音效檔案",
   "Variation Frequency": "變化頻率",
-  "Message Template": "消息樣板"
+  "Message Template": "消息樣板",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

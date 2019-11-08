@@ -27,5 +27,7 @@
   "Health Text Color": "HP szöveg színe",
   "Health Bar Color": "HP sáv színe",
   "Health Bar Background Color": "HP sáv háttérszíne",
-  "Font": "Betűtípus"
+  "Font": "Betűtípus",
+  "The boss will have additional health each time he is defeated. The amount is set below.": "The boss will have additional health each time he is defeated. The amount is set below.",
+  "The boss' health will change depending on how much damage is dealt on the killing blow. Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n Set your multiplier below.": "The boss' health will change depending on how much damage is dealt on the killing blow. Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n Set your multiplier below."
 }

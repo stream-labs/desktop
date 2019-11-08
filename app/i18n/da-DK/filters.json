@@ -20,5 +20,10 @@
   "Filter name": "Filternavn",
   "Add source filter": "Tilføj kildefilter",
   "No filters applied": "Ingen filtre anvendt",
-  "Source filters": "Kilde filtre"
+  "Source filters": "Kilde filtre",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

@@ -101,11 +101,7 @@ export abstract class StreamBossService extends BaseGoalService<
             title: $t('Overkill'),
             value: 'overkill',
             description: $t(
-              "The boss' health will change depending on how much damage is dealt on the killing blow." +
-                "Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 " +
-                // tslint:disable-next-line:max-line-length
-                'health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n' +
-                'Set your multiplier below.',
+              "The boss' health will change depending on how much damage is dealt on the killing blow. Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n Set your multiplier below.",
             ),
           },
         ],

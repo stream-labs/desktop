@@ -21,5 +21,11 @@
   "Unable to find face mask plugin. You will not be able to use Face Masks": "Não foi possível encontrar o plugin de máscaras faciais. Não conseguirá usar as Máscaras Faciais",
   "Face Mask Settings": "Configurações de Máscaras Faciais",
   "Twitch Follows": "Seguidores na Twitch",
-  "Youtube Follows": "Seguidores no YouTube"
+  "Youtube Follows": "Seguidores no YouTube",
+  "Mask Duration": "Mask Duration",
+  "Donation Masks": "Donation Masks",
+  "Minimum Bits to Activate": "Minimum Bits to Activate",
+  "Test Face Masks": "Test Face Masks",
+  "Collapse": "Collapse",
+  "Expand": "Expand"
 }

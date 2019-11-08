@@ -46,5 +46,6 @@
   "Stickers": "Наклейки",
   "Effects": "Эффекты",
   "has purchased %{product} from the store": "купил %{product} в магазине",
-  "Event Filters": "Фильтры событий"
+  "Event Filters": "Фильтры событий",
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here."
 }
