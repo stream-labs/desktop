@@ -4,6 +4,7 @@
   "Days Remaining": "剩余天数",
   "Start Goal": "开始目标",
   "Goal": "目标",
+  "End Goal": "End Goal",
   "Starting Amount": "起始金额",
   "End After": "结束后",
   "Include resubs?": "包含再次订阅?",
@@ -14,5 +15,11 @@
   "Text Color": "文本颜色",
   "Bar Text Color": "条形图的文本颜色",
   "Bar Thickness": "条横粗细",
-  "Font Family": "字体系列"
+  "Font Family": "字体系列",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }
