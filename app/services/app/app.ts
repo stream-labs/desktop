@@ -109,10 +109,6 @@ export class AppService extends StatefulService<IAppState> {
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    // Initialize any apps before loading the scene collection.  This allows
-    // the apps to already be in place when their sources are created.
-    await this.platformAppsService.initialize();
-
     await this.sceneCollectionsService.initialize();
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
