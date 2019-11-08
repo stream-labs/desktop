@@ -178,6 +178,7 @@ test('Stream with disabled confirmation', async t => {
 
   // try to stream after restart
   await restartApp(t);
+  await prepareToGoLive(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
   await stopStream(t);
