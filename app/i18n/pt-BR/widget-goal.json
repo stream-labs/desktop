@@ -4,6 +4,7 @@
   "Days Remaining": "Dias Restantes",
   "Start Goal": "Iniciar meta",
   "Goal": "Meta",
+  "End Goal": "End Goal",
   "Starting Amount": "Valor Inicial",
   "End After": "Terminar depois de",
   "Include resubs?": "Incluir reinscritos?",
@@ -14,5 +15,11 @@
   "Text Color": "Cor do Texto",
   "Bar Text Color": "Cor do Texto da Barra",
   "Bar Thickness": "Espessura da Barra",
-  "Font Family": "Família de fontes"
+  "Font Family": "Família de fontes",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }
