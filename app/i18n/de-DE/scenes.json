@@ -36,5 +36,7 @@
   "Rename Scene": "Szene umbenennen",
   "Name Scene": "Szene benennen",
   "Rename Folder": "Ordner umbenennen",
-  "Name Folder": "Ordner benennen"
+  "Name Folder": "Ordner benennen",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }
