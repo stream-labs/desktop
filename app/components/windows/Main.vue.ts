@@ -152,7 +152,7 @@ export default class Main extends Vue {
 
     const isDirectory = await this.isDirectory(files[0]).catch(err => {
       console.error(err);
-      return;
+      return false;
     });
 
     if (files.length > 1 || isDirectory) {
