@@ -36,5 +36,7 @@
   "Rename Scene": "Переименовать сцену",
   "Name Scene": "Название сцены",
   "Rename Folder": "Переименовать папку",
-  "Name Folder": "Назвать папку"
+  "Name Folder": "Назвать папку",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

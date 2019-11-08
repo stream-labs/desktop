@@ -72,5 +72,11 @@
   "Image/Video File": "Fichier image/vidéo",
   "Sound File": "Fichier audio",
   "Variation Frequency": "Fréquence des variations",
-  "Message Template": "Format du message"
+  "Message Template": "Format du message",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

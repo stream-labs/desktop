@@ -36,5 +36,7 @@
   "Rename Scene": "Renombrar escena",
   "Name Scene": "Nombrar escena",
   "Rename Folder": "Renombrar carpeta",
-  "Name Folder": "Nombrar carpeta"
+  "Name Folder": "Nombrar carpeta",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }
