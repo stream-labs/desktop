@@ -17,6 +17,8 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
+import { RestreamService } from 'app-services';
+import BrowserView from 'components/shared/BrowserView';
 
 @Component({
   components: {
@@ -24,6 +26,7 @@ import { WindowsService } from 'services/windows';
     ListInput,
     PlatformAppPageView,
     Tabs,
+    BrowserView,
   },
 })
 export default class LiveDock extends Vue {
@@ -35,6 +38,7 @@ export default class LiveDock extends Vue {
   @Inject() appService: AppService;
   @Inject() chatService: ChatService;
   @Inject() windowsService: WindowsService;
+  @Inject() restreamService: RestreamService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -50,6 +54,9 @@ export default class LiveDock extends Vue {
   underlyingSelectedChat = 'default';
 
   get selectedChat() {
+    if (this.underlyingSelectedChat === 'default') return 'default';
+    if (this.underlyingSelectedChat === 'restream') return 'restream';
+
     return this.chatApps.find(app => app.id === this.underlyingSelectedChat)
       ? this.underlyingSelectedChat
       : 'default';
@@ -177,24 +184,40 @@ export default class LiveDock extends Vue {
     );
   }
 
+  restreamChatView: Electron.BrowserView;
+
+  restreamChatReady(view: Electron.BrowserView) {
+    this.restreamChatView = view;
+  }
+
   refreshChat() {
-    if (!this.showDefaultPlatformChat) {
-      this.platformAppsService.refreshApp(this.selectedChat);
+    if (this.selectedChat === 'default') {
+      this.chatService.refreshChat();
       return;
     }
-    this.chatService.refreshChat();
+
+    if (this.selectedChat === 'restream') {
+      if (this.restreamChatView) this.restreamChatView.webContents.reload();
+      return;
+    }
+
+    this.platformAppsService.refreshApp(this.selectedChat);
   }
 
   get hideStyleBlockers() {
     return this.windowsService.state.main.hideStyleBlockers;
   }
 
-  get hasChatApps() {
-    return this.chatApps.length > 0;
+  get hasChatTabs() {
+    return this.chatTabs.length > 0;
   }
 
   get showDefaultPlatformChat() {
     return this.selectedChat === 'default';
+  }
+
+  get restreamChatUrl() {
+    return this.restreamService.chatUrl;
   }
 
   get chatApps(): ILoadedApp[] {
@@ -206,7 +229,7 @@ export default class LiveDock extends Vue {
   }
 
   get chatTabs(): ITab[] {
-    return [
+    const tabs: ITab[] = [
       {
         name: this.userService.platform.type.toString(),
         value: 'default',
@@ -221,10 +244,22 @@ export default class LiveDock extends Vue {
           };
         }),
     );
+
+    if (this.restreamService.shouldGoLiveWithRestream) {
+      tabs.push({
+        name: $t('Restream'),
+        value: 'restream',
+      });
+    }
+
+    console.log(tabs);
+
+    return tabs;
   }
 
   get isPopOutAllowed() {
     if (this.showDefaultPlatformChat) return false;
+    if (this.selectedChat === 'restream') return false;
 
     const chatPage = this.platformAppsService
       .getApp(this.selectedChat)

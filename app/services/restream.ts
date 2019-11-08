@@ -114,6 +114,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
+  get chatUrl() {
+    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
+  }
+
   /**
    * Go live requirements for now:
    * - Restream is enabled

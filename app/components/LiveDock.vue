@@ -66,7 +66,7 @@
       </div>
 
       <div class="live-dock-chat" v-if="!hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
-          <div v-if="hasChatApps" class="flex">
+          <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
               class="live-dock-chat-apps__popout icon-pop-out-1"
@@ -77,8 +77,13 @@
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
         <chat v-if="!applicationLoading && selectedChat === 'default'" />
+        <browser-view
+          v-if="selectedChat === 'restream'"
+          :src="restreamChatUrl"
+          :style="{ height: '100%' }"
+          @ready="restreamChatReady"/>
         <PlatformAppPageView
-          v-if="selectedChat !== 'default'"
+          v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
           class="live-dock-platform-app-webview"
           :appId="selectedChat"
           :pageSlot="slot"
