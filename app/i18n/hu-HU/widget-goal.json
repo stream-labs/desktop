@@ -4,6 +4,7 @@
   "Days Remaining": "Hátralévő napok",
   "Start Goal": "Cél Indítása",
   "Goal": "Cél",
+  "End Goal": "End Goal",
   "Starting Amount": "Induló összeg",
   "End After": "Véget ér ezután",
   "Include resubs?": "Tartalmazza az Újra Feliratkozásokat is?",
@@ -14,5 +15,11 @@
   "Text Color": "Szöveg színe",
   "Bar Text Color": "Szöveg színe a sávban",
   "Bar Thickness": "Sáv vastagság",
-  "Font Family": "Betűtípus család"
+  "Font Family": "Betűtípus család",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }
