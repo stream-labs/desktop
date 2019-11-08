@@ -3,7 +3,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm';
 import { ProjectorService } from 'services/projector';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
@@ -18,6 +18,7 @@ import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import { ERenderingMode } from '../../../obs-api';
 
 @Component({
   components: {
@@ -129,7 +130,7 @@ export default class WidgetEditor extends Vue {
   }
 
   get sourceProperties() {
-    return this.properties.slice(5);
+    return this.properties.slice(4);
   }
 
   get topProperties() {
@@ -137,7 +138,10 @@ export default class WidgetEditor extends Vue {
   }
 
   createProjector() {
-    this.projectorService.createProjector(this.widget.previewSourceId);
+    this.projectorService.createProjector(
+      ERenderingMode.OBS_MAIN_RENDERING,
+      this.widget.previewSourceId,
+    );
   }
 
   retryDataFetch() {

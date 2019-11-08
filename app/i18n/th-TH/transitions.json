@@ -1,5 +1,5 @@
 {
-  "Scene transition": "Scene transition",
+  "Scene Transitions": "Scene Transitions",
   "Cut": "Cut",
   "Fade": "Fade",
   "Swipe": "Swipe",
@@ -8,5 +8,20 @@
   "Luma Wipe": "Luma Wipe",
   "Stinger": "Stinger",
   "Transition": "Transition",
-  "Duration": "Duration"
+  "Duration": "Duration",
+  "Add Transition": "Add Transition",
+  "You need at least 1 transition.": "You need at least 1 transition.",
+  "Add Connection": "Add Connection",
+  "Beginning Scene": "Beginning Scene",
+  "Ending Scene": "Ending Scene",
+  "Scene Transition": "Scene Transition",
+  "Type": "Type",
+  "Transition Type": "Transition Type",
+  "Name": "Name",
+  "Transition Name": "Transition Name",
+  "Default": "Default",
+  "Deleted": "Deleted",
+  "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
+  "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
+  "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited."
 }

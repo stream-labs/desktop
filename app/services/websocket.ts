@@ -15,7 +15,10 @@ export type TSocketEvent =
   | IAlertProfileChanged
   | IEventSocketEvent
   | IFmExtEnabledSocketEvent
-  | IEventPanelSettingsChangedSocketEvent;
+  | IEventPanelSettingsChangedSocketEvent
+  | IMediaSharingSettingsUpdateSocketEvent
+  | IPauseEventQueueSocketEvent
+  | IUnpauseEventQueueSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -67,10 +70,27 @@ interface IAlertProfileChanged {
   type: 'alertProfileChanged';
 }
 
+interface IPauseEventQueueSocketEvent {
+  type: 'pauseQueue';
+}
+
+interface IUnpauseEventQueueSocketEvent {
+  type: 'unpauseQueue';
+}
+
 interface IEventPanelSettingsChangedSocketEvent {
   type: 'eventsPanelSettingsUpdate';
   message: {
     muted?: boolean;
+  };
+}
+
+interface IMediaSharingSettingsUpdateSocketEvent {
+  type: 'mediaSharingSettingsUpdate';
+  message: {
+    advanced_settings: {
+      enabled?: boolean;
+    };
   };
 }
 
@@ -84,8 +104,6 @@ export class WebsocketService extends Service {
   socketEvent = new Subject<TSocketEvent>();
 
   init() {
-    this.openSocketConnection();
-
     this.userService.userLogin.subscribe(() => {
       this.openSocketConnection();
     });

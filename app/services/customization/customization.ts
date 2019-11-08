@@ -5,6 +5,7 @@ import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  IPinnedStatistics,
 } from './customization-api';
 import {
   IObsInput,
@@ -14,17 +15,18 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
+import { Global } from '../../../obs-api';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': { r: 9, g: 22, b: 29 },
-  'day-theme': { r: 247, g: 249, b: 249 },
+  'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 // Maps to --section
 const DISPLAY_BACKGROUNDS = {
   'night-theme': { r: 11, g: 22, b: 28 },
-  'day-theme': { r: 245, g: 248, b: 250 },
+  'day-theme': { r: 227, g: 232, b: 235 },
 };
 
 /**
@@ -59,7 +61,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
     folderSelection: false,
+    navigateToLiveOnStreamStart: true,
     legacyEvents: false,
+    pinnedStatistics: {
+      cpu: false,
+      fps: false,
+      droppedFrames: false,
+      bandwidth: false,
+    },
     experimental: {
       // put experimental features here
     },
@@ -128,6 +137,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
+  setPinnedStatistics(pinned: IPinnedStatistics) {
+    this.setSettings({ pinnedStatistics: pinned });
+  }
+
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
@@ -138,8 +151,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
         options: [
-          { value: 'night-theme', description: $t('Night (Classic)') },
-          { value: 'day-theme', description: $t('Day (Classic)') },
+          { value: 'night-theme', description: $t('Night') },
+          { value: 'day-theme', description: $t('Day') },
         ],
         visible: true,
         enabled: true,

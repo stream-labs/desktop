@@ -4,7 +4,7 @@ import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import {
   GenericGoalService,
   IGoalCreateOptions,

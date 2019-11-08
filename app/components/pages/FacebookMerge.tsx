@@ -34,7 +34,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
     );
   }
 
-  createPageStep(h: Function) {
+  get createPageStep() {
     return (
       <div>
         <div>
@@ -51,7 +51,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
     );
   }
 
-  loginStep(h: Function) {
+  get loginStep() {
     return (
       <div>
         <div>
@@ -72,12 +72,12 @@ export default class FacebookMerge extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: '400px' }}>
           <h1>Connect Facebook</h1>
-          {this.showLogin ? this.loginStep(h) : this.createPageStep(h)}
+          {this.showLogin ? this.loginStep : this.createPageStep}
         </div>
       </div>
     );

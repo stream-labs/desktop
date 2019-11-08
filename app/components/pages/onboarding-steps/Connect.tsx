@@ -1,20 +1,21 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
+import { Component } from 'vue-property-decorator';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform, EPlatformCallResult } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
 
-@Component({})
-export default class Connect extends TsxComponent<{ continue: () => void }> {
+class ConnectProps {
+  continue: () => void = () => {};
+}
+
+@Component({ props: createProps(ConnectProps) })
+export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
-
-  @Prop() continue: () => void;
 
   loadingState = false;
 
@@ -25,10 +26,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
       () => (this.loadingState = false),
       () => (this.loadingState = true),
       result => {
-        // Currently we do not have special handling for generic errors
-        if (result === EPlatformCallResult.Success || result === EPlatformCallResult.Error) {
-          this.continue();
-        } else if (result === EPlatformCallResult.TwitchTwoFactor) {
+        if (result === EPlatformCallResult.TwitchTwoFactor) {
           this.loadingState = false;
           electron.remote.dialog
             .showMessageBox({
@@ -45,6 +43,9 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
                 electron.remote.shell.openExternal('https://twitch.tv/settings/security');
               }
             });
+        } else {
+          // Currently we do not have special handling for generic errors
+          this.props.continue();
         }
       },
     );
@@ -65,7 +66,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
     return this.onboardingService.options.isSecurityUpgrade;
   }
 
-  securityUpgradeLink(h: Function) {
+  get securityUpgradeLink() {
     return (
       <span>
         {$t(
@@ -80,14 +81,14 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div class={styles.container}>
         <div class={styles.progressCover} />
         <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
         <p>
           {this.isSecurityUpgrade
-            ? this.securityUpgradeLink(h)
+            ? this.securityUpgradeLink
             : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
         </p>
         <div class={styles.signupButtons}>
@@ -102,7 +103,7 @@ export default class Connect extends TsxComponent<{ continue: () => void }> {
             </button>
           ))}
         </div>
-        <span class={styles.skipButton} onClick={this.continue}>
+        <span class={styles.skipButton} onClick={this.props.continue}>
           {$t('Skip')}
         </span>
       </div>

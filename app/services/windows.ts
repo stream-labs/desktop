@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import Main from 'components/windows/Main.vue';
-import Settings from 'components/windows/Settings.vue';
+import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
@@ -22,13 +22,17 @@ import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
+import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
+import EventFilterMenu from 'components/windows/EventFilterMenu';
+import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
+import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -54,6 +58,7 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
+import { throttle } from 'lodash-decorators';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -90,7 +95,10 @@ export function getComponents() {
     OverlayPlaceholder,
     PerformanceMetrics,
     BrowserSourceInteraction,
+    EventFilterMenu,
+    GameOverlayEventFeed,
 
+    AdvancedStatistics,
     BitGoal,
     DonationGoal,
     FollowerGoal,
@@ -108,6 +116,7 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
+    YoutubeStreamStatus,
   };
 }
 
@@ -188,9 +197,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
+  @throttle(500)
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    if (window) {
+    if (window && !window.isDestroyed()) {
       const bounds = window.getBounds();
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);

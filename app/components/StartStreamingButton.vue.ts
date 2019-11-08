@@ -8,14 +8,18 @@ import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { SourcesService } from 'services/sources';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() sourcesService: SourcesService;
 
   @Prop() disabled: boolean;
 
@@ -38,9 +42,36 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
+      const visibleSources = this.sourcesService
+        .getSources()
+        .filter(source => source.type !== 'scene' && source.video);
+
+      if (!visibleSources.length) {
+        const goLive = await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: $t('No Sources'),
+            type: 'warning',
+            message:
+              // tslint:disable-next-line prefer-template
+              $t(
+                "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
+              ) +
+              ' ' +
+              $t('Are you sure you want to do this?') +
+              '\n\n' +
+              $t('You can add sources by clicking the + icon near the Sources box at any time'),
+            buttons: [$t('Cancel'), $t('Go Live Anyway')],
+          })
+          .then(({ response }) => !!response);
+
+        if (!goLive) return;
+      }
+
       if (
         this.userService.isLoggedIn() &&
-        (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
+        (this.customizationService.state.updateStreamInfoOnLive ||
+          this.isFacebook ||
+          this.isYoutube)
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
@@ -94,6 +125,10 @@ export default class StartStreamingButton extends Vue {
 
   get isFacebook() {
     return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+  }
+
+  get isYoutube() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'youtube';
   }
 
   get isDisabled() {

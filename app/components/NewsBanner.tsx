@@ -61,19 +61,16 @@ export default class NewsBanner extends Vue {
     }
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <div
           class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })}
           onClick={this.followLink}
         >
-          <img class={styles.bgImage} src={this.currentBanner.thumbnail} />
-          <div class={styles.imageContainer}>
-            <img class={styles.shadowImageLeft} src={this.currentBanner.thumbnail} />
-            <img class={styles.shadowImageRight} src={this.currentBanner.thumbnail} />
-            <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
-          </div>
+          <div class={styles.leftBlock} />
+          <div class={styles.rightBlock} />
+          <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
           <div class={styles.titleContainer}>
             <h3 class={styles.title}>{this.headerText}</h3>
             <span class={styles.subheading}>{this.currentBanner.subHeader}</span>

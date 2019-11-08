@@ -9,7 +9,7 @@ import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 
 @Component({
   components: {

@@ -1,7 +1,6 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" />
-  <div class="main-spacer" :class="{ 'main-spacer--error': errorAlert }"></div>
+  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" />
   <news-banner/>
   <div
     class="main-contents"
@@ -98,13 +97,12 @@
   position: relative;
 }
 
-.main-spacer {
-  height: 4px;
-  flex: 0 0 4px;
-  .bg--teal();
+.titlebar--error {
+  background: var(--warning) !important;
 
-  &.main-spacer--error {
-    background-color: @red;
+  /deep/ div,
+  /deep/ .titlebar-action {
+    color: var(--white) !important;
   }
 }
 

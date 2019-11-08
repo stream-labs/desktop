@@ -33,7 +33,7 @@ export default class SideNav extends Vue {
   @Prop() locked: boolean;
 
   navigate(page: TAppPage) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn() && page !== 'Studio') return;
 
     this.navigationService.navigate(page);
   }
@@ -65,17 +65,17 @@ export default class SideNav extends Vue {
     return this.appService.state.loading;
   }
 
-  render(h: Function) {
+  render() {
     const pageData = [
-      { target: 'Studio', icon: 'icon-studio' },
-      { target: 'BrowseOverlays', icon: 'icon-themes', title: 'Themes' },
+      { target: 'Studio', icon: 'icon-studio', title: $t('Editor') },
+      { target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') },
     ];
 
     if (this.chatbotVisible) {
-      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: 'Cloudbot' });
+      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: $t('Cloudbot') });
     }
     if (this.appStoreVisible) {
-      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: 'Store' });
+      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: $t('App Store') });
     }
 
     return (
@@ -84,10 +84,10 @@ export default class SideNav extends Vue {
           <div
             class={cx(styles.mainCell, {
               [styles.active]: this.page === page.target,
-              [styles.disabled]: !this.userService.isLoggedIn(),
+              [styles.disabled]: !this.userService.isLoggedIn() && page.target !== 'Studio',
             })}
             onClick={() => this.navigate(page.target as TAppPage)}
-            title={$t(page.title || page.target)}
+            title={page.title}
           >
             <i class={page.icon} />
           </div>

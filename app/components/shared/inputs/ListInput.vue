@@ -4,6 +4,7 @@
   data-role="input"
   data-type="list"
   :data-name="options.name"
+  :data-loading="options.loading"
   :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   :data-internal-search="options.internalSearch"
 >
@@ -28,6 +29,7 @@
     </span>
 
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
+    <template v-if="options.loading" slot="afterList"><spinner/></template>
 
   </multiselect>
   <div v-if="selectedOption && selectedOption.description" class="description">

@@ -1,12 +1,12 @@
 {
-  "You don't have any notifications": "Vous n'avez aucune notifications",
+  "You don't have any notifications": "Vous n'avez aucune notification",
   "Enable notifications": "Activer les notifications",
   "Enable sound": "Activer le son",
   "Skipped frames detected:": "Images ignorées detectées:",
   "Detect skipped frames": "Surveiller les images ignorées",
   "Skipped frames threshold": "Seuil de détection des images ignorées",
-  "Detect lagged frames": "Surveiller les images retardées",
-  "Lagged frames threshold": "Seuil de détection des images retardées",
+  "Detect lagged frames": "Surveiller les images délayées",
+  "Lagged frames threshold": "Seuil de détection des images délayées",
   "Detect dropped frames": "Détecter les pertes d’images",
   "Dropped frames threshold": "Seuil de perte d’images",
   "Show Notifications": "Afficher les notifications",
@@ -15,5 +15,6 @@
   "Click to open your Notifications window": "Cliquer pour ouvrir la fenêtre de notifications",
   "Click to read your unread Notifications": "Cliquer pour lire les notifications non lues",
   "New Notifications": "Nouvelle notification",
-  "Log": "Historique"
+  "Log": "Historique",
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS s'est mis à jour ! Cliquez ici pour voir ce qui a changé."
 }

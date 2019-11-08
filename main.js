@@ -23,6 +23,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const electronLog = require('electron-log');
 
+const overlay = require('@streamlabs/game-overlay');
+
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
@@ -46,7 +48,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   const fs = require('fs');
-  const bootstrap = require('./updater/bootstrap.js');
+  const bootstrap = require('./updater/build/bootstrap.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -129,8 +131,12 @@ if (!gotTheLock) {
 
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+    let crashHandlerLogPath = "";
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
+      crashHandlerLogPath = app.getPath('userData');
+    }
 
-    crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString());
+    crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
 
     const Raven = require('raven');
@@ -356,7 +362,6 @@ if (!gotTheLock) {
         versionFileName: `${releaseChannel}.json`
       };
 
-      log(updateInfo);
       bootstrap(updateInfo, startApp, app.exit);
     } else {
       startApp();
@@ -510,5 +515,24 @@ if (!gotTheLock) {
     if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
       mainWindow.send('showErrorAlert');
     }
+  });
+
+  ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
+    const contents = webContents.fromId(contentsId);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('paint', (event, dirty, image) => {
+      if (
+        overlay.paintOverlay(
+          overlayId,
+          image.getSize().width,
+          image.getSize().height,
+          image.getBitmap(),
+        ) === 0
+      ) {
+        contents.invalidate();
+      }
+    });
   });
 }

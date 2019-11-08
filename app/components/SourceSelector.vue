@@ -7,6 +7,10 @@
       </h2>
       <div>
         <i
+          :class="[{ 'icon--active': selectiveRecordingEnabled }, { disabled: selectiveRecordingLocked }, 'icon-smart-record icon-button icon-button--lg']"
+          @click="toggleSelectiveRecording"
+          v-tooltip.bottom="$t('Toggle Selective Recording')" />
+        <i
           class="icon-add-folder icon-button icon-button--lg"
           @click="addFolder"
           v-tooltip.bottom="addGroupTooltip" />
@@ -53,8 +57,17 @@
       </template>
 
       <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
-        <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
-        <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
+        <div class="icon-bar">
+          <i
+            v-if="selectiveRecordingEnabled"
+            class="source-selector-action"
+            v-tooltip="selectiveRecordingTooltip(node.data.id)"
+            :class="[selectiveRecordingClassesForSource(node.data.id), isLocked(node.data.id) ? 'disabled' : '']"
+            @click.stop="cycleSelectiveRecording(node.data.id)"
+            @dblclick.stop="() => {}" />
+          <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
+          <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
+        </div>
       </template>
 
     </sl-vue-tree>
@@ -67,19 +80,10 @@
 @import "../styles/index";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
-.source-selector-action {
-  display: inline-block;
-  width: 16px;
-  text-align: center;
-  opacity: 0.26;
-  margin-left: 8px;
-  color: var(--icon);
-}
-
 .fa.disabled,
 i.disabled {
   opacity: 0.26;
-  cursor: inherit;
+  cursor: not-allowed;
 
   &:hover {
     opacity: inherit;
@@ -93,6 +97,8 @@ i.disabled {
 }
 
 .sl-vue-tree-node-item {
+  align-items: center;
+
   &:hover,
   &.sl-vue-tree-selected {
     .transition();
@@ -106,21 +112,38 @@ i.disabled {
   }
 }
 
+.sl-vue-tree-title {
+  min-width: 0;
+
+  .item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+</style>
+
+<style lang="less" scoped>
+.source-selector-action {
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  opacity: 0.26;
+  margin-left: 8px;
+  color: var(--icon);
+}
+
+.icon--active {
+  color: var(--teal);
+}
+
 .title-container {
   display: inline-block;
   color: var(--title);
 }
 
-.layer-icon {
-  display: inline-block;
-  text-align: left;
-  width: 16px;
-  margin-right: 8px;
-
-  i,
-  .fa {
-    font-size: 12px;
-    font-weight: 700;
-  }
+.icon-bar {
+  display: flex;
+  flex-wrap: nowrap;
 }
 </style>

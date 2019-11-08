@@ -1,7 +1,7 @@
 const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader')
 
-const plugins = [new CheckerPlugin()];
+const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
 // uncomment and install to watch circular dependencies
 // const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -67,7 +67,7 @@ module.exports = {
       {
         test: /\.ts$/,
         loader: 'awesome-typescript-loader',
-        options: { useCache: true, reportedFiles: ['app/**/*.ts'] },
+        options: { useCache: true, reportFiles: ['app/**/*.ts'] },
         exclude: /node_modules|vue\/src/
       },
       {
@@ -77,8 +77,7 @@ module.exports = {
           'babel-loader',
           {
             loader: 'awesome-typescript-loader',
-            options: { useCache: true, reportedFiles: ['app/components/**/*.tsx'] }
-          }
+            options: { useCache: true, reportFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' } }
         ],
         exclude: /node_modules/,
       },
