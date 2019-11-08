@@ -16,5 +16,10 @@
   "Disable Studio Mode": "スタジオモードを無効化",
   "Transition (Studio Mode)": "遷移 (スタジオモード)",
   "Capture Foreground Window": "前景ウィンドウをキャプチャーする",
-  "Deactivate Capture": "キャプチャーを無効にする"
+  "Deactivate Capture": "キャプチャーを無効にする",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }
