@@ -3,6 +3,7 @@ import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { HostsService } from './hosts';
+import electron from 'electron';
 
 interface ILoginTokenResponse {
   login_token: string;
@@ -29,5 +30,14 @@ export class MagicLinkService extends Service {
     );
 
     return fetch(request).then(handleResponse);
+  }
+
+  async openWidgetThemesMagicLink() {
+    try {
+      const link = await this.getDashboardMagicLink('widgetthemes');
+      electron.remote.shell.openExternal(link);
+    } catch (e) {
+      console.error('Error generating dashboard magic link', e);
+    }
   }
 }
