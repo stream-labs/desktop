@@ -20,5 +20,10 @@
   "Filter name": "濾鏡名稱",
   "Add source filter": "新增濾鏡來源",
   "No filters applied": "無使用濾鏡",
-  "Source filters": "濾鏡來源"
+  "Source filters": "濾鏡來源",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }
