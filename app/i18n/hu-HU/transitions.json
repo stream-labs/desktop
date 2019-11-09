@@ -21,7 +21,7 @@
   "Transition Name": "Átmenet Neve",
   "Default": "Alapértelmezett",
   "Deleted": "Törölt",
-  "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
+  "This connection is redundant because another connection already connects these scenes.": "Ez a kapcsolat felesleges, mert egy másik kapcsolat már összeköti ezeket a jeleneteket.",
   "You need at least 2 scenes to edit transitions.": "Legalább 2 jelenetre van szüksége az átmenetek szerkesztéséhez.",
   "This scene transition is managed by an App and cannot be edited.": "Ezt a jelenetátmenetet egy alkalmazás kezeli, és nem szerkeszthető."
 }
