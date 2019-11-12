@@ -105,7 +105,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async initializeOverlay() {
-    overlay.start();
+    let crashHandlerLogPath = '';
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
+      const overlayLogFile = '\\game-overlays.log';
+      crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
+    }
+
+    overlay.start(crashHandlerLogPath);
 
     this.onWindowsReadySubscription = this.onWindowsReady
       .pipe(
