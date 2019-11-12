@@ -21,9 +21,9 @@
   "Add source filter": "Forrás szűrő hozzáadása",
   "No filters applied": "Nincsenek alkalmazott szűrők",
   "Source filters": "Forrás szűrők",
-  "Invert Polarity": "Invert Polarity",
+  "Invert Polarity": "Fordított polaritás",
   "Limiter": "Limiter",
   "Expander": "Expander",
   "Shader": "Shader",
-  "No settings are available for this filter": "No settings are available for this filter"
+  "No settings are available for this filter": "Ehhez a szűrőhöz nem állnak rendelkezésre beállítások"
 }
