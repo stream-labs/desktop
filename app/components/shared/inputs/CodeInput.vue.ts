@@ -6,6 +6,8 @@ import 'codemirror/mode/css/css.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/keymap/sublime';
 import { IInputMetadata } from './index';
+import { Inject } from 'services';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: { codemirror },
@@ -13,12 +15,16 @@ import { IInputMetadata } from './index';
 export default class CodeInput extends BaseInput<string, IInputMetadata> {
   @Prop({ default: '' })
   readonly value: string;
-
   @Prop()
   readonly title: string;
-
   @Prop({ default: () => ({ type: 'html' }) })
   readonly metadata: IInputMetadata;
+
+  @Inject() customizationService: CustomizationService;
+
+  get theme() {
+    return this.customizationService.isDarkTheme ? 'material' : 'xq-light';
+  }
 
   // codemirror options
   editorOptions = {
@@ -28,7 +34,7 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       lineNumbers: true,
       autofocus: true,
       tabSize: 2,
-      theme: 'material',
+      theme: this.theme,
       autoRefresh: true,
       autoCloseBrackets: true,
       matchBrackets: true,
@@ -45,7 +51,7 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       lineNumbers: true,
       autofocus: true,
       tabSize: 2,
-      theme: 'material',
+      theme: this.theme,
       autoRefresh: true,
       autoCloseBrackets: true,
       matchBrackets: true,
@@ -63,7 +69,7 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
       lineNumbers: true,
       autofocus: true,
       tabSize: 2,
-      theme: 'material',
+      theme: this.theme,
       autoRefresh: true,
       autoCloseBrackets: true,
       matchBrackets: true,

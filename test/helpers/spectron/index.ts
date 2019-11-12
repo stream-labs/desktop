@@ -26,6 +26,8 @@ const rimraf = require('rimraf');
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+let activeWindow: string | RegExp;
+
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
   afterStartCallbacks.push(cb);
@@ -37,7 +39,10 @@ export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return true;
+    if (url.match(regex)) {
+      activeWindow = regex;
+      return true;
+    }
   }
   return false;
 }
@@ -351,5 +356,18 @@ function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
+}
+
+// the built-in 'click' method doesn't show selector in the error message
+// wrap this method to achieve this functionality
+
+export async function click(t: TExecutionContext, selector: string) {
+  try {
+    return await t.context.app.client.click(selector);
+  } catch (e) {
+    const windowId = String(activeWindow);
+    const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
+    throw new Error(message);
   }
 }

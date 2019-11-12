@@ -1,6 +1,6 @@
 {
   "Layout": "Elrendezés",
-  "Alert": "Alert",
+  "Alert": "Értesítés",
   "Global Settings": "Globális beállítások",
   "Text to Speech": "Szöveg felolvasása",
   "Charity Streaming Donations": "Charity Streaming Donations",
@@ -23,7 +23,7 @@
   "Shares": "Shares",
   "Facemask Donations": "Arc Maszk Támogatás",
   "Cloudbot Store": "Cloudbot Store",
-  "Stickers": "Stickers",
+  "Stickers": "Matricák",
   "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Általános beállítások",
   "Moderator Tools": "Moderátor eszközök",
@@ -72,5 +72,11 @@
   "Image/Video File": "Image/Video File",
   "Sound File": "Sound File",
   "Variation Frequency": "Variation Frequency",
-  "Message Template": "Üzenetsablon"
+  "Message Template": "Üzenetsablon",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

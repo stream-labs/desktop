@@ -21,8 +21,12 @@ const getName = (event: IRecentEvent) => {
   return event.name;
 };
 
-@Component({})
-export default class RecentEvents extends TsxComponent<{}> {
+class RecentEventsProps {
+  isOverlay: boolean = false;
+}
+
+@Component({ props: createProps(RecentEventsProps) })
+export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   @Inject() recentEventsService: RecentEventsService;
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
@@ -145,7 +149,7 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   get renderNativeEvents() {
     return (
-      <div class={styles.eventContainer}>
+      <div class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
@@ -177,32 +181,36 @@ export default class RecentEvents extends TsxComponent<{}> {
   render() {
     return (
       <div class={styles.container}>
-        <Toolbar
-          popoutMediaShare={() => this.popoutMediaShare()}
-          popoutFilterMenu={() => this.popoutFilterMenu()}
-          popoutRecentEvents={() => this.popoutRecentEvents()}
-          muteEvents={() => this.muteEvents()}
-          skipAlert={() => this.skipAlert()}
-          toggleQueue={() => this.toggleQueue()}
-          queuePaused={this.queuePaused}
-          muted={this.muted}
-          mediaShareEnabled={this.mediaShareEnabled}
-          native={this.native}
-          onNativeswitch={val => this.setNative(val)}
-        />
+        {!this.props.isOverlay && (
+          <Toolbar
+            popoutMediaShare={() => this.popoutMediaShare()}
+            popoutFilterMenu={() => this.popoutFilterMenu()}
+            popoutRecentEvents={() => this.popoutRecentEvents()}
+            muteEvents={() => this.muteEvents()}
+            skipAlert={() => this.skipAlert()}
+            toggleQueue={() => this.toggleQueue()}
+            queuePaused={this.queuePaused}
+            muted={this.muted}
+            mediaShareEnabled={this.mediaShareEnabled}
+            native={this.native}
+            onNativeswitch={val => this.setNative(val)}
+          />
+        )}
         {this.native ? this.renderNativeEvents : this.renderEmbeddedEvents}
-        <HelpTip
-          dismissableKey={EDismissable.RecentEventsHelpTip}
-          position={{ top: '-8px', right: '360px' }}
-          tipPosition="right"
-        >
-          <div slot="title">{$t('New Events Feed')}</div>
-          <div slot="content">
-            {$t(
-              'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
-            )}
-          </div>
-        </HelpTip>
+        {!this.props.isOverlay && (
+          <HelpTip
+            dismissableKey={EDismissable.RecentEventsHelpTip}
+            position={{ top: '-8px', right: '360px' }}
+            tipPosition="right"
+          >
+            <div slot="title">{$t('New Events Feed')}</div>
+            <div slot="content">
+              {$t(
+                'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
+              )}
+            </div>
+          </HelpTip>
+        )}
       </div>
     );
   }

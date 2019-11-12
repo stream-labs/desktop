@@ -32,13 +32,11 @@
         <bool-input
           v-if="isLoggedIn && !isFacebook"
           v-model="streamInfoUpdate"
-          name="stream_info_udpate"
-          :metadata="{ title: $t('Confirm stream title and game before going live') }"
+          :metadata="{ title: $t('Confirm stream title and game before going live'), name: 'stream_info_udpate' }"
         />
         <bool-input
           v-model="disableHardwareAcceleration"
-          name="disable_ha"
-          :metadata="{ title: $t('Disable hardware acceleration (requires restart)') }"
+          :metadata="{ title: $t('Disable hardware acceleration (requires restart)'), name: 'disable_ha'  }"
         />
         <div class="actions">
           <div class="input-container">

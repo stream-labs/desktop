@@ -16,5 +16,10 @@
   "Disable Studio Mode": "Stüdyo Modunu Devre dışı bırak",
   "Transition (Studio Mode)": "Geçiş (Stüdyo Modu)",
   "Capture Foreground Window": "Önplan Pencere Görüntüsünü Yakala",
-  "Deactivate Capture": "Görüntü Yakalamayı Devre Dışı Bırak"
+  "Deactivate Capture": "Görüntü Yakalamayı Devre Dışı Bırak",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }

@@ -48,7 +48,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   const fs = require('fs');
-  const bootstrap = require('./updater/bootstrap.js');
+  const bootstrap = require('./updater/build/bootstrap.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -362,7 +362,6 @@ if (!gotTheLock) {
         versionFileName: `${releaseChannel}.json`
       };
 
-      log(updateInfo);
       bootstrap(updateInfo, startApp, app.exit);
     } else {
       startApp();

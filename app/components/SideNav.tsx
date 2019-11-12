@@ -33,7 +33,7 @@ export default class SideNav extends Vue {
   @Prop() locked: boolean;
 
   navigate(page: TAppPage) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn() && page !== 'Studio') return;
 
     this.navigationService.navigate(page);
   }
@@ -84,15 +84,12 @@ export default class SideNav extends Vue {
           <div
             class={cx(styles.mainCell, {
               [styles.active]: this.page === page.target,
-              [styles.disabled]: !this.userService.isLoggedIn(),
+              [styles.disabled]: !this.userService.isLoggedIn() && page.target !== 'Studio',
             })}
             onClick={() => this.navigate(page.target as TAppPage)}
             title={page.title}
           >
             <i class={page.icon} />
-            {page.target === 'BrowseOverlays' && (
-              <div class={cx(styles.badge, styles.newBadge)}>New</div>
-            )}
           </div>
         ))}
         {this.platformAppsService.enabledApps.length > 0 && <AppsNav />}

@@ -4,6 +4,7 @@
   data-role="input"
   data-type="list"
   :data-name="options.name"
+  :data-loading="options.loading"
   :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   :data-internal-search="options.internalSearch"
 >
@@ -23,11 +24,16 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <span slot="option" slot-scope="props" :data-option-value="props.option.value">
+    <span
+      slot="option"
+      slot-scope="props"
+      :data-option-value="props.option.value"
+      :data-option-title="props.option.title">
       <slot name="item" :option="props.option">{{ props.option.title }}</slot>
     </span>
 
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
+    <template v-if="options.loading" slot="afterList"><spinner/></template>
 
   </multiselect>
   <div v-if="selectedOption && selectedOption.description" class="description">

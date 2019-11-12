@@ -3,7 +3,7 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, SettingsService, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import electron from 'electron';
@@ -17,14 +17,19 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, TStartStreamOptions } from 'services/platforms';
 import { UserService } from 'services/user';
-import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
+import {
+  NotificationsService,
+  ENotificationType,
+  INotification,
+  ENotificationSubType,
+} from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
-import { TTwitchTag, TTwitchTagWithLabel } from '../platforms/twitch/tags';
 import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { StreamSettingsService } from '../settings/streaming';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -50,17 +55,9 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-/**
- * Streaming context that's passed if we need to use in an after hook
- */
-export interface StreamingContext {
-  twitchTags?: TTwitchTagWithLabel[];
-  allTwitchTags?: TTwitchTag[];
-}
-
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
-  @Inject() settingsService: SettingsService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
@@ -81,8 +78,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   streamingStateChange = new Subject<void>();
 
   powerSaveId: number;
-
-  private context: StreamingContext = null;
 
   static initialState = {
     streamingStatus: EStreamingState.Offline,
@@ -121,6 +116,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   setSelectiveRecording(enabled: boolean) {
+    // Selective recording cannot be toggled while live
+    if (this.state.streamingStatus !== EStreamingState.Offline) return;
+
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
   }
@@ -128,19 +126,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * @deprecated Use toggleStreaming instead
    */
-  startStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  startStreaming() {
+    this.toggleStreaming();
   }
 
   /**
    * @deprecated Use toggleStreaming instead
    */
-  stopStreaming(ctx?: StreamingContext) {
-    this.toggleStreaming(ctx);
+  stopStreaming() {
+    this.toggleStreaming();
   }
 
   private finishStartStreaming() {
-    const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
     const confirmText = $t('Are you sure you want to start streaming?');
     if (shouldConfirm && !confirm(confirmText)) return;
 
@@ -148,27 +146,33 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     obs.NodeObs.OBS_service_startStreaming();
 
-    const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+    const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
     if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
       this.toggleRecording();
     }
 
-    const replayWhenStreaming = this.settingsService.state.General.ReplayBufferWhileStreaming;
+    const replayWhenStreaming = this.streamSettingsService.settings.replayBufferWhileStreaming;
 
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
   }
 
-  async toggleStreaming(ctx?: StreamingContext) {
-    this.context = ctx;
-
+  async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      // in the "force" mode just try to start streaming without updating channel info
+      if (force) {
+        this.finishStartStreaming();
+        return Promise.resolve();
+      }
       try {
         if (this.userService.isLoggedIn && this.userService.platform) {
           const service = getPlatformService(this.userService.platform.type);
-          await service.beforeGoLive();
+
+          if (this.streamSettingsService.protectedModeEnabled) {
+            await service.beforeGoLive(options);
+          }
         }
         this.finishStartStreaming();
         return Promise.resolve();
@@ -182,7 +186,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Live ||
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
       const confirmText = $t('Are you sure you want to stop streaming?');
 
       if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
@@ -193,12 +197,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       obs.NodeObs.OBS_service_stopStreaming(false);
 
-      const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
+      const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
         this.toggleRecording();
       }
 
-      const keepReplaying = this.settingsService.state.General.KeepReplayBufferStreamStops;
+      const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
       if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
         this.stopReplayBuffer();
       }
@@ -278,11 +282,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   get delayEnabled() {
-    return this.settingsService.state.Advanced.DelayEnable;
+    return this.streamSettingsService.settings.delayEnable;
   }
 
   get delaySeconds() {
-    return this.settingsService.state.Advanced.DelaySec;
+    return this.streamSettingsService.settings.delaySec;
   }
 
   get delaySecondsRemaining() {
@@ -337,6 +341,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (existingReconnectNotif.length !== 0) return;
     this.notificationsService.push({
       type: ENotificationType.WARNING,
+      subType: ENotificationSubType.DISCONNECTED,
       lifeTime: -1,
       showTime: true,
       message: msg,
@@ -364,6 +369,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  private outputErrorOpen = false;
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -380,9 +387,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          if (this.streamInfoService.state.channelInfo) {
-            game = this.streamInfoService.state.channelInfo.game;
-          }
+          game = this.streamInfoService.state.game;
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }
@@ -403,6 +408,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
+        this.runPlaformAfterStopStreamHook();
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -446,7 +452,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     if (info.code) {
+      if (this.outputErrorOpen) {
+        console.warn('Not showing error message because existing window is open.', info);
+        return;
+      }
+
       let errorText = '';
+      let linkToDriverInfo = false;
 
       if (info.code === obs.EOutputCode.BadPath) {
         errorText = $t(
@@ -471,14 +483,49 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           $t(
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
-      } else if (info.code === obs.EOutputCode.Error) {
-        errorText = $t('An unexpected error occurred:') + info.error;
+      } else {
+        // -4 is used for generic unknown messages in OBS. Both -4 and any other code
+        // we don't recognize should fall into this branch and show a generic error.
+        if (info.error) {
+          errorText = info.error;
+        } else {
+          linkToDriverInfo = true;
+          errorText = $t(
+            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+          );
+        }
       }
 
-      electron.remote.dialog.showErrorBox(
-        info.type === EOBSOutputType.Streaming ? $t('Streaming Error') : $t('Recording Error'),
-        errorText,
-      );
+      const buttons = [$t('OK')];
+      const title = {
+        [EOBSOutputType.Streaming]: $t('Streaming Error'),
+        [EOBSOutputType.Recording]: $t('Recording Error'),
+        [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
+      }[info.type];
+
+      if (linkToDriverInfo) buttons.push($t('Learn More'));
+
+      this.outputErrorOpen = true;
+
+      electron.remote.dialog
+        .showMessageBox({
+          buttons,
+          title,
+          type: 'error',
+          message: errorText,
+        })
+        .then(({ response }) => {
+          this.outputErrorOpen = false;
+
+          if (linkToDriverInfo && response === 1) {
+            electron.remote.shell.openExternal(
+              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
+            );
+          }
+        })
+        .catch(() => {
+          this.outputErrorOpen = false;
+        });
     }
   }
 
@@ -505,12 +552,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn && this.userService.platform) {
+  private async runPlatformAfterGoLiveHook() {
+    if (this.userService.isLoggedIn() && this.userService.platform) {
       const service = getPlatformService(this.userService.platform.type);
       if (typeof service.afterGoLive === 'function') {
-        service.afterGoLive(this.context);
+        await service.afterGoLive();
       }
+    }
+  }
+
+  private async runPlaformAfterStopStreamHook() {
+    if (!this.userService.isLoggedIn()) return;
+    const service = this.userService.getPlatformService();
+    if (typeof service.afterStopStream === 'function') {
+      await service.afterStopStream();
     }
   }
 }

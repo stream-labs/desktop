@@ -23,9 +23,10 @@ interface ITestUser {
 }
 
 interface ITestUserFeatures {
-  streamingIsDisabled: boolean;
-  noFacebookPages: boolean;
-  hasLinkedTwitter: boolean;
+  streamingIsDisabled?: boolean;
+  noFacebookPages?: boolean;
+  hasLinkedTwitter?: boolean;
+  '2FADisabled'?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {
@@ -66,9 +67,14 @@ export async function logIn(
   await focusMain(t);
 
   app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
+
   if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;
+}
+
+export async function isLoggedIn(t: TExecutionContext) {
+  return t.context.app.client.isVisible('.fa-sign-out-alt');
 }
 
 /**

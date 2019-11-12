@@ -40,11 +40,9 @@ export default class HelpTip extends TsxComponent<HelpTipProps> {
           <i onClick={this.closeHelpTip} class={cx(styles.helpTipClose, 'icon-close')} />
           <div class={styles.helpTipTitle}>
             <i class="fa fa-info-circle" />
-            <slot name="title" />
+            {this.$slots.title}
           </div>
-          <div class={styles.helpTipBody}>
-            <slot name="content" />
-          </div>
+          <div class={styles.helpTipBody}>{this.$slots.content}</div>
         </div>
       )
     );

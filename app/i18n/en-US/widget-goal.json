@@ -4,6 +4,7 @@
   "Days Remaining": "Days Remaining",
   "Start Goal": "Start Goal",
   "Goal": "Goal",
+  "End Goal": "End Goal",
   "Starting Amount": "Starting Amount",
   "End After": "End After",
   "Include resubs?": "Include resubs?",
@@ -14,5 +15,11 @@
   "Text Color": "Text Color",
   "Bar Text Color": "Bar Text Color",
   "Bar Thickness": "Bar Thickness",
-  "Font Family": "Font Family"
+  "Font Family": "Font Family",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }

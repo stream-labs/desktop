@@ -4,6 +4,7 @@
   "Days Remaining": "Осталось дней",
   "Start Goal": "Стартовая цель",
   "Goal": "Цель",
+  "End Goal": "End Goal",
   "Starting Amount": "Начальное количество",
   "End After": "Закончить после",
   "Include resubs?": "Включить вернувшихся подписчиков?",
@@ -14,5 +15,11 @@
   "Text Color": "Цвет текста",
   "Bar Text Color": "Цвет текста",
   "Bar Thickness": "Толщина полоски",
-  "Font Family": "Семейство шрифтов"
+  "Font Family": "Семейство шрифтов",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }
