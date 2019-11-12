@@ -11,6 +11,7 @@ export enum EAvailableFeatures {
   creatorSites = 'slobs--creator-sites',
   facebookOnboarding = 'slobs--facebook-onboarding',
   twitter = 'slobs--twitter',
+  restream = 'slobs--restream',
 }
 
 interface IIncrementalRolloutServiceState {

@@ -1,21 +1,15 @@
 import { StatefulService } from 'services';
-import { Inject, mutation } from 'services/core';
+import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
+import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
+import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
 import { authorizedHeaders } from 'util/requests';
-import {
-  TPlatform,
-  getPlatformService,
-  IPlatformService,
-  TChannelInfo,
-  TStartStreamOptions,
-} from 'services/platforms';
-import { TwitchService } from 'app-services';
-import { ITwitchChannelInfo, ITwitchStartStreamOptions } from 'services/platforms/twitch';
-import { StreamSettingsService } from 'services/settings/streaming';
-import { IFacebookStartStreamOptions } from './platforms/facebook';
-import cloneDeep from 'lodash/cloneDeep';
 import Vue from 'vue';
+import { IFacebookStartStreamOptions } from './platforms/facebook';
+import { IncrementalRolloutService, EAvailableFeatures } from './incremental-rollout';
+import Utils from './utils';
 
 interface IRestreamTarget {
   id: number;
@@ -52,10 +46,12 @@ interface IUserSettingsResponse {
   streamKey: string;
 }
 
+@InitAfter('UserService')
 export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
   @Inject() streamSettingsService: StreamSettingsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   settings: IUserSettingsResponse;
 
@@ -80,10 +76,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   init() {
-    if (this.userService.isLoggedIn()) {
-      this.loadUserSettings();
-    }
-
     this.userService.userLogin.subscribe(() => this.loadUserSettings());
     this.userService.userLogout.subscribe(() => {
       this.settings = null;
@@ -108,9 +100,12 @@ export class RestreamService extends StatefulService<IRestreamState> {
    * - Rolled out to
    */
   get canEnableRestream() {
-    // TODO: Check server side rollout flag
     return !!(
-      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
+      this.userService.state.auth &&
+      this.userService.state.auth.primaryPlatform === 'twitch' &&
+      (this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.restream) ||
+        Utils.isDevMode() ||
+        Utils.isPreview())
     );
   }
 

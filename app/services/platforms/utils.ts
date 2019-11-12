@@ -61,6 +61,9 @@ export async function platformRequest<T = unknown>(
  * This is a shortcut for platformRequest()
  * @see platformRequest
  */
-export function platformAuthorizedRequest<T = unknown>(platform: TPlatform, req: IPlatformRequest | string): Promise<T> {
+export function platformAuthorizedRequest<T = unknown>(
+  platform: TPlatform,
+  req: IPlatformRequest | string,
+): Promise<T> {
   return platformRequest(platform, req, true);
 }
