@@ -108,7 +108,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
     const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
-    this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
+    this.windows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      width: 600,
+      componentName: 'GameOverlayEventFeed',
+      queryParams: { gameOverlay: true },
+      webPreferences: { offscreen: true, nodeIntegration: true },
+      isFullScreen: true,
+    });
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
@@ -170,7 +177,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
     if (this.streamInfoService.state.chatUrl) {
       this.windows.chat.loadURL(this.streamInfoService.state.chatUrl);
     }
@@ -338,6 +344,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private createWindowOverlays() {
     Object.keys(this.windows).forEach((key: string) => {
       const win: electron.BrowserWindow = this.windows[key];
+      // Fix race condition in screen tests
+      if (win.isDestroyed()) return;
+
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId === -1 || overlayId == null) {

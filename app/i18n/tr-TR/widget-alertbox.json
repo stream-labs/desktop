@@ -72,5 +72,11 @@
   "Image/Video File": "Görüntü/Video Dosyası",
   "Sound File": "Ses Dosyası",
   "Variation Frequency": "Değişim Sıklığı",
-  "Message Template": "Mesaj şablonu"
+  "Message Template": "Mesaj şablonu",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

@@ -4,6 +4,7 @@
   "Days Remaining": "残り日数",
   "Start Goal": "開始時の目標",
   "Goal": "目標",
+  "End Goal": "End Goal",
   "Starting Amount": "開始時の金額",
   "End After": "後に終了する",
   "Include resubs?": "リサブを含める?",
@@ -14,5 +15,11 @@
   "Text Color": "テキストの色",
   "Bar Text Color": "バーのテキストの色",
   "Bar Thickness": "バーの厚さ",
-  "Font Family": "フォントファミリー"
+  "Font Family": "フォントファミリー",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }

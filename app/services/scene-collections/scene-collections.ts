@@ -87,11 +87,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
-   * Whether the service has been initialized
-   */
-  private initialized = false;
-
-  /**
    * Whether a valid collection is currently loaded.
    * Is used to decide whether we should save.
    */
@@ -127,7 +122,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } else {
       await this.create({ auto: true });
     }
-    this.initialized = true;
   }
 
   /**
@@ -137,7 +131,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   @RunInLoadingMode()
   async setupNewUser() {
-    if (!this.initialized) return; // don't handle initial user login
     await this.initialize();
   }
 
@@ -547,8 +540,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * performed while the application is already in a "LOADING" state.
    */
   private async deloadCurrentApplicationState() {
-    if (!this.initialized) return;
-
     this.tcpServerService.stopRequestsHandling();
 
     this.collectionWillSwitch.next();

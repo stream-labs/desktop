@@ -16,5 +16,10 @@
   "Disable Studio Mode": "關閉工作室模式",
   "Transition (Studio Mode)": "轉場 （工作室模式）",
   "Capture Foreground Window": "擷取前台視窗",
-  "Deactivate Capture": "停止擷取"
+  "Deactivate Capture": "停止擷取",
+  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
+  "Play/Pause": "Play/Pause",
+  "Restart": "Restart",
+  "Next Slide": "Next Slide",
+  "Previous Slide": "Previous Slide"
 }

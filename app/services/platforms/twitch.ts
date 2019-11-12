@@ -118,28 +118,10 @@ export class TwitchService extends Service implements IPlatformService {
     return this.userService.platform.id;
   }
 
-  async beforeGoLive(channelInfo: ITwitchChannelInfo) {
+  async beforeGoLive(channelInfo?: ITwitchChannelInfo) {
     const key = await this.fetchStreamKey();
-    const currentStreamSettings = this.streamSettingsService.settings;
-
-    // disable protectedMode for users who manually changed their stream key before
-    const needToDisableProtectedMode: boolean =
-      currentStreamSettings.platform === 'twitch' &&
-      currentStreamSettings.key &&
-      currentStreamSettings.key !== key;
-
-    if (needToDisableProtectedMode) {
-      this.streamSettingsService.setSettings({ protectedModeEnabled: false });
-    } else {
-      this.streamSettingsService.setSettings({
-        key,
-        platform: 'twitch',
-        protectedModeEnabled: true,
-      });
-    }
-
+    this.streamSettingsService.setSettings({ key, platform: 'twitch' });
     if (channelInfo) await this.putChannelInfo(channelInfo);
-
     return key;
   }
 
@@ -175,7 +157,7 @@ export class TwitchService extends Service implements IPlatformService {
     return platformAuthorizedRequest<ITWitchChannel>('https://api.twitch.tv/kraken/channel');
   }
 
-  private fetchStreamKey(): Promise<string> {
+  fetchStreamKey(): Promise<string> {
     return this.fetchRawChannelInfo().then(json => json.stream_key);
   }
 

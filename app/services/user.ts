@@ -131,7 +131,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   // Makes sure the user's login is still good
-  validateLogin() {
+  async validateLogin() {
     if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
@@ -139,22 +139,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/validate`;
     const request = new Request(url, { headers });
 
-    fetch(request)
-      .then(res => {
-        return res.text();
-      })
-      .then(async valid => {
-        if (valid.match(/false/)) {
-          this.LOGOUT();
-          electron.remote.dialog.showMessageBox({
-            message: $t('You have been logged out'),
-          });
-          return;
-        }
-        const service = getPlatformService(this.state.auth.platform.type);
-        await this.login(service, this.state.auth);
-        this.refreshUserInfo();
+    const valid = await fetch(request).then(res => {
+      return res.text();
+    });
+
+    if (valid.match(/false/)) {
+      this.LOGOUT();
+      electron.remote.dialog.showMessageBox({
+        message: $t('You have been logged out'),
       });
+      return;
+    }
+
+    const service = getPlatformService(this.state.auth.platform.type);
+    await this.login(service, this.state.auth);
+    this.refreshUserInfo();
   }
 
   /**
@@ -227,6 +226,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get platform() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform;
+    }
+  }
+
+  get platformType(): TPlatform {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.type;
     }
   }
 

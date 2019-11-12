@@ -36,5 +36,7 @@
   "Rename Scene": "A jelenet átnevezése",
   "Name Scene": "Név jelenet",
   "Rename Folder": "Könyvtár Átnevezése",
-  "Name Folder": "Könyvtár Elnevezése"
+  "Name Folder": "Könyvtár Elnevezése",
+  "Switch Scenes": "Jelenetek váltása",
+  "Failed to load scene collection.  A new one will be created instead.": "Nem sikerült betölteni a jelenetgyűjteményt. Ehelyett egy új jön létre."
 }

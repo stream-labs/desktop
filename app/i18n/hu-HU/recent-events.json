@@ -15,11 +15,11 @@
   "Tier 2": "2. szint",
   "Tier 3": "3. szint",
   "Prime": "Prime",
-  "has sponsored since %{date}": "has sponsored since %{date}",
-  "has liked": "has liked",
-  "has supported for %{mounths} months": "has supported for %{mounths} months",
+  "has sponsored since %{date}": "%{date} óta szponzorál",
+  "has liked": "tetszett",
+  "has supported for %{mounths} months": "%{mounths} hónapig támogatott",
   "has shared": "megosztotta",
-  "has superchatted": "has superchatted",
+  "has superchatted": "szuperchatelt",
   "has pledged on Patreon": "has pledged on Patreon",
   "has donated to ExtraLife": "adományozott az ExtraLife-nek",
   "has donated to Tiltify": "adományozott a Tiltify-nek",
@@ -46,5 +46,6 @@
   "Stickers": "Matricák",
   "Effects": "Efektek",
   "has purchased %{product} from the store": "vásárolt %{product} a boltból",
-  "Event Filters": "Eseményszűrők"
+  "Event Filters": "Eseményszűrők",
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here."
 }

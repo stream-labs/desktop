@@ -21,5 +21,11 @@
   "Unable to find face mask plugin. You will not be able to use Face Masks": "Невозможно найти плагин для маски лица. Вы не сможете использовать маски для лица",
   "Face Mask Settings": "Настройки маски для лица",
   "Twitch Follows": "Последователи с Twitch",
-  "Youtube Follows": "Последователи с YouTube"
+  "Youtube Follows": "Последователи с YouTube",
+  "Mask Duration": "Mask Duration",
+  "Donation Masks": "Donation Masks",
+  "Minimum Bits to Activate": "Minimum Bits to Activate",
+  "Test Face Masks": "Test Face Masks",
+  "Collapse": "Collapse",
+  "Expand": "Expand"
 }
