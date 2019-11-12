@@ -7,6 +7,8 @@ import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
+import ListInput from 'components/shared/inputs/ListInput.vue';
+import ExtraPlatformConnect from './ExtraPlatformConnect';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -18,6 +20,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() onboardingService: OnboardingService;
 
   loadingState = false;
+  selectedExtraPlatform = '';
 
   authPlatform(platform: TPlatform) {
     this.loadingState = true;
@@ -81,7 +84,21 @@ export default class Connect extends TsxComponent<ConnectProps> {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
+  selectOtherPlatform(platform: string) {
+    this.selectedExtraPlatform = platform;
+  }
+
   render() {
+    if (this.selectedExtraPlatform) {
+      return (
+        <ExtraPlatformConnect
+          continue={this.props.continue}
+          platform={this.selectedExtraPlatform}
+          back={() => (this.selectedExtraPlatform = '')}
+        />
+      );
+    }
+
     return (
       <div class={styles.container}>
         <div class={styles.progressCover} />
@@ -103,9 +120,18 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </button>
           ))}
         </div>
-        <span class={styles.skipButton} onClick={this.props.continue}>
+        <p class={styles['select-another']}> {$t('or select another platform')} </p>
+        <ListInput
+          onInput={this.selectOtherPlatform}
+          metadata={{
+            allowEmpty: true,
+            options: [{ value: 'dlive', title: 'Dlive' }, { value: 'nimotv', title: 'NimoTV' }],
+          }}
+        />
+        <p class={styles.skipButton} onClick={this.props.continue}>
+          <br />
           {$t('Skip')}
-        </span>
+        </p>
       </div>
     );
   }
