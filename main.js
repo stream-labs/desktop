@@ -194,8 +194,6 @@ if (!gotTheLock) {
 
     mainWindow.removeMenu();
 
-    mainWindow.openDevTools({ mode: 'detach' });
-
     // wait until devtools will be opened and load app into window
     // it allows to start application with clean cache
     // and handle breakpoints on startup

@@ -116,7 +116,11 @@ export class AppService extends StatefulService<IAppState> {
     // the apps to already be in place when their sources are created.
     await this.platformAppsService.initialize();
 
-    await this.sceneCollectionsService.initialize();
+    if (!this.userService.isLoggedIn()) {
+      // If this user is logged in, this would have already happened as part of login
+      // TODO: We should come up with a better way to handle this.
+      await this.sceneCollectionsService.initialize();
+    }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
 

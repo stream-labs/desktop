@@ -22,10 +22,10 @@
   "Face Mask Settings": "Arcmaszk beállításai",
   "Twitch Follows": "Twitch Követések",
   "Youtube Follows": "YouTube Követések",
-  "Mask Duration": "Mask Duration",
-  "Donation Masks": "Donation Masks",
-  "Minimum Bits to Activate": "Minimum Bits to Activate",
-  "Test Face Masks": "Test Face Masks",
-  "Collapse": "Collapse",
-  "Expand": "Expand"
+  "Mask Duration": "Maszk időtartama",
+  "Donation Masks": "Adománymaszkok",
+  "Minimum Bits to Activate": "Minimális aktiválható bit",
+  "Test Face Masks": "Tesztelje az arcmaszkokat",
+  "Collapse": "Összeomlás",
+  "Expand": "Kiterjed"
 }
