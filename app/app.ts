@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
       missing: (...args: any[]) => {
+        if (isProduction) return;
         console.error(`Missed i18n string: ${args.join(' ')}`);
       },
     });
