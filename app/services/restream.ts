@@ -10,15 +10,12 @@ import Vue from 'vue';
 import { IFacebookStartStreamOptions } from './platforms/facebook';
 import { IncrementalRolloutService, EAvailableFeatures } from './incremental-rollout';
 import Utils from './utils';
+import electron from 'electron';
 
 interface IRestreamTarget {
   id: number;
   platform: TPlatform;
   streamKey: string;
-}
-
-interface IRestreamPlatformInfo {
-  enabled: boolean;
 }
 
 interface IRestreamState {
@@ -160,6 +157,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
   setEnabled(enabled: boolean) {
     this.SET_ENABLED(enabled);
 
+    if (!enabled) this.deinitChat();
+
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -230,35 +229,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all(promises2);
   }
 
-  // TODO: This function has no error handling
-  // async setupRestreamTargets(info: IStartRestreamInfo) {
-  //   const clonedInfo = cloneDeep(info);
-  //   const targets = await this.fetchTargets();
-
-  //   // Update/delete existing targets
-  //   for (const target of targets) {
-  //     if (clonedInfo[target.platform]) {
-  //       // Target already exists for this platform, update it
-  //       const service = getPlatformService(target.platform);
-  //       const streamKey = await service.beforeGoLive(clonedInfo[target.platform]);
-
-  //       await this.updateTarget(target.id, streamKey);
-  //       delete clonedInfo[target.platform];
-  //     } else {
-  //       // Remove the target
-  //       await this.deleteTarget(target.id);
-  //     }
-  //   }
-
-  //   // Create any new targets that may need to be created
-  //   for (const platform in clonedInfo) {
-  //     const service = getPlatformService(platform as TPlatform);
-  //     const streamKey = await service.beforeGoLive(clonedInfo[platform]);
-
-  //     await this.createTarget(platform as TPlatform, streamKey);
-  //   }
-  // }
-
   createTarget(platform: TPlatform, streamKey: string) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
@@ -303,5 +273,69 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return fetch(request).then(res => res.json());
+  }
+
+  /* Chat Handling
+   * TODO: Lots of this is copy-pasted from the chat service
+   * The chat service needs to be refactored\
+   */
+  private chatView: Electron.BrowserView;
+
+  refreshChat() {
+    this.chatView.webContents.loadURL(this.chatUrl);
+  }
+
+  mountChat(electronWindowId: number) {
+    if (!this.chatView) this.initChat();
+
+    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+
+    // This method was added in our fork
+    (win as any).addBrowserView(this.chatView);
+  }
+
+  setChatBounds(position: IVec2, size: IVec2) {
+    if (!this.chatView) return;
+
+    this.chatView.setBounds({
+      x: Math.round(position.x),
+      y: Math.round(position.y),
+      width: Math.round(size.x),
+      height: Math.round(size.y),
+    });
+  }
+
+  unmountChat(electronWindowId: number) {
+    if (!this.chatView) return;
+
+    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+
+    // @ts-ignore: this method was added in our fork
+    win.removeBrowserView(this.chatView);
+  }
+
+  private initChat() {
+    if (this.chatView) return;
+
+    const partition = this.userService.state.auth.partition;
+
+    this.chatView = new electron.remote.BrowserView({
+      webPreferences: {
+        partition,
+        nodeIntegration: false,
+      },
+    });
+
+    this.chatView.webContents.loadURL(this.chatUrl);
+
+    electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
+  }
+
+  private deinitChat() {
+    if (!this.chatView) return;
+
+    // @ts-ignore: typings are incorrect
+    this.chatView.destroy();
+    this.chatView = null;
   }
 }

@@ -1,8 +1,9 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { ChatService } from 'services/chat';
 import electron from 'electron';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class Chat extends Vue {
@@ -14,10 +15,13 @@ export default class Chat extends Vue {
   currentSize: IVec2;
   resizeInterval: number;
 
+  @Prop() restream: boolean;
+
   @Inject() chatService: ChatService;
+  @Inject() restreamService: RestreamService;
 
   mounted() {
-    this.chatService.mountChat(electron.remote.getCurrentWindow().id);
+    this.getChatService().mountChat(electron.remote.getCurrentWindow().id);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -25,8 +29,25 @@ export default class Chat extends Vue {
   }
 
   destroyed() {
-    this.chatService.unmountChat(electron.remote.getCurrentWindow().id);
+    this.getChatService().unmountChat(electron.remote.getCurrentWindow().id);
     clearInterval(this.resizeInterval);
+  }
+
+  @Watch('restream')
+  changeChat() {
+    const windowId = electron.remote.getCurrentWindow().id;
+
+    this.chatService.unmountChat(windowId);
+    this.restreamService.unmountChat(windowId);
+
+    this.getChatService().mountChat(windowId);
+    this.currentPosition = null;
+    this.currentSize = null;
+    this.checkResize();
+  }
+
+  getChatService(): RestreamService | ChatService {
+    return this.restream ? this.restreamService : this.chatService;
   }
 
   checkResize() {
@@ -38,7 +59,7 @@ export default class Chat extends Vue {
       this.currentPosition = { x: rect.left, y: rect.top };
       this.currentSize = { x: rect.width, y: rect.height };
 
-      this.chatService.setChatBounds(this.currentPosition, this.currentSize);
+      this.getChatService().setChatBounds(this.currentPosition, this.currentSize);
     }
   }
 

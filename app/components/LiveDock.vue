@@ -77,11 +77,9 @@
           </div>
         <!-- v-if is required because left-side chat will not properly load on application startup -->
         <chat v-if="!applicationLoading && selectedChat === 'default'" />
-        <browser-view
+        <chat
           v-if="selectedChat === 'restream'"
-          :src="restreamChatUrl"
-          :style="{ height: '100%' }"
-          @ready="restreamChatReady"/>
+          :restream="true"/>
         <PlatformAppPageView
           v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
           class="live-dock-platform-app-webview"

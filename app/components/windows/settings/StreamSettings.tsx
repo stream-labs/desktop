@@ -86,9 +86,9 @@ export default class StreamSettings extends TsxComponent {
                 <VFormGroup
                   vModel={this.restreamEnabled}
                   metadata={metadata.toggle({
-                    title: $t('Enable Restreaming'),
+                    title: $t('Enable Multistream'),
                     description: $t(
-                      'Restreaming allows you to stream to multiple platforms simultaneously.',
+                      'Multistream allows you to stream to multiple platforms simultaneously.',
                     ),
                   })}
                 />
