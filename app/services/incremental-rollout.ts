@@ -4,6 +4,7 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
+import { InitAfter } from './core';
 
 export enum EAvailableFeatures {
   chatbot = 'slobs--chatbot',
@@ -17,6 +18,7 @@ interface IIncrementalRolloutServiceState {
   availableFeatures: string[];
 }
 
+@InitAfter('UserService')
 export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
