@@ -60,10 +60,6 @@ export default class EditStreamInfo extends Vue {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() restreamService: RestreamService;
 
-  mounted() {
-    console.log('EDIT STREAM INFO MOUNT');
-  }
-
   // UI State Flags
   searchingGames = false;
   updatingInfo = false;
@@ -301,7 +297,6 @@ export default class EditStreamInfo extends Vue {
 
   async handleSubmit() {
     if (this.infoError || this.updateError) {
-      // TODO: Need to handle this branch for restream
       await this.goLive(true);
       return;
     }

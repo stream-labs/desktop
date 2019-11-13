@@ -37,7 +37,9 @@ interface IRestreamState {
 }
 
 interface IUserSettingsResponse {
-  // Not sure what effect this has
+  /**
+   * Whether this user has restream enabled
+   */
   enabled: boolean;
 
   streamKey: string;

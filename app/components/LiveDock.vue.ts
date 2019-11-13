@@ -7,8 +7,6 @@ import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
-import { getPlatformService } from 'services/platforms';
-import { YoutubeService } from 'services/platforms/youtube';
 import { $t } from 'services/i18n';
 import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
@@ -18,7 +16,6 @@ import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
 import { RestreamService } from 'app-services';
-import BrowserView from 'components/shared/BrowserView';
 
 @Component({
   components: {
@@ -26,7 +23,6 @@ import BrowserView from 'components/shared/BrowserView';
     ListInput,
     PlatformAppPageView,
     Tabs,
-    BrowserView,
   },
 })
 export default class LiveDock extends Vue {
@@ -187,12 +183,6 @@ export default class LiveDock extends Vue {
     );
   }
 
-  restreamChatView: Electron.BrowserView;
-
-  restreamChatReady(view: Electron.BrowserView) {
-    this.restreamChatView = view;
-  }
-
   refreshChat() {
     if (this.selectedChat === 'default') {
       this.chatService.refreshChat();
@@ -200,7 +190,7 @@ export default class LiveDock extends Vue {
     }
 
     if (this.selectedChat === 'restream') {
-      if (this.restreamChatView) this.restreamChatView.webContents.reload();
+      this.restreamService.refreshChat();
       return;
     }
 
