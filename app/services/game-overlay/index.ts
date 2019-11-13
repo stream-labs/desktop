@@ -86,7 +86,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
   async init() {
-    super.init();
     if (!this.state.isEnabled) return;
 
     this.lifecycle = await this.userService.withLifecycle({
