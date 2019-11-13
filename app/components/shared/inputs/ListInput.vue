@@ -29,10 +29,7 @@
       slot-scope="props"
       :data-option-value="props.option.value"
       :data-option-title="props.option.title">
-      <slot name="item" :option="props.option">
-        <img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>
-        {{ props.option.title }}
-      </slot>
+      <slot name="item" :option="props.option"><img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>{{ props.option.title }}</slot>
     </span>
 
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
