@@ -29,7 +29,7 @@ export abstract class PersistentStatefulService<TState extends object> extends S
     return `PersistentStatefulService-${this.name}`;
   }
 
-  init() {
+  afterInit() {
     this.store.watch(
       () => {
         return JSON.stringify(this.state);
