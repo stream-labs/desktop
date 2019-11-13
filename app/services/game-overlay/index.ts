@@ -48,7 +48,6 @@ const hideInteraction = `
 `;
 
 @InitAfter('UserService')
-@InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
@@ -79,28 +78,20 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     // overlayControls: Electron.BrowserWindow;
   } = {} as any;
 
-  onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
-  onWindowsReadySubscription: Subscription;
-  lifecycle: LoginLifecycle;
+  private onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
+  private onWindowsReadySubscription: Subscription;
+  private onChatUrlChangedSubscription: Subscription;
+  private lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
+  private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
-  async initialize() {
+  async init() {
     if (!this.state.isEnabled) return;
 
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
       destroy: this.destroyOverlay,
       context: this,
-    });
-
-    // sync chat url
-    this.streamInfoService.streamInfoChanged.subscribe(streamInfo => {
-      const chatWindow = this.windows.chat;
-      if (!chatWindow) return;
-      if (streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
-        chatWindow.loadURL(streamInfo.chatUrl);
-      }
     });
   }
 
@@ -189,6 +180,18 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (this.streamInfoService.state.chatUrl) {
       this.windows.chat.loadURL(this.streamInfoService.state.chatUrl);
     }
+
+    // sync chat url if it has been changed
+    this.onChatUrlChangedSubscription = this.streamInfoService.streamInfoChanged.subscribe(
+      streamInfo => {
+        if (!this.state.isEnabled) return;
+        const chatWindow = this.windows.chat;
+        if (!chatWindow) return;
+        if (streamInfo.chatUrl && streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
+          chatWindow.loadURL(streamInfo.chatUrl);
+        }
+      },
+    );
   }
 
   determineStartPosition(window: string) {
@@ -332,6 +335,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       if (this.previewWindows) {
         await Object.values(this.previewWindows).forEach(win => win.destroy());
       }
+      this.onChatUrlChangedSubscription.unsubscribe();
     }
     this.SET_PREVIEW_MODE(false);
     this.TOGGLE_OVERLAY(false);
