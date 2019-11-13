@@ -107,7 +107,8 @@ export default class Main extends Vue {
       this.isLoggedIn &&
       !this.isOnboarding &&
       this.hasLiveDock &&
-      this.userService.getPlatformService().liveDockEnabled()
+      this.userService.getPlatformService().liveDockEnabled() &&
+      !this.showLoadingSpinner
     );
   }
 
