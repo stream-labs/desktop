@@ -1,7 +1,7 @@
 /**
  * Run this script to find the strings that missed in localization dictionaries.
  */
-const searchExp = /\$t\(\'([ a-zA-Z\d\-_`@%;:,'’=&!~#\\\+\*\?\.\}\{\(\)\[\]\$/]+)\'.*?\)/gm;
+const searchExp = /\$t\(([\'\`\"])([ a-zA-Z\d\-_`@%;:,'’=&!~#\\\+\*\?\.\}\{\(\)\[\]\$\<\>/]+?)\1\)/gm;
 const fs = require('fs');
 const recursive = require('recursive-readdir');
 
@@ -34,7 +34,7 @@ const recursive = require('recursive-readdir');
     const fileContent = fs.readFileSync(filePath).toString();
     let match;
     while ((match = searchExp.exec(fileContent))) {
-      let string = match[1];
+      let string = match[2];
       string = string.replace('\\', '');
       if (!foundStrings.includes(string)) foundStrings.push(string);
     }
