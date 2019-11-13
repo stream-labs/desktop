@@ -36,7 +36,7 @@ const DISPLAY_BACKGROUNDS = {
  */
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
-    @Inject() userService: UserService;
+  @Inject() userService: UserService;
 
   static get migrations() {
     return [
