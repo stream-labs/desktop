@@ -82,7 +82,7 @@
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
-    "rxjs": "^5.4.3",
+    "rxjs": "^6.5.3",
     "semver": "^5.5.1",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "socket.io-client": "2.0.3",

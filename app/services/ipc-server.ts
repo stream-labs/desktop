@@ -1,7 +1,7 @@
 import { Service } from './service';
 import { ServicesManager } from '../services-manager';
 import electron from 'electron';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import {
   IJsonRpcRequest,
   IJsonRpcResponse,

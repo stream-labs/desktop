@@ -6,7 +6,7 @@ import { Inject } from '../util/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
 
 const { remote } = electron;

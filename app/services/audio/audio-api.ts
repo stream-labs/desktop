@@ -1,5 +1,5 @@
 import * as obs from '../../../obs-api';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { TFormData } from '../../components/shared/forms/Input';
 import { ISource } from '../sources/sources-api';
 
