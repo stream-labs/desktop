@@ -3,7 +3,9 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog, restartApp, closeWindow
+  skipCheckingErrorsInLog,
+  restartApp,
+  closeWindow,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, FormMonkey } from './helpers/form-monkey';
@@ -99,7 +101,7 @@ test('Streaming to Youtube', async t => {
 
   // give youtube 2 min to publish stream
   await focusChild(t);
-  await t.context.app.client.waitForVisible("p=You're live", 2 * 60 * 1000);
+  await t.context.app.client.waitForVisible("p=You're live!", 2 * 60 * 1000);
 
   t.pass();
 });
