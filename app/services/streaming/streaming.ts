@@ -176,7 +176,33 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
           if (this.streamSettingsService.protectedModeEnabled) {
             if (this.restreamService.shouldGoLiveWithRestream) {
-              await this.restreamService.beforeGoLive();
+              let ready: boolean;
+
+              try {
+                ready = await this.restreamService.checkStatus();
+              } catch (e) {
+                // Assume restream is down
+                console.error('Error fetching restreaming service', e);
+                ready = false;
+              }
+
+              if (ready) {
+                // Restream service is up and accepting connections
+                await this.restreamService.beforeGoLive();
+              } else {
+                // Restream service is down, just go live to Twitch for now
+
+                electron.remote.dialog.showMessageBox({
+                  type: 'error',
+                  message: $t(
+                    'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
+                  ),
+                  buttons: [$t('OK')],
+                });
+
+                const platform = this.userService.platformType;
+                await service.beforeGoLive(this.restreamService.state.platforms[platform].options);
+              }
             } else {
               await service.beforeGoLive(options);
             }

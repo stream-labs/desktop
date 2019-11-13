@@ -220,13 +220,24 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await Promise.all(promises);
 
-    console.log(JSON.stringify(this.state.platforms));
-
     const promises2 = Object.keys(this.state.platforms).map(platform => {
       return this.createTarget(platform as TPlatform, this.state.platforms[platform].streamKey);
     });
 
     await Promise.all(promises2);
+  }
+
+  checkStatus(): Promise<boolean> {
+    const url = `https://${this.host}/api/v1/rst/util/status`;
+    const request = new Request(url);
+
+    return fetch(request)
+      .then(res => res.json())
+      .then(
+        j =>
+          j.find((service: { name: string; enabled: boolean }) => service.name === 'restream')
+            .status,
+      );
   }
 
   createTarget(platform: TPlatform, streamKey: string) {
