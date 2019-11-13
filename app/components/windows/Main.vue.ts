@@ -6,6 +6,8 @@ import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
+import fs from 'fs';
 Vue.use(VueResize);
 
 // Pages
@@ -131,13 +133,45 @@ export default class Main extends Vue {
     return this.appService.state.errorAlert;
   }
 
-  onDropHandler(event: DragEvent) {
+  async isDirectory(path: string) {
+    return new Promise<boolean>((resolve, reject) => {
+      fs.lstat(path, (err, stats) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(stats.isDirectory());
+      });
+    });
+  }
+
+  async onDropHandler(event: DragEvent) {
     const fileList = event.dataTransfer.files;
     const files: string[] = [];
-
     let fi = fileList.length;
     while (fi--) files.push(fileList.item(fi).path);
 
+    const isDirectory = await this.isDirectory(files[0]).catch(err => {
+      console.error(err);
+      return false;
+    });
+
+    if (files.length > 1 || isDirectory) {
+      electron.remote.dialog
+        .showMessageBox(electron.remote.getCurrentWindow(), {
+          message: $t('Are you sure you want to import multiple files?'),
+          type: 'warning',
+          buttons: [$t('Cancel'), $t('OK')],
+        })
+        .then(({ response }) => {
+          if (!response) return;
+          this.executeFileDrop(files);
+        });
+    } else {
+      this.executeFileDrop(files);
+    }
+  }
+
+  executeFileDrop(files: string[]) {
     this.editorCommandsService.executeCommand(
       'AddFilesCommand',
       this.scenesService.activeSceneId,
