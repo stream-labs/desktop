@@ -9,9 +9,12 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 import { StreamSettingsService } from 'services/settings/streaming';
 import electron from 'electron';
+import PlatformLogo from 'components/shared/PlatformLogo';
+
+export type TExtraPlatform = 'nimotv' | 'dlive';
 
 export class ConnectProps {
-  platform = '';
+  platform: 'nimotv' | 'dlive' = 'dlive';
   continue: () => void = () => {};
   back: () => void = () => {};
 }
@@ -21,28 +24,33 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
-  keyMetadata = metadata.text({ title: $t('Stream Key'), masked: true });
+  keyMetadata = metadata.text({ title: $t('Stream Key'), name: 'key', masked: true });
   key = '';
   platformDefinitions = {
     dlive: {
       name: 'DLive',
       ingestUrl: 'rtmp://stream.dlive.tv/live',
       helpUrl: 'https://go.dlive.tv/stream',
+      icon: 'dlive-white.png',
     },
     nimotv: {
       name: 'Nimo.TV',
       ingestUrl: 'rtmp://txpush.rtmp.nimo.tv/live/',
       helpUrl: 'https://article.nimo.tv/p/1033/streamlabsprotocol.html',
+      icon: 'nimo-logo.png',
     },
   };
 
   get platformDefinition() {
-    console.log('get platform', this.props.platform);
     return this.platformDefinitions[this.props.platform];
   }
 
   next() {
-    this.streamSettingsService.setSettings({ key: this.key });
+    this.streamSettingsService.setSettings({
+      key: this.key,
+      streamType: 'rtmp_custom',
+      server: this.platformDefinition.ingestUrl,
+    });
     this.props.continue();
   }
 
@@ -53,13 +61,16 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
   render() {
     return (
       <div class={styles.container}>
-        <h1>{$t('Connect to %platform%', { platform: this.platformDefinition.name })}</h1>
         <p>
-          {$t('Enter your stream key')}
-
-          <a href="javascript:void 0" onCLick={() => this.openHelp()}>
+          <PlatformLogo platform={this.props.platform} />
+        </p>
+        <h1>{$t('Connect to %{platform}', { platform: this.platformDefinition.name })}</h1>
+        <p>
+          {$t('Enter your stream key.')}
+          &nbsp;
+          <span class={styles['link-button']} onClick={() => this.openHelp()}>
             {$t('View help docs')}
-          </a>
+          </span>
         </p>
 
         <div class="section">
@@ -67,18 +78,23 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
         </div>
 
         {!!this.key.trim().length && (
-          <button class="button button--dlive" onClick={() => this.next()}>
-            {$t('Finish')}
-          </button>
+          <p>
+            <button class={`button button--${this.props.platform}`} onClick={() => this.next()}>
+              {$t('Finish')}
+            </button>
+          </p>
         )}
 
-        <p class={styles.skipButton} onClick={this.props.continue}>
-          <br />
-          {$t('Skip')}
-        </p>
-        <p class={styles.skipButton} onClick={() => this.props.back()}>
-          <br />
-          {$t('Back')}
+        <p>
+          <a class={styles['link-button']} onClick={this.props.continue}>
+            {$t('Skip')}
+          </a>
+
+          <span style="display: inline-block; width: 32px"> </span>
+
+          <a class={styles['link-button']} onClick={() => this.props.back()}>
+            {$t('Back')}
+          </a>
         </p>
       </div>
     );

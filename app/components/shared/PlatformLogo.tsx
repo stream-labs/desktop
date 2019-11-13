@@ -5,7 +5,7 @@ import styles from './PlatformLogo.m.less';
 import { TPlatform } from 'services/platforms';
 
 class LogoProps {
-  platform: TPlatform = 'twitch';
+  platform: TPlatform | 'nimotv' | 'dlive' = 'twitch';
   size?: number = 0;
 }
 
@@ -17,6 +17,8 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       youtube: 'fab fa-youtube',
       mixer: 'fas fa-times',
       facebook: 'fab fa-facebook',
+      dlive: 'dlive',
+      nimotv: 'nimotv',
     }[this.props.platform];
   }
 

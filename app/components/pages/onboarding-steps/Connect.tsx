@@ -8,7 +8,8 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
 import ListInput from 'components/shared/inputs/ListInput.vue';
-import ExtraPlatformConnect from './ExtraPlatformConnect';
+import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
+import { IListOption } from '../../shared/inputs';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -20,7 +21,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() onboardingService: OnboardingService;
 
   loadingState = false;
-  selectedExtraPlatform = '';
+  selectedExtraPlatform: TExtraPlatform | '' = '';
 
   authPlatform(platform: TPlatform) {
     this.loadingState = true;
@@ -84,7 +85,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
-  selectOtherPlatform(platform: string) {
+  selectOtherPlatform(platform: TExtraPlatform) {
     this.selectedExtraPlatform = platform;
   }
 
@@ -125,12 +126,27 @@ export default class Connect extends TsxComponent<ConnectProps> {
           onInput={this.selectOtherPlatform}
           metadata={{
             allowEmpty: true,
-            options: [{ value: 'dlive', title: 'Dlive' }, { value: 'nimotv', title: 'NimoTV' }],
+            name: 'otherPlatform',
+            placeholder: $t('Select platform'),
+            options: [
+              {
+                value: 'dlive',
+                title: 'Dlive',
+                icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+              },
+              {
+                value: 'nimotv',
+                title: 'NimoTV',
+                icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+              },
+            ] as IListOption<TExtraPlatform>[],
           }}
         />
-        <p class={styles.skipButton} onClick={this.props.continue}>
+        <p>
           <br />
-          {$t('Skip')}
+          <span class={styles['link-button']} onClick={this.props.continue}>
+            {$t('Skip')}
+          </span>
         </p>
       </div>
     );

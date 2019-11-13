@@ -112,6 +112,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
+          // we should immediately save the streamType in OBS if it's changed
+          // otherwise OBS will not save 'key' and 'server' values
+          this.settingsService.setSettings('Stream', streamFormData);
         }
 
         if (parameter.name === 'server' && patch.server !== void 0) {
