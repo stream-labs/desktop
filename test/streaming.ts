@@ -99,7 +99,7 @@ test('Streaming to Youtube', async t => {
 
   // give youtube 2 min to publish stream
   await focusChild(t);
-  await t.context.app.client.waitForVisible('p=Your all set', 2 * 60 * 1000);
+  await t.context.app.client.waitForVisible("p=You're live", 2 * 60 * 1000);
 
   t.pass();
 });
