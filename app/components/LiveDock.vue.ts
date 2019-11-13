@@ -240,7 +240,7 @@ export default class LiveDock extends Vue {
 
     if (this.restreamService.shouldGoLiveWithRestream) {
       tabs.push({
-        name: $t('Restream'),
+        name: $t('Multistream'),
         value: 'restream',
       });
     }

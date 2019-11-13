@@ -41,8 +41,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
     return (
       <div>
         <div>
-          <b>{$t('Step')} 1:</b>
-          {$t('Create a Facebook Gaming page to get started.')}
+          <b>{$t('Step')} 1:</b> {$t('Create a Facebook Gaming page to get started.')}
         </div>
         <button
           style={{ marginTop: '24px' }}
@@ -59,8 +58,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
     return (
       <div>
         <div>
-          <b>{$t('Step')} 2:</b>
-          {$t('Connect Facebook to Streamlabs OBS.')}
+          <b>{$t('Step')} 2:</b> {$t('Connect Facebook to Streamlabs OBS.')}
           <br />
           {$t('All of your scenes, sources, and settings will be preserved.')}
         </div>
