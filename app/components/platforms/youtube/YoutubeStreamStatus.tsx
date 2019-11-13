@@ -36,27 +36,27 @@ export default class YoutubeStreamStatus extends TsxComponent {
         progress: 0,
       },
       waitForStreamToBeActive: {
-        msg: $t('Waiting for Youtube to start receiving the video...'),
+        msg: $t('Waiting for YouTube to receive the video signal...'),
         progress: 0.1,
       },
       transitionBroadcastToTesting: {
-        msg: $t('Start testing the broadcast...'),
+        msg: $t('Testing your broadcast...'),
         progress: 0.3,
       },
       waitForTesting: {
-        msg: $t('Wait testing to be finished...'),
+        msg: $t('Finalizing broadcast testing...'),
         progress: 0.4,
       },
       transitionBroadcastToActive: {
-        msg: $t('Publish the broadcast to the channel...'),
+        msg: $t('Publishing to your YouTube channel...'),
         progress: 0.5,
       },
       waitForBroadcastToBeLive: {
-        msg: $t('Waiting broadcast to be published...'),
+        msg: $t('Waiting for broadcast to be published...'),
         progress: 0.6,
       },
       live: {
-        msg: $t('Your all set'),
+        msg: $t("You're live!"),
         progress: 1,
       },
     };

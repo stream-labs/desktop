@@ -15,7 +15,8 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
-import { Global } from '../../../obs-api';
+import { Inject } from 'services/core';
+import { UserService } from 'services/user';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -35,6 +36,8 @@ const DISPLAY_BACKGROUNDS = {
  */
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
+    @Inject() userService: UserService;
+
   static get migrations() {
     return [
       {
@@ -144,7 +147,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
-    return [
+    const formData: TObsFormData = [
       <IObsListInput<string>>{
         value: settings.theme,
         name: 'theme',
@@ -195,25 +198,29 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         enabled: true,
         usePercentages: true,
       },
+    ];
 
-      <IObsInput<boolean>>{
+    if (this.userService.platform.type === 'twitch') {
+      formData.push(<IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
         description: $t('Enable BetterTTV emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
-      },
+      });
 
-      <IObsInput<boolean>>{
+      formData.push(<IObsInput<boolean>>{
         value: settings.enableFFZEmotes,
         name: 'enableFFZEmotes',
         description: $t('Enable FrankerFaceZ emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
-      },
-    ];
+      });
+    }
+
+    return formData;
   }
 
   getExperimentalSettingsFormData(): TObsFormData {
