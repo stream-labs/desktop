@@ -391,10 +391,16 @@ test('Recording when streaming', async t => {
 });
 
 test('Streaming to Dlive', async t => {
-  await focusMain(t);
+  // click Log-in
   await click(t, '.fa-sign-in-alt');
+
+  // select DLive from the "use another platform list"
   await fillForm(t, null, { otherPlatform: 'dlive' });
+
+  // provide  a fake stream key
   await fillForm(t, null, { key: 'fake key' });
+
+  // click finish and check settings
   await click(t, 'button=Finish');
   await showSettings(t, 'Stream');
 
