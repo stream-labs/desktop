@@ -178,7 +178,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
 
     if (this.streamInfoService.state.chatUrl) {
-      this.windows.chat.loadURL(this.streamInfoService.state.chatUrl);
+      this.windows.chat
+        .loadURL(this.streamInfoService.state.chatUrl)
+        .catch(this.handleRedirectError);
     }
 
     // sync chat url if it has been changed
@@ -188,10 +190,17 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         const chatWindow = this.windows.chat;
         if (!chatWindow) return;
         if (streamInfo.chatUrl && streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
-          chatWindow.loadURL(streamInfo.chatUrl);
+          chatWindow.loadURL(streamInfo.chatUrl).catch(this.handleRedirectError);
         }
       },
     );
+  }
+
+  handleRedirectError(e: Error) {
+    // This error happens when the page redirects, which is expected for chat
+    if (!e.message.match(/\(\-3\) loading/)) {
+      throw e;
+    }
   }
 
   determineStartPosition(window: string) {
