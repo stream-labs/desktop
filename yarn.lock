@@ -1261,9 +1261,9 @@
     "@sentry/types" "5.4.0"
     tslib "^1.9.3"
 
-"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-vv0.0.38electron6.tar.gz":
-  version "0.0.38-electron6"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-vv0.0.38electron6.tar.gz#03db4808bb9c80ec07b653c8658ff3f0634a48ef"
+"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz":
+  version "0.0.41"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz#a87241ac7b821b415f9b08ea1f80f8fde1a5b43b"
   dependencies:
     nan "^2.14.0"
 
