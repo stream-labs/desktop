@@ -245,8 +245,6 @@ export default class LiveDock extends Vue {
       });
     }
 
-    console.log(tabs);
-
     return tabs;
   }
 
