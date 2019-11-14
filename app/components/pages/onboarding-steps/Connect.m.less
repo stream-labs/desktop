@@ -1,3 +1,5 @@
+@import "../../../styles/index";
+
 .container {
   position: relative;
   display: flex;
@@ -8,6 +10,14 @@
   h1 {
     margin-bottom: 8px;
   }
+
+  :global(.list-input),
+  :global(.section)
+  { width: 400px }
+}
+
+.select-another {
+  .margin-v-sides(2);
 }
 
 .progress-cover {
@@ -29,10 +39,11 @@
   button {
     margin: 8px 0;
     width: 100%;
+    &:last-child { margin-bottom: 0}
   }
 }
 
-.skip-button {
+.link-button {
   text-decoration: underline;
 
   &:hover {
