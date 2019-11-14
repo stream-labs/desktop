@@ -89,6 +89,7 @@ export interface IListOption<TValue> {
   value: TValue;
   title: string;
   description?: string;
+  icon?: string;
   options?: { label: string; value: string }[];
 }
 

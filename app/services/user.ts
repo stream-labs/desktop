@@ -12,10 +12,11 @@ import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
-  IPlatformAuth,
+  IUserAuth,
   TPlatform,
   IPlatformService,
   EPlatformCallResult,
+  IPlatformAuth,
 } from './platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
@@ -30,11 +31,31 @@ import { OnboardingService } from './onboarding';
 import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
+import { StreamSettingsService } from './settings/streaming';
+
+interface ISecondaryPlatformAuth {
+  username: string;
+  token: string;
+  id: string;
+}
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
-  auth?: IPlatformAuth;
+  auth?: IUserAuth;
+}
+
+interface ILinkedPlatform {
+  access_token: string;
+  platform_id: string;
+  platform_name: string;
+}
+
+interface ILinkedPlatformsResponse {
+  twitch_account?: ILinkedPlatform;
+  facebook_account?: ILinkedPlatform;
+  youtube_account?: ILinkedPlatform;
+  mixer_account?: ILinkedPlatform;
 }
 
 export type LoginLifecycleOptions = {
@@ -72,10 +93,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   @mutation()
-  LOGIN(auth: IPlatformAuth) {
+  LOGIN(auth: IUserAuth) {
     Vue.set(this.state, 'auth', auth);
+
+    // For now, to ensure safe rollbacks, we will set the old format
+    Vue.set(this.state.auth, 'platform', auth.platforms[auth.primaryPlatform]);
+  }
+
+  @mutation()
+  UPDATE_PLATFORM(auth: IPlatformAuth) {
+    Vue.set(this.state.auth.platforms, auth.type, auth);
+  }
+
+  @mutation()
+  UNLINK_PLATFORM(platform: TPlatform) {
+    Vue.delete(this.state.auth.platforms, platform);
   }
 
   @mutation()
@@ -84,18 +119,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
-  private SET_PLATFORM_TOKEN(token: string) {
-    this.state.auth.platform.token = token;
+  private SET_PLATFORM_TOKEN(platform: TPlatform, token: string) {
+    this.state.auth.platforms[platform].token = token;
   }
 
   @mutation()
-  private SET_CHANNEL_ID(id: string) {
-    this.state.auth.platform.channelId = id;
+  private SET_CHANNEL_ID(platform: TPlatform, id: string) {
+    this.state.auth.platforms[platform].channelId = id;
   }
 
   @mutation()
-  private SET_USERNAME(name: string) {
-    this.state.auth.platform.channelId = name;
+  private SET_USERNAME(platform: TPlatform, name: string) {
+    this.state.auth.platforms[platform].channelId = name;
   }
 
   @mutation()
@@ -103,7 +138,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'loginValidated', validated);
   }
 
-  userLogin = new Subject<IPlatformAuth>();
+  /**
+   * Checks for v1 auth schema and migrates if needed
+   */
+  @mutation()
+  private MIGRATE_AUTH() {
+    if (!this.state.auth) return;
+
+    if (this.state.auth.platform && !this.state.auth.platforms) {
+      Vue.set(this.state.auth, 'platforms', {
+        [this.state.auth.platform.type]: this.state.auth.platform,
+      });
+      Vue.set(this.state.auth, 'primaryPlatform', this.state.auth.platform.type);
+
+      // We are not deleting the old key for now to ensure compatibility
+      // in the case we have to roll back. Eventually we should remove it.
+    }
+  }
+
+  userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
 
   /**
@@ -113,6 +166,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
+    this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
   }
 
@@ -122,8 +176,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      async (e: Electron.Event, auth: IPlatformAuth, isOnboardingTest: boolean) => {
-        const service = getPlatformService(auth.platform.type);
+      async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
+        const service = getPlatformService(auth.primaryPlatform);
         await this.login(service, auth);
         if (!isOnboardingTest) this.onboardingService.finish();
       },
@@ -151,7 +205,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return;
     }
 
-    const service = getPlatformService(this.state.auth.platform.type);
+    const service = getPlatformService(this.state.auth.primaryPlatform);
     await this.login(service, this.state.auth);
     this.refreshUserInfo();
   }
@@ -169,11 +223,75 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const userInfo = await service.fetchUserInfo();
 
       if (userInfo.username) {
-        this.SET_USERNAME(userInfo.username);
+        this.SET_USERNAME(this.platform.type, userInfo.username);
       }
     } catch (e) {
       console.error('Error fetching user info', e);
     }
+  }
+
+  async updateLinkedPlatforms() {
+    const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    // TODO: Could metaprogram this a bit more
+    if (linkedPlatforms.facebook_account) {
+      this.UPDATE_PLATFORM({
+        type: 'facebook',
+        username: linkedPlatforms.facebook_account.platform_name,
+        id: linkedPlatforms.facebook_account.platform_id,
+        token: linkedPlatforms.facebook_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'facebook') {
+      this.UNLINK_PLATFORM('facebook');
+    }
+
+    if (linkedPlatforms.mixer_account) {
+      this.UPDATE_PLATFORM({
+        type: 'mixer',
+        username: linkedPlatforms.mixer_account.platform_name,
+        id: linkedPlatforms.mixer_account.platform_id,
+        token: linkedPlatforms.mixer_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'mixer') {
+      this.UNLINK_PLATFORM('mixer');
+    }
+
+    if (linkedPlatforms.twitch_account) {
+      this.UPDATE_PLATFORM({
+        type: 'twitch',
+        username: linkedPlatforms.twitch_account.platform_name,
+        id: linkedPlatforms.twitch_account.platform_id,
+        token: linkedPlatforms.twitch_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'twitch') {
+      this.UNLINK_PLATFORM('twitch');
+    }
+
+    if (linkedPlatforms.youtube_account) {
+      this.UPDATE_PLATFORM({
+        type: 'youtube',
+        username: linkedPlatforms.youtube_account.platform_name,
+        id: linkedPlatforms.youtube_account.platform_id,
+        token: linkedPlatforms.youtube_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'youtube') {
+      this.UNLINK_PLATFORM('youtube');
+    }
+  }
+
+  fetchLinkedPlatforms(): Promise<ILinkedPlatformsResponse> {
+    if (!this.isLoggedIn()) return;
+
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.apiToken);
+    const url = `https://${host}/api/v5/restream/user/info`;
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(res => {
+        return res.json();
+      })
+      .catch(() => {});
   }
 
   /**
@@ -223,33 +341,36 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Returns the auth for the primary platform
+   */
   get platform() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform;
+      return this.state.auth.platforms[this.state.auth.primaryPlatform];
     }
   }
 
   get platformType(): TPlatform {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.type;
+      return this.state.auth.primaryPlatform;
     }
   }
 
   get username() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.username;
+      return this.platform.username;
     }
   }
 
   get platformId() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.id;
+      return this.platform.id;
     }
   }
 
   get channelId() {
     if (this.isLoggedIn()) {
-      return this.state.auth.platform.channelId;
+      return this.platform.channelId;
     }
   }
 
@@ -317,19 +438,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return fetch(request).then(handleResponse);
   }
 
-  getPlatformService(): IPlatformService {
-    return this.isLoggedIn() ? getPlatformService(this.platform.type) : null;
-  }
-
   async showLogin() {
     if (this.isLoggedIn()) await this.logOut();
     this.onboardingService.start({ isLogin: true });
   }
 
   @RunInLoadingMode()
-  private async login(service: IPlatformService, auth: IPlatformAuth) {
+  private async login(service: IPlatformService, auth: IUserAuth) {
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
+    await this.updateLinkedPlatforms();
     const result = await service.validatePlatform();
 
     // Currently we treat generic errors as success
@@ -401,13 +519,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const parsed = this.parseAuthFromUrl(url, merge);
 
       if (parsed) {
-        // This is a hack to work around the fact that the merge endpoint
-        // returns the wrong token.
-        if (merge) parsed.apiToken = this.apiToken;
         parsed.partition = partition;
         authWindow.close();
         onAuthStart();
-        const result = await this.login(service, parsed);
+
+        let result: EPlatformCallResult;
+
+        if (!merge) {
+          result = await this.login(service, parsed);
+
+          // A fresh auth should enable protected mode
+          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+        } else {
+          this.UPDATE_PLATFORM(parsed.platforms[parsed.primaryPlatform]);
+          result = EPlatformCallResult.Success;
+        }
+
         defer(() => onAuthFinish(result));
       }
     });
@@ -421,18 +548,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     authWindow.loadURL(authUrl);
   }
 
-  updatePlatformToken(token: string) {
-    this.SET_PLATFORM_TOKEN(token);
+  updatePlatformToken(platform: TPlatform, token: string) {
+    this.SET_PLATFORM_TOKEN(platform, token);
   }
 
-  updatePlatformChannelId(id: string) {
-    this.SET_CHANNEL_ID(id);
+  updatePlatformChannelId(platform: TPlatform, id: string) {
+    this.SET_CHANNEL_ID(platform, id);
   }
 
   /**
    * Parses tokens out of the auth URL
    */
-  private parseAuthFromUrl(url: string, merge: boolean) {
+  private parseAuthFromUrl(url: string, merge: boolean): IUserAuth {
     const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
     const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
 
@@ -442,16 +569,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return {
         widgetToken: merge ? this.widgetToken : query.token,
         apiToken: merge ? this.apiToken : query.oauth_token,
-        platform: {
-          type: query.platform,
-          username: query.platform_username,
-          token: query.platform_token,
-          id: query.platform_id,
+        primaryPlatform: query.platform as TPlatform,
+        platforms: {
+          [query.platform]: {
+            type: query.platform,
+            username: query.platform_username,
+            token: query.platform_token,
+            id: query.platform_id,
+          },
         },
-      } as IPlatformAuth;
+      };
     }
-
-    return false;
   }
 
   /**

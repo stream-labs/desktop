@@ -1,6 +1,6 @@
 import { getResource } from '../core';
 import { UserService } from '../user';
-import { IPlatformRequest } from './index';
+import { IPlatformRequest, TPlatform, getPlatformService } from './index';
 
 export interface IPlatformResponse<TResult = unknown> {
   ok: boolean;
@@ -32,11 +32,12 @@ export async function handlePlatformResponse(response: Response): Promise<any> {
  * @param useToken true|false or a token string
  */
 export async function platformRequest<T = unknown>(
+  platform: TPlatform,
   reqInfo: IPlatformRequest | string,
   useToken: boolean | string = false,
 ): Promise<T> {
   const req: IPlatformRequest = typeof reqInfo === 'string' ? { url: reqInfo } : reqInfo;
-  const platformService = getResource<UserService>('UserService').getPlatformService();
+  const platformService = getPlatformService(platform);
 
   // create a request function with required headers
   const requestFn = () => {
@@ -60,6 +61,9 @@ export async function platformRequest<T = unknown>(
  * This is a shortcut for platformRequest()
  * @see platformRequest
  */
-export function platformAuthorizedRequest<T = unknown>(req: IPlatformRequest | string): Promise<T> {
-  return platformRequest(req, true);
+export function platformAuthorizedRequest<T = unknown>(
+  platform: TPlatform,
+  req: IPlatformRequest | string,
+): Promise<T> {
+  return platformRequest(platform, req, true);
 }

@@ -24,6 +24,10 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Start fresh or import from OBS');
   await app.client.click('h2=Start Fresh');
 
+  await app.client.waitForVisible('h1=Setup Mic and Webcam');
+  await makeScreenshots(t, 'Setup Mic and Webcam');
+  await app.client.click('p=Skip');
+
   await app.client.waitForVisible('h1=Add a Theme');
   await makeScreenshots(t, 'Add a Theme');
   await app.client.click('p=Skip');
@@ -38,7 +42,6 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
-
 });
 
 test('OBS Importer', async t => {

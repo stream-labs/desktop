@@ -17,7 +17,7 @@ import {
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
-import { getPlatformService, TStartStreamOptions } from 'services/platforms';
+import { getPlatformService, TStartStreamOptions, TPlatform } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
   NotificationsService,
@@ -30,6 +30,9 @@ import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
+import { RestreamService } from 'services/restream';
+import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { IFacebookStartStreamOptions } from 'services/platforms/facebook';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -68,6 +71,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private restreamService: RestreamService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -171,7 +175,37 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           const service = getPlatformService(this.userService.platform.type);
 
           if (this.streamSettingsService.protectedModeEnabled) {
-            await service.beforeGoLive(options);
+            if (this.restreamService.shouldGoLiveWithRestream) {
+              let ready: boolean;
+
+              try {
+                ready = await this.restreamService.checkStatus();
+              } catch (e) {
+                // Assume restream is down
+                console.error('Error fetching restreaming service', e);
+                ready = false;
+              }
+
+              if (ready) {
+                // Restream service is up and accepting connections
+                await this.restreamService.beforeGoLive();
+              } else {
+                // Restream service is down, just go live to Twitch for now
+
+                electron.remote.dialog.showMessageBox({
+                  type: 'error',
+                  message: $t(
+                    'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
+                  ),
+                  buttons: [$t('OK')],
+                });
+
+                const platform = this.userService.platformType;
+                await service.beforeGoLive(this.restreamService.state.platforms[platform].options);
+              }
+            } else {
+              await service.beforeGoLive(options);
+            }
           }
         }
         this.finishStartStreaming();
@@ -264,12 +298,18 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  showEditStreamInfo() {
+  /**
+   * Opens the "go live" window. Platform is not required to be passed
+   * in unless restream is enabled and info is needed for multiple platforms.
+   * @param platforms The platforms to set up
+   * @param platformStep The current index in the platforms array
+   */
+  showEditStreamInfo(platforms?: TPlatform[], platformStep = 0) {
     const height = this.twitterIsEnabled ? 620 : 550;
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
       title: $t('Update Stream Info'),
-      queryParams: {},
+      queryParams: { platforms, platformStep },
       size: {
         height,
         width: 600,
@@ -563,7 +603,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private async runPlaformAfterStopStreamHook() {
     if (!this.userService.isLoggedIn()) return;
-    const service = this.userService.getPlatformService();
+    const service = getPlatformService(this.userService.platform.type);
     if (typeof service.afterStopStream === 'function') {
       await service.afterStopStream();
     }

@@ -10,6 +10,7 @@ import electron from 'electron';
 import { $t } from 'services/i18n';
 import { SourcesService } from 'services/sources';
 import { StreamSettingsService } from 'services/settings/streaming';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -20,6 +21,7 @@ export default class StartStreamingButton extends Vue {
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() sourcesService: SourcesService;
+  @Inject() restreamService: RestreamService;
 
   @Prop() disabled: boolean;
 
@@ -74,7 +76,11 @@ export default class StartStreamingButton extends Vue {
           this.isFacebook ||
           this.isYoutube)
       ) {
-        this.streamingService.showEditStreamInfo();
+        if (this.restreamService.shouldGoLiveWithRestream) {
+          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+        } else {
+          this.streamingService.showEditStreamInfo();
+        }
       } else {
         if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
           await this.videoEncodingOptimizationService.applyProfileFromCache();

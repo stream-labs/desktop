@@ -3,12 +3,10 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog,
-  restartApp,
-  closeWindow,
+  skipCheckingErrorsInLog, restartApp, closeWindow, click
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
-import { fillForm, FormMonkey } from './helpers/form-monkey';
+import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
 import { logIn, logOut } from './helpers/spectron/user';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
@@ -390,4 +388,26 @@ test('Recording when streaming', async t => {
   // check that recording has been created
   const files = await readdir(tmpDir);
   t.true(files.length === 1, 'Should be one recoded file');
+});
+
+test('Streaming to Dlive', async t => {
+  // click Log-in
+  await click(t, '.fa-sign-in-alt');
+
+  // select DLive from the "use another platform list"
+  await fillForm(t, null, { otherPlatform: 'dlive' });
+
+  // provide  a fake stream key
+  await fillForm(t, null, { key: 'fake key' });
+
+  // click finish and check settings
+  await click(t, 'button=Finish');
+  await showSettings(t, 'Stream');
+
+  t.true(
+    await formIncludes(t, { key: 'fake key', server: 'rtmp://stream.dlive.tv/live' }),
+    'Settings for Dlive should be visible in the Settings->Stream window',
+  );
+
+  // TODO: we probably want to start streaming with a real streamkey
 });

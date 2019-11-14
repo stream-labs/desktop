@@ -55,6 +55,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     }
 
     this.browserView = new electron.remote.BrowserView(options);
+
     this.$emit('ready', this.browserView);
 
     if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);

@@ -92,6 +92,7 @@
   "OBSInit.ModuleNotFoundError": "未能找到DirectX。請安裝適用您作業系統的最新版本DirectX <https://www.microsoft.com/en-us/download/details.aspx?id=35?> 後重試。",
   "OBSInit.NotSupportedError": "無法初始化OBS。您的顯示卡驅動程式可能過舊，或者您的作業系統不支援Streamlabs OBS。",
   "Logout %{username}": "Logout %{username}",
+  "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
   "Studio": "Studio",
   "Store": "Store",
   "Connect": "Connect",
