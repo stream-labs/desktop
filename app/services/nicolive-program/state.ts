@@ -1,8 +1,6 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { mutation } from '../stateful-service';
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { Subject, BehaviorSubject, Observable } from 'rxjs';
 
 interface IState {
   autoExtensionEnabled: boolean;

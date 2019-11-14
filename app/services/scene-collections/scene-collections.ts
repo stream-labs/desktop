@@ -28,7 +28,7 @@ import {
   ISceneCollectionCreateOptions
 } from '.';
 import { SceneCollectionsStateService } from './state';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { $t } from 'services/i18n';
 
 const uuid = window['require']('uuid/v4');

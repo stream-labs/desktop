@@ -1,7 +1,7 @@
 import { Inject } from '../../util/injector';
 import { mutation } from '../stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
 import { IFormInput, TFormData } from '../../components/shared/forms/Input';

@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from '../stateful-service';
 import {

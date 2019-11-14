@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { IListOption, setupSourceDefaults, TObsValue } from 'components/shared/forms/Input';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';

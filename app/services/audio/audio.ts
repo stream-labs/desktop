@@ -1,6 +1,5 @@
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject, Subscription, Observable } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper } from '../stateful-service';
 import { SourcesService, ISource, Source } from '../sources';
 import { ScenesService } from '../scenes';
@@ -17,7 +16,6 @@ import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
 } from './audio-api';
-import { Observable } from 'rxjs/Observable';
 import { $t } from 'services/i18n';
 
 const { ipcRenderer } = electron;

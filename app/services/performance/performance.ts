@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
