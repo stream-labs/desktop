@@ -97,7 +97,6 @@ export function getComponents() {
     BrowserSourceInteraction,
     EventFilterMenu,
     GameOverlayEventFeed,
-
     AdvancedStatistics,
     BitGoal,
     DonationGoal,

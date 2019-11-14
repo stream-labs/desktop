@@ -7,6 +7,9 @@ import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
+import ListInput from 'components/shared/inputs/ListInput.vue';
+import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
+import { IListOption } from '../../shared/inputs';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -18,6 +21,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() onboardingService: OnboardingService;
 
   loadingState = false;
+  selectedExtraPlatform: TExtraPlatform | '' = '';
 
   authPlatform(platform: TPlatform) {
     this.loadingState = true;
@@ -86,7 +90,21 @@ export default class Connect extends TsxComponent<ConnectProps> {
     this.props.continue();
   }
 
+  selectOtherPlatform(platform: TExtraPlatform) {
+    this.selectedExtraPlatform = platform;
+  }
+
   render() {
+    if (this.selectedExtraPlatform) {
+      return (
+        <ExtraPlatformConnect
+          continue={this.props.continue}
+          platform={this.selectedExtraPlatform}
+          back={() => (this.selectedExtraPlatform = '')}
+        />
+      );
+    }
+
     return (
       <div class={styles.container}>
         <div class={styles.progressCover} />
@@ -108,9 +126,33 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </button>
           ))}
         </div>
-        <span class={styles.skipButton} onClick={this.onSkip}>
-          {$t('Skip')}
-        </span>
+        <p class={styles['select-another']}> {$t('or select another platform')} </p>
+        <ListInput
+          onInput={this.selectOtherPlatform}
+          metadata={{
+            allowEmpty: true,
+            name: 'otherPlatform',
+            placeholder: $t('Select platform'),
+            options: [
+              {
+                value: 'dlive',
+                title: 'Dlive',
+                icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+              },
+              {
+                value: 'nimotv',
+                title: 'NimoTV',
+                icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+              },
+            ] as IListOption<TExtraPlatform>[],
+          }}
+        />
+        <p>
+          <br />
+          <span class={styles['link-button']} onClick={this.onSkip}>
+            {$t('Skip')}
+          </span>
+        </p>
       </div>
     );
   }

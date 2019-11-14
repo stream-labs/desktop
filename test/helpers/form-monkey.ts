@@ -388,3 +388,13 @@ export async function fillForm(
 ): Promise<any> {
   return new FormMonkey(t, selector).fill(formData);
 }
+
+/**
+ * a shortcut for FormMonkey.includes()
+ */
+export async function formIncludes(
+  t: TExecutionContext,
+  formData: Dictionary<string>,
+): Promise<boolean> {
+  return new FormMonkey(t).includes(formData);
+}

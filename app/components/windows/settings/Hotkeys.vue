@@ -1,7 +1,6 @@
 <template>
 <div>
   <div v-if="hotkeySet">
-    <v-form-group v-model="searchString" :metadata="{ type: 'text', name: 'search', title: $t('Search') }" />
     <hotkey-group
       v-if="filteredHotkeySet.general.length > 0"
       :hotkeys="filteredHotkeySet.general"/>
