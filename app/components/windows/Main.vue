@@ -115,7 +115,7 @@
 
 .main-loading {
   position: absolute;
-  top: 34px;
+  top: 30px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -123,7 +123,7 @@
   background-color: var(--background);
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
-    top: 34px;
+    top: 30px;
   }
 }
 
