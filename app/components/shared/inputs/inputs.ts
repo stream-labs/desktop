@@ -1,4 +1,4 @@
-export { default as ColorInput } from './ColorInput.vue';
+export { default as ColorInput } from './ColorInput';
 export { default as FontFamilyInput } from './FontFamilyInput.vue';
 export { default as FontSizeInput } from './FontSize.vue';
 export { default as ListInput } from './ListInput.vue';

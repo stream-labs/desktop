@@ -116,10 +116,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.VALIDATE_LOGIN(false);
   }
 
-  async initialize() {
-    await this.validateLogin();
-  }
-
   mounted() {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to

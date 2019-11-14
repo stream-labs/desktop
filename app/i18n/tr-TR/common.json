@@ -92,6 +92,7 @@
   "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için DirectX’in en son sürümünü yükleyin ve tekrar deneyin.",
   "OBSInit.NotSupportedError": "OBS başlatılamadı. Video sürücüleriniz güncel olmayabilir veya Streamlabs OBS sisteminizde desteklenmiyor olabilir.",
   "Logout %{username}": "Logout %{username}",
+  "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
   "Studio": "Studio",
   "Store": "Store",
   "Connect": "Connect",

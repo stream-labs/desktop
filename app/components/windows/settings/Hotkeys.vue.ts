@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { Inject } from 'services/index';
+import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Inject } from 'services/core';
 import { HotkeysService, IHotkeysSet, IHotkey } from 'services/hotkeys';
 import { ScenesService } from 'services/scenes/index';
 import { SourcesService } from 'services/sources/index';
@@ -30,15 +30,33 @@ export default class Hotkeys extends Vue {
 
   hotkeySet: IHotkeysSet = null;
 
-  searchString = '';
+  // sync global search and local search
+  @Prop()
+  globalSearchStr: string;
+  @Watch('globalSearchStr')
+  onGlobalSearchChange(val: string) {
+    this.searchString = val;
+  }
 
-  mounted() {
+  @Prop()
+  highlightSearch: (searchStr: string) => any;
+  searchString = this.globalSearchStr || '';
+  @Watch('searchString')
+  onSearchStringChangedHandler(val: string) {
+    this.highlightSearch(val);
+  }
+
+  async mounted() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
     this.hotkeysService.unregisterAll();
 
     // Render a blank page before doing synchronous IPC
-    setTimeout(() => (this.hotkeySet = this.hotkeysService.getHotkeysSet()), 100);
+    await new Promise(r => setTimeout(r, 100));
+
+    this.hotkeySet = this.hotkeysService.getHotkeysSet();
+    await this.$nextTick();
+    this.highlightSearch(this.globalSearchStr);
   }
 
   destroyed() {
