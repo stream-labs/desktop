@@ -8,7 +8,7 @@ import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
-import { getPlatformService } from 'services/platforms';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -31,6 +31,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import Utils from 'services/utils';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
 import { YoutubeService } from 'services/platforms/youtube';
+import { RestreamService } from 'services/restream';
 
 @Component({
   components: {
@@ -57,6 +58,7 @@ export default class EditStreamInfo extends Vue {
   @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() restreamService: RestreamService;
 
   // UI State Flags
   searchingGames = false;
@@ -221,7 +223,7 @@ export default class EditStreamInfo extends Vue {
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
     if (this.midStreamMode) {
-      const platform = this.userService.getPlatformService();
+      const platform = getPlatformService(this.userService.platform.type);
       platform
         .putChannelInfo(this.channelInfo)
         .then(success => {
@@ -309,6 +311,20 @@ export default class EditStreamInfo extends Vue {
       const tweetedSuccessfully = await this.handlePostTweet();
       if (!tweetedSuccessfully) return;
     }
+
+    if (this.restreamService.shouldGoLiveWithRestream) {
+      this.updatingInfo = true;
+      await this.restreamService.stagePlatform(this.platform, this.channelInfo);
+
+      if (!this.isFinalStep) {
+        this.streamingService.showEditStreamInfo(
+          this.windowQuery.platforms,
+          this.windowQuery.platformStep + 1,
+        );
+        return;
+      }
+    }
+
     this.updateAndGoLive();
   }
 
@@ -349,9 +365,9 @@ export default class EditStreamInfo extends Vue {
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
       // youtube needs additional actions after the stream has been started
-      if (this.isYoutube) (this.platform as YoutubeService).showStreamStatusWindow();
+      if (this.isYoutube) (this.platformService as YoutubeService).showStreamStatusWindow();
     } catch (e) {
-      const message = this.platform.getErrorDescription(e);
+      const message = this.platformService.getErrorDescription(e);
       this.$toasted.show(message, {
         position: 'bottom-center',
         className: 'toast-alert',
@@ -372,7 +388,9 @@ export default class EditStreamInfo extends Vue {
     this.channelInfo = null;
     this.infoError = false;
     try {
-      this.channelInfo = cloneDeep(await this.platform.prepopulateInfo()) as TCombinedChannelInfo;
+      this.channelInfo = cloneDeep(
+        await this.platformService.prepopulateInfo(),
+      ) as TCombinedChannelInfo;
       this.infoError = false;
     } catch (e) {
       this.infoError = true;
@@ -388,24 +406,49 @@ export default class EditStreamInfo extends Vue {
     await this.loadAvailableProfiles();
   }
 
-  get platform() {
-    return this.userService.getPlatformService();
+  get platformService() {
+    return getPlatformService(this.platform);
+  }
+
+  get windowHeading() {
+    if (this.windowQuery.platforms) {
+      return `Setup ${this.platform.charAt(0).toUpperCase() + this.platform.slice(1)} (${this
+        .windowQuery.platformStep + 1}/${this.windowQuery.platforms.length})`;
+    }
+  }
+
+  get windowQuery() {
+    return this.windowsService.getChildWindowQueryParams();
+  }
+
+  get isFinalStep() {
+    if (!this.windowQuery.platforms) return true;
+
+    return this.windowQuery.platforms.length === this.windowQuery.platformStep + 1;
+  }
+
+  get platform(): TPlatform {
+    if (this.windowQuery.platforms) {
+      return this.windowQuery.platforms[this.windowQuery.platformStep];
+    }
+
+    return this.userService.platform.type;
   }
 
   get isTwitch() {
-    return this.userService.platform.type === 'twitch';
+    return this.platform === 'twitch';
   }
 
   get isYoutube() {
-    return this.userService.platform.type === 'youtube';
+    return this.platform === 'youtube';
   }
 
   get isMixer() {
-    return this.userService.platform.type === 'mixer';
+    return this.platform === 'mixer';
   }
 
   get isFacebook() {
-    return this.userService.platform.type === 'facebook';
+    return this.platform === 'facebook';
   }
 
   get isServicedPlatform() {
@@ -413,6 +456,9 @@ export default class EditStreamInfo extends Vue {
   }
 
   get twitterIsEnabled() {
+    // Twitter is always done on the final step
+    if (!this.isFinalStep) return false;
+
     return (
       Utils.isPreview() ||
       this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter)
@@ -420,6 +466,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get submitText() {
+    if (!this.isFinalStep) return $t('Next');
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
     if (this.twitterIsEnabled && this.shouldPostTweet) return $t('Tweet & Go Live');
@@ -439,7 +486,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   openFBPageCreateLink() {
-    shell.openExternal('https://www.facebook.com/pages/creation/');
+    shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.closeChildWindow();
   }
 

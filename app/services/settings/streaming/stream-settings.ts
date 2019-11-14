@@ -2,7 +2,7 @@ import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { InitAfter, mutation, PersistentStatefulService } from '../../core';
 import { UserService } from 'services/user';
-import { TPlatform } from 'services/platforms';
+import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
 
@@ -78,6 +78,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   };
 
   init() {
+    super.init();
     this.userService.userLogin.subscribe(async _ => {
       const protectedModeHasBeenDisabled = await this.migrateToProtectedModeIfRequired();
       if (!protectedModeHasBeenDisabled) this.resetStreamSettings();
@@ -141,8 +142,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: this.state.protectedModeMigrationRequired,
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
-      streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       server: obsStreamSettings.server,
+      streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
       replayBufferWhileStreaming: obsGeneralSettings.ReplayBufferWhileStreaming,
@@ -203,7 +204,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     if (!currentStreamSettings.key) return false;
 
     // disable protected mod if fetched streamkey doesn't match streamkey in settings
-    const platform = (this.userService.getPlatformService() as unknown) as
+    const platform = (getPlatformService(this.userService.platformType) as unknown) as
       | TwitchService
       | MixerService;
     if ((await platform.fetchStreamKey()) !== currentStreamSettings.key) {

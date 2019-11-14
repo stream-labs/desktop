@@ -77,7 +77,8 @@ module.exports = {
           'babel-loader',
           {
             loader: 'awesome-typescript-loader',
-            options: { useCache: true, reportFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' } }
+            options: { useCache: true, reportFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' }
+          }
         ],
         exclude: /node_modules/,
       },

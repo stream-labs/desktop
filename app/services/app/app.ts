@@ -33,6 +33,7 @@ import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
+import { RestreamService } from 'services/restream';
 
 interface IAppState {
   loading: boolean;
@@ -86,6 +87,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
+  @Inject() private restreamService: RestreamService;
+
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   readonly pid = require('process').pid;

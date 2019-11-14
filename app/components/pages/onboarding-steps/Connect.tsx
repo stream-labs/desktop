@@ -85,6 +85,11 @@ export default class Connect extends TsxComponent<ConnectProps> {
     electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
+  onSkip() {
+    if (this.loadingState) return;
+    this.props.continue();
+  }
+
   selectOtherPlatform(platform: TExtraPlatform) {
     this.selectedExtraPlatform = platform;
   }
@@ -144,7 +149,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
         />
         <p>
           <br />
-          <span class={styles['link-button']} onClick={this.props.continue}>
+          <span class={styles['link-button']} onClick={this.onSkip}>
             {$t('Skip')}
           </span>
         </p>
