@@ -99,6 +99,11 @@ export class UsageStatisticsService extends Service {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
+    // Don't check logged in because login may not be verified at this point
+    if (this.userService.state.auth && this.userService.state.auth.primaryPlatform) {
+      metadata['platform'] = this.userService.state.auth.primaryPlatform;
+    }
+
     const bodyData: IUsageApiData = {
       event,
       slobs_user_id: this.userService.getLocalUserId(),
