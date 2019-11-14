@@ -109,5 +109,11 @@
   "Reset": "Reset",
   "Retry": "Retry",
   "Warning": "Warning",
+  "Off": "Off",
+  "Low": "Low",
+  "Medium": "Medium",
+  "High": "High",
+  "Very High": "Very High",
+  "Apps": "Apps",
   "Finish": "Finish"
 }
