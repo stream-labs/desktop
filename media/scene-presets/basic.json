@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "nodeType": "RootNode",
+  "sources": {
+    "schemaVersion": 3,
+    "nodeType": "SourcesNode",
+    "items": [
+      {
+        "id": "text_gdiplus_d899e8e0-363a-40e9-aee3-3a8d8cefc8f4",
+        "name": "テキスト",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -876259,
+          "custom_font": "",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "font": {
+            "face": "Arial",
+            "flags": 1,
+            "size": 36
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline_color": 16777215,
+          "outline_opacity": 100,
+          "outline_size": 2,
+          "text": "@Twitter",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "dshow_input_72455f7b-1c2a-4be2-897a-aada5f9d419a",
+        "name": "Webカメラ",
+        "type": "dshow_input",
+        "settings": {
+          "active": true,
+          "audio_device_id": "マイク配列 (Realtek Audio):",
+          "audio_output_mode": 0,
+          "buffering": 0,
+          "color_range": "partial",
+          "color_space": "default",
+          "frame_interval": -1,
+          "last_resolution": "1280x720",
+          "last_video_device_id": "Integrated Webcam:\\\\?\\usb#22vid_1bcf&pid_2b96&mi_00#226&18579e96&0&0000#22{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global",
+          "res_type": 0,
+          "resolution": "1280x720",
+          "video_device_id": "Integrated Webcam:\\\\?\\usb#22vid_1bcf&pid_2b96&mi_00#226&18579e96&0&0000#22{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global",
+          "video_format": 0
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        },
+        "deinterlaceMode": 0,
+        "deinterlaceFieldOrder": 0,
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0,
+        "mixerHidden": false
+      },
+      {
+        "id": "image_source_7a582fc8-14d1-4736-b867-88d8d895d44b",
+        "name": "ナマコちゃん",
+        "type": "image_source",
+        "settings": {
+          "file": "media\\images\\namako.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "image_source_eb09d48f-8926-48c3-b355-2b3076948c2e",
+        "name": "Twitter Icon",
+        "type": "image_source",
+        "settings": {
+          "file": "media\\images\\Twitter_Logo_Blue.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      }
+    ]
+  },
+  "scenes": {
+    "schemaVersion": 1,
+    "nodeType": "ScenesNode",
+    "items": [
+      {
+        "id": "scene_d483db2e-ef97-4908-a0fd-1529fc90e7de",
+        "name": "Scene",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "cb1d6ccb-96e8-401a-8118-b56f7c444eba",
+              "sourceId": "text_gdiplus_d899e8e0-363a-40e9-aee3-3a8d8cefc8f4",
+              "x": 128.05729632945395,
+              "y": 78.89516129032259,
+              "scaleX": 1.9072580645161281,
+              "scaleY": 1.9072580645161281,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "01317ea4-c917-4ee0-961f-c78694fc611c",
+              "sourceId": "image_source_eb09d48f-8926-48c3-b355-2b3076948c2e",
+              "x": 0,
+              "y": 49.19715828688592,
+              "scaleX": 0.3201432408236349,
+              "scaleY": 0.3201432408236349,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "7510f43d-8350-47bb-a4a3-db4cbe5e2630",
+              "name": "Twitter",
+              "sceneNodeType": "folder",
+              "sceneId": "scene_d483db2e-ef97-4908-a0fd-1529fc90e7de",
+              "resourceId": "SceneItemFolder[\"scene_d483db2e-ef97-4908-a0fd-1529fc90e7de\",\"7510f43d-8350-47bb-a4a3-db4cbe5e2630\"]",
+              "parentId": "",
+              "childrenIds": [
+                "01317ea4-c917-4ee0-961f-c78694fc611c",
+                "cb1d6ccb-96e8-401a-8118-b56f7c444eba"
+              ]
+            },
+            {
+              "id": "16931711-965a-4845-b065-825b7b30e953",
+              "sourceId": "dshow_input_72455f7b-1c2a-4be2-897a-aada5f9d419a",
+              "x": 0,
+              "y": 727.2580645161289,
+              "scaleX": 0.4899193548387097,
+              "scaleY": 0.4899193548387097,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "22ea1540-ce0f-4fcb-9646-de410f0a8443",
+              "sourceId": "image_source_7a582fc8-14d1-4736-b867-88d8d895d44b",
+              "x": 839.2479856759178,
+              "y": 0,
+              "scaleX": 1.8012533572068037,
+              "scaleY": 1.8012533572068037,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": true
+      },
+      {
+        "id": "scene_3df3d57b-8884-4f94-90b7-0cfb4150c07c",
+        "name": "シーン2",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": []
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": false
+      }
+    ]
+  },
+  "transition": {
+    "schemaVersion": 1,
+    "nodeType": "TransitionNode",
+    "type": "cut_transition",
+    "duration": 300,
+    "settings": {},
+    "propertiesManagerSettings": {
+      "mediaBackup": {}
+    }
+  },
+  "hotkeys": {
+    "schemaVersion": 2,
+    "nodeType": "HotkeysNode",
+    "items": []
+  }
+}
