@@ -128,7 +128,11 @@ export class TwitchService extends Service implements IPlatformService {
 
   async beforeGoLive(channelInfo?: ITwitchStartStreamOptions) {
     const key = await this.fetchStreamKey();
-    this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+
+    if (this.streamSettingsService.protectedModeEnabled) {
+      this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+    }
+
     if (channelInfo) await this.putChannelInfo(channelInfo);
     return key;
   }

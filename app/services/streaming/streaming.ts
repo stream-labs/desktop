@@ -174,7 +174,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         if (this.userService.isLoggedIn && this.userService.platform) {
           const service = getPlatformService(this.userService.platform.type);
 
-          if (this.streamSettingsService.protectedModeEnabled) {
+          // Twitch is special cased because we can safely call beforeGoLive and it will
+          // not touch the stream settings if protected mode is off. This is to retain
+          // compatibility with some legacy use cases.
+          if (
+            this.streamSettingsService.protectedModeEnabled ||
+            this.userService.platformType === 'twitch'
+          ) {
             if (this.restreamService.shouldGoLiveWithRestream) {
               let ready: boolean;
 
