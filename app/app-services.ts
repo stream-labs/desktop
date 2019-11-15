@@ -20,7 +20,6 @@ export { NotificationsService } from 'services/notifications';
 export { OnboardingService } from 'services/onboarding';
 export { NavigationService } from 'services/navigation';
 export { PerformanceService } from 'services/performance';
-export { PerformanceMonitorService } from 'services/performance-monitor';
 export { SettingsService, OutputSettingsService } from 'services/settings';
 export { VideoService } from 'services/video';
 export { WindowsService } from 'services/windows';
@@ -43,9 +42,10 @@ export { ProtocolLinksService } from 'services/protocol-links';
 export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
-export { HardwareService } from 'services/hardware';
+export { HardwareService, DefaultHardwareService } from 'services/hardware';
 export { Prefab, PrefabsService } from 'services/prefabs';
 export { EditorCommandsService } from 'services/editor-commands';
+export { StreamSettingsService } from 'services/settings/streaming';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -53,6 +53,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
+export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 

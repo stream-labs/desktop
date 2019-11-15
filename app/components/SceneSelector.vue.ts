@@ -7,7 +7,7 @@ import { TransitionsService } from 'services/transitions';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
-import HelpTip from './shared/HelpTip.vue';
+import HelpTip from './shared/HelpTip';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';

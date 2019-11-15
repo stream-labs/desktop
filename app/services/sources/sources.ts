@@ -30,7 +30,7 @@ import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
-import { HardwareService } from 'services/hardware';
+import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 
@@ -72,6 +72,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   /**
    * Maps a source id to a property manager
@@ -314,9 +315,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
     }
 
-    if (type === 'text_gdiplus') {
-      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    if (type === 'text_gdiplus' && resolvedSettings.text === void 0) {
+      resolvedSettings.text = name;
     }
+
+    if (
+      type === 'dshow_input' &&
+      resolvedSettings.video_device_id === void 0 &&
+      this.defaultHardwareService.state.defaultVideoDevice
+    ) {
+      resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
     return resolvedSettings;
   }
 

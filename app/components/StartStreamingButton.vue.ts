@@ -9,15 +9,19 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { SourcesService } from 'services/sources';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() sourcesService: SourcesService;
+  @Inject() restreamService: RestreamService;
 
   @Prop() disabled: boolean;
 
@@ -40,11 +44,12 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      const visibleSources = this.sourcesService
-        .getSources()
-        .filter(source => source.type !== 'scene' && source.video);
+      const needToShowNoSourcesWarning =
+        this.streamSettingsService.settings.warnNoVideoSources &&
+        this.sourcesService.getSources().filter(source => source.type !== 'scene' && source.video)
+          .length === 0;
 
-      if (!visibleSources.length) {
+      if (needToShowNoSourcesWarning) {
         const goLive = await electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
             title: $t('No Sources'),
@@ -67,9 +72,18 @@ export default class StartStreamingButton extends Vue {
 
       if (
         this.userService.isLoggedIn() &&
-        (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
+        // Twitch is special cased, as we can update the channel info regardless
+        // of what your ingest settings are set to.
+        (this.streamSettingsService.protectedModeEnabled || this.isTwitch) &&
+        (this.customizationService.state.updateStreamInfoOnLive ||
+          this.isFacebook ||
+          this.isYoutube)
       ) {
-        this.streamingService.showEditStreamInfo();
+        if (this.restreamService.shouldGoLiveWithRestream) {
+          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+        } else {
+          this.streamingService.showEditStreamInfo();
+        }
       } else {
         if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
           await this.videoEncodingOptimizationService.applyProfileFromCache();
@@ -120,7 +134,15 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn() && this.userService.platformType === 'facebook';
+  }
+
+  get isYoutube() {
+    return this.userService.isLoggedIn() && this.userService.platformType === 'youtube';
+  }
+
+  get isTwitch() {
+    return this.userService.isLoggedIn() && this.userService.platformType === 'twitch';
   }
 
   get isDisabled() {

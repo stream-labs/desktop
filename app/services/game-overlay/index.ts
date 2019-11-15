@@ -1,17 +1,21 @@
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import { Subject, Subscription } from 'rxjs';
 import { delay, take } from 'rxjs/operators';
-import overlay, { OverlayThreadStatus } from '@streamlabs/game-overlay';
 import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
-import { getPlatformService } from '../platforms';
 import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
+import { StreamInfoService } from 'services/stream-info';
 
 const { BrowserWindow } = electron.remote;
+
+// We remote.require because this module needs to live in the main
+// process so we can paint to it from there. We are doing this to
+// work around an electron bug: https://github.com/electron/electron/issues/20559
+const overlay = electron.remote.require('@streamlabs/game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -44,11 +48,11 @@ const hideInteraction = `
 `;
 
 @InitAfter('UserService')
-@InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() streamInfoService: StreamInfoService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
@@ -74,13 +78,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     // overlayControls: Electron.BrowserWindow;
   } = {} as any;
 
-  onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
-  onWindowsReadySubscription: Subscription;
-  lifecycle: LoginLifecycle;
+  private onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
+  private onWindowsReadySubscription: Subscription;
+  private onChatUrlChangedSubscription: Subscription;
+  private lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
+  private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
-  async initialize() {
+  async init() {
     if (!this.state.isEnabled) return;
 
     this.lifecycle = await this.userService.withLifecycle({
@@ -91,7 +96,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async initializeOverlay() {
-    overlay.start();
+    let crashHandlerLogPath = '';
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
+      const overlayLogFile = '\\game-overlays.log';
+      crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
+    }
+
+    overlay.start(crashHandlerLogPath);
 
     this.onWindowsReadySubscription = this.onWindowsReady
       .pipe(
@@ -103,7 +114,14 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
     const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
-    this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
+    this.windows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      width: 600,
+      componentName: 'GameOverlayEventFeed',
+      queryParams: { gameOverlay: true },
+      webPreferences: { offscreen: true, nodeIntegration: true },
+      isFullScreen: true,
+    });
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
@@ -126,7 +144,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       skipTaskbar: true,
       thickFrame: false,
       resizable: false,
-      webPreferences: { nodeIntegration: false, contextIsolation: true, offscreen: true },
+      webPreferences: { nodeIntegration: false, offscreen: true },
     };
   }
 
@@ -165,12 +183,30 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
-    this.windows.chat.loadURL(
-      await getPlatformService(this.userService.platform.type).getChatUrl(
-        this.customizationService.isDarkTheme ? 'night' : 'day',
-      ),
+    if (this.streamInfoService.state.chatUrl) {
+      this.windows.chat
+        .loadURL(this.streamInfoService.state.chatUrl)
+        .catch(this.handleRedirectError);
+    }
+
+    // sync chat url if it has been changed
+    this.onChatUrlChangedSubscription = this.streamInfoService.streamInfoChanged.subscribe(
+      streamInfo => {
+        if (!this.state.isEnabled) return;
+        const chatWindow = this.windows.chat;
+        if (!chatWindow) return;
+        if (streamInfo.chatUrl && streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
+          chatWindow.loadURL(streamInfo.chatUrl).catch(this.handleRedirectError);
+        }
+      },
     );
+  }
+
+  handleRedirectError(e: Error) {
+    // This error happens when the page redirects, which is expected for chat
+    if (!e.message.match(/\(\-3\) loading/)) {
+      throw e;
+    }
   }
 
   determineStartPosition(window: string) {
@@ -226,7 +262,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
-    if (overlay.getStatus() !== OverlayThreadStatus.Running || !this.state.isEnabled) {
+    // This is a typo in the module: "runing"
+    if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
       return;
     }
 
@@ -313,6 +350,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       if (this.previewWindows) {
         await Object.values(this.previewWindows).forEach(win => win.destroy());
       }
+      this.onChatUrlChangedSubscription.unsubscribe();
     }
     this.SET_PREVIEW_MODE(false);
     this.TOGGLE_OVERLAY(false);
@@ -321,6 +359,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private createWindowOverlays() {
     Object.keys(this.windows).forEach((key: string) => {
       const win: electron.BrowserWindow = this.windows[key];
+      // Fix race condition in screen tests
+      if (win.isDestroyed()) return;
+
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId === -1 || overlayId == null) {
@@ -339,18 +380,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       win.webContents.executeJavaScript(hideInteraction);
 
-      win.webContents.on('paint', (event, dirty, image) => {
-        if (
-          overlay.paintOverlay(
-            overlayId,
-            image.getSize().width,
-            image.getSize().height,
-            image.getBitmap(),
-          ) === 0
-        ) {
-          win.webContents.invalidate();
-        }
-      });
+      // We bind the paint callback in the main process to avoid a memory
+      // leak in electron. This can be moved back to the renderer process
+      // when the leak is fixed: https://github.com/electron/electron/issues/20559
+      ipcRenderer.send('gameOverlayPaintCallback', { overlayId, contentsId: win.webContents.id });
       win.webContents.setFrameRate(1);
     });
   }

@@ -1,6 +1,6 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" />
+  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" />
   <news-banner/>
   <div
     class="main-contents"
@@ -97,13 +97,12 @@
   position: relative;
 }
 
-.main-spacer {
-  height: 4px;
-  flex: 0 0 4px;
-  .bg--teal();
+.titlebar--error {
+  background: var(--warning) !important;
 
-  &.main-spacer--error {
-    background-color: @red;
+  /deep/ div,
+  /deep/ .titlebar-action {
+    color: var(--white) !important;
   }
 }
 
@@ -116,7 +115,7 @@
 
 .main-loading {
   position: absolute;
-  top: 34px;
+  top: 30px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -124,7 +123,7 @@
   background-color: var(--background);
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
-    top: 34px;
+    top: 30px;
   }
 }
 

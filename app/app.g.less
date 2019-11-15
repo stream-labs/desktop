@@ -258,6 +258,11 @@ a,
   .padding-h-sides();
   .radius();
   .shadow();
+
+  .button {
+    max-height: 32px;
+    white-space: nowrap;
+  }
 }
 
 .tabs {
@@ -297,6 +302,19 @@ a,
     i {
       color: var(--link-active);
     }
+  }
+}
+
+.layer-icon {
+  display: inline-block;
+  text-align: left;
+  width: 16px;
+  margin-right: 8px;
+
+  i,
+  .fa {
+    font-size: 12px;
+    font-weight: 700;
   }
 }
 

@@ -9,8 +9,10 @@ import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
 import Optimize from './onboarding-steps/Optimize';
 import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
+import HardwareSetup from './onboarding-steps/HardwareSetup';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
+import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 
 @Component({})
@@ -71,6 +73,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
+      this.stepsState.push({ complete: false });
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
@@ -80,7 +83,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     }
   }
 
-  steps(h: Function) {
+  get steps() {
     const steps = [
       <Connect slot="1" continue={this.continue.bind(this)} />,
       <ObsImport
@@ -94,9 +97,10 @@ export default class OnboardingPage extends TsxComponent<{}> {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
+    steps.push(<HardwareSetup slot="3" />);
     steps.push(
       <ThemeSelector
-        slot="3"
+        slot="4"
         continue={this.continue.bind(this)}
         setProcessing={this.setProcessing.bind(this)}
       />,
@@ -104,18 +108,18 @@ export default class OnboardingPage extends TsxComponent<{}> {
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(
         <Optimize
-          slot="4"
+          slot="5"
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="4" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
     }
     return steps;
   }
 
-  loginPage(h: Function) {
+  get loginPage() {
     return (
       <div>
         <div class={styles.container}>
@@ -125,7 +129,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  optimizePage(h: Function) {
+  get optimizePage() {
     return (
       <div>
         <div class={styles.container}>
@@ -138,15 +142,23 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
-    const steps = this.steps(h);
+  get hardwarePage() {
+    return (
+      <div>
+        <div class={styles.container}>
+          <HardwareSetup />
+          <button class="button button--action" onClick={this.complete}>
+            {$t('Complete')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-    if (this.onboardingService.options.isLogin) {
-      return this.loginPage(h);
-    }
-    if (this.onboardingService.options.isOptimize) {
-      return this.optimizePage(h);
-    }
+  render() {
+    if (this.onboardingService.options.isLogin) return this.loginPage;
+    if (this.onboardingService.options.isOptimize) return this.optimizePage;
+    if (this.onboardingService.options.isHardware) return this.hardwarePage;
 
     return (
       <div>
@@ -166,11 +178,11 @@ export default class OnboardingPage extends TsxComponent<{}> {
               [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
             }
             hideButton={
-              [1, 2, 4].includes(this.currentStep) ||
-              (this.currentStep === 3 && !this.importedFromObs)
+              [1, 2, 5].includes(this.currentStep) ||
+              (this.currentStep === 4 && !this.importedFromObs)
             }
           >
-            {steps}
+            {this.steps}
           </Onboarding>
         </div>
       </div>

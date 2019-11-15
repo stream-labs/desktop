@@ -20,5 +20,10 @@
   "Filter name": "フィルター名",
   "Add source filter": "ソースフィルターの追加",
   "No filters applied": "フィルターは適用されていません",
-  "Source filters": "ソースフィルター"
+  "Source filters": "ソースフィルター",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

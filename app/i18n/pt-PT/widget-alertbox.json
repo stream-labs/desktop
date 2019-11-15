@@ -1,7 +1,6 @@
 {
   "Layout": "Layout",
-  "Add Alert": "Adicionar alerta",
-  "Add ": "Adicionar ",
+  "Alert": "Alert",
   "Global Settings": "Configurações globais",
   "Text to Speech": "Texto para Voz",
   "Charity Streaming Donations": "Donativos em streamings para caridade",
@@ -23,6 +22,9 @@
   "Likes": "Gostos",
   "Shares": "Partilhas",
   "Facemask Donations": "Donativos Máscara Facial",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Configurações gerais",
   "Moderator Tools": "Ferramentas de moderação",
   "Title Message": "Mensagem de título",
@@ -70,5 +72,11 @@
   "Image/Video File": "Ficheiro de imagem/vídeo",
   "Sound File": "Ficheiro de som",
   "Variation Frequency": "Frequência da variável",
-  "Message Template": "Modelo de mensagem"
+  "Message Template": "Modelo de mensagem",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

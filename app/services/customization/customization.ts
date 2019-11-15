@@ -5,6 +5,7 @@ import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  IPinnedStatistics,
 } from './customization-api';
 import {
   IObsInput,
@@ -14,18 +15,19 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
-import { Global } from '../../../obs-api';
+import { Inject } from 'services/core';
+import { UserService } from 'services/user';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': { r: 9, g: 22, b: 29 },
-  'day-theme': { r: 247, g: 249, b: 249 },
+  'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 // Maps to --section
 const DISPLAY_BACKGROUNDS = {
   'night-theme': { r: 11, g: 22, b: 28 },
-  'day-theme': { r: 245, g: 248, b: 250 },
+  'day-theme': { r: 227, g: 232, b: 235 },
 };
 
 /**
@@ -34,6 +36,8 @@ const DISPLAY_BACKGROUNDS = {
  */
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
+  @Inject() userService: UserService;
+
   static get migrations() {
     return [
       {
@@ -62,6 +66,12 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
     legacyEvents: false,
+    pinnedStatistics: {
+      cpu: false,
+      fps: false,
+      droppedFrames: false,
+      bandwidth: false,
+    },
     experimental: {
       // put experimental features here
     },
@@ -130,18 +140,22 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
+  setPinnedStatistics(pinned: IPinnedStatistics) {
+    this.setSettings({ pinnedStatistics: pinned });
+  }
+
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
-    return [
+    const formData: TObsFormData = [
       <IObsListInput<string>>{
         value: settings.theme,
         name: 'theme',
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
         options: [
-          { value: 'night-theme', description: $t('Night (Classic)') },
-          { value: 'day-theme', description: $t('Day (Classic)') },
+          { value: 'night-theme', description: $t('Night') },
+          { value: 'day-theme', description: $t('Day') },
         ],
         visible: true,
         enabled: true,
@@ -184,25 +198,29 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         enabled: true,
         usePercentages: true,
       },
+    ];
 
-      <IObsInput<boolean>>{
+    if (this.userService.platform.type === 'twitch') {
+      formData.push(<IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
         description: $t('Enable BetterTTV emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
-      },
+      });
 
-      <IObsInput<boolean>>{
+      formData.push(<IObsInput<boolean>>{
         value: settings.enableFFZEmotes,
         name: 'enableFFZEmotes',
         description: $t('Enable FrankerFaceZ emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
-      },
-    ];
+      });
+    }
+
+    return formData;
   }
 
   getExperimentalSettingsFormData(): TObsFormData {

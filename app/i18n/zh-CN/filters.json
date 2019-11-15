@@ -20,5 +20,10 @@
   "Filter name": "滤镜名称",
   "Add source filter": "新增滤镜来源",
   "No filters applied": "无使用滤镜",
-  "Source filters": "滤镜来源"
+  "Source filters": "滤镜来源",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

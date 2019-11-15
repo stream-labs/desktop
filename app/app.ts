@@ -213,7 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
-      silentTranslationWarn: true,
+      missing: (language: string, key: string) => {
+        if (isProduction) return;
+        console.error(`Missing translation found for ${language} -- "${key}"`);
+      },
     });
     I18nService.setVuei18nInstance(i18n);
 

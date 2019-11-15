@@ -1,7 +1,6 @@
 {
   "Layout": "レイアウト",
-  "Add Alert": "アラートを追加",
-  "Add ": "追加",
+  "Alert": "Alert",
   "Global Settings": "グローバル設定",
   "Text to Speech": "スピーチへのテキスト",
   "Charity Streaming Donations": "チャリティーストリーミングの寄付",
@@ -23,6 +22,9 @@
   "Likes": "ライク",
   "Shares": "シェア",
   "Facemask Donations": "Facemaskのドネーション",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "通常の設置",
   "Moderator Tools": "モデレーターツール",
   "Title Message": "タイトルメッセージ",
@@ -70,5 +72,11 @@
   "Image/Video File": "イメージ、ビデオファイル",
   "Sound File": "サウンドファイル",
   "Variation Frequency": "バリエーションの頻度",
-  "Message Template": "メッセージのテンプレート"
+  "Message Template": "メッセージのテンプレート",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

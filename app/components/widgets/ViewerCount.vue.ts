@@ -6,7 +6,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { IViewerCountData, ViewerCountService } from 'services/widgets/settings/viewer-count';
 import { $t } from 'services/i18n';
 
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 @Component({
   components: {
     WidgetEditor,

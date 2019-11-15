@@ -15,7 +15,7 @@ import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
-import { PerformanceMonitorService } from 'services/performance-monitor';
+import { PerformanceService } from 'services/performance';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
@@ -33,6 +33,7 @@ import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
+import { RestreamService } from 'services/restream';
 
 interface IAppState {
   loading: boolean;
@@ -79,13 +80,15 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
-  @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private performanceService: PerformanceService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
+  @Inject() private restreamService: RestreamService;
+
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   readonly pid = require('process').pid;
@@ -102,18 +105,18 @@ export class AppService extends StatefulService<IAppState> {
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    await this.userService.initialize();
+    await this.userService.validateLogin();
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    // Initialize any apps before loading the scene collection.  This allows
-    // the apps to already be in place when their sources are created.
-    await this.platformAppsService.initialize();
-
-    await this.sceneCollectionsService.initialize();
+    if (!this.userService.isLoggedIn()) {
+      // If this user is logged in, this would have already happened as part of login
+      // TODO: We should come up with a better way to handle this.
+      await this.sceneCollectionsService.initialize();
+    }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
 
@@ -122,19 +125,7 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    // Eager load services
-    const _ = [
-      this.facemasksService,
-
-      this.incrementalRolloutService,
-      this.shortcutsService,
-      this.streamlabelsService,
-
-      // Pre-fetch stream info
-      this.streamInfoService,
-    ];
-
-    this.performanceMonitorService.start();
+    this.performanceService.startMonitoringPerformance();
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();
@@ -142,14 +133,9 @@ export class AppService extends StatefulService<IAppState> {
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
     this.announcementsService.updateBanner();
 
-    const _outageService = this.outageNotificationsService;
-
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
-
-    await this.gameOverlayService.initialize();
-    await this.recentEventsService.initialize();
   }
 
   shutdownStarted = new Subject();
@@ -169,7 +155,7 @@ export class AppService extends StatefulService<IAppState> {
       this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceService.stop();
       this.transitionsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();

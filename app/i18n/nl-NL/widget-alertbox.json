@@ -1,7 +1,6 @@
 {
   "Layout": "Inrichting",
-  "Add Alert": "Add Alert",
-  "Add ": "Voeg  toe",
+  "Alert": "Alert",
   "Global Settings": "Global Settings",
   "Text to Speech": "Tekst Naar Spraak",
   "Charity Streaming Donations": "Charity Streaming Donations",
@@ -23,6 +22,9 @@
   "Likes": "Likes",
   "Shares": "Shares",
   "Facemask Donations": "Facemask Donations",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Algemene instellingen",
   "Moderator Tools": "Moderator Tools",
   "Title Message": "Title Message",
@@ -70,5 +72,11 @@
   "Image/Video File": "Image/Video File",
   "Sound File": "Sound File",
   "Variation Frequency": "Variation Frequency",
-  "Message Template": "Bericht Sjabloon"
+  "Message Template": "Bericht Sjabloon",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

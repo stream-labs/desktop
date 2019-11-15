@@ -4,7 +4,7 @@ import { sleep } from './helpers/sleep';
 import { FormMonkey } from './helpers/form-monkey';
 import { sceneExisting } from './helpers/spectron/scenes';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];

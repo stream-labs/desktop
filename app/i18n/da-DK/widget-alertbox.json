@@ -1,7 +1,6 @@
 {
   "Layout": "Layout",
-  "Add Alert": "Add Alert",
-  "Add ": "Add ",
+  "Alert": "Alert",
   "Global Settings": "Global Settings",
   "Text to Speech": "Tekst til tale",
   "Charity Streaming Donations": "Charity Streaming Donations",
@@ -23,6 +22,9 @@
   "Likes": "Likes",
   "Shares": "Shares",
   "Facemask Donations": "Facemask Donations",
+  "Cloudbot Store": "Cloudbot Store",
+  "Stickers": "Stickers",
+  "Effects/Rallies": "Effects/Rallies",
   "General Settings": "Generelle indstillinger",
   "Moderator Tools": "Moderator Tools",
   "Title Message": "Title Message",
@@ -70,5 +72,11 @@
   "Image/Video File": "Image/Video File",
   "Sound File": "Sound File",
   "Variation Frequency": "Variation Frequency",
-  "Message Template": "Besked skabelon"
+  "Message Template": "Besked skabelon",
+  "Item Type": "Item Type",
+  "Sparks Enabled": "Sparks Enabled",
+  "Min. Sparks for Alert": "Min. Sparks for Alert",
+  "Embers Enabled": "Embers Enabled",
+  "Min. Embers for Alert": "Min. Embers for Alert",
+  "Use Skill Image": "Use Skill Image"
 }

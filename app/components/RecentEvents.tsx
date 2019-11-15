@@ -5,13 +5,13 @@ import { $t } from 'services/i18n';
 import { IRecentEvent, RecentEventsService } from 'services/recent-events';
 import { Component, Prop } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
-import TsxComponent from './tsx-component';
+import TsxComponent, { createProps } from './tsx-component';
 import BrowserView from 'components/shared/BrowserView';
 import { UserService } from 'services/user';
 import electron from 'electron';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import HelpTip from './shared/HelpTip.vue';
+import HelpTip from './shared/HelpTip';
 import { EDismissable, DismissablesService } from 'services/dismissables';
 import { MagicLinkService } from 'services/magic-link';
 
@@ -21,8 +21,12 @@ const getName = (event: IRecentEvent) => {
   return event.name;
 };
 
-@Component({})
-export default class RecentEvents extends TsxComponent<{}> {
+class RecentEventsProps {
+  isOverlay: boolean = false;
+}
+
+@Component({ props: createProps(RecentEventsProps) })
+export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   @Inject() recentEventsService: RecentEventsService;
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
@@ -145,7 +149,7 @@ export default class RecentEvents extends TsxComponent<{}> {
 
   get renderNativeEvents() {
     return (
-      <div class={styles.eventContainer}>
+      <div class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
@@ -177,113 +181,108 @@ export default class RecentEvents extends TsxComponent<{}> {
   render() {
     return (
       <div class={styles.container}>
-        <Toolbar
-          popoutMediaShare={() => this.popoutMediaShare()}
-          popoutFilterMenu={() => this.popoutFilterMenu()}
-          popoutRecentEvents={() => this.popoutRecentEvents()}
-          muteEvents={() => this.muteEvents()}
-          skipAlert={() => this.skipAlert()}
-          toggleQueue={() => this.toggleQueue()}
-          queuePaused={this.queuePaused}
-          muted={this.muted}
-          mediaShareEnabled={this.mediaShareEnabled}
-          native={this.native}
-          onNativeswitch={val => this.setNative(val)}
-        />
+        {!this.props.isOverlay && (
+          <Toolbar
+            popoutMediaShare={() => this.popoutMediaShare()}
+            popoutFilterMenu={() => this.popoutFilterMenu()}
+            popoutRecentEvents={() => this.popoutRecentEvents()}
+            muteEvents={() => this.muteEvents()}
+            skipAlert={() => this.skipAlert()}
+            toggleQueue={() => this.toggleQueue()}
+            queuePaused={this.queuePaused}
+            muted={this.muted}
+            mediaShareEnabled={this.mediaShareEnabled}
+            native={this.native}
+            onNativeswitch={val => this.setNative(val)}
+          />
+        )}
         {this.native ? this.renderNativeEvents : this.renderEmbeddedEvents}
-        <HelpTip
-          dismissableKey={EDismissable.RecentEventsHelpTip}
-          position={{ top: '-8px', right: '360px' }}
-          tipPosition="right"
-        >
-          <div slot="title">{$t('New Events Feed')}</div>
-          <div slot="content">
-            {$t(
-              'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
-            )}
-          </div>
-        </HelpTip>
+        {!this.props.isOverlay && (
+          <HelpTip
+            dismissableKey={EDismissable.RecentEventsHelpTip}
+            position={{ top: '-8px', right: '360px' }}
+            tipPosition="right"
+          >
+            <div slot="title">{$t('New Events Feed')}</div>
+            <div slot="content">
+              {$t(
+                'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
+              )}
+            </div>
+          </HelpTip>
+        )}
       </div>
     );
   }
 }
 
-interface IToolbarProps {
-  popoutMediaShare: Function;
-  popoutFilterMenu: Function;
-  popoutRecentEvents: Function;
-  muteEvents: Function;
-  skipAlert: Function;
-  toggleQueue: Function;
-  queuePaused: boolean;
-  muted: boolean;
-  mediaShareEnabled: boolean;
-  native: boolean;
-  onNativeswitch: (native: boolean) => void;
+class ToolbarProps {
+  popoutMediaShare: () => void = () => {};
+  popoutFilterMenu: () => void = () => {};
+  popoutRecentEvents: () => void = () => {};
+  muteEvents: () => void = () => {};
+  skipAlert: () => void = () => {};
+  toggleQueue: () => void = () => {};
+  queuePaused: boolean = false;
+  muted: boolean = false;
+  mediaShareEnabled: boolean = false;
+  native: boolean = true;
+  onNativeswitch: (native: boolean) => void = () => {};
 }
 
 // TODO: Refactor into stateless functional component
-@Component({})
-class Toolbar extends TsxComponent<IToolbarProps> {
-  @Prop() popoutMediaShare: () => void;
-  @Prop() popoutFilterMenu: () => void;
-  @Prop() popoutRecentEvents: () => void;
-  @Prop() muteEvents: () => void;
-  @Prop() skipAlert: () => void;
-  @Prop() toggleQueue: () => void;
-  @Prop() queuePaused: boolean;
-  @Prop() muted: boolean;
-  @Prop() mediaShareEnabled: boolean;
-  @Prop() native: boolean;
-
-  render(h: Function) {
-    const pauseTooltip = this.queuePaused ? $t('Unpause Alert Queue') : $t('Pause Alert Queue');
+@Component({ props: createProps(ToolbarProps) })
+class Toolbar extends TsxComponent<ToolbarProps> {
+  render() {
+    const pauseTooltip = this.props.queuePaused
+      ? $t('Unpause Alert Queue')
+      : $t('Pause Alert Queue');
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
-        <span class="action-icon" onClick={() => this.$emit('nativeswitch', !this.native)}>
+        <span class="action-icon" onClick={() => this.$emit('nativeswitch', !this.props.native)}>
           <i class="icon-live-dashboard" />
           <span style={{ marginLeft: '8px' }}>
-            {this.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
+            {this.props.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
           </span>
         </span>
-        {this.native && (
+        {this.props.native && (
           <i
             class="icon-filter action-icon"
-            onClick={this.popoutFilterMenu}
+            onClick={this.props.popoutFilterMenu}
             v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
           />
         )}
-        {this.native && this.mediaShareEnabled && (
+        {this.props.native && this.props.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
-            onClick={this.popoutMediaShare}
+            onClick={this.props.popoutMediaShare}
             v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
           />
         )}
-        {this.native && (
+        {this.props.native && (
           <i
-            class={`${this.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
-            onClick={this.toggleQueue}
+            class={`${this.props.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
+            onClick={this.props.toggleQueue}
             v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
           />
         )}
-        {this.native && (
+        {this.props.native && (
           <i
             class="icon-skip action-icon"
-            onClick={this.skipAlert}
+            onClick={this.props.skipAlert}
             v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
           />
         )}
-        {this.native && (
+        {this.props.native && (
           <i
             class={cx('action-icon', {
-              [styles.red]: this.muted,
-              fa: !this.muted,
-              'fa-volume-up': !this.muted,
-              'icon-mute': this.muted,
+              [styles.red]: this.props.muted,
+              fa: !this.props.muted,
+              'fa-volume-up': !this.props.muted,
+              'icon-mute': this.props.muted,
             })}
-            onClick={this.muteEvents}
+            onClick={this.props.muteEvents}
             v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
           />
         )}
@@ -307,19 +306,16 @@ const amountString = (event: IRecentEvent) => {
   return `${event.amount} ${event.type}`;
 };
 
-// TODO: Refactor into stateless functional component
-@Component({})
-class EventCell extends TsxComponent<{
-  event: IRecentEvent;
-  eventString: (event: IRecentEvent) => string;
-  repeatAlert: (event: IRecentEvent) => void;
-  readAlert: (event: IRecentEvent) => void;
-}> {
-  @Prop() event: IRecentEvent;
-  @Prop() eventString: (event: IRecentEvent) => string;
-  @Prop() repeatAlert: (event: IRecentEvent) => void;
-  @Prop() readAlert: (event: IRecentEvent) => void;
+class EventCellProps {
+  event: IRecentEvent = {} as IRecentEvent;
+  eventString: (event: IRecentEvent) => string = () => '';
+  repeatAlert: (event: IRecentEvent) => void = () => {};
+  readAlert: (event: IRecentEvent) => void = () => {};
+}
 
+// TODO: Refactor into stateless functional component
+@Component({ props: createProps(EventCellProps) })
+class EventCell extends TsxComponent<EventCellProps> {
   timestamp = '';
   timestampInterval: number;
 
@@ -340,38 +336,42 @@ class EventCell extends TsxComponent<{
   }
 
   get createdAt(): moment.Moment {
-    if (this.event.iso8601Created) {
-      return moment(this.event.iso8601Created);
+    if (this.props.event.iso8601Created) {
+      return moment(this.props.event.iso8601Created);
     }
 
-    return moment.utc(this.event.created_at);
+    return moment.utc(this.props.event.created_at);
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div
-        class={cx(styles.cell, this.event.read ? styles.cellRead : '')}
-        onClick={() => this.readAlert(this.event)}
+        class={cx(styles.cell, this.props.event.read ? styles.cellRead : '')}
+        onClick={() => this.props.readAlert(this.props.event)}
       >
         <span class={styles.timestamp}>{this.timestamp}</span>
-        <span class={styles.name}>{getName(this.event)}</span>
-        <span>{this.eventString(this.event)}</span>
-        {this.event.gifter && (
-          <span class={styles.name}>{this.event.from ? this.event.from : this.event.name}</span>
+        <span class={styles.name}>{getName(this.props.event)}</span>
+        <span>{this.props.eventString(this.props.event)}</span>
+        {this.props.event.gifter && (
+          <span class={styles.name}>
+            {this.props.event.from ? this.props.event.from : this.props.event.name}
+          </span>
         )}
-        {this.event.amount && (
-          <span class={styles[classForType(this.event)]}>{amountString(this.event)}</span>
+        {this.props.event.amount && (
+          <span class={styles[classForType(this.props.event)]}>
+            {amountString(this.props.event)}
+          </span>
         )}
-        {(this.event.comment || this.event.message) && (
+        {(this.props.event.comment || this.props.event.message) && (
           <span class={styles.whisper}>
-            {this.event.comment ? this.event.comment : this.event.message}
+            {this.props.event.comment ? this.props.event.comment : this.props.event.message}
           </span>
         )}
         <i
           class="icon-repeat action-icon"
           onClick={(event: any) => {
             event.stopPropagation();
-            this.repeatAlert(this.event);
+            this.props.repeatAlert(this.props.event);
           }}
           v-tooltip={{ content: $t('Repeat Alert'), placement: 'left' }}
         />

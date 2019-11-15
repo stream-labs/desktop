@@ -2,11 +2,12 @@
   "Goal Amount": "Целевая сумма",
   "Current Amount": "Текущая сумма",
   "Days Remaining": "Осталось дней",
-  "Start Goal": "Start Goal",
-  "Goal": "Goal",
+  "Start Goal": "Стартовая цель",
+  "Goal": "Цель",
+  "End Goal": "End Goal",
   "Starting Amount": "Начальное количество",
   "End After": "Закончить после",
-  "Include resubs?": "Include resubs?",
+  "Include resubs?": "Включить вернувшихся подписчиков?",
   "Layout": "Расположение",
   "Background Color": "Цвет фона",
   "Bar Color": "Цвет полоски",
@@ -14,5 +15,11 @@
   "Text Color": "Цвет текста",
   "Bar Text Color": "Цвет текста",
   "Bar Thickness": "Толщина полоски",
-  "Font Family": "Font Family"
+  "Font Family": "Семейство шрифтов",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }

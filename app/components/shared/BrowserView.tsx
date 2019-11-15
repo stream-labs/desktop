@@ -1,37 +1,31 @@
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import electron from 'electron';
 import path from 'path';
 import { I18nService } from 'services/i18n';
 import { Spinner } from 'streamlabs-beaker';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
+import cloneDeep from 'lodash/cloneDeep';
+import { CustomizationService } from 'services/customization';
 
-@Component({ components: { Spinner } })
-export default class BrowserView extends TsxComponent<{
-  src: string;
-  hidden?: boolean;
-  options?: Electron.BrowserViewConstructorOptions;
-  setLocale?: boolean;
-  enableGuestApi?: boolean;
-  onReady?: (view: Electron.BrowserView) => void;
-}> {
-  @Prop() src: string;
-  @Prop({ default: false }) hidden: boolean;
-  @Prop({
-    default: () => {
-      return {};
-    },
-  })
-  options: Electron.BrowserViewConstructorOptions;
-  @Prop({ default: false }) setLocale: boolean;
-  @Prop({ default: false }) enableGuestApi: boolean;
+class BrowserViewProps {
+  src: string = '';
+  hidden?: boolean = false;
+  options?: Electron.BrowserViewConstructorOptions = null;
+  setLocale?: boolean = false;
+  enableGuestApi?: boolean = false;
+  onReady?: (view: any) => void = () => {};
+}
 
+@Component({ props: createProps(BrowserViewProps) })
+export default class BrowserView extends TsxComponent<BrowserViewProps> {
   @Inject() windowsService: WindowsService;
   @Inject() appService: AppService;
+  @Inject() customizationService: CustomizationService;
 
   $refs: {
     sizeContainer: HTMLDivElement;
@@ -47,29 +41,30 @@ export default class BrowserView extends TsxComponent<{
   shutdownSubscription: Subscription;
 
   mounted() {
-    this.options.webPreferences = this.options.webPreferences || {};
+    const options = this.props.options ? cloneDeep(this.props.options) : { webPreferences: {} };
 
     // Enforce node integration disabled to prevent security issues
-    this.options.webPreferences.nodeIntegration = false;
+    options.webPreferences.nodeIntegration = false;
 
-    if (this.enableGuestApi) {
-      this.options.webPreferences.preload = path.resolve(
+    if (this.props.enableGuestApi) {
+      options.webPreferences.preload = path.resolve(
         electron.remote.app.getAppPath(),
         'bundles',
         'guest-api',
       );
     }
 
-    this.browserView = new electron.remote.BrowserView(this.options);
+    this.browserView = new electron.remote.BrowserView(options);
+
     this.$emit('ready', this.browserView);
 
-    if (this.setLocale) I18nService.setBrowserViewLocale(this.browserView);
+    if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);
 
     this.browserView.webContents.on('did-finish-load', () => (this.loading = false));
 
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
 
-    this.browserView.webContents.loadURL(this.src);
+    this.browserView.webContents.loadURL(this.props.src);
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -97,7 +92,7 @@ export default class BrowserView extends TsxComponent<{
     if (!this.$refs.sizeContainer) return;
 
     const rect: { left: number; top: number; width: number; height: number } =
-      this.hidden || this.hideStyleBlockers
+      this.props.hidden || this.hideStyleBlockers
         ? { left: 0, top: 0, width: 0, height: 0 }
         : this.$refs.sizeContainer.getBoundingClientRect();
 
@@ -114,6 +109,15 @@ export default class BrowserView extends TsxComponent<{
     }
   }
 
+  get theme() {
+    return this.customizationService.state.theme;
+  }
+
+  @Watch('theme')
+  refreshBrowser() {
+    this.browserView.webContents.loadURL(this.props.src);
+  }
+
   private rectChanged(rect: { left: number; top: number; width: number; height: number }) {
     return (
       rect.left !== this.currentPosition.x ||
@@ -123,11 +127,11 @@ export default class BrowserView extends TsxComponent<{
     );
   }
 
-  render(h: Function) {
+  render() {
     if (this.loading) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <spinner size="large" />
+          <Spinner size="large" />
         </div>
       );
     }

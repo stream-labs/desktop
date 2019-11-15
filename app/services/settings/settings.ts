@@ -41,6 +41,7 @@ export interface ISettingsState {
     key: string;
     streamType: string;
     service: string;
+    server: string;
   };
   Output: {
     RecRB?: boolean;

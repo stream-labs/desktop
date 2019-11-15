@@ -20,5 +20,10 @@
   "Filter name": "Filtername",
   "Add source filter": "Quellfilter hinzufügen",
   "No filters applied": "Keine Filter angewendet",
-  "Source filters": "Quellfilter"
+  "Source filters": "Quellfilter",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

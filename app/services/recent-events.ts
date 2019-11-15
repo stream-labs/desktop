@@ -1,11 +1,11 @@
 import { HostsService } from 'services/hosts';
-import { StatefulService, Inject, mutation } from 'services/core';
+import { StatefulService, Inject, mutation, InitAfter } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
-import pick from 'lodash/pick';
+import { pick, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
@@ -234,6 +234,7 @@ const SUPPORTED_EVENTS = [
   'treat',
 ];
 
+@InitAfter('UserService')
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
@@ -254,7 +255,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   lifecycle: LoginLifecycle;
   socketConnection: Subscription = null;
 
-  async initialize() {
+  async init() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
       destroy: () => Promise.resolve(this.onLogout()),
@@ -377,6 +378,11 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const readReceipts = await this.fetchReadReceipts(hashValues);
     eventArray.forEach(event => {
       event.read = readReceipts[event.hash] ? readReceipts[event.hash] : false;
+
+      // Events older than 1 month are treated as read
+      if (new Date(event.created_at).getTime() < new Date().getTime() - 1000 * 60 * 60 * 24 * 30) {
+        event.read = true;
+      }
     });
 
     eventArray.sort((a: IRecentEvent, b: IRecentEvent) => {
@@ -694,7 +700,18 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
       return this.shouldFilterSubscription(event);
     }
-    return this.state.filterConfig[event.type];
+    return this.transformFilterForFB()[event.type];
+  }
+
+  transformFilterForFB() {
+    const filterMap = cloneDeep(this.state.filterConfig);
+    if (this.userService.platform.type === 'facebook') {
+      filterMap['support'] = filterMap['facebook_support'];
+      filterMap['like'] = filterMap['facebook_like'];
+      filterMap['share'] = filterMap['facebook_share'];
+      filterMap['stars'] = filterMap['facebook_stars'];
+    }
+    return filterMap;
   }
 
   onEventSocket(e: IEventSocketEvent) {

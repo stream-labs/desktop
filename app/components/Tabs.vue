@@ -22,7 +22,6 @@
 @import "../styles/index";
 
 .tabs__container {
-  height: 100%;
   width: 100%;
 }
 
