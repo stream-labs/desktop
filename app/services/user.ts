@@ -526,10 +526,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         let result: EPlatformCallResult;
 
         if (!merge) {
-          result = await this.login(service, parsed);
+          // Ensure we are starting with fresh stream settings
+          this.streamSettingsService.resetStreamSettings();
 
-          // A fresh auth should enable protected mode
-          this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+          result = await this.login(service, parsed);
         } else {
           this.UPDATE_PLATFORM(parsed.platforms[parsed.primaryPlatform]);
           result = EPlatformCallResult.Success;

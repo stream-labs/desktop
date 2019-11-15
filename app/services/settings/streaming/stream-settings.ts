@@ -80,8 +80,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   init() {
     super.init();
     this.userService.userLogin.subscribe(async _ => {
-      const protectedModeHasBeenDisabled = await this.migrateToProtectedModeIfRequired();
-      if (!protectedModeHasBeenDisabled) this.resetStreamSettings();
+      await this.migrateOffProtectedModeIfRequired();
     });
     this.userService.userLogout.subscribe(async _ => {
       this.resetStreamSettings();
@@ -183,25 +182,40 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    * Protected mode is enabled by default but we should disable it for some users
    * returns true if protected mode has been disabled
    */
-  private async migrateToProtectedModeIfRequired(): Promise<boolean> {
+  private async migrateOffProtectedModeIfRequired() {
     const currentStreamSettings = this.settings;
-    if (!currentStreamSettings.protectedModeMigrationRequired) return false;
+
+    // We already migrated, so don't touch settings
+    if (!currentStreamSettings.protectedModeMigrationRequired) return;
 
     this.setSettings({ protectedModeMigrationRequired: false });
 
-    // only Twitch and Mixer require migration
-    if (!['twitch', 'mixer'].includes(this.userService.platform.type)) {
-      return false;
+    if (this.userService.platformType === 'youtube') {
+      if (currentStreamSettings.platform !== 'youtube') {
+        this.setSettings({ protectedModeEnabled: false });
+      }
+
+      return;
     }
+
+    if (this.userService.platformType === 'facebook') {
+      if (currentStreamSettings.platform !== 'facebook') {
+        this.setSettings({ protectedModeEnabled: false });
+      }
+
+      return;
+    }
+
+    // User is Twitch or Mixer
 
     // disable protectedMode for users who have manually changed their server
     if (currentStreamSettings.server !== 'auto') {
       this.setSettings({ protectedModeEnabled: false });
-      return true;
+      return;
     }
 
     // there is no need to migrate users with no streamKey set
-    if (!currentStreamSettings.key) return false;
+    if (!currentStreamSettings.key) return;
 
     // disable protected mod if fetched streamkey doesn't match streamkey in settings
     const platform = (getPlatformService(this.userService.platformType) as unknown) as
@@ -209,7 +223,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       | MixerService;
     if ((await platform.fetchStreamKey()) !== currentStreamSettings.key) {
       this.setSettings({ protectedModeEnabled: false });
-      return true;
+      return;
     }
 
     return false;

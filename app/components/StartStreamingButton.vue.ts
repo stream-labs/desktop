@@ -72,6 +72,9 @@ export default class StartStreamingButton extends Vue {
 
       if (
         this.userService.isLoggedIn() &&
+        // Twitch is special cased, as we can update the channel info regardless
+        // of what your ingest settings are set to.
+        (this.streamSettingsService.protectedModeEnabled || this.isTwitch) &&
         (this.customizationService.state.updateStreamInfoOnLive ||
           this.isFacebook ||
           this.isYoutube)
@@ -131,11 +134,15 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn() && this.userService.platformType === 'facebook';
   }
 
   get isYoutube() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'youtube';
+    return this.userService.isLoggedIn() && this.userService.platformType === 'youtube';
+  }
+
+  get isTwitch() {
+    return this.userService.isLoggedIn() && this.userService.platformType === 'twitch';
   }
 
   get isDisabled() {
