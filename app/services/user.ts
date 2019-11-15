@@ -178,6 +178,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       'testing-fakeAuth',
       async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
         const service = getPlatformService(auth.primaryPlatform);
+        this.streamSettingsService.resetStreamSettings();
         await this.login(service, auth);
         if (!isOnboardingTest) this.onboardingService.finish();
       },

@@ -173,6 +173,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     // protected mode is enabled by default
     this.setSettings({
       protectedModeEnabled: true,
+      protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
     });
