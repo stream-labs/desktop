@@ -214,6 +214,7 @@ export class FormMonkey {
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
     await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
+    await sleep(100); // give colorpicker some time to be closed
   }
 
   async getColorValue(selector: string) {
