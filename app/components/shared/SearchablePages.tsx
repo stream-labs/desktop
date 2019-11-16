@@ -110,6 +110,10 @@ export default class SearchablePages extends TsxComponent<SearchablePagesProps> 
 
       await (this.props.onPageRender && this.props.onPageRender(page));
 
+      if (page === 'Hotkeys') {
+        console.log('InnerText for Hotkeys:', this.$refs.pageSlot.innerText);
+      }
+
       // collect the page text and text from inputs
       this.pagesInfo[page] = {
         text: this.$refs.pageSlot.innerText,
