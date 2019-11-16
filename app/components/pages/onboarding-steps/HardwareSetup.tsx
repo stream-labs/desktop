@@ -86,7 +86,10 @@ export default class HardwareSetup extends TsxComponent {
             />
           )}
           {this.defaultHardwareService.selectedAudioSource && (
-            <div class={styles.volmeter}>
+            <div
+              class={styles.volmeter}
+              key={this.defaultHardwareService.selectedAudioSource.sourceId}
+            >
               <MixerVolmeter
                 audioSource={this.defaultHardwareService.selectedAudioSource}
                 class={styles.volmeterCenter}
