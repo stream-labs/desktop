@@ -87,8 +87,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async init() {
     super.init();
-    if (!this.state.isEnabled) return;
-
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
       destroy: this.destroyOverlay,
@@ -97,6 +95,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async initializeOverlay() {
+    if (!this.state.isEnabled) return;
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
