@@ -200,7 +200,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       },
     ];
 
-    if (this.userService.platform.type === 'twitch') {
+    if (this.userService.isLoggedIn() && this.userService.platform.type === 'twitch') {
       formData.push(<IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',

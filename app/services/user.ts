@@ -32,6 +32,7 @@ import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import { StreamSettingsService } from './settings/streaming';
+import { TwitchService } from './platforms/twitch';
 
 interface ISecondaryPlatformAuth {
   username: string;
