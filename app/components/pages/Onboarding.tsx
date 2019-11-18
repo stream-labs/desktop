@@ -11,6 +11,7 @@ import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
 import ThemeSelector from './onboarding-steps/ThemeSelector';
 import HardwareSetup from './onboarding-steps/HardwareSetup';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { SceneCollectionsService } from 'services/scene-collections';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
@@ -20,6 +21,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   currentStep = 1;
   importedFromObs = false;
@@ -73,7 +75,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
-      this.stepsState.push({ complete: false });
+      if (this.noExistingSceneCollections) {
+        this.stepsState.push({ complete: false });
+      }
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
@@ -98,23 +102,27 @@ export default class OnboardingPage extends TsxComponent<{}> {
       return steps;
     }
     steps.push(<HardwareSetup slot="3" />);
-    steps.push(
-      <ThemeSelector
-        slot="4"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    );
+    let nextStep = '4';
+    if (this.noExistingSceneCollections) {
+      steps.push(
+        <ThemeSelector
+          slot={nextStep}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />,
+      );
+      nextStep = '5';
+    }
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(
         <Optimize
-          slot="5"
+          slot={nextStep}
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
     }
     return steps;
   }
@@ -152,6 +160,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
           </button>
         </div>
       </div>
+    );
+  }
+
+  get noExistingSceneCollections() {
+    return (
+      this.sceneCollectionsService.collections.length === 1 &&
+      this.sceneCollectionsService.collections[0].auto
     );
   }
 
