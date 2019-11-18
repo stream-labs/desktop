@@ -113,10 +113,6 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const req = this.formRequest(endpoint);
     try {
       const newState = await fetch(req).then(rawResp => rawResp.json());
-      // TODO: remove for next release after BE switches over
-      if (newState.link_target) {
-        newState.linkTarget = newState.link_target;
-      }
 
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
       const queryString = newState.link.split('?')[1];

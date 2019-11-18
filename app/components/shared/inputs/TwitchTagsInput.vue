@@ -197,12 +197,6 @@ table.sp-table {
   background-color: transparent !important;
 }
 
-.sp-result-area::-webkit-scrollbar {
-  // TODO: add scrollbars back, personally I think it looks nice without it
-  // but since list inputs have them, consider adding for consistency.
-  display: none;
-}
-
 // HACK: specificity hack for the hover color for options
 div.sp-result-area table.sp-table tbody tr.sp-over td {
   &:nth-child(1),

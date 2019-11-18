@@ -554,8 +554,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
           width: source.initialSize.width,
           height: source.initialSize.height,
         };
-        // tslint:disable-next-line:no-else-after-return TODO
-      } else if (source.initialSize.type === ESourceSizeType.Relative) {
+      }
+      if (source.initialSize.type === ESourceSizeType.Relative) {
         return {
           width: source.initialSize.width * this.videoService.baseWidth,
           height: source.initialSize.height * this.videoService.baseHeight,
