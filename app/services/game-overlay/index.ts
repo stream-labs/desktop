@@ -286,10 +286,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
+    this.SET_ENABLED(shouldEnable);
     if (shouldStart) await this.initializeOverlay();
     if (shouldStop) await this.destroyOverlay();
-
-    this.SET_ENABLED(shouldEnable);
   }
 
   async toggleWindowEnabled(window: string) {
