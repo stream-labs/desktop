@@ -56,7 +56,6 @@ export default class Hotkeys extends Vue {
 
     this.hotkeySet = this.hotkeysService.getHotkeysSet();
     await this.$nextTick();
-
     this.highlightSearch(this.globalSearchStr);
   }
 
