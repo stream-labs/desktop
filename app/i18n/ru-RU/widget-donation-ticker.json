@@ -13,5 +13,6 @@
   "The amount that was donated": "Сумма, которая была пожертвована",
   "Manage List": "Управление списком",
   "Font Settings": "Настройки шрифта",
-  "A hex color for the text of the": "Шестнадцатеричный цвет для текста"
+  "A hex color for the text of the": "Шестнадцатеричный цвет для текста",
+  "token": "token"
 }

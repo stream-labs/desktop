@@ -41,6 +41,10 @@
   "Something went wrong": "Valami elromlott",
   "Streamlabs OBS is ready to go": "A Streamlabs OBS készen áll az indulásra",
   "Download and Apply": "Töltse le és alkalmazza",
+  "This device is not available": "This device is not available",
+  "Select your mic": "Select your mic",
+  "Select your webcam": "Select your webcam",
+  "Setup Mic and Webcam": "Setup Mic and Webcam",
   "Sign in with your streaming account to get started with Streamlabs OBS": "Jelentkezzen be streaming-fiókjával, hogy elkezdhesse a Streamlabs OBS használatát",
   "Welcome to Streamlabs OBS": "Üdvözöljük a Streamlabs OBS-ben",
   "Import your existing settings from OBS in less than a minute and go live": "Importálja meglévő beállításait kevesebb, mint egy perc alatt az OBS-ből, és kezdje el élőben",
@@ -57,5 +61,12 @@
   "Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music to stunning overlays to more tools to engage with your community. Head over to the app store in the main navigation to browse our selection of free and paid apps.": "Nézze meg több mint 50 lenyűgöző alkalmazást független fejlesztőktől, kezdve a DMCA-kompatibilis zenétől a lenyűgöző átfedésekig és a közösséggel való kapcsolattartáshoz szükséges további eszközökig. Menjen az alkalmazásboltba a fő navigációban az ingyenes és fizetett alkalmazások kiválasztásának böngészéséhez.",
   "Only have one screen? Perfect! Enable our in-game overlay to make sure you catch every chat message and stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ tab of the settings menu.": "Csak egy képernyő van? Tökéletes! Engedélyezze a játékon belüli átfedésünket, hogy megbizonyosodjon arról, hogy minden csevegőüzenetet és stream-eseményt elkap, ami a játék indításakor történik. Ezt a funkciót a Beállítások menü „Játékfedvény” lapján engedélyezheti.",
   "Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. Head over to the facemask settings to get started.": "Szereted az IRL közvetítésen keresztül a nézőivel való kapcsolattartást? Vigye az interakciót a következő szintre a Streamlabs Facemasks segítségével, amely olyan eszköz, amely lehetővé teszi a nézők számára, hogy adományozás közben 3D-s maszkokat adjon az arcodhoz. Keresse fel az arcmaszk beállításait az induláshoz.",
-  "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.": "Stream jobb minőségű és alacsonyabb CPU-használat mellett, lehetővé téve a videokódolás optimalizálását. Ezeket a fejlesztéseket azért érjük el, mert a Streamlabs OBS-t kifejezetten a választott játékodra és a sávszélességre hangoljuk. Az engedélyezéshez jelölje be az „Optimalizált kódolóbeállítások használata” jelölőnégyzetet a stream adatainak szerkesztése közben."
+  "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.": "Stream jobb minőségű és alacsonyabb CPU-használat mellett, lehetővé téve a videokódolás optimalizálását. Ezeket a fejlesztéseket azért érjük el, mert a Streamlabs OBS-t kifejezetten a választott játékodra és a sávszélességre hangoljuk. Az engedélyezéshez jelölje be az „Optimalizált kódolóbeállítások használata” jelölőnégyzetet a stream adatainak szerkesztése közben.",
+  "Re-Authorize": "Re-Authorize",
+  "or select another platform": "or select another platform",
+  "Connect to %{platform}": "Connect to %{platform}",
+  "View help docs": "View help docs",
+  "Enter your stream key.": "Enter your stream key.",
+  "Select platform": "Select platform",
+  "No webcam detected": "No webcam detected"
 }

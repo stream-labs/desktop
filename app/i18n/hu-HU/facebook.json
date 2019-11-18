@@ -2,5 +2,17 @@
   "You can access your Facebook Streamer Dashboard here.": "Itt érheti el a Facebook Streamer irányítópultját.",
   "You need a Facebook page to stream to Facebook. You can create one now.": "Szüksége van egy Facebook oldalra, hogy streameljen a Facebookra. Most létrehozhat egyet.",
   "Create a Page": "Hozzon létre egy oldalt",
-  "Facebook Setup": "A Facebook beállítása"
+  "Facebook Setup": "A Facebook beállítása",
+  "Streamer Dashboard": "Streamer Dashboard",
+  "It looks like you don't have any Pages. Head to ": "It looks like you don't have any Pages. Head to ",
+  "Share": "Share",
+  "Like": "Like",
+  "Step": "Step",
+  "Create a Facebook Gaming page to get started.": "Create a Facebook Gaming page to get started.",
+  "Create a Gaming Page": "Create a Gaming Page",
+  "Connect Facebook to Streamlabs OBS.": "Connect Facebook to Streamlabs OBS.",
+  "All of your scenes, sources, and settings will be preserved.": "All of your scenes, sources, and settings will be preserved.",
+  "Connect Facebook": "Connect Facebook",
+  "Multistream To Facebook": "Multistream To Facebook",
+  "Connect": "Csatlakozás"
 }
