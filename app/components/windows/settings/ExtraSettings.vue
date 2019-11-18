@@ -55,7 +55,7 @@
               {{ $t('Configure Default Devices') }}
             </button>
           </div>
-          <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming">
+          <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming && protectedMode">
             <button class="button button--default" @click="runAutoOptimizer">
               {{ $t('Auto Optimize') }}
             </button>
