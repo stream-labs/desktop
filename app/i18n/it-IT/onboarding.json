@@ -67,5 +67,6 @@
   "Connect to %{platform}": "Connect to %{platform}",
   "View help docs": "View help docs",
   "Enter your stream key.": "Enter your stream key.",
-  "Select platform": "Select platform"
+  "Select platform": "Select platform",
+  "No webcam detected": "No webcam detected"
 }
