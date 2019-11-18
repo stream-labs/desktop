@@ -41,6 +41,10 @@
   "Something went wrong": "Es kam zu einem Fehler",
   "Streamlabs OBS is ready to go": "Streamlabs OBS ist bereit",
   "Download and Apply": "Herunterladen und anwenden",
+  "This device is not available": "This device is not available",
+  "Select your mic": "Select your mic",
+  "Select your webcam": "Select your webcam",
+  "Setup Mic and Webcam": "Setup Mic and Webcam",
   "Sign in with your streaming account to get started with Streamlabs OBS": "Sign in with your streaming account to get started with Streamlabs OBS",
   "Welcome to Streamlabs OBS": "Welcome to Streamlabs OBS",
   "Import your existing settings from OBS in less than a minute and go live": "Import your existing settings from OBS in less than a minute and go live",
@@ -57,5 +61,12 @@
   "Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music to stunning overlays to more tools to engage with your community. Head over to the app store in the main navigation to browse our selection of free and paid apps.": "Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music to stunning overlays to more tools to engage with your community. Head over to the app store in the main navigation to browse our selection of free and paid apps.",
   "Only have one screen? Perfect! Enable our in-game overlay to make sure you catch every chat message and stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ tab of the settings menu.": "Only have one screen? Perfect! Enable our in-game overlay to make sure you catch every chat message and stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ tab of the settings menu.",
   "Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. Head over to the facemask settings to get started.": "Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. Head over to the facemask settings to get started.",
-  "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.": "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information."
+  "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.": "Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.",
+  "Re-Authorize": "Re-Authorize",
+  "or select another platform": "or select another platform",
+  "Connect to %{platform}": "Connect to %{platform}",
+  "View help docs": "View help docs",
+  "Enter your stream key.": "Enter your stream key.",
+  "Select platform": "Select platform",
+  "No webcam detected": "No webcam detected"
 }

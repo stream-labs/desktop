@@ -7,6 +7,7 @@
   "has gifted a sub (%{tier}) to": "ajándékozott feliratkozást (%{tier}) nak",
   "has resubscribed (%{tier}) for %{months} months": "újra feliratkozott (%{tier}) %{months} hónapja",
   "has subscribed (%{tier})": "feliratkozott (%{tier})",
+  "has subscribed": "has subscribed",
   "has used": "használta",
   "has hosted you with %{viewers} viewers": "hosztolt téged %{viewers} nézővel",
   "has raided you with a party of %{viewers}": "raidelt %{viewers} nézővel",

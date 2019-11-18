@@ -7,6 +7,7 @@
   "has gifted a sub (%{tier}) to": "подарил подписку (%{tier})",
   "has resubscribed (%{tier}) for %{months} months": "возобновил подписку (%{tier}) на %{months} месяцев",
   "has subscribed (%{tier})": "подписался (%{tier})",
+  "has subscribed": "has subscribed",
   "has used": "использовал",
   "has hosted you with %{viewers} viewers": "привел %{viewers} зретелей",
   "has raided you with a party of %{viewers}": "совершил налет с группой %{viewers}",
