@@ -1,5 +1,9 @@
 import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
+import { Inject } from 'services';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { getPlatformService } from 'services/platforms';
+import { TwitchService } from 'services/platforms/twitch';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
@@ -18,7 +22,20 @@ export interface IConfigProgress {
 type TConfigProgressCallback = (progress: IConfigProgress) => void;
 
 export class AutoConfigService extends Service {
-  start(cb: TConfigProgressCallback) {
+  @Inject() streamSettingsService: StreamSettingsService;
+
+  async start(cb: TConfigProgressCallback) {
+    const service = getPlatformService('twitch') as TwitchService;
+
+    try {
+      const key = await service.fetchStreamKey();
+      this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+    } catch (e) {
+      console.error('Failure fetching stream key for auto config');
+      this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
+      return;
+    }
+
     obs.NodeObs.InitializeAutoConfig(
       (progress: IConfigProgress) => {
         this.handleProgress(progress);
