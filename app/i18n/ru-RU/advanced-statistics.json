@@ -1,10 +1,10 @@
 {
-  "You do not have any notifications": "You do not have any notifications",
-  "Your stream is currently offline": "Your stream is currently offline",
-  "Your stream is experiencing issues": "Your stream is experiencing issues",
-  "Your stream is experiencing minor issues": "Your stream is experiencing minor issues",
-  "Live Stats": "Live Stats",
-  "Click on a stat to add it to your footer": "Click on a stat to add it to your footer",
-  "Click to add this info to your footer": "Click to add this info to your footer",
-  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here."
+  "You do not have any notifications": "У вас нет уведомлений",
+  "Your stream is currently offline": "В данный момент ваша трансляция недоступна",
+  "Your stream is experiencing issues": "В вашей трансляции возникают проблемы",
+  "Your stream is experiencing minor issues": "В вашей трансляции возникают незначительные проблемы",
+  "Live Stats": "Статистика в реальном времени",
+  "Click on a stat to add it to your footer": "Нажмите на статистику, чтобы добавить ее в нижний колонтитул",
+  "Click to add this info to your footer": "Нажмите, чтобы добавить эту информацию в нижний колонтитул",
+  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "Когда Streamlabs OBS обнаруживает проблемы с производительностью вашей трансляции, такие как пропущенные кадры, запаздывающие кадры или отключение трансляции, вам будут отправлены уведомления об устранении неполадок."
 }
