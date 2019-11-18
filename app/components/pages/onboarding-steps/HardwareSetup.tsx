@@ -9,21 +9,7 @@ import Display from 'components/shared/Display.vue';
 import { ERenderingMode } from '../../../../obs-api';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';
-
-const styles = {
-  volmeter: {
-    position: 'relative',
-    background: 'var(--section)',
-    height: '16px',
-    borderRadius: '4px',
-  },
-  center: {
-    position: 'absolute',
-    top: '50%',
-    transform: 'translate(0, -14%)',
-    width: '100%',
-  },
-};
+import styles from './HardwareSetup.m.less';
 
 @Component({})
 export default class HardwareSetup extends TsxComponent {
@@ -68,17 +54,18 @@ export default class HardwareSetup extends TsxComponent {
   }
 
   get displayRender() {
-    return (
-      this.defaultHardwareService.selectedVideoSource &&
-      !!this.videoDevices.length && (
-        <div style="height: 200px; margin-bottom: 8px;">
-          <Display
-            sourceId={this.defaultHardwareService.selectedVideoSource.sourceId}
-            renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-            key={this.defaultHardwareService.selectedVideoSource.sourceId}
-          />
-        </div>
-      )
+    return this.defaultHardwareService.selectedVideoSource && !!this.videoDevices.length ? (
+      <div class={styles.display}>
+        <Display
+          sourceId={this.defaultHardwareService.selectedVideoSource.sourceId}
+          renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+          key={this.defaultHardwareService.selectedVideoSource.sourceId}
+        />
+      </div>
+    ) : (
+      <div class={styles.placeholder}>
+        <span>{$t('No webcam detected')}</span>
+      </div>
     );
   }
 
@@ -99,10 +86,13 @@ export default class HardwareSetup extends TsxComponent {
             />
           )}
           {this.defaultHardwareService.selectedAudioSource && (
-            <div style={styles.volmeter}>
+            <div
+              class={styles.volmeter}
+              key={this.defaultHardwareService.selectedAudioSource.sourceId}
+            >
               <MixerVolmeter
                 audioSource={this.defaultHardwareService.selectedAudioSource}
-                style={styles.center}
+                class={styles.volmeterCenter}
               />
             </div>
           )}

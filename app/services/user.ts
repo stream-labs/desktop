@@ -32,6 +32,7 @@ import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import { StreamSettingsService } from './settings/streaming';
+import { TwitchService } from './platforms/twitch';
 
 interface ISecondaryPlatformAuth {
   username: string;
@@ -531,6 +532,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           this.streamSettingsService.resetStreamSettings();
 
           result = await this.login(service, parsed);
+
+          // Setup service so the autoconfig can run
+          if (platform === 'twitch' && service instanceof TwitchService) {
+            const key = await service.fetchStreamKey();
+            this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+          }
         } else {
           this.UPDATE_PLATFORM(parsed.platforms[parsed.primaryPlatform]);
           result = EPlatformCallResult.Success;
