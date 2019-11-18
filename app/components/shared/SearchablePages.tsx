@@ -185,7 +185,7 @@ export default class SearchablePages extends TsxComponent<SearchablePagesProps> 
       <div class={styles.searchablePages}>
         {this.loading && <Spinner />}
         <div ref="pageSlot">
-          {this.$scopedSlots.default({ page: this.currentPage, scanning: !this.loading })}
+          {this.$scopedSlots.default({ page: this.currentPage, scanning: this.loading })}
         </div>
       </div>
     );
