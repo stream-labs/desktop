@@ -5,6 +5,7 @@ import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
+import { PlatformAppsService } from 'services/platform-apps';
 
 /**
  * settings that we keep in the localStorage
@@ -68,6 +69,8 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
 export class StreamSettingsService extends PersistentStatefulService<IStreamSettingsState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private userService: UserService;
+  @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -99,7 +102,22 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    const streamFormData = this.getObsStreamSettings();
+    let streamFormData = this.getObsStreamSettings();
+
+    streamFormData.forEach(subCategory => {
+      subCategory.parameters.forEach(parameter => {
+        if (parameter.name === 'streamType' && patch.streamType !== void 0) {
+          parameter.value = patch.streamType;
+          // we should immediately save the streamType in OBS if it's changed
+          // otherwise OBS will not save 'key' and 'server' values
+          this.settingsService.setSettings('Stream', streamFormData);
+        }
+      });
+    });
+
+    // We need to refresh the data in case there are additional fields
+    streamFormData = this.getObsStreamSettings();
+
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'service' && patch.platform !== void 0) {
@@ -108,13 +126,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
         if (parameter.name === 'key' && patch.key !== void 0) {
           parameter.value = patch.key;
-        }
-
-        if (parameter.name === 'streamType' && patch.streamType !== void 0) {
-          parameter.value = patch.streamType;
-          // we should immediately save the streamType in OBS if it's changed
-          // otherwise OBS will not save 'key' and 'server' values
-          this.settingsService.setSettings('Stream', streamFormData);
         }
 
         if (parameter.name === 'server' && patch.server !== void 0) {
@@ -164,6 +175,26 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
   get protectedModeEnabled(): boolean {
     return this.userService.isLoggedIn() && this.state.protectedModeEnabled;
+  }
+
+  /**
+   * This is a workaround to support legacy apps that modify the stream key.
+   * This is only Mobcrush at the moment.
+   */
+  isSafeToModifyStreamKey() {
+    // Mobcrush production app id
+    if (
+      this.platformAppsService.state.loadedApps.find(app => app.id === '3ed9cf0dd4' && app.enabled)
+    ) {
+      if (
+        this.streamSettingsService.settings.streamType === 'rtmp_custom' &&
+        this.streamSettingsService.settings.server === 'rtmp://live.mobcrush.net/slobs'
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**

@@ -6,12 +6,14 @@ import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { RestreamService } from 'services/restream';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 @Component({})
 export default class FacebookMerge extends TsxComponent<{}> {
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
   @Inject() restreamService: RestreamService;
+  @Inject() streamSettingsService: StreamSettingsService;
 
   showLogin = false;
   loading = false;
@@ -31,6 +33,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
       () => (this.loading = true),
       () => {
         this.restreamService.setEnabled(true);
+        this.streamSettingsService.setSettings({ protectedModeEnabled: true });
         this.navigationService.navigate('Studio');
       },
       true,

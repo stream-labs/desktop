@@ -32,11 +32,13 @@ export default class ColorInput extends BaseInput<string, IInputMetadata> {
             </div>
             <transition name="colorpicker-slide">
               {this.pickerVisible && (
-                <Sketch
-                  value={{ hex: this.value }}
-                  onInput={(value: { hex: string }) => this.emitInput(value.hex)}
-                  class="colorpicker-menu"
-                />
+                <div class="colorpicker-container">
+                  <Sketch
+                    value={{ hex: this.value }}
+                    onInput={(value: { hex: string }) => this.emitInput(value.hex)}
+                    class="colorpicker-menu"
+                  />
+                </div>
               )}
             </transition>
           </div>
