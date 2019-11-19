@@ -102,7 +102,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    const streamFormData = this.getObsStreamSettings();
+    let streamFormData = this.getObsStreamSettings();
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -114,6 +114,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         }
       });
     });
+
+    // We need to refresh the data in case there are additional fields
+    streamFormData = this.getObsStreamSettings();
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
