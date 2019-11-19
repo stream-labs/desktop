@@ -5,6 +5,7 @@ import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
+import { PlatformAppsService } from 'services/platform-apps';
 
 /**
  * settings that we keep in the localStorage
@@ -68,6 +69,8 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
 export class StreamSettingsService extends PersistentStatefulService<IStreamSettingsState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private userService: UserService;
+  @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -164,6 +167,24 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
   get protectedModeEnabled(): boolean {
     return this.userService.isLoggedIn() && this.state.protectedModeEnabled;
+  }
+
+  /**
+   * This is a workaround to support legacy apps that modify the stream key.
+   * This is only Mobcrush at the moment.
+   */
+  isSafeToModifyStreamKey() {
+    // Mobcrush production app id
+    if (this.platformAppsService.state.loadedApps.find(app => app.id === '3ed9cf0dd4')) {
+      if (
+        this.streamSettingsService.settings.streamType === 'rtmp_custom' &&
+        this.streamSettingsService.settings.server === 'rtmp://live.mobcrush.net/slobs'
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
