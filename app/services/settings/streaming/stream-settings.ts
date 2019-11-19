@@ -103,6 +103,18 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
     // save settings related to "Settings->Stream" window
     const streamFormData = this.getObsStreamSettings();
+
+    streamFormData.forEach(subCategory => {
+      subCategory.parameters.forEach(parameter => {
+        if (parameter.name === 'streamType' && patch.streamType !== void 0) {
+          parameter.value = patch.streamType;
+          // we should immediately save the streamType in OBS if it's changed
+          // otherwise OBS will not save 'key' and 'server' values
+          this.settingsService.setSettings('Stream', streamFormData);
+        }
+      });
+    });
+
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'service' && patch.platform !== void 0) {
@@ -111,13 +123,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
         if (parameter.name === 'key' && patch.key !== void 0) {
           parameter.value = patch.key;
-        }
-
-        if (parameter.name === 'streamType' && patch.streamType !== void 0) {
-          parameter.value = patch.streamType;
-          // we should immediately save the streamType in OBS if it's changed
-          // otherwise OBS will not save 'key' and 'server' values
-          this.settingsService.setSettings('Stream', streamFormData);
         }
 
         if (parameter.name === 'server' && patch.server !== void 0) {
