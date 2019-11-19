@@ -1,17 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.18.0',
-  title: 'Combined Editor + Live, Selective Recording',
+  version: '0.19.0',
+  title: 'Redesigned YouTube and Stats',
   showChest: false,
   notes: [
-    "We've combined the Editor and Live tabs into a single tab with all of the same functionality.",
-    'Selective recording allows you to hide certain sources in your recordings that are present in your live stream. Enable it by clicking the icon above the sources list.',
-    'Added dynamic bitrate, an option enabled by default that will automatically adjust your bitrate based on your connection speed to prevent you dropping frames.',
-    'Added a button to open up the Streamlabs dashboard in a web browser.',
-    'Added a recording timer.',
-    'Added search functionality to the settings window.',
-    'Resolved an incompatibility with new drivers for certain webcams.',
+    "We've redesigned the YouTube experience from the ground up to support live events and the live Studio",
+    "The stats window has been redesigned to give you a realtime picture of your stream's health, and allows you to pin individual stats to the bottom of the main window.",
+    'Day mode has been overhauled to provide better contrast and readability',
+    'Added the ability to completely hide the preview display in the editor',
+    'Settings search now additionally searches hotkeys',
     'Lots of bug and crash fixes',
   ],
 };
