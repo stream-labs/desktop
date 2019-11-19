@@ -60,6 +60,12 @@ test('Streaming to Twitch', async t => {
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
+
+  // check we can't change stream setting while live
+  await showSettings(t, 'Stream');
+  await t.true(
+    await t.context.app.client.isExisting("div=You can not change these settings when you're live"),
+  );
   t.pass();
 });
 
