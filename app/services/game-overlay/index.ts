@@ -89,13 +89,19 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     super.init();
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
-      destroy: this.destroyOverlay,
+      destroy: () => this.setEnabled(false),
       context: this,
     });
   }
 
+  private overlayRunning = false;
+
   async initializeOverlay() {
     if (!this.state.isEnabled) return;
+
+    if (this.overlayRunning) return;
+    this.overlayRunning = true;
+
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
@@ -279,7 +285,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setEnabled(shouldEnable: boolean = true) {
-    if (!this.userService.isLoggedIn()) {
+    if (shouldEnable && !this.userService.isLoggedIn()) {
       return Promise.reject($t('Please log in to use the in-game overlay.'));
     }
 
@@ -342,15 +348,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async destroyOverlay() {
-    if (this.state.isEnabled) {
-      await overlay.stop();
-      if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
-      if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
-      if (this.previewWindows) {
-        await Object.values(this.previewWindows).forEach(win => win.destroy());
-      }
-      this.onChatUrlChangedSubscription.unsubscribe();
+    if (!this.overlayRunning) return;
+    this.overlayRunning = false;
+
+    await overlay.stop();
+    if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
+    if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
+    if (this.previewWindows) {
+      await Object.values(this.previewWindows).forEach(win => win.destroy());
     }
+    this.onChatUrlChangedSubscription.unsubscribe();
     this.SET_PREVIEW_MODE(false);
     this.TOGGLE_OVERLAY(false);
   }
