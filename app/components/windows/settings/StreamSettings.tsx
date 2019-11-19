@@ -86,12 +86,13 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            {this.canEditSettings && this.restreamService.canEnableRestream && (
+            {this.restreamService.canEnableRestream && (
               <div class="section">
                 <VFormGroup
                   vModel={this.restreamEnabled}
                   metadata={metadata.toggle({
                     title: $t('Enable Multistream'),
+                    disabled: !this.canEditSettings,
                     description: $t(
                       'Multistream allows you to stream to multiple platforms simultaneously.',
                     ),
@@ -108,7 +109,7 @@ export default class StreamSettings extends TsxComponent {
                 {this.userName} <br />
               </div>
             </div>
-            {this.canEditSettings && this.restreamEnabled && (
+            {this.restreamEnabled && (
               <div class="section flex">
                 <div class="margin-right--20">
                   <PlatformLogo platform={'facebook'} class={styles.platformLogo} />
@@ -120,9 +121,11 @@ export default class StreamSettings extends TsxComponent {
                   </div>
                 ) : (
                   <div style={{ lineHeight: '42px' }}>
-                    <button onClick={this.facebookMerge} class="button button--facebook">
-                      {$t('Connect')}
-                    </button>
+                    {this.canEditSettings && (
+                      <button onClick={this.facebookMerge} className="button button--facebook">
+                        {$t('Connect')}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
