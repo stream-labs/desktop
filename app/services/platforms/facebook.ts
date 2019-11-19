@@ -266,13 +266,17 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   async beforeGoLive(options: IFacebookStartStreamOptions) {
     await this.prepopulateInfo();
     await this.putChannelInfo(options);
-    this.streamSettingsService.setSettings({ platform: 'facebook' });
+    this.streamSettingsService.setSettings({ platform: 'facebook', streamType: 'rtmp_common' });
 
     // This generally happens when a stream was scheduled, or when we
     // fetched an existing stopped or scheduled stream from the API.
     if (this.state.streamUrl) {
       const streamKey = this.state.streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
-      this.streamSettingsService.setSettings({ key: streamKey, platform: 'facebook' });
+      this.streamSettingsService.setSettings({
+        key: streamKey,
+        platform: 'facebook',
+        streamType: 'rtmp_common',
+      });
       this.SET_STREAM_URL(null);
       return streamKey;
     }

@@ -218,7 +218,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const key = await this.fetchStreamKey();
 
     if (this.streamSettingsService.isSafeToModifyStreamKey()) {
-      this.streamSettingsService.setSettings({ key, platform: 'mixer' });
+      this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
     }
 
     if (startStreamOptions) await this.putChannelInfo(startStreamOptions);

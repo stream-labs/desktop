@@ -133,7 +133,11 @@ export class TwitchService extends Service implements IPlatformService {
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
-      this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+      this.streamSettingsService.setSettings({
+        key,
+        platform: 'twitch',
+        streamType: 'rtmp_common',
+      });
     }
 
     if (channelInfo) await this.putChannelInfo(channelInfo);
