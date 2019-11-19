@@ -1,6 +1,5 @@
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import cx from 'classnames';
 import { $t } from 'services/i18n';
 import { ISettingsSubCategory } from 'services/settings';
 import TsxComponent from 'components/tsx-component';
@@ -14,6 +13,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
+import { EStreamingState, StreamingService } from 'services/streaming';
 
 @Component({ components: { GenericFormGroups, PlatformLogo } })
 export default class StreamSettings extends TsxComponent {
@@ -22,6 +22,7 @@ export default class StreamSettings extends TsxComponent {
   @Inject() private restreamService: RestreamService;
   @Inject() private navigationService: NavigationService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private streamingService: StreamingService;
 
   private obsSettings = this.streamSettingsService.getObsStreamSettings();
 
@@ -62,6 +63,10 @@ export default class StreamSettings extends TsxComponent {
     return this.userService.isLoggedIn() && !this.protectedModeEnabled;
   }
 
+  get canEditSettings() {
+    return this.streamingService.state.streamingStatus === EStreamingState.Offline;
+  }
+
   get restreamEnabled() {
     return this.restreamService.state.enabled;
   }
@@ -81,7 +86,7 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            {this.restreamService.canEnableRestream && (
+            {this.canEditSettings && this.restreamService.canEnableRestream && (
               <div class="section">
                 <VFormGroup
                   vModel={this.restreamEnabled}
@@ -103,7 +108,7 @@ export default class StreamSettings extends TsxComponent {
                 {this.userName} <br />
               </div>
             </div>
-            {this.restreamEnabled && (
+            {this.canEditSettings && this.restreamEnabled && (
               <div class="section flex">
                 <div class="margin-right--20">
                   <PlatformLogo platform={'facebook'} class={styles.platformLogo} />
@@ -122,13 +127,20 @@ export default class StreamSettings extends TsxComponent {
                 )}
               </div>
             )}
-            <div>
-              <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
-            </div>
+            {this.canEditSettings && (
+              <div>
+                <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
+              </div>
+            )}
           </div>
         )}
 
-        {/* WARNING message */}
+        {/* WARNING messages */}
+        {!this.canEditSettings && (
+          <div class="section section--warning">
+            {$t("You can not change these settings when you're live")}
+          </div>
+        )}
         {this.needToShowWarning && (
           <div class="section section--warning">
             <b>{$t('Warning')}: </b>
@@ -137,14 +149,17 @@ export default class StreamSettings extends TsxComponent {
             )}
             <br />
             <br />
-            <button class="button button--warn" onClick={this.restoreDefaults}>
-              {$t('Use recommended settings')}
-            </button>
+
+            {this.canEditSettings && (
+              <button class="button button--warn" onClick={this.restoreDefaults}>
+                {$t('Use recommended settings')}
+              </button>
+            )}
           </div>
         )}
 
         {/* OBS settings */}
-        {!this.protectedModeEnabled && (
+        {!this.protectedModeEnabled && this.canEditSettings && (
           <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
         )}
       </div>
