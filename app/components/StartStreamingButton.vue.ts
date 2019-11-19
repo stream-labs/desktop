@@ -70,7 +70,7 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      if (this.shouldShowGoLiveWindow) {
+      if (this.shouldShowGoLiveWindow()) {
         if (this.restreamService.shouldGoLiveWithRestream) {
           this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
         } else {
@@ -89,7 +89,7 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.state.streamingStatus;
   }
 
-  get shouldShowGoLiveWindow() {
+  shouldShowGoLiveWindow() {
     if (!this.userService.isLoggedIn()) return false;
 
     if (this.isTwitch) {
