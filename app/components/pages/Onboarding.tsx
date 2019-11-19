@@ -97,6 +97,10 @@ export default class OnboardingPage extends TsxComponent<{}> {
       />,
     ];
 
+    return this.addOptionalSteps(steps);
+  }
+
+  addOptionalSteps(steps: JSX.Element[]) {
     if (this.importedFromObs) {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
