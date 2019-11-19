@@ -313,7 +313,8 @@ textarea[type=text] {
     height: 20px;
   }
 
-  .colorpicker-menu {
+  .colorpicker-container {
+    position: relative;
     top: -4px;
     z-index: 10;
     border-radius: 0 0 4px 4px;
@@ -322,6 +323,14 @@ textarea[type=text] {
     border-top: none;
     box-shadow: 0 8px 16px var(--shadow) !important;
     width: auto;
+  }
+
+  .colorpicker-menu {
+    width: auto;
+    max-width: 200px;
+    margin: 0 auto;
+    background: var(--dropdown-bg);
+    box-shadow: none;
   }
 
   // hide alpha input
