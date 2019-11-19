@@ -13,6 +13,7 @@ test('Creating, fetching and removing sources', async t => {
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
   const scene = scenesService.activeScene;
+  const presetSceneItemNames = scene.getItems().map(item => item['name']);
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
   const colorItem2 = scene.createAndAddSource('MyColorSource2', 'color_source');
@@ -23,7 +24,8 @@ test('Creating, fetching and removing sources', async t => {
   t.truthy(sources.find(source => source.name === 'MyColorSource2'));
 
   const colorItem1 = scene.addSource(colorSource1.sourceId);
-  let sceneItemNames = scene.getItems().map(item => item['name']);
+  let sceneItemNames = scene.getItems().map(item => item['name'])
+    .filter(i => !presetSceneItemNames.includes(i));
 
   t.deepEqual(sceneItemNames, ['MyColorSource1', 'MyColorSource2']);
 
@@ -31,9 +33,8 @@ test('Creating, fetching and removing sources', async t => {
   colorItem2.remove();
   sceneItemNames = scene.getItems().map(item => item['name']);
 
-  t.deepEqual(sceneItemNames, []);
+  t.deepEqual(sceneItemNames.filter(i => !presetSceneItemNames.includes(i)), []);
 });
-
 
 
 test('Source events', async t => {

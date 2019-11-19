@@ -4,8 +4,8 @@ import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
 import { ICustomizationServiceApi } from '../../app/services/customization';
-import { SceneBuilder } from "../helpers/scene-builder";
-import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
+import { SceneBuilder } from '../helpers/scene-builder';
+import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -29,6 +29,9 @@ test('Selection', async t => {
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
   const selection = client.getResource<ISelectionServiceApi>('SelectionService');
   const scene = scenesService.activeScene;
+  selection.selectAll();
+  const numPresetItems = selection.getSize();
+  selection.reset();
 
   const color1 = scene.createAndAddSource('Color1', 'color_source');
   const color2 = scene.createAndAddSource('Color2', 'color_source');
@@ -64,7 +67,7 @@ test('Selection', async t => {
 
   selection.selectAll();
 
-  t.is(selection.getSize(), 3);
+  t.is(selection.getSize(), numPresetItems + 3);
 });
 
 
