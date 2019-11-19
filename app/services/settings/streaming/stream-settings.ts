@@ -175,7 +175,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   isSafeToModifyStreamKey() {
     // Mobcrush production app id
-    if (this.platformAppsService.state.loadedApps.find(app => app.id === '3ed9cf0dd4')) {
+    if (
+      this.platformAppsService.state.loadedApps.find(app => app.id === '3ed9cf0dd4' && app.enabled)
+    ) {
       if (
         this.streamSettingsService.settings.streamType === 'rtmp_custom' &&
         this.streamSettingsService.settings.server === 'rtmp://live.mobcrush.net/slobs'
