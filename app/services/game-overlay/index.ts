@@ -133,6 +133,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       height: 600,
       webPreferences: chatWebPrefences,
     });
+
+    this.windows.chat.webContents.setAudioMuted(true);
+
     this.createPreviewWindows();
     await this.configureWindows();
   }
