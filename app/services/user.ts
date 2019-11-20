@@ -465,7 +465,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
-          'Your Twitch login is expired. Please log in again to continue using Streamlabs OBS',
+          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs OBS'),
         ),
         buttons: [$t('Refresh Login')],
       });
