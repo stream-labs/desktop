@@ -23,7 +23,7 @@
   "removeSceneConfirm": "Are you sure you want to remove %{sceneName}?",
   "disablePerformanceMode": "Disable Performance Mode",
   "sceneCollections": "Scene Collections",
-  "scenePreset": "TBD: Scene Preset",
+  "scenePreset": "Scene Preset",
   "sourcesTooltip": "The building blocks of your scene.",
   "addSourceTooltip": "Add a new Source to your Scene.",
   "removeSourcesTooltip": "Remove Sources from your Scene.",
