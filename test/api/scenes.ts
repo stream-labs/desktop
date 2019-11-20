@@ -3,7 +3,8 @@ import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { sleep } from '../helpers/sleep';
-import { SceneBuilder } from "../helpers/scene-builder";
+import { SceneBuilder } from '../helpers/scene-builder';
+import { DefaultSceneName } from '../helpers/spectron/scenes';
 const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -22,29 +23,33 @@ test('The default scene exists', async t => {
 test('Creating, fetching and removing scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  t.is(scenesService.getScenes().length, 1);
+  const scene1name = scenesService.getScenes()[0].name;
 
   const scene2 = scenesService.createScene('Scene2');
 
   t.is(scene2.name, 'Scene2');
 
-  let scenes = scenesService.getScenes();
+  let scenes = scenesService.getScenes().filter(scene => [scene1name, 'Scene2'].includes(scene.name));
   let scenesNames = scenes.map(scene => scene.name);
 
-  t.deepEqual(scenesNames, ['Scene', 'Scene2']);
+  t.deepEqual(scenesNames, [scene1name, 'Scene2']);
 
   scenesService.removeScene(scenes[1].id);
-  scenes = scenesService.getScenes();
+  scenes = scenesService.getScenes().filter(scene => [scene1name, 'Scene2'].includes(scene.name));
   scenesNames = scenes.map(scene => scene.name);
 
-  t.deepEqual(scenesNames, ['Scene']);
+  t.deepEqual(scenesNames, [scene1name]);
 });
 
 
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  t.is(scenesService.getScenes().length, 1);
+  const scene1name = scenesService.getScenes()[0].name;
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getSceneByName(scene1name);
   const scene2 = scenesService.createScene('Scene2');
 
 
@@ -65,18 +70,19 @@ test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getSceneByName(DefaultSceneName);
+  const presetItemIds = scene.getItems().map(item => item.id);
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
 
-  let items = scene.getItems();
+  let items = scene.getItems().filter(i => !presetItemIds.includes(i.id));
   let itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image2', 'Image1']);
 
 
   scene.removeItem(image2.sceneItemId);
-  items = scene.getItems();
+  items = scene.getItems().filter(i => !presetItemIds.includes(i.id));
   itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image1']);
 

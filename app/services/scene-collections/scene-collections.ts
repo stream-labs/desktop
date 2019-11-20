@@ -11,7 +11,7 @@ import path from 'path';
 import electron from 'electron';
 import fs from 'fs';
 import { parse } from './parse';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, Scene } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { E_AUDIO_CHANNELS } from 'services/audio';
 import { AppService } from 'services/app';
@@ -27,9 +27,11 @@ import {
   ISceneCollectionsServiceApi,
   ISceneCollectionCreateOptions
 } from '.';
-import { SceneCollectionsStateService } from './state';
+import { SceneCollectionsStateService, ScenePresetId } from './state';
 import { Subject } from 'rxjs';
 import { $t } from 'services/i18n';
+import { SettingsService } from 'services/settings';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 
 const uuid = window['require']('uuid/v4');
 
@@ -71,6 +73,8 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() settingsService: SettingsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -103,7 +107,60 @@ export class SceneCollectionsService extends Service
     } else {
       await this.create();
     }
+
+    const scenes = this.scenesService.scenes;
+    if (scenes.length === 1 && scenes[0].getItems().length === 0) {
+      // シーンが一つで空であるため、シーンプリセットをインストールする
+      await this.installPresetSceneCollection();
+    }
+
     this.initialized = true;
+  }
+
+  /// install preset scene collection into active scene collection
+  async installPresetSceneCollection() {
+    // 既存scene を消す
+    this.scenesService.scenes.forEach(scene => scene.remove(true));
+
+    // キャンバス解像度を 1280x720 に変更する
+    const CanvasResolution = '1280x720';
+    const video = this.settingsService.getSettingsFormData('Video');
+    if (video) {
+      const setting = this.settingsService.findSetting(video, 'Untitled', 'Base');
+      if (setting) {
+        if (setting.value !== CanvasResolution) {
+          console.log(`Canvas resolution is ${setting.value}. reset to ${CanvasResolution}.`);
+          setting.value = CanvasResolution;
+          this.settingsService.setSettings('Video', video);
+        }
+      }
+    }
+
+    // this.load() を参考に
+
+    this.startLoadingOperation();
+    await this.deloadCurrentApplicationState();
+
+    const jsonData = this.stateService.readCollectionFile(ScenePresetId);
+    // Preset file作成上の注意
+    //  - image pathを相対にする
+    //  - default audio sourcesを削除する
+
+    const root: RootNode = parse(jsonData, NODE_TYPES);
+    // この間で読み込んだ内容を加工できる
+    //  - デフォルトソースが重複している場合に除去する? 現在はpreset側で除去している
+    await root.load();
+    this.hotkeysService.bindHotkeys();
+
+    this.collectionLoaded = true;
+    await this.save();
+
+    this.finishLoadingOperation();
+
+    // activate tips for preset scene collection
+    this.dismissablesService.reset(EDismissable.ScenePresetHelpTip);
+    // dismiss initial scene collections help tip if not yet(since its position is overlapped)
+    this.dismissablesService.dismiss(EDismissable.SceneCollectionsHelpTip);
   }
 
   /**
