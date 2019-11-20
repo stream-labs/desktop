@@ -60,7 +60,7 @@
 
   <help-tip :dismissable-key="scenePresetHelpTipDismissable">
     <div slot="title">
-      {{ $t('scenes.sceneCollections') }}
+      {{ $t('scenes.scenePreset') }}
     </div>
     <div slot="content">
       {{ $t('scenes.scenePresetDescription') }}
