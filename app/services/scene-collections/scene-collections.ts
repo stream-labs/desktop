@@ -109,7 +109,7 @@ export class SceneCollectionsService extends Service
     }
 
     const scenes = this.scenesService.scenes;
-    if (scenes.length == 1 && scenes[0].getItems().length == 0) {
+    if (scenes.length === 1 && scenes[0].getItems().length === 0) {
       // シーンが一つで空であるため、シーンプリセットをインストールする
       await this.installPresetSceneCollection();
     }
