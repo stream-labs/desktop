@@ -137,10 +137,10 @@ export default class EditStreamInfo extends Vue {
         disabled: this.updatingInfo,
         fullWidth: true,
       }),
-      date: metadata.text({
+      date: metadata.date({
         title: $t('Scheduled Date'),
-        dateFormat: 'MM/dd/yyyy',
-        placeholder: 'MM/DD/YYYY',
+        // dateFormat: 'MM/dd/yyyy',
+        // placeholder: 'MM/DD/YYYY',
         required: true,
         disabled: this.updatingInfo,
         description: this.isFacebook

@@ -80,7 +80,8 @@
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "v-calendar": "^0.9.7"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",

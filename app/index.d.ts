@@ -74,6 +74,7 @@ declare module 'streamlabs-beaker';
 declare module '*.vert';
 declare module '*.frag';
 declare module 'mark.js';
+declare module 'v-calendar';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence
