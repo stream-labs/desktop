@@ -35,6 +35,7 @@ useSpectron({
       path.join(sceneCollectionsPath, 'manifest.json'),
     );
   },
+  pauseIfFailed: true,
 });
 
 /**
