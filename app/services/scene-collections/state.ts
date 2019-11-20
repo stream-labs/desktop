@@ -198,7 +198,7 @@ export class SceneCollectionsStateService extends StatefulService<
 
   getCollectionFilePath(id: string) {
     if (id === ScenePresetId) {
-      return path.join('media', 'scene-presets', 'basic.json');
+      return path.join('scene-presets', 'basic.json');
     }
     return path.join(this.collectionsDirectory, `${id}.json`);
   }

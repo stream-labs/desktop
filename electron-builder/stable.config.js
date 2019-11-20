@@ -14,6 +14,7 @@ const config = {
     'obs-api'
   ],
   extraFiles: [
+    'scene-presets',
     'LICENSE',
     'AGREEMENT.sjis'
   ],
