@@ -278,7 +278,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   unsubscribeFromSocketConnection() {
-    this.socketConnection.unsubscribe();
+    if (this.socketConnection) this.socketConnection.unsubscribe();
   }
 
   onLogout() {
