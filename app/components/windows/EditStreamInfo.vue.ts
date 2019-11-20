@@ -374,7 +374,7 @@ export default class EditStreamInfo extends Vue {
         duration: 1000,
         singleton: true,
       });
-      this.updateError = false;
+      this.infoError = true;
       this.updatingInfo = false;
     }
   }

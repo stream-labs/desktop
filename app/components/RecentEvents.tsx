@@ -196,7 +196,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             onNativeswitch={val => this.setNative(val)}
           />
         )}
-        {this.native ? this.renderNativeEvents : this.renderEmbeddedEvents}
+        {this.native || this.props.isOverlay ? this.renderNativeEvents : this.renderEmbeddedEvents}
         {!this.props.isOverlay && (
           <HelpTip
             dismissableKey={EDismissable.RecentEventsHelpTip}

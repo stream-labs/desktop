@@ -315,6 +315,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async fetchViewerCount(): Promise<number> {
+    if (!this.activeChannel) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
     const url = `${this.apiBase}/${endpoint}&id=${this.activeChannel.broadcastId}&access_token=${
       this.oauthToken

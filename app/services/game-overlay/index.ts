@@ -347,7 +347,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async destroy() {
     if (!this.lifecycle) return;
-    await this.lifecycle.destroy();
+    await this.destroyOverlay();
   }
 
   async destroyOverlay() {
