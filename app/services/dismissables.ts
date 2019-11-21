@@ -17,8 +17,8 @@ interface IDismissablesServiceState {
 
 
 /**
- * A dismissable is anything that can be dismissed and should
- * never show up again, like a help tip.
+ * A dismissable is anything that is shown by default, can be dismissed and
+ * show up again if needed, like a help tip.
  */
 export class DismissablesService extends PersistentStatefulService<IDismissablesServiceState> {
 
