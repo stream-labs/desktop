@@ -95,7 +95,10 @@ export default class StartStreamingButton extends Vue {
     if (this.isTwitch) {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
-      return this.customizationService.state.updateStreamInfoOnLive;
+      return (
+        this.restreamService.shouldGoLiveWithRestream ||
+        this.customizationService.state.updateStreamInfoOnLive
+      );
     }
 
     if (this.isMixer) {
