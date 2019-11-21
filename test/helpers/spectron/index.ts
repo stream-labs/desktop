@@ -75,6 +75,7 @@ export async function waitForLoader(t: any) {
 
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
+  skipThemes?: boolean;
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
@@ -100,6 +101,7 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
+  skipThemes: false,
   restartAppAfterEachTest: true,
   noSync: true,
   networkLogging: false,
@@ -210,7 +212,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('p=Skip');
-        await t.context.app.client.click('p=Skip');
+        if (!options.skipThemes) {
+          await t.context.app.client.click('p=Skip');
+        }
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');
