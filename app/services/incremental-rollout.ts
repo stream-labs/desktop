@@ -19,6 +19,7 @@ interface IIncrementalRolloutServiceState {
   availableFeatures: string[];
 }
 
+@InitAfter('UserService')
 export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
