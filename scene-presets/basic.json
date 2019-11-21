@@ -7,7 +7,7 @@
     "items": [
       {
         "id": "text_gdiplus_63fcf6f6-7648-404e-bdbf-8bef1d393e8c",
-        "name": "一言メッセージ",
+        "name": "メッセージ内容",
         "type": "text_gdiplus",
         "settings": {
           "align": "left",
@@ -352,7 +352,7 @@
             },
             {
               "id": "4a1cf838-f714-4235-afb8-281f7ee032ac",
-              "name": "吹き出し",
+              "name": "一言メッセージ",
               "sceneNodeType": "folder",
               "sceneId": "scene_d8929ac0-3632-4225-b0ba-59a67227b388",
               "resourceId": "SceneItemFolder[\"scene_d8929ac0-3632-4225-b0ba-59a67227b388\",\"4a1cf838-f714-4235-afb8-281f7ee032ac\"]",
