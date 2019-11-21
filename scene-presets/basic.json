@@ -7,7 +7,7 @@
     "items": [
       {
         "id": "text_gdiplus_63fcf6f6-7648-404e-bdbf-8bef1d393e8c",
-        "name": "一言メッセージ",
+        "name": "メッセージ内容",
         "type": "text_gdiplus",
         "settings": {
           "align": "left",
@@ -241,12 +241,12 @@
           "nodeType": "SceneItemsNode",
           "items": [
             {
-              "id": "72e5b99b-75dd-47b5-957d-0698021426a8",
-              "sourceId": "dshow_input_a1a3e9c4-493b-4b96-a217-19c37f014628",
-              "x": 268.6504004970529,
-              "y": 169.9474397544256,
-              "scaleX": 0.5813714295309904,
-              "scaleY": 0.5813714295309904,
+              "id": "b0253367-7eda-42a9-8758-f38fa038de84",
+              "sourceId": "image_source_f0ec48b4-a492-4706-9f3f-1320e44516d0",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1,
+              "scaleY": 1,
               "visible": true,
               "crop": {
                 "top": 0,
@@ -263,12 +263,12 @@
               "rotation": 0
             },
             {
-              "id": "b0253367-7eda-42a9-8758-f38fa038de84",
-              "sourceId": "image_source_f0ec48b4-a492-4706-9f3f-1320e44516d0",
-              "x": 0,
-              "y": 0,
-              "scaleX": 1,
-              "scaleY": 1,
+              "id": "72e5b99b-75dd-47b5-957d-0698021426a8",
+              "sourceId": "dshow_input_a1a3e9c4-493b-4b96-a217-19c37f014628",
+              "x": 268.6504004970529,
+              "y": 169.9474397544256,
+              "scaleX": 0.5813714295309904,
+              "scaleY": 0.5813714295309904,
               "visible": true,
               "crop": {
                 "top": 0,
@@ -305,62 +305,6 @@
                 "items": []
               },
               "rotation": 0
-            },
-            {
-              "id": "7ca865d8-6c31-4e0a-830d-86a52975d1d7",
-              "sourceId": "image_source_452bc18f-fcc6-4ca6-b70c-c8126fbc8c5a",
-              "x": 776.9328474752733,
-              "y": 39.564195753233776,
-              "scaleX": 1.06752910164254,
-              "scaleY": 1.06752910164254,
-              "visible": true,
-              "crop": {
-                "top": 0,
-                "bottom": 0,
-                "left": 0,
-                "right": 0
-              },
-              "locked": false,
-              "hotkeys": {
-                "schemaVersion": 2,
-                "nodeType": "HotkeysNode",
-                "items": []
-              },
-              "rotation": 0
-            },
-            {
-              "id": "8e462f67-86ba-4957-9dba-b7934593314f",
-              "sourceId": "text_gdiplus_63fcf6f6-7648-404e-bdbf-8bef1d393e8c",
-              "x": 862.713170223842,
-              "y": 187.7596903429955,
-              "scaleX": 1,
-              "scaleY": 1,
-              "visible": true,
-              "crop": {
-                "top": 0,
-                "bottom": 0,
-                "left": 0,
-                "right": 0
-              },
-              "locked": false,
-              "hotkeys": {
-                "schemaVersion": 2,
-                "nodeType": "HotkeysNode",
-                "items": []
-              },
-              "rotation": 0
-            },
-            {
-              "id": "4a1cf838-f714-4235-afb8-281f7ee032ac",
-              "name": "吹き出し",
-              "sceneNodeType": "folder",
-              "sceneId": "scene_d8929ac0-3632-4225-b0ba-59a67227b388",
-              "resourceId": "SceneItemFolder[\"scene_d8929ac0-3632-4225-b0ba-59a67227b388\",\"4a1cf838-f714-4235-afb8-281f7ee032ac\"]",
-              "parentId": "",
-              "childrenIds": [
-                "8e462f67-86ba-4957-9dba-b7934593314f",
-                "7ca865d8-6c31-4e0a-830d-86a52975d1d7"
-              ]
             },
             {
               "id": "463c8340-7bc5-40c9-949f-ad2d9f2fbd77",
@@ -416,6 +360,62 @@
               "childrenIds": [
                 "6a8c43db-cbd0-405a-bb41-6199f7f4848c",
                 "463c8340-7bc5-40c9-949f-ad2d9f2fbd77"
+              ]
+            },
+            {
+              "id": "7ca865d8-6c31-4e0a-830d-86a52975d1d7",
+              "sourceId": "image_source_452bc18f-fcc6-4ca6-b70c-c8126fbc8c5a",
+              "x": 776.9328474752733,
+              "y": 39.564195753233776,
+              "scaleX": 1.06752910164254,
+              "scaleY": 1.06752910164254,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "8e462f67-86ba-4957-9dba-b7934593314f",
+              "sourceId": "text_gdiplus_63fcf6f6-7648-404e-bdbf-8bef1d393e8c",
+              "x": 862.713170223842,
+              "y": 187.7596903429955,
+              "scaleX": 1,
+              "scaleY": 1,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "4a1cf838-f714-4235-afb8-281f7ee032ac",
+              "name": "一言メッセージ",
+              "sceneNodeType": "folder",
+              "sceneId": "scene_d8929ac0-3632-4225-b0ba-59a67227b388",
+              "resourceId": "SceneItemFolder[\"scene_d8929ac0-3632-4225-b0ba-59a67227b388\",\"4a1cf838-f714-4235-afb8-281f7ee032ac\"]",
+              "parentId": "",
+              "childrenIds": [
+                "8e462f67-86ba-4957-9dba-b7934593314f",
+                "7ca865d8-6c31-4e0a-830d-86a52975d1d7"
               ]
             }
           ]
