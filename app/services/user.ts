@@ -476,6 +476,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.refreshUserInfo();
     this.setSentryContext();
 
+    await this.incrementalRolloutService.fetchAvailableFeatures();
+
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
 
