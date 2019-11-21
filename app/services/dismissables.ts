@@ -7,6 +7,10 @@ export enum EDismissable {
   ScenePresetHelpTip = 'scene_preset_help_tip'
 }
 
+const InitiallyDismissed = new Set<EDismissable>([
+   EDismissable.ScenePresetHelpTip,
+]);
+
 interface IDismissablesServiceState {
   [key: string]: boolean;
 }
@@ -19,6 +23,9 @@ interface IDismissablesServiceState {
 export class DismissablesService extends PersistentStatefulService<IDismissablesServiceState> {
 
   shouldShow(key: EDismissable): boolean {
+    if (!(key in this.state)) {
+      return !InitiallyDismissed.has(key);
+    }
     return !this.state[key];
   }
 
