@@ -202,6 +202,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterGoLive() {
+    // we don't have activeChannel if user start stream with the 'just go live' button
+    if (!this.activeChannel) return;
+
     const { streamId, broadcastId } = this.activeChannel;
 
     try {
@@ -249,6 +252,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterStopStream() {
+    // we don't have activeChannel if user start stream with the 'just go live' button
+    if (!this.activeChannel) return;
+
     const { broadcastId, lifecycleStep } = this.activeChannel;
     this.updateActiveChannel({
       lifecycleStep: 'idle',
