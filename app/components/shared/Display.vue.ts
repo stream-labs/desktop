@@ -9,7 +9,8 @@ interface DisplayProps {
   sourceId: string;
   paddingSize?: number;
   drawUI?: false;
-  onOutputResize: (region: IRectangle) => void;
+  renderingMode?: number;
+  onOutputResize?: (region: IRectangle) => void;
 }
 
 @Component({})

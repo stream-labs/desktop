@@ -313,14 +313,24 @@ textarea[type=text] {
     height: 20px;
   }
 
-  .colorpicker-menu {
-    top: -2px;
+  .colorpicker-container {
+    position: relative;
+    top: -4px;
     z-index: 10;
-    border-bottom-right-radius: @radius;
-    border-bottom-left-radius: @radius;
+    border-radius: 0 0 4px 4px;
     background: var(--dropdown-bg);
-    border-color: var(--input-border);
-    .shadow() !important;
+    border: 1px solid var(--input-border);
+    border-top: none;
+    box-shadow: 0 8px 16px var(--shadow) !important;
+    width: auto;
+  }
+
+  .colorpicker-menu {
+    width: auto;
+    max-width: 200px;
+    margin: 0 auto;
+    background: var(--dropdown-bg);
+    box-shadow: none;
   }
 
   // hide alpha input
@@ -342,6 +352,20 @@ textarea[type=text] {
   .vc-checkerboard {
     display: none;
   }
+}
+
+.colorpicker-slide-enter,
+.colorpicker-slide-leave-to {
+  transform: translateY(-50%) scaleY(0);
+}
+
+.colorpicker-slide-enter-to {
+  transform: translateY(0) scaleY(100%);
+}
+
+.colorpicker-slide-enter-active,
+.colorpicker-slide-leave-active {
+  transition: all 0.2s linear;
 }
 
 // Path inputs

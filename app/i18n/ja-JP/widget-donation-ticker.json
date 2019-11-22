@@ -13,5 +13,6 @@
   "The amount that was donated": "ドネーションされた金額",
   "Manage List": "管理リスト",
   "Font Settings": "フォント設定",
-  "A hex color for the text of the": "テキストのhexカラー"
+  "A hex color for the text of the": "テキストのhexカラー",
+  "token": "token"
 }

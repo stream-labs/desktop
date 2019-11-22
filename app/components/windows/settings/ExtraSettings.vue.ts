@@ -15,6 +15,7 @@ import { AppService } from 'services/app/index';
 import fs from 'fs';
 import path from 'path';
 import { ObsImporterService } from 'services/obs-importer';
+import { StreamSettingsService } from 'services/settings/streaming';
 
 @Component({
   components: { BoolInput },
@@ -29,6 +30,7 @@ export default class ExtraSettings extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() appService: AppService;
   @Inject() obsImporterService: ObsImporterService;
+  @Inject() streamSettingsService: StreamSettingsService;
 
   cacheUploading = false;
 
@@ -38,6 +40,10 @@ export default class ExtraSettings extends Vue {
 
   set streamInfoUpdate(value: boolean) {
     this.customizationService.setUpdateStreamInfoOnLive(value);
+  }
+
+  get protectedMode() {
+    return this.streamSettingsService.state.protectedModeEnabled;
   }
 
   showCacheDir() {
@@ -84,6 +90,11 @@ export default class ExtraSettings extends Vue {
 
   runAutoOptimizer() {
     this.onboardingService.start({ isOptimize: true });
+    this.windowsService.closeChildWindow();
+  }
+
+  configureDefaults() {
+    this.onboardingService.start({ isHardware: true });
     this.windowsService.closeChildWindow();
   }
 

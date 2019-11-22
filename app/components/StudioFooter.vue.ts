@@ -11,13 +11,10 @@ import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { PerformanceService, EStreamQuality } from 'services/performance';
 import electron from 'electron';
-import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
-import { Subscription } from 'rxjs';
-import * as moment from 'moment';
 
 @Component({
   components: {
@@ -25,7 +22,6 @@ import * as moment from 'moment';
     TestWidgets,
     PerformanceMetrics,
     NotificationsArea,
-    GlobalSyncStatus,
   },
 })
 export default class StudioFooterComponent extends Vue {
@@ -136,8 +132,6 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openMetricsWindow() {
-    const mousePos = electron.remote.screen.getCursorScreenPoint();
-
     this.windowsService.showWindow({
       componentName: 'AdvancedStatistics',
       title: $t('Performance Metrics'),

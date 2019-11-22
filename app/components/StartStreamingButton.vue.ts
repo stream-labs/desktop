@@ -10,6 +10,7 @@ import electron from 'electron';
 import { $t } from 'services/i18n';
 import { SourcesService } from 'services/sources';
 import { StreamSettingsService } from 'services/settings/streaming';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -20,6 +21,7 @@ export default class StartStreamingButton extends Vue {
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() sourcesService: SourcesService;
+  @Inject() restreamService: RestreamService;
 
   @Prop() disabled: boolean;
 
@@ -42,11 +44,12 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      const visibleSources = this.sourcesService
-        .getSources()
-        .filter(source => source.type !== 'scene' && source.video);
+      const needToShowNoSourcesWarning =
+        this.streamSettingsService.settings.warnNoVideoSources &&
+        this.sourcesService.getSources().filter(source => source.type !== 'scene' && source.video)
+          .length === 0;
 
-      if (!visibleSources.length) {
+      if (needToShowNoSourcesWarning) {
         const goLive = await electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
             title: $t('No Sources'),
@@ -67,13 +70,12 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      if (
-        this.userService.isLoggedIn() &&
-        (this.customizationService.state.updateStreamInfoOnLive ||
-          this.isFacebook ||
-          this.isYoutube)
-      ) {
-        this.streamingService.showEditStreamInfo();
+      if (this.shouldShowGoLiveWindow()) {
+        if (this.restreamService.shouldGoLiveWithRestream) {
+          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+        } else {
+          this.streamingService.showEditStreamInfo();
+        }
       } else {
         if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
           await this.videoEncodingOptimizationService.applyProfileFromCache();
@@ -85,6 +87,41 @@ export default class StartStreamingButton extends Vue {
 
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
+  }
+
+  shouldShowGoLiveWindow() {
+    if (!this.userService.isLoggedIn()) return false;
+
+    if (this.isTwitch) {
+      // For Twitch, we can show the Go Live window even with protected mode off
+      // This is mainly for legacy reasons.
+      return (
+        this.restreamService.shouldGoLiveWithRestream ||
+        this.customizationService.state.updateStreamInfoOnLive
+      );
+    }
+
+    if (this.isMixer) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.customizationService.state.updateStreamInfoOnLive &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (this.isFacebook) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (this.isYoutube) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
   }
 
   getStreamButtonLabel() {
@@ -124,11 +161,19 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn() && this.userService.platformType === 'facebook';
   }
 
   get isYoutube() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'youtube';
+    return this.userService.isLoggedIn() && this.userService.platformType === 'youtube';
+  }
+
+  get isTwitch() {
+    return this.userService.isLoggedIn() && this.userService.platformType === 'twitch';
+  }
+
+  get isMixer() {
+    return this.userService.isLoggedIn() && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {

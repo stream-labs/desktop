@@ -36,5 +36,7 @@
   "Rename Scene": "Rename Scene",
   "Name Scene": "Name Scene",
   "Rename Folder": "Rinomina cartella",
-  "Name Folder": "Nome cartella"
+  "Name Folder": "Nome cartella",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

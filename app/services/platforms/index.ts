@@ -89,6 +89,11 @@ export enum EPlatformCallResult {
    * The user does not have live-streaming enabled on their Youtube account
    */
   YoutubeStreamingDisabled,
+
+  /**
+   * The user is missing an essential Twitch scope.
+   */
+  TwitchScopeMissing,
 }
 
 export type TStartStreamOptions =
@@ -156,22 +161,39 @@ export interface IPlatformService {
   getErrorDescription: (error: IPlatformResponse<unknown>) => string;
 }
 
-export interface IPlatformAuth {
+export interface IUserAuth {
   widgetToken: string;
   apiToken: string; // Streamlabs API Token
-  platform: {
-    type: TPlatform;
-    username: string;
-    token: string;
-    id: string;
-    channelId?: string;
-  };
+
+  /**
+   * Old key from when SLOBS only supported a single platform account
+   * @deprecated Use `platforms` instead
+   */
+  platform?: IPlatformAuth;
+
+  /**
+   * The primary platform used for chat, go live window, etc
+   */
+  primaryPlatform: TPlatform;
+
+  /**
+   * New key that supports multiple logged in platforms
+   */
+  platforms?: { [platform in TPlatform]?: IPlatformAuth };
 
   /**
    * Session partition used to separate cookies associated
    * with this user login.
    */
   partition?: string;
+}
+
+export interface IPlatformAuth {
+  type: TPlatform;
+  username: string;
+  token: string;
+  id: string;
+  channelId?: string;
 }
 
 export interface IUserInfo {

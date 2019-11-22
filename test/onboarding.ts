@@ -35,6 +35,12 @@ test('Go through the onboarding and autoconfig', async t => {
     await sleep(1000);
   }
 
+  // Skip hardware config
+  if (await t.context.app.client.isExisting('p=Skip')) {
+    await t.context.app.client.click('p=Skip');
+    await sleep(1000);
+  }
+
   // Skip picking a theme
   if (await t.context.app.client.isExisting('p=Skip')) {
     await t.context.app.client.click('p=Skip');

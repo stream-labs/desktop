@@ -18,11 +18,12 @@
             class="colorpicker__swatch"
             :style="swatchStyle"/>
         </div>
-        <color-picker
-          :value="obsColor"
-          @input="(value) => setValue(value.rgba)"
-          v-if="pickerVisible"
-          class="colorpicker-menu"/>
+        <div class="colorpicker-container" v-if="pickerVisible">
+          <color-picker
+            :value="obsColor"
+            @input="(value) => setValue(value.rgba)"
+            class="colorpicker-menu"/>
+        </div>
       </div>
     </div>
   </div>

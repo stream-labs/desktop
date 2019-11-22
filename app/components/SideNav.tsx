@@ -90,9 +90,6 @@ export default class SideNav extends Vue {
             title={page.title}
           >
             <i class={page.icon} />
-            {page.target === 'BrowseOverlays' && (
-              <div class={cx(styles.badge, styles.newBadge)}>New</div>
-            )}
           </div>
         ))}
         {this.platformAppsService.enabledApps.length > 0 && <AppsNav />}

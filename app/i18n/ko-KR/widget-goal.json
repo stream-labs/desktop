@@ -4,6 +4,7 @@
   "Days Remaining": "남은 날짜",
   "Start Goal": "Start Goal",
   "Goal": "Goal",
+  "End Goal": "End Goal",
   "Starting Amount": "시작 금액",
   "End After": "종료 후",
   "Include resubs?": "Include resubs?",
@@ -14,5 +15,11 @@
   "Text Color": "Text Color",
   "Bar Text Color": "이름 텍스트 색",
   "Bar Thickness": "바의 두께",
-  "Font Family": "Font Family"
+  "Font Family": "Font Family",
+  "Stars Goal": "Stars Goal",
+  "Facebook Stars": "Facebook Stars",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
+  "Facebook chat": "Facebook chat",
+  "Member Goal": "Member Goal"
 }

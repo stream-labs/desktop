@@ -32,28 +32,37 @@
         <bool-input
           v-if="isLoggedIn && !isFacebook"
           v-model="streamInfoUpdate"
-          name="stream_info_udpate"
-          :metadata="{ title: $t('Confirm stream title and game before going live') }"
+          :metadata="{ title: $t('Confirm stream title and game before going live'), name: 'stream_info_udpate' }"
         />
         <bool-input
           v-model="disableHardwareAcceleration"
-          name="disable_ha"
-          :metadata="{ title: $t('Disable hardware acceleration (requires restart)') }"
+          :metadata="{ title: $t('Disable hardware acceleration (requires restart)'), name: 'disable_ha'  }"
         />
         <div class="actions">
           <div class="input-container">
             <button class="button button--default" @click="restartStreamlabelsSession">
-              {{ $t('Restart Streamlabels Session') }}
+              {{ $t('Restart Streamlabels') }}
             </button>
           </div>
-          <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming">
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-content">
+        <div class="actions">
+          <div class="input-container">
+            <button class="button button--default" @click="configureDefaults">
+              {{ $t('Configure Default Devices') }}
+            </button>
+          </div>
+          <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming && protectedMode">
             <button class="button button--default" @click="runAutoOptimizer">
-              {{ $t('Run Auto Optimizer') }}
+              {{ $t('Auto Optimize') }}
             </button>
           </div>
           <div class="input-container">
-            <button class="button button--action" @click="importFromObs">
-              {{ $t('Import from OBS') }}
+            <button class="button button--default" @click="importFromObs">
+              {{ $t('OBS Import') }}
             </button>
           </div>
         </div>

@@ -173,6 +173,14 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     }
   }
 
+  handleUnlimitedModerationDelay(value: boolean) {
+    if (value) {
+      this.wData.settings.moderation_delay = -1;
+    } else {
+      this.wData.settings.moderation_delay = 0;
+    }
+  }
+
   selectAlertType(alertName: string) {
     this.selectedAlert = this.selectedAlert === alertName ? 'general' : alertName;
     this.selectedId = `default-${this.selectedAlert}`;

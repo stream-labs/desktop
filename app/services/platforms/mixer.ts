@@ -123,15 +123,16 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return fetch(request)
       .then(handleResponse)
       .then(response => {
-        this.userService.updatePlatformToken(response.access_token);
+        this.userService.updatePlatformToken('mixer', response.access_token);
       });
   }
 
   fetchRawChannelInfo() {
     return platformAuthorizedRequest<IMixerRawChannel>(
+      'mixer',
       `${this.apiBase}channels/${this.mixerUsername}/details`,
     ).then(json => {
-      this.userService.updatePlatformChannelId(json.id);
+      this.userService.updatePlatformChannelId('mixer', json.id);
       return json;
     });
   }
@@ -176,6 +177,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   fetchViewerCount(): Promise<number> {
     return platformRequest<{ viewersCurrent: number }>(
+      'mixer',
       `${this.apiBase}channels/${this.mixerUsername}`,
     ).then(json => json.viewersCurrent);
   }
@@ -187,7 +189,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       data['typeId'] = this.state.typeIdMap[game];
     }
 
-    await platformAuthorizedRequest({
+    await platformAuthorizedRequest('mixer', {
       url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -198,6 +200,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   searchGames(searchString: string): Promise<IGame[]> {
     return platformRequest<{ id: number; name: string }[]>(
+      'mixer',
       `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
     ).then(response => {
       response.forEach(game => {
@@ -213,23 +216,11 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   async beforeGoLive(startStreamOptions?: IMixerStartStreamOptions) {
     const key = await this.fetchStreamKey();
-    const currentStreamSettings = this.streamSettingsService.settings;
 
-    // disable protectedMode for users who manually changed their stream key before
-    const needToDisableProtectedMode: boolean =
-      currentStreamSettings.platform === 'mixer' &&
-      currentStreamSettings.key &&
-      currentStreamSettings.key !== key;
-
-    if (needToDisableProtectedMode) {
-      this.streamSettingsService.setSettings({ protectedModeEnabled: false });
-    } else {
-      this.streamSettingsService.setSettings({
-        key,
-        platform: 'mixer',
-        protectedModeEnabled: true,
-      });
+    if (this.streamSettingsService.isSafeToModifyStreamKey()) {
+      this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
     }
+
     if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
 
     return key;

@@ -24,8 +24,12 @@
     @input="onInputHandler"
     @search-change="onSearchChange"
   >
-    <span slot="option" slot-scope="props" :data-option-value="props.option.value">
-      <slot name="item" :option="props.option">{{ props.option.title }}</slot>
+    <span
+      slot="option"
+      slot-scope="props"
+      :data-option-value="props.option.value"
+      :data-option-title="props.option.title">
+      <slot name="item" :option="props.option"><img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>{{ props.option.title }}</slot>
     </span>
 
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
@@ -56,4 +60,12 @@
   font-size: 11px;
   font-style: italic;
 }
+
+.icon {
+  display: inline-block;
+  max-width: 16px;
+  max-height: 16px;
+  .margin-right(1);
+}
+
 </style>

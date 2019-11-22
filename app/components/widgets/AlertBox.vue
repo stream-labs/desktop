@@ -78,8 +78,8 @@
     <v-form-group v-model="wData.settings.alert_delay" :metadata="metadata.alertDelay" />
   </validated-form>
   <validated-form slot="moderation-properties" :key="`moderation-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="wData.settings.unlimited_alert_moderation_enabled" :metadata="metadata.unlimitedAlertMod" />
-    <v-form-group v-model="wData.settings.moderation_delay" :metadata="metadata.moderationDelay" />
+    <v-form-group :value="wData.settings.moderation_delay === -1" @input="handleUnlimitedModerationDelay" :metadata="metadata.unlimitedAlertMod" />
+    <v-form-group v-if="wData.settings.moderation_delay > -1" v-model="wData.settings.moderation_delay" :metadata="metadata.moderationDelay" />
     <v-form-group v-model="wData.settings.unlimited_media_moderation_delay" :metadata="metadata.unlimitedMediaMod" />
   </validated-form>
 

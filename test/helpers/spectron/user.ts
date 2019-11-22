@@ -1,5 +1,5 @@
 import { focusMain, TExecutionContext } from './index';
-import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
+import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 const request = require('request');
@@ -26,6 +26,7 @@ interface ITestUserFeatures {
   streamingIsDisabled?: boolean;
   noFacebookPages?: boolean;
   hasLinkedTwitter?: boolean;
+  '2FADisabled'?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {
@@ -49,7 +50,7 @@ export async function logIn(
   isOnboardingTest = false,
 ): Promise<boolean> {
   const app = t.context.app;
-  let authInfo: IPlatformAuth;
+  let authInfo: IUserAuth;
 
   if (user) throw 'User already logged in';
 
@@ -72,6 +73,10 @@ export async function logIn(
   return true;
 }
 
+export async function isLoggedIn(t: TExecutionContext) {
+  return t.context.app.client.isVisible('.fa-sign-out-alt');
+}
+
 /**
  * UserPool has limited amount of users
  * We must let slobs-users-pool service know that we are not going to do any actions with reserved
@@ -86,7 +91,7 @@ export async function releaseUserInPool() {
 /**
  * fetch credentials from ENV variables
  */
-function getAuthInfoFromEnv(): IPlatformAuth {
+function getAuthInfoFromEnv(): IUserAuth {
   const env = process.env;
 
   const authInfo = {
@@ -114,11 +119,14 @@ function getAuthInfoFromEnv(): IPlatformAuth {
   return {
     widgetToken: authInfo.SLOBS_TEST_WIDGET_TOKEN,
     apiToken: authInfo.SLOBS_TEST_API_TOKEN,
-    platform: {
-      type: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
-      id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
-      token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
-      username: authInfo.SLOBS_TEST_USERNAME,
+    primaryPlatform: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
+    platforms: {
+      [authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform]: {
+        type: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
+        id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
+        token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
+        username: authInfo.SLOBS_TEST_USERNAME,
+      },
     },
   };
 }
@@ -130,7 +138,7 @@ async function reserveUserFromPool(
   token: string,
   platformType: TPlatform,
   features: ITestUserFeatures = null,
-): Promise<IPlatformAuth> {
+): Promise<IUserAuth> {
   // try to get a user account from users-pool service
   // give it several attempts
   let attempts = 3;
@@ -157,12 +165,15 @@ async function reserveUserFromPool(
   return {
     widgetToken: user.widgetToken,
     apiToken: user.apiToken,
-    platform: {
-      username: user.username,
-      type: user.type,
-      id: user.id,
-      token: user.token,
-      channelId: user.channelId,
+    primaryPlatform: user.type,
+    platforms: {
+      [user.type]: {
+        username: user.username,
+        type: user.type,
+        id: user.id,
+        token: user.token,
+        channelId: user.channelId,
+      },
     },
   };
 }

@@ -1,17 +1,13 @@
-import { IInputMetadata } from '../../app/components/shared/inputs';
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
 import { TExecutionContext } from './spectron';
-
-interface IFormMonkeyFillOptions {
-  metadata?: Dictionary<IInputMetadata>;
-}
 
 interface IUIInput {
   id: string;
   type: string;
   name: string;
   selector: string;
+  loading: boolean;
 }
 
 const DEFAULT_SELECTOR = 'body';
@@ -22,9 +18,11 @@ const DEFAULT_SELECTOR = 'body';
 export class FormMonkey {
   constructor(
     private t: TExecutionContext,
-    private formSelector = DEFAULT_SELECTOR,
+    private formSelector?: string,
     private showLogs = false,
-  ) {}
+  ) {
+    if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
+  }
 
   get client() {
     return this.t.context.app.client;
@@ -44,17 +42,27 @@ export class FormMonkey {
     for (const $input of $inputs) {
       const id = ($input as any).ELEMENT;
       const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
-      const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
-      const selector = `${formSelector} [data-name="${name}"]`;
-      result.push({ id, name, type, selector });
+      if (!name) continue;
+      result.push(await this.getInput(name));
     }
     return result;
+  }
+
+  async getInput(name: string): Promise<IUIInput> {
+    const selector = `${this.formSelector} [data-name="${name}"]`;
+    const $el = await this.client.$(selector);
+    const id = ($el as any).value.ELEMENT;
+    const type = await this.getAttribute(selector, 'data-type');
+    const loadingAttr = await this.getAttribute(selector, 'data-loading');
+    const loading = loadingAttr === 'true';
+    return { id, name, type, selector, loading };
   }
 
   /**
    * fill the form with values
    */
-  async fill(formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
+  async fill(formData: Dictionary<any>) {
+    await this.waitForLoading();
     const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
@@ -110,6 +118,7 @@ export class FormMonkey {
    * returns all input values from the form
    */
   async read(): Promise<Dictionary<any>> {
+    await this.waitForLoading();
     const inputs = await this.getInputs();
     const formData = {};
 
@@ -205,6 +214,7 @@ export class FormMonkey {
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
     await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
+    await sleep(100); // give colorpicker some time to be closed
   }
 
   async getColorValue(selector: string) {
@@ -216,6 +226,33 @@ export class FormMonkey {
       `${selector} .multiselect .multiselect__option--selected span`,
       'data-option-value',
     );
+  }
+
+  /**
+   * return ListInput options
+   */
+  async getListOptions(fieldName: string): Promise<{ value: string; title: string }[]> {
+    await this.waitForLoading(fieldName);
+    const input = await this.getInput(fieldName);
+    const optionsEls = await this.client.$$(`${input.selector} [data-option-value]`);
+    const values: { value: string; title: string }[] = [];
+    for (const el of optionsEls) {
+      const id = (el as any).ELEMENT;
+      const value = (await this.client.elementIdAttribute(id, 'data-option-value')).value;
+      const title = (await this.client.elementIdAttribute(id, 'data-option-title')).value;
+      values.push({ value, title });
+    }
+    return values;
+  }
+
+  async getOptionByTitle(fieldName: string, optionTitle: string | RegExp) {
+    const options = await this.getListOptions(fieldName);
+    const option = options.find(option => {
+      return typeof optionTitle === 'string'
+        ? option.title === optionTitle
+        : !!option.title.match(optionTitle);
+    });
+    return option.value;
   }
 
   async setBoolValue(selector: string, value: boolean) {
@@ -317,6 +354,20 @@ export class FormMonkey {
     await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
   }
 
+  /**
+   * wait for input to be loaded
+   * if no field name provided then wait for all inputs
+   */
+  async waitForLoading(fieldName?: string) {
+    const loadingInputs = (await this.getInputs()).filter(input => {
+      return input.loading && (!fieldName || fieldName === input.name);
+    });
+    const watchers = loadingInputs.map(input => {
+      return this.client.waitUntil(async () => (await this.getInput(input.name)).loading === false);
+    });
+    return Promise.all(watchers);
+  }
+
   private async getAttribute(selector: string, attrName: string) {
     const id = (await this.client.$(selector)).value.ELEMENT;
     return (await this.client.elementIdAttribute(id, attrName)).value;
@@ -333,9 +384,18 @@ export class FormMonkey {
  */
 export async function fillForm(
   t: TExecutionContext,
-  selector: string,
+  selector = DEFAULT_SELECTOR,
   formData: Dictionary<any>,
 ): Promise<any> {
-  const formSelector = selector || DEFAULT_SELECTOR;
-  return new FormMonkey(t, formSelector).fill(formData);
+  return new FormMonkey(t, selector).fill(formData);
+}
+
+/**
+ * a shortcut for FormMonkey.includes()
+ */
+export async function formIncludes(
+  t: TExecutionContext,
+  formData: Dictionary<string>,
+): Promise<boolean> {
+  return new FormMonkey(t).includes(formData);
 }

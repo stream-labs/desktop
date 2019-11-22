@@ -48,7 +48,6 @@ const hideInteraction = `
 `;
 
 @InitAfter('UserService')
-@InitAfter('WindowsService')
 export class GameOverlayService extends PersistentStatefulService<GameOverlayState> {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
@@ -79,33 +78,37 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     // overlayControls: Electron.BrowserWindow;
   } = {} as any;
 
-  onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
-  onWindowsReadySubscription: Subscription;
-  lifecycle: LoginLifecycle;
+  private onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
+  private onWindowsReadySubscription: Subscription;
+  private onChatUrlChangedSubscription: Subscription;
+  private lifecycle: LoginLifecycle;
 
-  commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
+  private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
-  async initialize() {
-    if (!this.state.isEnabled) return;
-
+  async init() {
+    super.init();
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
-      destroy: this.destroyOverlay,
+      destroy: () => this.setEnabled(false),
       context: this,
-    });
-
-    // sync chat url
-    this.streamInfoService.streamInfoChanged.subscribe(streamInfo => {
-      const chatWindow = this.windows.chat;
-      if (!chatWindow) return;
-      if (streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
-        chatWindow.loadURL(streamInfo.chatUrl);
-      }
     });
   }
 
+  private overlayRunning = false;
+
   async initializeOverlay() {
-    overlay.start();
+    if (!this.state.isEnabled) return;
+
+    if (this.overlayRunning) return;
+    this.overlayRunning = true;
+
+    let crashHandlerLogPath = '';
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
+      const overlayLogFile = '\\game-overlays.log';
+      crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
+    }
+
+    overlay.start(crashHandlerLogPath);
 
     this.onWindowsReadySubscription = this.onWindowsReady
       .pipe(
@@ -117,12 +120,22 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
     const chatWebPrefences = { ...this.commonWindowOptions.webPreferences, partition };
-    this.windows.recentEvents = new BrowserWindow({ ...this.commonWindowOptions, width: 600 });
+    this.windows.recentEvents = this.windowsService.createOneOffWindowForOverlay({
+      ...this.commonWindowOptions,
+      width: 600,
+      componentName: 'GameOverlayEventFeed',
+      queryParams: { gameOverlay: true },
+      webPreferences: { offscreen: true, nodeIntegration: true },
+      isFullScreen: true,
+    });
     this.windows.chat = new BrowserWindow({
       ...this.commonWindowOptions,
       height: 600,
       webPreferences: chatWebPrefences,
     });
+
+    this.windows.chat.webContents.setAudioMuted(true);
+
     this.createPreviewWindows();
     await this.configureWindows();
   }
@@ -179,9 +192,29 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    this.windows.recentEvents.loadURL(this.userService.recentEventsUrl());
     if (this.streamInfoService.state.chatUrl) {
-      this.windows.chat.loadURL(this.streamInfoService.state.chatUrl);
+      this.windows.chat
+        .loadURL(this.streamInfoService.state.chatUrl)
+        .catch(this.handleRedirectError);
+    }
+
+    // sync chat url if it has been changed
+    this.onChatUrlChangedSubscription = this.streamInfoService.streamInfoChanged.subscribe(
+      streamInfo => {
+        if (!this.state.isEnabled) return;
+        const chatWindow = this.windows.chat;
+        if (!chatWindow) return;
+        if (streamInfo.chatUrl && streamInfo.chatUrl !== chatWindow.webContents.getURL()) {
+          chatWindow.loadURL(streamInfo.chatUrl).catch(this.handleRedirectError);
+        }
+      },
+    );
+  }
+
+  handleRedirectError(e: Error) {
+    // This error happens when the page redirects, which is expected for chat
+    if (!e.message.match(/\(\-3\) loading/)) {
+      throw e;
     }
   }
 
@@ -255,17 +288,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setEnabled(shouldEnable: boolean = true) {
-    if (!this.userService.isLoggedIn()) {
+    if (shouldEnable && !this.userService.isLoggedIn()) {
       return Promise.reject($t('Please log in to use the in-game overlay.'));
     }
 
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
+    this.SET_ENABLED(shouldEnable);
     if (shouldStart) await this.initializeOverlay();
     if (shouldStop) await this.destroyOverlay();
-
-    this.SET_ENABLED(shouldEnable);
   }
 
   async toggleWindowEnabled(window: string) {
@@ -315,18 +347,20 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async destroy() {
     if (!this.lifecycle) return;
-    await this.lifecycle.destroy();
+    await this.destroyOverlay();
   }
 
   async destroyOverlay() {
-    if (this.state.isEnabled) {
-      await overlay.stop();
-      if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
-      if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
-      if (this.previewWindows) {
-        await Object.values(this.previewWindows).forEach(win => win.destroy());
-      }
+    if (!this.overlayRunning) return;
+    this.overlayRunning = false;
+
+    await overlay.stop();
+    if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
+    if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
+    if (this.previewWindows) {
+      await Object.values(this.previewWindows).forEach(win => win.destroy());
     }
+    this.onChatUrlChangedSubscription.unsubscribe();
     this.SET_PREVIEW_MODE(false);
     this.TOGGLE_OVERLAY(false);
   }
@@ -334,6 +368,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   private createWindowOverlays() {
     Object.keys(this.windows).forEach((key: string) => {
       const win: electron.BrowserWindow = this.windows[key];
+      // Fix race condition in screen tests
+      if (win.isDestroyed()) return;
+
       const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId === -1 || overlayId == null) {

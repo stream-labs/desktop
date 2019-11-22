@@ -71,6 +71,8 @@ export class CacheUploaderService extends Service {
       this.addFileIfExists(archive, 'log.log');
       this.addFileIfExists(archive, 'crash-handler.log');
       this.addFileIfExists(archive, 'crash-handler.log.old');
+      this.addFileIfExists(archive, 'game-overlays.log');
+      this.addFileIfExists(archive, 'game-overlays.log.old');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
       archive.file(path.join(cacheDir, 'service-protected.json'), { name: 'service.json' });

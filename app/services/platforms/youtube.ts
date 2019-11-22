@@ -189,7 +189,11 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
-    this.streamSettingsService.setSettings({ platform: 'youtube', key: streamKey });
+    this.streamSettingsService.setSettings({
+      platform: 'youtube',
+      key: streamKey,
+      streamType: 'rtmp_common',
+    });
 
     // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
     this.setActiveBroadcast(broadcast);
@@ -222,6 +226,19 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // we all set
       this.setLifecycleStep('live');
     } catch (e) {
+      if (this.userService.platformType !== 'youtube') {
+        // user has logged out before the stream started
+        // don't treat this as an error
+        return;
+      }
+
+      if (this.activeChannel.lifecycleStep === 'idle') {
+        // user stopped streaming before it started, so transitions for broadcast may not work
+        // don't treat this as an error
+        return;
+      }
+
+      // something is wrong in afterGoLive hook
       // show the window with error description
       this.updateActiveChannel({ error: e.message });
       this.showStreamStatusWindow();
@@ -233,11 +250,18 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
   async afterStopStream() {
     const { broadcastId, lifecycleStep } = this.activeChannel;
-    if (lifecycleStep !== 'idle') this.transitionBroadcastStatus(broadcastId, 'complete');
     this.updateActiveChannel({
       lifecycleStep: 'idle',
       error: '',
     });
+    if (lifecycleStep !== 'idle') {
+      try {
+        await this.transitionBroadcastStatus(broadcastId, 'complete');
+      } catch (e) {
+        // most likely we tried to switch status to complete when the broadcast is in ready or testing state
+        // this happens when we stop stream before it becomes active
+      }
+    }
   }
 
   private setLifecycleStep(step: TYoutubeLifecycleStep) {
@@ -251,7 +275,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       const endpoint = 'liveStreams?part=id,snippet&mine=true';
       const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
-      await platformAuthorizedRequest(url);
+      await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
     } catch (resp) {
@@ -291,13 +315,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async fetchViewerCount(): Promise<number> {
+    if (!this.activeChannel) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
     const url = `${this.apiBase}/${endpoint}&id=${this.activeChannel.broadcastId}&access_token=${
       this.oauthToken
     }`;
     return platformAuthorizedRequest<{
       items: { liveStreamingDetails: { concurrentViewers: number } }[];
-    }>(url).then(
+    }>('youtube', url).then(
       json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
     );
   }
@@ -334,7 +359,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     return fetch(request)
       .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+      .then(response => this.userService.updatePlatformToken('youtube', response.access_token));
   }
 
   /**
@@ -414,7 +439,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       status: { privacyStatus: 'public' },
     };
 
-    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       body: JSON.stringify(data),
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -444,7 +469,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
     snippet.scheduledStartTime = new Date().toISOString();
 
-    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       body: JSON.stringify({ id, snippet }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -460,7 +485,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `/liveBroadcasts/bind?part=${fields.join(',')}`;
-    return platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+    return platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       method: 'POST',
       url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
         this.oauthToken
@@ -474,7 +499,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    */
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=cdn,snippet,contentDetails`;
-    return platformAuthorizedRequest<IYoutubeLiveStream>({
+    return platformAuthorizedRequest<IYoutubeLiveStream>('youtube', {
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       method: 'POST',
       body: JSON.stringify({
@@ -499,6 +524,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=${fields.join(',')}&id=${id}`;
     const collection = await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveStream>>(
+      'youtube',
       `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     );
     return collection.items[0];
@@ -521,7 +547,14 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
 
       // poll each 2s
       while (canPoll) {
-        const shouldStop = await cb();
+        let shouldStop = false;
+        try {
+          shouldStop = await cb();
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
         if (shouldStop) {
           canPoll = false;
           resolve();
@@ -539,6 +572,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   private async waitForStreamStatus(streamId: string, status: TStreamStatus) {
     try {
       await this.pollAPI(async () => {
+        // user clicked stop streaming, cancel polling
+        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
       });
@@ -556,13 +592,16 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       // ask Youtube to change the broadcast status
       const endpoint = `liveBroadcasts/transition?broadcastStatus=${status}&id=${broadcastId}&part=status`;
-      await platformAuthorizedRequest<IYoutubeLiveBroadcast>({
+      await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
         method: 'POST',
         url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       });
 
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
+        // if user clicked stop streaming, cancel polling
+        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
       });
@@ -625,7 +664,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     }`;
     const broadcastsCollection = await platformAuthorizedRequest<
       IYoutubeCollection<IYoutubeLiveBroadcast>
-    >(`${this.apiBase}/liveBroadcasts?${query}`);
+    >('youtube', `${this.apiBase}/liveBroadcasts?${query}`);
 
     // don't apply any filters if the ids filter specified
     if (ids) return broadcastsCollection.items;

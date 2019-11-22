@@ -1,5 +1,5 @@
 import { HostsService } from 'services/hosts';
-import { StatefulService, Inject, mutation } from 'services/core';
+import { StatefulService, Inject, mutation, InitAfter } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
@@ -186,7 +186,7 @@ function getHashForRecentEvent(event: IRecentEvent) {
     case 'sticker':
       return [event.name, event.type, event.currency].join(':');
     case 'subscription':
-      return [event.type, event.name, event.message].join(':');
+      return [event.type, event.name.toLowerCase(), event.message].join(':');
     case 'superchat':
       return [event.type, event.name, event.message].join(':');
     case 'superheart':
@@ -234,6 +234,7 @@ const SUPPORTED_EVENTS = [
   'treat',
 ];
 
+@InitAfter('UserService')
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
@@ -254,7 +255,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   lifecycle: LoginLifecycle;
   socketConnection: Subscription = null;
 
-  async initialize() {
+  async init() {
     this.lifecycle = await this.userService.withLifecycle({
       init: this.syncEventsState,
       destroy: () => Promise.resolve(this.onLogout()),
@@ -277,7 +278,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   unsubscribeFromSocketConnection() {
-    this.socketConnection.unsubscribe();
+    if (this.socketConnection) this.socketConnection.unsubscribe();
   }
 
   onLogout() {

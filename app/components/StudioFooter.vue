@@ -14,11 +14,7 @@
       @click="openMetricsWindow"
     />
     <performance-metrics mode="limited" class="performance-metrics" />
-    <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
-    <!-- <transition name="slide">
-      <performance-metrics v-if="metricsShown" class="performance-metrics" />
-    </transition> -->
   </div>
 
   <div class="nav-right">
