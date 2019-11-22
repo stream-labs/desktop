@@ -109,7 +109,7 @@ export class SceneCollectionsService extends Service
     }
 
     const scenes = this.scenesService.scenes;
-    if (scenes.length === 1 && scenes[0].getItems().length === 0) {
+    if (this.collections.length === 1 && scenes.length === 1 && scenes[0].getItems().length === 0) {
       // シーンが一つで空であるため、シーンプリセットをインストールする
       await this.installPresetSceneCollection();
     }
@@ -601,6 +601,9 @@ export class SceneCollectionsService extends Service
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
+
+    // コレクションが増えたら scene preset help tipを消す
+    this.dismissablesService.dismiss(EDismissable.ScenePresetHelpTip);
   }
 
   /**
