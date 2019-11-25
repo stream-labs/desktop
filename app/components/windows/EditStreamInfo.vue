@@ -63,8 +63,8 @@
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
-          <h-form-group type="text" v-model="startTimeModel.date" :metadata="formMetadata.date" />
-          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="formMetadata.time" />
+          <h-form-group v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <h-form-group v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"

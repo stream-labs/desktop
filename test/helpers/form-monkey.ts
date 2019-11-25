@@ -1,6 +1,6 @@
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
-import { TExecutionContext } from './spectron';
+import { click, TExecutionContext } from './spectron';
 
 interface IUIInput {
   id: string;
@@ -11,6 +11,21 @@ interface IUIInput {
 }
 
 const DEFAULT_SELECTOR = 'body';
+
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 /**
  * helper for simulating user input into SLOBS forms
@@ -97,6 +112,9 @@ export class FormMonkey {
         case 'fontSize':
         case 'fontWeight':
           await this.setSliderValue(input.selector, value);
+          break;
+        case 'date':
+          await this.setDateValue(input.selector, value);
           break;
         case 'twitchTags':
           await this.setTwitchTagsValue(input.selector, value);
@@ -322,6 +340,44 @@ export class FormMonkey {
         `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
       ),
     );
+  }
+
+  async setDateValue(selector: string, date: Date | number) {
+    date = new Date(date);
+    const day = date.getDay();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    // open calendar
+    await click(this.t, selector);
+
+    // switch to month selection
+    await click(this.t, `${selector} .day__month_btn`);
+
+    // switch to year selection
+    await click(this.t, `${selector} .month__year_btn`);
+
+    // select year
+
+    // await sleep(15999, true);
+    console.log('click year', selector);
+    try {
+      const el = await this.client.$(selector).$$(`span.year=${year}`);
+      console.log(el);
+    } catch (e) {
+      await sleep(15000, true);
+    }
+
+    console.log('year clicked', selector);
+    // await sleep(10000, true);
+    // await this.client.waitForVisible(`span.year=${year}`);
+    // await click(this.t, `${selector} span.year=${year}`);
+
+    // select month
+    await click(this.t, `span.month=${months[month]}`);
+
+    // select day
+    await click(this.t, `span.day=${day}`);
   }
 
   async setInputValue(selector: string, value: string) {

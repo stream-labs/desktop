@@ -77,7 +77,9 @@ export interface ITextMetadata extends IInputMetadata {
   emitOnChange?: boolean;
 }
 
-export interface IDateMetadata extends IInputMetadata {}
+export interface IDateMetadata extends IInputMetadata {
+  disablePastDates?: boolean;
+}
 
 export interface ISliderMetadata extends IInputMetadata {
   min?: number;

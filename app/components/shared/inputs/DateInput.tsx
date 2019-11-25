@@ -1,29 +1,64 @@
 import { Component, Prop } from 'vue-property-decorator';
-import cx from 'classnames';
 import { BaseInput } from './BaseInput';
 import { IDateMetadata } from './index';
-import { $t } from 'services/i18n';
-import VCalendar from 'v-calendar';
-import Vue from 'vue';
-import DatePicker from 'v-calendar/lib/components/date-picker.umd';
+import { I18nService } from 'services/i18n';
+import Datepicker from 'vuejs-datepicker';
+import * as locales from 'vuejs-datepicker/dist/locale';
+import { Inject } from 'services/core';
+import styles from './DateInput.m.less';
 
-Vue.use(VCalendar);
-
-@Component({})
-export default class DateInput extends BaseInput<string, IDateMetadata> {
-  @Prop() readonly value: string;
+@Component({ components: { Datepicker } })
+export default class DateInput extends BaseInput<number, IDateMetadata> {
+  @Inject() i18nService: I18nService;
+  @Prop() readonly value: number;
 
   @Prop({ default: () => ({}) })
   readonly metadata: IDateMetadata;
 
   @Prop() readonly title: string;
 
-  localValue: null;
+  get date() {
+    return this.value ? new Date(this.value) : null;
+  }
+
+  getOptions(): IDateMetadata {
+    // define default props
+    const options = super.getOptions();
+    return {
+      ...options,
+      disablePastDates: false,
+    };
+  }
+
+  locale = locales[this.i18nService.state.locale.split('-')[0]]; // use 2 letters code
+
+  get disabledDates() {
+    if (this.options.disablePastDates) return null;
+
+    // @see https://github.com/charliekassel/vuejs-datepicker#disabled-dates
+    return { to: new Date(Date.now() - 1000 * 60 * 60 * 24) };
+  }
 
   render() {
     return (
-      <span data-role="input" data-type="date" data-name={this.options.name}>
-        <DatePicker v-model={this.localValue} disabled={this.options.disabled} data-temp="true" />
+      <span
+        data-role="input"
+        data-type="date"
+        data-name={this.options.name}
+        class={styles['date-input']}
+      >
+        <Datepicker
+          language={this.locale}
+          value={this.date}
+          disabledDates={this.disabledDates}
+          onInput={(value: number, ev: Event) => this.emitInput(value ? +value : null, ev)}
+        />
+        <input
+          type="hidden"
+          value={this.value}
+          name={this.options.uuid}
+          v-validate={this.validate}
+        />
       </span>
     );
   }

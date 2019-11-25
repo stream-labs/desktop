@@ -81,7 +81,8 @@
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
     "uuid": "^3.0.1",
-    "v-calendar": "^0.9.7"
+    "v-calendar": "^0.9.7",
+    "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
