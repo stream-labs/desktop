@@ -344,7 +344,7 @@ export class FormMonkey {
 
   async setDateValue(selector: string, date: Date | number) {
     date = new Date(date);
-    const day = date.getDay();
+    const day = date.getDate();
     const month = date.getMonth();
     const year = date.getFullYear();
 
@@ -358,26 +358,21 @@ export class FormMonkey {
     await click(this.t, `${selector} .month__year_btn`);
 
     // select year
-
-    // await sleep(15999, true);
-    console.log('click year', selector);
-    try {
-      const el = await this.client.$(selector).$$(`span.year=${year}`);
-      console.log(el);
-    } catch (e) {
-      await sleep(15000, true);
-    }
-
-    console.log('year clicked', selector);
-    // await sleep(10000, true);
-    // await this.client.waitForVisible(`span.year=${year}`);
-    // await click(this.t, `${selector} span.year=${year}`);
+    let els: any[];
+    els = await this.client.$(selector).$$(`span.year=${year}`);
+    this.client.elementIdClick(els[1].ELEMENT);
 
     // select month
-    await click(this.t, `span.month=${months[month]}`);
+    await this.client
+      .$(selector)
+      .$(`span.month=${months[month]}`)
+      .click();
 
     // select day
-    await click(this.t, `span.day=${day}`);
+    await this.client
+      .$(selector)
+      .$(`span.day=${day}`)
+      .click();
   }
 
   async setInputValue(selector: string, value: string) {

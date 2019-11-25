@@ -39,6 +39,23 @@ export default class DateInput extends BaseInput<number, IDateMetadata> {
     return { to: new Date(Date.now() - 1000 * 60 * 60 * 24) };
   }
 
+  emitInput(val: number, ev: Event) {
+    if (!val) {
+      super.emitInput(val, ev);
+      return;
+    }
+
+    // Datepicker returns a date without resetting current time
+    // so reset it now
+    const date = new Date(val);
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    super.emitInput(date.valueOf(), ev);
+  }
+
   render() {
     return (
       <span
