@@ -89,6 +89,11 @@ export enum EPlatformCallResult {
    * The user does not have live-streaming enabled on their Youtube account
    */
   YoutubeStreamingDisabled,
+
+  /**
+   * The user is missing an essential Twitch scope.
+   */
+  TwitchScopeMissing,
 }
 
 export type TStartStreamOptions =
