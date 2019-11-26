@@ -23,7 +23,7 @@
     "package:internal-stable": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/internal-stable.config.js",
     "package:internal-unstable": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config electron-builder/internal-unstable.config.js",
     "release": "yarn install --cwd bin && node bin/release/mini-release.js",
-    "patch-note": "node bin/release/generatePatchNote.js",
+    "patch-note": "yarn install --cwd bin && node bin/release/generatePatchNote.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
     "test:unit": "yarn test:unit:app && yarn test:unit:bin",

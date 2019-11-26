@@ -11,12 +11,12 @@ const { getTagCommitId } = require('./util');
 
 // previous tag should be following rule:
 //  v{major}.{minor}.{yyyymmdd}-[{channel}.]{ord}[internalMark]
-const VERSION_REGEXP = /v(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel>\w+)\.)?(?<ord>\d+)(?<internalMark>d)?/;
+const VERSION_REGEXP = /(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel>\w+)\.)?(?<ord>\d+)(?<internalMark>d)?/;
 
-function parseVersionTag(tag) {
+function parseVersion(tag) {
   const result = VERSION_REGEXP.exec(tag);
   if (result && result.groups) return result.groups;
-  throw new Error(`cannot parse a given tag: ${tag}`)
+  throw new Error(`cannot parse a given tag: ${tag}`);
 }
 
 /** @typedef {{ channel: 'stable' | 'unstable', environment: 'public' | 'internal' }} VersionContext */
@@ -26,7 +26,7 @@ function parseVersionTag(tag) {
  * @returns {VersionContext}
  */
 function getVersionContext(tag) {
-  const result = parseVersionTag(tag);
+  const result = parseVersion(tag);
   if (result.channel === 'stable') {
     throw new Error('stable channel must have no prefix');
   }
@@ -68,12 +68,12 @@ function validateVersionContext({
 }
 
 function generateNewVersion({
-  previousTag,
+  previousVersion,
   now = Date.now(),
 }) {
   const {
     major, minor, date, channel, ord, internalMark
-  } = parseVersionTag(previousTag);
+  } = parseVersion(previousVersion);
 
   const today = moment(now).format('YYYYMMDD');
   const newOrd = date === today ? parseInt(ord, 10) + 1 : 1;
@@ -108,8 +108,8 @@ function writePatchNoteFile(patchNoteFileName, version, contents) {
   fs.writeFileSync(patchNoteFileName, body);
 }
 
-async function collectPullRequestMerges({ octokit, owner, repo }, previousTag) {
-  const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, { silent: true }).stdout;
+async function collectPullRequestMerges({ octokit, owner, repo }, previousVersion) {
+  const merges = executeCmd(`git log --oneline --merges v${previousVersion}..`, { silent: true }).stdout;
 
   const promises = [];
   for (const line of merges.split(/\r?\n/)) {
@@ -223,7 +223,7 @@ function readPatchNote({
 }
 
 module.exports = {
-  parseVersionTag,
+  parseVersion,
   getVersionContext,
   generateNewVersion,
   isSameVersionContext,

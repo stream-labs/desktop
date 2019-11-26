@@ -13,5 +13,6 @@ export type ReleaseConfig = {
   upload: {
     githubToken: string;
     s3BucketName: string;
+    s3KeyPrefix: string;
   };
 };
