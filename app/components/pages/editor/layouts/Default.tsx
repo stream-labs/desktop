@@ -11,7 +11,7 @@ export default class extends TsxComponent<LayoutProps> {
     const { bar1, bar2 } = this.props.resizes;
     return (
       <div>
-        <slot name="1" />
+        <slot name="1" style={{ height: `calc(100% - ${bar1 + bar2}px)` }} />
         <ResizeBar
           position="top"
           vModel={bar1}
