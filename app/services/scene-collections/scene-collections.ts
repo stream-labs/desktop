@@ -139,7 +139,6 @@ export class SceneCollectionsService extends Service
     // this.load() を参考に
 
     this.startLoadingOperation();
-    await this.deloadCurrentApplicationState();
 
     const jsonData = this.stateService.readCollectionFile(ScenePresetId);
     // Preset file作成上の注意
