@@ -75,7 +75,6 @@ export async function waitForLoader(t: any) {
 
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
-  skipThemes?: boolean;
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
@@ -101,7 +100,6 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  skipThemes: false,
   restartAppAfterEachTest: true,
   noSync: true,
   networkLogging: false,
@@ -212,7 +210,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('p=Skip');
-        if (!options.skipThemes) {
+        if (await t.context.app.client.isVisible('p=Skip')) {
           await t.context.app.client.click('p=Skip');
         }
       } else {
