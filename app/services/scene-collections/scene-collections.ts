@@ -151,7 +151,6 @@ export class SceneCollectionsService extends Service
     await root.load();
     this.hotkeysService.bindHotkeys();
 
-    this.collectionLoaded = true;
     await this.save();
 
     this.finishLoadingOperation();
