@@ -30,35 +30,15 @@ export default class Studio extends Vue {
 
   $refs: { studioModeContainer: HTMLDivElement; placeholder: HTMLDivElement };
 
-  stacked = false;
-  verticalPlaceholder = false;
-  showDisplay = true;
-
-  sizeCheckInterval: number;
-
   maxHeight: number = null;
 
   mounted() {
     this.reconcileHeightsWithinContraints();
 
     window.addEventListener('resize', this.windowResizeHandler);
-
-    this.sizeCheckInterval = window.setInterval(() => {
-      if (this.studioMode && this.$refs.studioModeContainer) {
-        const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
-
-        this.stacked = clientWidth / clientHeight <= 16 / 9;
-      }
-      if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
-        const { clientWidth, clientHeight } = this.$refs.placeholder;
-        this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
-      }
-    }, 1000);
   }
 
   destroyed() {
-    clearInterval(this.sizeCheckInterval);
-
     window.removeEventListener('resize', this.windowResizeHandler);
   }
 
@@ -84,15 +64,6 @@ export default class Studio extends Vue {
 
     // Roughly 1 mixer item
     const reasonableMinimumControlsHeight = 150;
-
-    const spaceForDisplay =
-      containerHeight - (this.eventsHeight + this.controlsHeight + this.resizeBarNudgeFactor);
-
-    if (spaceForDisplay < 50) {
-      this.showDisplay = false;
-    } else {
-      this.showDisplay = true;
-    }
 
     // Something needs to be adjusted to fit
     if (this.controlsHeight + this.eventsHeight > this.maxHeight) {
@@ -123,20 +94,6 @@ export default class Studio extends Vue {
       this.controlsHeight = this.maxHeight / 2;
       this.eventsHeight = this.maxHeight / 2;
     }
-  }
-
-  get displayEnabled() {
-    return (
-      !this.windowsService.state.main.hideStyleBlockers && !this.performanceMode && this.showDisplay
-    );
-  }
-
-  get performanceMode() {
-    return this.customizationService.state.performanceMode;
-  }
-
-  get studioMode() {
-    return this.transitionsService.state.studioMode;
   }
 
   studioModeTransition() {
