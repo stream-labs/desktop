@@ -1,5 +1,7 @@
 // @ts-check
 
+const fs = require('fs');
+const path = require('path');
 const OctoKit = require('@octokit/rest');
 const sh = require('shelljs');
 const colors = require('colors/safe');
@@ -23,6 +25,7 @@ const {
   writePatchNoteFile,
   collectPullRequestMerges,
 } = require('./scripts/patchNote');
+const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 async function generateRoutine({ githubTokenForReadPullRequest }) {
   info(colors.magenta('|------------------------------|'));
@@ -30,7 +33,7 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
   info(colors.magenta('|------------------------------|'));
 
   info('checking current version ...');
-  const previousVersion = executeCmd('git describe --tags --abbrev=0').stdout.trim().replace(/^v/, '');
+  const previousVersion = pjson.version;
 
   const baseDir = executeCmd('git rev-parse --show-cdup', { silent: true }).stdout.trim();
   const patchNoteFileName = `${baseDir}patch-note.txt`;

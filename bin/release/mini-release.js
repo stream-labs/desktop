@@ -32,6 +32,7 @@ const {
   uploadToGithub,
   uploadToSentry
 } = require('./scripts/uploadArtifacts');
+const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 /**
  * This is the main function of the script
@@ -320,7 +321,7 @@ async function releaseRoutine() {
   }
 
   info('checking current version ...');
-  const previousVersion = executeCmd('git describe --tags --abbrev=0').stdout.trim().replace(/^v/, '');
+  const previousVersion = pjson.version;
   const previousVersionContext = getVersionContext(previousVersion);
 
   const newVersionContext = getVersionContext(nextVersion);
