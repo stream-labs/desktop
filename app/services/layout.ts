@@ -7,7 +7,7 @@ enum ELayout {
   Default = 'Default',
 }
 
-enum ELayoutElement {
+export enum ELayoutElement {
   Minifeed = 'Minifeed',
   LegacyEvents = 'LegacyEvents',
   Display = 'Display',
