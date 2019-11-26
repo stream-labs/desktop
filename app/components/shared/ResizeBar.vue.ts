@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 class ResizeBarProps {
   // the side of the external container to stick ResizeBar to
   position: 'left' | 'right' | 'top' = 'left';
-  value: number = 0;
+  value?: number = 0;
   min: number = -Infinity;
   max: number = Infinity;
   // by default ResizeBar increases the value when move to bottom/right
