@@ -1,6 +1,6 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as obs from '../../../obs-api';
 
 export interface ISource extends IResource {

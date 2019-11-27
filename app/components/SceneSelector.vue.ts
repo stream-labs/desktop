@@ -149,4 +149,8 @@ export default class SceneSelector extends Vue {
   get helpTipDismissable() {
     return EDismissable.SceneCollectionsHelpTip;
   }
+
+  get scenePresetHelpTipDismissable() {
+    return EDismissable.ScenePresetHelpTip;
+  }
 }

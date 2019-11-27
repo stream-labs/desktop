@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ISourceApi, TSourceType, ISource } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
 
@@ -7,12 +7,14 @@ import { ISelection, TNodesList } from 'services/selection';
  */
 export interface IScenesServiceApi {
   createScene(name: string, options?: ISceneCreateOptions): ISceneApi;
+
   makeSceneActive(id: string): boolean;
   removeScene(id: string): IScene;
   scenes: ISceneApi[];
   activeScene: ISceneApi;
   activeSceneId: string;
   getScene(id: string): ISceneApi;
+  getSceneByName(name: string): ISceneApi;
   getScenes(): ISceneApi[];
   getModel(): IScenesState;
   suggestName(name: string): string;

@@ -12,6 +12,8 @@ interface ISceneCollectionsManifest {
   collections: ISceneCollectionsManifestEntry[];
 }
 
+export const ScenePresetId = 'preset/basic';
+
 /**
  * This is a submodule of the scene collections service that handles
  * state/manifest mutations and persistence.
@@ -195,6 +197,9 @@ export class SceneCollectionsStateService extends StatefulService<
   }
 
   getCollectionFilePath(id: string) {
+    if (id === ScenePresetId) {
+      return path.join('scene-presets', 'basic.json');
+    }
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
 

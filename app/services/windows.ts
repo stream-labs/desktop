@@ -27,7 +27,7 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 
 const { ipcRenderer, remote } = electron;

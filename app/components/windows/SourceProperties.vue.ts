@@ -9,7 +9,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
-import { Subscription } from 'rxjs/subscription';
+import { Subscription } from 'rxjs';
 import electron from 'electron';
 
 @Component({

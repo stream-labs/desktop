@@ -1,9 +1,8 @@
 
 import * as obs from '../../../obs-api';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription, Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ISource } from '../sources/sources-api';
-import { Observable } from 'rxjs/Observable';
 
 export interface IAudioSourcesState {
   audioSources: Dictionary<IAudioSource>;

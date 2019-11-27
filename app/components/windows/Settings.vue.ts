@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';

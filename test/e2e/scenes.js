@@ -7,7 +7,8 @@ import {
   selectScene,
   openRenameWindow,
   openDuplicateWindow,
-  sceneIsExisting
+  sceneIsExisting,
+  DefaultSceneName
 } from '../helpers/spectron/scenes';
 import { getClient } from '../helpers/api-client';
 
@@ -25,7 +26,7 @@ async function checkDefaultSources(t) {
 test('The default scene', async t => {
   const app = t.context.app;
   await focusMain(t);
-  t.true(await sceneIsExisting(t, 'Scene'));
+  t.true(await sceneIsExisting(t, DefaultSceneName));
   await checkDefaultSources(t);
 });
 
@@ -63,7 +64,7 @@ test('Scene switching with sources', async t => {
   t.false(await sourceIsExisting(t, sourceName));
 
   // Switch back to the default scene
-  await selectScene(t, 'Scene');
+  await selectScene(t, DefaultSceneName);
   t.true(await sourceIsExisting(t, sourceName));
 });
 
@@ -91,7 +92,7 @@ test('Rename scene', async t => {
   const app = t.context.app;
   const newSceneName = 'Scene2';
 
-  await openRenameWindow(t, 'Scene');
+  await openRenameWindow(t, DefaultSceneName);
   await app.client.setValue('input', newSceneName);
   await app.client.click('[data-test="Done"]');
 

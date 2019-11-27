@@ -2,7 +2,7 @@
  * simple singleton service implementation
  * @see original code http://stackoverflow.com/a/26227662
  */
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 const singleton = Symbol();
 const singletonEnforcer = Symbol();

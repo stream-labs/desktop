@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
@@ -317,7 +317,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           this.UPDATE_SOURCE(size);
         }
         this.updateSourceFlags(source, update.outputFlags);
-      });      
+      });
     }
   }
 

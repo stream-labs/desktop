@@ -1,6 +1,5 @@
 import Vue from 'vue';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject, Subscription, Observable } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -16,7 +15,6 @@ import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
 } from './audio-api';
-import { Observable } from 'rxjs/Observable';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { omit } from 'lodash';

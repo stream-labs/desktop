@@ -3,8 +3,13 @@ import { mutation } from './stateful-service';
 import Vue from 'vue';
 
 export enum EDismissable {
-  SceneCollectionsHelpTip = 'scene_collections_help_tip'
+  SceneCollectionsHelpTip = 'scene_collections_help_tip',
+  ScenePresetHelpTip = 'scene_preset_help_tip'
 }
+
+const InitiallyDismissed = new Set<EDismissable>([
+   EDismissable.ScenePresetHelpTip,
+]);
 
 interface IDismissablesServiceState {
   [key: string]: boolean;
@@ -12,17 +17,24 @@ interface IDismissablesServiceState {
 
 
 /**
- * A dismissable is anything that can be dismissed and should
- * never show up again, like a help tip.
+ * A dismissable is anything that is shown by default, can be dismissed and
+ * show up again if needed, like a help tip.
  */
 export class DismissablesService extends PersistentStatefulService<IDismissablesServiceState> {
 
   shouldShow(key: EDismissable): boolean {
+    if (!(key in this.state)) {
+      return !InitiallyDismissed.has(key);
+    }
     return !this.state[key];
   }
 
   dismiss(key: EDismissable) {
     this.DISMISS(key);
+  }
+
+  reset(key: EDismissable) {
+    this.RESET(key);
   }
 
   dismissAll() {
@@ -32,6 +44,11 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   @mutation()
   DISMISS(key: EDismissable) {
     Vue.set(this.state, key, true);
+  }
+
+  @mutation()
+  RESET(key: EDismissable) {
+    Vue.set(this.state, key, false);
   }
 
 }

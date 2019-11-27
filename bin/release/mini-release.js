@@ -6,7 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 const OctoKit = require('@octokit/rest');
-const inq = require('inquirer');
 const sh = require('shelljs');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
@@ -30,8 +29,10 @@ const {
 const {
   uploadS3File,
   uploadToGithub,
-  uploadToSentry
+  uploadToSentry,
 } = require('./scripts/uploadArtifacts');
+
+const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 /**
  * This is the main function of the script
@@ -309,23 +310,23 @@ async function releaseRoutine() {
     throw new Error(`patchNote is not found in ${patchNoteFileName}.`);
   }
 
-  const versionTag = `v${patchNote.version}`;
-  info(`patch-note.txt for ${versionTag} found`);
+  const nextVersion = patchNote.version;
+  info(`patch-note.txt for ${nextVersion} found`);
 
-  if (getTagCommitId(versionTag)) {
-    error(`Tag "${versionTag}" has already been released.`);
+  if (getTagCommitId(`v${nextVersion}`)) {
+    error(`Tag "v${nextVersion}" has already been released.`);
     info('Generate new patchNote with new version.');
     info('If you want to retry current release, remove the tag and related release commit.');
-    throw new Error(`Tag "${versionTag}" has already been released.`);
+    throw new Error(`Tag "${nextVersion}" has already been released.`);
   }
 
-  info('checking current tag ...');
-  const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
-  const previousVersionContext = getVersionContext(previousTag);
+  info('checking current version ...');
+  const previousVersion = pjson.version;
+  const previousVersionContext = getVersionContext(previousVersion);
 
-  const newVersionContext = getVersionContext(versionTag);
+  const newVersionContext = getVersionContext(nextVersion);
   if (!isSameVersionContext(previousVersionContext, newVersionContext)) {
-    const msg = `previous version ${previousTag} and releasing version ${versionTag} have different context.`;
+    const msg = `previous version ${previousVersion} and releasing version ${nextVersion} have different context.`;
     if (process.env.NAIR_IGNORE_VERSION_CONTEXT_CHECK) {
       await confirm(`${msg} Are you sure?`, false);
     } else {

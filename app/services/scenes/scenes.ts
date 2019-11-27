@@ -14,7 +14,7 @@ import {
 } from './index';
 import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { Inject } from 'util/injector';
 import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
@@ -170,6 +170,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return !this.state.scenes[id] ? null : new Scene(id);
   }
 
+  getSceneByName(name: string) {
+    const foundId = Object.keys(this.state.scenes).find(id => this.state.scenes[id].name === name);
+    return foundId ? this.getScene(foundId) : null;
+  }
 
   getSceneItem(sceneItemId: string) {
     for (const scene of this.scenes) {

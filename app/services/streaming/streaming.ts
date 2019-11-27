@@ -4,7 +4,7 @@ import { Inject } from 'util/injector';
 import moment from 'moment';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import * as electron from 'electron';
 import {
   IStreamingServiceApi,

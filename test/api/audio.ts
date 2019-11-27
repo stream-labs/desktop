@@ -12,7 +12,7 @@ test('The default sources exists', async t => {
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
   const audioSources = audioService.getSourcesForCurrentScene();
 
-  t.is(audioSources.length, 2);
+  t.deepEqual(audioSources.map(i => i.getModel().name), ['デスクトップ音声', 'マイク', 'Webカメラ']);
 
 });
 
@@ -26,7 +26,7 @@ test('The sources with audio have to be appeared in AudioService', async t => {
   scene.createAndAddSource('MyAudio', 'wasapi_output_capture');
   const audioSources = audioService.getSourcesForCurrentScene();
 
-  t.is(audioSources.length, 3);
+  t.deepEqual(audioSources.map(i => i.getModel().name), ['デスクトップ音声', 'マイク', 'MyAudio', 'Webカメラ']);
 });
 
 

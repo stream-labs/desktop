@@ -16,9 +16,7 @@ import {
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { mergeStatic } from 'rxjs/operator/merge';
+import { Subject, Observable, merge } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import {
   cpu as systemInfoCpu,
@@ -71,7 +69,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IPlatformAuth>();
   userLogout = new Subject<void>();
-  userLoginState: Observable<IPlatformAuth | void> = mergeStatic(this.userLogin, this.userLogout);
+  userLoginState: Observable<IPlatformAuth | void> = merge(this.userLogin, this.userLogout);
 
   init() {
     super.init();

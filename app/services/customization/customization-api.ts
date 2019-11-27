@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ICustomizationServiceState {

@@ -12,7 +12,7 @@ import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 export enum ETransitionType {
   Cut = 'cut_transition',

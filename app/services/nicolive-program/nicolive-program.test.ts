@@ -1,6 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
-import { Subject } from 'rxjs';
-import { BehaviorSubject } from '../../../node_modules/rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
+
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 type PanelState = import('./nicolive-program').PanelState;
 
