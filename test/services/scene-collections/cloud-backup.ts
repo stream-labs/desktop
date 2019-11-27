@@ -7,7 +7,7 @@ useSpectron({ noSync: false });
 
 
 test('Scene-collections cloud-backup', async t => {
-  // log-in and save credentials
+  // log-in and save the credentials
   const authInfo = await logIn(t);
 
   // build the scene
@@ -19,12 +19,12 @@ test('Scene-collections cloud-backup', async t => {
   `;
   sceneBuilder.build(sketch);
 
-  // restart app and delete the cache dir
+  // restart the app and delete the cache dir
   await stopApp(true);
   await startApp(t);
 
   // since we deleted the cache dir we need to login again
-  // use saved credential to login into the same account
+  // use saved credentials to login into the same account
   await loginWithAuthInfo(t, authInfo);
 
   // check the scene-collection is downloaded
