@@ -563,11 +563,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     // YT auth doesn't work with current Electron's user agent, so override it
-    const userAgent =
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36';
+    const browserOptions =
+      platform === 'youtube'
+        ? {
+            userAgent:
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36',
+          }
+        : {};
 
     authWindow.removeMenu();
-    authWindow.loadURL(authUrl, { userAgent });
+    authWindow.loadURL(authUrl, browserOptions);
   }
 
   updatePlatformToken(platform: TPlatform, token: string) {
