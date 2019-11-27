@@ -139,7 +139,6 @@ export class SceneCollectionsService extends Service
     // this.load() を参考に
 
     this.startLoadingOperation();
-    await this.deloadCurrentApplicationState();
 
     const jsonData = this.stateService.readCollectionFile(ScenePresetId);
     // Preset file作成上の注意
@@ -152,7 +151,6 @@ export class SceneCollectionsService extends Service
     await root.load();
     this.hotkeysService.bindHotkeys();
 
-    this.collectionLoaded = true;
     await this.save();
 
     this.finishLoadingOperation();
@@ -178,6 +176,7 @@ export class SceneCollectionsService extends Service
   async deinitialize() {
     this.disableAutoSave();
     await this.save();
+    this.tcpServerService.stopRequestsHandling();
     await this.deloadCurrentApplicationState();
     await this.stateService.flushManifestFile();
   }
@@ -317,7 +316,7 @@ export class SceneCollectionsService extends Service
     name: string,
     progressCallback?: (info: IDownloadProgress) => void
   ) {
-    this.startLoadingOperation();
+    this.startLoadingOperation(); // memo: calling this in loadOverlay() too
 
     const pathName = await this.overlaysPersistenceService.downloadOverlay(
       url,
@@ -520,8 +519,6 @@ export class SceneCollectionsService extends Service
   private async deloadCurrentApplicationState() {
     if (!this.initialized) return;
 
-    this.tcpServerService.stopRequestsHandling();
-
     this.collectionWillSwitch.next();
 
     this.disableAutoSave();
@@ -554,6 +551,7 @@ export class SceneCollectionsService extends Service
    */
   private startLoadingOperation() {
     this.appService.startLoading();
+    this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
   }
 
