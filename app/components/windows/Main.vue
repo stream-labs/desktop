@@ -15,8 +15,8 @@
         v-if="!isDockCollapsed"
         class="live-dock-resize-bar live-dock-resize-bar--left"
         position="right"
-        @onresizestart="onResizeStartHandler"
-        @onresizestop="onResizeStopHandler"
+        @resizestart="onResizeStartHandler"
+        @resizestop="onResizeStopHandler"
       />
     </div>
 
@@ -35,8 +35,8 @@
         v-if="!isDockCollapsed"
         class="live-dock-resize-bar"
         position="left"
-        @onresizestart="onResizeStartHandler"
-        @onresizestop="onResizeStopHandler"
+        @resizestart="onResizeStartHandler"
+        @resizestop="onResizeStopHandler"
       />
       <live-dock class="live-dock" />
     </div>

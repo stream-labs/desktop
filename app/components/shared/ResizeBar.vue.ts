@@ -11,8 +11,8 @@ class ResizeBarProps {
   // and decreases when move to left/top
   // change this option to reverse this behavior
   reverse: boolean = false;
-  onResizeStart: () => void = null;
-  onResizeStop: () => void = null;
+  onResizestart: () => void = null;
+  onResizestop: () => void = null;
 }
 
 /**
@@ -56,7 +56,7 @@ export default class ResizeBar extends TsxComponent<ResizeBarProps> {
     );
 
     this.mouseInitial = this.isHorizontal ? event.pageX : event.pageY;
-    this.$emit('onresizestart', event);
+    this.$emit('resizestart', event);
   }
 
   stopMouseTracking(event: MouseEvent) {
@@ -66,7 +66,7 @@ export default class ResizeBar extends TsxComponent<ResizeBarProps> {
     this.barOffset = 0;
     this.mouseInitial = 0;
     this.updateTransform();
-    this.$emit('onresizestop', offset, event);
+    this.$emit('resizestop', offset, event);
     this.$emit('input', offset + this.props.value, event);
   }
 

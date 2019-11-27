@@ -47,6 +47,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     super.init();
   }
 
+  setBarResize(bar: 'bar1' | 'bar2', size: number) {
+    this.SET_RESIZE(bar, size);
+  }
+
   unslottedElements() {
     return Object.keys(ELayoutElement).filter(
       el => !this.state.slottedWidgets[el],
@@ -63,5 +67,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   @mutation()
   SLOT_ELEMENT(element: ELayoutElement, slot: '1' | '2' | '3' | '4' | '5' | '6') {
     this.state.slottedWidgets[element] = slot;
+  }
+
+  @mutation()
+  SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
+    this.state.resizes[bar] = size;
   }
 }
