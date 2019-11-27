@@ -1,7 +1,13 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import { LayoutProps } from './index';
+import styles from './Layouts.m.less';
+
+export class LayoutProps {
+  resizeStartHandler: () => void = () => {};
+  resizeStopHandler: () => void = () => {};
+  resizes: { bar1: number; bar2: number } = null;
+}
 
 @Component({ props: createProps(LayoutProps) })
 export default class extends TsxComponent<LayoutProps> {
@@ -10,8 +16,8 @@ export default class extends TsxComponent<LayoutProps> {
   render() {
     const { bar1, bar2 } = this.props.resizes;
     return (
-      <div>
-        <slot name="1" style={{ height: `calc(100% - ${bar1 + bar2}px)` }} />
+      <div class={styles.rows}>
+        <div style={{ height: `calc(100% - ${bar1 + bar2}px)` }}>{this.$slots['1']}</div>
         <ResizeBar
           position="top"
           vModel={bar1}
@@ -21,7 +27,7 @@ export default class extends TsxComponent<LayoutProps> {
           min={32}
           reverse={true}
         />
-        <slot name="2" style={{ height: `${bar1}px` }} />
+        <div style={{ height: `${bar1}px` }}>{this.$slots['2']}</div>
         <ResizeBar
           position="top"
           vModel={bar2}
@@ -31,10 +37,10 @@ export default class extends TsxComponent<LayoutProps> {
           min={50}
           reverse={true}
         />
-        <div style={{ height: `${bar2}px` }}>
-          <slot name="3" />
-          <slot name="4" />
-          <slot name="5" />
+        <div style={{ height: `${bar2}px`, display: 'flex' }}>
+          {this.$slots['3']}
+          {this.$slots['4']}
+          {this.$slots['5']}
         </div>
       </div>
     );

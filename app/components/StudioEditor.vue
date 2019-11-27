@@ -1,5 +1,5 @@
 <template>
-<div ref="studioModeContainer">
+<div class="main-container" ref="studioModeContainer">
   <div v-if="displayEnabled" class="studio-mode-container" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
@@ -45,6 +45,10 @@
 
 <style lang="less" scoped>
 @import "../styles/index";
+
+.main-container {
+  height: 100%;
+}
 
 .studio-editor-display-container {
   position: relative;

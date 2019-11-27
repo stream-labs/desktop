@@ -23,7 +23,7 @@ const LAYOUT_MAP = {
 };
 
 @Component({})
-export default class Studio extends Vue {
+export default class Editor extends Vue {
   @Inject() private layoutService: LayoutService;
   @Inject() private windowsService: WindowsService;
 

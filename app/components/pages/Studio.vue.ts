@@ -11,9 +11,11 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import { WindowsService } from 'services/windows';
 import RecentEvents from 'components/RecentEvents';
 import { UserService } from 'services/user';
+import Editor from 'components/pages/editor/Editor';
 
 @Component({
   components: {
+    Editor,
     StudioEditor,
     StudioControls,
     Display,

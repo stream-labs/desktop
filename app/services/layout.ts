@@ -1,9 +1,7 @@
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
-import { Inject } from 'services/core';
-import { UserService } from 'services/user';
 
-enum ELayout {
+export enum ELayout {
   Default = 'Default',
 }
 
@@ -30,8 +28,6 @@ const RESIZE_DEFAULTS = {
 };
 
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
-  @Inject() userService: UserService;
-
   static defaultState: ILayoutServiceState = {
     currentLayout: ELayout.Default,
     slottedWidgets: {
