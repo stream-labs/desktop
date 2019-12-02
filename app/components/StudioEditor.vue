@@ -87,13 +87,11 @@
 .studio-mode-display-container {
   flex-grow: 1;
   position: relative;
-  // height: 100%;
 }
 
 .studio-mode-display {
   position: absolute;
   width: 100%;
-  // height: 100%;
 }
 
 .placeholder {

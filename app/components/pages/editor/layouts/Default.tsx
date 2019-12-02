@@ -6,10 +6,10 @@ import styles from './Layouts.m.less';
 export class LayoutProps {
   resizeStartHandler: () => void = () => {};
   resizeStopHandler: () => void = () => {};
-  reconcileHeightsWithinContraints: (mins: IResizeMins, isBar2Resize?: boolean) => void = () => {};
+  reconcileSizeWithinContraints: (mins: IResizeMins, isBar2Resize?: boolean) => void = () => {};
   setBarResize: (bar: 'bar1' | 'bar2', size: number) => void = () => {};
   resizes: { bar1: number; bar2: number } = null;
-  maxHeight: number = null;
+  max: number = null;
 }
 
 export interface IResizeMins {
@@ -25,7 +25,7 @@ const RESIZE_MINS = {
 @Component({ props: createProps(LayoutProps) })
 export default class extends TsxComponent<LayoutProps> {
   mounted() {
-    this.props.reconcileHeightsWithinContraints(RESIZE_MINS);
+    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
     window.addEventListener('resize', this.windowResizeHandler);
   }
   destroyed() {
@@ -33,7 +33,7 @@ export default class extends TsxComponent<LayoutProps> {
   }
 
   windowResizeHandler() {
-    this.props.reconcileHeightsWithinContraints(RESIZE_MINS);
+    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
   }
 
   get bar1() {
@@ -42,7 +42,7 @@ export default class extends TsxComponent<LayoutProps> {
   set bar1(size: number) {
     if (size === 0) return;
     this.props.setBarResize('bar1', size);
-    this.props.reconcileHeightsWithinContraints(RESIZE_MINS);
+    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
   }
 
   get bar2() {
@@ -50,7 +50,7 @@ export default class extends TsxComponent<LayoutProps> {
   }
   set bar2(size: number) {
     this.props.setBarResize('bar2', size);
-    this.props.reconcileHeightsWithinContraints(RESIZE_MINS, true);
+    this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
   render() {
@@ -62,7 +62,7 @@ export default class extends TsxComponent<LayoutProps> {
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.maxHeight - this.bar2}
+          max={this.props.max - this.bar2}
           min={32}
           reverse={true}
         />
@@ -72,7 +72,7 @@ export default class extends TsxComponent<LayoutProps> {
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.maxHeight}
+          max={this.props.max}
           min={50}
           reverse={true}
         />
