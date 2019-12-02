@@ -86,6 +86,7 @@ export default class Editor extends Vue {
         setBarResize={this.setBarResize.bind(this)}
         max={this.max}
         resizes={this.resizes}
+        class="editor-page"
       >
         {Object.keys(this.layoutService.state.slottedWidgets).map(widget => {
           const Element = COMPONENT_MAP[widget];
