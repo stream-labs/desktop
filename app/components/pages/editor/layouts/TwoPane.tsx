@@ -41,6 +41,18 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
+  get midsection() {
+    return (
+      <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>
+        <div style={{ height: '100%' }}>{this.$slots['1']}</div>
+        <div class={styles.segmented}>
+          <div class={styles.cell}>{this.$slots['3']}</div>
+          <div class={styles.cell}>{this.$slots['4']}</div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
@@ -56,13 +68,7 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           min={32}
           reverse={true}
         />
-        <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>
-          <div style={{ height: '100%' }}>{this.$slots['1']}</div>
-          <div class={styles.segmented}>
-            <div class={styles.cell}>{this.$slots['3']}</div>
-            <div class={styles.cell}>{this.$slots['4']}</div>
-          </div>
-        </div>
+        {this.midsection}
         <ResizeBar
           position="left"
           vModel={this.bar2}
