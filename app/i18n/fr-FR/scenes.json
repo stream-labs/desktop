@@ -37,6 +37,6 @@
   "Name Scene": "Nommer la scène",
   "Rename Folder": "Renommer le dossier",
   "Name Folder": "Nommer le dossier",
-  "Switch Scenes": "Switch Scenes",
-  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
+  "Switch Scenes": "Changer les scènes",
+  "Failed to load scene collection.  A new one will be created instead.": "Échec du chargement de la scène. Une nouvelle scène sera créée."
 }
