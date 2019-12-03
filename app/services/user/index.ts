@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import URI from 'urijs';
 import defer from 'lodash/defer';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
@@ -7,7 +6,7 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service } from 'services/core';
 import electron from 'electron';
-import { HostsService } from './hosts';
+import { HostsService } from 'services/hosts';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { PlatformAppsService } from 'services/platform-apps';
 import {
@@ -17,7 +16,7 @@ import {
   IPlatformService,
   EPlatformCallResult,
   IPlatformAuth,
-} from './platforms';
+} from 'services/platforms';
 import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
@@ -27,12 +26,13 @@ import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
-import { OnboardingService } from './onboarding';
-import { NavigationService } from './navigation';
-import { SettingsService } from './settings';
-import * as obs from '../../obs-api';
-import { StreamSettingsService } from './settings/streaming';
-import { TwitchService } from './platforms/twitch';
+import { OnboardingService } from 'services/onboarding';
+import { NavigationService } from 'services/navigation';
+import { SettingsService } from 'services/settings';
+import * as obs from '../../../obs-api';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { lazyModule } from 'util/lazy-module';
+import { AuthModule } from './auth-module';
 
 interface ISecondaryPlatformAuth {
   username: string;
@@ -164,6 +164,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Used by child and 1-off windows to update their sentry contexts
    */
   sentryContext = new Subject<ISentryContext>();
+
+  @lazyModule(AuthModule) private authModule: AuthModule;
 
   init() {
     super.init();
@@ -505,15 +507,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
-  startAuth(
+  async startAuth(
     platform: TPlatform,
     onWindowShow: () => void,
-    onAuthStart: () => void,
-    onAuthFinish: (result: EPlatformCallResult) => void,
+    onLoginStart: () => void,
+    onLoginFinish: (result: EPlatformCallResult) => void,
+    mode: 'internal' | 'external',
     merge = false,
   ) {
     const service = getPlatformService(platform);
-    const partition = `persist:${uuid()}`;
     const authUrl =
       merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
 
@@ -521,49 +523,31 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
-    const authWindow = new electron.remote.BrowserWindow({
-      ...service.authWindowOptions,
-      alwaysOnTop: false,
-      show: false,
-      webPreferences: {
-        partition,
-        nodeIntegration: false,
-        nativeWindowOpen: true,
-        sandbox: true,
-      },
-    });
+    const auth =
+      mode === 'internal'
+        ? await this.authModule.startInternalAuth(
+            authUrl,
+            service.authWindowOptions,
+            onWindowShow,
+            merge,
+          )
+        : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
 
-    authWindow.webContents.on('did-navigate', async (e, url) => {
-      const parsed = this.parseAuthFromUrl(url, merge);
+    onLoginStart();
 
-      if (parsed) {
-        parsed.partition = partition;
-        authWindow.close();
-        onAuthStart();
+    let result: EPlatformCallResult;
 
-        let result: EPlatformCallResult;
+    if (!merge) {
+      // Ensure we are starting with fresh stream settings
+      this.streamSettingsService.resetStreamSettings();
 
-        if (!merge) {
-          // Ensure we are starting with fresh stream settings
-          this.streamSettingsService.resetStreamSettings();
+      result = await this.login(service, auth);
+    } else {
+      this.UPDATE_PLATFORM(auth.platforms[auth.primaryPlatform]);
+      result = EPlatformCallResult.Success;
+    }
 
-          result = await this.login(service, parsed);
-        } else {
-          this.UPDATE_PLATFORM(parsed.platforms[parsed.primaryPlatform]);
-          result = EPlatformCallResult.Success;
-        }
-
-        defer(() => onAuthFinish(result));
-      }
-    });
-
-    authWindow.once('ready-to-show', () => {
-      authWindow.show();
-      defer(onWindowShow);
-    });
-
-    authWindow.removeMenu();
-    authWindow.loadURL(authUrl);
+    defer(() => onLoginFinish(result));
   }
 
   updatePlatformToken(platform: TPlatform, token: string) {
@@ -572,32 +556,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   updatePlatformChannelId(platform: TPlatform, id: string) {
     this.SET_CHANNEL_ID(platform, id);
-  }
-
-  /**
-   * Parses tokens out of the auth URL
-   */
-  private parseAuthFromUrl(url: string, merge: boolean): IUserAuth {
-    const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
-    const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
-
-    if (!merge) requiredFields.push('token', 'oauth_token');
-
-    if (requiredFields.every(field => !!query[field])) {
-      return {
-        widgetToken: merge ? this.widgetToken : query.token,
-        apiToken: merge ? this.apiToken : query.oauth_token,
-        primaryPlatform: query.platform as TPlatform,
-        platforms: {
-          [query.platform]: {
-            type: query.platform,
-            username: query.platform_username,
-            token: query.platform_token,
-            id: query.platform_id,
-          },
-        },
-      };
-    }
   }
 
   /**
