@@ -71,7 +71,10 @@ export class AuthModule {
         const parsed = this.parseAuthFromUrl(request.url, merge);
 
         if (parsed) {
-          response.writeHead(302, { Location: 'https://streamlabs.com/dashboard' });
+          response.writeHead(302, {
+            Location:
+              'https://streamlabs.com/msg?msg=You%27re%20all%20set%21%20You%20may%20close%20this%20window%20now',
+          });
           response.end();
 
           this.authServer.close();
