@@ -68,16 +68,11 @@ export class AuthModule {
       }
 
       this.authServer = http.createServer((request, response) => {
-        console.log('GOT REQUEST', request.url);
-
         const parsed = this.parseAuthFromUrl(request.url, merge);
 
-        response.writeHead(200);
-        response.write('Success');
-        response.end();
-
         if (parsed) {
-          console.log('PARSED', parsed);
+          response.writeHead(302, { Location: 'https://streamlabs.com/dashboard' });
+          response.end();
 
           this.authServer.close();
           this.authServer.unref();
@@ -92,18 +87,19 @@ export class AuthModule {
           win.setAlwaysOnTop(false);
 
           resolve(parsed);
+        } else {
+          // All other requests we respond with a generic 200
+          response.writeHead(200);
+          response.write('Success');
+          response.end();
         }
       });
 
       this.authServer.on('listening', () => {
-        console.log('listening');
         const address = this.authServer.address();
 
         if (address && typeof address !== 'string') {
-          console.log('PORT', address.port);
           const url = `${authUrl}&port=${address.port}`;
-
-          console.log('OPENING URL', url);
 
           electron.shell.openExternal(url);
           onWindowShow();
