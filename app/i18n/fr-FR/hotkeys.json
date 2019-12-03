@@ -17,9 +17,9 @@
   "Transition (Studio Mode)": "Transition (mode Studio)",
   "Capture Foreground Window": "Capturer la fenêtre au premier plan",
   "Deactivate Capture": "Désactiver la capture",
-  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
-  "Play/Pause": "Play/Pause",
-  "Restart": "Restart",
-  "Next Slide": "Next Slide",
-  "Previous Slide": "Previous Slide"
+  "Toggle overlay positioning mode": "Activer le mode de positionnement de superposition",
+  "Play/Pause": "Lecture/Pause",
+  "Restart": "Redémarrer",
+  "Next Slide": "Diapositive suivante",
+  "Previous Slide": "Diapositive précédente"
 }
