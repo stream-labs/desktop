@@ -1,13 +1,13 @@
 {
-  "Sponsor Banner": "Sponsor Banner",
+  "Sponsor Banner": "Bannière du sponsor",
   "Ad Layout": "Mise en page de la publicité",
   "Placement": "Emplacement",
   "Image Layout": "Disposition de l'image",
   "Image Duration": "Durée de l'image",
   "Seconds": "Secondes",
   "Add Image": "Ajouter l'image",
-  "Widget Hide Duration": "Durée d'apparition du module",
-  "Widget Show Duration": "Durée d'apparition du module",
+  "Widget Hide Duration": "Durée de masquage du widget",
+  "Widget Show Duration": "Durée d'affichage du widget",
   "Banner Width": "Largeur de la bannière",
   "Banner Height": "Hauteur de la bannière",
   "Image Animation": "Animation de l'image",
@@ -21,5 +21,5 @@
   "Visual Settings": "Paramètres visuels",
   "Image Set ": "Jeu d'images ",
   "No Image": "Aucune image",
-  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Configurez une bannière de sponsor pour pouvoir éditer (ajouter, supprimer, mettre à jour) des logos de sponsor rotatifs sur la chaîne du streamer."
 }
